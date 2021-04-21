@@ -4,5 +4,9 @@
   "description": "Contracts and tools for UNS",
   "main": "index.js",
   "repository": "https://github.com/unstoppabledomains/uns.git",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@chainlink/contracts": "0.0.10",
+    "@openzeppelin/contracts": "2.3.0"
+  }
 }
