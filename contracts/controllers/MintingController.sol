@@ -1,18 +1,19 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/access/roles/MinterRole.sol";
+pragma solidity ^0.8.0;
+
 import "./IMintingController.sol";
 import "../Registry.sol";
+import "../roles/MinterRole.sol";
 
 /**
  * @title MintingController
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
 contract MintingController is IMintingController, MinterRole {
-
     Registry internal _registry;
 
-    constructor (Registry registry) public {
+    constructor(Registry registry) {
         _registry = registry;
     }
 
@@ -20,15 +21,15 @@ contract MintingController is IMintingController, MinterRole {
         return address(_registry);
     }
 
-    function mintSLD(address to, string memory label) public onlyMinter {
+    function mintSLD(address to, string memory label) public override onlyMinter {
         _registry.controlledMintChild(to, _registry.root(), label);
     }
 
-    function safeMintSLD(address to, string calldata label) external {
+    function safeMintSLD(address to, string calldata label) external override {
         safeMintSLD(to, label, "");
     }
 
-    function safeMintSLD(address to, string memory label, bytes memory _data) public onlyMinter {
+    function safeMintSLD(address to, string memory label, bytes memory _data) public override onlyMinter {
         _registry.controlledSafeMintChild(to, _registry.root(), label, _data);
     }
 
@@ -46,5 +47,4 @@ contract MintingController is IMintingController, MinterRole {
         safeMintSLD(to, label, _data);
         _registry.controlledResolveTo(resolver, _registry.childIdOf(_registry.root(), label));
     }
-
 }

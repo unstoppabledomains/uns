@@ -1,17 +1,21 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
+import "@openzeppelin/contracts/utils/Address.sol";
 
 import "./IRegistry.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721Burnable.sol";
-import "./util/ControllerRole.sol";
-
-// solium-disable no-empty-blocks,error-reason
+import "./roles/ControllerRole.sol";
 
 /**
  * @title Registry
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, ControllerRole, ERC721Burnable {
+contract Registry is IRegistry, ControllerRole, ERC721Burnable, ERC165Storage {
+    using Address for address;
 
     // Optional mapping for token URIs
     mapping(uint256 => string) internal _tokenURIs;
@@ -26,11 +30,11 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable {
         0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
-        require(_isApprovedOrOwner(msg.sender, tokenId));
+        require(_isApprovedOrOwner(_msgSender(), tokenId));
         _;
     }
 
-    constructor () public {
+    constructor() ERC721(".crypto", "UD") {
         _mint(address(0xdead), _CRYPTO_HASH);
         // register the supported interfaces to conform to ERC721 via ERC165
         _registerInterface(0x5b5e139f); // ERC721 Metadata Interface
@@ -40,27 +44,19 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable {
 
     /// ERC721 Metadata extension
 
-    function name() external view returns (string memory) {
-        return ".crypto";
-    }
-
-    function symbol() external view returns (string memory) {
-        return "UD";
-    }
-
-    function tokenURI(uint256 tokenId) external view returns (string memory) {
+    function tokenURI(uint256 tokenId) public view virtual override(ERC721, IERC721Metadata) returns (string memory) {
         require(_exists(tokenId));
         return string(abi.encodePacked(_prefix, _tokenURIs[tokenId]));
     }
 
-    function controlledSetTokenURIPrefix(string calldata prefix) external onlyController {
+    function controlledSetTokenURIPrefix(string calldata prefix) external override onlyController {
         _prefix = prefix;
         emit NewURIPrefix(prefix);
     }
 
     /// Ownership
 
-    function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool) {
+    function isApprovedOrOwner(address spender, uint256 tokenId) external view override returns (bool) {
         return _isApprovedOrOwner(spender, tokenId);
     }
 
@@ -70,17 +66,17 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable {
         return _CRYPTO_HASH;
     }
 
-    function childIdOf(uint256 tokenId, string calldata label) external pure returns (uint256) {
+    function childIdOf(uint256 tokenId, string calldata label) external pure override returns (uint256) {
         return _childId(tokenId, label);
     }
 
     /// Minting
 
-    function mintChild(address to, uint256 tokenId, string calldata label) external onlyApprovedOrOwner(tokenId) {
+    function mintChild(address to, uint256 tokenId, string calldata label) external override onlyApprovedOrOwner(tokenId) {
         _mintChild(to, tokenId, label);
     }
 
-    function controlledMintChild(address to, uint256 tokenId, string calldata label) external onlyController {
+    function controlledMintChild(address to, uint256 tokenId, string calldata label) external override onlyController {
         _mintChild(to, tokenId, label);
     }
 
@@ -104,19 +100,19 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable {
 
     /// Transfering
 
-    function setOwner(address to, uint256 tokenId) external onlyApprovedOrOwner(tokenId)  {
-        super._transferFrom(ownerOf(tokenId), to, tokenId);
+    function setOwner(address to, uint256 tokenId) external override onlyApprovedOrOwner(tokenId)  {
+        super._transfer(ownerOf(tokenId), to, tokenId);
     }
 
     function transferFromChild(address from, address to, uint256 tokenId, string calldata label)
-        external
+        external override
         onlyApprovedOrOwner(tokenId)
     {
-        _transferFrom(from, to, _childId(tokenId, label));
+        _transfer(from, to, _childId(tokenId, label));
     }
 
-    function controlledTransferFrom(address from, address to, uint256 tokenId) external onlyController {
-        _transferFrom(from, to, tokenId);
+    function controlledTransferFrom(address from, address to, uint256 tokenId) external override onlyController {
+        _transfer(from, to, tokenId);
     }
 
     function safeTransferFromChild(
@@ -125,53 +121,60 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable {
         uint256 tokenId,
         string memory label,
         bytes memory _data
-    ) public onlyApprovedOrOwner(tokenId) {
+    ) public override onlyApprovedOrOwner(tokenId) {
         uint256 childId = _childId(tokenId, label);
-        _transferFrom(from, to, childId);
-        require(_checkOnERC721Received(from, to, childId, _data));
+        _transfer(from, to, childId);
+        require(_checkERC721Received(from, to, childId, _data));
     }
 
-    function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external {
+    function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external override {
         safeTransferFromChild(from, to, tokenId, label, "");
     }
 
     function controlledSafeTransferFrom(address from, address to, uint256 tokenId, bytes calldata _data)
-        external
+        external override
         onlyController
     {
-        _transferFrom(from, to, tokenId);
-        require(_checkOnERC721Received(from, to, tokenId, _data));
+        _transfer(from, to, tokenId);
+        require(_checkERC721Received(from, to, tokenId, _data));
     }
 
     /// Burning
 
-    function burnChild(uint256 tokenId, string calldata label) external onlyApprovedOrOwner(tokenId) {
+    function burnChild(uint256 tokenId, string calldata label) external override onlyApprovedOrOwner(tokenId) {
         _burn(_childId(tokenId, label));
     }
 
-    function controlledBurn(uint256 tokenId) external onlyController {
+    function controlledBurn(uint256 tokenId) external override onlyController {
         _burn(tokenId);
     }
 
     /// Resolution
 
-    function resolverOf(uint256 tokenId) external view returns (address) {
+    function resolverOf(uint256 tokenId) external view override returns (address) {
         address resolver = _tokenResolvers[tokenId];
         require(resolver != address(0));
         return resolver;
     }
 
-    function resolveTo(address to, uint256 tokenId) external onlyApprovedOrOwner(tokenId) {
+    function resolveTo(address to, uint256 tokenId) external override onlyApprovedOrOwner(tokenId) {
         _resolveTo(to, tokenId);
     }
 
-    function controlledResolveTo(address to, uint256 tokenId) external onlyController {
+    function controlledResolveTo(address to, uint256 tokenId) external override onlyController {
         _resolveTo(to, tokenId);
     }
 
     function sync(uint256 tokenId, uint256 updateId) external {
-        require(_tokenResolvers[tokenId] == msg.sender);
-        emit Sync(msg.sender, updateId, tokenId);
+        require(_tokenResolvers[tokenId] == _msgSender());
+        emit Sync(_msgSender(), updateId, tokenId);
+    }
+
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId) public view virtual override(AccessControl, ERC721, IERC165, ERC165Storage) returns (bool) {
+        return super.supportsInterface(interfaceId);
     }
 
     /// Internal
@@ -196,18 +199,18 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable {
 
     function _safeMintChild(address to, uint256 tokenId, string memory label, bytes memory _data) internal {
         _mintChild(to, tokenId, label);
-        require(_checkOnERC721Received(address(0), to, _childId(tokenId, label), _data));
+        require(_checkERC721Received(address(0), to, _childId(tokenId, label), _data));
     }
 
-    function _transferFrom(address from, address to, uint256 tokenId) internal {
-        super._transferFrom(from, to, tokenId);
+    function _transfer(address from, address to, uint256 tokenId) internal override {
+        super._transfer(from, to, tokenId);
         // Clear resolver (if any)
         if (_tokenResolvers[tokenId] != address(0x0)) {
             delete _tokenResolvers[tokenId];
         }
     }
 
-    function _burn(uint256 tokenId) internal {
+    function _burn(uint256 tokenId) internal override {
         super._burn(tokenId);
         // Clear resolver (if any)
         if (_tokenResolvers[tokenId] != address(0x0)) {
@@ -225,4 +228,24 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable {
         _tokenResolvers[tokenId] = to;
     }
 
+    function _checkERC721Received(address from, address to, uint256 tokenId, bytes memory _data)
+        private returns (bool)
+    {
+        if (to.isContract()) {
+            try IERC721Receiver(to).onERC721Received(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
+                return retval == IERC721Receiver(to).onERC721Received.selector;
+            } catch (bytes memory reason) {
+                if (reason.length == 0) {
+                    revert("ERC721: transfer to non ERC721Receiver implementer");
+                } else {
+                    // solhint-disable-next-line no-inline-assembly
+                    assembly {
+                        revert(add(32, reason), mload(reason))
+                    }
+                }
+            }
+        } else {
+            return true;
+        }
+    }
 }

@@ -1,9 +1,19 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 import "../util/ERC677Receiver.sol";
+import "../roles/MinterRole.sol";
 
-contract LinkTokenMock is ERC20Mintable {
+contract LinkTokenMock is ERC20, MinterRole {
+    constructor() ERC20('LinkTokenMock', 'LTM') { }
+
+    function mint(address to, uint256 amount) public onlyMinter {
+        _mint(to, amount);
+    }
+
     /**
     * @dev transfer token to a contract address with additional data if the recipient is a contact.
     * @param _to The address to transfer to.

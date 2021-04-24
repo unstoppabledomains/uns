@@ -1,8 +1,10 @@
-pragma solidity 0.5.12;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT
 
-import '@openzeppelin/contracts/cryptography/ECDSA.sol';
-import "./BulkWhitelistedRole.sol";
+pragma solidity ^0.8.0;
+
+import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+
+import "../roles/BulkWhitelistedRole.sol";
 import "../controllers/IMintingController.sol";
 import "../controllers/MintingController.sol";
 import "../Registry.sol";
@@ -69,7 +71,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
      */
     bytes4 private constant _SIG_SAFE_MINT_RESOLVER_DATA = 0x898851f8;
 
-    constructor(MintingController mintingController) public {
+    constructor(MintingController mintingController) {
         _mintingController = mintingController;
         _registry = Registry(mintingController.registry());
         _addWhitelisted(address(this));
@@ -110,6 +112,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
 
     function mintSLD(address to, string calldata label)
         external
+        override
         onlyWhitelisted
     {
         _mintingController.mintSLD(to, label);
@@ -117,6 +120,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
 
     function safeMintSLD(address to, string calldata label)
         external
+        override
         onlyWhitelisted
     {
         _mintingController.safeMintSLD(to, label);
@@ -126,7 +130,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
         address to,
         string calldata label,
         bytes calldata _data
-    ) external onlyWhitelisted {
+    ) external override onlyWhitelisted {
         _mintingController.safeMintSLD(to, label, _data);
     }
 
@@ -218,7 +222,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
             /* solium-disable-next-line security/no-inline-assembly */
             assembly {
                 let ptr := mload(0x40)
-                let size := returndatasize
+                let size := returndatasize()
                 returndatacopy(ptr, 0, size)
                 revert(ptr, size)
             }

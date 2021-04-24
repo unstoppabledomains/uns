@@ -1,4 +1,8 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.0;
+
+import "../util/ITokenBasedNonce.sol";
 
 /**
  * @title ISignatureController
@@ -17,15 +21,7 @@ pragma solidity 0.5.12;
  * @dev The method we use for signing is non standard. It'd be worth it to
  * consider using EIP712 Typed signing https://eips.ethereum.org/EIPS/eip-712.
  */
-interface ISignatureController {
-
-    /**
-     * @dev Returns the given owners' nonce.
-     * @param tokenId token ID to query the nonce of
-     * @return uint256 nonce of the owner
-     */
-    function nonceOf(uint256 tokenId) external view returns (uint256);
-
+interface ISignatureController is ITokenBasedNonce {
     /// A signature function based on transferFrom inside Open Zeppelin's ERC721.sol.
     function transferFromFor(address from, address to, uint256 tokenId, bytes calldata signature) external;
 
@@ -51,5 +47,4 @@ interface ISignatureController {
 
     /// A signature function based on burnChild inside ./IChildController.sol.
     function burnChildFor(uint256 tokenId, string calldata label, bytes calldata signature) external;
-
 }

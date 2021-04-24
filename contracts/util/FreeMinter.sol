@@ -1,5 +1,6 @@
-pragma solidity 0.5.12;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.0;
 
 import "../IResolver.sol";
 import "../IRegistryReader.sol";
@@ -14,7 +15,7 @@ contract FreeMinter {
     IResolver private _resolver;
     IRegistryReader private _registry;
 
-    constructor(MintingController mintingController, IResolver resolver, IRegistryReader registry) public {
+    constructor(MintingController mintingController, IResolver resolver, IRegistryReader registry) {
         _mintingController = mintingController;
         _resolver = resolver;
         _registry = registry;

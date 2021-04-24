@@ -5,8 +5,19 @@
   "main": "index.js",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "private": true,
+  "scripts": {
+    "ganache:start": "ganache-cli --port 7545 --networkId 4447 --gasLimit 440167000 --allowUnlimitedContractSize --quiet --account 0x2b2bdbbc2587eaa5f3d927394689b0354bb4129e3ab893d378c6afc30c5c2fd9,0xffffffffffffffffffff --account 0x6c6d6117e5f74903a6abc9f351baa1e0ab67806f6fcc285afc67998f003f75e6,0xffffffffffffffffffff --account 0xccab217c763cfeb41cd266fcb2ba9036b8570353f1bb0e6680a089dff3735818,0xffffffffffffffffffff --account 0x22b22dcb8bca5ee2fac79bfeb4ca839bea1f39626a1c2f3f25f0f8fd64a7953b,0xffffffffffffffffffff --account 0x322e324c976b4e814c7767355b75530d2c01e289e71a3e1f9c6ff10bb44e7944,0xffffffffffffffffffff --account 0x9ec8c608c5c417a4057ab469318960ff4814708e195adfec54fa51d695537fb7,0xffffffffffffffffffff --account 0x12b6e65588dca46a1b6de2695b9c3f995562d54eeca5afe67a6aae194066283c,0xffffffffffffffffffff --account 0x67ef87a612b60f954f6a9aea611a3d0c5695ccc5177526305a412dc593824a1b,0xffffffffffffffffffff --account 0x36906346eb3ed453ec22f4af83666450ff37873df765e0a4ee00e2e56bbc0b14,0xffffffffffffffffffff --account 0x81dd1aa6b0d888a6cb52617d0bb5d42c8eb114d28cb9e451b03b0b46239bd2ce,0xffffffffffffffffffff &",
+    "ganache:stop": "lsof -ti:7545 | xargs kill",
+    "test": "truffle test"
+  },
   "devDependencies": {
-    "@chainlink/contracts": "0.0.10",
-    "@openzeppelin/contracts": "2.3.0"
+    "@chainlink/contracts": "^0.1.7",
+    "@openzeppelin/contracts": "^4.0.0",
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
+    "ganache-cli": "^6.12.2",
+    "node-fetch": "^2.6.1",
+    "solhint": "^3.3.4",
+    "solidity-coverage": "^0.7.16"
   }
 }

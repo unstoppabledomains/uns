@@ -1,4 +1,6 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.0;
 
 contract Simple {
   uint256 internal _nbr = 0;

@@ -1,11 +1,14 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
 
+pragma solidity ^0.8.0;
+
+import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+
+import './ITokenBasedNonce.sol';
+import './IRegistryProvider.sol';
 import '../Registry.sol';
-import '@openzeppelin/contracts/cryptography/ECDSA.sol';
 
-// solium-disable error-reason
-
-contract SignatureUtil {
+contract SignatureUtil is ITokenBasedNonce, IRegistryProvider {
     using ECDSA for bytes32;
 
     // Mapping from owner to a nonce
@@ -13,11 +16,11 @@ contract SignatureUtil {
 
     Registry internal _registry;
 
-    constructor(Registry registry) public {
+    constructor(Registry registry) {
         _registry = registry;
     }
 
-    function registry() external view returns (address) {
+    function registry() public view override returns (address) {
         return address(_registry);
     }
 
@@ -26,7 +29,7 @@ contract SignatureUtil {
      * @param tokenId token ID for nonce query
      * @return nonce of the given address
      */
-    function nonceOf(uint256 tokenId) external view returns (uint256) {
+    function nonceOf(uint256 tokenId) public view override returns (uint256) {
         return _nonces[tokenId];
     }
 
@@ -45,5 +48,4 @@ contract SignatureUtil {
 
         _nonces[tokenId] += 1;
     }
-
 }

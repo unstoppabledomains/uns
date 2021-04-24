@@ -1,19 +1,11 @@
-pragma solidity 0.5.12;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT
 
-interface IResolverReader {
-    /**
-     * @dev Gets the nonce of the specified address.
-     * @param tokenId token ID for nonce query
-     * @return nonce of the given address
-     */
-    function nonceOf(uint256 tokenId) external view returns (uint256);
+pragma solidity ^0.8.0;
 
-    /**
-     * @return registry address
-     */
-    function registry() external view returns (address);
+import './util/ITokenBasedNonce.sol';
+import './util/IRegistryProvider.sol';
 
+interface IResolverReader is ITokenBasedNonce, IRegistryProvider {
     /**
      * @dev Function to get record.
      * @param key The key to query the value of.
@@ -40,7 +32,6 @@ interface IResolverReader {
      * @dev Function get value by provied key hash. Keys hashes can be found in Sync event emitted by Registry.sol contract.
      * @param keyHash The key to query the value of.
      * @param tokenId The token id to set.
-     * @return Key and value.
      */
     function getByHash(uint256 keyHash, uint256 tokenId)
         external
@@ -51,7 +42,6 @@ interface IResolverReader {
      * @dev Function get values by provied key hashes. Keys hashes can be found in Sync event emitted by Registry.sol contract.
      * @param keyHashes The key to query the value of.
      * @param tokenId The token id to set.
-     * @return Keys and values.
      */
     function getManyByHash(uint256[] calldata keyHashes, uint256 tokenId)
         external

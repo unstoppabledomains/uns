@@ -1,17 +1,17 @@
-pragma solidity 0.5.12;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT
 
-import "../util/BulkWhitelistedRole.sol";
+pragma solidity ^0.8.0;
+
+import "../roles/BulkWhitelistedRole.sol";
 import "../IRegistry.sol";
 import "../IResolver.sol";
 
 contract DomainZoneController is BulkWhitelistedRole {
-
     event MintChild(uint256 indexed tokenId, uint256 indexed parentTokenId, string label);
 
     IRegistry internal _registry;
 
-    constructor (IRegistry registry, address[] memory accounts) public {
+    constructor(IRegistry registry, address[] memory accounts) {
         _registry = registry;
         for (uint256 index = 0; index < accounts.length; index++) {
             _addWhitelisted(accounts[index]);

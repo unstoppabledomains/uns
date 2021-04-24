@@ -1,8 +1,10 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol";
+pragma solidity ^0.8.0;
 
-contract IRegistry is IERC721Metadata {
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+
+interface IRegistry is IERC721Metadata {
 
     event NewURI(uint256 indexed tokenId, string uri);
 

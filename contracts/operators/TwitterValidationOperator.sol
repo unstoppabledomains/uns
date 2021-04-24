@@ -1,11 +1,13 @@
-pragma solidity 0.5.12;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/access/roles/WhitelistedRole.sol";
-import "@openzeppelin/contracts/access/roles/CapperRole.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@chainlink/contracts/src/v0.5/interfaces/LinkTokenInterface.sol";
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
+
 import "../util/ERC677Receiver.sol";
+import "../roles/WhitelistedRole.sol";
+import "../roles/CapperRole.sol";
 import "../IRegistry.sol";
 import "../IResolver.sol";
 
@@ -36,7 +38,7 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
     * @param _linkToken The address of the LINK token
     * @param _paymentCappers Addresses allowed to update payment amount per validation
     */
-    constructor (IRegistry _registry, LinkTokenInterface _linkToken, address[] memory _paymentCappers) public {
+    constructor(IRegistry _registry, LinkTokenInterface _linkToken, address[] memory _paymentCappers) {
         require(address(_registry) != address(0), "TwitterValidationOperator: INVALID_REGISTRY_ADDRESS");
         require(address(_linkToken) != address(0), "TwitterValidationOperator: INVALID_LINK_TOKEN_ADDRESS");
         require(_paymentCappers.length > 0, "TwitterValidationOperator: NO_CAPPERS_PROVIDED");
@@ -73,7 +75,7 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
      * @dev Reverts if method called not from LINK token contract
      */
     modifier linkTokenOnly() {
-        require(msg.sender == address(linkToken), "TwitterValidationOperator: CAN_CALL_FROM_LINK_TOKEN_ONLY");
+        require(_msgSender() == address(linkToken), "TwitterValidationOperator: CAN_CALL_FROM_LINK_TOKEN_ONLY");
         _;
     }
 
@@ -143,7 +145,7 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
     * @param _value Tokens amount
     * @param _data Encoded additional data needed to initiate domain verification: `abi.encode(uint256 tokenId, string code)`
     */
-    function onTokenTransfer(address _sender, uint256 _value, bytes calldata _data) external linkTokenOnly correctTokensAmount(_value) {
+    function onTokenTransfer(address _sender, uint256 _value, bytes calldata _data) external override linkTokenOnly correctTokensAmount(_value) {
         (uint256 _tokenId, string memory _code) = abi.decode(_data, (uint256, string));
         require(registry.isApprovedOrOwner(_sender, _tokenId), "TwitterValidationOperator: SENDER_DOES_NOT_HAVE_ACCESS_TO_DOMAIN");
         require(bytes(_code).length > 0, "TwitterValidationOperator: CODE_IS_EMPTY");

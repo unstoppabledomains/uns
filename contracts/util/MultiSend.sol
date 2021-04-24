@@ -1,11 +1,13 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.0;
 
 contract MultiSend {
-    constructor (address payable[] memory accounts, uint256[] memory values) public payable {
+    constructor(address payable[] memory accounts, uint256[] memory values) payable {
         for (uint256 index = 0; index < accounts.length; index++) {
             accounts[index].transfer(values[index]);
         }
-        selfdestruct(msg.sender);
+        selfdestruct(payable(msg.sender));
     }
 
 //     function send(address payable[] memory accounts, uint256[] memory values) public payable {
@@ -13,6 +15,4 @@ contract MultiSend {
 //             accounts[index].transfer(values[index]);
 //         }
 //     }
-
 }
-

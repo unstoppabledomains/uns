@@ -1,6 +1,8 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
 
-import '@openzeppelin/contracts/cryptography/ECDSA.sol';
+pragma solidity ^0.8.0;
+
+import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
 // {
 // 	"6d4ce63c": "get()",
@@ -70,7 +72,7 @@ contract RelayTest {
             /* solium-disable-next-line security/no-inline-assembly */
             assembly {
                 let ptr := mload(0x40)
-                let size := returndatasize
+                let size := returndatasize()
                 returndatacopy(ptr, 0, size)
                 revert(ptr, size)
             }

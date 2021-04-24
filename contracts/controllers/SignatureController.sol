@@ -1,11 +1,12 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.0;
+
+import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
 import "./ISignatureController.sol";
-import '@openzeppelin/contracts/cryptography/ECDSA.sol';
 import "../Registry.sol";
 import "../util/SignatureUtil.sol";
-
-// solium-disable error-reason
 
 /**
  * @title SignatureController
@@ -13,13 +14,12 @@ import "../util/SignatureUtil.sol";
  * transactions on behalf of a token owner.
  */
 contract SignatureController is ISignatureController, SignatureUtil {
-
-    constructor (Registry registry) public SignatureUtil(registry) {}
+    constructor(Registry registry) SignatureUtil(registry) {}
 
     /*
      * 0x23b872dd == bytes4(keccak256('transferFrom(address,address,uint256)'))
      */
-    function transferFromFor(address from, address to, uint256 tokenId, bytes calldata signature) external {
+    function transferFromFor(address from, address to, uint256 tokenId, bytes calldata signature) external override {
         _validate(
             keccak256(abi.encodeWithSelector(0x23b872dd, from, to, tokenId)),
             tokenId,
@@ -38,7 +38,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
         bytes calldata _data,
         bytes calldata signature
     )
-        external
+        external override
     {
         _validate(
             keccak256(abi.encodeWithSelector(0xb88d4fde, from, to, tokenId, _data)),
@@ -51,7 +51,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
     /*
      * 0x42842e0e == bytes4(keccak256('safeTransferFrom(address,address,uint256)'))
      */
-    function safeTransferFromFor(address from, address to, uint256 tokenId, bytes calldata signature) external {
+    function safeTransferFromFor(address from, address to, uint256 tokenId, bytes calldata signature) external override {
         _validate(
             keccak256(abi.encodeWithSelector(0x42842e0e, from, to, tokenId)),
             tokenId,
@@ -63,7 +63,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
     /*
      * 0x42966c68 == bytes4(keccak256('burn(uint256)'))
      */
-    function burnFor(uint256 tokenId, bytes calldata signature) external {
+    function burnFor(uint256 tokenId, bytes calldata signature) external override {
         _validate(
             keccak256(abi.encodeWithSelector(0x42966c68, tokenId)),
             tokenId,
@@ -75,7 +75,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
     /*
      * 0xd8d3cc6e == bytes4(keccak256('mintChild(address,uint256,string)'))
      */
-    function mintChildFor(address to, uint256 tokenId, string calldata label, bytes calldata signature) external {
+    function mintChildFor(address to, uint256 tokenId, string calldata label, bytes calldata signature) external override {
         _validate(
             keccak256(abi.encodeWithSelector(0xd8d3cc6e, to, tokenId, label)),
             tokenId,
@@ -118,7 +118,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
         string calldata label,
         bytes calldata signature
     )
-        external
+        external override
     {
         _validate(
             keccak256(abi.encodeWithSelector(0x9e5be9a5, from, to, tokenId, label)),
@@ -139,7 +139,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
         bytes calldata _data,
         bytes calldata signature
     )
-        external
+        external override
     {
         _validate(
             keccak256(abi.encodeWithSelector(0xc29b52f9, from, to, tokenId, label, _data)),
@@ -159,7 +159,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
         string calldata label,
         bytes calldata signature
     )
-        external
+        external override
     {
         _validate(
             keccak256(abi.encodeWithSelector(0x9d743989, from, to, tokenId, label)),
@@ -172,7 +172,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
     /*
      * 0x5cbe1112 == bytes4(keccak256('burnChild(uint256,string)'))
      */
-    function burnChildFor(uint256 tokenId, string calldata label, bytes calldata signature) external {
+    function burnChildFor(uint256 tokenId, string calldata label, bytes calldata signature) external override {
         _validate(
             keccak256(abi.encodeWithSelector(0x5cbe1112, tokenId, label)),
             tokenId,
@@ -184,7 +184,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
     /*
      * 0x2392c189 == bytes4(keccak256('resolveTo(address,uint256)'))
      */
-    function resolveToFor(address to, uint256 tokenId, bytes calldata signature) external {
+    function resolveToFor(address to, uint256 tokenId, bytes calldata signature) external override {
         _validate(
             keccak256(abi.encodeWithSelector(0x2392c189, to, tokenId)),
             tokenId,
@@ -192,5 +192,4 @@ contract SignatureController is ISignatureController, SignatureUtil {
         );
         _registry.controlledResolveTo(to, tokenId);
     }
-
 }
