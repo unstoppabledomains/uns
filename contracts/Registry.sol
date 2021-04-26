@@ -123,8 +123,7 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable, ERC165Storage {
         bytes memory _data
     ) public override onlyApprovedOrOwner(tokenId) {
         uint256 childId = _childId(tokenId, label);
-        _transfer(from, to, childId);
-        require(_checkERC721Received(from, to, childId, _data));
+        _safeTransfer(from, to, childId, _data);
     }
 
     function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external override {
@@ -135,8 +134,7 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable, ERC165Storage {
         external override
         onlyController
     {
-        _transfer(from, to, tokenId);
-        require(_checkERC721Received(from, to, tokenId, _data));
+        _safeTransfer(from, to, tokenId, _data);
     }
 
     /// Burning
@@ -188,6 +186,7 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable, ERC165Storage {
         uint256 childId = _childId(tokenId, label);
         _mint(to, childId);
 
+        // TODO: DRY
         require(bytes(label).length != 0);
         require(_exists(childId));
 
@@ -198,8 +197,17 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable, ERC165Storage {
     }
 
     function _safeMintChild(address to, uint256 tokenId, string memory label, bytes memory _data) internal {
-        _mintChild(to, tokenId, label);
-        require(_checkERC721Received(address(0), to, _childId(tokenId, label), _data));
+        uint256 childId = _childId(tokenId, label);
+        _safeMint(to, childId, _data);
+
+        // TODO: DRY
+        require(bytes(label).length != 0);
+        require(_exists(childId));
+
+        bytes memory domain = abi.encodePacked(label, ".", _tokenURIs[tokenId]);
+
+        _tokenURIs[childId] = string(domain);
+        emit NewURI(childId, string(domain));
     }
 
     function _transfer(address from, address to, uint256 tokenId) internal override {
@@ -226,26 +234,5 @@ contract Registry is IRegistry, ControllerRole, ERC721Burnable, ERC165Storage {
         require(_exists(tokenId));
         emit Resolve(tokenId, to);
         _tokenResolvers[tokenId] = to;
-    }
-
-    function _checkERC721Received(address from, address to, uint256 tokenId, bytes memory _data)
-        private returns (bool)
-    {
-        if (to.isContract()) {
-            try IERC721Receiver(to).onERC721Received(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
-                return retval == IERC721Receiver(to).onERC721Received.selector;
-            } catch (bytes memory reason) {
-                if (reason.length == 0) {
-                    revert("ERC721: transfer to non ERC721Receiver implementer");
-                } else {
-                    // solhint-disable-next-line no-inline-assembly
-                    assembly {
-                        revert(add(32, reason), mload(reason))
-                    }
-                }
-            }
-        } else {
-            return true;
-        }
     }
 }
