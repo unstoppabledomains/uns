@@ -1,17 +1,13 @@
+const { expectRevert } = require('@openzeppelin/test-helpers');
+const { utils } = require('web3');
+
 const Registry = artifacts.require('registry/Registry.sol')
 const MintingController = artifacts.require('controller/MintingController.sol')
 const Resolver = artifacts.require('Resolver.sol')
 
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
+const submitSigTransaction = require('./helpers/submitSigTransaction');
 const usedGas = require("./helpers/getUsedGas");
 const getUsedGas = usedGas.getUsedGas;
-chai.use(chaiAsPromised)
-const assert = chai.assert
-const web3 = require('web3');
-const utils = web3.utils;
-const submitSigTransaction = require('./helpers/submitSigTransaction');
-const expectRevert = require('./helpers/expectRevert.js');
 
 contract('Resolver', function ([coinbase, notOwner, ...accounts]) {
   let mintingController, registry, resolver
@@ -26,7 +22,7 @@ contract('Resolver', function ([coinbase, notOwner, ...accounts]) {
 
   before(async () => {
     await usedGas.init();
-    
+
     registry = await Registry.new();
     mintingController = await MintingController.new(registry.address);
     await registry.addController(mintingController.address);
@@ -34,20 +30,19 @@ contract('Resolver', function ([coinbase, notOwner, ...accounts]) {
     resolver = await Resolver.new(registry.address, mintingController.address);
   })
 
-  beforeEach(async () => {
-    
-  })
-
   it('should resolve tokens', async () => {
     const tok = await registry.childIdOf(await registry.root(), 'label')
 
     // should fail to set name if not owner
-    await assert.isRejected(resolver.set('key', 'value', tok))
+    await expectRevert(
+      resolver.set('key', 'value', tok),
+      'ERC721: operator query for nonexistent token',
+    );
 
     await mintingController.mintSLD(coinbase, 'label')
 
     // should fail to get name if not resolving to name
-    await assert.isRejected(resolver.set('key', 'value', tok))
+    await expectRevert.unspecified(resolver.set('key', 'value', tok));
 
     let tx = await registry.resolveTo(resolver.address, tok)
     console.log(`      ⓘ Resolver.resolveTo: ${getUsedGas(tx)}`)
@@ -82,8 +77,11 @@ contract('Resolver', function ([coinbase, notOwner, ...accounts]) {
     await registry.transferFrom(coinbase, accounts[1], tok)
 
     // should fail to set name if not owned
-    await assert.isRejected(resolver.set('key', 'value', tok))
-    await assert.isRejected(resolver.get('key', tok))
+    await expectRevert(
+      resolver.set('key', 'value', tok),
+      'SENDER_IS_NOT_APPROVED_OR_OWNER',
+    );
+    await expectRevert.unspecified(resolver.get('key', tok));
   })
 
   it('should get key by hash', async () => {
@@ -198,7 +196,8 @@ contract('Resolver', function ([coinbase, notOwner, ...accounts]) {
     // should fail when trying to reconfigure non-owned domain
     await expectRevert(
       resolver.reconfigure(['new-key'], ['new-value'], tok, { from: notOwner }),
-      'SENDER_IS_NOT_APPROVED_OR_OWNER');
+      'SENDER_IS_NOT_APPROVED_OR_OWNER'
+    );
   })
 
   it('should revert reconfigureFor by not owner', async () => {
@@ -228,7 +227,9 @@ contract('Resolver', function ([coinbase, notOwner, ...accounts]) {
         ['new-key'],
         ['new-value'],
         tok
-      ), 'INVALID_SIGNATURE');
+      ),
+      'INVALID_SIGNATURE',
+    );
   })
 
   it('should execute setManyFor', async () => {

@@ -1,15 +1,10 @@
+const { expectRevert } = require('@openzeppelin/test-helpers');
+
 const Registry = artifacts.require('registry/Registry.sol')
-const SignatureController = artifacts.require(
-  'controller/SignatureController.sol',
-)
+const SignatureController = artifacts.require('controller/SignatureController.sol')
 const MintingController = artifacts.require('controller/MintingController.sol')
 
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
-chai.use(chaiAsPromised)
-const assert = chai.assert
 const submitSigTransaction = require('./helpers/submitSigTransaction');
-const expectRevert = require('./helpers/expectRevert.js');
 
 contract('SignatureController', ([coinbase]) => {
   let registry, mintingController, signatureController
@@ -48,7 +43,7 @@ contract('SignatureController', ([coinbase]) => {
     )
 
     // should fail to transfer unowned name
-    await assert.isRejected(
+    await expectRevert(
       submitSigTransaction(
         signatureController,
         registry,
@@ -58,7 +53,8 @@ contract('SignatureController', ([coinbase]) => {
         '0x1234567890123456789012345678901234567890',
         tok.toString(),
       ),
-    )
+      'INVALID_SIGNATURE',
+    );
   })
 
   it('should transfer using safeTransferFromFor', async () => {
@@ -86,7 +82,7 @@ contract('SignatureController', ([coinbase]) => {
     )
 
     // should fail to transfer unowned name
-    await assert.isRejected(
+    await expectRevert(
       submitSigTransaction(
         signatureController,
         registry,
@@ -96,7 +92,8 @@ contract('SignatureController', ([coinbase]) => {
         '0x1234567890123456789012345678901234567890',
         tok.toString(),
       ),
-    )
+      'INVALID_SIGNATURE',
+    );
   })
 
   it('should resolve using resolveToFor', async () => {
@@ -126,7 +123,7 @@ contract('SignatureController', ([coinbase]) => {
     )
 
     // should fail to transfer unowned name
-    await assert.isRejected(
+    await expectRevert(
       submitSigTransaction(
         signatureController,
         registry,
@@ -135,7 +132,8 @@ contract('SignatureController', ([coinbase]) => {
         '0x1234567890123456789012345678901234567890',
         tok.toString(),
       ),
-    )
+      'INVALID_SIGNATURE',
+    );
   })
 
   it('should burn using burnFor', async () => {
@@ -161,7 +159,7 @@ contract('SignatureController', ([coinbase]) => {
         'burn',
         tok.toString()),
       'ERC721: operator query for nonexistent token'
-    )
+    );
   })
 
   it('should mint using mintChildFor', async () => {
@@ -195,7 +193,7 @@ contract('SignatureController', ([coinbase]) => {
     )
 
     // should fail to mint token without permission
-    await assert.isRejected(
+    await expectRevert(
       submitSigTransaction(
         signatureController,
         registry,
@@ -205,7 +203,8 @@ contract('SignatureController', ([coinbase]) => {
         tok.toString(),
         'label',
       ),
-    )
+      'INVALID_SIGNATURE'
+    );
   })
 
   it('should mint using transferFromChildFor', async () => {
@@ -243,7 +242,7 @@ contract('SignatureController', ([coinbase]) => {
     )
 
     // should fail to mint token without permission
-    await assert.isRejected(
+    await expectRevert(
       submitSigTransaction(
         signatureController,
         registry,
@@ -254,7 +253,8 @@ contract('SignatureController', ([coinbase]) => {
         tok.toString(),
         'label',
       ),
-    )
+      'INVALID_SIGNATURE'
+    );
   })
 
   it('should mint using safeTransferFromChildFor', async () => {
@@ -293,7 +293,7 @@ contract('SignatureController', ([coinbase]) => {
     )
 
     // should fail to mint token without permission
-    await assert.isRejected(
+    await expectRevert(
       submitSigTransaction(
         signatureController,
         registry,
@@ -305,7 +305,8 @@ contract('SignatureController', ([coinbase]) => {
         'label',
         '0x12345768',
       ),
-    )
+      'INVALID_SIGNATURE'
+    );
   })
 
   it('should mint using burnChildFor', async () => {

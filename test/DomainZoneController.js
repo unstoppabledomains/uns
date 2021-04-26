@@ -1,14 +1,12 @@
+const { expectRevert } = require('@openzeppelin/test-helpers');
+
 const Registry = artifacts.require('registry/Registry.sol')
 const MintingController = artifacts.require('controller/MintingController.sol')
 const Resolver = artifacts.require('Resolver.sol')
 const DomainZoneController = artifacts.require('controller/DomainZoneController.sol')
 
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
 const usedGas = require("./helpers/getUsedGas");
 const getUsedGas = usedGas.getUsedGas;
-chai.use(chaiAsPromised)
-const assert = chai.assert
 
 contract('DomainZoneController', function([coinbase, whitelisted, domainReceiver, ...accounts]) {
   let mintingController, registry, resolver, secondLevelTokenId;
@@ -42,7 +40,7 @@ contract('DomainZoneController', function([coinbase, whitelisted, domainReceiver
     const domainZoneController = await DomainZoneController.new(registry.address, accounts)
     assert.isAbove(accounts.length, 0)
     for (account of accounts) {
-        assert.isTrue(await domainZoneController.isWhitelisted(account))
+      assert.isTrue(await domainZoneController.isWhitelisted(account))
     }
   })
 
@@ -60,8 +58,8 @@ contract('DomainZoneController', function([coinbase, whitelisted, domainReceiver
     console.log(`      ⓘ DomainZoneController.mintChild - no records: ${ getUsedGas(tx) }`)
     const subdomainTokenId = await registry.childIdOf(secondLevelTokenId, subdomainName)
     assert.equal(
-        await registry.tokenURI(subdomainTokenId),
-        expectedDomainUri
+      await registry.tokenURI(subdomainTokenId),
+      expectedDomainUri
     )
   })
 
@@ -75,8 +73,8 @@ contract('DomainZoneController', function([coinbase, whitelisted, domainReceiver
     console.log(`      ⓘ DomainZoneController.mintChild - three records: ${ getUsedGas(tx) }`)
     const subdomainTokenId = await registry.childIdOf(secondLevelTokenId, subdomainName)
     assert.deepEqual(
-        await resolver.getMany(keys, subdomainTokenId, {from: domainReceiver}),
-        values
+      await resolver.getMany(keys, subdomainTokenId, {from: domainReceiver}),
+      values
     )
   })
 
@@ -84,12 +82,10 @@ contract('DomainZoneController', function([coinbase, whitelisted, domainReceiver
     const subdomainName = 'not-allowed-to-mint'
     const domainZoneController = await DomainZoneController.new(registry.address, [whitelisted])
     await registry.approve(domainZoneController.address, secondLevelTokenId)
-    try {
-        await domainZoneController.mintChild(domainReceiver, secondLevelTokenId, subdomainName, [], [], {from: domainReceiver})
-        assert.fail('mintChild function should fail when trying to call from not allowed address')
-    } catch (e) {
-        assert.equal(e.reason, 'WhitelistedRole: CALLER_IS_NOT_WHITELISTED')
-    }
+    await expectRevert(
+      domainZoneController.mintChild(domainReceiver, secondLevelTokenId, subdomainName, [], [], {from: domainReceiver}),
+      'WhitelistedRole: CALLER_IS_NOT_WHITELISTED',
+    );
   })
 
   it('should transfer minted domain to owner', async () => {
@@ -99,15 +95,17 @@ contract('DomainZoneController', function([coinbase, whitelisted, domainReceiver
     await domainZoneController.mintChild(domainReceiver, secondLevelTokenId, subdomainName, [], [], {from: whitelisted})
     const subdomainTokenId = await registry.childIdOf(secondLevelTokenId, subdomainName)
     assert.equal(
-        await registry.ownerOf(subdomainTokenId),
-        domainReceiver
+      await registry.ownerOf(subdomainTokenId),
+      domainReceiver
     )
   })
 
   it('should not allow minting from not allowed second-level domains', async () => {
     const subdomainName = 'not-allowed-to-transfer'
     const domainZoneController = await DomainZoneController.new(registry.address, [whitelisted])
-    assert.isRejected(domainZoneController.mintChild(domainReceiver, secondLevelTokenId, subdomainName, [], [], {from: whitelisted}))
+    await expectRevert.unspecified(
+      domainZoneController.mintChild(domainReceiver, secondLevelTokenId, subdomainName, [], [], {from: whitelisted}),
+    );
   })
 
   it('should resolve to new resolver', async () => {
@@ -116,13 +114,10 @@ contract('DomainZoneController', function([coinbase, whitelisted, domainReceiver
     const tokenId = await registry.childIdOf(await registry.root(), domainName)
     const domainZoneController = await DomainZoneController.new(registry.address, [whitelisted])
     await registry.transferFrom(coinbase, domainZoneController.address, tokenId)
-    assert.isRejected(registry.resolverOf(tokenId))
+    await expectRevert.unspecified(registry.resolverOf(tokenId));
     const tx = await domainZoneController.resolveTo(resolver.address, tokenId, {from: whitelisted})
     console.log(`      ⓘ DomainZoneController.resolveTo: ${ getUsedGas(tx) }`)
-    assert.equal(
-      await registry.resolverOf(tokenId),
-      resolver.address
-    )
+    assert.equal(await registry.resolverOf(tokenId), resolver.address)
   })
 
   it('should not resolve to new resolver from not whitelisted address', async () => {
@@ -131,12 +126,11 @@ contract('DomainZoneController', function([coinbase, whitelisted, domainReceiver
     const tokenId = await registry.childIdOf(await registry.root(), domainName)
     const domainZoneController = await DomainZoneController.new(registry.address, [whitelisted])
     await registry.transferFrom(coinbase, domainZoneController.address, tokenId)
-    try {
-        await domainZoneController.resolveTo(resolver.address, tokenId)
-        assert.fail('resolveTo function should fail when trying to call from not allowed address')
-    } catch (e) {
-        assert.equal(e.reason, 'WhitelistedRole: CALLER_IS_NOT_WHITELISTED')
-    }
+
+    await expectRevert(
+      domainZoneController.resolveTo(resolver.address, tokenId),
+      'WhitelistedRole: CALLER_IS_NOT_WHITELISTED',
+    );
   })
   
   it('should set records for domain', async () => {
@@ -165,12 +159,11 @@ contract('DomainZoneController', function([coinbase, whitelisted, domainReceiver
     const domainZoneController = await DomainZoneController.new(registry.address, [whitelisted])
     await registry.resolveTo(resolver.address, tokenId)
     await registry.setOwner(domainZoneController.address, tokenId)
-    try {
-      await domainZoneController.setMany(keys, values, tokenId)
-      assert.fail('setMany function should fail when trying to call from not allowed address')
-    } catch (e) {
-        assert.equal(e.reason, 'WhitelistedRole: CALLER_IS_NOT_WHITELISTED')
-    }
+
+    await expectRevert(
+      domainZoneController.setMany(keys, values, tokenId),
+      'WhitelistedRole: CALLER_IS_NOT_WHITELISTED',
+    );
   })
 
   it('should emit MintChild event', async () => {

@@ -1,19 +1,12 @@
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
-const Web3 = require('web3')
+const { BN, expectEvent, expectRevert, constants } = require('@openzeppelin/test-helpers');
 
 const Registry = artifacts.require('registry/Registry.sol')
 const Resolver = artifacts.require('registry/Resolver.sol')
 const MintingController = artifacts.require('controller/MintingController.sol')
 const WhitelistedMinter = artifacts.require('util/WhitelistedMinter.sol')
-const expectRevert = require('./helpers/expectRevert.js')
-const expectEvent = require('./helpers/expectEvent.js')
-const {ZERO_ADDRESS} = require('./helpers/constants.js')
 const {sign} = require('./helpers/signature.js')
 
-chai.use(chaiAsPromised)
-const assert = chai.assert
-const {BN} = web3.utils
+const { ZERO_ADDRESS } = constants;
 
 contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
   let whitelistedMinter, registry, mintingController, resolver, customResolver

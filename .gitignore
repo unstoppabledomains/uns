@@ -20,3 +20,14 @@ pids
 
 coverage/
 coverage.json
+coverageEnv
+
+# temporary artifact from solidity-coverage
+allFiredEvents
+.coverage_artifacts
+.coverage_cache
+.coverage_contracts
+
+# hardhat
+cache
+artifacts

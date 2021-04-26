@@ -1,8 +1,4 @@
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
-chai.use(chaiAsPromised)
-const {assert} = chai
-const expectRevert = require('./helpers/expectRevert.js')
+const { expectRevert } = require('@openzeppelin/test-helpers');
 
 const Registry = artifacts.require('Registry.sol')
 const MintingController = artifacts.require('controller/MintingController.sol')

@@ -1,10 +1,7 @@
+const { expectRevert } = require('@openzeppelin/test-helpers');
+
 const Registry = artifacts.require('Registry.sol')
 const MintingController = artifacts.require('controller/MintingController.sol')
-
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
-chai.use(chaiAsPromised)
-const assert = chai.assert
 
 contract('Registry', function([coinbase, ...accounts]) {
   let mintingController, registry
@@ -29,15 +26,18 @@ contract('Registry', function([coinbase, ...accounts]) {
     const tok = await registry.childIdOf(await registry.root(), 'resolution')
 
     // should fail to get resolver of non existent token
-    await assert.isRejected(registry.resolverOf(1))
+    await expectRevert.unspecified(registry.resolverOf(1));
 
     // should fail to set resolver of non existent token
-    await assert.isRejected(registry.resolveTo(accounts[0], tok))
+    await expectRevert(
+      registry.resolveTo(accounts[0], tok),
+      'ERC721: operator query for nonexistent token',
+    );
 
     await mintingController.mintSLD(coinbase, 'resolution')
 
     // should fail to get non existent resolver
-    await assert.isRejected(registry.resolverOf(tok))
+    await expectRevert.unspecified(registry.resolverOf(tok));
 
     await registry.resolveTo(accounts[0], tok)
 
@@ -50,7 +50,7 @@ contract('Registry', function([coinbase, ...accounts]) {
     await registry.burn(tok)
 
     // should fail to get non existent resolver after burn
-    await assert.isRejected(registry.resolverOf(tok))
+    await expectRevert.unspecified(registry.resolverOf(tok));
 
     await mintingController.mintSLD(coinbase, 'resolution')
 
@@ -59,10 +59,10 @@ contract('Registry', function([coinbase, ...accounts]) {
     await registry.transferFrom(coinbase, accounts[0], tok)
 
     // should fail to get non existent resolver after transfer
-    await assert.isRejected(registry.resolverOf(tok))
+    await expectRevert.unspecified(registry.resolverOf(tok));
 
     // should fail to set resolver of token not owned by user
-    await assert.isRejected(registry.resolveTo(accounts[0], tok))
+    await expectRevert.unspecified(registry.resolveTo(accounts[0], tok));
   })
 
   it('should mint children', async () => {
@@ -101,20 +101,24 @@ contract('Registry', function([coinbase, ...accounts]) {
     )
 
     // should fail to mint existing token
-    await assert.isRejected(registry.mintChild(coinbase, tok, '3ld'))
+    await expectRevert(
+      registry.mintChild(coinbase, tok, '3ld'),
+      'ERC721: token already minted',
+    );
 
     // should fail to mint existing without permission
-    await assert.isRejected(
+    await expectRevert.unspecified(
       registry.mintChild(coinbase, tok, '3ld', {from: accounts[0]}),
-    )
+    );
   })
 
   it('should transfer children', async () => {
     const tok = await registry.childIdOf(await registry.root(), 'transfer')
 
     // should fail to transfer non-existing token
-    await assert.isRejected(
-      registry.transferFromChild(coinbase, accounts[0], 1),
+    await expectRevert(
+      registry.transferFromChild(coinbase, accounts[0], 1, ''),
+      'ERC721: operator query for nonexistent token'
     )
 
     await mintingController.mintSLD(coinbase, 'transfer')
@@ -132,8 +136,9 @@ contract('Registry', function([coinbase, ...accounts]) {
     )
 
     // should fail to transfer token without permission
-    await assert.isRejected(
+    await expectRevert(
       registry.transferFromChild(accounts[1], accounts[2], tok, '3ld'),
+      'ERC721: transfer of token that is not own'
     )
 
     await registry.transferFromChild(accounts[0], coinbase, tok, '3ld')
@@ -149,25 +154,31 @@ contract('Registry', function([coinbase, ...accounts]) {
     const tok = await registry.childIdOf(await registry.root(), 'burn')
 
     // should fail to burn non-existing token
-    await assert.isRejected(registry.burnChild(1))
+    await expectRevert(
+      registry.burnChild(1, ''),
+      'ERC721: operator query for nonexistent token'
+    );
 
     await mintingController.mintSLD(coinbase, 'burn')
 
     await registry.mintChild(coinbase, tok, '3ld')
 
-    const threeld = await registry.childIdOf(tok, '3ld')
+    await registry.childIdOf(tok, '3ld')
 
     await registry.burnChild(tok, '3ld')
 
     // should burn token correctly
-    await assert.isRejected(registry.burnChild(tok, '3ld'))
+    await expectRevert(
+      registry.burnChild(tok, '3ld'),
+      'ERC721: owner query for nonexistent token'
+    );
 
     await registry.mintChild(coinbase, tok, '3ld')
 
     await registry.transferFrom(coinbase, accounts[0], tok)
 
     // should fail to burn token without permission
-    await assert.isRejected(registry.burnChild(tok, '3ld'))
+    await expectRevert.unspecified(registry.burnChild(tok, '3ld'));
   })
 
   it('should mint/burn/transfer metadata', async () => {
@@ -188,7 +199,7 @@ contract('Registry', function([coinbase, ...accounts]) {
     )
 
     // should fail to get non existent tokenURI
-    await assert.isRejected(registry.tokenURI(1))
+    await expectRevert.unspecified(registry.tokenURI(1));
 
     const threeldTok = await registry.childIdOf(tok, '3ld')
 
@@ -203,7 +214,7 @@ contract('Registry', function([coinbase, ...accounts]) {
     await registry.burn(threeldTok)
 
     // should fail to get non existent tokenURI
-    await assert.isRejected(registry.tokenURI(threeldTok))
+    await expectRevert.unspecified(registry.tokenURI(threeldTok));
   })
 
   it('should set URI prefix', async () => {

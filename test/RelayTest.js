@@ -1,14 +1,8 @@
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
-const Web3 = require('web3')
+const { expectRevert } = require('@openzeppelin/test-helpers');
 
 const RelayTest = artifacts.require('test-helpers/RelayTest.sol')
-const expectRevert = require('./helpers/expectRevert.js')
 
-chai.use(chaiAsPromised)
-const {assert} = chai
-
-contract.skip('RelayTest', ([coinbase]) => {
+contract('RelayTest', ([coinbase]) => {
   let relayTest
 
   before(async () => {
@@ -39,7 +33,7 @@ contract.skip('RelayTest', ([coinbase]) => {
     )
   }
 
-  describe('Ganache', () => {
+  describe.skip('Ganache', () => {
     it('revert get string', async () => {
       const web3 = new Web3(relayTest.constructor.web3.currentProvider)
       const abi = RelayTest.toJSON().abi.find(v => v.name === 'getString')
@@ -58,7 +52,7 @@ contract.skip('RelayTest', ([coinbase]) => {
     })
   })
 
-  describe('Ropsten', () => {
+  describe.skip('Ropsten', () => {
     const to = '0xc13e670D7f74C6505792501B76B73227d008AA7d'
     const pKey = process.env.ROPSTEN_PRIVATE_KEY
     const web3 = new Web3(

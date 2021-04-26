@@ -1,11 +1,8 @@
+const { expectRevert } = require('@openzeppelin/test-helpers');
+
 const Registry = artifacts.require('registry/Registry.sol')
 const MintingController = artifacts.require('controller/MintingController.sol')
 const Simple = artifacts.require('test-helpers/Simple.sol')
-
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
-chai.use(chaiAsPromised)
-const assert = chai.assert
 
 contract('MintingController', ([coinbase, ...accounts]) => {
   let mintingController, registry
@@ -28,10 +25,14 @@ contract('MintingController', ([coinbase, ...accounts]) => {
     )
 
     // should fail to mint existing token
-    await assert.isRejected(mintingController.mintSLD.call(coinbase, 'label_22'))
-    await assert.isRejected(
+    await expectRevert(
+      mintingController.mintSLD.call(coinbase, 'label_22'),
+      'ERC721: token already minted'
+    );
+    await expectRevert(
       mintingController.mintSLD.call(accounts[0], 'label_22'),
-    )
+      'ERC721: token already minted'
+    );
 
     await registry.burn(tok)
 
@@ -55,13 +56,17 @@ contract('MintingController', ([coinbase, ...accounts]) => {
     )
 
     // should fail to safely mint existing token contract
-    await assert.isRejected(mintingController.safeMintSLD(coinbase, 'label_93'))
+    await expectRevert(
+      mintingController.safeMintSLD(coinbase, 'label_93'),
+      'ERC721: token already minted'
+    );
     await registry.burn(tok)
 
     // should fail to safely mint token to non reciever contract
-    await assert.isRejected(
+    await expectRevert(
       mintingController.safeMintSLD(mintingController.address, 'label_93'),
-    )
+      'ERC721: transfer to non ERC721Receiver implementer'
+    );
 
     const simple = await Simple.new()
     await mintingController.safeMintSLD(simple.address, 'label_93')
