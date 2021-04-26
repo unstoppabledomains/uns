@@ -7,9 +7,6 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 abstract contract WhitelistedRole is AccessControl {
     bytes32 public constant WHITELISTED_ROLE = keccak256("WHITELISTED_ROLE");
 
-    event WhitelistedAdded(address indexed account);
-    event WhitelistedRemoved(address indexed account);
-
     modifier onlyWhitelisted() {
         require(isWhitelisted(_msgSender()), "WhitelistedRole: CALLER_IS_NOT_WHITELISTED");
         _;
@@ -42,11 +39,9 @@ abstract contract WhitelistedRole is AccessControl {
 
     function _addWhitelisted(address account) internal {
         _setupRole(WHITELISTED_ROLE, account);
-        emit WhitelistedAdded(account);
     }
 
     function _removeWhitelisted(address account) internal {
         renounceRole(WHITELISTED_ROLE, account);
-        emit WhitelistedRemoved(account);
     }
 }

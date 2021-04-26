@@ -12,9 +12,6 @@ abstract contract MinterRole is AccessControl {
         _;
     }
 
-    event MinterAdded(address indexed account);
-    event MinterRemoved(address indexed account);
-
     constructor() {
         _addMinter(_msgSender());
     }
@@ -33,11 +30,9 @@ abstract contract MinterRole is AccessControl {
 
     function _addMinter(address account) internal {
         _setupRole(MINTER_ROLE, account);
-        emit MinterAdded(account);
     }
 
     function _removeMinter(address account) internal {
         renounceRole(MINTER_ROLE, account);
-        emit MinterRemoved(account);
     }
 }

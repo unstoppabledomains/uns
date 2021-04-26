@@ -130,14 +130,14 @@ contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCa
   it('should not allow set price per validation from Admin', async () => {
     await expectRevert(
       operator.setPaymentPerValidation(100, 0, {from: coinbase}),
-      'CapperRole: caller does not have the Capper role'
+      'CapperRole: CALLER_IS_NOT_CAPPER'
     );
   })
 
   it('should not allow set price per valiation from Whitelisted', async () => {
     await expectRevert(
       operator.setPaymentPerValidation(100, 0, {from: whitelisted}),
-      'CapperRole: caller does not have the Capper role'
+      'CapperRole: CALLER_IS_NOT_CAPPER'
     );
   })
 

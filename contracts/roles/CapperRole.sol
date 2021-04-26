@@ -7,15 +7,12 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 abstract contract CapperRole is AccessControl {
     bytes32 public constant CAPPER_ROLE = keccak256("CAPPER_ROLE");
 
-    event CapperAdded(address indexed account);
-    event CapperRemoved(address indexed account);
-
     constructor() {
         _addCapper(_msgSender());
     }
 
     modifier onlyCapper() {
-        require(isCapper(_msgSender()), "CapperRole: caller does not have the Capper role");
+        require(isCapper(_msgSender()), "CapperRole: CALLER_IS_NOT_CAPPER");
         _;
     }
 
@@ -33,11 +30,9 @@ abstract contract CapperRole is AccessControl {
 
     function _addCapper(address account) internal {
         _setupRole(CAPPER_ROLE, account);
-        emit CapperAdded(account);
     }
 
     function _removeCapper(address account) internal {
         renounceRole(CAPPER_ROLE, account);
-        emit CapperRemoved(account);
     }
 }
