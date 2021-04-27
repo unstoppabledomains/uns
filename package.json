@@ -20,6 +20,7 @@
     "@openzeppelin/test-helpers": "^0.5.10",
     "chai": "^4.3.4",
     "hardhat": "^2.2.1",
+    "hardhat-contract-sizer": "^2.0.3",
     "hardhat-gas-reporter": "^1.0.4",
     "node-fetch": "^2.6.1",
     "solhint": "^3.3.4",

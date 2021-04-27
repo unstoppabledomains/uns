@@ -15,6 +15,7 @@ const argv = require('yargs/yargs')()
 require('@nomiclabs/hardhat-truffle5');
 require('@nomiclabs/hardhat-solhint');
 require('solidity-coverage');
+require('hardhat-contract-sizer');
 
 if (argv.enableGasReport) {
   require('hardhat-gas-reporter');
@@ -46,4 +47,9 @@ module.exports = {
     currency: 'USD',
     outputFile: argv.ci ? 'gas-report.txt' : undefined,
   },
+  contractSizer: {
+    alphaSort: true,
+    runOnCompile: true,
+    disambiguatePaths: false,
+  }
 };
