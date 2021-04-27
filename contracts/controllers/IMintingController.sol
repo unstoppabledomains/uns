@@ -26,4 +26,6 @@ interface IMintingController {
      * @param _data bytes data to send along with a safe transfer check
      */
     function safeMintSLD(address to, string calldata label, bytes calldata _data) external;
+
+    function mintSLDWithRecords(address to, string memory label, string[] memory keys, string[] memory values) external;
 }

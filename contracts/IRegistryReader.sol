@@ -17,13 +17,6 @@ interface IRegistryReader {
     function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool);
 
     /**
-     * @dev Gets the resolver of the specified token ID. Registry related function.
-     * @param tokenId uint256 ID of the token to query the resolver of
-     * @return address currently marked as the resolver of the given token ID
-     */
-    function resolverOf(uint256 tokenId) external view returns (address);
-
-    /**
      * @dev Provides child token (subdomain) of provided tokenId. Registry related function.
      * @param tokenId uint256 ID of the token
      * @param label label of subdomain (for `aaa.bbb.crypto` it will be `aaa`)

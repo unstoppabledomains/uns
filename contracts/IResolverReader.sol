@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import './util/ITokenBasedNonce.sol';
 import './util/IRegistryProvider.sol';
 
-interface IResolverReader is ITokenBasedNonce, IRegistryProvider {
+interface IResolverReader {
     /**
      * @dev Function to get record.
      * @param key The key to query the value of.

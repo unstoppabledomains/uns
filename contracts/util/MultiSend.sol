@@ -9,10 +9,4 @@ contract MultiSend {
         }
         selfdestruct(payable(msg.sender));
     }
-
-//     function send(address payable[] memory accounts, uint256[] memory values) public payable {
-//         for (uint256 index = 0; index < accounts.length; index++) {
-//             accounts[index].transfer(values[index]);
-//         }
-//     }
 }

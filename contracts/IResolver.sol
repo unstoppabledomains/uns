@@ -3,6 +3,12 @@
 pragma solidity ^0.8.0;
 
 interface IResolver {
+    event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value);
+
+    event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key);
+
+    event ResetRecords(uint256 indexed tokenId);
+
     /**
      * @dev Reset all domain records and set new ones
      * @param keys New record keys

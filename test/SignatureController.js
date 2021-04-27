@@ -96,46 +96,6 @@ contract('SignatureController', ([coinbase]) => {
     );
   })
 
-  it('should resolve using resolveToFor', async () => {
-    await mintingController.mintSLD(coinbase, 'resolveTo-label')
-
-    const tok = await registry.childIdOf(await registry.root(), 'resolveTo-label')
-
-    await submitSigTransaction(
-      signatureController,
-      registry,
-      coinbase,
-      'resolveTo',
-      '0x1234567890123456789012345678901234567890',
-      tok.toString(),
-    )
-
-    assert.equal(
-      await registry.resolverOf(tok),
-      '0x1234567890123456789012345678901234567890',
-      'should resolve to new address',
-    )
-
-    await registry.transferFrom(
-      coinbase,
-      '0x5678901234567890123456789012345678901234',
-      tok,
-    )
-
-    // should fail to transfer unowned name
-    await expectRevert(
-      submitSigTransaction(
-        signatureController,
-        registry,
-        coinbase,
-        'resolveTo',
-        '0x1234567890123456789012345678901234567890',
-        tok.toString(),
-      ),
-      'INVALID_SIGNATURE',
-    );
-  })
-
   it('should burn using burnFor', async () => {
     await mintingController.mintSLD(coinbase, 'burnFor-label')
 

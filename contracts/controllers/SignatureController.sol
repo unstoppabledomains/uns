@@ -180,16 +180,4 @@ contract SignatureController is ISignatureController, SignatureUtil {
         );
         _registry.controlledBurn(_registry.childIdOf(tokenId, label));
     }
-
-    /*
-     * 0x2392c189 == bytes4(keccak256('resolveTo(address,uint256)'))
-     */
-    function resolveToFor(address to, uint256 tokenId, bytes calldata signature) external override {
-        _validate(
-            keccak256(abi.encodeWithSelector(0x2392c189, to, tokenId)),
-            tokenId,
-            signature
-        );
-        _registry.controlledResolveTo(to, tokenId);
-    }
 }

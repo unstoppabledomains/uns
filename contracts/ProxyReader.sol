@@ -97,10 +97,6 @@ contract ProxyReader is ERC165Storage, IRegistryReader, IResolverReader, IDataRe
         return _registry.isApprovedOrOwner(spender, tokenId);
     }
 
-    function resolverOf(uint256 tokenId) external view override returns (address) {
-        return _registry.resolverOf(tokenId);
-    }
-
     function childIdOf(uint256 tokenId, string calldata label)
         external
         view
@@ -139,23 +135,13 @@ contract ProxyReader is ERC165Storage, IRegistryReader, IResolverReader, IDataRe
         return _registry.root();
     }
 
-    function nonceOf(uint256 tokenId) external view override returns (uint256) {
-        Resolver resolver = Resolver(_registry.resolverOf(tokenId));
-        return resolver.nonceOf(tokenId);
-    }
-
-    function registry() external view override returns (address) {
-        return address(_registry);
-    }
-
     function get(string calldata key, uint256 tokenId)
         external
         view
         override
         returns (string memory)
     {
-        Resolver resolver = Resolver(_registry.resolverOf(tokenId));
-        return resolver.get(key, tokenId);
+        return _registry.get(key, tokenId);
     }
 
     function getMany(string[] calldata keys, uint256 tokenId)
@@ -164,8 +150,7 @@ contract ProxyReader is ERC165Storage, IRegistryReader, IResolverReader, IDataRe
         override
         returns (string[] memory)
     {
-        Resolver resolver = Resolver(_registry.resolverOf(tokenId));
-        return resolver.getMany(keys, tokenId);
+        return _registry.getMany(keys, tokenId);
     }
 
     function getByHash(uint256 keyHash, uint256 tokenId)
@@ -174,8 +159,7 @@ contract ProxyReader is ERC165Storage, IRegistryReader, IResolverReader, IDataRe
         override
         returns (string memory key, string memory value)
     {
-        Resolver resolver = Resolver(_registry.resolverOf(tokenId));
-        return resolver.getByHash(keyHash, tokenId);
+        return _registry.getByHash(keyHash, tokenId);
     }
 
     function getManyByHash(uint256[] calldata keyHashes, uint256 tokenId)
@@ -184,43 +168,34 @@ contract ProxyReader is ERC165Storage, IRegistryReader, IResolverReader, IDataRe
         override
         returns (string[] memory keys, string[] memory values)
     {
-        Resolver resolver = Resolver(_registry.resolverOf(tokenId));
-        return resolver.getManyByHash(keyHashes, tokenId);
+        return _registry.getManyByHash(keyHashes, tokenId);
     }
 
     function getData(string[] calldata keys, uint256 tokenId)
         external
         override
         returns (
-            address resolver,
             address owner,
             string[] memory values
         )
     {
-        resolver = _resolverOf(tokenId);
         owner = _ownerOf(tokenId);
-
-        if(resolver != address(0x0)) {
-            Resolver resolverContract = Resolver(resolver);
-            values = resolverContract.getMany(keys, tokenId);
-        }
+        values = _registry.getMany(keys, tokenId);
     }
 
     function getDataForMany(string[] calldata keys, uint256[] calldata tokenIds)
         external
         override
         returns (
-            address[] memory resolvers,
             address[] memory owners,
             string[][] memory values
         )
     {
-        resolvers = new address[](tokenIds.length);
         owners = new address[](tokenIds.length);
         values = new string[][](tokenIds.length);
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            (resolvers[i], owners[i], values[i]) = this.getData(keys, tokenIds[i]);
+            (owners[i], values[i]) = this.getData(keys, tokenIds[i]);
         }
     }
 
@@ -228,38 +203,30 @@ contract ProxyReader is ERC165Storage, IRegistryReader, IResolverReader, IDataRe
         external
         override
         returns (
-            address resolver,
             address owner,
             string[] memory keys,
             string[] memory values
         )
     {
-        resolver = _resolverOf(tokenId);
         owner = _ownerOf(tokenId);
-
-        if(resolver != address(0x0)) {
-            Resolver resolverContract = Resolver(resolver);
-            (keys, values) = resolverContract.getManyByHash(keyHashes, tokenId);
-        }
+        (keys, values) = _registry.getManyByHash(keyHashes, tokenId);
     }
 
     function getDataByHashForMany(uint256[] calldata keyHashes, uint256[] calldata tokenIds)
         external
         override
         returns (
-            address[] memory resolvers,
             address[] memory owners,
             string[][] memory keys,
             string[][] memory values
         )
     {
-        resolvers = new address[](tokenIds.length);
         owners = new address[](tokenIds.length);
         keys = new string[][](tokenIds.length);
         values = new string[][](tokenIds.length);
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            (resolvers[i], owners[i], keys[i], values[i]) = this.getDataByHash(keyHashes, tokenIds[i]);
+            (owners[i], keys[i], values[i]) = this.getDataByHash(keyHashes, tokenIds[i]);
         }
     }
 
@@ -280,16 +247,6 @@ contract ProxyReader is ERC165Storage, IRegistryReader, IResolverReader, IDataRe
         if (success == true) {
             (address _owner) = abi.decode(result, (address));
             return _owner;
-        }
-        return address(0x0);
-    }
-
-    // bytes4(keccak256(abi.encodePacked('resolverOf(uint256)'))) == 0xb3f9e4cb
-    function _resolverOf(uint256 tokenId) private returns (address) {
-        (bool success, bytes memory result) = address(this).call(abi.encodeWithSelector(0xb3f9e4cb, tokenId));
-        if (success == true) {
-            (address _resolver) = abi.decode(result, (address));
-            return _resolver;
         }
         return address(0x0);
     }

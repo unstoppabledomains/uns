@@ -29,9 +29,6 @@ interface ISignatureController is ITokenBasedNonce {
     function safeTransferFromFor(address from, address to, uint256 tokenId, bytes calldata _data, bytes calldata signature) external;
     function safeTransferFromFor(address from, address to, uint256 tokenId, bytes calldata signature) external;
 
-    /// A signature function based on resolveTo inside ./IRegistry.sol.
-    function resolveToFor(address to, uint256 tokenId, bytes calldata signature) external;
-
     /// A signature function based on burn inside ./IRegistry.sol.
     function burnFor(uint256 tokenId, bytes calldata signature) external;
 

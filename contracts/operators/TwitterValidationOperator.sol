@@ -101,9 +101,8 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
     hasAvailableBalance {
         uint256 _payment = calculatePaymentForValidation(_requestId);
         withdrawableTokens = withdrawableTokens.add(_payment);
-        IResolver Resolver = IResolver(registry.resolverOf(_tokenId));
-        Resolver.set("social.twitter.username", _username, _tokenId);
-        Resolver.set("validation.social.twitter.username", _signature, _tokenId);
+        registry.set("social.twitter.username", _username, _tokenId);
+        registry.set("validation.social.twitter.username", _signature, _tokenId);
         emit Validation(_tokenId, _requestId, _payment);
     }
 

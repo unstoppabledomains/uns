@@ -4,7 +4,9 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
-interface IRegistry is IERC721Metadata {
+import "./IResolver.sol";
+
+interface IRegistry is IERC721Metadata, IResolver {
 
     event NewURI(uint256 indexed tokenId, string uri);
 
@@ -120,29 +122,6 @@ interface IRegistry is IERC721Metadata {
      * @param tokenId uint256 ID of the token to be burned
      */
     function controlledBurn(uint256 tokenId) external;
-
-    /**
-     * @dev Sets the resolver of a given token ID to another address.
-     * Requires the msg.sender to be the owner, approved, or operator.
-     * @param to address the given token ID will resolve to
-     * @param tokenId uint256 ID of the token to be transferred
-     */
-    function resolveTo(address to, uint256 tokenId) external;
-
-    /**
-     * @dev Gets the resolver of the specified token ID.
-     * @param tokenId uint256 ID of the token to query the resolver of
-     * @return address currently marked as the resolver of the given token ID
-     */
-    function resolverOf(uint256 tokenId) external view returns (address);
-
-    /**
-     * @dev Controlled function to sets the resolver of a given token ID.
-     * Requires the msg.sender to be controller.
-     * @param to address the given token ID will resolve to
-     * @param tokenId uint256 ID of the token to be transferred
-     */
-    function controlledResolveTo(address to, uint256 tokenId) external;
 
     /**
      * @dev Provides child token (subdomain) of provided tokenId.

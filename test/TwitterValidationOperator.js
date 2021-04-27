@@ -3,7 +3,6 @@ const { expectRevert, constants } = require('@openzeppelin/test-helpers');
 const TwitterValidationOperator = artifacts.require('operators/TwitterValidationOperator.sol')
 const LinkTokenMock = artifacts.require('mocks/LinkTokenMock.sol')
 const Registry = artifacts.require('registry/Registry.sol')
-const Resolver = artifacts.require('Resolver.sol')
 const MintingController = artifacts.require('controller/MintingController.sol')
 
 const usedGas = require('./helpers/getUsedGas')
@@ -14,7 +13,7 @@ const { ZERO_ADDRESS } = constants;
 contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCapper, fundsReceiver, validationRequester]) {
   const domainName = 'twitter-validation'
   const operatorInitialBalance = 100
-  let linkToken, registry, resolver, mintingController, domainTokenId, operator
+  let linkToken, registry, mintingController, domainTokenId, operator
 
   before(async () => {
     linkToken = await LinkTokenMock.new()
@@ -23,11 +22,9 @@ contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCa
     registry = await Registry.new()
     mintingController = await MintingController.new(registry.address)
     await registry.addController(mintingController.address)
-    resolver = await Resolver.new(registry.address, mintingController.address)
 
     await mintingController.mintSLD(coinbase, domainName)
     domainTokenId = await registry.childIdOf(await registry.root(), domainName)
-    await registry.resolveTo(resolver.address, domainTokenId)
   })
 
   beforeEach(async () => {
@@ -41,21 +38,20 @@ contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCa
   it('should set twitter username and signature', async () => {
     let tx = await operator.setValidation('rainberk', '0x1bd3c1e0eb3d9143d6365cfd328a002e01b01d1acd719b12d37d8791fbaeed7b0b850d995c3e32ba79b34dbb15962bd68529f9360eb7507961f67e7e6645e9a41b', domainTokenId, 0, {from: whitelisted})
     console.log(`      ⓘ TwitterValidationOperator.setValidation - first validation, first domain: ${getUsedGas(tx)}`)
-    let validationRecords = await resolver.getMany(['social.twitter.username', 'validation.social.twitter.username'], domainTokenId)
+    let validationRecords = await registry.getMany(['social.twitter.username', 'validation.social.twitter.username'], domainTokenId)
     assert.deepEqual(validationRecords, ['rainberk', '0x1bd3c1e0eb3d9143d6365cfd328a002e01b01d1acd719b12d37d8791fbaeed7b0b850d995c3e32ba79b34dbb15962bd68529f9360eb7507961f67e7e6645e9a41b'])
 
     tx = await operator.setValidation('apple', '0x1bd3c1e0eb3d9143d6365cfd328a002e01b01d1acd719b12d37d8791fbaeed7b0b850d995c3e32ba79b34dbb15962bd68529f9360eb7507961f67e7e6645e9a41b', domainTokenId, 0, {from: whitelisted})
     console.log(`      ⓘ TwitterValidationOperator.setValidation - second validation, first domain: ${getUsedGas(tx)}`)
-    validationRecords = await resolver.getMany(['social.twitter.username', 'validation.social.twitter.username'], domainTokenId)
+    validationRecords = await registry.getMany(['social.twitter.username', 'validation.social.twitter.username'], domainTokenId)
     assert.deepEqual(validationRecords, ['apple', '0x1bd3c1e0eb3d9143d6365cfd328a002e01b01d1acd719b12d37d8791fbaeed7b0b850d995c3e32ba79b34dbb15962bd68529f9360eb7507961f67e7e6645e9a41b'])
 
     await mintingController.mintSLD(coinbase, 'testing-test')
     const secondDomainTokenId = await registry.childIdOf(await registry.root(), 'testing-test')
-    await registry.resolveTo(resolver.address, secondDomainTokenId)
     await registry.approve(operator.address, secondDomainTokenId)
     tx = await operator.setValidation('google', '0x1bd3c1e0eb3d9143d6365cfd328a002e01b01d1acd719b12d37d8791fbaeed7b0b850d995c3e32ba79b34dbb15962bd68529f9360eb7507961f67e7e6645e9a41b', secondDomainTokenId, 0, {from: whitelisted})
     console.log(`      ⓘ TwitterValidationOperator.setValidation - third validation, second domain: ${getUsedGas(tx)}`)
-    validationRecords = await resolver.getMany(['social.twitter.username', 'validation.social.twitter.username'], secondDomainTokenId)
+    validationRecords = await registry.getMany(['social.twitter.username', 'validation.social.twitter.username'], secondDomainTokenId)
     assert.deepEqual(validationRecords, ['google', '0x1bd3c1e0eb3d9143d6365cfd328a002e01b01d1acd719b12d37d8791fbaeed7b0b850d995c3e32ba79b34dbb15962bd68529f9360eb7507961f67e7e6645e9a41b'])
   })
 

@@ -9,10 +9,6 @@ import './IResolver.sol';
 import './IResolverReader.sol';
 
 contract Resolver is IResolverReader, SignatureUtil, IResolver {
-    event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value);
-    event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key);
-    event ResetRecords(uint256 indexed tokenId);
-
     // Mapping from token ID to preset id to key to value
     mapping (uint256 => mapping (uint256 =>  mapping (string => string))) internal _records;
 
@@ -33,7 +29,7 @@ contract Resolver is IResolverReader, SignatureUtil, IResolver {
      * @dev Throws if called when not the resolver.
      */
     modifier whenResolver(uint256 tokenId) {
-        require(address(this) == _registry.resolverOf(tokenId), "RESOLVER_DETACHED_FROM_DOMAIN");
+        // require(address(this) == _registry.resolverOf(tokenId), "RESOLVER_DETACHED_FROM_DOMAIN");
         _;
     }
 
@@ -220,7 +216,7 @@ contract Resolver is IResolverReader, SignatureUtil, IResolver {
     // reset records
     function _setPreset(uint256 presetId, uint256 tokenId) internal {
         _tokenPresets[tokenId] = presetId;
-        _registry.sync(tokenId, 0); // notify registry that domain records were reset
+        // _registry.sync(tokenId, 0); // notify registry that domain records were reset
         emit ResetRecords(tokenId);
     }
 
@@ -234,7 +230,7 @@ contract Resolver is IResolverReader, SignatureUtil, IResolver {
     function _set(uint256 preset, string memory key, string memory value, uint256 tokenId) internal {
         uint256 keyHash = uint256(keccak256(bytes(key)));
         bool isNewKey = bytes(_records[tokenId][preset][key]).length == 0;
-        _registry.sync(tokenId, keyHash);
+        // _registry.sync(tokenId, keyHash);
         _records[tokenId][preset][key] = value;
 
         if (bytes(_hashedKeys[keyHash]).length == 0) {
