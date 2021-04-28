@@ -7,7 +7,7 @@ import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
 import "@openzeppelin/contracts/utils/Address.sol";
 
 import "./IRegistry.sol";
-import './IResolverReader.sol';
+import './RecordStorage.sol';
 import "./roles/ControllerRole.sol";
 
 /**
@@ -15,22 +15,13 @@ import "./roles/ControllerRole.sol";
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, IResolverReader, ControllerRole, ERC721Burnable, ERC165Storage {
+contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721Burnable, ERC165Storage {
     using Address for address;
 
     // Optional mapping for token URIs
     mapping(uint256 => string) internal _tokenURIs;
 
     string internal _prefix;
-
-    // Mapping from token ID to preset id to key to value
-    mapping (uint256 => mapping (uint256 =>  mapping (string => string))) internal _records;
-
-    // Mapping from token ID to current preset id
-    mapping (uint256 => uint256) _tokenPresets;
-
-    // All keys that were set
-    mapping (uint256 => string) _hashedKeys;
 
     // uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked("crypto")))))
     uint256 private constant _CRYPTO_HASH =
@@ -156,77 +147,40 @@ contract Registry is IRegistry, IResolverReader, ControllerRole, ERC721Burnable,
 
     /// Resolution
 
-    function reset(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) {
-        _setPreset(block.timestamp, tokenId);
-    }
-
-    function get(string memory key, uint256 tokenId) public view override returns (string memory) {
-        return _records[tokenId][_tokenPresets[tokenId]][key];
-    }
-
-    function hashToKey(uint256 keyHash) public view returns (string memory) {
-        return _hashedKeys[keyHash];
-    }
-
-    function hashesToKeys(uint256[] memory hashes) public view returns (string[] memory) {
-        uint256 keyCount = hashes.length;
-        string[] memory values = new string[](keyCount);
-        for (uint256 i = 0; i < keyCount; i++) {
-            values[i] = hashToKey(hashes[i]);
-        }
-
-        return values;
-    }
-
-    function getByHash(uint256 keyHash, uint256 tokenId) public view override returns (string memory key, string memory value) {
-        key = hashToKey(keyHash);
-        value = get(key, tokenId);
-    }
-
-    function getManyByHash(
-        uint256[] memory keyHashes,
+    function set(
+        string calldata key,
+        string calldata value,
         uint256 tokenId
-    ) public view override returns (string[] memory keys, string[] memory values) {
-        uint256 keyCount = keyHashes.length;
-        keys = new string[](keyCount);
-        values = new string[](keyCount);
-        for (uint256 i = 0; i < keyCount; i++) {
-            (keys[i], values[i]) = getByHash(keyHashes[i], tokenId);
-        }
-    }
-
-    function preconfigure(
-        string[] memory keys,
-        string[] memory values,
-        uint256 tokenId
-    ) public override onlyController {
-        _setMany(_tokenPresets[tokenId], keys, values, tokenId);
-    }
-
-    function set(string calldata key, string calldata value, uint256 tokenId) external override onlyApprovedOrOwner(tokenId) {
-        _set(_tokenPresets[tokenId], key, value, tokenId);
-    }
-
-    function getMany(string[] calldata keys, uint256 tokenId) external view override returns (string[] memory) {
-        uint256 keyCount = keys.length;
-        string[] memory values = new string[](keyCount);
-        uint256 preset = _tokenPresets[tokenId];
-        for (uint256 i = 0; i < keyCount; i++) {
-            values[i] = _records[tokenId][preset][keys[i]];
-        }
-        return values;
+    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) {
+        super.set(key, value, tokenId);
     }
 
     function setMany(
         string[] memory keys,
         string[] memory values,
         uint256 tokenId
-    ) public override onlyApprovedOrOwner(tokenId) {
-        _setMany(_tokenPresets[tokenId], keys, values, tokenId);
+    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) {
+        super.setMany(keys, values, tokenId);
     }
 
-    function reconfigure(string[] memory keys, string[] memory values, uint256 tokenId) public override onlyApprovedOrOwner(tokenId) {
-        _reconfigure(keys, values, tokenId);
+    function preconfigure(
+        string[] memory keys,
+        string[] memory values,
+        uint256 tokenId
+    ) public override(IRecordStorage, RecordStorage) onlyController {
+        super.preconfigure(keys, values, tokenId);
+    }
+
+    function reconfigure(
+        string[] memory keys,
+        string[] memory values,
+        uint256 tokenId
+    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) {
+        super.reconfigure(keys, values, tokenId);
+    }
+
+    function reset(uint256 tokenId) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) {
+        super.reset(tokenId);
     }
 
     /**
@@ -273,39 +227,5 @@ contract Registry is IRegistry, IResolverReader, ControllerRole, ERC721Burnable,
         if (bytes(_tokenURIs[tokenId]).length != 0) {
             delete _tokenURIs[tokenId];
         }
-    }
-
-    function _setPreset(uint256 presetId, uint256 tokenId) internal {
-        _tokenPresets[tokenId] = presetId;
-        emit Sync(_msgSender(), 0, tokenId);
-        emit ResetRecords(tokenId);
-    }
-
-    function _set(uint256 preset, string memory key, string memory value, uint256 tokenId) internal {
-        uint256 keyHash = uint256(keccak256(bytes(key)));
-        bool isNewKey = bytes(_records[tokenId][preset][key]).length == 0;
-        emit Sync(_msgSender(), keyHash, tokenId);
-        _records[tokenId][preset][key] = value;
-
-        if (bytes(_hashedKeys[keyHash]).length == 0) {
-            _hashedKeys[keyHash] = key;
-        }
-
-        if (isNewKey) {
-            emit NewKey(tokenId, key, key);
-        }
-        emit Set(tokenId, key, value, key, value);
-    }
-
-    function _setMany(uint256 preset, string[] memory keys, string[] memory values, uint256 tokenId) internal {
-        uint256 keyCount = keys.length;
-        for (uint256 i = 0; i < keyCount; i++) {
-            _set(preset, keys[i], values[i], tokenId);
-        }
-    }
-
-    function _reconfigure(string[] memory keys, string[] memory values, uint256 tokenId) internal {
-        _setPreset(block.timestamp, tokenId);
-        _setMany(_tokenPresets[tokenId], keys, values, tokenId);
     }
 }

@@ -1,7 +1,6 @@
 const { BN, expectEvent, expectRevert, constants } = require('@openzeppelin/test-helpers');
 
 const Registry = artifacts.require('registry/Registry.sol')
-const Resolver = artifacts.require('registry/Resolver.sol')
 const MintingController = artifacts.require('controller/MintingController.sol')
 const WhitelistedMinter = artifacts.require('util/WhitelistedMinter.sol')
 const {sign} = require('./helpers/signature.js')
@@ -9,7 +8,7 @@ const {sign} = require('./helpers/signature.js')
 const { ZERO_ADDRESS } = constants;
 
 contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
-  let whitelistedMinter, registry, mintingController, resolver, customResolver
+  let whitelistedMinter, registry, mintingController
 
   const getCallData = (contract, funcSig, ...args) => {
     const web3 = new Web3(contract.constructor.web3.currentProvider)
@@ -41,9 +40,6 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
     registry = await Registry.new()
     mintingController = await MintingController.new(registry.address)
     await registry.addController(mintingController.address)
-
-    resolver = await Resolver.new(registry.address, mintingController.address)
-    customResolver = await Resolver.new(registry.address, mintingController.address)
   })
 
   beforeEach(async () => {
@@ -344,7 +340,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
     })
   })
 
-  describe.skip('Gas consumption', () => {
+  describe('Gas consumption', () => {
     const keys1 = ['test-key1']
     const keys2 = [...keys1, 'test-key2']
     const keys5 = [...keys2, 'test-key3', 'test-key4', 'test-key5']
@@ -373,67 +369,11 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
     }
 
     const getCases = () => {
-      const {address: addr} = customResolver
       return [
         {
           func: 'mintSLD',
           funcSig: 'mintSLD(address,string)',
           params: [accounts[0], 't1-w1-'],
-        },
-        {
-          func: 'mintSLDToDefaultResolver',
-          funcSig: 'mintSLDToDefaultResolver(address,string,string[],string[])',
-          params: [accounts[0], 't1-l0-', [], []],
-        },
-        {
-          func: 'mintSLDToDefaultResolver',
-          funcSig: 'mintSLDToDefaultResolver(address,string,string[],string[])',
-          params: [accounts[0], 't1-l1-', keys1, values1],
-        },
-        {
-          func: 'mintSLDToDefaultResolver',
-          funcSig: 'mintSLDToDefaultResolver(address,string,string[],string[])',
-          params: [accounts[0], 't1-l2-', keys2, values2],
-        },
-        {
-          func: 'mintSLDToDefaultResolver',
-          funcSig: 'mintSLDToDefaultResolver(address,string,string[],string[])',
-          params: [accounts[0], 't1-l5-', keys5, values5],
-        },
-        {
-          func: 'mintSLDToDefaultResolver',
-          funcSig: 'mintSLDToDefaultResolver(address,string,string[],string[])',
-          params: [accounts[0], 't1-l10-', keys10, values10],
-        },
-        {
-          func: 'mintSLDToResolver',
-          funcSig:
-            'mintSLDToResolver(address,string,string[],string[],address)',
-          params: [accounts[0], 't1-g0-', [], [], addr],
-        },
-        {
-          func: 'mintSLDToResolver',
-          funcSig:
-            'mintSLDToResolver(address,string,string[],string[],address)',
-          params: [accounts[0], 't1-g1-', keys1, values1, addr],
-        },
-        {
-          func: 'mintSLDToResolver',
-          funcSig:
-            'mintSLDToResolver(address,string,string[],string[],address)',
-          params: [accounts[0], 't1-g2-', keys2, values2, addr],
-        },
-        {
-          func: 'mintSLDToResolver',
-          funcSig:
-            'mintSLDToResolver(address,string,string[],string[],address)',
-          params: [accounts[0], 't1-g5-', keys5, values5, addr],
-        },
-        {
-          func: 'mintSLDToResolver',
-          funcSig:
-            'mintSLDToResolver(address,string,string[],string[],address)',
-          params: [accounts[0], 't1-g10-', keys10, values10, addr],
         },
         {
           func: 'safeMintSLD',
@@ -444,66 +384,6 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
           func: 'safeMintSLD',
           funcSig: 'safeMintSLD(address,string,bytes)',
           params: [accounts[0], 't1-y1-', '0x'],
-        },
-        {
-          func: 'safeMintSLDToDefaultResolver',
-          funcSig:
-            'safeMintSLDToDefaultResolver(address,string,string[],string[])',
-          params: [accounts[0], 't1-c0-', [], []],
-        },
-        {
-          func: 'safeMintSLDToDefaultResolver',
-          funcSig:
-            'safeMintSLDToDefaultResolver(address,string,string[],string[])',
-          params: [accounts[0], 't1-c1-', keys1, values1],
-        },
-        {
-          func: 'safeMintSLDToDefaultResolver',
-          funcSig:
-            'safeMintSLDToDefaultResolver(address,string,string[],string[])',
-          params: [accounts[0], 't1-c2-', keys2, values2],
-        },
-        {
-          func: 'safeMintSLDToDefaultResolver',
-          funcSig:
-            'safeMintSLDToDefaultResolver(address,string,string[],string[])',
-          params: [accounts[0], 't1-c5-', keys5, values5],
-        },
-        {
-          func: 'safeMintSLDToDefaultResolver',
-          funcSig:
-            'safeMintSLDToDefaultResolver(address,string,string[],string[])',
-          params: [accounts[0], 't1-c10-', keys10, values10],
-        },
-        {
-          func: 'safeMintSLDToResolver',
-          funcSig:
-            'safeMintSLDToResolver(address,string,string[],string[],bytes,address)',
-          params: [accounts[0], 't1-qq-', [], [], '0x', addr],
-        },
-        {
-          func: 'safeMintSLDToResolver',
-          funcSig:
-            'safeMintSLDToResolver(address,string,string[],string[],bytes,address)',
-          params: [accounts[0], 't1-qw-', keys1, values1, '0x1234', addr],
-        },
-        {
-          func: 'safeMintSLDToResolver',
-          funcSig:
-            'safeMintSLDToResolver(address,string,string[],string[],bytes,address)',
-          params: [accounts[0], 't1-qe-', keys2, values2, '0x1234', addr],
-        },
-        {
-          func: 'safeMintSLDToResolver',
-          funcSig:
-            'safeMintSLDToResolver(address,string,string[],string[],bytes,address)',
-          params: [accounts[0], 't1-q5-', keys5, values5, '0x1234', addr],
-        },
-        {
-          func: 'safeMintSLDToResolver',
-          funcSig:
-            'safeMintSLDToResolver(address,string,string[],string[],bytes,address)',
-          params: [accounts[0], 't1-q10-', keys10, values10, '0x1234', addr],
         },
       ]
     }

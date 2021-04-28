@@ -107,9 +107,9 @@ contract('ProxyReader', ([coinbase, ...accounts]) => {
       });
     });
 
-    describe('IResolverReader', () => {
-      it('should support IResolverReader interface', async () => {
-        const isSupport = await proxy.supportsInterface('0xc897de98');
+    describe('IRecordReader', () => {
+      it('should support IRecordReader interface', async () => {
+        const isSupport = await proxy.supportsInterface('0xdf4c495e');
         assert.isTrue(isSupport);
       });
 
@@ -168,28 +168,6 @@ contract('ProxyReader', ([coinbase, ...accounts]) => {
       });
 
       describe('getData', () => {
-        it('should return empty data when resolver not found', async () => {
-          const unknownTokenId = await registry.childIdOf(await registry.root(), 'unknown');
-          const data = await proxy.getData.call([], unknownTokenId)
-
-          assert.equal(data.owner, ZERO_ADDRESS);
-          assert.deepEqual(data.values, []);
-        });
-
-        it('should return empty resolver when resolver is not set', async () => {
-          // arrange
-          const _domainName = 'hey_hoy_1qw'
-          await mintingController.mintSLD(coinbase, _domainName);
-          const _tokenId = await registry.childIdOf(await registry.root(), _domainName);
-
-          // act
-          const data = await proxy.getData.call([], _tokenId);
-
-          // assert
-          assert.equal(data.owner, coinbase);
-          assert.deepEqual(data.values, []);
-        });
-
         it('should return data by keys', async () => {
           // arrange
           const _domainName = 'hey_hoy_121'
@@ -211,14 +189,6 @@ contract('ProxyReader', ([coinbase, ...accounts]) => {
 
           assert.deepEqual(data.owners, []);
           assert.deepEqual(data.values, []);
-        });
-
-        it('should return empty data when resolver not found', async () => {
-          const unknownTokenId = await registry.childIdOf(await registry.root(), 'unknown');
-          const data = await proxy.getDataForMany.call([], [unknownTokenId])
-
-          assert.deepEqual(data.owners, [ZERO_ADDRESS]);
-          assert.deepEqual(data.values, [[]]);
         });
 
         it('should return data for multiple tokens', async () => {
@@ -252,28 +222,6 @@ contract('ProxyReader', ([coinbase, ...accounts]) => {
       });
 
       describe('getDataByHash', () => {
-        it('should return empty data when resolver not found', async () => {
-          const unknownTokenId = await registry.childIdOf(await registry.root(), 'unknown');
-          const data = await proxy.getDataByHash.call([], unknownTokenId)
-
-          assert.equal(data.owner, ZERO_ADDRESS);
-          assert.deepEqual(data.values, []);
-        });
-
-        it('should return empty resolver when resolver is not set', async () => {
-          // arrange
-          const _domainName = 'hey_hoy_faw'
-          await mintingController.mintSLD(coinbase, _domainName);
-          const _tokenId = await registry.childIdOf(await registry.root(), _domainName);
-
-          // act
-          const data = await proxy.getDataByHash.call([], _tokenId);
-
-          // assert
-          assert.equal(data.owner, coinbase);
-          assert.deepEqual(data.values, []);
-        });
-
         it('should return data by hashes', async () => {
           // arrange
           const hashes = keys.map(utils.keccak256);
@@ -298,15 +246,6 @@ contract('ProxyReader', ([coinbase, ...accounts]) => {
           assert.deepEqual(data.owners, []);
           assert.deepEqual(data.keys, []);
           assert.deepEqual(data.values, []);
-        });
-
-        it('should return empty data when resolver not found', async () => {
-          const unknownTokenId = await registry.childIdOf(await registry.root(), 'unknown');
-          const data = await proxy.getDataByHashForMany.call([], [unknownTokenId])
-
-          assert.deepEqual(data.owners, [ZERO_ADDRESS]);
-          assert.deepEqual(data.keys, [[]]);
-          assert.deepEqual(data.values, [[]]);
         });
 
         it('should return data for multiple tokens', async () => {

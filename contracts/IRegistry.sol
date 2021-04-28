@@ -4,9 +4,9 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
-import "./IResolver.sol";
+import "./IRecordStorage.sol";
 
-interface IRegistry is IERC721Metadata, IResolver {
+interface IRegistry is IERC721Metadata, IRecordStorage {
 
     event NewURI(uint256 indexed tokenId, string uri);
 

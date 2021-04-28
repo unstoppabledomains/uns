@@ -263,7 +263,7 @@ contract('Registry', function([coinbase, ...accounts]) {
       const expectedKey = 'new-hashed-key'
       await registry.set(expectedKey, 'value', tok)
       const expectedKeyHash = utils.keccak256(expectedKey)
-      const keyFromHash = await registry.hashToKey(utils.hexToNumberString(expectedKeyHash))
+      const keyFromHash = await registry.getKey(utils.hexToNumberString(expectedKeyHash))
   
       assert.equal(keyFromHash, expectedKey)
     })
@@ -276,8 +276,8 @@ contract('Registry', function([coinbase, ...accounts]) {
         const keyHash = utils.keccak256(key)
         return utils.hexToNumberString(keyHash)
       });
-      const keysFromHashes = await registry.hashesToKeys(expectedKeyHashes)
-  
+      const keysFromHashes = await registry.getKeys(expectedKeyHashes)
+
       assert.deepEqual(keysFromHashes, expectedKeys)
     })
 

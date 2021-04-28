@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-interface IResolverReader {
+interface IRecordReader {
     /**
      * @dev Function to get record.
      * @param key The key to query the value of.

@@ -5,12 +5,11 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
 
 import './IRegistryReader.sol';
-import './IResolverReader.sol';
+import './IRecordReader.sol';
 import './IDataReader.sol';
 import './Registry.sol';
-import './Resolver.sol';
 
-contract ProxyReader is ERC165Storage, IRegistryReader, IResolverReader, IDataReader {
+contract ProxyReader is ERC165Storage, IRegistryReader, IRecordReader, IDataReader {
     string public constant NAME = 'Unstoppable Proxy Reader';
     string public constant VERSION = '0.2.0';
 
@@ -42,17 +41,14 @@ contract ProxyReader is ERC165Storage, IRegistryReader, IResolverReader, IDataRe
     bytes4 private constant _INTERFACE_ID_REGISTRY_READER = 0x6eabca0d;
 
     /*
-     * bytes4(keccak256(abi.encodePacked('nonceOf(uint256)'))) == 0x6ccbae5f
-     * bytes4(keccak256(abi.encodePacked('registry()'))) == 0x7b103999
      * bytes4(keccak256(abi.encodePacked('get(string,uint256)'))) == 0x1be5e7ed
      * bytes4(keccak256(abi.encodePacked('getByHash(uint256,uint256)'))) == 0x672b9f81
      * bytes4(keccak256(abi.encodePacked('getMany(string[],uint256)'))) == 0x1bd8cc1a
      * bytes4(keccak256(abi.encodePacked('getManyByHash(uint256[],uint256)'))) == 0xb85afd28
      *
-     * => 0x6ccbae5f ^ 0x7b103999 ^ 0x1be5e7ed ^
-     *    0x672b9f81 ^ 0x1bd8cc1a ^ 0xb85afd28 == 0xc897de98
+     * => 0x1be5e7ed ^ 0x672b9f81 ^ 0x1bd8cc1a ^ 0xb85afd28 == 0xdf4c495e
      */
-    bytes4 private constant _INTERFACE_ID_RESOLVER_READER = 0xc897de98;
+    bytes4 private constant _INTERFACE_ID_RECORD_READER = 0xdf4c495e;
 
     /*
      * bytes4(keccak256(abi.encodePacked('getData(string[],uint256)'))) == 0x91015f6b
@@ -72,7 +68,7 @@ contract ProxyReader is ERC165Storage, IRegistryReader, IResolverReader, IDataRe
 
         _registerInterface(_INTERFACE_ID_ERC165);
         _registerInterface(_INTERFACE_ID_REGISTRY_READER);
-        _registerInterface(_INTERFACE_ID_RESOLVER_READER);
+        _registerInterface(_INTERFACE_ID_RECORD_READER);
         _registerInterface(_INTERFACE_ID_DATA_READER);
     }
 
