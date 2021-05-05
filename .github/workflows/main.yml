@@ -23,11 +23,9 @@ jobs:
           restore-keys: yarn-v2-
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true'
-      - run: yarn test
+      - run: yarn compile:size
         env:
           FORCE_COLOR: 1
-          ENABLE_CONTRACT_SIZER: true
-          COMPILE_MODE: production
 
   test:
     runs-on: ubuntu-latest
