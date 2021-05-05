@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": false,
+    "module": "commonjs",
+    "target": "ES2017",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "composite": true,
+    "declaration": true,
+    "removeComments": true,
+    "noLib": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  },
+  "exclude": ["node_modules", "build"],
+  "include": ["./test", "./build/types"],
+  "files": ["./hardhat.config.ts"]
+}

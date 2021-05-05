@@ -24,23 +24,23 @@ abstract contract BradenRecords is ERC721 {
         uint256 token;
     }
 
-    /// @notice mapping of keyIds to keys
+    /// @dev mapping of keyIds to keys
     mapping(uint256 => string) internal _keys;
 
-    /// @notice mapping of presetIds to keyIds to values
-    mapping(uint256 => mapping(uint256 => string)) _presets;
+    /// @dev mapping of presetIds to keyIds to values
+    mapping(uint256 => mapping(uint256 => string)) internal _presets;
 
-    /// @notice mapping of tokenIds to presetIds
-    mapping(uint256 => uint256) _tokenPresets;
+    /// @dev mapping of tokenIds to presetIds
+    mapping(uint256 => uint256) internal _tokenPresets;
 
     // NOTE(bradenp): there are two additional costs to having the two types of presets:
     //   1. initialization cost in newOwnedPreset/newTokenPreset b/c of the require read.
     //   2. an aditional cost when transfering to wipe owned presets.
 
-    /// @notice mapping of presetId to preset owners
+    /// @dev mapping of presetId to preset owners
     mapping(uint256 => address) _presetOwners;
 
-    /// @notice mapping of presetId to preset tokens
+    /// @dev mapping of presetId to preset tokens
     mapping(uint256 => uint256) _presetTokens;
 
     function presetOf(uint256 tokenId) external view returns (uint256) {

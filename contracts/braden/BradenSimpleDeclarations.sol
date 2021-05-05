@@ -17,7 +17,7 @@ abstract contract BradenSimpleDeclarations is ERC721 {
         string value;
     }
 
-    /// @notice mapping of tokenId to owner to keyId to value
+    /// @dev mapping of tokenId to owner to keyId to value
     mapping(uint256 => mapping(address => mapping(uint256 => string))) _records;
 
     function write(Write[] calldata writes) external {
