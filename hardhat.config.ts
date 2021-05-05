@@ -11,13 +11,14 @@ const argv = require('yargs/yargs')()
   .boolean('enableGasReport')
   .boolean('enableContractSizer')
   .boolean('ci')
-  .string('compileMode')
-  .argv;
+  .string('compileMode').argv;
 
-require('@nomiclabs/hardhat-truffle5');
-require("@nomiclabs/hardhat-waffle");
-require('@nomiclabs/hardhat-solhint');
-require('solidity-coverage');
+import '@nomiclabs/hardhat-truffle5';
+import '@nomiclabs/hardhat-waffle';
+import '@nomiclabs/hardhat-solhint';
+import 'solidity-coverage';
+import 'hardhat-deploy';
+import '@typechain/hardhat';
 
 if (argv.enableGasReport) {
   require('hardhat-gas-reporter');
@@ -36,7 +37,7 @@ if (argv.enableContractSizer) {
  */
 module.exports = {
   solidity: {
-    version: '0.8.0',
+    version: '0.8.4',
     settings: {
       optimizer: {
         enabled: argv.enableGasReport || argv.compileMode === 'production',
@@ -57,5 +58,9 @@ module.exports = {
     alphaSort: true,
     runOnCompile: true,
     disambiguatePaths: false,
-  }
+  },
+  typechain: {
+    outDir: 'build/types',
+    target: 'ethers-v5',
+  },
 };
