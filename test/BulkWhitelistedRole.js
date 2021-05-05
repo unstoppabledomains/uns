@@ -1,35 +1,44 @@
+const { ethers } = require("hardhat");
 const { expectRevert } = require('@openzeppelin/test-helpers');
 
-const BulkWhitelistedRole = artifacts.require('roles/BulkWhitelistedRole.sol');
+describe('BulkWhitelistedRole', () => {
+  let bulkWhitelistedRole, notAdmin, accounts;
 
-contract('BulkWhitelistedRole', function([, notAdmin, ...accounts]) {
-  let bulkWhitelistedRole;
+  before(async () => {
+    [, notAdmin, ...accounts] = await ethers.getSigners();
+  })
 
   beforeEach(async () => {
-    bulkWhitelistedRole = await BulkWhitelistedRole.new()
+    const BulkWhitelistedRole = await ethers.getContractFactory("BulkWhitelistedRole");
+    bulkWhitelistedRole = await BulkWhitelistedRole.deploy();
+    
+    await bulkWhitelistedRole.deployed();
+    console.log('bulkWhitelistedRole');
   })
 
   it('should add and remove multiple accounts', async () => {
-    await bulkWhitelistedRole.bulkAddWhitelisted(accounts);
-    assert.isAbove(accounts.length, 0);
-    for (account of accounts) {
+    const _accounts = accounts.map(s => s.address);
+    await bulkWhitelistedRole.bulkAddWhitelisted(_accounts);
+    assert.isAbove(_accounts.length, 0);
+    for (account of _accounts) {
       assert.isTrue(await bulkWhitelistedRole.isWhitelisted(account))
     }
 
-    await bulkWhitelistedRole.bulkRemoveWhitelisted(accounts);
-    for (account of accounts) {
+    await bulkWhitelistedRole.bulkRemoveWhitelisted(_accounts);
+    for (account of _accounts) {
       assert.isFalse(await bulkWhitelistedRole.isWhitelisted(account))
     }
   })
 
   it('should not allow add or remove accounts from non-admin address', async () => {
+    const _accounts = accounts.map(s => s.address);
     await expectRevert(
-      bulkWhitelistedRole.bulkAddWhitelisted(accounts, {from: notAdmin}),
+      bulkWhitelistedRole.connect(notAdmin).bulkAddWhitelisted(_accounts),
       'WhitelistedRole: CALLER_IS_NOT_ADMIN',
     );
 
     await expectRevert(
-      bulkWhitelistedRole.bulkRemoveWhitelisted(accounts, {from: notAdmin}),
+      bulkWhitelistedRole.connect(notAdmin).bulkRemoveWhitelisted(_accounts),
       'WhitelistedRole: CALLER_IS_NOT_ADMIN',
     );
   })
