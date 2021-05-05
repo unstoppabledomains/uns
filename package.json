@@ -7,6 +7,7 @@
   "private": true,
   "scripts": {
     "compile": "hardhat compile",
+    "compile:size": "env ENABLE_CONTRACT_SIZER=true COMPILE_MODE=production yarn compile",
     "coverage": "hardhat coverage",
     "test": "hardhat test",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test"

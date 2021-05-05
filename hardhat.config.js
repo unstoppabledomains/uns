@@ -1,5 +1,6 @@
 /// ENVVAR
 // - ENABLE_GAS_REPORT
+// - ENABLE_CONTRACT_SIZER
 // - CI
 // - COMPILE_MODE
 
@@ -8,6 +9,7 @@ const path = require('path');
 const argv = require('yargs/yargs')()
   .env('')
   .boolean('enableGasReport')
+  .boolean('enableContractSizer')
   .boolean('ci')
   .string('compileMode')
   .argv;
@@ -15,10 +17,13 @@ const argv = require('yargs/yargs')()
 require('@nomiclabs/hardhat-truffle5');
 require('@nomiclabs/hardhat-solhint');
 require('solidity-coverage');
-require('hardhat-contract-sizer');
 
 if (argv.enableGasReport) {
   require('hardhat-gas-reporter');
+}
+
+if (argv.enableContractSizer) {
+  require('hardhat-contract-sizer');
 }
 
 // for (const f of fs.readdirSync(path.join(__dirname, 'hardhat'))) {
