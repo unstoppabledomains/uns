@@ -3,7 +3,6 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
-import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
 import "@openzeppelin/contracts/utils/Address.sol";
 
 import "./IRegistry.sol";
@@ -15,11 +14,8 @@ import "./roles/ControllerRole.sol";
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721Burnable, ERC165Storage {
+contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721Burnable {
     using Address for address;
-
-    // Optional mapping for token URIs
-    mapping(uint256 => string) internal _tokenURIs;
 
     string internal _prefix;
 
@@ -34,18 +30,9 @@ contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721Burnable, E
 
     constructor() ERC721(".crypto", "UD") {
         _mint(address(0xdead), _CRYPTO_HASH);
-        // register the supported interfaces to conform to ERC721 via ERC165
-        _registerInterface(0x5b5e139f); // ERC721 Metadata Interface
-        _tokenURIs[root()] = "crypto";
-        emit NewURI(root(), "crypto");
     }
 
     /// ERC721 Metadata extension
-
-    function tokenURI(uint256 tokenId) public view virtual override(ERC721, IERC721Metadata) returns (string memory) {
-        require(_exists(tokenId));
-        return string(abi.encodePacked(_prefix, _tokenURIs[tokenId]));
-    }
 
     function controlledSetTokenURIPrefix(string calldata prefix) external override onlyController {
         _prefix = prefix;
@@ -186,7 +173,7 @@ contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721Burnable, E
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId) public view virtual override(AccessControl, ERC721, IERC165, ERC165Storage) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(AccessControl, ERC721, IERC165) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -198,34 +185,14 @@ contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721Burnable, E
     }
 
     function _mintChild(address to, uint256 tokenId, string memory label) internal {
-        uint256 childId = _childId(tokenId, label);
-        _mint(to, childId);
-
-        _afterMintChild(childId, tokenId, label);
+        _mint(to, _childId(tokenId, label));
     }
 
     function _safeMintChild(address to, uint256 tokenId, string memory label, bytes memory _data) internal {
-        uint256 childId = _childId(tokenId, label);
-        _safeMint(to, childId, _data);
-
-        _afterMintChild(childId, tokenId, label);
+        _safeMint(to, _childId(tokenId, label), _data);
     }
 
-    function _afterMintChild(uint256 childId, uint256 tokenId, string memory label) internal {
-        require(bytes(label).length != 0);
-        require(_exists(childId));
-
-        bytes memory domain = abi.encodePacked(label, ".", _tokenURIs[tokenId]);
-
-        _tokenURIs[childId] = string(domain);
-        emit NewURI(childId, string(domain));
-    }
-
-    function _burn(uint256 tokenId) internal override {
-        super._burn(tokenId);
-        // Clear metadata (if any)
-        if (bytes(_tokenURIs[tokenId]).length != 0) {
-            delete _tokenURIs[tokenId];
-        }
+    function _baseURI() internal view override(ERC721) returns (string memory) {
+        return _prefix;
     }
 }

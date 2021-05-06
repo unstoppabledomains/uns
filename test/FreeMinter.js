@@ -17,6 +17,7 @@ describe('FreeMinter', () => {
     registry = await Registry.deploy();
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
+    await registry.controlledSetTokenURIPrefix('/');
 
     freeMinter = await FreeMinter.deploy(mintingController.address);
     await mintingController.addMinter(freeMinter.address);
@@ -31,7 +32,7 @@ describe('FreeMinter', () => {
       await freeMinter.connect(developerSigner).functions['claim(string)'](domainSuffix)
       const tokenId = await registry.childIdOf(await registry.root(), `${DomainNamePrefix}${domainSuffix}`)
       const tokenUri = await registry.tokenURI(tokenId)
-      assert.equal(tokenUri, `${DomainNamePrefix}${domainSuffix}.crypto`)
+      assert.equal(tokenUri, `/${tokenId}`)
     })
 
     it('should send domain to requester', async () => {

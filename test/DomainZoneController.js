@@ -22,6 +22,7 @@ describe('DomainZoneController', () => {
     registry = await Registry.deploy();
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
+    await registry.controlledSetTokenURIPrefix('/');
 
     await mintingController.mintSLD(coinbase, secondLevelDomainName);
     secondLevelTokenId = await registry.childIdOf(await registry.root(), secondLevelDomainName);
@@ -52,18 +53,14 @@ describe('DomainZoneController', () => {
 
   it('should mint new child (subdomain) from whitelisted address', async () => {
     const subdomainName = 'subdomain'
-    const expectedDomainUri = `${subdomainName}.${secondLevelDomainName}.crypto`
-    const domainZoneController = await DomainZoneController.deploy(registry.address, [whitelisted])
+    const domainZoneController = await DomainZoneController.deploy(registry.address, [whitelisted]);
     await registry.approve(domainZoneController.address, secondLevelTokenId)
     const tx = await domainZoneController.connect(whitelistedSigner)
       .mintChild(domainReceiver, secondLevelTokenId, subdomainName, [], []);
     tx.receipt = await tx.wait();
     console.log(`      ⓘ DomainZoneController.mintChild - no records: ${ getUsedGas(tx) }`)
     const subdomainTokenId = await registry.childIdOf(secondLevelTokenId, subdomainName)
-    assert.equal(
-      await registry.tokenURI(subdomainTokenId),
-      expectedDomainUri
-    )
+    assert.equal(await registry.tokenURI(subdomainTokenId), `/${subdomainTokenId}`);
   })
 
   it('should mint new child (subdomain) with predefined domain records', async () => {

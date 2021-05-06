@@ -16,6 +16,7 @@ describe('Registry', () => {
     registry = await Registry.deploy();
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
+    await registry.controlledSetTokenURIPrefix('/');
   })
 
   describe('Registry', () => {
@@ -148,67 +149,39 @@ describe('Registry', () => {
     })
 
     it('should mint/burn/transfer metadata', async () => {
-      assert.equal(
-        await registry.tokenURI(await registry.root()),
-        'crypto',
-        'good root token URI',
-      )
+      const rootTok = await registry.root();
+      assert.equal(await registry.tokenURI(rootTok), `/${rootTok}`);
 
-      const tok = await registry.childIdOf(await registry.root(), 'label')
-
+      const tok = await registry.childIdOf(rootTok, 'label')
       await mintingController.mintSLD(coinbase, 'label')
 
-      assert.equal(
-        await registry.tokenURI(tok),
-        'label.crypto',
-        'good sld token URI',
-      )
+      assert.equal(await registry.tokenURI(tok), `/${tok}`);
 
       // should fail to get non existent tokenURI
       await expect(
         registry.tokenURI(1)
-      ).to.be.revertedWith('Transaction reverted without a reason');
+      ).to.be.revertedWith('ERC721Metadata: URI query for nonexistent token');
 
       const threeldTok = await registry.childIdOf(tok, '3ld')
-
       await registry.mintChild(coinbase, tok, '3ld')
-
-      assert.equal(
-        await registry.tokenURI(threeldTok),
-        '3ld.label.crypto',
-        'good 3ld token URI',
-      )
+      assert.equal(await registry.tokenURI(threeldTok), `/${threeldTok}`)
 
       await registry.burn(threeldTok)
-
       // should fail to get non existent tokenURI
       await expect(
         registry.tokenURI(threeldTok)
-      ).to.be.revertedWith('Transaction reverted without a reason');
+      ).to.be.revertedWith('ERC721Metadata: URI query for nonexistent token');
     })
 
     it('should set URI prefix', async () => {
-      assert.equal(
-        await registry.tokenURI(await registry.root()),
-        'crypto',
-        'good root token URI',
-      )
+      const tok = await registry.root();
+      assert.equal(await registry.tokenURI(tok), `/${tok}`);
 
-      await registry.controlledSetTokenURIPrefix('prefix-')
+      await registry.controlledSetTokenURIPrefix('prefix-');
+      assert.equal(await registry.tokenURI(tok), `prefix-${tok}`);
 
-      assert.equal(
-        await registry.tokenURI(await registry.root()),
-        'prefix-crypto',
-        'good URI prefix',
-      )
-
-      await registry.controlledSetTokenURIPrefix('')
-
-      assert.equal(
-        await registry.tokenURI(await registry.root()),
-        'crypto',
-        'good URI prefix',
-      )
+      await registry.controlledSetTokenURIPrefix('/');
+      assert.equal(await registry.tokenURI(tok), `/${tok}`);
     })
   });
 

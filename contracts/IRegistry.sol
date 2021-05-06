@@ -8,8 +8,6 @@ import "./IRecordStorage.sol";
 
 interface IRegistry is IERC721Metadata, IRecordStorage {
 
-    event NewURI(uint256 indexed tokenId, string uri);
-
     event NewURIPrefix(string prefix);
 
     event Resolve(uint256 indexed tokenId, address indexed to);
