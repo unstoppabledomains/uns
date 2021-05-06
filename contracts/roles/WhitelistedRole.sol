@@ -37,6 +37,15 @@ abstract contract WhitelistedRole is AccessControl {
         _removeWhitelisted(_msgSender());
     }
 
+
+    function addWhitelistAdmin(address account) public onlyWhitelistAdmin {
+        _setupRole(DEFAULT_ADMIN_ROLE, account);
+    }
+
+    function renounceWhitelistAdmin() public {
+        renounceRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    }
+
     function _addWhitelisted(address account) internal {
         _setupRole(WHITELISTED_ROLE, account);
     }
