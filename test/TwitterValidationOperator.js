@@ -1,4 +1,4 @@
-const { expectRevert, constants } = require('@openzeppelin/test-helpers');
+const { ZERO_ADDRESS } = require('./helpers/constants');
 
 const TwitterValidationOperator = artifacts.require('operators/TwitterValidationOperator.sol')
 const LinkTokenMock = artifacts.require('mocks/LinkTokenMock.sol')
@@ -7,8 +7,6 @@ const MintingController = artifacts.require('controller/MintingController.sol')
 
 const usedGas = require('./helpers/getUsedGas')
 const getUsedGas = usedGas.getUsedGas
-
-const { ZERO_ADDRESS } = constants;
 
 contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCapper, fundsReceiver, validationRequester]) {
   const domainName = 'twitter-validation'
@@ -79,27 +77,24 @@ contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCa
     await operator.setValidation('rainberk', 'signature', domainTokenId, 0, {from: whitelisted})
     const withdrawableTokens = (await operator.withdrawableTokens()).toNumber()
 
-    await expectRevert(
-      operator.withdraw(fundsReceiver, withdrawableTokens + 1),
-      'TwitterValidationOperator: TOO_MANY_TOKENS_REQUESTED'
-    );
+    await expect(
+      operator.withdraw(fundsReceiver, withdrawableTokens + 1)
+    ).to.be.revertedWith('TwitterValidationOperator: TOO_MANY_TOKENS_REQUESTED');
   })
 
   it('should not allow to withdraw LINK tokens from non-admin address', async () => {
     await operator.setValidation('rainberk', 'signature', domainTokenId, 0, {from: whitelisted})
     const withdrawableTokens = await operator.withdrawableTokens()
 
-    await expectRevert(
-      operator.withdraw(fundsReceiver, withdrawableTokens, {from: whitelisted}),
-      'WhitelistedRole: CALLER_IS_NOT_ADMIN'
-    );
+    await expect(
+      operator.withdraw(fundsReceiver, withdrawableTokens + 1, {from: whitelisted})
+    ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_ADMIN');
   })
 
   it('should not allowed to set validation from non-whitelised address', async () => {
-    await expectRevert(
-      operator.setValidation('rainberk', 'signature', domainTokenId, 0, {from: fundsReceiver}),
-      'WhitelistedRole: CALLER_IS_NOT_WHITELISTED'
-    );
+    await expect(
+      operator.setValidation('rainberk', 'signature', domainTokenId, 0, {from: fundsReceiver})
+    ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
   })
 
   it('should unlock LINK tokens for each validation', async () => {
@@ -124,17 +119,15 @@ contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCa
   })
 
   it('should not allow set price per validation from Admin', async () => {
-    await expectRevert(
-      operator.setPaymentPerValidation(100, 0, {from: coinbase}),
-      'CapperRole: CALLER_IS_NOT_CAPPER'
-    );
+    await expect(
+      operator.setPaymentPerValidation(100, 0, {from: coinbase})
+    ).to.be.revertedWith('CapperRole: CALLER_IS_NOT_CAPPER');
   })
 
   it('should not allow set price per valiation from Whitelisted', async () => {
-    await expectRevert(
-      operator.setPaymentPerValidation(100, 0, {from: whitelisted}),
-      'CapperRole: CALLER_IS_NOT_CAPPER'
-    );
+    await expect(
+      operator.setPaymentPerValidation(100, 0, {from: whitelisted})
+    ).to.be.revertedWith('CapperRole: CALLER_IS_NOT_CAPPER');
   })
 
   it('should not allow validate if operator does not have enough LINK tokens on balance', async () => {
@@ -145,10 +138,9 @@ contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCa
     await operator.setPaymentPerValidation(paymentPerValidation, 0, {from: paymentCapper})
     await linkToken.transfer(operator.address, paymentPerValidation - 1)
 
-    await expectRevert(
-      operator.setValidation('rainberk', 'signature', domainTokenId, 0, {from: whitelisted}),
-      'TwitterValidationOperator: NOT_ENOUGH_TOKENS_ON_CONTRACT_BALANCE'
-    );
+    await expect(
+      operator.setValidation('rainberk', 'signature', domainTokenId, 0, {from: whitelisted})
+    ).to.be.revertedWith('TwitterValidationOperator: NOT_ENOUGH_TOKENS_ON_CONTRACT_BALANCE');
   })
 
   it('should work with zero price', async () => {
@@ -172,18 +164,14 @@ contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCa
   })
 
   it('should fail canSetValidation from non-whitelisted address', async () => {
-    await expectRevert(
-      operator.canSetValidation(),
-      'WhitelistedRole: CALLER_IS_NOT_WHITELISTED'
-    );
+    await expect(operator.canSetValidation())
+      .to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
   })
 
   it('should fail canSetValidation if not enough balance', async () => {
     await operator.setPaymentPerValidation(999999, 0, {from: paymentCapper})
-    await expectRevert(
-      operator.canSetValidation({from: whitelisted}),
-      'TwitterValidationOperator: NOT_ENOUGH_TOKENS_ON_CONTRACT_BALANCE'
-    );
+    await expect(operator.canSetValidation({from: whitelisted}))
+      .to.be.revertedWith('TwitterValidationOperator: NOT_ENOUGH_TOKENS_ON_CONTRACT_BALANCE');
   })
 
   it('should set payment per validation for operator and user', async () => {
@@ -219,20 +207,18 @@ contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCa
     const userPaymentPerValidation = 1
     const validationData = web3.eth.abi.encodeParameters(['uint256', 'string'], [domainTokenId.toString(), 'adDweFs12'])
 
-    await expectRevert(
-      linkToken.transferAndCall(operator.address, userPaymentPerValidation, validationData),
-      'TwitterValidationOperator: INCORRECT_TOKENS_AMOUNT'
-    );
+    await expect(
+      linkToken.transferAndCall(operator.address, userPaymentPerValidation, validationData)
+    ).to.be.revertedWith('TwitterValidationOperator: INCORRECT_TOKENS_AMOUNT');
   })
 
   it('should fail if calling onTokenTransfer method directly not via LINK token smart contact', async () => {
     const userPaymentPerValidation = 2
     const validationData = web3.eth.abi.encodeParameters(['uint256', 'string'], [domainTokenId.toString(), 'adDweFs12'])
 
-    await expectRevert(
-      operator.onTokenTransfer(coinbase, userPaymentPerValidation, validationData),
-      'TwitterValidationOperator: CAN_CALL_FROM_LINK_TOKEN_ONLY'
-    );
+    await expect(
+      operator.onTokenTransfer(coinbase, userPaymentPerValidation, validationData)
+    ).to.be.revertedWith('TwitterValidationOperator: CAN_CALL_FROM_LINK_TOKEN_ONLY');
   })
 
   it('should fail if validation contract is not approved for tokenId', async () => {
@@ -240,10 +226,9 @@ contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCa
     const userPaymentPerValidation = 2
     const validationData = web3.eth.abi.encodeParameters(['uint256', 'string'], [domainTokenId.toString(), 'adDweFs12'])
 
-    await expectRevert(
-      linkToken.transferAndCall(operator.address, userPaymentPerValidation, validationData),
-      'TwitterValidationOperator: OPERATOR_SHOULD_BE_APPROVED'
-    );
+    await expect(
+      linkToken.transferAndCall(operator.address, userPaymentPerValidation, validationData)
+    ).to.be.revertedWith('TwitterValidationOperator: OPERATOR_SHOULD_BE_APPROVED');
   })
 
   it('should fail if sender doesn not have access to domain', async () => {
@@ -251,10 +236,9 @@ contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCa
     await linkToken.transfer(validationRequester, userPaymentPerValidation)
     const validationData = web3.eth.abi.encodeParameters(['uint256', 'string'], [domainTokenId.toString(), 'adDweFs12'])
 
-    await expectRevert(
-      linkToken.transferAndCall(operator.address, userPaymentPerValidation, validationData, {from: validationRequester}),
-      'TwitterValidationOperator: SENDER_DOES_NOT_HAVE_ACCESS_TO_DOMAIN'
-    );
+    await expect(
+      linkToken.transferAndCall(operator.address, userPaymentPerValidation, validationData, {from: validationRequester})
+    ).to.be.revertedWith('TwitterValidationOperator: SENDER_DOES_NOT_HAVE_ACCESS_TO_DOMAIN');
   })
 
   it('should set validation initiated from blockchain', async () => {

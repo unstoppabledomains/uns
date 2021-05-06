@@ -1,15 +1,20 @@
-const { expectRevert, expectEvent } = require('@openzeppelin/test-helpers');
-const { utils } = require('web3');
+const { utils, BigNumber } = ethers;
 
-const Registry = artifacts.require('Registry.sol')
-const MintingController = artifacts.require('controller/MintingController.sol')
-
-contract('Registry', function([coinbase, ...accounts]) {
-  let mintingController, registry
+describe('Registry', () => {
+  let Registry, MintingController;
+  let mintingController, registry;
+  let signers, coinbase, accounts;
 
   before(async () => {
-    registry = await Registry.new();
-    mintingController = await MintingController.new(registry.address);
+    signers = await ethers.getSigners();
+    [coinbase, ...accounts] = signers.map(s => s.address);
+
+    Registry = await ethers.getContractFactory('Registry');
+    MintingController = await ethers.getContractFactory('MintingController');
+    Simple = await ethers.getContractFactory('Simple');
+
+    registry = await Registry.deploy();
+    mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
   })
 
@@ -18,8 +23,8 @@ contract('Registry', function([coinbase, ...accounts]) {
       const root = await registry.root()
 
       assert.equal(
-        root.toString(16),
-        'f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
+        root.toHexString(),
+        '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
         'good root',
       )
     })
@@ -38,11 +43,9 @@ contract('Registry', function([coinbase, ...accounts]) {
 
     it('should mint children', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'otherlabel')
-
       await mintingController.mintSLD(coinbase, 'otherlabel')
 
       await registry.mintChild(coinbase, tok, '3ld')
-
       const threeld = await registry.childIdOf(tok, '3ld')
 
       assert.equal(
@@ -52,7 +55,6 @@ contract('Registry', function([coinbase, ...accounts]) {
       )
 
       await registry.mintChild(coinbase, threeld, '4ld')
-
       const fourld = await registry.childIdOf(threeld, '4ld')
 
       assert.equal(
@@ -72,32 +74,28 @@ contract('Registry', function([coinbase, ...accounts]) {
       )
 
       // should fail to mint existing token
-      await expectRevert(
-        registry.mintChild(coinbase, tok, '3ld'),
-        'ERC721: token already minted',
-      );
+      await expect(
+        registry.mintChild(coinbase, tok, '3ld')
+      ).to.be.revertedWith('ERC721: token already minted');
 
       // should fail to mint existing without permission
-      await expectRevert.unspecified(
-        registry.mintChild(coinbase, tok, '3ld', {from: accounts[0]}),
-      );
+      await expect(
+        registry.connect(signers[1]).mintChild(coinbase, tok, '3ld')
+      ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNE');
     })
 
     it('should transfer children', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'transfer')
 
       // should fail to transfer non-existing token
-      await expectRevert(
-        registry.transferFromChild(coinbase, accounts[0], 1, ''),
-        'ERC721: operator query for nonexistent token'
-      )
+      await expect(
+        registry.transferFromChild(coinbase, accounts[0], 1, '')
+      ).to.be.revertedWith('ERC721: operator query for nonexistent token');
 
       await mintingController.mintSLD(coinbase, 'transfer')
 
       await registry.mintChild(coinbase, tok, '3ld')
-
       await registry.transferFromChild(coinbase, accounts[0], tok, '3ld')
-
       const threeld = await registry.childIdOf(tok, '3ld')
 
       assert.equal(
@@ -107,10 +105,9 @@ contract('Registry', function([coinbase, ...accounts]) {
       )
 
       // should fail to transfer token without permission
-      await expectRevert(
-        registry.transferFromChild(accounts[1], accounts[2], tok, '3ld'),
-        'ERC721: transfer of token that is not own'
-      )
+      await expect(
+        registry.transferFromChild(accounts[1], accounts[2], tok, '3ld')
+      ).to.be.revertedWith('ERC721: transfer of token that is not own');
 
       await registry.transferFromChild(accounts[0], coinbase, tok, '3ld')
 
@@ -125,31 +122,29 @@ contract('Registry', function([coinbase, ...accounts]) {
       const tok = await registry.childIdOf(await registry.root(), 'burn')
 
       // should fail to burn non-existing token
-      await expectRevert(
-        registry.burnChild(1, ''),
-        'ERC721: operator query for nonexistent token'
-      );
+      await expect(
+        registry.burnChild(1, '')
+      ).to.be.revertedWith('ERC721: operator query for nonexistent token');
 
       await mintingController.mintSLD(coinbase, 'burn')
 
       await registry.mintChild(coinbase, tok, '3ld')
-
       await registry.childIdOf(tok, '3ld')
 
       await registry.burnChild(tok, '3ld')
 
       // should burn token correctly
-      await expectRevert(
-        registry.burnChild(tok, '3ld'),
-        'ERC721: owner query for nonexistent token'
-      );
+      await expect(
+        registry.burnChild(tok, '3ld')
+      ).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
       await registry.mintChild(coinbase, tok, '3ld')
-
       await registry.transferFrom(coinbase, accounts[0], tok)
 
       // should fail to burn token without permission
-      await expectRevert.unspecified(registry.burnChild(tok, '3ld'));
+      await expect(
+        registry.burnChild(tok, '3ld')
+      ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     })
 
     it('should mint/burn/transfer metadata', async () => {
@@ -170,7 +165,9 @@ contract('Registry', function([coinbase, ...accounts]) {
       )
 
       // should fail to get non existent tokenURI
-      await expectRevert.unspecified(registry.tokenURI(1));
+      await expect(
+        registry.tokenURI(1)
+      ).to.be.revertedWith('Transaction reverted without a reason');
 
       const threeldTok = await registry.childIdOf(tok, '3ld')
 
@@ -185,7 +182,9 @@ contract('Registry', function([coinbase, ...accounts]) {
       await registry.burn(threeldTok)
 
       // should fail to get non existent tokenURI
-      await expectRevert.unspecified(registry.tokenURI(threeldTok));
+      await expect(
+        registry.tokenURI(threeldTok)
+      ).to.be.revertedWith('Transaction reverted without a reason');
     })
 
     it('should set URI prefix', async () => {
@@ -224,10 +223,9 @@ contract('Registry', function([coinbase, ...accounts]) {
       const tok = await registry.childIdOf(await registry.root(), 'label_931')
   
       // should fail to set name if not owner
-      await expectRevert(
-        registry.set('key', 'value', tok),
-        'ERC721: operator query for nonexistent token',
-      );
+      await expect(
+        registry.set('key', 'value', tok)
+      ).to.be.revertedWith('ERC721: operator query for nonexistent token');
 
       await mintingController.mintSLD(coinbase, 'label_931')
       await registry.set('key', 'value', tok)
@@ -248,22 +246,21 @@ contract('Registry', function([coinbase, ...accounts]) {
       );
 
       // should reset
-      const receipt = await registry.reset(tok);
-      expectEvent(receipt, 'ResetRecords', {tokenId: tok.toString()});
+      await expect(registry.reset(tok))
+        .to.emit(registry, 'ResetRecords')
+        .withArgs(tok.toString());
   
       // should fail to set name if not owned
-      await expectRevert(
-        registry.set('key', 'value', tok, {from: accounts[1]}),
-        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
-      );
+      await expect(
+        registry.connect(signers[1]).set('key', 'value', tok)
+      ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     })
 
     it('should get key by hash', async () => {
       const tok = await initializeDomain('heyhash')
       const expectedKey = 'new-hashed-key'
       await registry.set(expectedKey, 'value', tok)
-      const expectedKeyHash = utils.keccak256(expectedKey)
-      const keyFromHash = await registry.getKey(utils.hexToNumberString(expectedKeyHash))
+      const keyFromHash = await registry.getKey(BigNumber.from(utils.id(expectedKey)))
   
       assert.equal(keyFromHash, expectedKey)
     })
@@ -272,10 +269,7 @@ contract('Registry', function([coinbase, ...accounts]) {
       const tok = await initializeDomain('heyhash-many')
       const expectedKeys = ['keyhash-many-1', 'keyhash-many-2']
       await registry.setMany(expectedKeys, ['value', 'value'], tok)
-      const expectedKeyHashes = expectedKeys.map(key => {
-        const keyHash = utils.keccak256(key)
-        return utils.hexToNumberString(keyHash)
-      });
+      const expectedKeyHashes = expectedKeys.map(key => BigNumber.from(utils.id(key)));
       const keysFromHashes = await registry.getKeys(expectedKeyHashes)
 
       assert.deepEqual(keysFromHashes, expectedKeys)
@@ -284,15 +278,21 @@ contract('Registry', function([coinbase, ...accounts]) {
     it('should not consume additional gas if key hash was set before', async () => {
       const tok = await initializeDomain('heyhash-gas')
       let newKeyHashTx = await registry.set('keyhash-gas', 'value', tok)
+      newKeyHashTx.receipt = await newKeyHashTx.wait();
       let exitsKeyHashTx = await registry.set('keyhash-gas', 'value', tok)
+      exitsKeyHashTx.receipt = await exitsKeyHashTx.wait();
       assert.isAbove(newKeyHashTx.receipt.gasUsed, exitsKeyHashTx.receipt.gasUsed)
 
       newKeyHashTx = await registry.setMany(['keyhash-gas-1', 'keyhash-gas-2'], ['value-1', 'value-2'], tok)
+      newKeyHashTx.receipt = await newKeyHashTx.wait();
       exitsKeyHashTx = await registry.setMany(['keyhash-gas-1', 'keyhash-gas-2'], ['value-1', 'value-2'], tok)
+      exitsKeyHashTx.receipt = await exitsKeyHashTx.wait();
       assert.isAbove(newKeyHashTx.receipt.gasUsed, exitsKeyHashTx.receipt.gasUsed)
 
       newKeyHashTx = await registry.setMany(['keyhash-gas-3', 'keyhash-gas-4', 'keyhash-gas-5'], ['value-1', 'value-2', 'value-3'], tok)
+      newKeyHashTx.receipt = await newKeyHashTx.wait();
       exitsKeyHashTx = await registry.setMany(['keyhash-gas-3', 'keyhash-gas-4', 'keyhash-gas-5'], ['value-1', 'value-2', 'value-3'], tok)
+      exitsKeyHashTx.receipt = await exitsKeyHashTx.wait();
       assert.isAbove(newKeyHashTx.receipt.gasUsed, exitsKeyHashTx.receipt.gasUsed)
     })
 
@@ -301,8 +301,7 @@ contract('Registry', function([coinbase, ...accounts]) {
       const key = 'get-key-by-hash-key'
       const expectedValue = 'get-key-by-hash-value'
       await registry.set(key, expectedValue, tok)
-      const keyHash = utils.keccak256(key)
-      const result = await registry.getByHash(keyHash, tok)
+      const result = await registry.getByHash(utils.id(key), tok)
   
       assert.equal(result.value, expectedValue)
       assert.equal(result.key, key)
@@ -313,45 +312,39 @@ contract('Registry', function([coinbase, ...accounts]) {
       const keys = ['key-to-hash-1', 'key-to-hash-2']
       const expectedValues = ['value-42', 'value-43']
       await registry.setMany(keys, expectedValues, tok)
-      const hashedKeys = keys.map(key => {
-        const keyHash = utils.keccak256(key)
-        return utils.hexToNumberString(keyHash)
-      });
+      const hashedKeys = keys.map(key => BigNumber.from(utils.id(key)));
       const result = await registry.getManyByHash(hashedKeys, tok)
   
-      assert.deepEqual(result.values, expectedValues)
-      assert.deepEqual(result.keys, keys)
+      assert.deepEqual(result, [keys, expectedValues])
     })
 
     it('should emit NewKey event new keys added', async () => {
       const tok = await initializeDomain('new-key')
       const key = 'new-key'
       const value = 'value';
-      let receipt = await registry.set(key, value, tok)
-      expectEvent(receipt, 'NewKey', {
-        tokenId: tok.toString(),
-        keyIndex: utils.keccak256(key),
-        key: key
-      });
-  
-      receipt = await registry.set(key, value, tok);
-      const event = receipt.logs.find(e => e.event == 'NewKey')
-      assert.isUndefined(event)
+
+      await expect(registry.set(key, value, tok))
+        .to.emit(registry, 'NewKey')
+        .withArgs(tok, utils.id(key), key);
+
+      await expect(registry.set(key, value, tok))
+        .not.to.emit(registry, 'NewKey')
     })
 
     it('should emit correct Set event', async () => {
       const tok = await initializeDomain('check-set-event')
       const key = 'new-key'
       const value = 'value';
-      const receipt = await registry.set(key, value, tok)
 
-      expectEvent(receipt, 'Set', {
-        tokenId: tok.toString(),
-        keyIndex: utils.keccak256(key),
-        valueIndex: utils.keccak256(value),
-        key: key,
-        value: value,
-      });
+      await expect(registry.set(key, value, tok))
+        .to.emit(registry, 'Set')
+        .withArgs(
+          tok,
+          utils.id(key),
+          utils.id(value),
+          key,
+          value,
+        );
     })
 
     it('should reconfigure resolver with new values', async () => {
@@ -363,10 +356,9 @@ contract('Registry', function([coinbase, ...accounts]) {
       assert.equal(await registry.get('new-key', tok), 'new-value')
 
       // should fail when trying to reconfigure non-owned domain
-      await expectRevert(
-        registry.reconfigure(['new-key'], ['new-value'], tok, { from: accounts[1] }),
-        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNE'
-      );
+      await expect(
+        registry.connect(signers[1]).reconfigure(['new-key'], ['new-value'], tok)
+      ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     })
   });
 })

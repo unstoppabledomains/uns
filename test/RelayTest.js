@@ -1,12 +1,10 @@
-const { expectRevert } = require('@openzeppelin/test-helpers');
-
-const RelayTest = artifacts.require('test-helpers/RelayTest.sol')
-
-contract('RelayTest', ([coinbase]) => {
+describe('RelayTest', () => {
+  let RelayTest
   let relayTest
 
   before(async () => {
-    relayTest = await RelayTest.new({from: coinbase})
+    RelayTest = await ethers.getContractFactory('RelayTest');
+    relayTest = await RelayTest.deploy()
   })
 
   function getCallData(web3, method, ...params) {
@@ -39,16 +37,15 @@ contract('RelayTest', ([coinbase]) => {
       const abi = RelayTest.toJSON().abi.find(v => v.name === 'getString')
       const data = web3.eth.abi.encodeFunctionCall(abi, [0])
 
-      await expectRevert(
+      await expect(
         web3.eth.call(
           {
             to: relayTest.address,
             data,
           },
           'latest',
-        ),
-        'VM Exception while processing transaction: revert',
-      )
+        )
+      ).to.be.revertedWith('VM Exception while processing transaction: revert');
     })
   })
 
