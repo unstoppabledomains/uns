@@ -48,6 +48,10 @@ module.exports = {
     hardhat: {
       blockGasLimit: 10000000,
     },
+    rinkeby: {
+      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_TEST_KEY}`,
+      accounts: [process.env.RINKEBY_UD_PRIVATE_KEY]
+    },
   },
   gasReporter: {
     currency: 'USD',
@@ -57,5 +61,5 @@ module.exports = {
     alphaSort: true,
     runOnCompile: true,
     disambiguatePaths: false,
-  }
+  },
 };

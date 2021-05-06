@@ -10,6 +10,9 @@
     "compile:size": "env ENABLE_CONTRACT_SIZER=true COMPILE_MODE=production yarn compile",
     "coverage": "hardhat coverage",
     "test": "hardhat test",
+    "migrate:localhost": "hardhat run scripts/migrate.js --network localhost",
+    "migrate:rinkeby": "hardhat run scripts/migrate.js --network rinkeby",
+    "node": "hardhat node",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test"
   },
   "devDependencies": {
