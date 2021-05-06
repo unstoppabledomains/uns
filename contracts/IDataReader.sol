@@ -10,6 +10,7 @@ interface IDataReader {
      */
     function getData(string[] calldata keys, uint256 tokenId)
         external
+        view
         returns (
             address owner,
             string[] memory values
@@ -22,6 +23,7 @@ interface IDataReader {
      */
     function getDataForMany(string[] calldata keys, uint256[] calldata tokenIds)
         external
+        view
         returns (
             address[] memory owners,
             string[][] memory values
@@ -34,6 +36,7 @@ interface IDataReader {
      */
     function getDataByHash(uint256[] calldata keyHashes, uint256 tokenId)
         external
+        view
         returns (
             address owner,
             string[] memory keys,
@@ -47,6 +50,7 @@ interface IDataReader {
      */
     function getDataByHashForMany(uint256[] calldata keyHashes, uint256[] calldata tokenIds)
         external
+        view
         returns (
             address[] memory owners,
             string[][] memory keys,
@@ -58,5 +62,6 @@ interface IDataReader {
      */
     function ownerOfForMany(uint256[] calldata tokenIds)
         external
+        view
         returns (address[] memory owners);
 }
