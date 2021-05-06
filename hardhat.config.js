@@ -4,8 +4,6 @@
 // - CI
 // - COMPILE_MODE
 
-const fs = require('fs');
-const path = require('path');
 const argv = require('yargs/yargs')()
   .env('')
   .boolean('enableGasReport')
@@ -15,7 +13,7 @@ const argv = require('yargs/yargs')()
   .argv;
 
 require('@nomiclabs/hardhat-truffle5');
-require("@nomiclabs/hardhat-waffle");
+require('@nomiclabs/hardhat-waffle');
 require('@nomiclabs/hardhat-solhint');
 require('solidity-coverage');
 
@@ -27,16 +25,15 @@ if (argv.enableContractSizer) {
   require('hardhat-contract-sizer');
 }
 
-// for (const f of fs.readdirSync(path.join(__dirname, 'hardhat'))) {
-//   require(path.join(__dirname, 'hardhat', f));
-// }
-
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
   solidity: {
     version: '0.8.0',
+    metadata: {
+      bytecodeHash: 'none',
+    },
     settings: {
       optimizer: {
         enabled: argv.enableGasReport || argv.compileMode === 'production',
@@ -50,12 +47,15 @@ module.exports = {
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.INFURA_TEST_KEY}`,
-      accounts: [process.env.RINKEBY_UD_PRIVATE_KEY]
+      accounts: process.env.RINKEBY_UD_PRIVATE_KEY
+        ? [process.env.RINKEBY_UD_PRIVATE_KEY]
+        : undefined
     },
   },
   gasReporter: {
     currency: 'USD',
     outputFile: argv.ci ? 'gas-report.txt' : undefined,
+    excludeContracts: ['Simple', 'LinkTokenMock' ],
   },
   contractSizer: {
     alphaSort: true,
