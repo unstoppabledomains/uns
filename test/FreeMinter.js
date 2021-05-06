@@ -18,7 +18,7 @@ describe('FreeMinter', () => {
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
 
-    freeMinter = await FreeMinter.deploy(mintingController.address, registry.address);
+    freeMinter = await FreeMinter.deploy(mintingController.address);
     await mintingController.addMinter(freeMinter.address);
   })
 

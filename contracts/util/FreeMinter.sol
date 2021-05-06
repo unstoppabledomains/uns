@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-import "../IResolver.sol";
 import "../controllers/MintingController.sol";
 
 contract FreeMinter {
@@ -11,11 +10,9 @@ contract FreeMinter {
     string private constant DOMAIN_NAME_PREFIX = 'udtestdev-';
 
     MintingController private _mintingController;
-    IResolver private _registry;
 
-    constructor(MintingController mintingController, IResolver registry) {
+    constructor(MintingController mintingController) {
         _mintingController = mintingController;
-        _registry = registry;
     }
 
     function claim(string calldata label) external {
