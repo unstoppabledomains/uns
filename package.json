@@ -7,7 +7,8 @@
   "private": true,
   "scripts": {
     "compile": "hardhat compile",
-    "compile:size": "env ENABLE_CONTRACT_SIZER=true COMPILE_MODE=production yarn compile",
+    "compile:size": "env ENABLE_CONTRACT_SIZER=true yarn compile",
+    "compile:size:prod": "env ENABLE_CONTRACT_SIZER=true COMPILE_MODE=production yarn compile",
     "coverage": "hardhat coverage",
     "test": "hardhat test",
     "migrate:localhost": "hardhat run --network localhost scripts/migrate.js",
