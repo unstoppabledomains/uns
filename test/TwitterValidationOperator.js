@@ -18,6 +18,7 @@ contract('TwitterValidationOperator', function([coinbase, whitelisted, paymentCa
     await linkToken.mint(coinbase, 100500)
 
     registry = await Registry.new()
+    await registry.initialize();
     mintingController = await MintingController.new(registry.address)
     await registry.addController(mintingController.address)
 

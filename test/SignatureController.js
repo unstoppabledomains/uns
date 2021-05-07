@@ -9,6 +9,7 @@ contract('SignatureController', ([coinbase]) => {
 
   before(async () => {
     registry = await Registry.new();
+    await registry.initialize();
     mintingController = await MintingController.new(registry.address);
     await registry.addController(mintingController.address);
 

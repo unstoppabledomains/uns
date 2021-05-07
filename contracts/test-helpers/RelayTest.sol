@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
 // {
 // 	"6d4ce63c": "get()",
@@ -17,7 +17,7 @@ import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
  * NOTE: The contract was built only for testing purposes
  */
 contract RelayTest {
-    using ECDSA for bytes32;
+    using ECDSAUpgradeable for bytes32;
 
     mapping(uint => string) private _stringStore;
     mapping(uint => uint) private _uintStore;

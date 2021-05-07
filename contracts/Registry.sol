@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
 import "./IRegistry.sol";
 import './RecordStorage.sol';
@@ -14,8 +14,8 @@ import "./roles/ControllerRole.sol";
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721Burnable {
-    using Address for address;
+contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721BurnableUpgradeable {
+    using AddressUpgradeable for address;
 
     string internal _prefix;
 
@@ -28,7 +28,9 @@ contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721Burnable {
         _;
     }
 
-    constructor() ERC721(".crypto", "UD") {
+    function initialize() public initializer {
+        __ERC721_init(".crypto", "UD");
+        _addRole(_msgSender());
         _mint(address(0xdead), _CRYPTO_HASH);
     }
 
@@ -173,7 +175,10 @@ contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721Burnable {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId) public view virtual override(AccessControl, ERC721, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        public view override(AccessControlUpgradeable, ERC721Upgradeable, IERC165Upgradeable)
+        returns (bool)
+    {
         return super.supportsInterface(interfaceId);
     }
 
@@ -192,7 +197,10 @@ contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721Burnable {
         _safeMint(to, _childId(tokenId, label), _data);
     }
 
-    function _baseURI() internal view override(ERC721) returns (string memory) {
+    function _baseURI()
+        internal view override(ERC721Upgradeable)
+        returns (string memory)
+    {
         return _prefix;
     }
 }

@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
 import "../roles/BulkWhitelistedRole.sol";
 import "../controllers/IMintingController.sol";
@@ -14,7 +14,7 @@ import "../Registry.sol";
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
 contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
-    using ECDSA for bytes32;
+    using ECDSAUpgradeable for bytes32;
 
     event Relayed(address indexed sender, address indexed signer, bytes4 indexed funcSig, bytes32 dataHash);
 

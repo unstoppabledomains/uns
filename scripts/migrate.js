@@ -1,4 +1,4 @@
-const hre = require("hardhat");
+const { ethers } = require("hardhat");
 
 const rinkebyAccounts = {
   workers: [
@@ -29,15 +29,15 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
-  const Registry = await hre.ethers.getContractFactory('Registry');
-  const URIPrefixController = await hre.ethers.getContractFactory('URIPrefixController');
-  const SignatureController = await hre.ethers.getContractFactory('SignatureController');
-  const MintingController = await hre.ethers.getContractFactory('MintingController');
-  const DomainZoneController = await hre.ethers.getContractFactory('DomainZoneController');
-  const WhitelistedMinter = await hre.ethers.getContractFactory('WhitelistedMinter');
-  const ProxyReader = await hre.ethers.getContractFactory('ProxyReader');
-  const TwitterValidationOperator = await hre.ethers.getContractFactory('TwitterValidationOperator');
-  const FreeMinter = await hre.ethers.getContractFactory('FreeMinter');
+  const Registry = await ethers.getContractFactory('Registry');
+  const URIPrefixController = await ethers.getContractFactory('URIPrefixController');
+  const SignatureController = await ethers.getContractFactory('SignatureController');
+  const MintingController = await ethers.getContractFactory('MintingController');
+  const DomainZoneController = await ethers.getContractFactory('DomainZoneController');
+  const WhitelistedMinter = await ethers.getContractFactory('WhitelistedMinter');
+  const ProxyReader = await ethers.getContractFactory('ProxyReader');
+  const TwitterValidationOperator = await ethers.getContractFactory('TwitterValidationOperator');
+  const FreeMinter = await ethers.getContractFactory('FreeMinter');
 
   console.log('Network', process.env.HARDHAT_NETWORK);
   const network = process.env.HARDHAT_NETWORK;
@@ -47,19 +47,19 @@ async function main() {
 
   const signatureController = await SignatureController.deploy(registry.address);
   console.log("SignatureController deployed to:", signatureController.address);
+  await registry.addController(signatureController.address);
 
   const mintingController = await MintingController.deploy(registry.address);
   console.log("MintingController deployed to:", mintingController.address);
+  await registry.addController(mintingController.address);
 
   const uriPrefixController = await URIPrefixController.deploy(registry.address);
   console.log("URIPrefixController deployed to:", uriPrefixController.address);
+  await registry.addController(uriPrefixController.address);
 
   const domainZoneController = await DomainZoneController.deploy(registry.address, []);
   console.log("DomainZoneController deployed to:", domainZoneController.address);
-
-  await registry.addController(signatureController.address);
-  await registry.addController(mintingController.address);
-  await registry.addController(uriPrefixController.address);
+  // TODO: figure out why domainZoneController did not add to registry as a controller (dot-crypto migration)
 
   if (network === 'live') {
     await registry.renounceController();

@@ -8,7 +8,6 @@
   "scripts": {
     "compile": "hardhat compile",
     "compile:size": "env ENABLE_CONTRACT_SIZER=true yarn compile",
-    "compile:size:prod": "env ENABLE_CONTRACT_SIZER=true COMPILE_MODE=production yarn compile",
     "coverage": "hardhat coverage",
     "test": "hardhat test",
     "migrate:localhost": "hardhat run --network localhost scripts/migrate.js",
@@ -23,7 +22,8 @@
     "@nomiclabs/hardhat-truffle5": "^2.0.0",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@openzeppelin/contracts": "^4.1.0",
+    "@openzeppelin/contracts-upgradeable": "^4.1.0",
+    "@openzeppelin/hardhat-upgrades": "^1.7.0",
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.1.4",

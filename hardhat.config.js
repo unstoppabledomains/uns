@@ -2,16 +2,15 @@
 // - ENABLE_GAS_REPORT
 // - ENABLE_CONTRACT_SIZER
 // - CI
-// - COMPILE_MODE
 
 const argv = require('yargs/yargs')()
   .env('')
   .boolean('enableGasReport')
   .boolean('enableContractSizer')
   .boolean('ci')
-  .string('compileMode')
   .argv;
 
+require('@openzeppelin/hardhat-upgrades');
 require('@nomiclabs/hardhat-truffle5');
 require('@nomiclabs/hardhat-waffle');
 require('@nomiclabs/hardhat-solhint');
@@ -36,7 +35,7 @@ module.exports = {
     },
     settings: {
       optimizer: {
-        enabled: argv.enableGasReport || argv.compileMode === 'production',
+        enabled: true,
         runs: 200,
       },
     },

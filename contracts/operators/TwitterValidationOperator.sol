@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 
 import "../util/ERC677Receiver.sol";
@@ -15,7 +15,7 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
     string public constant NAME = 'Chainlink Twitter Validation Operator';
     string public constant VERSION = '0.2.0';
 
-    using SafeMath for uint256;
+    using SafeMathUpgradeable for uint256;
 
     event Validation(uint256 indexed tokenId, uint256 requestId, uint256 paymentAmount);
     event ValidationRequest(uint256 indexed tokenId, address indexed owner, uint256 requestId, string code);

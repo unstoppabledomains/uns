@@ -15,6 +15,7 @@ describe('FreeMinter', () => {
     FreeMinter = await ethers.getContractFactory('FreeMinter');
 
     registry = await Registry.deploy();
+    await registry.initialize();
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
     await registry.controlledSetTokenURIPrefix('/');

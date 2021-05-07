@@ -23,7 +23,7 @@ jobs:
           restore-keys: yarn-v2-
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true'
-      - run: yarn compile:size:prod
+      - run: yarn compile:size
         env:
           FORCE_COLOR: 1
 

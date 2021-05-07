@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-abstract contract WhitelistedRole is AccessControl {
+abstract contract WhitelistedRole is AccessControlUpgradeable {
     bytes32 public constant WHITELISTED_ROLE = keccak256("WHITELISTED_ROLE");
 
     modifier onlyWhitelisted() {

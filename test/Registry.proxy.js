@@ -1,6 +1,6 @@
 const { utils, BigNumber } = ethers;
 
-describe('Registry', () => {
+describe('Registry (proxy)', () => {
   let Registry, MintingController;
   let mintingController, registry;
   let signers, coinbase, accounts;
@@ -13,8 +13,7 @@ describe('Registry', () => {
     MintingController = await ethers.getContractFactory('MintingController');
     Simple = await ethers.getContractFactory('Simple');
 
-    registry = await Registry.deploy();
-    await registry.initialize();
+    registry = await upgrades.deployProxy(Registry);
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
     await registry.controlledSetTokenURIPrefix('/');

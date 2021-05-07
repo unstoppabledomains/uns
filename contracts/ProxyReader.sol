@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts/utils/introspection/ERC165.sol';
+import '@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol';
 
 import './IRegistryReader.sol';
 import './IRecordReader.sol';
 import './IDataReader.sol';
 import './Registry.sol';
 
-contract ProxyReader is ERC165, IRegistryReader, IRecordReader, IDataReader {
+contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IDataReader {
     string public constant NAME = 'Unstoppable Proxy Reader';
     string public constant VERSION = '0.2.0';
 

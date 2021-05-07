@@ -2,18 +2,14 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-abstract contract ControllerRole is AccessControl {
+abstract contract ControllerRole is AccessControlUpgradeable {
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");
 
     modifier onlyController() {
         require(isController(_msgSender()), "ControllerRole: CALLER_IS_NOT_CONTROLLER");
         _;
-    }
-
-    constructor() {
-        _addRole(_msgSender());
     }
 
     function isController(address account) public view returns (bool) {

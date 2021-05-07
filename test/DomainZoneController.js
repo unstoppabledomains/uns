@@ -20,6 +20,7 @@ describe('DomainZoneController', () => {
     await usedGas.init();
 
     registry = await Registry.deploy();
+    await registry.initialize();
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
     await registry.controlledSetTokenURIPrefix('/');

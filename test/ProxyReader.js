@@ -19,6 +19,7 @@ describe('ProxyReader', () => {
     ProxyReader = await ethers.getContractFactory('ProxyReader');
 
     registry = await Registry.deploy();
+    await registry.initialize();
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
 

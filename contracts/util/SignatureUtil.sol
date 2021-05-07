@@ -2,22 +2,22 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
 import './ITokenBasedNonce.sol';
 import './IRegistryProvider.sol';
 import '../Registry.sol';
 
 contract SignatureUtil is ITokenBasedNonce, IRegistryProvider {
-    using ECDSA for bytes32;
+    using ECDSAUpgradeable for bytes32;
 
     // Mapping from owner to a nonce
     mapping (uint256 => uint256) internal _nonces;
 
     Registry internal _registry;
 
-    constructor(Registry registry) {
-        _registry = registry;
+    constructor(Registry registry_) {
+        _registry = registry_;
     }
 
     function registry() public view override returns (address) {

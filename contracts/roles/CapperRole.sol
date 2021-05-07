@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-abstract contract CapperRole is AccessControl {
+abstract contract CapperRole is AccessControlUpgradeable {
     bytes32 public constant CAPPER_ROLE = keccak256("CAPPER_ROLE");
 
     constructor() {

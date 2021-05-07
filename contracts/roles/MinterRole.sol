@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-abstract contract MinterRole is AccessControl {
+abstract contract MinterRole is AccessControlUpgradeable {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     modifier onlyMinter() {
