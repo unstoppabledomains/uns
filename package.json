@@ -10,8 +10,10 @@
     "compile:size": "env ENABLE_CONTRACT_SIZER=true yarn compile",
     "coverage": "hardhat coverage",
     "test": "hardhat test",
-    "migrate:localhost": "hardhat run --network localhost scripts/migrate.js",
-    "migrate:rinkeby": "hardhat run --network rinkeby scripts/migrate.js",
+    "deploy:localhost": "hardhat run --network localhost scripts/deploy.js",
+    "deploy:rinkeby": "hardhat run --network rinkeby scripts/deploy.js",
+    "deploy:proxy:localhost": "PROXY=true hardhat run --network localhost scripts/deploy.js",
+    "upgrade:proxy:localhost": "hardhat run --network localhost scripts/upgrade.js",
     "start:node": "hardhat node",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test"
   },

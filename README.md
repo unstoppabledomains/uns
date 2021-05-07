@@ -388,6 +388,11 @@ UNS registry smart contracts.
 ## Main stack
 
 - Solidity `^0.8.0`
-- OpenZeppelin contracts `^4.1.0`
+- OpenZeppelin contracts-upgradeable `^4.1.0`
 - Hardhat `^2.2.1`
 - ethers.js `^5.1.4`
+
+## Upgradeable proxy
+
+- Deploy registry `yarn deploy:proxy:localhost`
+- Upgrade registry `PROXY_ADDRESS={proxy_address} yarn upgrade:proxy:localhost`

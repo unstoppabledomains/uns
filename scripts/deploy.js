@@ -1,4 +1,8 @@
-const { ethers } = require("hardhat");
+const { ethers, upgrades } = require("hardhat");
+const argv = require('yargs/yargs')()
+  .env('')
+  .boolean('proxy')
+  .argv;
 
 const rinkebyAccounts = {
   workers: [
@@ -42,9 +46,16 @@ async function main() {
   console.log('Network', process.env.HARDHAT_NETWORK);
   const network = process.env.HARDHAT_NETWORK;
 
-  const registry = await Registry.deploy();
-  console.log("Registry deployed to:", registry.address);
-
+  let registry;
+  if (argv.proxy) {
+    registry = await upgrades.deployProxy(Registry);
+    console.log("Registry PROXY deployed to:", registry.address);
+  } else {
+    registry = await Registry.deploy();
+    await registry.initialize();
+    console.log("Registry deployed to:", registry.address);
+  }
+return
   const signatureController = await SignatureController.deploy(registry.address);
   console.log("SignatureController deployed to:", signatureController.address);
   await registry.addController(signatureController.address);
