@@ -2,11 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
-
-import "./ISignatureController.sol";
-import "../Registry.sol";
-import "../util/SignatureUtil.sol";
+import './ISignatureController.sol';
+import '../Registry.sol';
+import '../util/SignatureUtil.sol';
 
 /**
  * @title SignatureController
@@ -57,7 +55,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
             tokenId,
             signature
         );
-        _registry.controlledSafeTransferFrom(from, to, tokenId, "");
+        _registry.controlledSafeTransferFrom(from, to, tokenId, '');
     }
 
     /*
@@ -105,7 +103,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
             tokenId,
             signature
         );
-        _registry.controlledSafeMintChild(to, tokenId, label, "");
+        _registry.controlledSafeMintChild(to, tokenId, label, '');
     }
 
     /*
@@ -166,7 +164,7 @@ contract SignatureController is ISignatureController, SignatureUtil {
             tokenId,
             signature
         );
-        _registry.controlledSafeTransferFrom(from, to, _registry.childIdOf(tokenId, label), "");
+        _registry.controlledSafeTransferFrom(from, to, _registry.childIdOf(tokenId, label), '');
     }
 
     /*

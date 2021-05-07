@@ -29,12 +29,12 @@ contract Resolver is IResolverReader, SignatureUtil, IResolver {
      * @dev Throws if called when not the resolver.
      */
     modifier whenResolver(uint256 tokenId) {
-        // require(address(this) == _registry.resolverOf(tokenId), "RESOLVER_DETACHED_FROM_DOMAIN");
+        // require(address(this) == _registry.resolverOf(tokenId), 'RESOLVER_DETACHED_FROM_DOMAIN');
         _;
     }
 
     modifier whenApprovedOrOwner(uint256 tokenId) {
-        require(_registry.isApprovedOrOwner(msg.sender, tokenId), "SENDER_IS_NOT_APPROVED_OR_OWNER");
+        require(_registry.isApprovedOrOwner(msg.sender, tokenId), 'SENDER_IS_NOT_APPROVED_OR_OWNER');
         _;
     }
 
@@ -114,7 +114,7 @@ contract Resolver is IResolverReader, SignatureUtil, IResolver {
         string[] memory values,
         uint256 tokenId
     ) public override {
-        require(_mintingController.isMinter(msg.sender), "SENDER_IS_NOT_MINTER");
+        require(_mintingController.isMinter(msg.sender), 'SENDER_IS_NOT_MINTER');
         _setMany(_tokenPresets[tokenId], keys, values, tokenId);
     }
 

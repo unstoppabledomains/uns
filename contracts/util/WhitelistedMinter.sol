@@ -4,10 +4,10 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
-import "../roles/BulkWhitelistedRole.sol";
-import "../controllers/IMintingController.sol";
-import "../controllers/MintingController.sol";
-import "../Registry.sol";
+import '../roles/BulkWhitelistedRole.sol';
+import '../controllers/IMintingController.sol';
+import '../controllers/MintingController.sol';
+import '../Registry.sol';
 
 /**
  * @title WhitelistedMinter
@@ -57,7 +57,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
         payable
         onlyWhitelisted
     {
-        require(receiver != address(0x0), "WhitelistedMinter: RECEIVER_IS_EMPTY");
+        require(receiver != address(0x0), 'WhitelistedMinter: RECEIVER_IS_EMPTY');
 
         renounceWhitelisted();
         receiver.transfer(msg.value);
@@ -71,7 +71,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
         payable
         onlyWhitelisted
     {
-        require(receiver != address(0x0), "WhitelistedMinter: RECEIVER_IS_EMPTY");
+        require(receiver != address(0x0), 'WhitelistedMinter: RECEIVER_IS_EMPTY');
 
         _addWhitelisted(receiver);
         renounceWhitelisted();

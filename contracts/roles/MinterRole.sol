@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 
 abstract contract MinterRole is AccessControlUpgradeable {
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant MINTER_ROLE = keccak256('MINTER_ROLE');
 
     modifier onlyMinter() {
-        require(isMinter(_msgSender()), "MinterRole: CALLER_IS_NOT_MINTER");
+        require(isMinter(_msgSender()), 'MinterRole: CALLER_IS_NOT_MINTER');
         _;
     }
 

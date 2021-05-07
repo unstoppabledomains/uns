@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 
-import "./IRegistry.sol";
+import './IRegistry.sol';
 import './RecordStorage.sol';
-import "./roles/ControllerRole.sol";
+import './roles/ControllerRole.sol';
 
 /**
  * @title Registry
@@ -19,7 +19,7 @@ contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721BurnableUpg
 
     string internal _prefix;
 
-    // uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked("crypto")))))
+    // uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked('crypto')))))
     uint256 private constant _CRYPTO_HASH =
         0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
 
@@ -29,7 +29,7 @@ contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721BurnableUpg
     }
 
     function initialize() public initializer {
-        __ERC721_init(".crypto", "UD");
+        __ERC721_init('.crypto', 'UD');
         _addRole(_msgSender());
         _mint(address(0xdead), _CRYPTO_HASH);
     }
@@ -68,7 +68,7 @@ contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721BurnableUpg
     }
 
     function safeMintChild(address to, uint256 tokenId, string calldata label) external onlyApprovedOrOwner(tokenId) {
-        _safeMintChild(to, tokenId, label, "");
+        _safeMintChild(to, tokenId, label, '');
     }
 
     function safeMintChild(address to, uint256 tokenId, string calldata label, bytes calldata _data)
@@ -114,7 +114,7 @@ contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721BurnableUpg
     }
 
     function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external override {
-        safeTransferFromChild(from, to, tokenId, label, "");
+        safeTransferFromChild(from, to, tokenId, label, '');
     }
 
     function controlledSafeTransferFrom(address from, address to, uint256 tokenId, bytes calldata _data)

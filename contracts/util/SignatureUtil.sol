@@ -43,7 +43,7 @@ contract SignatureUtil is ITokenBasedNonce, IRegistryProvider {
                 signer,
                 tokenId
             ),
-            "INVALID_SIGNATURE"
+            'INVALID_SIGNATURE'
         );
 
         _nonces[tokenId] += 1;

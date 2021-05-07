@@ -2,17 +2,17 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 
 abstract contract CapperRole is AccessControlUpgradeable {
-    bytes32 public constant CAPPER_ROLE = keccak256("CAPPER_ROLE");
+    bytes32 public constant CAPPER_ROLE = keccak256('CAPPER_ROLE');
 
     constructor() {
         _addCapper(_msgSender());
     }
 
     modifier onlyCapper() {
-        require(isCapper(_msgSender()), "CapperRole: CALLER_IS_NOT_CAPPER");
+        require(isCapper(_msgSender()), 'CapperRole: CALLER_IS_NOT_CAPPER');
         _;
     }
 

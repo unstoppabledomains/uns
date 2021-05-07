@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "./IURIPrefixController.sol";
-import "../roles/WhitelistedRole.sol";
-import "../Registry.sol";
+import './IURIPrefixController.sol';
+import '../roles/WhitelistedRole.sol';
+import '../Registry.sol';
 
 /**
  * @title URIPrefixController
@@ -13,8 +13,8 @@ import "../Registry.sol";
 contract URIPrefixController is IURIPrefixController, WhitelistedRole {
     Registry internal _registry;
 
-    constructor(Registry registry) {
-        _registry = registry;
+    constructor(Registry registry_) {
+        _registry = registry_;
     }
 
     function registry() external view returns (address) {

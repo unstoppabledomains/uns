@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 
 abstract contract ControllerRole is AccessControlUpgradeable {
-    bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");
+    bytes32 public constant CONTROLLER_ROLE = keccak256('CONTROLLER_ROLE');
 
     modifier onlyController() {
-        require(isController(_msgSender()), "ControllerRole: CALLER_IS_NOT_CONTROLLER");
+        require(isController(_msgSender()), 'ControllerRole: CALLER_IS_NOT_CONTROLLER');
         _;
     }
 

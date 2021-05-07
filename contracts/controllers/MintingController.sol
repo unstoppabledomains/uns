@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "./IMintingController.sol";
-import "../Registry.sol";
-import "../roles/MinterRole.sol";
+import './IMintingController.sol';
+import '../Registry.sol';
+import '../roles/MinterRole.sol';
 
 /**
  * @title MintingController
@@ -13,8 +13,8 @@ import "../roles/MinterRole.sol";
 contract MintingController is IMintingController, MinterRole {
     Registry internal _registry;
 
-    constructor(Registry registry) {
-        _registry = registry;
+    constructor(Registry registry_) {
+        _registry = registry_;
     }
 
     function registry() external view returns (address) {
@@ -26,7 +26,7 @@ contract MintingController is IMintingController, MinterRole {
     }
 
     function safeMintSLD(address to, string calldata label) external override {
-        safeMintSLD(to, label, "");
+        safeMintSLD(to, label, '');
     }
 
     function safeMintSLD(address to, string memory label, bytes memory _data) public override onlyMinter {

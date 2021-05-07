@@ -2,18 +2,18 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 
 abstract contract WhitelistedRole is AccessControlUpgradeable {
-    bytes32 public constant WHITELISTED_ROLE = keccak256("WHITELISTED_ROLE");
+    bytes32 public constant WHITELISTED_ROLE = keccak256('WHITELISTED_ROLE');
 
     modifier onlyWhitelisted() {
-        require(isWhitelisted(_msgSender()), "WhitelistedRole: CALLER_IS_NOT_WHITELISTED");
+        require(isWhitelisted(_msgSender()), 'WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
         _;
     }
 
     modifier onlyWhitelistAdmin() {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "WhitelistedRole: CALLER_IS_NOT_ADMIN");
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), 'WhitelistedRole: CALLER_IS_NOT_ADMIN');
         _;
     }
 

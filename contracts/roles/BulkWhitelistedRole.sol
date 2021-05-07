@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "./WhitelistedRole.sol";
+import './WhitelistedRole.sol';
 
 /**
  * @title BulkWhitelistedRole
