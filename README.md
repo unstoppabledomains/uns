@@ -367,11 +367,71 @@ UNS registry smart contracts.
     }
     ```
 
+    Improvement Proposals:
+
+    1. Remove presets
+
+       ```
+       // Mapping from token ID to preset id to key to value
+       mapping (uint256 => mapping (uint256 =>  mapping (string => string))) internal _records;
+
+       // Mapping from token ID to current preset id
+       mapping (uint256 => uint256) internal _presets;
+       ```
+
+       Replace by:
+
+       ```
+       /**
+       * @dev slot -> {key, value}
+       * slot = keccak256(abi.encodePacked(tokenId, owner))
+       */
+       mapping (bytes32 => mapping (string => string)) internal _records;
+       ```
+
+       By this changes token owner will have unique records space for each token. In case of token transfer, new owner will have clean records space by default.
+
+       Pros:
+
+       - less storage, cheaper in a long term
+       - decrease interface complexity, remove functions (reset, preconfigure, reconfigure), contracts size improvement
+
+       Cons:
+
+       - not possible to clean up all records
+
+    2. `bytes32 key` instead of `string key`
+
+       ```
+       mapping (uint256 => mapping (uint256 =>  mapping (string => string))) internal _records;
+       ```
+
+       Replace by:
+
+       ```
+       mapping (uint256 => mapping (uint256 =>  mapping (bytes32 => string))) internal _records;
+       ```
+
+       Pros:
+
+       - less dynamic types -> cheaper usage
+
+       Cons:
+
+       - key max length is 32 characters
+       - usage will always require conversion between string and bytes32
+
 7.  Upgradable registry
 
     TBD:
 
     - [Transparent vs UUPS Proxies](https://docs.openzeppelin.com/contracts/4.x/api/proxy#transparent-vs-uups)
+
+    Refs:
+
+    - [IMPORTANT: Storage layout](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#modifying-your-contracts)
+    - [Writing Upgradeable Contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable)
+    - [UUPS Proxies: Tutorial (Solidity + JavaScript)](https://forum.openzeppelin.com/t/uups-proxies-tutorial-solidity-javascript/7786)
 
 8)  TLD agnostic
 9)  Support meta-transactions
