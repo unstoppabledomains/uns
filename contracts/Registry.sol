@@ -14,7 +14,7 @@ import './roles/ControllerRole.sol';
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721BurnableUpgradeable {
+contract Registry is IRegistry, ERC721BurnableUpgradeable, ControllerRole, RecordStorage {
     using AddressUpgradeable for address;
 
     string internal _prefix;
@@ -28,9 +28,9 @@ contract Registry is IRegistry, RecordStorage, ControllerRole, ERC721BurnableUpg
         _;
     }
 
-    function initialize() public initializer {
+    function initialize() public override initializer {
         __ERC721_init('.crypto', 'UD');
-        _addRole(_msgSender());
+        ControllerRole.initialize();
         _mint(address(0xdead), _CRYPTO_HASH);
     }
 

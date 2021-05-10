@@ -55,7 +55,7 @@ async function main() {
     await registry.initialize();
     console.log("Registry deployed to:", registry.address);
   }
-return
+
   const signatureController = await SignatureController.deploy(registry.address);
   console.log("SignatureController deployed to:", signatureController.address);
   await registry.addController(signatureController.address);

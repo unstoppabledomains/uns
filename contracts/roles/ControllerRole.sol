@@ -12,6 +12,10 @@ abstract contract ControllerRole is AccessControlUpgradeable {
         _;
     }
 
+    function initialize() public virtual initializer {
+        _addRole(_msgSender());
+    }
+
     function isController(address account) public view returns (bool) {
         return hasRole(CONTROLLER_ROLE, account);
     }
