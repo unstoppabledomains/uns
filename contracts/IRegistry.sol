@@ -122,6 +122,13 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
     function controlledBurn(uint256 tokenId) external;
 
     /**
+     * @dev Gets the resolver of the specified token ID.
+     * @param tokenId uint256 ID of the token to query the resolver of
+     * @return address currently marked as the resolver of the given token ID
+     */
+    function resolverOf(uint256 tokenId) external view returns (address);
+
+    /**
      * @dev Provides child token (subdomain) of provided tokenId.
      * @param tokenId uint256 ID of the token
      * @param label label of subdomain (for `aaa.bbb.crypto` it will be `aaa`)

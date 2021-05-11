@@ -8,16 +8,17 @@ import './IRegistryReader.sol';
 import './IRecordReader.sol';
 import './IDataReader.sol';
 import './Registry.sol';
+import './util/IRegistryProvider.sol';
 
-contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IDataReader {
+contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IDataReader, IRegistryProvider {
     string public constant NAME = 'Unstoppable Proxy Reader';
     string public constant VERSION = '0.2.0';
 
     Registry private _registry;
 
-    constructor(Registry registry) {
-        require(address(registry) != address(0), 'Registry is empty');
-        _registry = registry;
+    constructor(Registry registry_) {
+        require(address(registry_) != address(0), 'Registry is empty');
+        _registry = registry_;
     }
 
     function name() external view override returns (string memory) {
@@ -46,6 +47,10 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         returns (bool)
     {
         return _registry.isApprovedOrOwner(spender, tokenId);
+    }
+
+    function resolverOf(uint256 tokenId) external view override returns (address) {
+        return _registry.resolverOf(tokenId);
     }
 
     function childIdOf(uint256 tokenId, string calldata label)
@@ -84,6 +89,10 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
 
     function root() external view override returns (uint256) {
         return _registry.root();
+    }
+
+    function registry() external view override returns (address) {
+        return address(_registry);
     }
 
     function get(string calldata key, uint256 tokenId)

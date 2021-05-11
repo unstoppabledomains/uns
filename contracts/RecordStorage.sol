@@ -75,14 +75,6 @@ contract RecordStorage is IRecordStorage, IRecordReader, KeyStorage {
         _setMany(_presets[tokenId], keys, values, tokenId);
     }
 
-    function preconfigure(
-        string[] memory keys,
-        string[] memory values,
-        uint256 tokenId
-    ) public virtual override {
-        _setMany(_presets[tokenId], keys, values, tokenId);
-    }
-
     function reset(uint256 tokenId) public virtual override {
         _setPreset(block.timestamp, tokenId);
     }

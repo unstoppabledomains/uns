@@ -136,6 +136,13 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ControllerRole, Recor
 
     /// Resolution
 
+    /**
+     * Notes: Keep it for backward compatibility
+     */
+    function resolverOf(uint256) external view override returns (address) {
+        return address(this);
+    }
+
     function set(
         string calldata key,
         string calldata value,
@@ -152,14 +159,6 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ControllerRole, Recor
         super.setMany(keys, values, tokenId);
     }
 
-    function preconfigure(
-        string[] memory keys,
-        string[] memory values,
-        uint256 tokenId
-    ) public override(IRecordStorage, RecordStorage) onlyController {
-        super.preconfigure(keys, values, tokenId);
-    }
-
     function reconfigure(
         string[] memory keys,
         string[] memory values,
@@ -170,6 +169,14 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ControllerRole, Recor
 
     function reset(uint256 tokenId) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) {
         super.reset(tokenId);
+    }
+
+    function preconfigure(
+        string[] memory keys,
+        string[] memory values,
+        uint256 tokenId
+    ) public onlyController {
+        super.setMany(keys, values, tokenId);
     }
 
     /**

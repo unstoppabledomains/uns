@@ -32,15 +32,18 @@ describe('Registry', () => {
     })
 
     it('should resolve properly', async () => {
-      const tok = await registry.childIdOf(await registry.root(), 'resolution')
+      const tok = await registry.childIdOf(await registry.root(), 'resolution');
 
-      await mintingController.mintSLD(coinbase, 'resolution')
+      await mintingController.mintSLD(coinbase, 'resolution');
+      assert.equal(await registry.resolverOf(tok), registry.address);
 
-      await registry.burn(tok)
+      await registry.burn(tok);
+      assert.equal(await registry.resolverOf(tok), registry.address);
 
-      await mintingController.mintSLD(coinbase, 'resolution')
+      await mintingController.mintSLD(coinbase, 'resolution');
+      assert.equal(await registry.resolverOf(tok), registry.address);
 
-      await registry.transferFrom(coinbase, accounts[0], tok)
+      await registry.transferFrom(coinbase, accounts[0], tok);
     })
 
     it('should mint children', async () => {

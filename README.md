@@ -317,6 +317,7 @@ UNS registry smart contracts.
     - Controlled functions: combine with normal or split it into different interface, rename
     - `string calldata label` I think we agreed to replace by `bytes32 child` = `keccak256(abi.encodePacked(label))`, needs to be confirmed
     - Backward incompatible: [resolverOf, emit Sync, emit NewURI]
+    - resolverOf: should always return registry address OR only when token exists?
 
 6.  Records storage
 
