@@ -174,7 +174,7 @@ UNS registry smart contracts.
 
     - `tokenURI()` returns empty string(by default) when `_baseURI()` is empty string
     - `event NewURI(uint256 indexed tokenId, string uri)` removed
-    - In case of defined specific record `tokenURI()` should return value of the record. Record key is to be defined
+    - In case of defined specific record `tokenURI()` should return value of the record. Record key is to be defined (metadata.uri)
 
 5.  Implements IRegistry
 
