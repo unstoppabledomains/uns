@@ -316,6 +316,7 @@ UNS registry smart contracts.
 
     - Controlled functions: combine with normal or split it into different interface, rename
     - `string calldata label` I think we agreed to replace by `bytes32 child` = `keccak256(abi.encodePacked(label))`, needs to be confirmed
+    - Backward incompatible: [resolverOf, emit Sync, emit NewURI]
 
 6.  Records storage
 
