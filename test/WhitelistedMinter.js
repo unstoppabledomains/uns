@@ -270,7 +270,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
       ).to.be.revertedWith('ECDSA: invalid signature length');
     })
 
-    it.skip('relay meta-safe mint', async () => {
+    it('relay meta-safe mint', async () => {
       const data = getCallData(
         whitelistedMinter,
         'safeMintSLD(address,string)',
@@ -288,16 +288,16 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
       )
       
       assert.equal(await registry.ownerOf(tokenId), accounts[0]);
-      expectEvent(receipt, 'Relayed', {
-        sender: accounts[1],
-        signer: coinbase,
-        funcSig:
-          '0xb2da297900000000000000000000000000000000000000000000000000000000',
-        dataHash: Web3.utils.keccak256(data),
-      })
+      // expectEvent(receipt, 'Relayed', {
+      //   sender: accounts[1],
+      //   signer: coinbase,
+      //   funcSig:
+      //     '0xb2da297900000000000000000000000000000000000000000000000000000000',
+      //   dataHash: Web3.utils.keccak256(data),
+      // })
     })
 
-    it.skip('relay meta-safe mint with data', async () => {
+    it('relay meta-safe mint with data', async () => {
       const data = getCallData(
         whitelistedMinter,
         'safeMintSLD(address,string,bytes)',
@@ -315,13 +315,41 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
         'test-p1-p1saor',
       )
       assert.equal(await registry.ownerOf(tokenId), accounts[0])
-      expectEvent(receipt, 'Relayed', {
-        sender: accounts[1],
-        signer: coinbase,
-        funcSig:
-          '0xbe362e2e00000000000000000000000000000000000000000000000000000000',
-        dataHash: Web3.utils.keccak256(data),
+      // expectEvent(receipt, 'Relayed', {
+      //   sender: accounts[1],
+      //   signer: coinbase,
+      //   funcSig:
+      //     '0xbe362e2e00000000000000000000000000000000000000000000000000000000',
+      //   dataHash: Web3.utils.keccak256(data),
+      // })
+    })
+
+    it('relay meta-mint wiith records', async () => {
+      const data = getCallData(
+        whitelistedMinter,
+        'mintSLDWithRecords(address,string,string[],string[])',
+        accounts[0],
+        'test-p1-p1adr',
+        [],
+        [],
+      )
+      const signature = await calcSignature(data)
+      const receipt = await whitelistedMinter.relay(data, signature, {
+        from: accounts[1],
       })
+
+      const tokenId = await registry.childIdOf(
+        await registry.root(),
+        'test-p1-p1adr',
+      )
+      assert.equal(await registry.ownerOf(tokenId), accounts[0])
+      // expectEvent(receipt, 'Relayed', {
+      //   sender: accounts[1],
+      //   signer: coinbase,
+      //   funcSig:
+      //     '0x3d7989fe00000000000000000000000000000000000000000000000000000000',
+      //   dataHash: Web3.utils.keccak256(data),
+      // })
     })
   })
 

@@ -24,20 +24,25 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
     MintingController internal _mintingController;
     Registry internal _registry;
 
-    /*
-     * bytes4(keccak256('mintSLD(address,string)')) == 0x4c0b0ed2
+    /**
+     * @dev bytes4(keccak256('mintSLD(address,string)')) == 0x4c0b0ed2
      */
     bytes4 private constant _SIG_MINT = 0x4c0b0ed2;
 
-    /*
-     * bytes4(keccak256('safeMintSLD(address,string)')) == 0xb2da2979
+    /**
+     * @dev bytes4(keccak256('safeMintSLD(address,string)')) == 0xb2da2979
      */
     bytes4 private constant _SIG_SAFE_MINT = 0xb2da2979;
 
-    /*
-     * bytes4(keccak256('safeMintSLD(address,string,bytes)')) == 0xbe362e2e
+    /**
+     * @dev bytes4(keccak256('safeMintSLD(address,string,bytes)')) == 0xbe362e2e
      */
     bytes4 private constant _SIG_SAFE_MINT_DATA = 0xbe362e2e;
+
+    /**
+     * @dev bytes4(keccak256('mintSLDWithRecords(address,string,string[],string[])')) == 0x63a9e80b
+     */
+    bytes4 private constant _SIG_MINT_WITH_RECORDS = 0x63a9e80b;
 
     constructor(MintingController mintingController) {
         _mintingController = mintingController;
@@ -155,7 +160,8 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
 
         bool isSupported = sig == _SIG_MINT ||
             sig == _SIG_SAFE_MINT ||
-            sig == _SIG_SAFE_MINT_DATA;
+            sig == _SIG_SAFE_MINT_DATA ||
+            sig == _SIG_MINT_WITH_RECORDS;
 
         require(isSupported, 'WhitelistedMinter: UNSUPPORTED_CALL');
     }
