@@ -10,10 +10,6 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
 
     event NewURIPrefix(string prefix);
 
-    event Resolve(uint256 indexed tokenId, address indexed to);
-
-    event Sync(address indexed resolver, uint256 indexed updateId, uint256 indexed tokenId);
-
     /**
      * @dev Controlled function to set the token URI Prefix for all tokens.
      * @param prefix string URI to assign
