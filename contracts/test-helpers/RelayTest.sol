@@ -1,6 +1,8 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
 
-import '@openzeppelin/contracts/cryptography/ECDSA.sol';
+pragma solidity ^0.8.0;
+
+import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
 // {
 // 	"6d4ce63c": "get()",
@@ -15,7 +17,7 @@ import '@openzeppelin/contracts/cryptography/ECDSA.sol';
  * NOTE: The contract was built only for testing purposes
  */
 contract RelayTest {
-    using ECDSA for bytes32;
+    using ECDSAUpgradeable for bytes32;
 
     mapping(uint => string) private _stringStore;
     mapping(uint => uint) private _uintStore;
@@ -70,7 +72,7 @@ contract RelayTest {
             /* solium-disable-next-line security/no-inline-assembly */
             assembly {
                 let ptr := mload(0x40)
-                let size := returndatasize
+                let size := returndatasize()
                 returndatacopy(ptr, 0, size)
                 revert(ptr, size)
             }

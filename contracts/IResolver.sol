@@ -1,14 +1,21 @@
-pragma solidity 0.5.12;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT
 
-contract IResolver {
+pragma solidity ^0.8.0;
+
+interface IResolver {
+    event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value);
+
+    event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key);
+
+    event ResetRecords(uint256 indexed tokenId);
+
     /**
      * @dev Reset all domain records and set new ones
      * @param keys New record keys
      * @param values New record values
      * @param tokenId ERC-721 token id of the domain
      */
-    function reconfigure(string[] memory keys, string[] memory values, uint256 tokenId) public;
+    function reconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external;
 
     /**
     * @dev Set all domain records for newly minted domain
@@ -16,7 +23,7 @@ contract IResolver {
     * @param values New record values
     * @param tokenId ERC-721 token id of the domain
     */
-    function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) public;
+    function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external;
 
     /**
      * @dev Set or update domain records
@@ -24,7 +31,7 @@ contract IResolver {
      * @param values New record values
      * @param tokenId ERC-721 token id of the domain
      */
-    function setMany(string[] memory keys, string[] memory values, uint256 tokenId) public;
+    function setMany(string[] memory keys, string[] memory values, uint256 tokenId) external;
 
     /**
      * @dev Function to set record.

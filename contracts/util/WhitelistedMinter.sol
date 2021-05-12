@@ -1,19 +1,20 @@
-pragma solidity 0.5.12;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT
 
-import '@openzeppelin/contracts/cryptography/ECDSA.sol';
-import "./BulkWhitelistedRole.sol";
-import "../controllers/IMintingController.sol";
-import "../controllers/MintingController.sol";
-import "../Registry.sol";
-import "../Resolver.sol";
+pragma solidity ^0.8.0;
+
+import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
+
+import '../roles/BulkWhitelistedRole.sol';
+import '../controllers/IMintingController.sol';
+import '../controllers/MintingController.sol';
+import '../Registry.sol';
 
 /**
  * @title WhitelistedMinter
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
 contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
-    using ECDSA for bytes32;
+    using ECDSAUpgradeable for bytes32;
 
     event Relayed(address indexed sender, address indexed signer, bytes4 indexed funcSig, bytes32 dataHash);
 
@@ -21,55 +22,29 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
     string public constant VERSION = '0.3.0';
 
     MintingController internal _mintingController;
-    Resolver internal _resolver;
     Registry internal _registry;
 
-    /*
-     * bytes4(keccak256('mintSLD(address,string)')) == 0x4c0b0ed2
+    /**
+     * @dev bytes4(keccak256('mintSLD(address,string)')) == 0x4c0b0ed2
      */
     bytes4 private constant _SIG_MINT = 0x4c0b0ed2;
 
-    /*
-     * bytes4(keccak256('mintSLDToDefaultResolver(address,string,string[],string[])')) == 0x3d7989fe
-     */
-    bytes4 private constant _SIG_MINT_DEF_RESOLVER = 0x3d7989fe;
-
-    /*
-     * bytes4(keccak256('mintSLDToResolver(address,string,string[],string[],address)')) == 0xaceb4764
-     */
-    bytes4 private constant _SIG_MINT_RESOLVER = 0xaceb4764;
-
-    /*
-     * bytes4(keccak256('safeMintSLD(address,string)')) == 0xb2da2979
+    /**
+     * @dev bytes4(keccak256('safeMintSLD(address,string)')) == 0xb2da2979
      */
     bytes4 private constant _SIG_SAFE_MINT = 0xb2da2979;
 
-    /*
-     * bytes4(keccak256('safeMintSLD(address,string,bytes)')) == 0xbe362e2e
+    /**
+     * @dev bytes4(keccak256('safeMintSLD(address,string,bytes)')) == 0xbe362e2e
      */
     bytes4 private constant _SIG_SAFE_MINT_DATA = 0xbe362e2e;
 
-    /*
-     * bytes4(keccak256('safeMintSLDToDefaultResolver(address,string,string[],string[])')) == 0x61050ffd
+    /**
+     * @dev bytes4(keccak256('mintSLDWithRecords(address,string,string[],string[])')) == 0x63a9e80b
      */
-    bytes4 private constant _SIG_SAFE_MINT_DEF_RESOLVER = 0x61050ffd;
+    bytes4 private constant _SIG_MINT_WITH_RECORDS = 0x63a9e80b;
 
-    /*
-     * bytes4(keccak256('safeMintSLDToDefaultResolver(address,string,string[],string[],bytes)')) == 0x4b18abea
-     */
-    bytes4 private constant _SIG_SAFE_MINT_DEF_RESOLVER_DATA = 0x4b18abea;
-
-    /*
-     * bytes4(keccak256('safeMintSLDToResolver(address,string,string[],string[],address)')) == 0x4b44c01a
-     */
-    bytes4 private constant _SIG_SAFE_MINT_RESOLVER = 0x4b44c01a;
-
-    /*
-     * bytes4(keccak256('safeMintSLDToResolver(address,string,string[],string[],bytes,address)')) == 0x898851f8
-     */
-    bytes4 private constant _SIG_SAFE_MINT_RESOLVER_DATA = 0x898851f8;
-
-    constructor(MintingController mintingController) public {
+    constructor(MintingController mintingController) {
         _mintingController = mintingController;
         _registry = Registry(mintingController.registry());
         _addWhitelisted(address(this));
@@ -87,7 +62,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
         payable
         onlyWhitelisted
     {
-        require(receiver != address(0x0), "WhitelistedMinter: RECEIVER_IS_EMPTY");
+        require(receiver != address(0x0), 'WhitelistedMinter: RECEIVER_IS_EMPTY');
 
         renounceWhitelisted();
         receiver.transfer(msg.value);
@@ -101,7 +76,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
         payable
         onlyWhitelisted
     {
-        require(receiver != address(0x0), "WhitelistedMinter: RECEIVER_IS_EMPTY");
+        require(receiver != address(0x0), 'WhitelistedMinter: RECEIVER_IS_EMPTY');
 
         _addWhitelisted(receiver);
         renounceWhitelisted();
@@ -110,6 +85,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
 
     function mintSLD(address to, string calldata label)
         external
+        override
         onlyWhitelisted
     {
         _mintingController.mintSLD(to, label);
@@ -117,6 +93,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
 
     function safeMintSLD(address to, string calldata label)
         external
+        override
         onlyWhitelisted
     {
         _mintingController.safeMintSLD(to, label);
@@ -126,78 +103,17 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
         address to,
         string calldata label,
         bytes calldata _data
-    ) external onlyWhitelisted {
+    ) external override onlyWhitelisted {
         _mintingController.safeMintSLD(to, label, _data);
     }
 
-    function mintSLDToDefaultResolver(
+    function mintSLDWithRecords(
         address to,
-        string memory label,
-        string[] memory keys,
-        string[] memory values
-    ) public onlyWhitelisted {
-        mintSLDToResolver(to, label, keys, values, address(_resolver));
-    }
-
-    function mintSLDToResolver(
-        address to,
-        string memory label,
-        string[] memory keys,
-        string[] memory values,
-        address resolver
-    ) public onlyWhitelisted {
-        _mintingController.mintSLDWithResolver(to, label, resolver);
-        preconfigureResolver(label, keys, values, resolver);
-    }
-
-    function safeMintSLDToDefaultResolver(
-        address to,
-        string memory label,
-        string[] memory keys,
-        string[] memory values
-    ) public onlyWhitelisted {
-        safeMintSLDToResolver(to, label, keys, values, address(_resolver));
-    }
-
-    function safeMintSLDToResolver(
-        address to,
-        string memory label,
-        string[] memory keys,
-        string[] memory values,
-        address resolver
-    ) public onlyWhitelisted {
-        _mintingController.safeMintSLDWithResolver(to, label, resolver);
-        preconfigureResolver(label, keys, values, resolver);
-    }
-
-    function safeMintSLDToDefaultResolver(
-        address to,
-        string memory label,
-        string[] memory keys,
-        string[] memory values,
-        bytes memory _data
-    ) public onlyWhitelisted {
-        safeMintSLDToResolver(to, label, keys, values, _data, address(_resolver));
-    }
-
-    function safeMintSLDToResolver(
-        address to,
-        string memory label,
-        string[] memory keys,
-        string[] memory values,
-        bytes memory _data,
-        address resolver
-    ) public onlyWhitelisted {
-        _mintingController.safeMintSLDWithResolver(to, label, resolver, _data);
-        preconfigureResolver(label, keys, values, resolver);
-    }
-
-    function setDefaultResolver(address resolver) external onlyWhitelistAdmin {
-        _resolver = Resolver(resolver);
-    }
-
-    function getDefaultResolver() external view returns (address) {
-        return address(_resolver);
+        string calldata label,
+        string[] calldata keys,
+        string[] calldata values
+    ) external override onlyWhitelisted {
+        _mintingController.mintSLDWithRecords(to, label, keys, values);
     }
 
     /**
@@ -218,7 +134,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
             /* solium-disable-next-line security/no-inline-assembly */
             assembly {
                 let ptr := mload(0x40)
-                let size := returndatasize
+                let size := returndatasize()
                 returndatacopy(ptr, 0, size)
                 revert(ptr, size)
             }
@@ -226,19 +142,6 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
 
         emit Relayed(msg.sender, signer, funcSig, dataHash);
         return result;
-    }
-
-    function preconfigureResolver(
-        string memory label,
-        string[] memory keys,
-        string[] memory values,
-        address resolver
-    ) private {
-        if(keys.length == 0) {
-            return;
-        }
-
-        Resolver(resolver).preconfigure(keys, values, _registry.childIdOf(_registry.root(), label));
     }
 
     function verifySigner(bytes32 data, bytes memory signature) private view returns(address signer) {
@@ -256,14 +159,9 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
         }
 
         bool isSupported = sig == _SIG_MINT ||
-            sig == _SIG_MINT_DEF_RESOLVER ||
-            sig == _SIG_MINT_RESOLVER ||
             sig == _SIG_SAFE_MINT ||
             sig == _SIG_SAFE_MINT_DATA ||
-            sig == _SIG_SAFE_MINT_DEF_RESOLVER ||
-            sig == _SIG_SAFE_MINT_DEF_RESOLVER_DATA ||
-            sig == _SIG_SAFE_MINT_RESOLVER ||
-            sig == _SIG_SAFE_MINT_RESOLVER_DATA;
+            sig == _SIG_MINT_WITH_RECORDS;
 
         require(isSupported, 'WhitelistedMinter: UNSUPPORTED_CALL');
     }

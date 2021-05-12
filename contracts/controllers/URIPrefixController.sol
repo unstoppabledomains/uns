@@ -1,27 +1,27 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/access/roles/WhitelistedRole.sol";
-import "./IURIPrefixController.sol";
-import "../Registry.sol";
+pragma solidity ^0.8.0;
+
+import './IURIPrefixController.sol';
+import '../roles/WhitelistedRole.sol';
+import '../Registry.sol';
 
 /**
  * @title URIPrefixController
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
 contract URIPrefixController is IURIPrefixController, WhitelistedRole {
-
     Registry internal _registry;
 
-    constructor (Registry registry) public {
-        _registry = registry;
+    constructor(Registry registry_) {
+        _registry = registry_;
     }
 
     function registry() external view returns (address) {
         return address(_registry);
     }
 
-    function setTokenURIPrefix(string calldata prefix) external onlyWhitelisted {
+    function setTokenURIPrefix(string calldata prefix) external override onlyWhitelisted {
         _registry.controlledSetTokenURIPrefix(prefix);
     }
-
 }

@@ -1,16 +1,14 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol";
+pragma solidity ^0.8.0;
 
-contract IRegistry is IERC721Metadata {
+import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol';
 
-    event NewURI(uint256 indexed tokenId, string uri);
+import './IRecordStorage.sol';
+
+interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
 
     event NewURIPrefix(string prefix);
-
-    event Resolve(uint256 indexed tokenId, address indexed to);
-
-    event Sync(address indexed resolver, uint256 indexed updateId, uint256 indexed tokenId);
 
     /**
      * @dev Controlled function to set the token URI Prefix for all tokens.
@@ -120,27 +118,11 @@ contract IRegistry is IERC721Metadata {
     function controlledBurn(uint256 tokenId) external;
 
     /**
-     * @dev Sets the resolver of a given token ID to another address.
-     * Requires the msg.sender to be the owner, approved, or operator.
-     * @param to address the given token ID will resolve to
-     * @param tokenId uint256 ID of the token to be transferred
-     */
-    function resolveTo(address to, uint256 tokenId) external;
-
-    /**
      * @dev Gets the resolver of the specified token ID.
      * @param tokenId uint256 ID of the token to query the resolver of
      * @return address currently marked as the resolver of the given token ID
      */
     function resolverOf(uint256 tokenId) external view returns (address);
-
-    /**
-     * @dev Controlled function to sets the resolver of a given token ID.
-     * Requires the msg.sender to be controller.
-     * @param to address the given token ID will resolve to
-     * @param tokenId uint256 ID of the token to be transferred
-     */
-    function controlledResolveTo(address to, uint256 tokenId) external;
 
     /**
      * @dev Provides child token (subdomain) of provided tokenId.

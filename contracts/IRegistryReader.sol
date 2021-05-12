@@ -1,4 +1,6 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.0;
 
 interface IRegistryReader {
     function name() external view returns (string memory);
@@ -43,12 +45,12 @@ interface IRegistryReader {
      * @dev Returns the owner of the NFT specified by `tokenId`. ERC721 related function.
      */
     function ownerOf(uint256 tokenId) external view returns (address);
-    
+
     /**
      * @dev ERC721 related function.
      */
     function getApproved(uint256 tokenId) external view returns (address);
-    
+
     /**
      * @dev ERC721 related function.
      */

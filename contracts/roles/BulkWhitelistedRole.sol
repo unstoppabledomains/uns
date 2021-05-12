@@ -1,7 +1,8 @@
-pragma solidity 0.5.12;
+// SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/access/Roles.sol";
-import "@openzeppelin/contracts/access/roles/WhitelistedRole.sol";
+pragma solidity ^0.8.0;
+
+import './WhitelistedRole.sol';
 
 /**
  * @title BulkWhitelistedRole
@@ -12,17 +13,15 @@ import "@openzeppelin/contracts/access/roles/WhitelistedRole.sol";
  * it), and not Whitelisteds themselves.
  */
 contract BulkWhitelistedRole is WhitelistedRole {
-
     function bulkAddWhitelisted(address[] memory accounts) public onlyWhitelistAdmin {
         for (uint256 index = 0; index < accounts.length; index++) {
-            _addWhitelisted(accounts[index]);
+            grantRole(WHITELISTED_ROLE, accounts[index]);
         }
     }
 
     function bulkRemoveWhitelisted(address[] memory accounts) public onlyWhitelistAdmin {
         for (uint256 index = 0; index < accounts.length; index++) {
-            _removeWhitelisted(accounts[index]);
+            revokeRole(WHITELISTED_ROLE, accounts[index]);
         }
     }
-
 }

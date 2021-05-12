@@ -1,8 +1,7 @@
-pragma solidity 0.5.12;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT
 
-import "../IResolver.sol";
-import "../IRegistryReader.sol";
+pragma solidity ^0.8.0;
+
 import "../controllers/MintingController.sol";
 
 contract FreeMinter {
@@ -11,13 +10,9 @@ contract FreeMinter {
     string private constant DOMAIN_NAME_PREFIX = 'udtestdev-';
 
     MintingController private _mintingController;
-    IResolver private _resolver;
-    IRegistryReader private _registry;
 
-    constructor(MintingController mintingController, IResolver resolver, IRegistryReader registry) public {
+    constructor(MintingController mintingController) {
         _mintingController = mintingController;
-        _resolver = resolver;
-        _registry = registry;
     }
 
     function claim(string calldata label) external {
@@ -29,18 +24,12 @@ contract FreeMinter {
     }
 
     function claimToWithRecords(string calldata label, address receiver, string[] calldata keys, string[] calldata values) external {
-        string memory labelWithPrefix = mintSLD(label, receiver);
-        if (keys.length == 0) {
-            return;
-        }
-        uint256 tokenId = _registry.childIdOf(_registry.root(), labelWithPrefix);
-        _resolver.preconfigure(keys, values, tokenId);
+        string memory labelWithPrefix = string(abi.encodePacked(DOMAIN_NAME_PREFIX, label));
+        _mintingController.mintSLDWithRecords(receiver, labelWithPrefix, keys, values);
     }
 
-    function mintSLD(string memory label, address receiver) private returns (string memory) {
+    function mintSLD(string memory label, address receiver) private {
         string memory labelWithPrefix = string(abi.encodePacked(DOMAIN_NAME_PREFIX, label));
-        _mintingController.mintSLDWithResolver(receiver, labelWithPrefix, address(_resolver));
-
-        return labelWithPrefix;
+        _mintingController.mintSLD(receiver, labelWithPrefix);
     }
 }
