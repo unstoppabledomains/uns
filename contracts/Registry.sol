@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 
 import './IRegistry.sol';
@@ -14,7 +15,7 @@ import './roles/ControllerRole.sol';
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, ERC721BurnableUpgradeable, ControllerRole, RecordStorage {
+contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgradeable, ControllerRole, RecordStorage {
     using AddressUpgradeable for address;
 
     string internal _prefix;
@@ -28,8 +29,9 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ControllerRole, Recor
         _;
     }
 
-    function initialize() public override initializer {
+    function initialize(address forwarder) public initializer {
         __ERC721_init('.crypto', 'UD');
+        __ERC2771Context_init(forwarder);
         ControllerRole.initialize();
         _mint(address(0xdead), _CRYPTO_HASH);
     }
@@ -209,5 +211,19 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ControllerRole, Recor
         returns (string memory)
     {
         return _prefix;
+    }
+
+    function _msgSender()
+        internal view override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (address sender)
+    {
+        return super._msgSender();
+    }
+
+    function _msgData()
+        internal view override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (bytes calldata)
+    {
+        return super._msgData();
     }
 }

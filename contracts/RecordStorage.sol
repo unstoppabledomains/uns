@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "./IRecordStorage.sol";
-import "./KeyStorage.sol";
+import './IRecordStorage.sol';
+import './KeyStorage.sol';
 
 contract RecordStorage is IRecordStorage, KeyStorage {
     // Mapping from token ID to preset id to key to value

@@ -1,3 +1,4 @@
+const { ZERO_ADDRESS } = require('./helpers/constants');
 const { utils, BigNumber } = ethers;
 
 describe('Registry (proxy)', () => {
@@ -13,7 +14,7 @@ describe('Registry (proxy)', () => {
     MintingController = await ethers.getContractFactory('MintingController');
     Simple = await ethers.getContractFactory('Simple');
 
-    registry = await upgrades.deployProxy(Registry);
+    registry = await upgrades.deployProxy(Registry, [ZERO_ADDRESS], {initializer: 'initialize(address)'});
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
     await registry.controlledSetTokenURIPrefix('/');
