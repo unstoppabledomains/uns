@@ -3,10 +3,9 @@
 pragma solidity ^0.8.0;
 
 import "./IRecordStorage.sol";
-import "./IRecordReader.sol";
 import "./KeyStorage.sol";
 
-contract RecordStorage is IRecordStorage, IRecordReader, KeyStorage {
+contract RecordStorage is IRecordStorage, KeyStorage {
     // Mapping from token ID to preset id to key to value
     mapping (uint256 => mapping (uint256 =>  mapping (string => string))) internal _records;
 
