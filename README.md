@@ -272,9 +272,9 @@ UNS registry smart contracts.
 
        ```
        /**
-       * @dev slot -> {key, value}
-       * slot = keccak256(abi.encodePacked(tokenId, owner))
-       */
+        * @dev slot -> {key, value}
+        * slot = keccak256(abi.encodePacked(tokenId, owner))
+        */
        mapping (bytes32 => mapping (string => string)) internal _records;
        ```
 
@@ -310,7 +310,49 @@ UNS registry smart contracts.
        - key max length is 32 characters
        - usage will always require conversion between string and bytes32
 
-7.  Upgradable registry
+7.  Support meta-transactions
+
+    ```
+    struct ForwardRequest {
+        address from;
+        uint256 gas;
+        uint256 tokenId;
+        uint256 nonce;
+        bytes data;
+    }
+
+    abstract contract Forwarder {
+        /**
+         * @dev Return current token nonce
+         */
+        function nonceOf(uint256 tokenId) public view returns (uint256);
+
+        /**
+         * @dev Verify signature against provided request
+         */
+        function verify(ForwardRequest calldata req, bytes calldata signature) public view returns (bool);
+
+        /**
+         * @dev Execute bytecode if signature is correct
+         */
+        function execute(ForwardRequest calldata req, bytes calldata signature) public returns (bool, bytes memory);
+    }
+    ```
+
+    ### TBD:
+
+    - What does `EIP-712: Ethereum typed structured data hashing and signing` bring us?
+    - `RegistryForwarder` implementation:
+
+      - Design flaw: `req.tokenId` does not coupled with `req.data.tokenId`, leads to security breach
+      - should `execute` function be `payable`?
+      - does it make sence to have `req.gas`?
+      - do we need `expiry` check?
+
+    - Removing SignatureController
+    - Removing controlled functions from Registry
+
+8.  Upgradable registry
 
     TBD:
 
@@ -322,9 +364,8 @@ UNS registry smart contracts.
     - [Writing Upgradeable Contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable)
     - [UUPS Proxies: Tutorial (Solidity + JavaScript)](https://forum.openzeppelin.com/t/uups-proxies-tutorial-solidity-javascript/7786)
 
-8)  TLD agnostic
-9)  Support meta-transactions
-10) Controllers
+9.  TLD agnostic
+10. Controllers
 
     TBD:
 
