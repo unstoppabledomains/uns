@@ -312,6 +312,52 @@ UNS registry smart contracts.
 
 7.  Support meta-transactions
 
+    EIP-2771: Secure Protocol for Native Meta Transactions
+
+    Ref: https://eips.ethereum.org/EIPS/eip-2771
+
+    ### Recipient:
+
+    In order to support `EIP-2771` recepient should implement `Context`.
+
+    ```
+    interface Context {
+        function _msgSender() internal view returns (address);
+        function _msgData() internal view returns (bytes calldata);
+    }
+    ```
+
+    The implementation should allow replacement of `_msgSender` and `_msgData` in case of forwarding.
+
+    ```
+    abstract contract ERC2771Context is Context {
+        address _trustedForwarder;
+
+        function isTrustedForwarder(address forwarder) public view virtual returns(bool) {
+            return forwarder == _trustedForwarder;
+        }
+
+        function _msgSender() internal view virtual override returns (address sender) {
+            if (isTrustedForwarder(msg.sender)) {
+                // The assembly code is more direct than the Solidity version using `abi.decode`.
+                assembly { sender := shr(96, calldataload(sub(calldatasize(), 20))) }
+            } else {
+                return super._msgSender();
+            }
+        }
+
+        function _msgData() internal view virtual override returns (bytes calldata) {
+            if (isTrustedForwarder(msg.sender)) {
+                return msg.data[:msg.data.length-20];
+            } else {
+                return super._msgData();
+            }
+        }
+    }
+    ```
+
+    ### Forwarder:
+
     ```
     struct ForwardRequest {
         address from;
@@ -321,7 +367,7 @@ UNS registry smart contracts.
         bytes data;
     }
 
-    abstract contract Forwarder {
+    interface Forwarder {
         /**
          * @dev Return current token nonce
          */
