@@ -1,4 +1,3 @@
-const { ZERO_ADDRESS } = require('./helpers/constants');
 const { utils, BigNumber } = ethers;
 
 describe('Registry (proxy)', () => {
