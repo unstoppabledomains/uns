@@ -8,6 +8,7 @@ import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 
 import './IRegistry.sol';
 import './RecordStorage.sol';
+import './RegistryForwarder.sol';
 import './roles/ControllerRole.sol';
 
 /**
@@ -15,7 +16,7 @@ import './roles/ControllerRole.sol';
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgradeable, ControllerRole, RecordStorage {
+contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgradeable, ControllerRole, RecordStorage, RegistryForwarder {
     using AddressUpgradeable for address;
 
     string internal _prefix;
@@ -29,10 +30,11 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgrade
         _;
     }
 
-    function initialize(address forwarder) public initializer {
-        __ERC721_init('.crypto', 'UD');
-        __ERC2771Context_init(forwarder);
-        ControllerRole.initialize();
+    function initialize() public initializer {
+        __ERC721_init_unchained('.crypto', 'UD');
+        __ERC2771Context_init_unchained(address(this));
+        __ControllerRole_init_unchained();
+        __RegistryForwarder_init_unchained();
         _mint(address(0xdead), _CRYPTO_HASH);
     }
 

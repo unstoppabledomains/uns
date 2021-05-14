@@ -1,5 +1,3 @@
-const { ZERO_ADDRESS } = require('./helpers/constants');
-
 describe('MintingController', () => {
   let Registry, MintingController, Simple;
   let mintingController, registry;
@@ -14,7 +12,7 @@ describe('MintingController', () => {
     Simple = await ethers.getContractFactory('Simple');
 
     registry = await Registry.deploy();
-    await registry.functions['initialize(address)'](ZERO_ADDRESS);
+    await registry.initialize();
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
   })

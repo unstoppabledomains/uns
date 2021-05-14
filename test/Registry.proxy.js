@@ -14,7 +14,7 @@ describe('Registry (proxy)', () => {
     MintingController = await ethers.getContractFactory('MintingController');
     Simple = await ethers.getContractFactory('Simple');
 
-    registry = await upgrades.deployProxy(Registry, [ZERO_ADDRESS], {initializer: 'initialize(address)'});
+    registry = await upgrades.deployProxy(Registry);
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
     await registry.controlledSetTokenURIPrefix('/');

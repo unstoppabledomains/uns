@@ -12,7 +12,11 @@ abstract contract ControllerRole is AccessControlUpgradeable {
         _;
     }
 
-    function initialize() public virtual initializer {
+    function __ControllerRole_init() internal initializer {
+        __ControllerRole_init_unchained();
+    }
+
+    function __ControllerRole_init_unchained() internal initializer {
         _addRole(_msgSender());
     }
 

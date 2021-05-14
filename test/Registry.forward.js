@@ -1,8 +1,8 @@
 const { utils, BigNumber } = ethers;
 
-describe('Registry (forward)', () => {
-  let Registry, Forwarder, MintingController;
-  let mintingController, registry, forwarder;
+describe('Registry (forwarder)', () => {
+  let Registry, MintingController;
+  let registry, mintingController;
   let signers, accounts;
 
   before(async () => {
@@ -10,15 +10,11 @@ describe('Registry (forward)', () => {
     [, ...accounts] = signers.map(s => s.address);
 
     Registry = await ethers.getContractFactory('Registry');
-    Forwarder = await ethers.getContractFactory('Forwarder');
     MintingController = await ethers.getContractFactory('MintingController');
     Simple = await ethers.getContractFactory('Simple');
 
-    forwarder = await Forwarder.deploy();
-    await forwarder.initialize();
-
     registry = await Registry.deploy();
-    await registry.functions['initialize(address)'](forwarder.address);
+    await registry.initialize();
     mintingController = await MintingController.deploy(registry.address);
     await registry.addController(mintingController.address);
   })
@@ -26,18 +22,17 @@ describe('Registry (forward)', () => {
   describe('Registry', () => {
     const sign = async (signer, value) => {
       const domain = {
-        name: 'MinimalForwarder',
+        name: 'RegistryForwarder',
         version: '0.0.1',
         chainId: await web3.eth.getChainId(),
-        verifyingContract: forwarder.address,
+        verifyingContract: registry.address,
       };
 
       const types = {
         ForwardRequest: [
           { name: 'from', type: 'address' },
-          { name: 'to', type: 'address' },
-          { name: 'value', type: 'uint256' },
           { name: 'gas', type: 'uint256' },
+          { name: 'tokenId', type: 'uint256' },
           { name: 'nonce', type: 'uint256' },
           { name: 'data', type: 'bytes' },
         ],
@@ -54,15 +49,14 @@ describe('Registry (forward)', () => {
 
       const req = {
         from: owner.address,
-        to: registry.address,
-        value: '0',
         gas: '100000',
-        nonce: Number(await forwarder.getNonce(owner.address)),
+        tokenId: tok,
+        nonce: Number(await registry.nonceOf(owner.address)),
         data: registry.interface.encodeFunctionData('setOwner', [receiver.address, tok]),
       };
       const sig = await sign(owner, req);
 
-      await forwarder.execute(req, sig);
+      await registry.execute(req, sig);
 
       assert.equal(receiver.address, await registry.ownerOf(tok))
     })
