@@ -51,7 +51,7 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
         _nonces[req.tokenId] = req.nonce + 1;
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = address(this).call{gas: req.gas}(abi.encodePacked(req.data, req.from));
+        (bool success, bytes memory returndata) = address(this).call{gas: req.gas}(abi.encodePacked(req.data, req.from, req.tokenId));
         // Validate that the relayer has sent enough gas for the call.
         // See https://ronan.eth.link/blog/ethereum-gas-dangers/
         assert(gasleft() > req.gas / 63);

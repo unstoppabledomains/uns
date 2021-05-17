@@ -3,12 +3,12 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 
 import './IRegistry.sol';
 import './RecordStorage.sol';
-import './RegistryForwarder.sol';
+import './metatx/ERC2771RegistryContext.sol';
+import './metatx/RegistryForwarder.sol';
 import './roles/ControllerRole.sol';
 
 /**
@@ -16,7 +16,7 @@ import './roles/ControllerRole.sol';
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgradeable, ControllerRole, RecordStorage, RegistryForwarder {
+contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContext, ControllerRole, RecordStorage, RegistryForwarder {
     using AddressUpgradeable for address;
 
     string internal _prefix;
@@ -32,7 +32,7 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgrade
 
     function initialize() public initializer {
         __ERC721_init_unchained('.crypto', 'UD');
-        __ERC2771Context_init_unchained(address(this));
+        __ERC2771RegistryContext_init_unchained(address(this));
         __ControllerRole_init_unchained();
         __RegistryForwarder_init_unchained();
         _mint(address(0xdead), _CRYPTO_HASH);
@@ -63,7 +63,12 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgrade
 
     /// Minting
 
-    function mintChild(address to, uint256 tokenId, string calldata label) external override onlyApprovedOrOwner(tokenId) {
+    function mintChild(address to, uint256 tokenId, string calldata label)
+        external
+        override
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
         _mintChild(to, tokenId, label);
     }
 
@@ -71,13 +76,18 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgrade
         _mintChild(to, tokenId, label);
     }
 
-    function safeMintChild(address to, uint256 tokenId, string calldata label) external onlyApprovedOrOwner(tokenId) {
+    function safeMintChild(address to, uint256 tokenId, string calldata label)
+        external
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
         _safeMintChild(to, tokenId, label, '');
     }
 
     function safeMintChild(address to, uint256 tokenId, string calldata label, bytes calldata _data)
         external
         onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
     {
         _safeMintChild(to, tokenId, label, _data);
     }
@@ -91,13 +101,20 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgrade
 
     /// Transfering
 
-    function setOwner(address to, uint256 tokenId) external override onlyApprovedOrOwner(tokenId)  {
+    function setOwner(address to, uint256 tokenId)
+        external
+        override
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
         super._transfer(ownerOf(tokenId), to, tokenId);
     }
 
     function transferFromChild(address from, address to, uint256 tokenId, string calldata label)
-        external override
+        external
+        override
         onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
     {
         _transfer(from, to, _childId(tokenId, label));
     }
@@ -112,7 +129,7 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgrade
         uint256 tokenId,
         string memory label,
         bytes memory _data
-    ) public override onlyApprovedOrOwner(tokenId) {
+    ) public override onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
         uint256 childId = _childId(tokenId, label);
         _safeTransfer(from, to, childId, _data);
     }
@@ -130,7 +147,12 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgrade
 
     /// Burning
 
-    function burnChild(uint256 tokenId, string calldata label) external override onlyApprovedOrOwner(tokenId) {
+    function burnChild(uint256 tokenId, string calldata label)
+        external
+        override
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
         _burn(_childId(tokenId, label));
     }
 
@@ -151,7 +173,7 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgrade
         string calldata key,
         string calldata value,
         uint256 tokenId
-    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) {
+    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
         super.set(key, value, tokenId);
     }
 
@@ -159,7 +181,7 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgrade
         string[] memory keys,
         string[] memory values,
         uint256 tokenId
-    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) {
+    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
         super.setMany(keys, values, tokenId);
     }
 
@@ -167,11 +189,16 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgrade
         string[] memory keys,
         string[] memory values,
         uint256 tokenId
-    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) {
+    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
         super.reconfigure(keys, values, tokenId);
     }
 
-    function reset(uint256 tokenId) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) {
+    function reset(uint256 tokenId)
+        public
+        override(IRecordStorage, RecordStorage)
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
         super.reset(tokenId);
     }
 
@@ -216,14 +243,14 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771ContextUpgrade
     }
 
     function _msgSender()
-        internal view override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        internal view override(ContextUpgradeable, ERC2771RegistryContext)
         returns (address sender)
     {
         return super._msgSender();
     }
 
     function _msgData()
-        internal view override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        internal view override(ContextUpgradeable, ERC2771RegistryContext)
         returns (bytes calldata)
     {
         return super._msgData();
