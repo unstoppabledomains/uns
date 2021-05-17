@@ -390,7 +390,7 @@ UNS registry smart contracts.
     - What does `EIP-712: Ethereum typed structured data hashing and signing` bring us?
     - `RegistryForwarder` implementation:
 
-      - Design flaw: `req.tokenId` does not coupled with `req.data.tokenId`, leads to security breach
+      - [design flaw](https://github.com/unstoppabledomains/uns/pull/2/commits/53990cbf9ea6d21a3cd1b299d600786bd0ef84fc#diff-509d7bcab22bd6041f0ee0295fc0c0e9ce606c73aac737abcf5b6f78908e860cR37-R54): `req.tokenId` does not coupled with `req.data.tokenId`, leads to security breach ([solution](https://github.com/unstoppabledomains/uns/pull/2/commits/75c07d061c35a0bbbcc9f54081b0c9bc4e8b99f4#diff-ca840be5bb23f8405058ac3d81aa16ee9bbe19cd811b1d83bd32ef71239d0e20R54))
       - should `execute` function be `payable`?
       - does it make sence to have `req.gas`?
       - do we need `expiry` check?
