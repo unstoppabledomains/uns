@@ -108,7 +108,7 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         onlyMinter
     {
         _mintChild(to, _CRYPTO_HASH, label);
-        super.setMany(keys, values, _childId(_CRYPTO_HASH, label));
+        _setMany(keys, values, _childId(_CRYPTO_HASH, label));
     }
 
     /// Transfering
@@ -190,37 +190,40 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         return _exists(tokenId) ? address(this) : address(0x0);
     }
 
-    function set(
-        string calldata key,
-        string calldata value,
-        uint256 tokenId
-    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
-        super.set(key, value, tokenId);
-    }
-
-    function setMany(
-        string[] memory keys,
-        string[] memory values,
-        uint256 tokenId
-    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
-        super.setMany(keys, values, tokenId);
-    }
-
-    function reconfigure(
-        string[] memory keys,
-        string[] memory values,
-        uint256 tokenId
-    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
-        super.reconfigure(keys, values, tokenId);
-    }
-
-    function reset(uint256 tokenId)
-        public
-        override(IRecordStorage, RecordStorage)
+    function set(string calldata key, string calldata value, uint256 tokenId)
+        external
+        override
         onlyApprovedOrOwner(tokenId)
         validForwardedToken(tokenId)
     {
-        super.reset(tokenId);
+        _set(key, value, tokenId);
+    }
+
+    function setMany(string[] memory keys, string[] memory values, uint256 tokenId)
+        external
+        override
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _setMany(keys, values, tokenId);
+    }
+
+    function reconfigure(string[] memory keys, string[] memory values, uint256 tokenId)
+        external
+        override
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _reconfigure(keys, values, tokenId);
+    }
+
+    function reset(uint256 tokenId)
+        external
+        override
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _reset(tokenId);
     }
 
     /**

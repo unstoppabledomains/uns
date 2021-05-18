@@ -24,7 +24,6 @@ abstract contract ERC2771RegistryContext is Initializable, ContextUpgradeable {
     modifier validForwardedToken(uint256 tokenId) {
         if (isTrustedForwarder(msg.sender)) {
             uint256 _tokenId;
-            // The assembly code is more direct than the Solidity version using `abi.decode`.
             assembly { _tokenId := calldataload(sub(calldatasize(), 32)) }
             require(tokenId == _tokenId, 'ERC2771RegistryContext: TOKEN_INVALID');
         }
