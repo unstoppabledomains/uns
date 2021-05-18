@@ -3,11 +3,11 @@ const { ZERO_ADDRESS } = require('./helpers/constants');
 const { utils } = ethers;
 
 describe('ProxyReader', () => {
-	const domainName = 'test_42';
-	const keys = ['test.key1', 'test.key2'];
-	const values = ['test.value1', 'test.value2'];
+  const domainName = 'test_42';
+  const keys = ['test.key1', 'test.key2'];
+  const values = ['test.value1', 'test.value2'];
   let Registry, ProxyReader;
-	let registry, proxy, tokenId;
+  let registry, proxy, tokenId;
   let signers, coinbase, accounts;
 
   before(async () => {
