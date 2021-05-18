@@ -1,3 +1,5 @@
+const { ZERO_ADDRESS } = require('./helpers/constants');
+
 const { utils, BigNumber } = ethers;
 
 describe('Registry', () => {
@@ -38,7 +40,7 @@ describe('Registry', () => {
       assert.equal(await registry.resolverOf(tok), registry.address);
 
       await registry.burn(tok);
-      assert.equal(await registry.resolverOf(tok), registry.address);
+      assert.equal(await registry.resolverOf(tok), ZERO_ADDRESS);
 
       await mintingController.mintSLD(coinbase, 'resolution');
       assert.equal(await registry.resolverOf(tok), registry.address);

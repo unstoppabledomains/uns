@@ -38,7 +38,7 @@ describe('Registry (forwarder)', () => {
         ],
       };
 
-     return signer._signTypedData(domain, types, value);
+      return signer._signTypedData(domain, types, value);
     }
 
     it('should transfer through meta-tx', async () => {

@@ -107,7 +107,25 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         onlyApprovedOrOwner(tokenId)
         validForwardedToken(tokenId)
     {
-        super._transfer(ownerOf(tokenId), to, tokenId);
+        _transfer(ownerOf(tokenId), to, tokenId);
+    }
+
+    function transferFrom(address from, address to, uint256 tokenId)
+        public
+        override(IERC721Upgradeable, ERC721Upgradeable)
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _transfer(from, to, tokenId);
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data)
+        public
+        override(IERC721Upgradeable, ERC721Upgradeable)
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _safeTransfer(from, to, tokenId, _data);
     }
 
     function transferFromChild(address from, address to, uint256 tokenId, string calldata label)
@@ -123,6 +141,10 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         _transfer(from, to, tokenId);
     }
 
+    function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external override {
+        safeTransferFromChild(from, to, tokenId, label, '');
+    }
+
     function safeTransferFromChild(
         address from,
         address to,
@@ -134,10 +156,6 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         _safeTransfer(from, to, childId, _data);
     }
 
-    function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external override {
-        safeTransferFromChild(from, to, tokenId, label, '');
-    }
-
     function controlledSafeTransferFrom(address from, address to, uint256 tokenId, bytes calldata _data)
         external override
         onlyController
@@ -146,6 +164,15 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
     }
 
     /// Burning
+
+    function burn(uint256 tokenId)
+        public
+        override
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _burn(tokenId);
+    }
 
     function burnChild(uint256 tokenId, string calldata label)
         external
@@ -162,11 +189,8 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
 
     /// Resolution
 
-    /**
-     * Notes: Keep it for backward compatibility
-     */
-    function resolverOf(uint256) external view override returns (address) {
-        return address(this);
+    function resolverOf(uint256 tokenId) external view override returns (address) {
+        return _exists(tokenId) ? address(this) : address(0x0);
     }
 
     function set(
