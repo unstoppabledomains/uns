@@ -9,7 +9,6 @@ import "../util/ERC677Receiver.sol";
 import "../roles/WhitelistedRole.sol";
 import "../roles/CapperRole.sol";
 import "../IRegistry.sol";
-import "../IResolver.sol";
 
 contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receiver {
     string public constant NAME = 'Chainlink Twitter Validation Operator';

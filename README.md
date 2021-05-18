@@ -272,9 +272,9 @@ UNS registry smart contracts.
 
        ```
        /**
-       * @dev slot -> {key, value}
-       * slot = keccak256(abi.encodePacked(tokenId, owner))
-       */
+        * @dev slot -> {key, value}
+        * slot = keccak256(abi.encodePacked(tokenId, owner))
+        */
        mapping (bytes32 => mapping (string => string)) internal _records;
        ```
 
@@ -310,7 +310,95 @@ UNS registry smart contracts.
        - key max length is 32 characters
        - usage will always require conversion between string and bytes32
 
-7.  Upgradable registry
+7.  Support meta-transactions
+
+    EIP-2771: Secure Protocol for Native Meta Transactions
+
+    Ref: https://eips.ethereum.org/EIPS/eip-2771
+
+    ### Recipient:
+
+    In order to support `EIP-2771` recepient should implement `Context`.
+
+    ```
+    interface Context {
+        function _msgSender() internal view returns (address);
+        function _msgData() internal view returns (bytes calldata);
+    }
+    ```
+
+    The implementation should allow replacement of `_msgSender` and `_msgData` in case of forwarding.
+
+    ```
+    abstract contract ERC2771Context is Context {
+        address _trustedForwarder;
+
+        function isTrustedForwarder(address forwarder) public view virtual returns(bool) {
+            return forwarder == _trustedForwarder;
+        }
+
+        function _msgSender() internal view virtual override returns (address sender) {
+            if (isTrustedForwarder(msg.sender)) {
+                // The assembly code is more direct than the Solidity version using `abi.decode`.
+                assembly { sender := shr(96, calldataload(sub(calldatasize(), 20))) }
+            } else {
+                return super._msgSender();
+            }
+        }
+
+        function _msgData() internal view virtual override returns (bytes calldata) {
+            if (isTrustedForwarder(msg.sender)) {
+                return msg.data[:msg.data.length-20];
+            } else {
+                return super._msgData();
+            }
+        }
+    }
+    ```
+
+    ### Forwarder:
+
+    ```
+    struct ForwardRequest {
+        address from;
+        uint256 gas;
+        uint256 tokenId;
+        uint256 nonce;
+        bytes data;
+    }
+
+    interface Forwarder {
+        /**
+         * @dev Return current token nonce
+         */
+        function nonceOf(uint256 tokenId) public view returns (uint256);
+
+        /**
+         * @dev Verify signature against provided request
+         */
+        function verify(ForwardRequest calldata req, bytes calldata signature) public view returns (bool);
+
+        /**
+         * @dev Execute bytecode if signature is correct
+         */
+        function execute(ForwardRequest calldata req, bytes calldata signature) public returns (bool, bytes memory);
+    }
+    ```
+
+    ### TBD:
+
+    - What does `EIP-712: Ethereum typed structured data hashing and signing` bring us?
+    - `RegistryForwarder` implementation:
+
+      - [design flaw](https://github.com/unstoppabledomains/uns/pull/2/commits/53990cbf9ea6d21a3cd1b299d600786bd0ef84fc#diff-509d7bcab22bd6041f0ee0295fc0c0e9ce606c73aac737abcf5b6f78908e860cR37-R54): `req.tokenId` does not coupled with `req.data.tokenId`, leads to security breach ([solution](https://github.com/unstoppabledomains/uns/pull/2/commits/75c07d061c35a0bbbcc9f54081b0c9bc4e8b99f4#diff-ca840be5bb23f8405058ac3d81aa16ee9bbe19cd811b1d83bd32ef71239d0e20R54))
+      - should `execute` function be `payable`?
+      - does it make sence to have `req.gas`?
+      - do we need `expiry` check?
+
+    - Removing SignatureController
+    - Removing controlled functions from Registry
+
+8.  Upgradable registry
 
     TBD:
 
@@ -322,9 +410,8 @@ UNS registry smart contracts.
     - [Writing Upgradeable Contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable)
     - [UUPS Proxies: Tutorial (Solidity + JavaScript)](https://forum.openzeppelin.com/t/uups-proxies-tutorial-solidity-javascript/7786)
 
-8)  TLD agnostic
-9)  Support meta-transactions
-10) Controllers
+9.  TLD agnostic
+10. Controllers
 
     TBD:
 
