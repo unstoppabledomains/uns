@@ -5,15 +5,14 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
 import '../roles/BulkWhitelistedRole.sol';
-import '../controllers/IMintingController.sol';
-import '../controllers/MintingController.sol';
+import '../ISLDMinter.sol';
 import '../Registry.sol';
 
 /**
  * @title WhitelistedMinter
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
+contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
     using ECDSAUpgradeable for bytes32;
 
     event Relayed(address indexed sender, address indexed signer, bytes4 indexed funcSig, bytes32 dataHash);
@@ -21,7 +20,6 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
     string public constant NAME = 'Unstoppable Whitelisted Minter';
     string public constant VERSION = '0.3.0';
 
-    MintingController internal _mintingController;
     Registry internal _registry;
 
     /**
@@ -44,14 +42,13 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
      */
     bytes4 private constant _SIG_MINT_WITH_RECORDS = 0x63a9e80b;
 
-    constructor(MintingController mintingController) {
-        _mintingController = mintingController;
-        _registry = Registry(mintingController.registry());
+    constructor(Registry registry_) {
+        _registry = registry_;
         _addWhitelisted(address(this));
     }
 
     function renounceMinter() external onlyWhitelistAdmin {
-        _mintingController.renounceMinter();
+        _registry.renounceMinter();
     }
 
     /**
@@ -88,7 +85,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
         override
         onlyWhitelisted
     {
-        _mintingController.mintSLD(to, label);
+        _registry.mintSLD(to, label);
     }
 
     function safeMintSLD(address to, string calldata label)
@@ -96,7 +93,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
         override
         onlyWhitelisted
     {
-        _mintingController.safeMintSLD(to, label);
+        _registry.safeMintSLD(to, label);
     }
 
     function safeMintSLD(
@@ -104,7 +101,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
         string calldata label,
         bytes calldata _data
     ) external override onlyWhitelisted {
-        _mintingController.safeMintSLD(to, label, _data);
+        _registry.safeMintSLD(to, label, _data);
     }
 
     function mintSLDWithRecords(
@@ -113,7 +110,7 @@ contract WhitelistedMinter is IMintingController, BulkWhitelistedRole {
         string[] calldata keys,
         string[] calldata values
     ) external override onlyWhitelisted {
-        _mintingController.mintSLDWithRecords(to, label, keys, values);
+        _registry.mintSLDWithRecords(to, label, keys, values);
     }
 
     /**

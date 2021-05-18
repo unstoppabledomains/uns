@@ -2,12 +2,11 @@ const { BigNumber } = require('@ethersproject/bignumber');
 const { ZERO_ADDRESS } = require('./helpers/constants');
 
 const Registry = artifacts.require('registry/Registry.sol')
-const MintingController = artifacts.require('controller/MintingController.sol')
 const WhitelistedMinter = artifacts.require('util/WhitelistedMinter.sol')
 const {sign} = require('./helpers/signature.js')
 
 contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
-  let whitelistedMinter, registry, mintingController
+  let whitelistedMinter, registry
 
   const getCallData = (contract, funcSig, ...args) => {
     const web3 = new Web3(contract.constructor.web3.currentProvider)
@@ -38,15 +37,13 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
   before(async () => {
     registry = await Registry.new()
     await registry.initialize();
-    mintingController = await MintingController.new(registry.address)
-    await registry.addController(mintingController.address)
   })
 
   beforeEach(async () => {
-    whitelistedMinter = await WhitelistedMinter.new(mintingController.address)
+    whitelistedMinter = await WhitelistedMinter.new(registry.address)
     await whitelistedMinter.addWhitelisted(coinbase)
 
-    await mintingController.addMinter(whitelistedMinter.address)
+    await registry.addMinter(whitelistedMinter.address)
   })
 
   describe('renounce minter', () => {
@@ -324,7 +321,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
       // })
     })
 
-    it('relay meta-mint wiith records', async () => {
+    it('relay meta-mint with records', async () => {
       const data = getCallData(
         whitelistedMinter,
         'mintSLDWithRecords(address,string,string[],string[])',

@@ -1,8 +1,8 @@
 const { utils, BigNumber } = ethers;
 
 describe('RegistryForwarder', () => {
-  let Registry, MintingController;
-  let registry, mintingController;
+  let Registry;
+  let registry;
   let signers, owner, nonOwner;
 
   const receiverAddress = '0x1234567890123456789012345678901234567890';
@@ -33,18 +33,15 @@ describe('RegistryForwarder', () => {
     [, owner, nonOwner] = signers;
 
     Registry = await ethers.getContractFactory('Registry');
-    MintingController = await ethers.getContractFactory('MintingController');
 
     registry = await Registry.deploy();
     await registry.initialize();
-    mintingController = await MintingController.deploy(registry.address);
-    await registry.addController(mintingController.address);
   })
 
   describe('meta-transferFrom', () => {
     it('should transfer using meta-transferFrom', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_1591');
-      await mintingController.mintSLD(owner.address, 'meta_1591');
+      await registry.mintSLD(owner.address, 'meta_1591');
 
       const req = {
         from: owner.address,
@@ -61,7 +58,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-transferFrom when used signature', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_80238');
-      await mintingController.mintSLD(owner.address, 'meta_80238');
+      await registry.mintSLD(owner.address, 'meta_80238');
 
       const req = {
         from: owner.address,
@@ -78,7 +75,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-transferFrom for non-onwer', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_6458');
-      await mintingController.mintSLD(owner.address, 'meta_6458');
+      await registry.mintSLD(owner.address, 'meta_6458');
 
       const req = {
         from: nonOwner.address,
@@ -97,8 +94,8 @@ describe('RegistryForwarder', () => {
     it('should revert meta-transferFrom when tokenId does not match', async () => {
       const tok1 = await registry.childIdOf(await registry.root(), 'meta_1311');
       const tok2 = await registry.childIdOf(await registry.root(), 'meta_3311');
-      await mintingController.mintSLD(owner.address, 'meta_1311');
-      await mintingController.mintSLD(owner.address, 'meta_3311');
+      await registry.mintSLD(owner.address, 'meta_1311');
+      await registry.mintSLD(owner.address, 'meta_3311');
 
       const req = {
         from: owner.address,
@@ -119,7 +116,7 @@ describe('RegistryForwarder', () => {
   describe('meta-safeTransferFrom(address,address,uint256)', () => {
     it('should transfer using meta-safeTransferFrom', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_10235');
-      await mintingController.mintSLD(owner.address, 'meta_10235');
+      await registry.mintSLD(owner.address, 'meta_10235');
 
       const req = {
         from: owner.address,
@@ -139,7 +136,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-safeTransferFrom when used signature', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_5y812');
-      await mintingController.mintSLD(owner.address, 'meta_5y812');
+      await registry.mintSLD(owner.address, 'meta_5y812');
 
       const req = {
         from: owner.address,
@@ -159,7 +156,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-safeTransferFrom for non-onwer', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_e5iuw');
-      await mintingController.mintSLD(owner.address, 'meta_e5iuw');
+      await registry.mintSLD(owner.address, 'meta_e5iuw');
 
       const req = {
         from: nonOwner.address,
@@ -181,8 +178,8 @@ describe('RegistryForwarder', () => {
     it('should revert meta-safeTransferFrom when tokenId does not match', async () => {
       const tok1 = await registry.childIdOf(await registry.root(), 'meta_2211');
       const tok2 = await registry.childIdOf(await registry.root(), 'meta_1122');
-      await mintingController.mintSLD(owner.address, 'meta_2211');
-      await mintingController.mintSLD(owner.address, 'meta_1122');
+      await registry.mintSLD(owner.address, 'meta_2211');
+      await registry.mintSLD(owner.address, 'meta_1122');
 
       const req = {
         from: owner.address,
@@ -207,7 +204,7 @@ describe('RegistryForwarder', () => {
   describe('meta-burn', () => {
     it('should burn using meta-burn', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_ar093');
-      await mintingController.mintSLD(owner.address, 'meta_ar093');
+      await registry.mintSLD(owner.address, 'meta_ar093');
 
       const req = {
         from: owner.address,
@@ -224,7 +221,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-burn when used signature', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_5sdfs4');
-      await mintingController.mintSLD(owner.address, 'meta_5sdfs4');
+      await registry.mintSLD(owner.address, 'meta_5sdfs4');
 
       const req = {
         from: owner.address,
@@ -241,7 +238,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-burn for non-onwer', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_53dg3');
-      await mintingController.mintSLD(owner.address, 'meta_53dg3');
+      await registry.mintSLD(owner.address, 'meta_53dg3');
 
       const req = {
         from: nonOwner.address,
@@ -260,8 +257,8 @@ describe('RegistryForwarder', () => {
     it('should revert meta-burn when tokenId does not match', async () => {
       const tok1 = await registry.childIdOf(await registry.root(), 'meta_rqd11');
       const tok2 = await registry.childIdOf(await registry.root(), 'meta_s11rq');
-      await mintingController.mintSLD(owner.address, 'meta_rqd11');
-      await mintingController.mintSLD(owner.address, 'meta_s11rq');
+      await registry.mintSLD(owner.address, 'meta_rqd11');
+      await registry.mintSLD(owner.address, 'meta_s11rq');
 
       const req = {
         from: owner.address,
@@ -282,7 +279,7 @@ describe('RegistryForwarder', () => {
   describe('meta-mintChild', () => {
     it('should mint using meta-mintChild', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_2435fg');
-      await mintingController.mintSLD(owner.address, 'meta_2435fg');
+      await registry.mintSLD(owner.address, 'meta_2435fg');
 
       const req = {
         from: owner.address,
@@ -304,7 +301,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-mintChild when used signature', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_fsge2');
-      await mintingController.mintSLD(owner.address, 'meta_fsge2');
+      await registry.mintSLD(owner.address, 'meta_fsge2');
 
       const req = {
         from: owner.address,
@@ -321,7 +318,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-mintChild for non-onwer', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_23fwsg');
-      await mintingController.mintSLD(owner.address, 'meta_23fwsg');
+      await registry.mintSLD(owner.address, 'meta_23fwsg');
 
       const req = {
         from: nonOwner.address,
@@ -340,8 +337,8 @@ describe('RegistryForwarder', () => {
     it('should revert meta-mintChild when tokenId does not match', async () => {
       const tok1 = await registry.childIdOf(await registry.root(), 'meta_r89dfsg');
       const tok2 = await registry.childIdOf(await registry.root(), 'meta_7sf67w');
-      await mintingController.mintSLD(owner.address, 'meta_r89dfsg');
-      await mintingController.mintSLD(owner.address, 'meta_7sf67w');
+      await registry.mintSLD(owner.address, 'meta_r89dfsg');
+      await registry.mintSLD(owner.address, 'meta_7sf67w');
 
       const req = {
         from: owner.address,
@@ -366,7 +363,7 @@ describe('RegistryForwarder', () => {
   describe('meta-transferFromChild', () => {
     it('should mint using transferFromChild', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_oih245');
-      await mintingController.mintSLD(owner.address, 'meta_oih245');
+      await registry.mintSLD(owner.address, 'meta_oih245');
 
       const threeld = await registry.childIdOf(tok, 'label')
       await registry.connect(owner).mintChild(owner.address, tok, 'label')
@@ -390,7 +387,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-transferFromChild when used signature', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_fwef23f');
-      await mintingController.mintSLD(owner.address, 'meta_fwef23f');
+      await registry.mintSLD(owner.address, 'meta_fwef23f');
 
       const req = {
         from: owner.address,
@@ -410,7 +407,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-transferFromChild for non-onwer', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_dsvg34');
-      await mintingController.mintSLD(owner.address, 'meta_dsvg34');
+      await registry.mintSLD(owner.address, 'meta_dsvg34');
 
       const req = {
         from: nonOwner.address,
@@ -432,8 +429,8 @@ describe('RegistryForwarder', () => {
     it('should revert meta-transferFromChild when tokenId does not match', async () => {
       const tok1 = await registry.childIdOf(await registry.root(), 'meta_34tne');
       const tok2 = await registry.childIdOf(await registry.root(), 'meta_fwef3');
-      await mintingController.mintSLD(owner.address, 'meta_34tne');
-      await mintingController.mintSLD(owner.address, 'meta_fwef3');
+      await registry.mintSLD(owner.address, 'meta_34tne');
+      await registry.mintSLD(owner.address, 'meta_fwef3');
 
       const req = {
         from: owner.address,
@@ -461,7 +458,7 @@ describe('RegistryForwarder', () => {
   describe('meta-safeTransferFromChild', () => {
     it('should mint using safeTransferFromChild', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_we23r');
-      await mintingController.mintSLD(owner.address, 'meta_we23r');
+      await registry.mintSLD(owner.address, 'meta_we23r');
 
       const threeld = await registry.childIdOf(tok, 'label');
       await registry.connect(owner).mintChild(owner.address, tok, 'label');
@@ -485,7 +482,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-safeTransferFromChild when used signature', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_dfgsyi3');
-      await mintingController.mintSLD(owner.address, 'meta_dfgsyi3');
+      await registry.mintSLD(owner.address, 'meta_dfgsyi3');
 
       const req = {
         from: owner.address,
@@ -505,7 +502,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-safeTransferFromChild for non-onwer', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_kj345c');
-      await mintingController.mintSLD(owner.address, 'meta_kj345c');
+      await registry.mintSLD(owner.address, 'meta_kj345c');
 
       const req = {
         from: nonOwner.address,
@@ -527,8 +524,8 @@ describe('RegistryForwarder', () => {
     it('should revert meta-safeTransferFromChild when tokenId does not match', async () => {
       const tok1 = await registry.childIdOf(await registry.root(), 'meta_dfvu6y4');
       const tok2 = await registry.childIdOf(await registry.root(), 'meta_sdfgiu2');
-      await mintingController.mintSLD(owner.address, 'meta_dfvu6y4');
-      await mintingController.mintSLD(owner.address, 'meta_sdfgiu2');
+      await registry.mintSLD(owner.address, 'meta_dfvu6y4');
+      await registry.mintSLD(owner.address, 'meta_sdfgiu2');
 
       const req = {
         from: owner.address,
@@ -556,7 +553,7 @@ describe('RegistryForwarder', () => {
   describe('meta-burnChild', () => {
     it('should mint using burnChild', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_sfhk2');
-      await mintingController.mintSLD(owner.address, 'meta_sfhk2');
+      await registry.mintSLD(owner.address, 'meta_sfhk2');
 
       const threeld = await registry.childIdOf(tok, 'label');
       await registry.connect(owner).mintChild(owner.address, tok, 'label');
@@ -577,7 +574,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-burnChild when used signature', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_wefh2356');
-      await mintingController.mintSLD(owner.address, 'meta_wefh2356');
+      await registry.mintSLD(owner.address, 'meta_wefh2356');
 
       const req = {
         from: owner.address,
@@ -594,7 +591,7 @@ describe('RegistryForwarder', () => {
 
     it('should revert meta-burnChild for non-onwer', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'meta_we2jh3');
-      await mintingController.mintSLD(owner.address, 'meta_we2jh3');
+      await registry.mintSLD(owner.address, 'meta_we2jh3');
 
       const req = {
         from: nonOwner.address,
@@ -613,8 +610,8 @@ describe('RegistryForwarder', () => {
     it('should revert meta-burnChild when tokenId does not match', async () => {
       const tok1 = await registry.childIdOf(await registry.root(), 'meta_gf8974');
       const tok2 = await registry.childIdOf(await registry.root(), 'meta_se84mv');
-      await mintingController.mintSLD(owner.address, 'meta_gf8974');
-      await mintingController.mintSLD(owner.address, 'meta_se84mv');
+      await registry.mintSLD(owner.address, 'meta_gf8974');
+      await registry.mintSLD(owner.address, 'meta_se84mv');
 
       const req = {
         from: owner.address,

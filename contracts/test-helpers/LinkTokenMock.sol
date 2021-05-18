@@ -10,6 +10,7 @@ import '../roles/MinterRole.sol';
 contract LinkTokenMock is ERC20Upgradeable, MinterRole {
     function initialize() public initializer {
         __ERC20_init('LinkTokenMock', 'LTM');
+        __MinterRole_init_unchained();
     }
 
     function mint(address to, uint256 amount) public onlyMinter {

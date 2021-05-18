@@ -10,13 +10,14 @@ import './RecordStorage.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/RegistryForwarder.sol';
 import './roles/ControllerRole.sol';
+import './roles/MinterRole.sol';
 
 /**
  * @title Registry
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContext, ControllerRole, RecordStorage, RegistryForwarder {
+contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContext, RecordStorage, RegistryForwarder, ControllerRole, MinterRole {
     using AddressUpgradeable for address;
 
     string internal _prefix;
@@ -33,14 +34,15 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
     function initialize() public initializer {
         __ERC721_init_unchained('.crypto', 'UD');
         __ERC2771RegistryContext_init_unchained(address(this));
-        __ControllerRole_init_unchained();
         __RegistryForwarder_init_unchained();
+        __ControllerRole_init_unchained();
+        __MinterRole_init_unchained();
         _mint(address(0xdead), _CRYPTO_HASH);
     }
 
     /// ERC721 Metadata extension
 
-    function controlledSetTokenURIPrefix(string calldata prefix) external override onlyController {
+    function setTokenURIPrefix(string calldata prefix) external override onlyController {
         _prefix = prefix;
         emit NewURIPrefix(prefix);
     }
@@ -72,8 +74,8 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         _mintChild(to, tokenId, label);
     }
 
-    function controlledMintChild(address to, uint256 tokenId, string calldata label) external override onlyController {
-        _mintChild(to, tokenId, label);
+    function mintSLD(address to, string memory label) external override onlyMinter {
+        _mintChild(to, _CRYPTO_HASH, label);
     }
 
     function safeMintChild(address to, uint256 tokenId, string calldata label)
@@ -92,11 +94,21 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         _safeMintChild(to, tokenId, label, _data);
     }
 
-    function controlledSafeMintChild(address to, uint256 tokenId, string calldata label, bytes calldata _data)
+    function safeMintSLD(address to, string calldata label) external override onlyMinter {
+        safeMintSLD(to, label, '');
+    }
+
+    function safeMintSLD(address to, string memory label, bytes memory _data) public override onlyMinter {
+        _safeMintChild(to, _CRYPTO_HASH, label, _data);
+    }
+
+    function mintSLDWithRecords(address to, string memory label, string[] memory keys, string[] memory values)
         external
-        onlyController
+        override
+        onlyMinter
     {
-        _safeMintChild(to, tokenId, label, _data);
+        _mintChild(to, _CRYPTO_HASH, label);
+        super.setMany(keys, values, _childId(_CRYPTO_HASH, label));
     }
 
     /// Transfering
@@ -209,14 +221,6 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         validForwardedToken(tokenId)
     {
         super.reset(tokenId);
-    }
-
-    function preconfigure(
-        string[] memory keys,
-        string[] memory values,
-        uint256 tokenId
-    ) public onlyController {
-        super.setMany(keys, values, tokenId);
     }
 
     /**
