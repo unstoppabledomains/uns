@@ -137,10 +137,6 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         _transfer(from, to, _childId(tokenId, label));
     }
 
-    function controlledTransferFrom(address from, address to, uint256 tokenId) external override onlyController {
-        _transfer(from, to, tokenId);
-    }
-
     function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external override {
         safeTransferFromChild(from, to, tokenId, label, '');
     }
@@ -154,13 +150,6 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
     ) public override onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
         uint256 childId = _childId(tokenId, label);
         _safeTransfer(from, to, childId, _data);
-    }
-
-    function controlledSafeTransferFrom(address from, address to, uint256 tokenId, bytes calldata _data)
-        external override
-        onlyController
-    {
-        _safeTransfer(from, to, tokenId, _data);
     }
 
     /// Burning
@@ -181,10 +170,6 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         validForwardedToken(tokenId)
     {
         _burn(_childId(tokenId, label));
-    }
-
-    function controlledBurn(uint256 tokenId) external override onlyController {
-        _burn(tokenId);
     }
 
     /// Resolution

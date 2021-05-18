@@ -59,17 +59,6 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
     function transferFromChild(address from, address to, uint256 tokenId, string calldata label) external;
 
     /**
-     * @dev Controlled function to transfers the ownership of a token ID to
-     * another address.
-     * Requires the msg.sender to be controller.
-     * Requires the token already exist.
-     * @param from current owner of the token
-     * @param to address to receive the ownership of the given token ID
-     * @param tokenId uint256 ID of the token to be transferred
-     */
-    function controlledTransferFrom(address from, address to, uint256 tokenId) external;
-
-    /**
      * @dev Safely transfers the ownership of a child token ID to another address.
      * Calculates child token ID using a namehash function.
      * Implements a ERC721Reciever check unlike transferFromChild.
@@ -87,19 +76,6 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
     function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external;
 
     /**
-     * @dev Controlled frunction to safely transfers the ownership of a token ID
-     * to another address.
-     * Implements a ERC721Reciever check unlike controlledSafeTransferFrom.
-     * Requires the msg.sender to be controller.
-     * Requires the token already exist.
-     * @param from current owner of the token
-     * @param to address to receive the ownership of the given token ID
-     * @param tokenId uint256 parent ID of the token to be transferred
-     * @param _data bytes data to send along with a safe transfer check
-     */
-    function controlledSafeTransferFrom(address from, address to, uint256 tokenId, bytes calldata _data) external;
-
-    /**
      * @dev Burns a child token ID.
      * Calculates child token ID using a namehash function.
      * Requires the msg.sender to be the owner, approved, or operator of tokenId.
@@ -108,14 +84,6 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
      * @param label subdomain label of the child token ID
      */
     function burnChild(uint256 tokenId, string calldata label) external;
-
-    /**
-     * @dev Controlled function to burn a given token ID.
-     * Requires the msg.sender to be controller.
-     * Requires the token already exist.
-     * @param tokenId uint256 ID of the token to be burned
-     */
-    function controlledBurn(uint256 tokenId) external;
 
     /**
      * @dev Gets the resolver of the specified token ID.
