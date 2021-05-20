@@ -5,14 +5,14 @@ pragma solidity ^0.8.0;
 import './IRecordStorage.sol';
 import './KeyStorage.sol';
 
-contract RecordStorage is IRecordStorage, KeyStorage {
+abstract contract RecordStorage is IRecordStorage, KeyStorage {
     // Mapping from token ID to preset id to key to value
     mapping (uint256 => mapping (uint256 =>  mapping (string => string))) internal _records;
 
     // Mapping from token ID to current preset id
     mapping (uint256 => uint256) internal _presets;
 
-    function get(string memory key, uint256 tokenId) public view virtual override returns (string memory) {
+    function get(string memory key, uint256 tokenId) public view override returns (string memory) {
         return _records[tokenId][_presets[tokenId]][key];
     }
 
@@ -39,7 +39,7 @@ contract RecordStorage is IRecordStorage, KeyStorage {
     function getMany(
         string[] calldata keys,
         uint256 tokenId
-    ) public view virtual override returns (string[] memory) {
+    ) public view override returns (string[] memory) {
         uint256 keyCount = keys.length;
         string[] memory values = new string[](keyCount);
         uint256 preset = _presets[tokenId];
@@ -49,37 +49,25 @@ contract RecordStorage is IRecordStorage, KeyStorage {
         return values;
     }
 
-    function set(
-        string calldata key,
-        string calldata value,
-        uint256 tokenId
-    ) public virtual override {
+    function _set(string calldata key, string calldata value, uint256 tokenId) internal {
         _set(_presets[tokenId], key, value, tokenId);
     }
 
-    function setMany(
-        string[] memory keys,
-        string[] memory values,
-        uint256 tokenId
-    ) public virtual override {
+    function _setMany(string[] memory keys, string[] memory values, uint256 tokenId) internal {
         _setMany(_presets[tokenId], keys, values, tokenId);
     }
 
-    function reconfigure(
-        string[] memory keys,
-        string[] memory values,
-        uint256 tokenId
-    ) public virtual override {
-        _setPreset(block.timestamp, tokenId);
+    function _reconfigure(string[] memory keys, string[] memory values, uint256 tokenId) internal {
+        _setPreset(tokenId);
         _setMany(_presets[tokenId], keys, values, tokenId);
     }
 
-    function reset(uint256 tokenId) public virtual override {
-        _setPreset(block.timestamp, tokenId);
+    function _reset(uint256 tokenId) internal {
+        _setPreset(tokenId);
     }
 
-    function _setPreset(uint256 presetId, uint256 tokenId) private {
-        _presets[tokenId] = presetId;
+    function _setPreset(uint256 tokenId) private {
+        _presets[tokenId] = block.timestamp;
         emit ResetRecords(tokenId);
     }
 

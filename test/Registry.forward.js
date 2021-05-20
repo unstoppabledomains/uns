@@ -1,8 +1,8 @@
 const { utils, BigNumber } = ethers;
 
 describe('Registry (forwarder)', () => {
-  let Registry, MintingController;
-  let registry, mintingController;
+  let Registry;
+  let registry;
   let signers, accounts;
 
   before(async () => {
@@ -10,13 +10,10 @@ describe('Registry (forwarder)', () => {
     [, ...accounts] = signers.map(s => s.address);
 
     Registry = await ethers.getContractFactory('Registry');
-    MintingController = await ethers.getContractFactory('MintingController');
     Simple = await ethers.getContractFactory('Simple');
 
     registry = await Registry.deploy();
     await registry.initialize();
-    mintingController = await MintingController.deploy(registry.address);
-    await registry.addController(mintingController.address);
   })
 
   describe('Registry', () => {
@@ -38,14 +35,14 @@ describe('Registry (forwarder)', () => {
         ],
       };
 
-     return signer._signTypedData(domain, types, value);
+      return signer._signTypedData(domain, types, value);
     }
 
     it('should transfer through meta-tx', async () => {
       const owner = signers[1];
       const receiver = signers[2];
       const tok = await registry.childIdOf(await registry.root(), 'res_label_113a');
-      await mintingController.mintSLD(owner.address, 'res_label_113a');
+      await registry.mintSLD(owner.address, 'res_label_113a');
 
       const req = {
         from: owner.address,

@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-interface IMintingController {
+interface ISLDMinter {
     /**
      * @dev Minter function that mints a Second Level Domain (SLD).
      * @param to address to mint the new SLD to.
@@ -27,5 +27,12 @@ interface IMintingController {
      */
     function safeMintSLD(address to, string calldata label, bytes calldata _data) external;
 
+    /**
+     * @dev Minter function that mints a Second Level Domain (SLD) with records.
+     * @param to address to mint the new SLD to.
+     * @param label SLD label to mint.
+     * @param keys Record keys.
+     * @param values Record values.
+     */
     function mintSLDWithRecords(address to, string memory label, string[] memory keys, string[] memory values) external;
 }

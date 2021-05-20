@@ -10,13 +10,14 @@ import './RecordStorage.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/RegistryForwarder.sol';
 import './roles/ControllerRole.sol';
+import './roles/MinterRole.sol';
 
 /**
  * @title Registry
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContext, ControllerRole, RecordStorage, RegistryForwarder {
+contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContext, RecordStorage, RegistryForwarder, ControllerRole, MinterRole {
     using AddressUpgradeable for address;
 
     string internal _prefix;
@@ -33,14 +34,15 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
     function initialize() public initializer {
         __ERC721_init_unchained('.crypto', 'UD');
         __ERC2771RegistryContext_init_unchained(address(this));
-        __ControllerRole_init_unchained();
         __RegistryForwarder_init_unchained();
+        __ControllerRole_init_unchained();
+        __MinterRole_init_unchained();
         _mint(address(0xdead), _CRYPTO_HASH);
     }
 
     /// ERC721 Metadata extension
 
-    function controlledSetTokenURIPrefix(string calldata prefix) external override onlyController {
+    function setTokenURIPrefix(string calldata prefix) external override onlyController {
         _prefix = prefix;
         emit NewURIPrefix(prefix);
     }
@@ -72,8 +74,8 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         _mintChild(to, tokenId, label);
     }
 
-    function controlledMintChild(address to, uint256 tokenId, string calldata label) external override onlyController {
-        _mintChild(to, tokenId, label);
+    function mintSLD(address to, string memory label) external override onlyMinter {
+        _mintChild(to, _CRYPTO_HASH, label);
     }
 
     function safeMintChild(address to, uint256 tokenId, string calldata label)
@@ -92,11 +94,21 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         _safeMintChild(to, tokenId, label, _data);
     }
 
-    function controlledSafeMintChild(address to, uint256 tokenId, string calldata label, bytes calldata _data)
+    function safeMintSLD(address to, string calldata label) external override onlyMinter {
+        safeMintSLD(to, label, '');
+    }
+
+    function safeMintSLD(address to, string memory label, bytes memory _data) public override onlyMinter {
+        _safeMintChild(to, _CRYPTO_HASH, label, _data);
+    }
+
+    function mintSLDWithRecords(address to, string memory label, string[] memory keys, string[] memory values)
         external
-        onlyController
+        override
+        onlyMinter
     {
-        _safeMintChild(to, tokenId, label, _data);
+        _mintChild(to, _CRYPTO_HASH, label);
+        _setMany(keys, values, _childId(_CRYPTO_HASH, label));
     }
 
     /// Transfering
@@ -107,7 +119,25 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         onlyApprovedOrOwner(tokenId)
         validForwardedToken(tokenId)
     {
-        super._transfer(ownerOf(tokenId), to, tokenId);
+        _transfer(ownerOf(tokenId), to, tokenId);
+    }
+
+    function transferFrom(address from, address to, uint256 tokenId)
+        public
+        override(IERC721Upgradeable, ERC721Upgradeable)
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _transfer(from, to, tokenId);
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data)
+        public
+        override(IERC721Upgradeable, ERC721Upgradeable)
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _safeTransfer(from, to, tokenId, _data);
     }
 
     function transferFromChild(address from, address to, uint256 tokenId, string calldata label)
@@ -119,8 +149,8 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         _transfer(from, to, _childId(tokenId, label));
     }
 
-    function controlledTransferFrom(address from, address to, uint256 tokenId) external override onlyController {
-        _transfer(from, to, tokenId);
+    function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external override {
+        safeTransferFromChild(from, to, tokenId, label, '');
     }
 
     function safeTransferFromChild(
@@ -134,18 +164,16 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         _safeTransfer(from, to, childId, _data);
     }
 
-    function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external override {
-        safeTransferFromChild(from, to, tokenId, label, '');
-    }
-
-    function controlledSafeTransferFrom(address from, address to, uint256 tokenId, bytes calldata _data)
-        external override
-        onlyController
-    {
-        _safeTransfer(from, to, tokenId, _data);
-    }
-
     /// Burning
+
+    function burn(uint256 tokenId)
+        public
+        override
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _burn(tokenId);
+    }
 
     function burnChild(uint256 tokenId, string calldata label)
         external
@@ -156,58 +184,46 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         _burn(_childId(tokenId, label));
     }
 
-    function controlledBurn(uint256 tokenId) external override onlyController {
-        _burn(tokenId);
-    }
-
     /// Resolution
 
-    /**
-     * Notes: Keep it for backward compatibility
-     */
-    function resolverOf(uint256) external view override returns (address) {
-        return address(this);
+    function resolverOf(uint256 tokenId) external view override returns (address) {
+        return _exists(tokenId) ? address(this) : address(0x0);
     }
 
-    function set(
-        string calldata key,
-        string calldata value,
-        uint256 tokenId
-    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
-        super.set(key, value, tokenId);
-    }
-
-    function setMany(
-        string[] memory keys,
-        string[] memory values,
-        uint256 tokenId
-    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
-        super.setMany(keys, values, tokenId);
-    }
-
-    function reconfigure(
-        string[] memory keys,
-        string[] memory values,
-        uint256 tokenId
-    ) public override(IRecordStorage, RecordStorage) onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
-        super.reconfigure(keys, values, tokenId);
-    }
-
-    function reset(uint256 tokenId)
-        public
-        override(IRecordStorage, RecordStorage)
+    function set(string calldata key, string calldata value, uint256 tokenId)
+        external
+        override
         onlyApprovedOrOwner(tokenId)
         validForwardedToken(tokenId)
     {
-        super.reset(tokenId);
+        _set(key, value, tokenId);
     }
 
-    function preconfigure(
-        string[] memory keys,
-        string[] memory values,
-        uint256 tokenId
-    ) public onlyController {
-        super.setMany(keys, values, tokenId);
+    function setMany(string[] memory keys, string[] memory values, uint256 tokenId)
+        external
+        override
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _setMany(keys, values, tokenId);
+    }
+
+    function reconfigure(string[] memory keys, string[] memory values, uint256 tokenId)
+        external
+        override
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _reconfigure(keys, values, tokenId);
+    }
+
+    function reset(uint256 tokenId)
+        external
+        override
+        onlyApprovedOrOwner(tokenId)
+        validForwardedToken(tokenId)
+    {
+        _reset(tokenId);
     }
 
     /**

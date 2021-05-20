@@ -1,8 +1,8 @@
 const { utils, BigNumber } = ethers;
 
 describe('Registry (proxy)', () => {
-  let Registry, MintingController;
-  let mintingController, registry;
+  let Registry;
+  let registry;
   let signers, coinbase, accounts;
 
   before(async () => {
@@ -10,13 +10,10 @@ describe('Registry (proxy)', () => {
     [coinbase, ...accounts] = signers.map(s => s.address);
 
     Registry = await ethers.getContractFactory('Registry');
-    MintingController = await ethers.getContractFactory('MintingController');
     Simple = await ethers.getContractFactory('Simple');
 
     registry = await upgrades.deployProxy(Registry);
-    mintingController = await MintingController.deploy(registry.address);
-    await registry.addController(mintingController.address);
-    await registry.controlledSetTokenURIPrefix('/');
+    await registry.setTokenURIPrefix('/');
   })
 
   describe('Registry', () => {
@@ -33,18 +30,18 @@ describe('Registry (proxy)', () => {
     it('should resolve properly', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'resolution')
 
-      await mintingController.mintSLD(coinbase, 'resolution')
+      await registry.mintSLD(coinbase, 'resolution')
 
       await registry.burn(tok)
 
-      await mintingController.mintSLD(coinbase, 'resolution')
+      await registry.mintSLD(coinbase, 'resolution')
 
       await registry.transferFrom(coinbase, accounts[0], tok)
     })
 
     it('should mint children', async () => {
       const tok = await registry.childIdOf(await registry.root(), 'otherlabel')
-      await mintingController.mintSLD(coinbase, 'otherlabel')
+      await registry.mintSLD(coinbase, 'otherlabel')
 
       await registry.mintChild(coinbase, tok, '3ld')
       const threeld = await registry.childIdOf(tok, '3ld')
@@ -93,7 +90,7 @@ describe('Registry (proxy)', () => {
         registry.transferFromChild(coinbase, accounts[0], 1, '')
       ).to.be.revertedWith('ERC721: operator query for nonexistent token');
 
-      await mintingController.mintSLD(coinbase, 'transfer')
+      await registry.mintSLD(coinbase, 'transfer')
 
       await registry.mintChild(coinbase, tok, '3ld')
       await registry.transferFromChild(coinbase, accounts[0], tok, '3ld')
@@ -127,7 +124,7 @@ describe('Registry (proxy)', () => {
         registry.burnChild(1, '')
       ).to.be.revertedWith('ERC721: operator query for nonexistent token');
 
-      await mintingController.mintSLD(coinbase, 'burn')
+      await registry.mintSLD(coinbase, 'burn')
 
       await registry.mintChild(coinbase, tok, '3ld')
       await registry.childIdOf(tok, '3ld')
@@ -153,7 +150,7 @@ describe('Registry (proxy)', () => {
       assert.equal(await registry.tokenURI(rootTok), `/${rootTok}`);
 
       const tok = await registry.childIdOf(rootTok, 'label')
-      await mintingController.mintSLD(coinbase, 'label')
+      await registry.mintSLD(coinbase, 'label')
 
       assert.equal(await registry.tokenURI(tok), `/${tok}`);
 
@@ -177,10 +174,10 @@ describe('Registry (proxy)', () => {
       const tok = await registry.root();
       assert.equal(await registry.tokenURI(tok), `/${tok}`);
 
-      await registry.controlledSetTokenURIPrefix('prefix-');
+      await registry.setTokenURIPrefix('prefix-');
       assert.equal(await registry.tokenURI(tok), `prefix-${tok}`);
 
-      await registry.controlledSetTokenURIPrefix('/');
+      await registry.setTokenURIPrefix('/');
       assert.equal(await registry.tokenURI(tok), `/${tok}`);
     })
   });
@@ -188,7 +185,7 @@ describe('Registry (proxy)', () => {
   describe('Resolver', () => {
     const initializeDomain = async (name) => {
       const tok = await registry.childIdOf(await registry.root(), name);
-      await mintingController.mintSLD(coinbase, name);
+      await registry.mintSLD(coinbase, name);
       return tok;
     }
 
@@ -200,7 +197,7 @@ describe('Registry (proxy)', () => {
         registry.set('key', 'value', tok)
       ).to.be.revertedWith('ERC721: operator query for nonexistent token');
 
-      await mintingController.mintSLD(coinbase, 'label_931')
+      await registry.mintSLD(coinbase, 'label_931')
       await registry.set('key', 'value', tok)
   
       assert.equal(

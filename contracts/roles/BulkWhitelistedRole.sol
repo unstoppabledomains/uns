@@ -14,14 +14,18 @@ import './WhitelistedRole.sol';
  */
 contract BulkWhitelistedRole is WhitelistedRole {
     function bulkAddWhitelisted(address[] memory accounts) public onlyWhitelistAdmin {
-        for (uint256 index = 0; index < accounts.length; index++) {
-            grantRole(WHITELISTED_ROLE, accounts[index]);
-        }
+        _bulkAddWhitelisted(accounts);
     }
 
     function bulkRemoveWhitelisted(address[] memory accounts) public onlyWhitelistAdmin {
         for (uint256 index = 0; index < accounts.length; index++) {
             revokeRole(WHITELISTED_ROLE, accounts[index]);
+        }
+    }
+
+    function _bulkAddWhitelisted(address[] memory accounts) internal {
+        for (uint256 index = 0; index < accounts.length; index++) {
+            _addWhitelisted(accounts[index]);
         }
     }
 }

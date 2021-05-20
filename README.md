@@ -22,6 +22,10 @@ UNS registry smart contracts.
 
     Ref: https://eips.ethereum.org/EIPS/eip-721
 
+    TBD:
+
+    - Obsolete due to overriding burn function for meta-transactions (`validForwardedToken` guard)
+
 4.  Implements IERC721Metadata
 
     IERC721Metadata is an extension of ERC-721. IERC721Metadata allows smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
@@ -35,37 +39,27 @@ UNS registry smart contracts.
     - Major `tokenURI()` difference
 
       ```
-      CNS.tokenURI() => {prefix}{domain_name}
+      CNS.tokenURI() => prefix ? {prefix}{domain_name} : {domain_name}
 
-      UNS.tokenURI() => records['metadata.uri'].value || {prefix}{tokin_id}
+      UNS.tokenURI() => records['metadata.uri'].value || prefix ? {prefix}{tokin_id} : ''
       ```
 
     - `tokenURI()` returns empty string(by default) when `prefix` is empty string
     - `event NewURI(uint256 indexed tokenId, string uri)` removed
-    - [TO_BE_IMPL]: When `metadata.uri` recond is defined, `tokenURI()` returns value of the record instead of default uri
-
-    ### TBD:
-
-    - `tokenURI()` returns empty string(by default) when `prefix` is empty string
-
-      ```
-      CNS.tokenURI() => prefix ? {prefix}{domain_name} : {domain_name}
-
-      UNS.tokenURI() => prefix ? {prefix}{tokin_id} : ''
-      ```
+    - When `metadata.uri` recond is defined, `tokenURI()` returns value of the record instead of default uri [#178196957](https://www.pivotaltracker.com/story/show/178196957)
 
 5.  Implements IRegistry
 
     ```
-    interface IRegistry /_ is IERC721Metadata, IRecordStorage _/ {
+    interface IRegistry /_ is IERC721Metadata, ISLDMinter, IRecordStorage _/ {
 
         event NewURIPrefix(string prefix);
 
         /**
-         * @dev Controlled function to set the token URI Prefix for all tokens.
+         * @dev Function to set the token URI Prefix for all tokens.
          * @param prefix string URI to assign
          */
-        function controlledSetTokenURIPrefix(string calldata prefix) external;
+        function setTokenURIPrefix(string calldata prefix) external;
 
         /**
          * @dev Returns whether the given spender can transfer a given token ID.
@@ -88,16 +82,6 @@ UNS registry smart contracts.
         function mintChild(address to, uint256 tokenId, string calldata label) external;
 
         /**
-         * @dev Controlled function to mint a given token ID.
-         * Requires the msg.sender to be controller.
-         * Requires the token ID to not exist.
-         * @param to address the given token ID will be minted to
-         * @param label string that is a subdomain
-         * @param tokenId uint256 ID of the parent token
-         */
-        function controlledMintChild(address to, uint256 tokenId, string calldata label) external;
-
-        /**
          * @dev Transfers the ownership of a child token ID to another address.
          * Calculates child token ID using a namehash function.
          * Requires the msg.sender to be the owner, approved, or operator of tokenId.
@@ -108,17 +92,6 @@ UNS registry smart contracts.
          * @param label subdomain label of the child token ID
          */
         function transferFromChild(address from, address to, uint256 tokenId, string calldata label) external;
-
-        /**
-         * @dev Controlled function to transfers the ownership of a token ID to
-         * another address.
-         * Requires the msg.sender to be controller.
-         * Requires the token already exist.
-         * @param from current owner of the token
-         * @param to address to receive the ownership of the given token ID
-         * @param tokenId uint256 ID of the token to be transferred
-         */
-        function controlledTransferFrom(address from, address to, uint256 tokenId) external;
 
         /**
          * @dev Safely transfers the ownership of a child token ID to another address.
@@ -138,19 +111,6 @@ UNS registry smart contracts.
         function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external;
 
         /**
-         * @dev Controlled frunction to safely transfers the ownership of a token ID
-         * to another address.
-         * Implements a ERC721Reciever check unlike controlledSafeTransferFrom.
-         * Requires the msg.sender to be controller.
-         * Requires the token already exist.
-         * @param from current owner of the token
-         * @param to address to receive the ownership of the given token ID
-         * @param tokenId uint256 parent ID of the token to be transferred
-         * @param _data bytes data to send along with a safe transfer check
-         */
-        function controlledSafeTransferFrom(address from, address to, uint256 tokenId, bytes calldata _data) external;
-
-        /**
          * @dev Burns a child token ID.
          * Calculates child token ID using a namehash function.
          * Requires the msg.sender to be the owner, approved, or operator of tokenId.
@@ -161,12 +121,11 @@ UNS registry smart contracts.
         function burnChild(uint256 tokenId, string calldata label) external;
 
         /**
-         * @dev Controlled function to burn a given token ID.
-         * Requires the msg.sender to be controller.
-         * Requires the token already exist.
-         * @param tokenId uint256 ID of the token to be burned
+         * @dev Gets the resolver of the specified token ID.
+         * @param tokenId uint256 ID of the token to query the resolver of
+         * @return address currently marked as the resolver of the given token ID
          */
-        function controlledBurn(uint256 tokenId) external;
+        function resolverOf(uint256 tokenId) external view returns (address);
 
         /**
          * @dev Provides child token (subdomain) of provided tokenId.
@@ -194,19 +153,9 @@ UNS registry smart contracts.
     - `function resolveTo(address to, uint256 tokenId) external {}` removed
     - `function controlledResolveTo(address to, uint256 tokenId) external {}` removed
     - `function sync(uint256 tokenId, uint256 updateId) external {}` removed
-    - `function resolverOf(uint256 tokenId) external view returns (address) {}` returns registry's address
-    - `function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external {}` added as a controlled function
-    - [TO_BE_IMPL]: `string calldata label` replaced by `bytes32 child` = `keccak256(abi.encodePacked(label))`
-
-    ### TBD:
-
-    - `function resolverOf(uint256 tokenId) external view returns (address) {}` returns registry's address
-
-      Q: should it check existence of token?
-
-    ### Ideas:
-
-    - Controlled functions: combine with normal or split it into different interface, rename
+    - `function resolverOf(uint256 tokenId) external view returns (address) {}` returns registry's address when token exists
+    - ~~`function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external {}` added as a controlled function~~ Removed due to removing controllers
+    - `string calldata label` replaced by `bytes32 child` = `keccak256(abi.encodePacked(label))`[#178199979](https://www.pivotaltracker.com/story/show/178199979)
 
 6.  Records Storage
 
@@ -337,10 +286,19 @@ UNS registry smart contracts.
             return forwarder == _trustedForwarder;
         }
 
+        modifier validForwardedToken(uint256 tokenId) {
+            if (isTrustedForwarder(msg.sender)) {
+                uint256 _tokenId;
+                assembly { _tokenId := calldataload(sub(calldatasize(), 32)) }
+                require(tokenId == _tokenId, 'ERC2771Context: TOKEN_INVALID');
+            }
+            _;
+        }
+
         function _msgSender() internal view virtual override returns (address sender) {
             if (isTrustedForwarder(msg.sender)) {
                 // The assembly code is more direct than the Solidity version using `abi.decode`.
-                assembly { sender := shr(96, calldataload(sub(calldatasize(), 20))) }
+                assembly { sender := shr(96, calldataload(sub(calldatasize(), 52))) }
             } else {
                 return super._msgSender();
             }
@@ -348,7 +306,7 @@ UNS registry smart contracts.
 
         function _msgData() internal view virtual override returns (bytes calldata) {
             if (isTrustedForwarder(msg.sender)) {
-                return msg.data[:msg.data.length-20];
+                return msg.data[:msg.data.length-52];
             } else {
                 return super._msgData();
             }
@@ -395,10 +353,13 @@ UNS registry smart contracts.
       - does it make sence to have `req.gas`?
       - do we need `expiry` check?
 
-    - Removing SignatureController
-    - Removing controlled functions from Registry
+8.  Controllers
 
-8.  Upgradable registry
+    - Removed SignatureController
+    - Removed URIPrefixController
+    - Removed MintingController
+
+9.  Upgradable registry
 
     TBD:
 
@@ -410,16 +371,8 @@ UNS registry smart contracts.
     - [Writing Upgradeable Contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable)
     - [UUPS Proxies: Tutorial (Solidity + JavaScript)](https://forum.openzeppelin.com/t/uups-proxies-tutorial-solidity-javascript/7786)
 
-9.  TLD agnostic
-10. Controllers
-
-    TBD:
-
-    - ControllerRole
-    - Types of controllers
-    - Allowed functions
-
-11) Multicalls
+10. TLD management
+11. Multicalls
 
 ## Main stack
 

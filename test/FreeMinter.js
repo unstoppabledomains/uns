@@ -1,7 +1,7 @@
 describe('FreeMinter', () => {
   const DomainNamePrefix = 'udtestdev-';
-  let Registry, MintingController, FreeMinter;
-  let registry, mintingController, freeMinter, domainSuffix;
+  let Registry, FreeMinter;
+  let registry, freeMinter, domainSuffix;
   let signers, developerSigner;
   let developer, receiver;
 
@@ -11,17 +11,14 @@ describe('FreeMinter', () => {
     [, developer, receiver] = signers.map(s => s.address);
 
     Registry = await ethers.getContractFactory('Registry');
-    MintingController = await ethers.getContractFactory('MintingController');
     FreeMinter = await ethers.getContractFactory('FreeMinter');
 
     registry = await Registry.deploy();
     await registry.initialize();
-    mintingController = await MintingController.deploy(registry.address);
-    await registry.addController(mintingController.address);
-    await registry.controlledSetTokenURIPrefix('/');
+    await registry.setTokenURIPrefix('/');
 
-    freeMinter = await FreeMinter.deploy(mintingController.address);
-    await mintingController.addMinter(freeMinter.address);
+    freeMinter = await FreeMinter.deploy(registry.address);
+    await registry.addMinter(freeMinter.address);
   })
 
   beforeEach(() => {

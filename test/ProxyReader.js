@@ -3,11 +3,11 @@ const { ZERO_ADDRESS } = require('./helpers/constants');
 const { utils } = ethers;
 
 describe('ProxyReader', () => {
-	const domainName = 'test_42';
-	const keys = ['test.key1', 'test.key2'];
-	const values = ['test.value1', 'test.value2'];
-  let Registry, MintingController, ProxyReader;
-	let registry, proxy, tokenId, mintingController;
+  const domainName = 'test_42';
+  const keys = ['test.key1', 'test.key2'];
+  const values = ['test.value1', 'test.value2'];
+  let Registry, ProxyReader;
+  let registry, proxy, tokenId;
   let signers, coinbase, accounts;
 
   before(async () => {
@@ -15,15 +15,12 @@ describe('ProxyReader', () => {
     [coinbase, ...accounts] = signers.map(s => s.address);
 
     Registry = await ethers.getContractFactory('Registry');
-    MintingController = await ethers.getContractFactory('MintingController');
     ProxyReader = await ethers.getContractFactory('ProxyReader');
 
     registry = await Registry.deploy();
     await registry.initialize();
-    mintingController = await MintingController.deploy(registry.address);
-    await registry.addController(mintingController.address);
 
-    await mintingController.mintSLD(coinbase, domainName);
+    await registry.mintSLD(coinbase, domainName);
     tokenId = await registry.childIdOf(await registry.root(), domainName);
     
     proxy = await ProxyReader.deploy(registry.address);
@@ -234,7 +231,7 @@ describe('ProxyReader', () => {
       it('should return data by keys', async () => {
         // arrange
         const _domainName = 'hey_hoy_121';
-        await mintingController.mintSLD(coinbase, _domainName);
+        await registry.mintSLD(coinbase, _domainName);
         const _tokenId = await registry.childIdOf(await registry.root(), _domainName);
 
         // act
@@ -255,7 +252,7 @@ describe('ProxyReader', () => {
       it('should return data for multiple tokens', async () => {
         // arrange
         const _domainName = 'test_1291'
-        await mintingController.mintSLD(accounts[0], _domainName);
+        await registry.mintSLD(accounts[0], _domainName);
         const _tokenId = await registry.childIdOf(await registry.root(), _domainName);
         for (let i = 0; i < keys.length; i++) {
             await registry.set(keys[i], values[i], tokenId);
@@ -316,7 +313,7 @@ describe('ProxyReader', () => {
       it('should return data for multiple tokens', async () => {
         // arrange
         const _domainName = 'test_1082q'
-        await mintingController.mintSLD(accounts[0], _domainName);
+        await registry.mintSLD(accounts[0], _domainName);
         const _tokenId = await registry.childIdOf(await registry.root(), _domainName);
         const hashes = keys.map(utils.id);
         for (let i = 0; i < keys.length; i++) {
@@ -365,7 +362,7 @@ describe('ProxyReader', () => {
       it('should return owners for multiple tokens', async () => {
         // arrange
         const _domainName = 'test_1211'
-        await mintingController.mintSLD(accounts[0], _domainName);
+        await registry.mintSLD(accounts[0], _domainName);
         const _tokenId = await registry.childIdOf(await registry.root(), _domainName);
 
         // act

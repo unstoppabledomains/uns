@@ -34,10 +34,7 @@ async function main() {
   // await hre.run('compile');
 
   const Registry = await ethers.getContractFactory('Registry');
-  const URIPrefixController = await ethers.getContractFactory('URIPrefixController');
-  const SignatureController = await ethers.getContractFactory('SignatureController');
-  const MintingController = await ethers.getContractFactory('MintingController');
-  const DomainZoneController = await ethers.getContractFactory('DomainZoneController');
+  const DomainZoneOperator = await ethers.getContractFactory('DomainZoneOperator');
   const WhitelistedMinter = await ethers.getContractFactory('WhitelistedMinter');
   const ProxyReader = await ethers.getContractFactory('ProxyReader');
   const TwitterValidationOperator = await ethers.getContractFactory('TwitterValidationOperator');
@@ -56,35 +53,21 @@ async function main() {
     console.log("Registry deployed to:", registry.address);
   }
 
-  const signatureController = await SignatureController.deploy(registry.address);
-  console.log("SignatureController deployed to:", signatureController.address);
-  await registry.addController(signatureController.address);
-
-  const mintingController = await MintingController.deploy(registry.address);
-  console.log("MintingController deployed to:", mintingController.address);
-  await registry.addController(mintingController.address);
-
-  const uriPrefixController = await URIPrefixController.deploy(registry.address);
-  console.log("URIPrefixController deployed to:", uriPrefixController.address);
-  await registry.addController(uriPrefixController.address);
-
-  const domainZoneController = await DomainZoneController.deploy(registry.address, []);
-  console.log("DomainZoneController deployed to:", domainZoneController.address);
-  // TODO: figure out why domainZoneController did not add to registry as a controller (dot-crypto migration)
+  const domainZoneOperator = await DomainZoneOperator.deploy(registry.address, []);
+  console.log("DomainZoneOperator deployed to:", domainZoneOperator.address);
 
   if (network === 'live') {
     await registry.renounceController();
   }
 
-  const whitelistedMinter = await WhitelistedMinter.deploy(mintingController.address);
+  const whitelistedMinter = await WhitelistedMinter.deploy(registry.address);
   console.log("WhitelistedMinter deployed to:", whitelistedMinter.address);
-  await mintingController.addMinter(whitelistedMinter.address);
+  await registry.addMinter(whitelistedMinter.address);
 
   if (network === 'rinkeby') {
     for(const admin of rinkebyAccounts.admins) {
       await whitelistedMinter.addWhitelistAdmin(admin);
-      await domainZoneController.addWhitelistAdmin(admin);
-      await uriPrefixController.addWhitelistAdmin(admin);
+      await domainZoneOperator.addWhitelistAdmin(admin);
     }
     
     await whitelistedMinter.bulkAddWhitelisted([
@@ -92,7 +75,7 @@ async function main() {
       ...rinkebyAccounts.priorityWorkers
     ]);
 
-    await domainZoneController.bulkAddWhitelisted(rinkebyAccounts.priorityWorkers);
+    await domainZoneOperator.bulkAddWhitelisted(rinkebyAccounts.priorityWorkers);
   }
 
   const proxyReader = await ProxyReader.deploy(registry.address);
@@ -106,12 +89,12 @@ async function main() {
     console.log("TwitterValidationOperator deployed to:", twitterValidationOperator.address);
   }
 
-  const freeMinter = await FreeMinter.deploy(mintingController.address);
+  const freeMinter = await FreeMinter.deploy(registry.address);
   console.log("FreeMinter deployed to:", freeMinter.address);
-  await mintingController.addMinter(freeMinter.address);
+  await registry.addMinter(freeMinter.address);
 
   if (network === 'live') {
-    await mintingController.renounceMinter();
+    await registry.renounceMinter();
   }
 
   console.log('Migrated!');
