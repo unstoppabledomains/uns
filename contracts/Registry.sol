@@ -33,7 +33,7 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
 
     function initialize() public initializer {
         __ERC721_init_unchained('.crypto', 'UD');
-        __ERC2771RegistryContext_init_unchained(address(this));
+        __ERC2771RegistryContext_init_unchained();
         __RegistryForwarder_init_unchained();
         __ControllerRole_init_unchained();
         __MinterRole_init_unchained();

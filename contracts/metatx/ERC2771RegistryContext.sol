@@ -6,19 +6,16 @@ import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 abstract contract ERC2771RegistryContext is Initializable, ContextUpgradeable {
-    address _trustedForwarder;
-
-    function __ERC2771RegistryContext_init(address trustedForwarder) internal initializer {
+    function __ERC2771RegistryContext_init() internal initializer {
         __Context_init_unchained();
-        __ERC2771RegistryContext_init_unchained(trustedForwarder);
+        __ERC2771RegistryContext_init_unchained();
     }
 
-    function __ERC2771RegistryContext_init_unchained(address trustedForwarder) internal initializer {
-        _trustedForwarder = trustedForwarder;
+    function __ERC2771RegistryContext_init_unchained() internal initializer {
     }
 
     function isTrustedForwarder(address forwarder) public view virtual returns(bool) {
-        return forwarder == _trustedForwarder;
+        return forwarder == address(this);
     }
 
     modifier validForwardedToken(uint256 tokenId) {
