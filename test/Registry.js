@@ -3,7 +3,7 @@ const { ZERO_ADDRESS } = require('./helpers/constants');
 const { utils, BigNumber } = ethers;
 
 describe('Registry', () => {
-  let Registry;
+  let Registry, SimpleMock;
   let registry;
   let signers, coinbase, accounts;
 
@@ -12,7 +12,7 @@ describe('Registry', () => {
     [coinbase, ...accounts] = signers.map(s => s.address);
 
     Registry = await ethers.getContractFactory('Registry');
-    Simple = await ethers.getContractFactory('Simple');
+    SimpleMock = await ethers.getContractFactory('SimpleMock');
 
     registry = await Registry.deploy();
     await registry.initialize();
@@ -227,7 +227,7 @@ describe('Registry', () => {
         registry.callStatic['safeMintSLD(address,string)'](registry.address, 'label_93')
       ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
   
-      const simple = await Simple.deploy();
+      const simple = await SimpleMock.deploy();
       await registry.functions['safeMintSLD(address,string)'](simple.address, 'label_93');
   
       assert.equal(simple.address, await registry.ownerOf(tok));

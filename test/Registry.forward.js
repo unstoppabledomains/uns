@@ -1,8 +1,7 @@
 const { utils, BigNumber } = ethers;
 
 describe('Registry (forwarder)', () => {
-  let Registry;
-  let registry;
+  let Registry, registry;
   let signers, accounts;
 
   before(async () => {
@@ -10,7 +9,6 @@ describe('Registry (forwarder)', () => {
     [, ...accounts] = signers.map(s => s.address);
 
     Registry = await ethers.getContractFactory('Registry');
-    Simple = await ethers.getContractFactory('Simple');
 
     registry = await Registry.deploy();
     await registry.initialize();
