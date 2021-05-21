@@ -53,6 +53,14 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         return _isApprovedOrOwner(spender, tokenId);
     }
 
+    function approve(address to, uint256 tokenId)
+        public
+        override(IERC721Upgradeable, ERC721Upgradeable)
+        validForwardedToken(tokenId)
+    {
+        super.approve(to, tokenId);
+    }
+
     /// Registry Constants
 
     function root() public pure returns (uint256) {

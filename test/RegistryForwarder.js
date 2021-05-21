@@ -30,12 +30,15 @@ describe('RegistryForwarder', () => {
 
   before(async () => {
     signers = await ethers.getSigners();
-    [, owner, nonOwner] = signers;
+    [coinbase, owner, nonOwner, receiver, accessControl, operator] = signers;
 
     Registry = await ethers.getContractFactory('Registry');
 
     registry = await Registry.deploy();
     await registry.initialize();
+    await registry.setTokenURIPrefix('/');
+
+    root = await registry.root();
   })
 
   describe('meta-transferFrom', () => {
@@ -630,6 +633,238 @@ describe('RegistryForwarder', () => {
       const subTok = await registry.childIdOf(tok2, 'label');
       await expect(registry.ownerOf(subTok)).to.be
         .revertedWith('ERC721: owner query for nonexistent token');
+    })
+  })
+
+  describe('ABI-based tests', () => {
+    const registryFuncs = () => {
+      return Registry.interface.fragments
+        .filter(x => x.type === 'function' && !['view', 'pure'].includes(x.stateMutability))
+    }
+
+    const buidRequest = async (fragment, from, reqId, paramsMap) => {
+      const funcSig = funcFragmentToSig(fragment);
+      const req = {
+        from,
+        gas: '200000',
+        tokenId: reqId,
+        nonce: Number(await registry.nonceOf(reqId || from)),
+        data: registry.interface.encodeFunctionData(funcSig, fragment.inputs.map(x => paramsMap[x.name])),
+      };
+      return req;
+    }
+
+    const funcFragmentToSig = (fragment) => {
+      return `${fragment.name}(${fragment.inputs.map(x => `${x.type} ${x.name}`).join(',')})`;
+    };
+  
+    const getReason = (returnData) => {
+      let reason;
+      if (returnData && returnData.slice(2, 10).toString('hex') === '08c379a0') {
+        var abiCoder = new utils.AbiCoder();
+        reason = abiCoder.decode(['string'], '0x' + returnData.slice(10))[0];
+      }
+      return reason;
+    }
+
+    describe('Token-based functions', () => {
+      const paramValueMap = {
+        label: 'label',
+        '_data': '0x',
+        key: 'key1',
+        value: 'value',
+        keys: ['key1'],
+        values: ['value1']
+      }
+
+      const getFuncs = () => {
+        return registryFuncs()
+          .filter(x => x.inputs.filter(i => i.name === 'tokenId').length);
+      }
+
+      const mintToken = async (fragment, owner, label) => {
+        await registry.mintSLD(owner.address, label);
+        if(['burnChild', 'safeTransferFromChild', 'transferFromChild'].includes(fragment.name)) {
+          await registry.connect(owner)
+            .mintChild(owner.address, paramValueMap.tokenId, paramValueMap.label);
+        }
+      }
+
+      before(async () => {
+        paramValueMap.from = owner.address;
+        paramValueMap.to = receiver.address;
+      })
+
+      it('should execute all functions successfully', async () => {
+        for(const func of getFuncs()) {
+          const funcSigHash = utils.id(`${funcFragmentToSig(func)}_ok`);
+          paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
+          await mintToken(func, owner, funcSigHash);
+
+          const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
+          const sig = await sign(owner, req);
+          const [success, returnData] = await registry.callStatic.execute(req, sig);
+
+          if(!success) {
+            console.error(getReason(returnData));
+          }
+          expect(success).to.be.true;
+        }
+      })
+
+      it('should revert execution of all token-based functions when used signature', async () => {
+        for(const func of getFuncs()) {
+          const funcSigHash = utils.id(`${funcFragmentToSig(func)}_doubleUse`);
+          paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
+          await mintToken(func, owner, funcSigHash);
+
+          const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
+          const sig = await sign(owner, req);
+
+          const [success, returnData] = await registry.callStatic.execute(req, sig);
+          if(!success) {
+            console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
+            console.error(getReason(returnData));
+          }
+          expect(success).to.be.true;
+
+          await registry.execute(req, sig);
+
+          await expect(registry.execute(req, sig)).to.be
+            .revertedWith('RegistryForwarder: signature does not match request');
+        }
+      })
+
+      it('should fail execution of all token-based functions when tokenId does not match', async () => {
+        for(const func of getFuncs()) {
+          const funcSig = funcFragmentToSig(func);
+          const funcSigHash = utils.id(`${funcSig}_wrongToken`);
+
+          paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
+          await mintToken(func, owner, funcSigHash);
+
+          const tokenIdForwarder = await registry.childIdOf(root, utils.id(`_${funcSig}`));
+          const req = await buidRequest(func, owner.address, tokenIdForwarder, paramValueMap);
+          const sig = await sign(owner, req);
+          const [success, returnData] = await registry.callStatic.execute(req, sig);
+
+          expect(success).to.be.false;
+          expect(getReason(returnData)).to.be.eql('ERC2771RegistryContext: TOKEN_INVALID');
+        }
+      })
+
+      it('should fail execution of all token-based functions when tokenId is empty', async () => {
+        for(const func of getFuncs()) {
+          const funcSigHash = utils.id(`${funcFragmentToSig(func)}_emptyTokenId`);
+          paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
+          await mintToken(func, owner, funcSigHash);
+
+          const req = await buidRequest(func, owner.address, 0, paramValueMap);
+          const sig = await sign(owner, req);
+          const [success, returndata] = await registry.callStatic.execute(req, sig);
+
+          expect(success).to.be.false;
+          expect(getReason(returndata)).to.be.eql('ERC2771RegistryContext: TOKEN_INVALID');
+        }
+      })
+    })
+
+    describe('Non-Token functions', () => {
+      const paramValueMap = {
+        label: 'label',
+        '_data': '0x',
+        role: '0x1000000000000000000000000000000000000000000000000000000000000000',
+        keys: ['key1'],
+        values: ['value1'],
+        approved: true,
+        prefix: '/'
+      };
+
+      const excluded = [
+        'execute',
+        'initialize',
+        'renounceController', // might influence tests
+        'renounceMinter',     // might influence tests
+        'renounceRole',       // might influence tests
+        'grantRole',          // requires Default Admin role
+        'revokeRole',         // requires Default Admin role
+      ];
+
+      before(async () => {
+        paramValueMap.account = accessControl.address;
+        paramValueMap.to = owner.address;
+        paramValueMap.operator = operator.address;
+      })
+
+      const getFuncs = () => {
+        return registryFuncs()
+          .filter(x => !x.inputs.filter(i => i.name === 'tokenId').length)
+          .filter(x => !excluded.includes(x.name));
+      }
+
+      it('should execute all functions successfully', async () => {
+        for(const func of getFuncs()) {
+          const funcSig = funcFragmentToSig(func);
+          paramValueMap.label = utils.id(`${funcSig}_label`);
+
+          const req = await buidRequest(func, coinbase.address, 0, paramValueMap);
+          const sig = await sign(coinbase, req);
+          const [success, returnData] = await registry.callStatic.execute(req, sig);
+
+          if(!success) {
+            console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
+            console.error(getReason(returnData));
+          }
+          expect(success).to.be.true;
+        }
+      })
+
+      it('should revert execution of all functions when used signature', async () => {
+        for(const func of getFuncs()) {
+          const funcSig = funcFragmentToSig(func);
+          paramValueMap.label = utils.id(`${funcSig}_doubleUse`);
+
+          const tokenIdForwarder = await registry.childIdOf(root, utils.id(`_${funcSig}`));
+          const req = await buidRequest(func, coinbase.address, tokenIdForwarder, paramValueMap);
+          const sig = await sign(coinbase, req);
+
+          const [success, returnData] = await registry.callStatic.execute(req, sig);
+          if(!success) {
+            console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
+            console.error(getReason(returnData));
+          }
+          expect(success).to.be.true;
+
+          await registry.execute(req, sig);
+
+          await expect(registry.execute(req, sig)).to.be
+            .revertedWith('RegistryForwarder: signature does not match request');
+        }
+      })
+
+      it('should revert execution of all functions when used signature and tokenId is empty', async () => {
+        for(const func of getFuncs()) {
+          const funcSig = funcFragmentToSig(func);
+          paramValueMap.label = utils.id(`${funcSig}_doubleUse_0`);
+
+          const nonce = await registry.nonceOf(coinbase.address);
+          const req = await buidRequest(func, coinbase.address, 0, paramValueMap);
+          const sig = await sign(coinbase, req);
+
+          const [success, returnData] = await registry.callStatic.execute(req, sig);
+          if(!success) {
+            console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
+            console.error(getReason(returnData));
+          }
+          expect(success).to.be.true;
+
+          await registry.execute(req, sig);
+
+          expect(await registry.nonceOf(coinbase.address)).to.be.equal(nonce.add(1));
+          await expect(registry.execute(req, sig)).to.be
+            .revertedWith('RegistryForwarder: signature does not match request');
+        }
+      })
     })
   })
 })
