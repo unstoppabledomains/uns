@@ -1,4 +1,4 @@
-const { ZERO_ADDRESS } = require('./helpers/constants');
+const { ZERO_ADDRESS } = require('../helpers/constants');
 
 describe('ForwarderMock', () => {
   let ForwarderMock, forwarder;
