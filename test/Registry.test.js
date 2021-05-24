@@ -387,6 +387,32 @@ describe('Registry', () => {
       assert.equal(receiver.address, await registry.ownerOf(tok))
     })
 
+    it('should setApprovalForAll using meta-setApprovalForAll', async () => {
+      const req = {
+        from: owner.address,
+        gas: '100000',
+        tokenId: 0,
+        nonce: Number(await registry.nonceOf(owner.address)),
+        data: registry.interface.encodeFunctionData('setApprovalForAll', [operator.address, true]),
+      };
+      const sig = await signTypedData(registry.address, owner, req);
+      const [success, ] = await registry.callStatic.execute(req, sig);
+      expect(success).to.be.true;
+    })
+
+    it('should revert meta-setApprovalForAll for non-onwer', async () => {
+      const req = {
+        from: owner.address,
+        gas: '100000',
+        tokenId: 0,
+        nonce: Number(await registry.nonceOf(owner.address)),
+        data: registry.interface.encodeFunctionData('setApprovalForAll', [operator.address, true]),
+      };
+      const sig = await signTypedData(registry.address, nonOwner, req);
+      await expect(registry.execute(req, sig)).to.be
+        .revertedWith('RegistryForwarder: signature does not match request');
+    })
+
     it('should transfer using meta-transferFrom', async () => {
       const tok = await registry.childIdOf(root, 'meta_1591');
       await registry.mintSLD(owner.address, 'meta_1591');
@@ -532,7 +558,7 @@ describe('Registry', () => {
       expect(success).to.be.false;
     })
 
-    it('should mint using transferFromChild', async () => {
+    it('should transfer using meta-transferFromChild', async () => {
       const tok = await registry.childIdOf(root, 'meta_oih245');
       await registry.mintSLD(owner.address, 'meta_oih245');
 
@@ -575,7 +601,7 @@ describe('Registry', () => {
       expect(success).to.be.false;
     })
 
-    it('should mint using safeTransferFromChild', async () => {
+    it('should transfer using meta-safeTransferFromChild', async () => {
       const tok = await registry.childIdOf(root, 'meta_we23r');
       await registry.mintSLD(owner.address, 'meta_we23r');
 
@@ -618,7 +644,7 @@ describe('Registry', () => {
       expect(success).to.be.false;
     })
 
-    it('should mint using burnChild', async () => {
+    it('should burn using meta-burnChild', async () => {
       const tok = await registry.childIdOf(root, 'meta_sfhk2');
       await registry.mintSLD(owner.address, 'meta_sfhk2');
 
