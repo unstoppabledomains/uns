@@ -7,7 +7,7 @@ describe('ProxyReader', () => {
   const keys = ['test.key1', 'test.key2'];
   const values = ['test.value1', 'test.value2'];
   let Registry, ProxyReader;
-  let registry, proxy, tokenId;
+  let registry, root, proxy, tokenId;
   let signers, coinbase, accounts;
 
   before(async () => {
@@ -20,9 +20,11 @@ describe('ProxyReader', () => {
     registry = await Registry.deploy();
     await registry.initialize();
 
+    root = await registry.root();
+
     await registry.mintSLD(coinbase, domainName);
-    tokenId = await registry.childIdOf(await registry.root(), domainName);
-    
+    tokenId = await registry.childIdOf(root, domainName);
+
     proxy = await ProxyReader.deploy(registry.address);
   });
 
@@ -132,7 +134,7 @@ describe('ProxyReader', () => {
 
     it('should proxy root call', async () => {
       const result = await proxy.root();
-      const expected = await registry.root();
+      const expected = root;
       assert.equal(result.toString(), expected.toString());
     });
   });
@@ -219,7 +221,7 @@ describe('ProxyReader', () => {
       it('should return zero owner for non-existing token', async () => {
         // arrange
         const _domainName = 'hey_hoy_1037';
-        const _tokenId = await registry.childIdOf(await registry.root(), _domainName);
+        const _tokenId = await registry.childIdOf(root, _domainName);
 
         // act
         const data = await proxy.callStatic.getData(keys, _tokenId);
@@ -232,7 +234,7 @@ describe('ProxyReader', () => {
         // arrange
         const _domainName = 'hey_hoy_121';
         await registry.mintSLD(coinbase, _domainName);
-        const _tokenId = await registry.childIdOf(await registry.root(), _domainName);
+        const _tokenId = await registry.childIdOf(root, _domainName);
 
         // act
         const data = await proxy.callStatic.getData(keys, _tokenId);
@@ -253,7 +255,7 @@ describe('ProxyReader', () => {
         // arrange
         const _domainName = 'test_1291'
         await registry.mintSLD(accounts[0], _domainName);
-        const _tokenId = await registry.childIdOf(await registry.root(), _domainName);
+        const _tokenId = await registry.childIdOf(root, _domainName);
         for (let i = 0; i < keys.length; i++) {
             await registry.set(keys[i], values[i], tokenId);
         }
@@ -270,7 +272,7 @@ describe('ProxyReader', () => {
 
       it('should return owners for multiple tokens (including unknown)', async () => {
         // arrange
-        const unknownTokenId = await registry.childIdOf(await registry.root(), 'unknown');
+        const unknownTokenId = await registry.childIdOf(root, 'unknown');
 
         // act
         const data = await proxy.callStatic.getDataForMany([], [tokenId, unknownTokenId]);
@@ -314,7 +316,7 @@ describe('ProxyReader', () => {
         // arrange
         const _domainName = 'test_1082q'
         await registry.mintSLD(accounts[0], _domainName);
-        const _tokenId = await registry.childIdOf(await registry.root(), _domainName);
+        const _tokenId = await registry.childIdOf(root, _domainName);
         const hashes = keys.map(utils.id);
         for (let i = 0; i < keys.length; i++) {
             await registry.set(keys[i], values[i], tokenId);
@@ -333,7 +335,7 @@ describe('ProxyReader', () => {
 
       it('should return owners for multiple tokens (including unknown)', async () => {
         // arrange
-        const unknownTokenId = await registry.childIdOf(await registry.root(), 'unknown');
+        const unknownTokenId = await registry.childIdOf(root, 'unknown');
 
         // act
         const data = await proxy.callStatic.getDataByHashForMany([], [tokenId, unknownTokenId]);
@@ -349,7 +351,7 @@ describe('ProxyReader', () => {
 
     describe('ownerOfForMany', () => {
       it('should return empty owner for unknown token', async () => {
-        const unknownTokenId = await registry.childIdOf(await registry.root(), 'unknown');
+        const unknownTokenId = await registry.childIdOf(root, 'unknown');
         const owners = await proxy.callStatic.ownerOfForMany([unknownTokenId]);
         assert.deepEqual(owners, [ZERO_ADDRESS]);
       });
@@ -363,7 +365,7 @@ describe('ProxyReader', () => {
         // arrange
         const _domainName = 'test_1211'
         await registry.mintSLD(accounts[0], _domainName);
-        const _tokenId = await registry.childIdOf(await registry.root(), _domainName);
+        const _tokenId = await registry.childIdOf(root, _domainName);
 
         // act
         const owners = await proxy.callStatic.ownerOfForMany([tokenId, _tokenId]);
@@ -374,7 +376,7 @@ describe('ProxyReader', () => {
 
       it('should return owners for multiple tokens (including unknown)', async () => {
         // arrange
-        const unknownTokenId = await registry.childIdOf(await registry.root(), 'unknown');
+        const unknownTokenId = await registry.childIdOf(root, 'unknown');
 
         // act
         const owners = await proxy.callStatic.ownerOfForMany([tokenId, unknownTokenId]);
