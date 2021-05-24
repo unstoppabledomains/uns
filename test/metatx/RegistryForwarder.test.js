@@ -1,31 +1,12 @@
-const { utils, BigNumber } = ethers;
+const { signTypedData } = require('../helpers/metatx');
+
+const { utils } = ethers;
 
 describe('RegistryForwarder', () => {
   let Registry, registry;
   let signers, owner, nonOwner, root;
 
   const receiverAddress = '0x1234567890123456789012345678901234567890';
-
-  const sign = async (signer, value) => {
-    const domain = {
-      name: 'RegistryForwarder',
-      version: '0.0.1',
-      chainId: await web3.eth.getChainId(),
-      verifyingContract: registry.address,
-    };
-
-    const types = {
-      ForwardRequest: [
-        { name: 'from', type: 'address' },
-        { name: 'gas', type: 'uint256' },
-        { name: 'tokenId', type: 'uint256' },
-        { name: 'nonce', type: 'uint256' },
-        { name: 'data', type: 'bytes' },
-      ],
-    };
-
-    return signer._signTypedData(domain, types, value);
-  }
 
   const getReason = (returnData) => {
     let reason;
@@ -61,7 +42,7 @@ describe('RegistryForwarder', () => {
         nonce: Number(await registry.nonceOf(tok)),
         data: registry.interface.encodeFunctionData('transferFrom', [owner.address, receiverAddress, tok]),
       };
-      const sig = await sign(owner, req);
+      const sig = await signTypedData(registry, owner, req);
       await registry.execute(req, sig);
 
       assert.equal(await registry.ownerOf(tok), receiverAddress);
@@ -78,7 +59,7 @@ describe('RegistryForwarder', () => {
         nonce: Number(await registry.nonceOf(tok)),
         data: registry.interface.encodeFunctionData('transferFrom', [nonOwner.address, receiverAddress, tok]),
       };
-      const sig = await sign(nonOwner, req);
+      const sig = await signTypedData(registry, nonOwner, req);
       const [success, ] = await registry.callStatic.execute(req, sig);
       expect(success).to.be.false;
     })
@@ -99,7 +80,7 @@ describe('RegistryForwarder', () => {
           [owner.address, receiverAddress, tok]
         ),
       };
-      const sig = await sign(owner, req);
+      const sig = await signTypedData(registry, owner, req);
       await registry.execute(req, sig);
 
       assert.equal(await registry.ownerOf(tok), receiverAddress);
@@ -119,7 +100,7 @@ describe('RegistryForwarder', () => {
           [nonOwner.address, receiverAddress, tok]
         ),
       };
-      const sig = await sign(nonOwner, req);
+      const sig = await signTypedData(registry, nonOwner, req);
       const [success, ] = await registry.callStatic.execute(req, sig);
       expect(success).to.be.false;
     })
@@ -139,7 +120,7 @@ describe('RegistryForwarder', () => {
         nonce: Number(await registry.nonceOf(tok)),
         data: registry.interface.encodeFunctionData('burn', [tok]),
       };
-      const sig = await sign(owner, req);
+      const sig = await signTypedData(registry, owner, req);
       await registry.execute(req, sig);
   
       await expect(registry.ownerOf(tok)).to.be.revertedWith('ERC721: owner query for nonexistent token');
@@ -156,7 +137,7 @@ describe('RegistryForwarder', () => {
         nonce: Number(await registry.nonceOf(tok)),
         data: registry.interface.encodeFunctionData('burn', [tok]),
       };
-      const sig = await sign(nonOwner, req);
+      const sig = await signTypedData(registry, nonOwner, req);
       const [success, ] = await registry.callStatic.execute(req, sig);
       expect(success).to.be.false;
     })
@@ -174,7 +155,7 @@ describe('RegistryForwarder', () => {
         nonce: Number(await registry.nonceOf(tok)),
         data: registry.interface.encodeFunctionData('mintChild', [owner.address, tok, 'label']),
       };
-      const sig = await sign(owner, req);
+      const sig = await signTypedData(registry, owner, req);
       await registry.execute(req, sig);
 
       const subTok = await registry.childIdOf(tok, 'label');
@@ -196,7 +177,7 @@ describe('RegistryForwarder', () => {
         nonce: Number(await registry.nonceOf(tok)),
         data: registry.interface.encodeFunctionData('mintChild', [owner.address, tok, 'label']),
       };
-      const sig = await sign(nonOwner, req);
+      const sig = await signTypedData(registry, nonOwner, req);
       const [success, ] = await registry.callStatic.execute(req, sig);
       expect(success).to.be.false;
     })
@@ -220,7 +201,7 @@ describe('RegistryForwarder', () => {
           [owner.address, receiverAddress, tok, 'label']
         ),
       };
-      const sig = await sign(owner, req);
+      const sig = await signTypedData(registry, owner, req);
       await registry.execute(req, sig);
 
       assert.equal(await registry.ownerOf(threeld), receiverAddress);
@@ -241,7 +222,7 @@ describe('RegistryForwarder', () => {
           [owner.address, receiverAddress, tok, 'label']
         ),
       };
-      const sig = await sign(nonOwner, req);
+      const sig = await signTypedData(registry, nonOwner, req);
       const [success, ] = await registry.callStatic.execute(req, sig);
       expect(success).to.be.false;
     })
@@ -265,7 +246,7 @@ describe('RegistryForwarder', () => {
           [owner.address, receiverAddress, tok, 'label']  
         ),
       };
-      const sig = await sign(owner, req);
+      const sig = await signTypedData(registry, owner, req);
       await registry.execute(req, sig);
 
       assert.equal(await registry.ownerOf(threeld), receiverAddress);
@@ -286,7 +267,7 @@ describe('RegistryForwarder', () => {
           [owner.address, receiverAddress, tok, 'label']
         ),
       };
-      const sig = await sign(nonOwner, req);
+      const sig = await signTypedData(registry, nonOwner, req);
       const [success, ] = await registry.callStatic.execute(req, sig);
       expect(success).to.be.false;
     })
@@ -307,7 +288,7 @@ describe('RegistryForwarder', () => {
         nonce: Number(await registry.nonceOf(tok)),
         data: registry.interface.encodeFunctionData('burnChild', [tok, 'label']),
       };
-      const sig = await sign(owner, req);
+      const sig = await signTypedData(registry, owner, req);
       await registry.execute(req, sig);
 
       await expect(registry.ownerOf(threeld)).to.be.revertedWith('ERC721: owner query for nonexistent token');
@@ -325,7 +306,7 @@ describe('RegistryForwarder', () => {
         nonce: Number(await registry.nonceOf(tok)),
         data: registry.interface.encodeFunctionData('burnChild', [tok, 'label']),
       };
-      const sig = await sign(nonOwner, req);
+      const sig = await signTypedData(registry, nonOwner, req);
       const [success, ] = await registry.callStatic.execute(req, sig);
       expect(success).to.be.false;
     })
@@ -388,7 +369,7 @@ describe('RegistryForwarder', () => {
           await mintToken(func, owner, funcSigHash);
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
-          const sig = await sign(owner, req);
+          const sig = await signTypedData(registry, owner, req);
           const [success, returnData] = await registry.callStatic.execute(req, sig);
 
           if(!success) {
@@ -405,7 +386,7 @@ describe('RegistryForwarder', () => {
           await mintToken(func, owner, funcSigHash);
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
-          const sig = await sign(owner, req);
+          const sig = await signTypedData(registry, owner, req);
 
           const [success, returnData] = await registry.callStatic.execute(req, sig);
           if(!success) {
@@ -431,7 +412,7 @@ describe('RegistryForwarder', () => {
 
           const tokenIdForwarder = await registry.childIdOf(root, utils.id(`_${funcSig}`));
           const req = await buidRequest(func, owner.address, tokenIdForwarder, paramValueMap);
-          const sig = await sign(owner, req);
+          const sig = await signTypedData(registry, owner, req);
           const [success, returnData] = await registry.callStatic.execute(req, sig);
 
           expect(success).to.be.false;
@@ -446,7 +427,7 @@ describe('RegistryForwarder', () => {
           await mintToken(func, owner, funcSigHash);
 
           const req = await buidRequest(func, owner.address, 0, paramValueMap);
-          const sig = await sign(owner, req);
+          const sig = await signTypedData(registry, owner, req);
           const [success, returndata] = await registry.callStatic.execute(req, sig);
 
           expect(success).to.be.false;
@@ -494,7 +475,7 @@ describe('RegistryForwarder', () => {
           paramValueMap.label = utils.id(`${funcSig}_label`);
 
           const req = await buidRequest(func, coinbase.address, 0, paramValueMap);
-          const sig = await sign(coinbase, req);
+          const sig = await signTypedData(registry, coinbase, req);
           const [success, returnData] = await registry.callStatic.execute(req, sig);
 
           if(!success) {
@@ -512,7 +493,7 @@ describe('RegistryForwarder', () => {
 
           const tokenIdForwarder = await registry.childIdOf(root, utils.id(`_${funcSig}`));
           const req = await buidRequest(func, coinbase.address, tokenIdForwarder, paramValueMap);
-          const sig = await sign(coinbase, req);
+          const sig = await signTypedData(registry, coinbase, req);
 
           const [success, returnData] = await registry.callStatic.execute(req, sig);
           if(!success) {
@@ -535,7 +516,7 @@ describe('RegistryForwarder', () => {
 
           const nonce = await registry.nonceOf(coinbase.address);
           const req = await buidRequest(func, coinbase.address, 0, paramValueMap);
-          const sig = await sign(coinbase, req);
+          const sig = await signTypedData(registry, coinbase, req);
 
           const [success, returnData] = await registry.callStatic.execute(req, sig);
           if(!success) {
