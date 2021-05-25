@@ -280,10 +280,8 @@ UNS registry smart contracts.
 
     ```
     abstract contract ERC2771Context is Context {
-        address _trustedForwarder;
-
         function isTrustedForwarder(address forwarder) public view virtual returns(bool) {
-            return forwarder == _trustedForwarder;
+            return forwarder == address(this);
         }
 
         modifier validForwardedToken(uint256 tokenId) {
