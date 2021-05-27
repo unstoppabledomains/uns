@@ -86,7 +86,7 @@ describe('RegistryForwarder', () => {
 
     // NOTE: When tokenId is empty, req.from is used for nonce verification
     it('should execute when signature is valid and tokenId is empty', async () => {
-      const nonce = await forwarder.nonceOf(owner.address);
+      const nonce = await forwarder.nonceOf(0);
       const req = {
         from: owner.address,
         gas: '100000',
@@ -97,7 +97,7 @@ describe('RegistryForwarder', () => {
       const sig = await signTypedData(forwarder.address, owner, req);
       await forwarder.execute(req, sig);
 
-      expect(await forwarder.nonceOf(owner.address)).to.be.equal(nonce.add(1));
+      expect(await forwarder.nonceOf(0)).to.be.equal(nonce.add(1));
     })
 
     it('should fail execution when signature is tampered', async () => {

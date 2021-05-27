@@ -48,14 +48,12 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
             req.nonce,
             keccak256(req.data)
         ))).recover(signature);
-        uint256 id = req.tokenId == 0 ? uint256(uint160(req.from)) : req.tokenId;
-        return _nonces[id] == req.nonce && signer == req.from;
+        return _nonces[req.tokenId] == req.nonce && signer == req.from;
     }
 
     function execute(ForwardRequest calldata req, bytes calldata signature) public returns (bool, bytes memory) {
         require(verify(req, signature), "RegistryForwarder: signature does not match request");
-        uint256 id = req.tokenId == 0 ? uint256(uint160(req.from)) : req.tokenId;
-        _nonces[id] = req.nonce + 1;
+        _nonces[req.tokenId] = req.nonce + 1;
 
         // solhint-disable-next-line avoid-low-level-calls
         (bool success, bytes memory returndata) = address(this).call{gas: req.gas}(abi.encodePacked(req.data, req.from, req.tokenId));

@@ -693,7 +693,7 @@ describe('Registry', () => {
           from,
           gas: '200000',
           tokenId: reqId,
-          nonce: Number(await registry.nonceOf(reqId || from)),
+          nonce: Number(await registry.nonceOf(reqId)),
           data: registry.interface.encodeFunctionData(funcSig, fragment.inputs.map(x => paramsMap[x.name])),
         };
         return req;
@@ -883,8 +883,9 @@ describe('Registry', () => {
             const funcSig = funcFragmentToSig(func);
             paramValueMap.label = utils.id(`${funcSig}_doubleUse_0`);
 
-            const nonce = await registry.nonceOf(coinbase.address);
-            const req = await buidRequest(func, coinbase.address, 0, paramValueMap);
+            const tokenId = 0;
+            const nonce = await registry.nonceOf(tokenId);
+            const req = await buidRequest(func, coinbase.address, tokenId, paramValueMap);
             const sig = await signTypedData(registry.address, coinbase, req);
 
             const [success, returnData] = await registry.callStatic.execute(req, sig);
@@ -896,7 +897,7 @@ describe('Registry', () => {
 
             await registry.execute(req, sig);
 
-            expect(await registry.nonceOf(coinbase.address)).to.be.equal(nonce.add(1));
+            expect(await registry.nonceOf(tokenId)).to.be.equal(nonce.add(1));
             await expect(registry.execute(req, sig)).to.be
               .revertedWith('RegistryForwarder: signature does not match request');
           }

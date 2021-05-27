@@ -34,10 +34,6 @@ abstract contract ERC2771RegistryContext is Initializable, ContextUpgradeable {
 
     /**
      * @dev Guarde whether tokenId param and forwarded _tokenId_ are the same in case of forwarding.
-     *
-     * IMPORTANT: not all functions require usage of this modifier, especially non-token based functions.
-     * It is important to set forwarded tokenId to 0 for non-token based functions.
-     * In this case forwarded calldata layout: {bytes:data}{address:from}{uint256:tokenId = 0}
      */
     modifier validForwardedToken(uint256 tokenId) {
         if (isTrustedForwarder(msg.sender)) {
