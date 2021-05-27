@@ -6,6 +6,11 @@ import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 
+/**
+ * @dev https://eips.ethereum.org/EIPS/eip-2771[EIP 2771] is a standard for native meta transactions.
+ *
+ * A base contract to be inherited by any contract that want to forward transactions.
+ */
 abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
     using ECDSAUpgradeable for bytes32;
 

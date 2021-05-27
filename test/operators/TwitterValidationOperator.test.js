@@ -1,6 +1,6 @@
-const { ZERO_ADDRESS } = require('./helpers/constants');
+const { ZERO_ADDRESS } = require('../helpers/constants');
 
-const usedGas = require('./helpers/getUsedGas')
+const usedGas = require('../helpers/getUsedGas')
 const getUsedGas = usedGas.getUsedGas
 
 describe('TwitterValidationOperator', () => {

@@ -33,7 +33,7 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
 
     function initialize() public initializer {
         __ERC721_init_unchained('.crypto', 'UD');
-        __ERC2771RegistryContext_init_unchained(address(this));
+        __ERC2771RegistryContext_init_unchained();
         __RegistryForwarder_init_unchained();
         __ControllerRole_init_unchained();
         __MinterRole_init_unchained();
@@ -51,6 +51,14 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
 
     function isApprovedOrOwner(address spender, uint256 tokenId) external view override returns (bool) {
         return _isApprovedOrOwner(spender, tokenId);
+    }
+
+    function approve(address to, uint256 tokenId)
+        public
+        override(IERC721Upgradeable, ERC721Upgradeable)
+        validForwardedToken(tokenId)
+    {
+        super.approve(to, tokenId);
     }
 
     /// Registry Constants

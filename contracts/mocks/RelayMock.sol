@@ -16,7 +16,7 @@ import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.
 /**
  * NOTE: The contract was built only for testing purposes
  */
-contract RelayTest {
+contract RelayMock {
     using ECDSAUpgradeable for bytes32;
 
     mapping(uint => string) private _stringStore;
@@ -26,7 +26,7 @@ contract RelayTest {
     function setString(uint key, string calldata value) external {
         /* solium-disable-next-line error-reason */
         require(key != 0);
-        require(bytes(value).length != 0, 'RelayTest: VALUE_EMPTY');
+        require(bytes(value).length != 0, 'RelayMock: VALUE_EMPTY');
 
         _stringStore[key] = value;
     }
@@ -41,7 +41,7 @@ contract RelayTest {
     function setUint(uint key, uint value) external {
         /* solium-disable-next-line error-reason */
         require(key != 0);
-        require(value != 0, 'RelayTest: VALUE_EMPTY');
+        require(value != 0, 'RelayMock: VALUE_EMPTY');
 
         _uintStore[key] = value;
     }

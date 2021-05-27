@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-contract Simple {
+contract SimpleMock {
   uint256 internal _nbr = 0;
   address internal _sender;
 

@@ -1,16 +1,16 @@
-const { ZERO_ADDRESS } = require('./helpers/constants');
+const { ZERO_ADDRESS } = require('../helpers/constants');
 
-describe('Forwarder', () => {
-  let Forwarder, forwarder;
+describe('ForwarderMock', () => {
+  let ForwarderMock, forwarder;
   let signers, accounts;
 
   before(async () => {
     signers = await ethers.getSigners();
     [, ...accounts] = signers.map(s => s.address);
 
-    Forwarder = await ethers.getContractFactory('Forwarder');
+    ForwarderMock = await ethers.getContractFactory('ForwarderMock');
 
-    forwarder = await Forwarder.deploy();
+    forwarder = await ForwarderMock.deploy();
     await forwarder.initialize();
   })
 

@@ -1,4 +1,4 @@
-const usedGas = require('./helpers/getUsedGas');
+const usedGas = require('../helpers/getUsedGas');
 const getUsedGas = usedGas.getUsedGas;
 
 describe('DomainZoneOperator', () => {

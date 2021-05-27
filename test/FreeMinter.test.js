@@ -1,7 +1,7 @@
 describe('FreeMinter', () => {
   const DomainNamePrefix = 'udtestdev-';
   let Registry, FreeMinter;
-  let registry, freeMinter, domainSuffix;
+  let registry, root, freeMinter, domainSuffix;
   let signers, developerSigner;
   let developer, receiver;
 
@@ -17,6 +17,8 @@ describe('FreeMinter', () => {
     await registry.initialize();
     await registry.setTokenURIPrefix('/');
 
+    root = await registry.root();
+
     freeMinter = await FreeMinter.deploy(registry.address);
     await registry.addMinter(freeMinter.address);
   })
@@ -28,14 +30,14 @@ describe('FreeMinter', () => {
   describe('FreeMinter.claim(string calldata _label)', () => {
     it('should mint prefixed domain', async () => {
       await freeMinter.connect(developerSigner).functions['claim(string)'](domainSuffix)
-      const tokenId = await registry.childIdOf(await registry.root(), `${DomainNamePrefix}${domainSuffix}`)
+      const tokenId = await registry.childIdOf(root, `${DomainNamePrefix}${domainSuffix}`)
       const tokenUri = await registry.tokenURI(tokenId)
       assert.equal(tokenUri, `/${tokenId}`)
     })
 
     it('should send domain to requester', async () => {
       await freeMinter.connect(developerSigner).functions['claim(string)'](domainSuffix)
-      const tokenId = await registry.childIdOf(await registry.root(), `${DomainNamePrefix}${domainSuffix}`)
+      const tokenId = await registry.childIdOf(root, `${DomainNamePrefix}${domainSuffix}`)
       const owner = await registry.ownerOf(tokenId)
       assert.equal(owner, developer)
     })
@@ -53,7 +55,7 @@ describe('FreeMinter', () => {
   describe('FreeMinter.claimTo(string calldata _label, address _receiver)', () => {
     it('should mint domain to receiver', async () => {
       await freeMinter.connect(developerSigner).functions['claimTo(string,address)'](domainSuffix, receiver)
-      const tokenId = await registry.childIdOf(await registry.root(), `${DomainNamePrefix}${domainSuffix}`)
+      const tokenId = await registry.childIdOf(root, `${DomainNamePrefix}${domainSuffix}`)
       const owner = await registry.ownerOf(tokenId)
       assert.equal(owner, receiver)
     })
@@ -63,7 +65,7 @@ describe('FreeMinter', () => {
     it('should mint domain to receiver with predefined keys', async () => {
       const devFreeMinter = freeMinter.connect(developerSigner);
       await devFreeMinter.functions['claimToWithRecords(string,address,string[],string[])'](domainSuffix, receiver, ['key'], ['value'])
-      const tokenId = await registry.childIdOf(await registry.root(), `${DomainNamePrefix}${domainSuffix}`)
+      const tokenId = await registry.childIdOf(root, `${DomainNamePrefix}${domainSuffix}`)
       const owner = await registry.ownerOf(tokenId)
       const values = await registry.getMany(['key'], tokenId)
       assert.equal(owner, receiver)
@@ -73,7 +75,7 @@ describe('FreeMinter', () => {
     it('should mint domain with empty keys', async () => {
       const devFreeMinter = freeMinter.connect(developerSigner);
       await devFreeMinter.functions['claimToWithRecords(string,address,string[],string[])'](domainSuffix, receiver, [], []);
-      const tokenId = await registry.childIdOf(await registry.root(), `${DomainNamePrefix}${domainSuffix}`)
+      const tokenId = await registry.childIdOf(root, `${DomainNamePrefix}${domainSuffix}`)
       const owner = await registry.ownerOf(tokenId)
       const values = await registry.getMany(['key1', 'key2'], tokenId)
       assert.equal(owner, receiver)

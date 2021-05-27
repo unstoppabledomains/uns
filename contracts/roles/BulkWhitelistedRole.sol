@@ -12,7 +12,7 @@ import './WhitelistedRole.sol';
  * crowdsale). This role is special in that the only accounts that can add it are WhitelistAdmins (who can also remove
  * it), and not Whitelisteds themselves.
  */
-contract BulkWhitelistedRole is WhitelistedRole {
+abstract contract BulkWhitelistedRole is WhitelistedRole {
     function bulkAddWhitelisted(address[] memory accounts) public onlyWhitelistAdmin {
         _bulkAddWhitelisted(accounts);
     }

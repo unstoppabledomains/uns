@@ -1,8 +1,7 @@
 const { utils, BigNumber } = ethers;
 
 describe('Registry (proxy)', () => {
-  let Registry;
-  let registry;
+  let Registry, registry;
   let signers, coinbase, accounts;
 
   before(async () => {
@@ -10,7 +9,6 @@ describe('Registry (proxy)', () => {
     [coinbase, ...accounts] = signers.map(s => s.address);
 
     Registry = await ethers.getContractFactory('Registry');
-    Simple = await ethers.getContractFactory('Simple');
 
     registry = await upgrades.deployProxy(Registry);
     await registry.setTokenURIPrefix('/');
