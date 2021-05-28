@@ -73,33 +73,8 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
 
     /// Minting
 
-    function mintChild(address to, uint256 tokenId, string calldata label)
-        external
-        override
-        onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
-    {
-        _mintChild(to, tokenId, label);
-    }
-
     function mintSLD(address to, string memory label) external override onlyMinter {
         _mintChild(to, _CRYPTO_HASH, label);
-    }
-
-    function safeMintChild(address to, uint256 tokenId, string calldata label)
-        external
-        onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
-    {
-        _safeMintChild(to, tokenId, label, '');
-    }
-
-    function safeMintChild(address to, uint256 tokenId, string calldata label, bytes calldata _data)
-        external
-        onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
-    {
-        _safeMintChild(to, tokenId, label, _data);
     }
 
     function safeMintSLD(address to, string calldata label) external override onlyMinter {
@@ -107,7 +82,7 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
     }
 
     function safeMintSLD(address to, string memory label, bytes memory _data) public override onlyMinter {
-        _safeMintChild(to, _CRYPTO_HASH, label, _data);
+        _safeMint(to, _childId(_CRYPTO_HASH, label), _data);
     }
 
     function mintSLDWithRecords(address to, string memory label, string[] memory keys, string[] memory values)
@@ -148,30 +123,6 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         _safeTransfer(from, to, tokenId, _data);
     }
 
-    function transferFromChild(address from, address to, uint256 tokenId, string calldata label)
-        external
-        override
-        onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
-    {
-        _transfer(from, to, _childId(tokenId, label));
-    }
-
-    function safeTransferFromChild(address from, address to, uint256 tokenId, string calldata label) external override {
-        safeTransferFromChild(from, to, tokenId, label, '');
-    }
-
-    function safeTransferFromChild(
-        address from,
-        address to,
-        uint256 tokenId,
-        string memory label,
-        bytes memory _data
-    ) public override onlyApprovedOrOwner(tokenId) validForwardedToken(tokenId) {
-        uint256 childId = _childId(tokenId, label);
-        _safeTransfer(from, to, childId, _data);
-    }
-
     /// Burning
 
     function burn(uint256 tokenId)
@@ -181,15 +132,6 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
         validForwardedToken(tokenId)
     {
         _burn(tokenId);
-    }
-
-    function burnChild(uint256 tokenId, string calldata label)
-        external
-        override
-        onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
-    {
-        _burn(_childId(tokenId, label));
     }
 
     /// Resolution
@@ -253,10 +195,6 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
 
     function _mintChild(address to, uint256 tokenId, string memory label) internal {
         _mint(to, _childId(tokenId, label));
-    }
-
-    function _safeMintChild(address to, uint256 tokenId, string memory label, bytes memory _data) internal {
-        _safeMint(to, _childId(tokenId, label), _data);
     }
 
     function _baseURI()

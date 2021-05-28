@@ -34,7 +34,6 @@ async function main() {
   // await hre.run('compile');
 
   const Registry = await ethers.getContractFactory('Registry');
-  const DomainZoneOperator = await ethers.getContractFactory('DomainZoneOperator');
   const WhitelistedMinter = await ethers.getContractFactory('WhitelistedMinter');
   const ProxyReader = await ethers.getContractFactory('ProxyReader');
   const TwitterValidationOperator = await ethers.getContractFactory('TwitterValidationOperator');
@@ -52,9 +51,6 @@ async function main() {
     await registry.initialize();
     console.log("Registry deployed to:", registry.address);
   }
-
-  const domainZoneOperator = await DomainZoneOperator.deploy(registry.address, []);
-  console.log("DomainZoneOperator deployed to:", domainZoneOperator.address);
 
   if (network === 'live') {
     await registry.renounceController();
