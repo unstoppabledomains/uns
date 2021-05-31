@@ -29,7 +29,7 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, OwnableUpgradeable, E
     }
 
     modifier onlyMintingManager() {
-        require(_msgSender() == _mintingManager, 'Registry: SENDER_IS_NOT_MINTING');
+        require(_msgSender() == _mintingManager, 'Registry: SENDER_IS_NOT_MINTING_MANAGER');
         _;
     }
 
