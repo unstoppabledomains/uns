@@ -104,8 +104,7 @@ describe('ProxyReader', () => {
 
     it('should proxy isController call', async () => {
       const result = await proxy.isController(accounts[0]);
-      const expected = await registry.isController(accounts[0]);
-      assert.equal(result, expected);
+      assert.equal(result, false);
     });
 
     it('should proxy balanceOf call', async () => {

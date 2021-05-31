@@ -3,13 +3,13 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 
 import './IRegistry.sol';
 import './RecordStorage.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/RegistryForwarder.sol';
-import './roles/ControllerRole.sol';
 import './roles/MinterRole.sol';
 
 /**
@@ -17,7 +17,7 @@ import './roles/MinterRole.sol';
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContext, RecordStorage, RegistryForwarder, ControllerRole, MinterRole {
+contract Registry is IRegistry, ERC721BurnableUpgradeable, OwnableUpgradeable, ERC2771RegistryContext, RecordStorage, RegistryForwarder, MinterRole {
     using AddressUpgradeable for address;
 
     string internal _prefix;
@@ -33,16 +33,16 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
 
     function initialize() public initializer {
         __ERC721_init_unchained('.crypto', 'UD');
+        __Ownable_init_unchained();
         __ERC2771RegistryContext_init_unchained();
         __RegistryForwarder_init_unchained();
-        __ControllerRole_init_unchained();
         __MinterRole_init_unchained();
         _mint(address(0xdead), _CRYPTO_HASH);
     }
 
     /// ERC721 Metadata extension
 
-    function setTokenURIPrefix(string calldata prefix) external override onlyController {
+    function setTokenURIPrefix(string calldata prefix) external override onlyOwner {
         _prefix = prefix;
         emit NewURIPrefix(prefix);
     }

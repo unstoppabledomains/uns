@@ -547,11 +547,12 @@ describe('Registry', () => {
         const excluded = [
           'execute',
           'initialize',
-          'renounceController', // might influence tests
           'renounceMinter',     // might influence tests
           'renounceRole',       // might influence tests
           'grantRole',          // requires Default Admin role
           'revokeRole',         // requires Default Admin role
+          'transferOwnership',  // might influence tests
+          'renounceOwnership',  // might influence tests
         ];
 
         before(async () => {
