@@ -14,13 +14,12 @@ describe('FreeMinter', () => {
     FreeMinter = await ethers.getContractFactory('FreeMinter');
 
     registry = await Registry.deploy();
-    await registry.initialize();
-    await registry.setTokenURIPrefix('/');
 
-    root = await registry.root();
+    root = '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
 
     freeMinter = await FreeMinter.deploy(registry.address);
-    await registry.addMinter(freeMinter.address);
+    await registry.initialize(freeMinter.address);
+    await registry.setTokenURIPrefix('/');
   })
 
   beforeEach(() => {

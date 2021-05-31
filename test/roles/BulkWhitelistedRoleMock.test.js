@@ -11,6 +11,7 @@ describe('BulkWhitelistedRoleMock', () => {
   beforeEach(async () => {
     const BulkWhitelistedRoleMock = await ethers.getContractFactory('BulkWhitelistedRoleMock');
     bulkWhitelistedRole = await BulkWhitelistedRoleMock.deploy();
+    await bulkWhitelistedRole.initialize();
   })
 
   it('should add and remove multiple accounts', async () => {

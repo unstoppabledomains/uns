@@ -17,7 +17,12 @@ abstract contract WhitelistedRole is AccessControlUpgradeable {
         _;
     }
 
-    constructor() {
+    function __WhitelistedRole_init() internal initializer {
+        __AccessControl_init_unchained();
+        __WhitelistedRole_init_unchained();
+    }
+
+    function __WhitelistedRole_init_unchained() internal initializer {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 

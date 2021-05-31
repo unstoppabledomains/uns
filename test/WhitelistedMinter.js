@@ -6,7 +6,7 @@ const WhitelistedMinter = artifacts.require('util/WhitelistedMinter.sol')
 const {sign} = require('./helpers/signature.js')
 
 contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
-  let whitelistedMinter, registry
+  let whitelistedMinter, registry, root;
 
   const getCallData = (contract, funcSig, ...args) => {
     const web3 = new Web3(contract.constructor.web3.currentProvider)
@@ -34,19 +34,18 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
     )
   }
 
-  before(async () => {
-    registry = await Registry.new()
-    await registry.initialize();
-  })
-
   beforeEach(async () => {
-    whitelistedMinter = await WhitelistedMinter.new(registry.address)
-    await whitelistedMinter.addWhitelisted(coinbase)
+    root = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
 
-    await registry.addMinter(whitelistedMinter.address)
+    registry = await Registry.new();
+    whitelistedMinter = await WhitelistedMinter.new(registry.address);
+    await whitelistedMinter.addWhitelisted(coinbase);
+
+    await registry.initialize(whitelistedMinter.address);
+    await whitelistedMinter.mint();
   })
 
-  describe('renounce minter', () => {
+  describe.skip('renounce minter', () => {
     it('revert when renouncing by non-admin', async () => {
       await expect(
         whitelistedMinter.renounceMinter({from: accounts[0]})
@@ -185,10 +184,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
 
     it('mint domain', async () => {
       await whitelistedMinter.mintSLD(coinbase, 'test-1dp')
-      const tokenId = await registry.childIdOf(
-        await registry.root(),
-        'test-1dp',
-      )
+      const tokenId = await registry.childIdOf(root, 'test-1dp')
       assert.equal(await registry.ownerOf(tokenId), coinbase)
     })
   })
@@ -205,10 +201,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
 
     it('safe mint domain', async () => {
       await whitelistedMinter.safeMintSLD(coinbase, 'test-2oa')
-      const tokenId = await registry.childIdOf(
-        await registry.root(),
-        'test-2oa',
-      )
+      const tokenId = await registry.childIdOf(root, 'test-2oa')
       assert.equal(await registry.ownerOf(tokenId), coinbase)
     })
   })
@@ -227,10 +220,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
       const funcSig = 'safeMintSLD(address,string,bytes)'
       await whitelistedMinter.methods[funcSig](coinbase, 'test-3oa', '0x')
 
-      const tokenId = await registry.childIdOf(
-        await registry.root(),
-        'test-3oa',
-      )
+      const tokenId = await registry.childIdOf(root, 'test-3oa')
       assert.equal(await registry.ownerOf(tokenId), coinbase)
     })
   })
@@ -279,10 +269,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
         from: accounts[1],
       })
 
-      const tokenId = await registry.childIdOf(
-        await registry.root(),
-        'test-p1-p1sapr',
-      )
+      const tokenId = await registry.childIdOf(root, 'test-p1-p1sapr')
       
       assert.equal(await registry.ownerOf(tokenId), accounts[0]);
       // expectEvent(receipt, 'Relayed', {
@@ -307,10 +294,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
         from: accounts[1],
       })
 
-      const tokenId = await registry.childIdOf(
-        await registry.root(),
-        'test-p1-p1saor',
-      )
+      const tokenId = await registry.childIdOf(root, 'test-p1-p1saor')
       assert.equal(await registry.ownerOf(tokenId), accounts[0])
       // expectEvent(receipt, 'Relayed', {
       //   sender: accounts[1],
@@ -335,10 +319,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
         from: accounts[1],
       })
 
-      const tokenId = await registry.childIdOf(
-        await registry.root(),
-        'test-p1-p1adr',
-      )
+      const tokenId = await registry.childIdOf(root, 'test-p1-p1adr')
       assert.equal(await registry.ownerOf(tokenId), accounts[0])
       // expectEvent(receipt, 'Relayed', {
       //   sender: accounts[1],

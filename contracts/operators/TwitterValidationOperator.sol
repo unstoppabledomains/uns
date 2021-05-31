@@ -43,6 +43,7 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
         require(_paymentCappers.length > 0, "TwitterValidationOperator: NO_CAPPERS_PROVIDED");
         registry = _registry;
         linkToken = _linkToken;
+        __WhitelistedRole_init_unchained();
         uint256 cappersCount = _paymentCappers.length;
         for (uint256 i = 0; i < cappersCount; i++) {
             addCapper(_paymentCappers[i]);

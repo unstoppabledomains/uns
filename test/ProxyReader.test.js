@@ -18,11 +18,11 @@ describe('ProxyReader', () => {
     ProxyReader = await ethers.getContractFactory('ProxyReader');
 
     registry = await Registry.deploy();
-    await registry.initialize();
+    await registry.initialize(coinbase);
 
-    root = await registry.root();
+    root = '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
 
-    await registry.mintSLD(coinbase, domainName);
+    await registry.mintSLD(coinbase, root, domainName);
     tokenId = await registry.childIdOf(root, domainName);
 
     proxy = await ProxyReader.deploy(registry.address);
@@ -133,8 +133,7 @@ describe('ProxyReader', () => {
 
     it('should proxy root call', async () => {
       const result = await proxy.root();
-      const expected = root;
-      assert.equal(result.toString(), expected.toString());
+      assert.equal(result.toString(), '0');
     });
   });
 
@@ -232,7 +231,7 @@ describe('ProxyReader', () => {
       it('should return data by keys', async () => {
         // arrange
         const _domainName = 'hey_hoy_121';
-        await registry.mintSLD(coinbase, _domainName);
+        await registry.mintSLD(coinbase, root, _domainName);
         const _tokenId = await registry.childIdOf(root, _domainName);
 
         // act
@@ -253,7 +252,7 @@ describe('ProxyReader', () => {
       it('should return data for multiple tokens', async () => {
         // arrange
         const _domainName = 'test_1291'
-        await registry.mintSLD(accounts[0], _domainName);
+        await registry.mintSLD(accounts[0], root, _domainName);
         const _tokenId = await registry.childIdOf(root, _domainName);
         for (let i = 0; i < keys.length; i++) {
             await registry.set(keys[i], values[i], tokenId);
@@ -314,7 +313,7 @@ describe('ProxyReader', () => {
       it('should return data for multiple tokens', async () => {
         // arrange
         const _domainName = 'test_1082q'
-        await registry.mintSLD(accounts[0], _domainName);
+        await registry.mintSLD(accounts[0], root, _domainName);
         const _tokenId = await registry.childIdOf(root, _domainName);
         const hashes = keys.map(utils.id);
         for (let i = 0; i < keys.length; i++) {
@@ -363,7 +362,7 @@ describe('ProxyReader', () => {
       it('should return owners for multiple tokens', async () => {
         // arrange
         const _domainName = 'test_1211'
-        await registry.mintSLD(accounts[0], _domainName);
+        await registry.mintSLD(accounts[0], root, _domainName);
         const _tokenId = await registry.childIdOf(root, _domainName);
 
         // act

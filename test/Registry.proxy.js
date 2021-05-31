@@ -1,7 +1,7 @@
 const { utils, BigNumber } = ethers;
 
 describe('Registry (proxy)', () => {
-  let Registry, registry;
+  let Registry, registry, root;
   let signers, coinbase, accounts;
 
   before(async () => {
@@ -10,14 +10,15 @@ describe('Registry (proxy)', () => {
 
     Registry = await ethers.getContractFactory('Registry');
 
-    registry = await upgrades.deployProxy(Registry);
+    root = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
+
+    registry = await upgrades.deployProxy(Registry, [coinbase], { initializer: 'initialize' });
+    await registry.mint('0xdead000000000000000000000000000000000000', root);
     await registry.setTokenURIPrefix('/');
   })
 
   describe('Registry', () => {
     it('should construct itself correctly', async () => {
-      const root = await registry.root()
-
       assert.equal(
         root.toHexString(),
         '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
@@ -26,19 +27,19 @@ describe('Registry (proxy)', () => {
     })
 
     it('should resolve properly', async () => {
-      const tok = await registry.childIdOf(await registry.root(), 'resolution')
+      const tok = await registry.childIdOf(root, 'resolution')
 
-      await registry.mintSLD(coinbase, 'resolution')
+      await registry.mintSLD(coinbase, root, 'resolution')
 
       await registry.burn(tok)
 
-      await registry.mintSLD(coinbase, 'resolution')
+      await registry.mintSLD(coinbase, root, 'resolution')
 
       await registry.transferFrom(coinbase, accounts[0], tok)
     })
 
     it('should set URI prefix', async () => {
-      const tok = await registry.root();
+      const tok = root;
       assert.equal(await registry.tokenURI(tok), `/${tok}`);
 
       await registry.setTokenURIPrefix('prefix-');
@@ -51,20 +52,20 @@ describe('Registry (proxy)', () => {
 
   describe('Resolver', () => {
     const initializeDomain = async (name) => {
-      const tok = await registry.childIdOf(await registry.root(), name);
-      await registry.mintSLD(coinbase, name);
+      const tok = await registry.childIdOf(root, name);
+      await registry.mintSLD(coinbase, root, name);
       return tok;
     }
 
     it('should resolve tokens', async () => {
-      const tok = await registry.childIdOf(await registry.root(), 'label_931')
+      const tok = await registry.childIdOf(root, 'label_931')
   
       // should fail to set name if not owner
       await expect(
         registry.set('key', 'value', tok)
       ).to.be.revertedWith('ERC721: operator query for nonexistent token');
 
-      await registry.mintSLD(coinbase, 'label_931')
+      await registry.mintSLD(coinbase, root, 'label_931')
       await registry.set('key', 'value', tok)
   
       assert.equal(

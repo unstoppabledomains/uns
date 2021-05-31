@@ -16,10 +16,12 @@ describe('Registry', () => {
     Registry = await ethers.getContractFactory('Registry');
     SimpleMock = await ethers.getContractFactory('SimpleMock');
 
+    root = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
+
     registry = await Registry.deploy();
-    await registry.initialize();
+    await registry.initialize(coinbase.address);
+    await registry.mint('0xdead000000000000000000000000000000000000', root);
     await registry.setTokenURIPrefix('/');
-    root = await registry.root()
   })
 
   describe('Registry', () => {
@@ -30,13 +32,13 @@ describe('Registry', () => {
     it('should resolve properly', async () => {
       const tok = await registry.childIdOf(root, 'resolution');
 
-      await registry.mintSLD(coinbase.address, 'resolution');
+      await registry.mintSLD(coinbase.address, root, 'resolution');
       assert.equal(await registry.resolverOf(tok), registry.address);
 
       await registry.burn(tok);
       assert.equal(await registry.resolverOf(tok), ZERO_ADDRESS);
 
-      await registry.mintSLD(coinbase.address, 'resolution');
+      await registry.mintSLD(coinbase.address, root, 'resolution');
       assert.equal(await registry.resolverOf(tok), registry.address);
 
       await registry.transferFrom(coinbase.address, accounts[0], tok);
@@ -55,45 +57,45 @@ describe('Registry', () => {
 
   describe('Registry (SLD minter)', () => {
     it('minting SLDs', async () => {
-      await registry.mintSLD(coinbase.address, 'label_22');
+      await registry.mintSLD(coinbase.address, root, 'label_22');
   
       const tok = await registry.childIdOf(root, 'label_22');
       assert.equal(coinbase.address, await registry.ownerOf(tok));
   
       // should fail to mint existing token
       await expect(
-        registry.callStatic.mintSLD(coinbase.address, 'label_22')
+        registry.callStatic.mintSLD(coinbase.address, root, 'label_22')
       ).to.be.revertedWith('ERC721: token already minted');
       await expect(
-        registry.callStatic.mintSLD(accounts[0], 'label_22')
+        registry.callStatic.mintSLD(accounts[0], root, 'label_22')
       ).to.be.revertedWith('ERC721: token already minted');
   
       await registry.burn(tok);
-      await registry.mintSLD(coinbase.address, 'label_22');
+      await registry.mintSLD(coinbase.address, root, 'label_22');
   
       assert.equal(coinbase.address, await registry.ownerOf(tok));
     })
 
     it('safe minting SLDs', async () => {
       const tok = await registry.childIdOf(root, 'label_93');
-      await registry.functions['safeMintSLD(address,string)'](coinbase.address, 'label_93');
+      await registry.functions['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label_93');
   
       assert.equal(coinbase.address, await registry.ownerOf(tok));
   
       // should fail to safely mint existing token contract
       await expect(
-        registry.callStatic['safeMintSLD(address,string)'](coinbase.address, 'label_93')
+        registry.callStatic['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label_93')
       ).to.be.revertedWith('ERC721: token already minted');
   
       await registry.burn(tok)
   
       // should fail to safely mint token to non reciever contract
       await expect(
-        registry.callStatic['safeMintSLD(address,string)'](registry.address, 'label_93')
+        registry.callStatic['safeMintSLD(address,uint256,string)'](registry.address, root, 'label_93')
       ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
   
       const simple = await SimpleMock.deploy();
-      await registry.functions['safeMintSLD(address,string)'](simple.address, 'label_93');
+      await registry.functions['safeMintSLD(address,uint256,string)'](simple.address, root, 'label_93');
   
       assert.equal(simple.address, await registry.ownerOf(tok));
     })
@@ -102,7 +104,7 @@ describe('Registry', () => {
   describe('Registry (records management)', () => {
     const initializeDomain = async (name) => {
       const tok = await registry.childIdOf(root, name);
-      await registry.mintSLD(coinbase.address, name);
+      await registry.mintSLD(coinbase.address, root, name);
       return tok;
     }
 
@@ -114,7 +116,7 @@ describe('Registry', () => {
         registry.set('key', 'value', tok)
       ).to.be.revertedWith('ERC721: operator query for nonexistent token');
 
-      await registry.mintSLD(coinbase.address, 'label_931')
+      await registry.mintSLD(coinbase.address, root, 'label_931')
       await registry.set('key', 'value', tok)
   
       assert.equal(
@@ -265,7 +267,7 @@ describe('Registry', () => {
       const owner = signers[1];
       const receiver = signers[2];
       const tok = await registry.childIdOf(root, 'res_label_113a');
-      await registry.mintSLD(owner.address, 'res_label_113a');
+      await registry.mintSLD(owner.address, root, 'res_label_113a');
 
       const req = {
         from: owner.address,
@@ -308,7 +310,7 @@ describe('Registry', () => {
 
     it('should transfer using meta-transferFrom', async () => {
       const tok = await registry.childIdOf(root, 'meta_1591');
-      await registry.mintSLD(owner.address, 'meta_1591');
+      await registry.mintSLD(owner.address, root, 'meta_1591');
 
       const req = {
         from: owner.address,
@@ -325,7 +327,7 @@ describe('Registry', () => {
 
     it('should revert meta-transferFrom for non-onwer', async () => {
       const tok = await registry.childIdOf(root, 'meta_6458');
-      await registry.mintSLD(owner.address, 'meta_6458');
+      await registry.mintSLD(owner.address, root, 'meta_6458');
 
       const req = {
         from: nonOwner.address,
@@ -341,7 +343,7 @@ describe('Registry', () => {
 
     it('should transfer using meta-safeTransferFrom', async () => {
       const tok = await registry.childIdOf(root, 'meta_10235');
-      await registry.mintSLD(owner.address, 'meta_10235');
+      await registry.mintSLD(owner.address, root, 'meta_10235');
 
       const req = {
         from: owner.address,
@@ -361,7 +363,7 @@ describe('Registry', () => {
 
     it('should revert meta-safeTransferFrom for non-onwer', async () => {
       const tok = await registry.childIdOf(root, 'meta_e5iuw');
-      await registry.mintSLD(owner.address, 'meta_e5iuw');
+      await registry.mintSLD(owner.address, root, 'meta_e5iuw');
 
       const req = {
         from: nonOwner.address,
@@ -382,7 +384,7 @@ describe('Registry', () => {
 
     it('should burn using meta-burn', async () => {
       const tok = await registry.childIdOf(root, 'meta_ar093');
-      await registry.mintSLD(owner.address, 'meta_ar093');
+      await registry.mintSLD(owner.address, root, 'meta_ar093');
 
       const req = {
         from: owner.address,
@@ -399,7 +401,7 @@ describe('Registry', () => {
 
     it('should revert meta-burn for non-onwer', async () => {
       const tok = await registry.childIdOf(root, 'meta_53dg3');
-      await registry.mintSLD(owner.address, 'meta_53dg3');
+      await registry.mintSLD(owner.address, root, 'meta_53dg3');
 
       const req = {
         from: nonOwner.address,
@@ -445,13 +447,18 @@ describe('Registry', () => {
           values: ['value1']
         }
 
+        const excluded = [
+          'mint'
+        ];
+
         const getFuncs = () => {
           return registryFuncs()
-            .filter(x => x.inputs.filter(i => i.name === 'tokenId').length);
+            .filter(x => x.inputs.filter(i => i.name === 'tokenId').length)
+            .filter(x => !excluded.includes(x.name));
         }
 
         const mintToken = async (owner, label) => {
-          await registry.mintSLD(owner.address, label);
+          await registry.mintSLD(owner.address, root, label);
         }
 
         before(async () => {
@@ -556,6 +563,7 @@ describe('Registry', () => {
         ];
 
         before(async () => {
+          paramValueMap.tld = root;
           paramValueMap.account = accessControl.address;
           paramValueMap.to = owner.address;
           paramValueMap.operator = operator.address;

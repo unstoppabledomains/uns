@@ -10,7 +10,7 @@ describe('TwitterValidationOperator', () => {
   let Registry, TwitterValidationOperator, LinkTokenMock;
   let signers, coinbase, whitelisted, paymentCapper, fundsReceiver, validationRequester;
   let coinbaseAddress, whitelistedAddress, paymentCapperAddress, fundsReceiverAddress, validationRequesterAddress;
-  let linkToken, registry, domainTokenId, operator;
+  let linkToken, registry, domainTokenId, operator, root;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -32,10 +32,11 @@ describe('TwitterValidationOperator', () => {
     await linkToken.mint(coinbaseAddress, 100500);
 
     registry = await Registry.deploy();
-    await registry.initialize();
+    await registry.initialize(coinbaseAddress);
+    root = '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
 
-    await registry.mintSLD(coinbaseAddress, domainName);
-    domainTokenId = await registry.childIdOf(await registry.root(), domainName);
+    await registry.mintSLD(coinbaseAddress, root, domainName);
+    domainTokenId = await registry.childIdOf(root, domainName);
   })
 
   beforeEach(async () => {
@@ -61,8 +62,8 @@ describe('TwitterValidationOperator', () => {
     validationRecords = await registry.getMany(['social.twitter.username', 'validation.social.twitter.username'], domainTokenId)
     assert.deepEqual(validationRecords, ['apple', '0x1bd3c1e0eb3d9143d6365cfd328a002e01b01d1acd719b12d37d8791fbaeed7b0b850d995c3e32ba79b34dbb15962bd68529f9360eb7507961f67e7e6645e9a41b'])
 
-    await registry.mintSLD(coinbaseAddress, 'testing-test')
-    const secondDomainTokenId = await registry.childIdOf(await registry.root(), 'testing-test')
+    await registry.mintSLD(coinbaseAddress, root, 'testing-test')
+    const secondDomainTokenId = await registry.childIdOf(root, 'testing-test')
     await registry.approve(operator.address, secondDomainTokenId)
 
     tx = await operator.connect(whitelisted)
@@ -205,8 +206,8 @@ describe('TwitterValidationOperator', () => {
 
   it('should initiate validation via LINK token transfer', async () => {
     const guestManageDomainName = 'guest-manage-verification'
-    await registry.mintSLD(validationRequesterAddress, guestManageDomainName)
-    const tokenId = await registry.childIdOf(await registry.root(), guestManageDomainName)
+    await registry.mintSLD(validationRequesterAddress, root, guestManageDomainName)
+    const tokenId = await registry.childIdOf(root, guestManageDomainName)
     await registry.connect(validationRequester).approve(operator.address, tokenId)
     const operatorInitialBalance = await linkToken.balanceOf(operator.address)
     const userPaymentPerValidation = 2

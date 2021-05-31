@@ -62,6 +62,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         return _registry.childIdOf(tokenId, label);
     }
 
+    // NOTE: obsolete, kept for backward compatibility
     function isController(address account) external view override returns (bool) {
         return _registry.owner() == account;
     }

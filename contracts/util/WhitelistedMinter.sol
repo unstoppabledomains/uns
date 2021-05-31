@@ -22,6 +22,9 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
 
     Registry internal _registry;
 
+    uint256 private constant _CRYPTO_HASH =
+        0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
+
     /**
      * @dev bytes4(keccak256('mintSLD(address,string)')) == 0x4c0b0ed2
      */
@@ -44,11 +47,13 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
 
     constructor(Registry registry_) {
         _registry = registry_;
+        __WhitelistedRole_init_unchained();
         _addWhitelisted(address(this));
     }
 
+    // NOTE: deprecated
     function renounceMinter() external onlyWhitelistAdmin {
-        _registry.renounceMinter();
+        // _registry.renounceMinter();
     }
 
     /**
@@ -80,12 +85,17 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
         receiver.transfer(msg.value);
     }
 
+    // NOTE: temp function
+    function mint() external onlyWhitelistAdmin {
+        _registry.mint(address(0xdead), _CRYPTO_HASH);
+    }
+
     function mintSLD(address to, string calldata label)
         external
         override
         onlyWhitelisted
     {
-        _registry.mintSLD(to, label);
+        _registry.mintSLD(to, _CRYPTO_HASH, label);
     }
 
     function safeMintSLD(address to, string calldata label)
@@ -93,7 +103,7 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
         override
         onlyWhitelisted
     {
-        _registry.safeMintSLD(to, label);
+        _registry.safeMintSLD(to, _CRYPTO_HASH, label);
     }
 
     function safeMintSLD(
@@ -101,7 +111,7 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
         string calldata label,
         bytes calldata _data
     ) external override onlyWhitelisted {
-        _registry.safeMintSLD(to, label, _data);
+        _registry.safeMintSLD(to, _CRYPTO_HASH, label, _data);
     }
 
     function mintSLDWithRecords(
@@ -110,7 +120,7 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
         string[] calldata keys,
         string[] calldata values
     ) external override onlyWhitelisted {
-        _registry.mintSLDWithRecords(to, label, keys, values);
+        _registry.mintSLDWithRecords(to, _CRYPTO_HASH, label, keys, values);
     }
 
     /**
