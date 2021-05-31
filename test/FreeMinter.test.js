@@ -26,16 +26,16 @@ describe('FreeMinter', () => {
     domainSuffix = `prefixed-domain-${Math.random() * 1000}`;
   })
 
-  describe('FreeMinter.claim(string calldata _label)', () => {
+  describe('FreeMinter.claim(uint256,string)', () => {
     it('should mint prefixed domain', async () => {
-      await freeMinter.connect(developerSigner).functions['claim(string)'](domainSuffix)
+      await freeMinter.connect(developerSigner).functions['claim(uint256,string)'](root, domainSuffix)
       const tokenId = await registry.childIdOf(root, `${DomainNamePrefix}${domainSuffix}`)
       const tokenUri = await registry.tokenURI(tokenId)
       assert.equal(tokenUri, `/${tokenId}`)
     })
 
     it('should send domain to requester', async () => {
-      await freeMinter.connect(developerSigner).functions['claim(string)'](domainSuffix)
+      await freeMinter.connect(developerSigner).functions['claim(uint256,string)'](root, domainSuffix)
       const tokenId = await registry.childIdOf(root, `${DomainNamePrefix}${domainSuffix}`)
       const owner = await registry.ownerOf(tokenId)
       assert.equal(owner, developer)
@@ -43,27 +43,29 @@ describe('FreeMinter', () => {
 
     it('should not allow to mint the same domain twice', async () => {
       const devFreeMinter = freeMinter.connect(developerSigner);
-      await devFreeMinter.functions['claim(string)'](domainSuffix);
+      await devFreeMinter.functions['claim(uint256,string)'](root, domainSuffix);
 
       await expect(
-        devFreeMinter.functions['claim(string)'](domainSuffix)
+        devFreeMinter.functions['claim(uint256,string)'](root, domainSuffix)
       ).to.be.revertedWith('ERC721: token already minted');
     })
   })
 
-  describe('FreeMinter.claimTo(string calldata _label, address _receiver)', () => {
+  describe('FreeMinter.claimTo(uint256,string,address)', () => {
     it('should mint domain to receiver', async () => {
-      await freeMinter.connect(developerSigner).functions['claimTo(string,address)'](domainSuffix, receiver)
+      await freeMinter.connect(developerSigner).functions['claimTo(uint256,string,address)'](root, domainSuffix, receiver)
       const tokenId = await registry.childIdOf(root, `${DomainNamePrefix}${domainSuffix}`)
       const owner = await registry.ownerOf(tokenId)
       assert.equal(owner, receiver)
     })
   })
 
-  describe('FreeMinter.claimToWithRecords(string calldata _label, address _receiver, string[] calldata _keys, string [] calldata _values)', () => {
+  describe('FreeMinter.claimToWithRecords(uint256,string,address,string[],string[])', () => {
+    const funcSig = 'claimToWithRecords(uint256,string,address,string[],string[])';
+
     it('should mint domain to receiver with predefined keys', async () => {
       const devFreeMinter = freeMinter.connect(developerSigner);
-      await devFreeMinter.functions['claimToWithRecords(string,address,string[],string[])'](domainSuffix, receiver, ['key'], ['value'])
+      await devFreeMinter.functions[funcSig](root, domainSuffix, receiver, ['key'], ['value'])
       const tokenId = await registry.childIdOf(root, `${DomainNamePrefix}${domainSuffix}`)
       const owner = await registry.ownerOf(tokenId)
       const values = await registry.getMany(['key'], tokenId)
@@ -73,7 +75,7 @@ describe('FreeMinter', () => {
 
     it('should mint domain with empty keys', async () => {
       const devFreeMinter = freeMinter.connect(developerSigner);
-      await devFreeMinter.functions['claimToWithRecords(string,address,string[],string[])'](domainSuffix, receiver, [], []);
+      await devFreeMinter.functions[funcSig](root, domainSuffix, receiver, [], []);
       const tokenId = await registry.childIdOf(root, `${DomainNamePrefix}${domainSuffix}`)
       const owner = await registry.ownerOf(tokenId)
       const values = await registry.getMany(['key1', 'key2'], tokenId)

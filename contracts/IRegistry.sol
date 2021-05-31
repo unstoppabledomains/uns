@@ -4,9 +4,10 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol';
 
+import './ISLDMinter.sol';
 import './IRecordStorage.sol';
 
-interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
+interface IRegistry is IERC721MetadataUpgradeable, ISLDMinter, IRecordStorage {
 
     event NewURIPrefix(string prefix);
 

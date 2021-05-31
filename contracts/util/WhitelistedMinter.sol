@@ -22,28 +22,25 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
 
     Registry internal _registry;
 
-    uint256 private constant _CRYPTO_HASH =
-        0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
+    /**
+     * @dev bytes4(keccak256('mintSLD(address,uint256,string)')) == 0xae2ad903
+     */
+    bytes4 private constant _SIG_MINT = 0xae2ad903;
 
     /**
-     * @dev bytes4(keccak256('mintSLD(address,string)')) == 0x4c0b0ed2
+     * @dev bytes4(keccak256('safeMintSLD(address,uint256,string)')) == 0x4c1819e0
      */
-    bytes4 private constant _SIG_MINT = 0x4c0b0ed2;
+    bytes4 private constant _SIG_SAFE_MINT = 0x4c1819e0;
 
     /**
-     * @dev bytes4(keccak256('safeMintSLD(address,string)')) == 0xb2da2979
+     * @dev bytes4(keccak256('safeMintSLD(address,uint256,string,bytes)')) == 0x58839d6b
      */
-    bytes4 private constant _SIG_SAFE_MINT = 0xb2da2979;
+    bytes4 private constant _SIG_SAFE_MINT_DATA = 0x58839d6b;
 
     /**
-     * @dev bytes4(keccak256('safeMintSLD(address,string,bytes)')) == 0xbe362e2e
+     * @dev bytes4(keccak256('mintSLDWithRecords(address,uint256,string,string[],string[])')) == 0x39ccf4d0
      */
-    bytes4 private constant _SIG_SAFE_MINT_DATA = 0xbe362e2e;
-
-    /**
-     * @dev bytes4(keccak256('mintSLDWithRecords(address,string,string[],string[])')) == 0x63a9e80b
-     */
-    bytes4 private constant _SIG_MINT_WITH_RECORDS = 0x63a9e80b;
+    bytes4 private constant _SIG_MINT_WITH_RECORDS = 0x39ccf4d0;
 
     constructor(Registry registry_) {
         _registry = registry_;
@@ -87,40 +84,43 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
 
     // NOTE: temp function
     function mint() external onlyWhitelistAdmin {
-        _registry.mint(address(0xdead), _CRYPTO_HASH);
+        // .crypto
+        _registry.mint(address(0xdead), 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f);
     }
 
-    function mintSLD(address to, string calldata label)
+    function mintSLD(address to, uint256 tld, string calldata label)
         external
         override
         onlyWhitelisted
     {
-        _registry.mintSLD(to, _CRYPTO_HASH, label);
+        _registry.mintSLD(to, tld, label);
     }
 
-    function safeMintSLD(address to, string calldata label)
+    function safeMintSLD(address to, uint256 tld, string calldata label)
         external
         override
         onlyWhitelisted
     {
-        _registry.safeMintSLD(to, _CRYPTO_HASH, label);
+        _registry.safeMintSLD(to, tld, label);
     }
 
     function safeMintSLD(
         address to,
+        uint256 tld,
         string calldata label,
         bytes calldata _data
     ) external override onlyWhitelisted {
-        _registry.safeMintSLD(to, _CRYPTO_HASH, label, _data);
+        _registry.safeMintSLD(to, tld, label, _data);
     }
 
     function mintSLDWithRecords(
         address to,
+        uint256 tld,
         string calldata label,
         string[] calldata keys,
         string[] calldata values
     ) external override onlyWhitelisted {
-        _registry.mintSLDWithRecords(to, _CRYPTO_HASH, label, keys, values);
+        _registry.mintSLDWithRecords(to, tld, label, keys, values);
     }
 
     /**

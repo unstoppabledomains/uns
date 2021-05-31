@@ -81,22 +81,23 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, OwnableUpgradeable, E
         _mint(to, tokenId);
     }
 
-    function mintSLD(address to, uint256 tld, string memory label) external onlyMintingManager {
+    function mintSLD(address to, uint256 tld, string memory label) external override onlyMintingManager {
         _mintChild(to, tld, label);
     }
 
-    function safeMintSLD(address to, uint256 tld, string calldata label) external onlyMintingManager {
+    function safeMintSLD(address to, uint256 tld, string calldata label) external override onlyMintingManager {
         safeMintSLD(to, tld, label, '');
     }
 
     function safeMintSLD(address to, uint256 tld, string memory label, bytes memory _data)
-        public onlyMintingManager
+        public override onlyMintingManager
     {
         _safeMint(to, _childId(tld, label), _data);
     }
 
     function mintSLDWithRecords(address to, uint256 tld, string memory label, string[] memory keys, string[] memory values)
         external
+        override
         onlyMintingManager
     {
         _mintChild(to, tld, label);

@@ -83,7 +83,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
       })
 
       await expect(
-        whitelistedMinter.safeMintSLD(coinbase, 'label')
+        whitelistedMinter.safeMintSLD(coinbase, root, 'label')
       ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
 
       const actualBalance = await web3.eth.getBalance(faucet)
@@ -100,7 +100,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
       })
 
       await expect(
-        whitelistedMinter.safeMintSLD(coinbase, 'label')
+        whitelistedMinter.safeMintSLD(coinbase, root, 'label')
       ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
 
       const actualBalance = await web3.eth.getBalance(faucet)
@@ -129,7 +129,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
       await whitelistedMinter.rotateWhitelisted(receiver, {from: coinbase})
 
       await expect(
-        whitelistedMinter.safeMintSLD(coinbase, 'label')
+        whitelistedMinter.safeMintSLD(coinbase, root, 'label')
       ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
 
       const actualBalance = await web3.eth.getBalance(receiver)
@@ -146,7 +146,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
       })
 
       await expect(
-        whitelistedMinter.safeMintSLD(coinbase, 'label')
+        whitelistedMinter.safeMintSLD(coinbase, root, 'label')
       ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
 
       const actualBalance = await web3.eth.getBalance(receiver)
@@ -164,7 +164,7 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
       })
 
       await expect(
-        whitelistedMinter.safeMintSLD(coinbase, 'label')
+        whitelistedMinter.safeMintSLD(coinbase, root, 'label')
       ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
 
       const actualBalance = await web3.eth.getBalance(receiver)
@@ -176,14 +176,14 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
   describe('mint second level domain', () => {
     it('revert minting when account is not whitelisted', async () => {
       await expect(
-        whitelistedMinter.mintSLD(coinbase, 'test-1ka', {
+        whitelistedMinter.mintSLD(coinbase, root, 'test-1ka', {
           from: accounts[0],
         })
       ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
     })
 
     it('mint domain', async () => {
-      await whitelistedMinter.mintSLD(coinbase, 'test-1dp')
+      await whitelistedMinter.mintSLD(coinbase, root, 'test-1dp')
       const tokenId = await registry.childIdOf(root, 'test-1dp')
       assert.equal(await registry.ownerOf(tokenId), coinbase)
     })
@@ -191,16 +191,16 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
 
   describe('safe mint second level domain', () => {
     it('revert safe minting when account is not whitelisted', async () => {
-      const funcSig = 'safeMintSLD(address,string)';
+      const funcSig = 'safeMintSLD(address,uint256,string)';
       await expect(
-        whitelistedMinter.methods[funcSig](coinbase, 'test-2oa', {
+        whitelistedMinter.methods[funcSig](coinbase, root, 'test-2oa', {
           from: accounts[0],
         })
       ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
     })
 
     it('safe mint domain', async () => {
-      await whitelistedMinter.safeMintSLD(coinbase, 'test-2oa')
+      await whitelistedMinter.safeMintSLD(coinbase, root, 'test-2oa')
       const tokenId = await registry.childIdOf(root, 'test-2oa')
       assert.equal(await registry.ownerOf(tokenId), coinbase)
     })
@@ -208,17 +208,17 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
 
   describe('safe mint(data) second level domain', () => {
     it('revert safe minting when account is not whitelisted', async () => {
-      const funcSig = 'safeMintSLD(address,string,bytes)';
+      const funcSig = 'safeMintSLD(address,uint256,string,bytes)';
       await expect(
-        whitelistedMinter.methods[funcSig](coinbase, 'test-3oa', '0x', {
+        whitelistedMinter.methods[funcSig](coinbase, root, 'test-3oa', '0x', {
           from: accounts[0],
         })
       ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
     })
 
     it('safe mint domain', async () => {
-      const funcSig = 'safeMintSLD(address,string,bytes)'
-      await whitelistedMinter.methods[funcSig](coinbase, 'test-3oa', '0x')
+      const funcSig = 'safeMintSLD(address,uint256,string,bytes)'
+      await whitelistedMinter.methods[funcSig](coinbase, root, 'test-3oa', '0x')
 
       const tokenId = await registry.childIdOf(root, 'test-3oa')
       assert.equal(await registry.ownerOf(tokenId), coinbase)
@@ -229,8 +229,9 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
     it('revert relay meta-mint when signer is not whitelisted', async () => {
       const data = getCallData(
         whitelistedMinter,
-        'mintSLD(address,string)',
+        'mintSLD(address,uint256,string)',
         accounts[0],
+        root,
         'test-p1-revert',
       )
       const signature = await calcSignature(data, faucet)
@@ -245,8 +246,9 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
     it('revert relay meta-mint when signature is empty', async () => {
       const data = getCallData(
         whitelistedMinter,
-        'mintSLD(address,string)',
+        'mintSLD(address,uint256,string)',
         accounts[0],
+        root,
         'test-p1-revert',
       )
 
@@ -260,8 +262,9 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
     it('relay meta-safe mint', async () => {
       const data = getCallData(
         whitelistedMinter,
-        'safeMintSLD(address,string)',
+        'safeMintSLD(address,uint256,string)',
         accounts[0],
+        root,
         'test-p1-p1sapr',
       )
       const signature = await calcSignature(data)
@@ -284,8 +287,9 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
     it('relay meta-safe mint with data', async () => {
       const data = getCallData(
         whitelistedMinter,
-        'safeMintSLD(address,string,bytes)',
+        'safeMintSLD(address,uint256,string,bytes)',
         accounts[0],
+        root,
         'test-p1-p1saor',
         '0x',
       )
@@ -308,8 +312,9 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
     it('relay meta-mint with records', async () => {
       const data = getCallData(
         whitelistedMinter,
-        'mintSLDWithRecords(address,string,string[],string[])',
+        'mintSLDWithRecords(address,uint256,string,string[],string[])',
         accounts[0],
+        root,
         'test-p1-p1adr',
         [],
         [],
@@ -340,18 +345,18 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
       return [
         {
           func: 'mintSLD',
-          funcSig: 'mintSLD(address,string)',
-          params: [accounts[0], 't1-w1-'],
+          funcSig: 'mintSLD(address,uint256,string)',
+          params: [accounts[0], root, 't1-w1-'],
         },
         {
           func: 'safeMintSLD',
-          funcSig: 'safeMintSLD(address,string)',
-          params: [accounts[0], 't1-m1-'],
+          funcSig: 'safeMintSLD(address,uint256,string)',
+          params: [accounts[0], root, 't1-m1-'],
         },
         {
           func: 'safeMintSLD',
-          funcSig: 'safeMintSLD(address,string,bytes)',
-          params: [accounts[0], 't1-y1-', '0x'],
+          funcSig: 'safeMintSLD(address,uint256,string,bytes)',
+          params: [accounts[0], root, 't1-y1-', '0x'],
         },
       ]
     }
@@ -362,8 +367,8 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
       const cases = getCases()
       for (let i = 0; i < cases.length; i++) {
         const {func, funcSig, params} = cases[i]
-        const [acc, token, ...rest] = params
-        const relayParams = [acc, token + 'r', ...rest]
+        const [acc, root, token, ...rest] = params
+        const relayParams = [acc, root, token + 'r', ...rest]
 
         const callData = getCallData(whitelistedMinter, funcSig, ...relayParams)
         const signature = await calcSignature(callData)
