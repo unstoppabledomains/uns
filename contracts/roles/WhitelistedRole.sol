@@ -42,7 +42,6 @@ abstract contract WhitelistedRole is AccessControlUpgradeable {
         _removeWhitelisted(_msgSender());
     }
 
-
     function addWhitelistAdmin(address account) public onlyWhitelistAdmin {
         _setupRole(DEFAULT_ADMIN_ROLE, account);
     }

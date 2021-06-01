@@ -113,46 +113,46 @@ describe('MintingManager', () => {
       registry = await Registry.deploy();
       mintingManager = await MintingManager.deploy();
       await mintingManager.initialize(registry.address);
-      await mintingManager.addWhitelisted(coinbase.address);
+      await mintingManager.addMinter(coinbase.address);
 
       await registry.initialize(mintingManager.address);
       await registry.setTokenURIPrefix('/');
     })
 
-    describe('close whitelisted account', () => {
-      it('revert when closing by non-whitelisted account', async () => {
+    describe('close minter account', () => {
+      it('revert when closing by non-minter account', async () => {
         await expect(
-          mintingManager.connect(receiver).closeWhitelisted(receiver.address)
-        ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
+          mintingManager.connect(receiver).closeMinter(receiver.address)
+        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
       })
   
       it('revert when zero account', async () => {
         await expect(
-          mintingManager.closeWhitelisted(ZERO_ADDRESS)
-        ).to.be.revertedWith('MintingManager: RECEIVER_IS_EMPTY');
+          mintingManager.closeMinter(ZERO_ADDRESS)
+        ).to.be.revertedWith('MinterRole: RECEIVER_IS_EMPTY');
       })
   
-      it('close whitelisted without forwarding funds', async () => {
+      it('close minter without forwarding funds', async () => {
         const initBalance = await faucet.getBalance();
-        await mintingManager.closeWhitelisted(faucet.address, { value: 0 });
+        await mintingManager.closeMinter(faucet.address, { value: 0 });
   
         await expect(
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label')
-        ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
+        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
   
         const actualBalance = await faucet.getBalance();
         assert.equal(actualBalance, initBalance.toString());
       })
   
-      it('close whitelisted with forwarding funds', async () => {
+      it('close minter with forwarding funds', async () => {
         const value = 1
         const initBalance = await faucet.getBalance()
   
-        await mintingManager.closeWhitelisted(faucet.address, { value })
+        await mintingManager.closeMinter(faucet.address, { value })
   
         await expect(
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label')
-        ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
+        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
   
         const actualBalance = await faucet.getBalance()
         const expectedBalance = BigNumber.from(initBalance).add(value)
@@ -160,54 +160,54 @@ describe('MintingManager', () => {
       })
     })
 
-    describe('rotate whitelisted account', () => {
-      it('revert when rotateing by non-whitelisted account', async () => {
+    describe('rotate minter account', () => {
+      it('revert when rotateing by non-minter account', async () => {
         await expect(
-          mintingManager.connect(receiver).rotateWhitelisted(receiver.address)
-        ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
+          mintingManager.connect(receiver).rotateMinter(receiver.address)
+        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
       })
   
       it('revert when zero account', async () => {
         await expect(
-          mintingManager.rotateWhitelisted(ZERO_ADDRESS)
-        ).to.be.revertedWith('MintingManager: RECEIVER_IS_EMPTY');
+          mintingManager.rotateMinter(ZERO_ADDRESS)
+        ).to.be.revertedWith('MinterRole: RECEIVER_IS_EMPTY');
       })
   
-      it('rotate whitelisted without defining value', async () => {
+      it('rotate minter without defining value', async () => {
         const initBalance = await receiver.getBalance()
   
-        await mintingManager.rotateWhitelisted(receiver.address)
+        await mintingManager.rotateMinter(receiver.address)
   
         await expect(
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label')
-        ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
+        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
   
         const actualBalance = await receiver.getBalance()
         assert.equal(actualBalance, initBalance.toString())
       })
   
-      it('rotate whitelisted without forwarding funds', async () => {
+      it('rotate minter without forwarding funds', async () => {
         const initBalance = await receiver.getBalance()
   
-        await mintingManager.rotateWhitelisted(receiver.address, { value: 0 })
+        await mintingManager.rotateMinter(receiver.address, { value: 0 })
   
         await expect(
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label')
-        ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
+        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
   
         const actualBalance = await receiver.getBalance()
         assert.equal(actualBalance, initBalance.toString())
       })
   
-      it('rotate whitelisted with forwarding funds', async () => {
+      it('rotate minter with forwarding funds', async () => {
         const value = 3
         const initBalance = await receiver.getBalance()
   
-        await mintingManager.rotateWhitelisted(receiver.address, { value })
+        await mintingManager.rotateMinter(receiver.address, { value })
   
         await expect(
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label')
-        ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
+        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
   
         const actualBalance = await receiver.getBalance()
         const expectedBalance = BigNumber.from(initBalance).add(value)
@@ -216,10 +216,10 @@ describe('MintingManager', () => {
     })
 
     describe('mint second level domain', () => {
-      it('revert minting when account is not whitelisted', async () => {
+      it('revert minting when account is not minter', async () => {
         await expect(
           mintingManager.connect(receiver).mintSLD(coinbase.address, root, 'test-1ka')
-        ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
+        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
       })
   
       it('mint domain', async () => {
@@ -232,10 +232,10 @@ describe('MintingManager', () => {
     describe('safe mint second level domain', () => {
       const funcSig = 'safeMintSLD(address,uint256,string)';
 
-      it('revert safe minting when account is not whitelisted', async () => {
+      it('revert safe minting when account is not minter', async () => {
         await expect(
           mintingManager.connect(receiver)[funcSig](coinbase.address, root, 'test-2oa')
-        ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
+        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
       })
   
       it('safe mint domain', async () => {
@@ -248,10 +248,10 @@ describe('MintingManager', () => {
     describe('safe mint(data) second level domain', () => {
       const funcSig = 'safeMintSLD(address,uint256,string,bytes)';
 
-      it('revert safe minting when account is not whitelisted', async () => {
+      it('revert safe minting when account is not minter', async () => {
         await expect(
           mintingManager.connect(receiver)[funcSig](coinbase.address, root, 'test-3oa', '0x')
-        ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_WHITELISTED');
+        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
       })
   
       it('safe mint domain', async () => {
@@ -263,7 +263,7 @@ describe('MintingManager', () => {
     })
 
     describe('relay', () => {
-      it('revert relay meta-mint when signer is not whitelisted', async () => {
+      it('revert relay meta-mint when signer is not minter', async () => {
         const data = mintingManager.interface.encodeFunctionData(
           'mintSLD(address,uint256,string)',
           [receiver.address, root, 'test-p1-revert']
@@ -272,7 +272,7 @@ describe('MintingManager', () => {
 
         await expect(
           mintingManager.connect(receiver).relay(data, signature)
-        ).to.be.revertedWith('MintingManager: SIGNER_IS_NOT_WHITELISTED');
+        ).to.be.revertedWith('MintingManager: SIGNER_IS_NOT_MINTER');
       })
   
       it('revert relay meta-mint when signature is empty', async () => {

@@ -5,19 +5,19 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
 import './IMintingManager.sol';
-import '../roles/BulkWhitelistedRole.sol';
+import '../roles/MinterRole.sol';
 import '../Registry.sol';
 
 /**
  * @title MintingManager
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract MintingManager is IMintingManager, BulkWhitelistedRole {
+contract MintingManager is IMintingManager, MinterRole {
     using ECDSAUpgradeable for bytes32;
 
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.1.0';
-    string private constant DOMAIN_NAME_PREFIX = 'udtestdev-';
+    string private constant FREE_DOMAIN_NAME_PREFIX = 'udtestdev-';
 
     Registry internal _registry;
 
@@ -45,48 +45,19 @@ contract MintingManager is IMintingManager, BulkWhitelistedRole {
 
     function initialize(Registry registry_) public initializer {
         _registry = registry_;
-        __WhitelistedRole_init_unchained();
-        _addWhitelisted(address(this));
+        __Ownable_init_unchained();
+        __MinterRole_init_unchained();
+        _addMinter(address(this));
 
-        // uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked('crypto')))))
         _tlds[0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f] = 'crypto';
         _tlds[0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230] = 'wallet';
         _tlds[0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2] = 'coin';
     }
 
-    /**
-     * Renounce whitelisted account with funds' forwarding
-     */
-    function closeWhitelisted(address payable receiver)
-        external
-        payable
-        onlyWhitelisted
-    {
-        require(receiver != address(0x0), 'MintingManager: RECEIVER_IS_EMPTY');
-
-        renounceWhitelisted();
-        receiver.transfer(msg.value);
-    }
-
-    /**
-     * Replace whitelisted account by new account with funds' forwarding
-     */
-    function rotateWhitelisted(address payable receiver)
-        external
-        payable
-        onlyWhitelisted
-    {
-        require(receiver != address(0x0), 'MintingManager: RECEIVER_IS_EMPTY');
-
-        _addWhitelisted(receiver);
-        renounceWhitelisted();
-        receiver.transfer(msg.value);
-    }
-
     function mintSLD(address to, uint256 tld, string calldata label)
         external
         override
-        onlyWhitelisted
+        onlyMinter
     {
         _registry.mintSLD(to, tld, label);
     }
@@ -94,7 +65,7 @@ contract MintingManager is IMintingManager, BulkWhitelistedRole {
     function safeMintSLD(address to, uint256 tld, string calldata label)
         external
         override
-        onlyWhitelisted
+        onlyMinter
     {
         _registry.safeMintSLD(to, tld, label);
     }
@@ -104,7 +75,7 @@ contract MintingManager is IMintingManager, BulkWhitelistedRole {
         uint256 tld,
         string calldata label,
         bytes calldata _data
-    ) external override onlyWhitelisted {
+    ) external override onlyMinter {
         _registry.safeMintSLD(to, tld, label, _data);
     }
 
@@ -114,7 +85,7 @@ contract MintingManager is IMintingManager, BulkWhitelistedRole {
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyWhitelisted {
+    ) external override onlyMinter {
         _registry.mintSLDWithRecords(to, tld, label, keys, values);
     }
 
@@ -131,12 +102,9 @@ contract MintingManager is IMintingManager, BulkWhitelistedRole {
         uint256 tld,
         string calldata label,
         string[] calldata keys,
-        string[] calldata values)
-        external
-        override
-    {
-        string memory labelWithPrefix = string(abi.encodePacked(DOMAIN_NAME_PREFIX, label));
-        _registry.mintSLDWithRecords(to, tld, labelWithPrefix, keys, values);
+        string[] calldata values
+    ) external override {
+        _registry.mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
     }
 
     /**
@@ -172,7 +140,7 @@ contract MintingManager is IMintingManager, BulkWhitelistedRole {
             .toEthSignedMessageHash()
             .recover(signature);
         require(signer != address(0), 'MintingManager: SIGNATURE_IS_INVALID');
-        require(isWhitelisted(signer), 'MintingManager: SIGNER_IS_NOT_WHITELISTED');
+        require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
     }
 
     function verifyCall(bytes memory data) private pure returns(bytes4 sig) {
@@ -189,8 +157,11 @@ contract MintingManager is IMintingManager, BulkWhitelistedRole {
         require(isSupported, 'MintingManager: UNSUPPORTED_CALL');
     }
 
-    function _claimSLD(address to, uint256 tld, string memory label) private {
-        string memory labelWithPrefix = string(abi.encodePacked(DOMAIN_NAME_PREFIX, label));
-        _registry.mintSLD(to, tld, labelWithPrefix);
+    function _claimSLD(address to, uint256 tld, string calldata label) private {
+        _registry.mintSLD(to, tld, _freeSLDLabel(label));
+    }
+
+    function _freeSLDLabel(string calldata label) private pure returns(string memory) {
+        return string(abi.encodePacked(FREE_DOMAIN_NAME_PREFIX, label));
     }
 }
