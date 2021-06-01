@@ -13,7 +13,7 @@ describe('Registry (proxy)', () => {
     root = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
 
     registry = await upgrades.deployProxy(Registry, [coinbase], { initializer: 'initialize' });
-    await registry.mint('0xdead000000000000000000000000000000000000', root);
+    await registry.mintTLD('0xdead000000000000000000000000000000000000', root);
     await registry.setTokenURIPrefix('/');
   })
 

@@ -89,10 +89,6 @@ async function main() {
   console.log("FreeMinter deployed to:", freeMinter.address);
   await registry.addMinter(freeMinter.address);
 
-  if (network === 'live') {
-    await registry.renounceMinter();
-  }
-
   console.log('Migrated!');
 }
 

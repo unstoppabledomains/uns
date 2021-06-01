@@ -20,7 +20,7 @@ describe('Registry', () => {
 
     registry = await Registry.deploy();
     await registry.initialize(coinbase.address);
-    await registry.mint('0xdead000000000000000000000000000000000000', root);
+    await registry.mintTLD('0xdead000000000000000000000000000000000000', root);
     await registry.setTokenURIPrefix('/');
   })
 
@@ -447,9 +447,7 @@ describe('Registry', () => {
           values: ['value1']
         }
 
-        const excluded = [
-          'mint'
-        ];
+        const excluded = ['mintTLD'];
 
         const getFuncs = () => {
           return registryFuncs()
@@ -485,7 +483,8 @@ describe('Registry', () => {
 
         it('should revert execution of all token-based functions when used signature', async () => {
           for(const func of getFuncs()) {
-            const funcSigHash = utils.id(`${funcFragmentToSig(func)}_doubleUse`);
+            const funcSig = funcFragmentToSig(func)
+            const funcSigHash = utils.id(`${funcSig}_doubleUse`);
             paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
             await mintToken(owner, funcSigHash);
 
@@ -554,10 +553,6 @@ describe('Registry', () => {
         const excluded = [
           'execute',
           'initialize',
-          'renounceMinter',     // might influence tests
-          'renounceRole',       // might influence tests
-          'grantRole',          // requires Default Admin role
-          'revokeRole',         // requires Default Admin role
           'transferOwnership',  // might influence tests
           'renounceOwnership',  // might influence tests
         ];

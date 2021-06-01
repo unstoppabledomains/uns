@@ -48,11 +48,6 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
         _addWhitelisted(address(this));
     }
 
-    // NOTE: deprecated
-    function renounceMinter() external onlyWhitelistAdmin {
-        // _registry.renounceMinter();
-    }
-
     /**
      * Renounce whitelisted account with funds' forwarding
      */
@@ -85,7 +80,7 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
     // NOTE: temp function
     function mint() external onlyWhitelistAdmin {
         // .crypto
-        _registry.mint(address(0xdead), 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f);
+        _registry.mintTLD(address(0xdead), 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f);
     }
 
     function mintSLD(address to, uint256 tld, string calldata label)

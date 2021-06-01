@@ -45,22 +45,6 @@ contract('WhitelistedMinter', function([coinbase, faucet, ...accounts]) {
     await whitelistedMinter.mint();
   })
 
-  describe.skip('renounce minter', () => {
-    it('revert when renouncing by non-admin', async () => {
-      await expect(
-        whitelistedMinter.renounceMinter({from: accounts[0]})
-      ).to.be.revertedWith('WhitelistedRole: CALLER_IS_NOT_ADMIN');
-    })
-
-    it('revert minting when minter has been renounced', async () => {
-      await whitelistedMinter.renounceMinter({from: coinbase})
-
-      await expect(
-        whitelistedMinter.safeMintSLD(coinbase, 'label')
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-    })
-  })
-
   describe('close whitelisted account', () => {
     it('revert when closing by non-whitelisted account', async () => {
       await expect(

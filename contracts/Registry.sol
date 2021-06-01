@@ -76,8 +76,7 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, OwnableUpgradeable, E
 
     /// Minting
 
-    // NOTE: allow to register TLD token
-    function mint(address to, uint256 tokenId) external onlyMintingManager {
+    function mintTLD(address to, uint256 tokenId) external onlyMintingManager {
         _mint(to, tokenId);
     }
 

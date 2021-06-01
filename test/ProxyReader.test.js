@@ -51,7 +51,7 @@ describe('ProxyReader', () => {
       * bytes4(keccak256(abi.encodePacked('isApprovedOrOwner(address,uint256)'))) == 0x430c2081
       * bytes4(keccak256(abi.encodePacked('resolverOf(uint256)'))) == 0xb3f9e4cb
       * bytes4(keccak256(abi.encodePacked('childIdOf(uint256,string)'))) == 0x68b62d32
-      * bytes4(keccak256(abi.encodePacked('isController(address)'))) == 0xb429afeb
+      * bytes4(keccak256(abi.encodePacked('owner()'))) == 0x8da5cb5b
       * bytes4(keccak256(abi.encodePacked('balanceOf(address)'))) == 0x70a08231
       * bytes4(keccak256(abi.encodePacked('ownerOf(uint256)'))) == 0x6352211e
       * bytes4(keccak256(abi.encodePacked('getApproved(uint256)'))) == 0x081812fc
@@ -59,10 +59,10 @@ describe('ProxyReader', () => {
       * bytes4(keccak256(abi.encodePacked('root()'))) == 0xebf0c717
       *
       * => 0x06fdde03 ^ 0x95d89b41 ^ 0xc87b56dd ^ 0x430c2081 ^
-      *    0xb3f9e4cb ^ 0x68b62d32 ^ 0xb429afeb ^ 0x70a08231 ^
-      *    0x6352211e ^ 0x081812fc ^ 0xe985e9c5 ^ 0xebf0c717 == 0x6eabca0d
+      *    0xb3f9e4cb ^ 0x68b62d32 ^ 0x8da5cb5b ^ 0x70a08231 ^
+      *    0x6352211e ^ 0x081812fc ^ 0xe985e9c5 ^ 0xebf0c717 == 0x5727aebd
       */
-      const isSupport = await proxy.supportsInterface('0x6eabca0d');
+      const isSupport = await proxy.supportsInterface('0x5727aebd');
       assert.isTrue(isSupport);
     });
 
@@ -102,9 +102,10 @@ describe('ProxyReader', () => {
       assert.equal(result.toString(), expected.toString());
     });
 
-    it('should proxy isController call', async () => {
-      const result = await proxy.isController(accounts[0]);
-      assert.equal(result, false);
+    it('should proxy owner call', async () => {
+      const result = await proxy.owner();
+      const expected = await registry.owner();
+      assert.equal(result, expected);
     });
 
     it('should proxy balanceOf call', async () => {
