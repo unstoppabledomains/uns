@@ -4,23 +4,24 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
+import './IMintingManager.sol';
 import '../roles/BulkWhitelistedRole.sol';
-import '../ISLDMinter.sol';
 import '../Registry.sol';
 
 /**
- * @title WhitelistedMinter
+ * @title MintingManager
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
+contract MintingManager is IMintingManager, BulkWhitelistedRole {
     using ECDSAUpgradeable for bytes32;
 
-    event Relayed(address indexed sender, address indexed signer, bytes4 indexed funcSig, bytes32 dataHash);
-
-    string public constant NAME = 'Unstoppable Whitelisted Minter';
-    string public constant VERSION = '0.3.0';
+    string public constant NAME = 'UNS: Minting Manager';
+    string public constant VERSION = '0.1.0';
+    string private constant DOMAIN_NAME_PREFIX = 'udtestdev-';
 
     Registry internal _registry;
+
+    mapping(uint256 => string) internal _tlds;
 
     /**
      * @dev bytes4(keccak256('mintSLD(address,uint256,string)')) == 0xae2ad903
@@ -42,10 +43,15 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
      */
     bytes4 private constant _SIG_MINT_WITH_RECORDS = 0x39ccf4d0;
 
-    constructor(Registry registry_) {
+    function initialize(Registry registry_) public initializer {
         _registry = registry_;
         __WhitelistedRole_init_unchained();
         _addWhitelisted(address(this));
+
+        // uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked('crypto')))))
+        _tlds[0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f] = 'crypto';
+        _tlds[0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230] = 'wallet';
+        _tlds[0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2] = 'coin';
     }
 
     /**
@@ -56,7 +62,7 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
         payable
         onlyWhitelisted
     {
-        require(receiver != address(0x0), 'WhitelistedMinter: RECEIVER_IS_EMPTY');
+        require(receiver != address(0x0), 'MintingManager: RECEIVER_IS_EMPTY');
 
         renounceWhitelisted();
         receiver.transfer(msg.value);
@@ -70,17 +76,11 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
         payable
         onlyWhitelisted
     {
-        require(receiver != address(0x0), 'WhitelistedMinter: RECEIVER_IS_EMPTY');
+        require(receiver != address(0x0), 'MintingManager: RECEIVER_IS_EMPTY');
 
         _addWhitelisted(receiver);
         renounceWhitelisted();
         receiver.transfer(msg.value);
-    }
-
-    // NOTE: temp function
-    function mint() external onlyWhitelistAdmin {
-        // .crypto
-        _registry.mintTLD(address(0xdead), 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f);
     }
 
     function mintSLD(address to, uint256 tld, string calldata label)
@@ -118,6 +118,27 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
         _registry.mintSLDWithRecords(to, tld, label, keys, values);
     }
 
+    function claim(uint256 tld, string calldata label) external override {
+        _claimSLD(_msgSender(), tld, label);
+    }
+
+    function claimTo(address to, uint256 tld, string calldata label) external override {
+        _claimSLD(to, tld, label);
+    }
+
+    function claimToWithRecords(
+        address to,
+        uint256 tld,
+        string calldata label,
+        string[] calldata keys,
+        string[] calldata values)
+        external
+        override
+    {
+        string memory labelWithPrefix = string(abi.encodePacked(DOMAIN_NAME_PREFIX, label));
+        _registry.mintSLDWithRecords(to, tld, labelWithPrefix, keys, values);
+    }
+
     /**
      * Relay allows execute transaction on behalf of whitelisted minter.
      * The function verify signature of call data parameter before execution.
@@ -142,7 +163,7 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
             }
         }
 
-        emit Relayed(msg.sender, signer, funcSig, dataHash);
+        emit Relayed(_msgSender(), signer, funcSig, dataHash);
         return result;
     }
 
@@ -150,8 +171,8 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
         signer = keccak256(abi.encodePacked(data, address(this)))
             .toEthSignedMessageHash()
             .recover(signature);
-        require(signer != address(0), 'WhitelistedMinter: SIGNATURE_IS_INVALID');
-        require(isWhitelisted(signer), 'WhitelistedMinter: SIGNER_IS_NOT_WHITELISTED');
+        require(signer != address(0), 'MintingManager: SIGNATURE_IS_INVALID');
+        require(isWhitelisted(signer), 'MintingManager: SIGNER_IS_NOT_WHITELISTED');
     }
 
     function verifyCall(bytes memory data) private pure returns(bytes4 sig) {
@@ -165,6 +186,11 @@ contract WhitelistedMinter is ISLDMinter, BulkWhitelistedRole {
             sig == _SIG_SAFE_MINT_DATA ||
             sig == _SIG_MINT_WITH_RECORDS;
 
-        require(isSupported, 'WhitelistedMinter: UNSUPPORTED_CALL');
+        require(isSupported, 'MintingManager: UNSUPPORTED_CALL');
+    }
+
+    function _claimSLD(address to, uint256 tld, string memory label) private {
+        string memory labelWithPrefix = string(abi.encodePacked(DOMAIN_NAME_PREFIX, label));
+        _registry.mintSLD(to, tld, labelWithPrefix);
     }
 }
