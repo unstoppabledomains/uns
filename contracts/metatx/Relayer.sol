@@ -29,8 +29,8 @@ abstract contract Relayer is ContextUpgradeable {
             funcSig := mload(add(_data, add(0x20, 0)))
         }
 
-        verifySigner(signer);
-        verifyCall(funcSig, data);
+        _verifyRelaySigner(signer);
+        _verifyRelayCall(funcSig, data);
 
         /* solium-disable-next-line security/no-low-level-calls */
         (bool success, bytes memory result) = address(this).call(data);
@@ -48,10 +48,10 @@ abstract contract Relayer is ContextUpgradeable {
         return result;
     }
 
-    function verifySigner(address signer) internal view virtual {
+    function _verifyRelaySigner(address signer) internal view virtual {
         require(signer != address(0), 'Relayer: SIGNATURE_IS_INVALID');
     }
 
-    function verifyCall(bytes4 funcSig, bytes calldata data) internal pure virtual {
+    function _verifyRelayCall(bytes4 funcSig, bytes calldata data) internal pure virtual {
     }
 }

@@ -51,6 +51,8 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         _registry = registry_;
         __Ownable_init_unchained();
         __MinterRole_init_unchained();
+
+        // Relayer is required to be a minter
         _addMinter(address(this));
 
         _tlds[0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f] = 'crypto';
@@ -113,18 +115,18 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         _registry.mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
     }
 
-    function verifySigner(address signer) internal view override {
-        super.verifySigner(signer);
+    function _verifyRelaySigner(address signer) internal view override {
+        super._verifyRelaySigner(signer);
         require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
     }
 
-    function verifyCall(bytes4 funcSig, bytes calldata) internal pure override {
+    function _verifyRelayCall(bytes4 funcSig, bytes calldata) internal pure override {
         bool isSupported = funcSig == _SIG_MINT ||
             funcSig == _SIG_SAFE_MINT ||
             funcSig == _SIG_SAFE_MINT_DATA ||
             funcSig == _SIG_MINT_WITH_RECORDS;
 
-        require(isSupported, 'MintingManager: UNSUPPORTED_CALL');
+        require(isSupported, 'MintingManager: UNSUPPORTED_RELAY_CALL');
     }
 
     function _claimSLD(address to, uint256 tld, string calldata label) private {
