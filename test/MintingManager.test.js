@@ -1,5 +1,5 @@
 const { assert } = require('chai');
-const { ZERO_ADDRESS } = require('../helpers/constants');
+const { ZERO_ADDRESS } = require('./helpers/constants');
 
 const { utils, BigNumber } = ethers;
 
@@ -27,8 +27,8 @@ describe('MintingManager', () => {
     signers = await ethers.getSigners();
 
     Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
-    CryptoRegistry = await ethers.getContractFactory('CryptoRegistry');
-    MintingManager = await ethers.getContractFactory('MintingManager');
+    CryptoRegistry = await ethers.getContractFactory('dot-crypto/contracts/Registry.sol:Registry');
+    MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
   })
 
   describe('IClaimer', () => {
@@ -428,7 +428,7 @@ describe('MintingManager', () => {
       await cryptoRegistry.addController(mintingManager.address);
     })
 
-    it('mint .crypto domain in CNS registry', async () => {
+    it('should mint .crypto domain in CNS registry', async () => {
       await mintingManager['mintSLD(address,uint256,string)'](coinbase.address, cryptoRoot, 'test-m12');
 
       const tokenId = await cryptoRegistry.childIdOf(cryptoRoot, 'test-m12');
@@ -436,7 +436,7 @@ describe('MintingManager', () => {
       await expect(registry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
     })
 
-    it('mint .wallet domain in UNS registry', async () => {
+    it('should mint .wallet domain in UNS registry', async () => {
       await mintingManager['mintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'test-m241');
 
       const tokenId = await cryptoRegistry.childIdOf(walletRoot, 'test-m241');
