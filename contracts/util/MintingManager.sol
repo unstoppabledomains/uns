@@ -6,15 +6,14 @@ import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.
 
 import './IMintingManager.sol';
 import '../roles/MinterRole.sol';
+import '../metatx/Relayer.sol';
 import '../Registry.sol';
 
 /**
  * @title MintingManager
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract MintingManager is IMintingManager, MinterRole {
-    using ECDSAUpgradeable for bytes32;
-
+contract MintingManager is IMintingManager, MinterRole, Relayer {
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.1.0';
     string private constant FREE_DOMAIN_NAME_PREFIX = 'udtestdev-';
@@ -107,52 +106,16 @@ contract MintingManager is IMintingManager, MinterRole {
         _registry.mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
     }
 
-    /**
-     * Relay allows execute transaction on behalf of whitelisted minter.
-     * The function verify signature of call data parameter before execution.
-     * It allows anybody send transaction on-chain when minter has provided proper parameters.
-     * The function allows to relaying calls of fixed functions. The restriction defined in function `verifyCall`
-     */
-    function relay(bytes calldata data, bytes calldata signature) external returns(bytes memory) {
-        bytes32 dataHash = keccak256(data);
-        address signer = verifySigner(dataHash, signature);
-        bytes memory _data = data;
-        bytes4 funcSig = verifyCall(_data);
-
-        /* solium-disable-next-line security/no-low-level-calls */
-        (bool success, bytes memory result) = address(this).call(data);
-        if (success == false) {
-            /* solium-disable-next-line security/no-inline-assembly */
-            assembly {
-                let ptr := mload(0x40)
-                let size := returndatasize()
-                returndatacopy(ptr, 0, size)
-                revert(ptr, size)
-            }
-        }
-
-        emit Relayed(_msgSender(), signer, funcSig, dataHash);
-        return result;
-    }
-
-    function verifySigner(bytes32 data, bytes memory signature) private view returns(address signer) {
-        signer = keccak256(abi.encodePacked(data, address(this)))
-            .toEthSignedMessageHash()
-            .recover(signature);
-        require(signer != address(0), 'MintingManager: SIGNATURE_IS_INVALID');
+    function verifySigner(address signer) internal view override {
+        super.verifySigner(signer);
         require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
     }
 
-    function verifyCall(bytes memory data) private pure returns(bytes4 sig) {
-        /* solium-disable-next-line security/no-inline-assembly */
-        assembly {
-            sig := mload(add(data, add(0x20, 0)))
-        }
-
-        bool isSupported = sig == _SIG_MINT ||
-            sig == _SIG_SAFE_MINT ||
-            sig == _SIG_SAFE_MINT_DATA ||
-            sig == _SIG_MINT_WITH_RECORDS;
+    function verifyCall(bytes4 funcSig, bytes calldata) internal pure override {
+        bool isSupported = funcSig == _SIG_MINT ||
+            funcSig == _SIG_SAFE_MINT ||
+            funcSig == _SIG_SAFE_MINT_DATA ||
+            funcSig == _SIG_MINT_WITH_RECORDS;
 
         require(isSupported, 'MintingManager: UNSUPPORTED_CALL');
     }
