@@ -29,16 +29,29 @@ if (argv.enableContractSizer) {
  */
 module.exports = {
   solidity: {
-    version: '0.8.0',
-    metadata: {
-      bytecodeHash: 'none',
-    },
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200,
+    compilers: [
+      {
+        version: '0.5.12',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
       },
-    },
+      {
+        version: '0.8.0',
+        metadata: {
+          bytecodeHash: 'none',
+        },
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      }
+    ],
   },
   networks: {
     hardhat: {

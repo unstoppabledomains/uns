@@ -14,7 +14,7 @@ describe('ProxyReader', () => {
     signers = await ethers.getSigners();
     [coinbase, ...accounts] = signers.map(s => s.address);
 
-    Registry = await ethers.getContractFactory('Registry');
+    Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
     ProxyReader = await ethers.getContractFactory('ProxyReader');
 
     registry = await Registry.deploy();

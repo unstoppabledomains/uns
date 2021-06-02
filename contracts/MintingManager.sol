@@ -5,9 +5,10 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
 import './IMintingManager.sol';
-import '../roles/MinterRole.sol';
-import '../metatx/Relayer.sol';
-import '../Registry.sol';
+import './ISLDMinter.sol';
+import './metatx/Relayer.sol';
+import './roles/MinterRole.sol';
+import './cns/ICryptoSLDMinter.sol';
 
 /**
  * @title MintingManager
@@ -18,7 +19,8 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
     string public constant VERSION = '0.1.0';
     string private constant FREE_DOMAIN_NAME_PREFIX = 'udtestdev-';
 
-    Registry internal _registry;
+    ISLDMinter internal _unsMinter;
+    ICryptoSLDMinter internal _cryptoMinter;
 
     mapping(uint256 => string) internal _tlds;
 
@@ -47,8 +49,10 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         _;
     }
 
-    function initialize(Registry registry_) public initializer {
-        _registry = registry_;
+    function initialize(ISLDMinter unsMinter, ICryptoSLDMinter cryptoMinter) public initializer {
+        _unsMinter = unsMinter;
+        _cryptoMinter = cryptoMinter;
+
         __Ownable_init_unchained();
         __MinterRole_init_unchained();
 
@@ -66,7 +70,11 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         onlyMinter
         validTld(tld)
     {
-        _registry.mintSLD(to, tld, label);
+        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            _cryptoMinter.controlledMintChild(to, tld, label);
+        } else {
+            _unsMinter.mintSLD(to, tld, label);
+        }
     }
 
     function safeMintSLD(address to, uint256 tld, string calldata label)
@@ -75,7 +83,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         onlyMinter
         validTld(tld)
     {
-        _registry.safeMintSLD(to, tld, label);
+        _unsMinter.safeMintSLD(to, tld, label);
     }
 
     function safeMintSLD(
@@ -84,7 +92,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         string calldata label,
         bytes calldata _data
     ) external override onlyMinter validTld(tld) {
-        _registry.safeMintSLD(to, tld, label, _data);
+        _unsMinter.safeMintSLD(to, tld, label, _data);
     }
 
     function mintSLDWithRecords(
@@ -94,7 +102,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         string[] calldata keys,
         string[] calldata values
     ) external override onlyMinter validTld(tld) {
-        _registry.mintSLDWithRecords(to, tld, label, keys, values);
+        _unsMinter.mintSLDWithRecords(to, tld, label, keys, values);
     }
 
     function claim(uint256 tld, string calldata label) external override validTld(tld) {
@@ -112,7 +120,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         string[] calldata keys,
         string[] calldata values
     ) external override validTld(tld) {
-        _registry.mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
+        _unsMinter.mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
     }
 
     function _verifyRelaySigner(address signer) internal view override {
@@ -130,7 +138,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
     }
 
     function _claimSLD(address to, uint256 tld, string calldata label) private {
-        _registry.mintSLD(to, tld, _freeSLDLabel(label));
+        _unsMinter.mintSLD(to, tld, _freeSLDLabel(label));
     }
 
     function _freeSLDLabel(string calldata label) private pure returns(string memory) {
