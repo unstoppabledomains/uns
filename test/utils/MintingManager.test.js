@@ -125,35 +125,35 @@ describe('MintingManager', () => {
           mintingManager.connect(receiver).closeMinter(receiver.address)
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
       })
-  
+
       it('revert when zero account', async () => {
         await expect(
           mintingManager.closeMinter(ZERO_ADDRESS)
         ).to.be.revertedWith('MinterRole: RECEIVER_IS_EMPTY');
       })
-  
+
       it('close minter without forwarding funds', async () => {
         const initBalance = await faucet.getBalance();
         await mintingManager.closeMinter(faucet.address, { value: 0 });
-  
+
         await expect(
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label')
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-  
+
         const actualBalance = await faucet.getBalance();
         assert.equal(actualBalance, initBalance.toString());
       })
-  
+
       it('close minter with forwarding funds', async () => {
         const value = 1
         const initBalance = await faucet.getBalance()
-  
+
         await mintingManager.closeMinter(faucet.address, { value })
-  
+
         await expect(
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label')
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-  
+
         const actualBalance = await faucet.getBalance()
         const expectedBalance = BigNumber.from(initBalance).add(value)
         assert.equal(actualBalance, expectedBalance.toString())
@@ -166,31 +166,31 @@ describe('MintingManager', () => {
           mintingManager.connect(receiver).rotateMinter(receiver.address)
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
       })
-  
+
       it('revert when zero account', async () => {
         await expect(
           mintingManager.rotateMinter(ZERO_ADDRESS)
         ).to.be.revertedWith('MinterRole: RECEIVER_IS_EMPTY');
       })
-  
+
       it('rotate minter without defining value', async () => {
         const initBalance = await receiver.getBalance()
-  
+
         await mintingManager.rotateMinter(receiver.address)
-  
+
         await expect(
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label')
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-  
+
         const actualBalance = await receiver.getBalance()
         assert.equal(actualBalance, initBalance.toString())
       })
-  
+
       it('rotate minter without forwarding funds', async () => {
         const initBalance = await receiver.getBalance()
-  
+
         await mintingManager.rotateMinter(receiver.address, { value: 0 })
-  
+
         await expect(
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label')
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
@@ -198,13 +198,13 @@ describe('MintingManager', () => {
         const actualBalance = await receiver.getBalance()
         assert.equal(actualBalance, initBalance.toString())
       })
-  
+
       it('rotate minter with forwarding funds', async () => {
         const value = 3
         const initBalance = await receiver.getBalance()
-  
+
         await mintingManager.rotateMinter(receiver.address, { value })
-  
+
         await expect(
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label')
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
@@ -221,7 +221,13 @@ describe('MintingManager', () => {
           mintingManager.connect(receiver).mintSLD(coinbase.address, root, 'test-1ka')
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
       })
-  
+
+      it('revert minting when tld is invalid', async () => {
+        await expect(
+          mintingManager.mintSLD(coinbase.address, 0, 'test-1ka3')
+        ).to.be.revertedWith('MintingManager: TLD_NOT_VALID');
+      })
+
       it('mint domain', async () => {
         await mintingManager.mintSLD(coinbase.address, root, 'test-1dp')
         const tokenId = await registry.childIdOf(root, 'test-1dp')
@@ -237,7 +243,13 @@ describe('MintingManager', () => {
           mintingManager.connect(receiver)[funcSig](coinbase.address, root, 'test-2oa')
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
       })
-  
+
+      it('revert safe minting when tld is invalid', async () => {
+        await expect(
+          mintingManager.mintSLD(coinbase.address, 0, 'test-2oa32')
+        ).to.be.revertedWith('MintingManager: TLD_NOT_VALID');
+      })
+
       it('safe mint domain', async () => {
         await mintingManager[funcSig](coinbase.address, root, 'test-2oa')
         const tokenId = await registry.childIdOf(root, 'test-2oa')
@@ -253,10 +265,16 @@ describe('MintingManager', () => {
           mintingManager.connect(receiver)[funcSig](coinbase.address, root, 'test-3oa', '0x')
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
       })
-  
+
+      it('revert safe minting when tld is invalid', async () => {
+        await expect(
+          mintingManager[funcSig](coinbase.address, 0, 'test-3oa23', '0x')
+        ).to.be.revertedWith('MintingManager: TLD_NOT_VALID');
+      })
+
       it('safe mint domain', async () => {
         await mintingManager[funcSig](coinbase.address, root, 'test-3oa', '0x')
-  
+
         const tokenId = await registry.childIdOf(root, 'test-3oa')
         assert.equal(await registry.ownerOf(tokenId), coinbase.address)
       })
@@ -274,7 +292,7 @@ describe('MintingManager', () => {
           mintingManager.connect(receiver).relay(data, signature)
         ).to.be.revertedWith('MintingManager: SIGNER_IS_NOT_MINTER');
       })
-  
+
       it('revert relay meta-mint when signature is empty', async () => {
         const data = mintingManager.interface.encodeFunctionData(
           'mintSLD(address,uint256,string)',
@@ -285,7 +303,7 @@ describe('MintingManager', () => {
           mintingManager.connect(receiver).relay(data, '0x')
         ).to.be.revertedWith('ECDSA: invalid signature length');
       })
-  
+
       it('relay meta-safe mint', async () => {
         const data = mintingManager.interface.encodeFunctionData(
           'safeMintSLD(address,uint256,string)',
@@ -300,7 +318,7 @@ describe('MintingManager', () => {
         const tokenId = await registry.childIdOf(root, 'test-p1-p1sapr')
         assert.equal(await registry.ownerOf(tokenId), receiver.address);
       })
-  
+
       it('relay meta-safe mint with data', async () => {
         const data = mintingManager.interface.encodeFunctionData(
           'safeMintSLD(address,uint256,string,bytes)',
@@ -315,7 +333,7 @@ describe('MintingManager', () => {
         const tokenId = await registry.childIdOf(root, 'test-p1-p1saor')
         assert.equal(await registry.ownerOf(tokenId), receiver.address)
       })
-  
+
       it('relay meta-mint with records', async () => {
         const data = mintingManager.interface.encodeFunctionData(
           'mintSLDWithRecords(address,uint256,string,string[],string[])',
@@ -336,7 +354,7 @@ describe('MintingManager', () => {
       function percDiff(a, b) {
         return -((a - b) / a) * 100
       }
-  
+
       const getCases = () => {
         return [
           {
@@ -356,10 +374,10 @@ describe('MintingManager', () => {
           },
         ]
       }
-  
+
       it('Consumption', async () => {
         const result = []
-  
+
         const cases = getCases()
         for (let i = 0; i < cases.length; i++) {
           const {funcSig, params} = cases[i]

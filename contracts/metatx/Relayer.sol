@@ -49,7 +49,7 @@ abstract contract Relayer is ContextUpgradeable {
     }
 
     function verifySigner(address signer) internal view virtual {
-        require(signer != address(0), 'MintingManager: SIGNATURE_IS_INVALID');
+        require(signer != address(0), 'Relayer: SIGNATURE_IS_INVALID');
     }
 
     function verifyCall(bytes4 funcSig, bytes calldata data) internal pure virtual {

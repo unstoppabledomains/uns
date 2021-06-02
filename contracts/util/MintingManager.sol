@@ -42,6 +42,11 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
      */
     bytes4 private constant _SIG_MINT_WITH_RECORDS = 0x39ccf4d0;
 
+    modifier validTld(uint256 tld) {
+        require(bytes(_tlds[tld]).length > 0, 'MintingManager: TLD_NOT_VALID');
+        _;
+    }
+
     function initialize(Registry registry_) public initializer {
         _registry = registry_;
         __Ownable_init_unchained();
@@ -57,6 +62,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         external
         override
         onlyMinter
+        validTld(tld)
     {
         _registry.mintSLD(to, tld, label);
     }
@@ -65,6 +71,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         external
         override
         onlyMinter
+        validTld(tld)
     {
         _registry.safeMintSLD(to, tld, label);
     }
@@ -74,7 +81,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         uint256 tld,
         string calldata label,
         bytes calldata _data
-    ) external override onlyMinter {
+    ) external override onlyMinter validTld(tld) {
         _registry.safeMintSLD(to, tld, label, _data);
     }
 
@@ -84,15 +91,15 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMinter {
+    ) external override onlyMinter validTld(tld) {
         _registry.mintSLDWithRecords(to, tld, label, keys, values);
     }
 
-    function claim(uint256 tld, string calldata label) external override {
+    function claim(uint256 tld, string calldata label) external override validTld(tld) {
         _claimSLD(_msgSender(), tld, label);
     }
 
-    function claimTo(address to, uint256 tld, string calldata label) external override {
+    function claimTo(address to, uint256 tld, string calldata label) external override validTld(tld) {
         _claimSLD(to, tld, label);
     }
 
@@ -102,7 +109,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override {
+    ) external override validTld(tld) {
         _registry.mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
     }
 
