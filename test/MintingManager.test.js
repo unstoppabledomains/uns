@@ -27,7 +27,7 @@ describe('MintingManager', () => {
     signers = await ethers.getSigners();
 
     Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
-    CryptoRegistry = await ethers.getContractFactory('dot-crypto/contracts/Registry.sol:Registry');
+    CryptoRegistry = await ethers.getContractFactory('contracts/cns/CryptoRegistry.sol:CryptoRegistry');
     MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
   })
 
