@@ -411,6 +411,83 @@ describe('MintingManager', () => {
     })
   })
 
+  describe('Tld-based claiming', () => {
+    before(async () => {
+      [coinbase] = signers;
+    })
+
+    beforeEach(async () => {
+      registry = await Registry.deploy();
+
+      cryptoRegistry = await CryptoRegistry.deploy();
+      cryptoMintingController = await CryptoMintingController.deploy(cryptoRegistry.address);
+      await cryptoRegistry.addController(cryptoMintingController.address);
+
+      mintingManager = await MintingManager.deploy();
+      await mintingManager.initialize(registry.address, cryptoMintingController.address);
+      await mintingManager.addMinter(coinbase.address);
+
+      await registry.initialize(mintingManager.address);
+      await registry.setTokenURIPrefix('/');
+
+      await cryptoMintingController.addMinter(mintingManager.address);
+    })
+
+    describe('claim(uint256,string)', () => {
+      it('should claim .crypto domain in CNS registry', async () => {
+        await mintingManager['claim(uint256,string)'](cryptoRoot, 'test-c221');
+
+        const tokenId = await cryptoRegistry.childIdOf(cryptoRoot, `${DomainNamePrefix}test-c221`);
+        expect(await cryptoRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
+        await expect(registry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+
+      it('should claim .wallet domain in UNS registry', async () => {
+        await mintingManager['claim(uint256,string)'](walletRoot, 'test-c029');
+
+        const tokenId = await cryptoRegistry.childIdOf(walletRoot, `${DomainNamePrefix}test-c029`);
+        assert.equal(await registry.ownerOf(tokenId), coinbase.address);
+        await expect(cryptoRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+    })
+
+    describe('claimTo(address,uint256,string)', () => {
+      it('should claim .crypto domain in CNS registry', async () => {
+        await mintingManager['claimTo(address,uint256,string)'](coinbase.address, cryptoRoot, 'test-c221');
+
+        const tokenId = await cryptoRegistry.childIdOf(cryptoRoot, `${DomainNamePrefix}test-c221`);
+        expect(await cryptoRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
+        await expect(registry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+
+      it('should claim .wallet domain in UNS registry', async () => {
+        await mintingManager['claimTo(address,uint256,string)'](coinbase.address, walletRoot, 'test-c029');
+
+        const tokenId = await cryptoRegistry.childIdOf(walletRoot, `${DomainNamePrefix}test-c029`);
+        assert.equal(await registry.ownerOf(tokenId), coinbase.address);
+        await expect(cryptoRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+    })
+
+    describe('claimToWithRecords(address,uint256,string,string[],string[])', () => {
+      it('revert claim with records .crypto domain in CNS registry', async () => {
+        await expect(
+          mintingManager['claimToWithRecords(address,uint256,string,string[],string[])']
+            (coinbase.address, cryptoRoot, `${DomainNamePrefix}test-c039`, [], [])
+        ).to.be.revertedWith('MintingManager: UNSUPPORTED_CALL');
+      })
+
+      it('should claim with records .wallet domain in UNS registry', async () => {
+        await mintingManager['claimToWithRecords(address,uint256,string,string[],string[])']
+          (coinbase.address, walletRoot, 'test-c846', [], []);
+
+        const tokenId = await cryptoRegistry.childIdOf(walletRoot, `${DomainNamePrefix}test-c846`);
+        assert.equal(await registry.ownerOf(tokenId), coinbase.address);
+        await expect(cryptoRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+    })
+  })
+
   describe('Tld-based minting', () => {
     before(async () => {
       [coinbase] = signers;
@@ -433,20 +510,76 @@ describe('MintingManager', () => {
       await cryptoMintingController.addMinter(mintingManager.address);
     })
 
-    it('should mint .crypto domain in CNS registry', async () => {
-      await mintingManager['mintSLD(address,uint256,string)'](coinbase.address, cryptoRoot, 'test-m12');
+    describe('mintSLD(address,uint256,string)', () => {
+      it('should mint .crypto domain in CNS registry', async () => {
+        await mintingManager['mintSLD(address,uint256,string)'](coinbase.address, cryptoRoot, 'test-m12');
 
-      const tokenId = await cryptoRegistry.childIdOf(cryptoRoot, 'test-m12');
-      expect(await cryptoRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
-      await expect(registry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+        const tokenId = await cryptoRegistry.childIdOf(cryptoRoot, 'test-m12');
+        expect(await cryptoRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
+        await expect(registry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+
+      it('should mint .wallet domain in UNS registry', async () => {
+        await mintingManager['mintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'test-m241');
+
+        const tokenId = await cryptoRegistry.childIdOf(walletRoot, 'test-m241');
+        assert.equal(await registry.ownerOf(tokenId), coinbase.address);
+        await expect(cryptoRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
     })
 
-    it('should mint .wallet domain in UNS registry', async () => {
-      await mintingManager['mintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'test-m241');
+    describe('safeMintSLD(address,uint256,string)', () => {
+      it('should safe-mint .crypto domain in CNS registry', async () => {
+        await mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, cryptoRoot, 'test-m986');
 
-      const tokenId = await cryptoRegistry.childIdOf(walletRoot, 'test-m241');
-      assert.equal(await registry.ownerOf(tokenId), coinbase.address);
-      await expect(cryptoRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+        const tokenId = await cryptoRegistry.childIdOf(cryptoRoot, 'test-m986');
+        expect(await cryptoRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
+        await expect(registry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+
+      it('should safe-mint .wallet domain in UNS registry', async () => {
+        await mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'test-m675');
+
+        const tokenId = await cryptoRegistry.childIdOf(walletRoot, 'test-m675');
+        assert.equal(await registry.ownerOf(tokenId), coinbase.address);
+        await expect(cryptoRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+    })
+
+    describe('safeMintSLD(address,uint256,string,bytes)', () => {
+      it('should safe-mint .crypto domain in CNS registry', async () => {
+        await mintingManager['safeMintSLD(address,uint256,string,bytes)'](coinbase.address, cryptoRoot, 'test-m636', '0x');
+
+        const tokenId = await cryptoRegistry.childIdOf(cryptoRoot, 'test-m636');
+        expect(await cryptoRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
+        await expect(registry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+
+      it('should safe-mint .wallet domain in UNS registry', async () => {
+        await mintingManager['safeMintSLD(address,uint256,string,bytes)'](coinbase.address, walletRoot, 'test-m999', '0x');
+
+        const tokenId = await cryptoRegistry.childIdOf(walletRoot, 'test-m999');
+        assert.equal(await registry.ownerOf(tokenId), coinbase.address);
+        await expect(cryptoRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+    })
+
+    describe('mintSLDWithRecords(address,uint256,string,bytes)', () => {
+      it('revert mint with records .crypto domain in CNS registry', async () => {
+        await expect(
+          mintingManager['mintSLDWithRecords(address,uint256,string,string[],string[])']
+            (coinbase.address, cryptoRoot, 'test-m110', [], [])
+        ).to.be.revertedWith('MintingManager: UNSUPPORTED_CALL');
+      })
+
+      it('should mint with records .wallet domain in UNS registry', async () => {
+        await mintingManager['mintSLDWithRecords(address,uint256,string,string[],string[])']
+          (coinbase.address, walletRoot, 'test-m771', [], []);
+
+        const tokenId = await cryptoRegistry.childIdOf(walletRoot, 'test-m771');
+        assert.equal(await registry.ownerOf(tokenId), coinbase.address);
+        await expect(cryptoRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
     })
   })
 })

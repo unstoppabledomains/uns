@@ -17,7 +17,6 @@ import './cns/ICryptoSLDMinter.sol';
 contract MintingManager is IMintingManager, MinterRole, Relayer {
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.1.0';
-    string private constant FREE_DOMAIN_NAME_PREFIX = 'udtestdev-';
 
     ISLDMinter internal _unsMinter;
     ICryptoSLDMinter internal _cryptoMinter;
@@ -83,7 +82,11 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         onlyMinter
         validTld(tld)
     {
-        _unsMinter.safeMintSLD(to, tld, label);
+        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            _cryptoMinter.safeMintSLD(to, label);
+        } else {
+            _unsMinter.safeMintSLD(to, tld, label);
+        }
     }
 
     function safeMintSLD(
@@ -92,7 +95,11 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         string calldata label,
         bytes calldata _data
     ) external override onlyMinter validTld(tld) {
-        _unsMinter.safeMintSLD(to, tld, label, _data);
+        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            _cryptoMinter.safeMintSLD(to, label, _data);
+        } else {
+            _unsMinter.safeMintSLD(to, tld, label, _data);
+        }
     }
 
     function mintSLDWithRecords(
@@ -102,7 +109,11 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         string[] calldata keys,
         string[] calldata values
     ) external override onlyMinter validTld(tld) {
-        _unsMinter.mintSLDWithRecords(to, tld, label, keys, values);
+        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            revert('MintingManager: UNSUPPORTED_CALL');
+        } else {
+            _unsMinter.mintSLDWithRecords(to, tld, label, keys, values);
+        }
     }
 
     function claim(uint256 tld, string calldata label) external override validTld(tld) {
@@ -120,7 +131,11 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         string[] calldata keys,
         string[] calldata values
     ) external override validTld(tld) {
-        _unsMinter.mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
+        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            revert('MintingManager: UNSUPPORTED_CALL');
+        } else {
+            _unsMinter.mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
+        }
     }
 
     function _verifyRelaySigner(address signer) internal view override {
@@ -138,10 +153,14 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
     }
 
     function _claimSLD(address to, uint256 tld, string calldata label) private {
-        _unsMinter.mintSLD(to, tld, _freeSLDLabel(label));
+        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            _cryptoMinter.mintSLD(to, _freeSLDLabel(label));
+        } else {
+            _unsMinter.mintSLD(to, tld, _freeSLDLabel(label));
+        }
     }
 
     function _freeSLDLabel(string calldata label) private pure returns(string memory) {
-        return string(abi.encodePacked(FREE_DOMAIN_NAME_PREFIX, label));
+        return string(abi.encodePacked('udtestdev-', label));
     }
 }
