@@ -8,8 +8,8 @@ describe('MintingManager', () => {
   const cryptoRoot = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
   const walletRoot = BigNumber.from('0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230');
 
-  let Registry, CryptoRegistry, MintingManager;
-  let registry, cryptoRegistry, mintingManager;
+  let Registry, CryptoRegistry, CryptoMintingController, MintingManager;
+  let registry, cryptoRegistry, cryptoMintingController, mintingManager;
   let signers, domainSuffix;
 
   const sign = async (data, address, signer) => {
@@ -28,6 +28,7 @@ describe('MintingManager', () => {
 
     Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
     CryptoRegistry = await ethers.getContractFactory('contracts/cns/CryptoRegistry.sol:CryptoRegistry');
+    CryptoMintingController = await ethers.getContractFactory('contracts/cns/CryptoMintingController.sol:CryptoMintingController');
     MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
   })
 
@@ -417,15 +418,19 @@ describe('MintingManager', () => {
 
     beforeEach(async () => {
       registry = await Registry.deploy();
+
       cryptoRegistry = await CryptoRegistry.deploy();
+      cryptoMintingController = await CryptoMintingController.deploy(cryptoRegistry.address);
+      await cryptoRegistry.addController(cryptoMintingController.address);
+
       mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(registry.address, cryptoRegistry.address);
+      await mintingManager.initialize(registry.address, cryptoMintingController.address);
       await mintingManager.addMinter(coinbase.address);
 
       await registry.initialize(mintingManager.address);
       await registry.setTokenURIPrefix('/');
 
-      await cryptoRegistry.addController(mintingManager.address);
+      await cryptoMintingController.addMinter(mintingManager.address);
     })
 
     it('should mint .crypto domain in CNS registry', async () => {
