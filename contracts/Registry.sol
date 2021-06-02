@@ -3,46 +3,48 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 
 import './IRegistry.sol';
 import './RecordStorage.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/RegistryForwarder.sol';
-import './roles/ControllerRole.sol';
-import './roles/MinterRole.sol';
 
 /**
  * @title Registry
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContext, RecordStorage, RegistryForwarder, ControllerRole, MinterRole {
+contract Registry is IRegistry, ERC721BurnableUpgradeable, OwnableUpgradeable, ERC2771RegistryContext, RecordStorage, RegistryForwarder {
     using AddressUpgradeable for address;
 
     string internal _prefix;
 
-    // uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked('crypto')))))
-    uint256 private constant _CRYPTO_HASH =
-        0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
+    address internal _mintingManager;
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
         _;
     }
 
-    function initialize() public initializer {
-        __ERC721_init_unchained('.crypto', 'UD');
+    modifier onlyMintingManager() {
+        require(_msgSender() == _mintingManager, 'Registry: SENDER_IS_NOT_MINTING_MANAGER');
+        _;
+    }
+
+    function initialize(address mintingManager_) public initializer {
+        _mintingManager = mintingManager_;
+
+        __ERC721_init_unchained('uns', 'UD');
+        __Ownable_init_unchained();
         __ERC2771RegistryContext_init_unchained();
         __RegistryForwarder_init_unchained();
-        __ControllerRole_init_unchained();
-        __MinterRole_init_unchained();
-        _mint(address(0xdead), _CRYPTO_HASH);
     }
 
     /// ERC721 Metadata extension
 
-    function setTokenURIPrefix(string calldata prefix) external override onlyController {
+    function setTokenURIPrefix(string calldata prefix) external override onlyOwner {
         _prefix = prefix;
         emit NewURIPrefix(prefix);
     }
@@ -63,8 +65,9 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
 
     /// Registry Constants
 
+    // NOTE: obsolete, kept for backward compatibility
     function root() public pure returns (uint256) {
-        return _CRYPTO_HASH;
+        return 0;
     }
 
     function childIdOf(uint256 tokenId, string calldata label) external pure override returns (uint256) {
@@ -73,25 +76,31 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
 
     /// Minting
 
-    function mintSLD(address to, string memory label) external override onlyMinter {
-        _mintChild(to, _CRYPTO_HASH, label);
+    function mintTLD(address to, uint256 tokenId) external onlyMintingManager {
+        _mint(to, tokenId);
     }
 
-    function safeMintSLD(address to, string calldata label) external override onlyMinter {
-        safeMintSLD(to, label, '');
+    function mintSLD(address to, uint256 tld, string memory label) external override onlyMintingManager {
+        _mintChild(to, tld, label);
     }
 
-    function safeMintSLD(address to, string memory label, bytes memory _data) public override onlyMinter {
-        _safeMint(to, _childId(_CRYPTO_HASH, label), _data);
+    function safeMintSLD(address to, uint256 tld, string calldata label) external override onlyMintingManager {
+        safeMintSLD(to, tld, label, '');
     }
 
-    function mintSLDWithRecords(address to, string memory label, string[] memory keys, string[] memory values)
+    function safeMintSLD(address to, uint256 tld, string memory label, bytes memory _data)
+        public override onlyMintingManager
+    {
+        _safeMint(to, _childId(tld, label), _data);
+    }
+
+    function mintSLDWithRecords(address to, uint256 tld, string memory label, string[] memory keys, string[] memory values)
         external
         override
-        onlyMinter
+        onlyMintingManager
     {
-        _mintChild(to, _CRYPTO_HASH, label);
-        _setMany(keys, values, _childId(_CRYPTO_HASH, label));
+        _mintChild(to, tld, label);
+        _setMany(keys, values, _childId(tld, label));
     }
 
     /// Transfering
@@ -180,7 +189,7 @@ contract Registry is IRegistry, ERC721BurnableUpgradeable, ERC2771RegistryContex
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(bytes4 interfaceId)
-        public view override(AccessControlUpgradeable, ERC721Upgradeable, IERC165Upgradeable)
+        public view override(ERC721Upgradeable, IERC165Upgradeable)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);

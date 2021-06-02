@@ -38,7 +38,7 @@ UNS registry smart contracts.
 
     - Major `tokenURI()` difference
 
-      ```
+      ```solidity
       CNS.tokenURI() => prefix ? {prefix}{domain_name} : {domain_name}
 
       UNS.tokenURI() => records['metadata.uri'].value || prefix ? {prefix}{tokin_id} : ''
@@ -50,7 +50,7 @@ UNS registry smart contracts.
 
 5.  Implements IRegistry
 
-    ```
+    ```solidity
     interface IRegistry /_ is IERC721Metadata, ISLDMinter, IRecordStorage _/ {
 
         event NewURIPrefix(string prefix);
@@ -105,17 +105,19 @@ UNS registry smart contracts.
     - `function sync(uint256 tokenId, uint256 updateId) external {}` removed
     - `function resolverOf(uint256 tokenId) external view returns (address) {}` returns registry's address when token exists
     - ~~`function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external {}` added as a controlled function~~ Removed due to removing controllers
-    - `string calldata label` replaced by `bytes32 child` = `keccak256(abi.encodePacked(label))`[#178199979](https://www.pivotaltracker.com/story/show/178199979)
+    - ~~`string calldata label` replaced by `bytes32 child` = `keccak256(abi.encodePacked(label))`[#178199979](https://www.pivotaltracker.com/story/show/178199979)~~ Deprioritized due to backward compatibility
 
 6.  Records Storage
 
     Records Storage early known as Resolver
 
-    ```
+    ```solidity
     interface IRecordStorage {
         event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value);
 
         event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key);
+
+        event ResetRecords(uint256 indexed tokenId);
 
         /**
          * @dev Function to set record.
@@ -157,46 +159,15 @@ UNS registry smart contracts.
 
     ### Ideas:
 
-    1. Remove presets
+    1. `bytes32 key` instead of `string key`
 
-       ```
-       // Mapping from token ID to preset id to key to value
-       mapping (uint256 => mapping (uint256 =>  mapping (string => string))) internal _records;
-
-       // Mapping from token ID to current preset id
-       mapping (uint256 => uint256) internal _presets;
-       ```
-
-       Replace by:
-
-       ```
-       /**
-        * @dev slot -> {key, value}
-        * slot = keccak256(abi.encodePacked(tokenId, owner))
-        */
-       mapping (bytes32 => mapping (string => string)) internal _records;
-       ```
-
-       By this changes token owner will have unique records space for each token. In case of token transfer, new owner will have clean records space by default.
-
-       Pros:
-
-       - less storage, cheaper in a long term
-       - decrease interface complexity, remove functions (reset, reconfigure), contracts size improvement
-
-       Cons:
-
-       - not possible to clean up all records
-
-    2. `bytes32 key` instead of `string key`
-
-       ```
+       ```solidity
        mapping (uint256 => mapping (uint256 =>  mapping (string => string))) internal _records;
        ```
 
        Replace by:
 
-       ```
+       ```solidity
        mapping (uint256 => mapping (uint256 =>  mapping (bytes32 => string))) internal _records;
        ```
 
@@ -219,7 +190,7 @@ UNS registry smart contracts.
 
     In order to support `EIP-2771` recepient should implement `Context`.
 
-    ```
+    ```solidity
     interface Context {
         function _msgSender() internal view returns (address);
         function _msgData() internal view returns (bytes calldata);
@@ -228,7 +199,7 @@ UNS registry smart contracts.
 
     The implementation should allow replacement of `_msgSender` and `_msgData` in case of forwarding.
 
-    ```
+    ```solidity
     abstract contract ERC2771Context is Context {
         function isTrustedForwarder(address forwarder) public view virtual returns(bool) {
             return forwarder == address(this);
@@ -264,7 +235,7 @@ UNS registry smart contracts.
 
     ### Forwarder:
 
-    ```
+    ```solidity
     struct ForwardRequest {
         address from;
         uint256 gas;
@@ -293,7 +264,6 @@ UNS registry smart contracts.
 
     ### TBD:
 
-    - What does `EIP-712: Ethereum typed structured data hashing and signing` bring us?
     - `RegistryForwarder` implementation:
 
       - [design flaw](https://github.com/unstoppabledomains/uns/pull/2/commits/53990cbf9ea6d21a3cd1b299d600786bd0ef84fc#diff-509d7bcab22bd6041f0ee0295fc0c0e9ce606c73aac737abcf5b6f78908e860cR37-R54): `req.tokenId` does not coupled with `req.data.tokenId`, leads to security breach ([solution](https://github.com/unstoppabledomains/uns/pull/2/commits/75c07d061c35a0bbbcc9f54081b0c9bc4e8b99f4#diff-ca840be5bb23f8405058ac3d81aa16ee9bbe19cd811b1d83bd32ef71239d0e20R54))
@@ -321,6 +291,7 @@ UNS registry smart contracts.
 
 10. TLD management
 11. Multicalls
+12. Roles
 
 ## Main stack
 
