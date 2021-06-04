@@ -138,6 +138,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
 
     function burn(uint256 tokenId)
         public
+        override
         onlyApprovedOrOwner(tokenId)
         validForwardedToken(tokenId)
     {
