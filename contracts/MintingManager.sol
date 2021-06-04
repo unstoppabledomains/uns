@@ -2,24 +2,35 @@
 
 pragma solidity ^0.8.0;
 
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
+import './cns/ICryptoResolver.sol';
+import './cns/ICryptoSLDMinter.sol';
 import './IMintingManager.sol';
-import '../roles/MinterRole.sol';
-import '../metatx/Relayer.sol';
-import '../Registry.sol';
+import './IRegistry.sol';
+import './metatx/Relayer.sol';
+import './roles/MinterRole.sol';
 
 /**
  * @title MintingManager
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract MintingManager is IMintingManager, MinterRole, Relayer {
+contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable, MinterRole, Relayer, IMintingManager {
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.1.0';
-    string private constant FREE_DOMAIN_NAME_PREFIX = 'udtestdev-';
 
-    Registry internal _registry;
+    IRegistry public UnsRegistry;
+    ICryptoSLDMinter public CryptoMinter;
+    ICryptoResolver public CryptoResolver;
 
+    /**
+     * @dev Mapping TLD `hashname` to TLD label
+     *
+     * `hashname` = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(label)))))
+     */
     mapping(uint256 => string) internal _tlds;
 
     /**
@@ -47,8 +58,15 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         _;
     }
 
-    function initialize(Registry registry_) public initializer {
-        _registry = registry_;
+    function initialize(
+        IRegistry unsRegistry,
+        ICryptoSLDMinter cryptoMinter,
+        ICryptoResolver cryptoResolver
+    ) public initializer {
+        UnsRegistry = unsRegistry;
+        CryptoMinter = cryptoMinter;
+        CryptoResolver = cryptoResolver;
+
         __Ownable_init_unchained();
         __MinterRole_init_unchained();
 
@@ -66,7 +84,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         onlyMinter
         validTld(tld)
     {
-        _registry.mintSLD(to, tld, label);
+        _mintSLD(to, tld, label);
     }
 
     function safeMintSLD(address to, uint256 tld, string calldata label)
@@ -75,7 +93,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         onlyMinter
         validTld(tld)
     {
-        _registry.safeMintSLD(to, tld, label);
+        _safeMintSLD(to, tld, label, '');
     }
 
     function safeMintSLD(
@@ -84,7 +102,7 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         string calldata label,
         bytes calldata _data
     ) external override onlyMinter validTld(tld) {
-        _registry.safeMintSLD(to, tld, label, _data);
+        _safeMintSLD(to, tld, label, _data);
     }
 
     function mintSLDWithRecords(
@@ -94,15 +112,15 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         string[] calldata keys,
         string[] calldata values
     ) external override onlyMinter validTld(tld) {
-        _registry.mintSLDWithRecords(to, tld, label, keys, values);
+        _mintSLDWithRecords(to, tld, label, keys, values);
     }
 
     function claim(uint256 tld, string calldata label) external override validTld(tld) {
-        _claimSLD(_msgSender(), tld, label);
+        _mintSLD(_msgSender(), tld, _freeSLDLabel(label));
     }
 
     function claimTo(address to, uint256 tld, string calldata label) external override validTld(tld) {
-        _claimSLD(to, tld, label);
+        _mintSLD(to, tld, _freeSLDLabel(label));
     }
 
     function claimToWithRecords(
@@ -112,7 +130,11 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         string[] calldata keys,
         string[] calldata values
     ) external override validTld(tld) {
-        _registry.mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
+        _mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
+    }
+
+    function setResolver(address resolver) external onlyOwner {
+        CryptoResolver = ICryptoResolver(resolver);
     }
 
     function _verifyRelaySigner(address signer) internal view override {
@@ -129,11 +151,49 @@ contract MintingManager is IMintingManager, MinterRole, Relayer {
         require(isSupported, 'MintingManager: UNSUPPORTED_RELAY_CALL');
     }
 
-    function _claimSLD(address to, uint256 tld, string calldata label) private {
-        _registry.mintSLD(to, tld, _freeSLDLabel(label));
+    function _mintSLD(address to, uint256 tld, string memory label) private {
+        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            CryptoMinter.mintSLD(to, label);
+        } else {
+            UnsRegistry.mintSLD(to, tld, label);
+        }
+    }
+
+    function _safeMintSLD(
+        address to,
+        uint256 tld,
+        string calldata label,
+        bytes memory _data
+    ) private {
+        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            CryptoMinter.safeMintSLD(to, label, _data);
+        } else {
+            UnsRegistry.safeMintSLD(to, tld, label, _data);
+        }
+    }
+
+    function _mintSLDWithRecords(
+        address to,
+        uint256 tld,
+        string memory label,
+        string[] calldata keys,
+        string[] calldata values
+    ) private {
+        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            CryptoMinter.mintSLDWithResolver(to, label, address(CryptoResolver));
+            if(keys.length > 0) {
+                uint256 tokenId = UnsRegistry.childIdOf(tld, label);
+                CryptoResolver.preconfigure(keys, values, tokenId);
+            }
+        } else {
+            UnsRegistry.mintSLDWithRecords(to, tld, label, keys, values);
+        }
     }
 
     function _freeSLDLabel(string calldata label) private pure returns(string memory) {
-        return string(abi.encodePacked(FREE_DOMAIN_NAME_PREFIX, label));
+        return string(abi.encodePacked('udtestdev-', label));
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }

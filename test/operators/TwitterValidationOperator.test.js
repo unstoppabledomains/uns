@@ -23,7 +23,7 @@ describe('TwitterValidationOperator', () => {
       validationRequesterAddress
     ] = signers.map(s => s.address);
 
-    Registry = await ethers.getContractFactory('Registry');
+    Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
     TwitterValidationOperator = await ethers.getContractFactory('TwitterValidationOperator');
     LinkTokenMock = await ethers.getContractFactory('LinkTokenMock');
 
