@@ -26,4 +26,12 @@ interface ICryptoSLDMinter {
      * @param _data bytes data to send along with a safe transfer check
      */
     function safeMintSLD(address to, string calldata label, bytes calldata _data) external;
+
+    /**
+     * @dev Minter function that mints a Second Level Domain (SLD) with resolver.
+     * @param to address to mint the new SLD to.
+     * @param label SLD label to mint.
+     * @param resolver address.
+     */
+    function mintSLDWithResolver(address to, string memory label, address resolver) external;
 }

@@ -16,17 +16,7 @@ UNS registry smart contracts.
 
     Ref: https://eips.ethereum.org/EIPS/eip-165
 
-3.  Implements ERC721Burnable
-
-    ERC721Burnable is an extension of ERC-721
-
-    Ref: https://eips.ethereum.org/EIPS/eip-721
-
-    TBD:
-
-    - Obsolete due to overriding burn function for meta-transactions (`validForwardedToken` guard)
-
-4.  Implements IERC721Metadata
+3.  Implements IERC721Metadata
 
     IERC721Metadata is an extension of ERC-721. IERC721Metadata allows smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
 
@@ -48,7 +38,7 @@ UNS registry smart contracts.
     - `event NewURI(uint256 indexed tokenId, string uri)` removed
     - When `metadata.uri` recond is defined, `tokenURI()` returns value of the record instead of default uri [#178196957](https://www.pivotaltracker.com/story/show/178196957)
 
-5.  Implements IRegistry
+4.  Implements IRegistry
 
     ```solidity
     interface IRegistry /_ is IERC721Metadata, ISLDMinter, IRecordStorage _/ {
@@ -90,6 +80,15 @@ UNS registry smart contracts.
          * @param tokenId uint256 ID of the token to be transferred
          */
         function setOwner(address to, uint256 tokenId) external;
+
+        /**
+        * @dev Burns `tokenId`. See {ERC721-_burn}.
+        *
+        * Requirements:
+        *
+        * - The caller must own `tokenId` or be an approved operator.
+        */
+        function burn(uint256 tokenId) external;
     }
     ```
 
@@ -107,7 +106,7 @@ UNS registry smart contracts.
     - ~~`function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external {}` added as a controlled function~~ Removed due to removing controllers
     - ~~`string calldata label` replaced by `bytes32 child` = `keccak256(abi.encodePacked(label))`[#178199979](https://www.pivotaltracker.com/story/show/178199979)~~ Deprioritized due to backward compatibility
 
-6.  Records Storage
+5.  Records Storage
 
     Records Storage early known as Resolver
 
@@ -180,7 +179,7 @@ UNS registry smart contracts.
        - key max length is 32 characters
        - usage will always require conversion between string and bytes32
 
-7.  Support meta-transactions
+6.  Support meta-transactions
 
     EIP-2771: Secure Protocol for Native Meta Transactions
 
@@ -271,13 +270,13 @@ UNS registry smart contracts.
       - does it make sence to have `req.gas`?
       - do we need `expiry` check?
 
-8.  Controllers
+7.  Controllers
 
     - Removed SignatureController
     - Removed URIPrefixController
     - Removed MintingController
 
-9.  Upgradable registry
+8.  Upgradable registry
 
     TBD:
 
@@ -289,9 +288,21 @@ UNS registry smart contracts.
     - [Writing Upgradeable Contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable)
     - [UUPS Proxies: Tutorial (Solidity + JavaScript)](https://forum.openzeppelin.com/t/uups-proxies-tutorial-solidity-javascript/7786)
 
-10. TLD management
-11. Multicalls
-12. Roles
+9. TLD management
+
+    ```solidity
+    contract IMintingManager is ISLDMinter, IClaimer {
+        /**
+         * @dev Mapping TLD `hashname` to TLD label
+         *
+         * `hashname` = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(label)))))
+         */
+        mapping(uint256 => string) internal _tlds;
+    }
+    ```
+
+10. Multicalls
+11. Roles model
 
 ## Main stack
 

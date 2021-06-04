@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-contract KeyStorage {
+abstract contract KeyStorage {
     mapping (uint256 => string) private _keys;
 
     function getKey(uint256 keyHash) public view virtual returns (string memory) {

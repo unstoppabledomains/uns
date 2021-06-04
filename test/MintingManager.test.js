@@ -8,8 +8,8 @@ describe('MintingManager', () => {
   const cryptoRoot = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
   const walletRoot = BigNumber.from('0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230');
 
-  let Registry, CryptoRegistry, CryptoMintingController, MintingManager;
-  let registry, cryptoRegistry, cryptoMintingController, mintingManager;
+  let Registry, CryptoRegistry, CryptoResolver, CryptoMintingController, MintingManager;
+  let registry, cryptoRegistry, cryptoResolver, cryptoMintingController, mintingManager;
   let signers, domainSuffix;
 
   const sign = async (data, address, signer) => {
@@ -25,22 +25,22 @@ describe('MintingManager', () => {
 
   before(async () => {
     signers = await ethers.getSigners();
+    [coinbase] = signers;
 
     Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
     CryptoRegistry = await ethers.getContractFactory('contracts/cns/CryptoRegistry.sol:CryptoRegistry');
+    CryptoResolver = await ethers.getContractFactory('contracts/cns/CryptoResolver.sol:CryptoResolver');
     CryptoMintingController = await ethers.getContractFactory('contracts/cns/CryptoMintingController.sol:CryptoMintingController');
     MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
   })
 
   describe('IClaimer', () => {
-    let developer;
-
     before(async () => {
       [, developer, receiver] = signers;
 
       registry = await Registry.deploy();
       mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(registry.address, ZERO_ADDRESS);
+      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
       await registry.initialize(mintingManager.address);
       await registry.setTokenURIPrefix('/');
     })
@@ -110,13 +110,13 @@ describe('MintingManager', () => {
 
   describe('SLDMinter', () => {
     before(async () => {
-      [coinbase, faucet, receiver, spender] = signers;
+      [, faucet, receiver, spender] = signers;
     })
 
     beforeEach(async () => {
       registry = await Registry.deploy();
       mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(registry.address, ZERO_ADDRESS);
+      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.addMinter(coinbase.address);
 
       await registry.initialize(mintingManager.address);
@@ -412,19 +412,16 @@ describe('MintingManager', () => {
   })
 
   describe('Tld-based claiming', () => {
-    before(async () => {
-      [coinbase] = signers;
-    })
-
     beforeEach(async () => {
       registry = await Registry.deploy();
 
       cryptoRegistry = await CryptoRegistry.deploy();
       cryptoMintingController = await CryptoMintingController.deploy(cryptoRegistry.address);
       await cryptoRegistry.addController(cryptoMintingController.address);
+      cryptoResolver = await CryptoResolver.deploy(cryptoRegistry.address, cryptoMintingController.address);
 
       mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(registry.address, cryptoMintingController.address);
+      await mintingManager.initialize(registry.address, cryptoMintingController.address, cryptoResolver.address);
       await mintingManager.addMinter(coinbase.address);
 
       await registry.initialize(mintingManager.address);
@@ -470,38 +467,41 @@ describe('MintingManager', () => {
     })
 
     describe('claimToWithRecords(address,uint256,string,string[],string[])', () => {
-      it('revert claim with records .crypto domain in CNS registry', async () => {
-        await expect(
-          mintingManager['claimToWithRecords(address,uint256,string,string[],string[])']
-            (coinbase.address, cryptoRoot, `${DomainNamePrefix}test-c039`, [], [])
-        ).to.be.revertedWith('MintingManager: UNSUPPORTED_CALL');
+      it('should mint with records .crypto domain in CNS registry', async () => {
+        await mintingManager['claimToWithRecords(address,uint256,string,string[],string[])']
+          (coinbase.address, cryptoRoot, 'test-c039', ['key1'], ['value3']);
+
+        const tokenId = await cryptoRegistry.childIdOf(cryptoRoot, `${DomainNamePrefix}test-c039`);
+        expect(await cryptoRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
+        await expect(registry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+
+        expect(await cryptoResolver.get('key1', tokenId)).to.be.eql('value3');
       })
 
       it('should claim with records .wallet domain in UNS registry', async () => {
         await mintingManager['claimToWithRecords(address,uint256,string,string[],string[])']
-          (coinbase.address, walletRoot, 'test-c846', [], []);
+          (coinbase.address, walletRoot, 'test-c846', ['key9'], ['value2']);
 
         const tokenId = await cryptoRegistry.childIdOf(walletRoot, `${DomainNamePrefix}test-c846`);
         assert.equal(await registry.ownerOf(tokenId), coinbase.address);
         await expect(cryptoRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+
+        expect(await registry.get('key9', tokenId)).to.be.eql('value2');
       })
     })
   })
 
   describe('Tld-based minting', () => {
-    before(async () => {
-      [coinbase] = signers;
-    })
-
     beforeEach(async () => {
       registry = await Registry.deploy();
 
       cryptoRegistry = await CryptoRegistry.deploy();
       cryptoMintingController = await CryptoMintingController.deploy(cryptoRegistry.address);
       await cryptoRegistry.addController(cryptoMintingController.address);
+      cryptoResolver = await CryptoResolver.deploy(cryptoRegistry.address, cryptoMintingController.address);
 
       mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(registry.address, cryptoMintingController.address);
+      await mintingManager.initialize(registry.address, cryptoMintingController.address, cryptoResolver.address);
       await mintingManager.addMinter(coinbase.address);
 
       await registry.initialize(mintingManager.address);
@@ -564,22 +564,59 @@ describe('MintingManager', () => {
       })
     })
 
-    describe('mintSLDWithRecords(address,uint256,string,bytes)', () => {
-      it('revert mint with records .crypto domain in CNS registry', async () => {
-        await expect(
-          mintingManager['mintSLDWithRecords(address,uint256,string,string[],string[])']
-            (coinbase.address, cryptoRoot, 'test-m110', [], [])
-        ).to.be.revertedWith('MintingManager: UNSUPPORTED_CALL');
+    describe('mintSLDWithRecords(address,uint256,string,string[],string[])', () => {
+      it('should mint with records .crypto domain in CNS registry', async () => {
+        await mintingManager['mintSLDWithRecords(address,uint256,string,string[],string[])']
+          (coinbase.address, cryptoRoot, 'test-m110', ['key1'], ['value1']);
+
+        const tokenId = await cryptoRegistry.childIdOf(cryptoRoot, 'test-m110');
+        expect(await cryptoRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
+        await expect(registry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+
+        expect(await cryptoResolver.get('key1', tokenId)).to.be.eql('value1');
       })
 
       it('should mint with records .wallet domain in UNS registry', async () => {
         await mintingManager['mintSLDWithRecords(address,uint256,string,string[],string[])']
-          (coinbase.address, walletRoot, 'test-m771', [], []);
+          (coinbase.address, walletRoot, 'test-m771', ['key1'], ['value1']);
 
         const tokenId = await cryptoRegistry.childIdOf(walletRoot, 'test-m771');
         assert.equal(await registry.ownerOf(tokenId), coinbase.address);
         await expect(cryptoRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+
+        expect(await registry.get('key1', tokenId)).to.be.eql('value1');
       })
+    })
+  })
+
+  describe('Crypto resolver management', () => {
+    beforeEach(async () => {
+      mintingManager = await MintingManager.deploy();
+      await mintingManager.initialize(ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+    })
+
+    it('should return zero resolver', async () => {
+      const resolver = await mintingManager.CryptoResolver();
+
+      assert.equal(resolver, ZERO_ADDRESS);
+    })
+
+    it('should update resolver', async () => {
+      cryptoMintingController = await CryptoMintingController.deploy(ZERO_ADDRESS);
+      cryptoResolver = await CryptoResolver.deploy(ZERO_ADDRESS, cryptoMintingController.address);
+      await mintingManager.setResolver(cryptoResolver.address);
+
+      const resolver = await mintingManager.CryptoResolver();
+      assert.equal(resolver, cryptoResolver.address);
+    })
+
+    it('should revert update resolver when call by non-owner', async () => {
+      cryptoMintingController = await CryptoMintingController.deploy(ZERO_ADDRESS);
+      cryptoResolver = await CryptoResolver.deploy(ZERO_ADDRESS, cryptoMintingController.address);
+      
+      await expect(
+        mintingManager.connect(signers[5]).setResolver(cryptoResolver.address)
+      ).to.be.revertedWith('Ownable: caller is not the owner');
     })
   })
 })
