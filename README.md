@@ -242,17 +242,6 @@ Note: List of changes which makes UNS and CNS backward incompatibile
 
 ### Events
 
-Affected components: 
-
-* Website Backend
-  * UNS Mirror
-* Resolution Service
-  * UNS Mirror
-* Resolution Libs
-  * allRecords
-* Mobile App
-  * Importing domains from blockchain
-
 * `event NewURI(uint256 indexed tokenId, string uri)` 
   * Removed
 * `event Resolve(uint256 indexed tokenId, address indexed to)` 
@@ -267,13 +256,26 @@ Affected components:
   * Moved from Resolver to Registry
   * Registry now fires this event when records are reset on transfer.
 
+#### Affected components
+
+* Website Backend
+  * UNS Mirror
+* Resolution Service
+  * UNS Mirror
+* Resolution Libs
+  * allRecords
+* Mobile App
+  * Importing domains from blockchain
+
 ### Read API
 
 
 * `Registry.isController`
   * Removed
 
-Affected Components: None
+#### Affected Components
+
+None
 
 ### Resolvers Removal
 
@@ -283,7 +285,7 @@ Affected Components: None
 * `function resolverOf(uint256 tokenId)`
   * Now always returns Regsitry address itself
 
-Affected Components: 
+#### Affected Components
 
 * Website Backend
   * Records Management
@@ -303,7 +305,7 @@ Changes:
 * `MintingManager`
   * Added - it's minting methods are similar to old `WhitelistedMinter` but they all have additional parameter - `tld`
 
-Affected Components: 
+#### Affected Components
 
 * Website Backend
   * Claim a domain
@@ -311,7 +313,6 @@ Affected Components:
 
 ### Internal package API changed
 
-Affected Components: None
 
 * `function controlledResolveTo(address to, uint256 tokenId) external {}` 
   * Removed
@@ -320,5 +321,4 @@ Affected Components: None
 * `function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external {}` 
   * Removed due to removing controllers
 
-
-
+#### Affected Components: None
