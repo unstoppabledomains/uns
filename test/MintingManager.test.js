@@ -34,83 +34,9 @@ describe('MintingManager', () => {
     MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
   })
 
-  describe('IClaimer', () => {
+  describe('MinterRole', () => {
     before(async () => {
-      [, developer, receiver] = signers;
-
-      registry = await Registry.deploy();
-      mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
-      await registry.initialize(mintingManager.address);
-      await registry.setTokenURIPrefix('/');
-    })
-
-    beforeEach(() => {
-      domainSuffix = `prefixed-domain-${Math.random() * 1000}`;
-    })
-
-    describe('claim(uint256,string)', () => {
-      it('should mint prefixed domain', async () => {
-        await mintingManager.connect(developer).functions['claim(uint256,string)'](walletRoot, domainSuffix)
-        const tokenId = await registry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`)
-        const tokenUri = await registry.tokenURI(tokenId)
-        assert.equal(tokenUri, `/${tokenId}`)
-      })
-
-      it('should send domain to requester', async () => {
-        await mintingManager.connect(developer).functions['claim(uint256,string)'](walletRoot, domainSuffix)
-        const tokenId = await registry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`)
-        const owner = await registry.ownerOf(tokenId)
-        assert.equal(owner, developer.address)
-      })
-
-      it('should not allow to mint the same domain twice', async () => {
-        const minter = mintingManager.connect(developer);
-        await minter.functions['claim(uint256,string)'](walletRoot, domainSuffix);
-
-        await expect(
-          minter.functions['claim(uint256,string)'](walletRoot, domainSuffix)
-        ).to.be.revertedWith('ERC721: token already minted');
-      })
-    })
-
-    describe('claimTo(address,uint256,string)', () => {
-      it('should mint domain to receiver', async () => {
-        await mintingManager.connect(developer).functions['claimTo(address,uint256,string)'](receiver.address, walletRoot, domainSuffix)
-        const tokenId = await registry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`)
-        const owner = await registry.ownerOf(tokenId)
-        assert.equal(owner, receiver.address)
-      })
-    })
-
-    describe('claimToWithRecords(address,uint256,string,string[],string[])', () => {
-      const funcSig = 'claimToWithRecords(address,uint256,string,string[],string[])';
-
-      it('should mint domain to receiver with predefined keys', async () => {
-        const minter = mintingManager.connect(developer);
-        await minter.functions[funcSig](receiver.address, walletRoot, domainSuffix, ['key'], ['value'])
-        const tokenId = await registry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`)
-        const owner = await registry.ownerOf(tokenId)
-        const values = await registry.getMany(['key'], tokenId)
-        assert.equal(owner, receiver.address)
-        assert.deepEqual(values, ['value'])
-      })
-
-      it('should mint domain with empty keys', async () => {
-        const minter = mintingManager.connect(developer);
-        await minter.functions[funcSig](receiver.address, walletRoot, domainSuffix, [], []);
-        const tokenId = await registry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`)
-        const owner = await registry.ownerOf(tokenId)
-        const values = await registry.getMany(['key1', 'key2'], tokenId)
-        assert.equal(owner, receiver.address)
-        assert.deepEqual(values, ['', ''])
-      })
-    })
-  })
-
-  describe('SLDMinter', () => {
-    before(async () => {
-      [, faucet, receiver, spender] = signers;
+      [, faucet, receiver] = signers;
     })
 
     beforeEach(async () => {
@@ -217,6 +143,96 @@ describe('MintingManager', () => {
         const expectedBalance = BigNumber.from(initBalance).add(value)
         assert.equal(actualBalance, expectedBalance.toString())
       })
+    })
+  })
+
+  describe('IClaimer', () => {
+    before(async () => {
+      [, developer, receiver] = signers;
+
+      registry = await Registry.deploy();
+      mintingManager = await MintingManager.deploy();
+      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
+      await registry.initialize(mintingManager.address);
+      await registry.setTokenURIPrefix('/');
+    })
+
+    beforeEach(() => {
+      domainSuffix = `prefixed-domain-${Math.random() * 1000}`;
+    })
+
+    describe('claim(uint256,string)', () => {
+      it('should mint prefixed domain', async () => {
+        await mintingManager.connect(developer).functions['claim(uint256,string)'](walletRoot, domainSuffix)
+        const tokenId = await registry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`)
+        const tokenUri = await registry.tokenURI(tokenId)
+        assert.equal(tokenUri, `/${tokenId}`)
+      })
+
+      it('should send domain to requester', async () => {
+        await mintingManager.connect(developer).functions['claim(uint256,string)'](walletRoot, domainSuffix)
+        const tokenId = await registry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`)
+        const owner = await registry.ownerOf(tokenId)
+        assert.equal(owner, developer.address)
+      })
+
+      it('should not allow to mint the same domain twice', async () => {
+        const minter = mintingManager.connect(developer);
+        await minter.functions['claim(uint256,string)'](walletRoot, domainSuffix);
+
+        await expect(
+          minter.functions['claim(uint256,string)'](walletRoot, domainSuffix)
+        ).to.be.revertedWith('ERC721: token already minted');
+      })
+    })
+
+    describe('claimTo(address,uint256,string)', () => {
+      it('should mint domain to receiver', async () => {
+        await mintingManager.connect(developer).functions['claimTo(address,uint256,string)'](receiver.address, walletRoot, domainSuffix)
+        const tokenId = await registry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`)
+        const owner = await registry.ownerOf(tokenId)
+        assert.equal(owner, receiver.address)
+      })
+    })
+
+    describe('claimToWithRecords(address,uint256,string,string[],string[])', () => {
+      const funcSig = 'claimToWithRecords(address,uint256,string,string[],string[])';
+
+      it('should mint domain to receiver with predefined keys', async () => {
+        const minter = mintingManager.connect(developer);
+        await minter.functions[funcSig](receiver.address, walletRoot, domainSuffix, ['key'], ['value'])
+        const tokenId = await registry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`)
+        const owner = await registry.ownerOf(tokenId)
+        const values = await registry.getMany(['key'], tokenId)
+        assert.equal(owner, receiver.address)
+        assert.deepEqual(values, ['value'])
+      })
+
+      it('should mint domain with empty keys', async () => {
+        const minter = mintingManager.connect(developer);
+        await minter.functions[funcSig](receiver.address, walletRoot, domainSuffix, [], []);
+        const tokenId = await registry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`)
+        const owner = await registry.ownerOf(tokenId)
+        const values = await registry.getMany(['key1', 'key2'], tokenId)
+        assert.equal(owner, receiver.address)
+        assert.deepEqual(values, ['', ''])
+      })
+    })
+  })
+
+  describe('SLDMinter', () => {
+    before(async () => {
+      [, faucet, receiver, spender] = signers;
+    })
+
+    beforeEach(async () => {
+      registry = await Registry.deploy();
+      mintingManager = await MintingManager.deploy();
+      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.addMinter(coinbase.address);
+
+      await registry.initialize(mintingManager.address);
+      await registry.setTokenURIPrefix('/');
     })
 
     describe('mint second level domain', () => {
@@ -589,16 +605,14 @@ describe('MintingManager', () => {
     })
   })
 
-  describe('Crypto resolver management', () => {
+  describe('CryptoResolver management', () => {
     beforeEach(async () => {
       mintingManager = await MintingManager.deploy();
       await mintingManager.initialize(ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     })
 
-    it('should return zero resolver', async () => {
-      const resolver = await mintingManager.CryptoResolver();
-
-      assert.equal(resolver, ZERO_ADDRESS);
+    it('should return zero resolver when initialized by zero address', async () => {
+      assert.equal(await mintingManager.CryptoResolver(), ZERO_ADDRESS);
     })
 
     it('should update resolver', async () => {
@@ -606,8 +620,7 @@ describe('MintingManager', () => {
       cryptoResolver = await CryptoResolver.deploy(ZERO_ADDRESS, cryptoMintingController.address);
       await mintingManager.setResolver(cryptoResolver.address);
 
-      const resolver = await mintingManager.CryptoResolver();
-      assert.equal(resolver, cryptoResolver.address);
+      assert.equal(await mintingManager.CryptoResolver(), cryptoResolver.address);
     })
 
     it('should revert update resolver when call by non-owner', async () => {
@@ -617,6 +630,54 @@ describe('MintingManager', () => {
       await expect(
         mintingManager.connect(signers[5]).setResolver(cryptoResolver.address)
       ).to.be.revertedWith('Ownable: caller is not the owner');
+    })
+  })
+
+  describe('Upgradable', () => {
+    beforeEach(async () => {
+      registry = await Registry.deploy();
+
+      mintingManager = await upgrades.deployProxy(
+        MintingManager,
+        [registry.address, ZERO_ADDRESS, ZERO_ADDRESS],
+        { initializer: 'initialize' }
+      );
+      await mintingManager.addMinter(coinbase.address);
+
+      await registry.initialize(mintingManager.address);
+      await registry.setTokenURIPrefix('/');
+    })
+
+    it('should persist state after proxy upgrade', async () => {
+      cryptoMintingController = await CryptoMintingController.deploy(ZERO_ADDRESS);
+      cryptoResolver = await CryptoResolver.deploy(ZERO_ADDRESS, cryptoMintingController.address);
+      await mintingManager.setResolver(cryptoResolver.address);
+
+      await upgrades.upgradeProxy(
+        mintingManager.address,
+        MintingManager,
+        [registry.address, ZERO_ADDRESS, ZERO_ADDRESS],
+        { initializer: 'initialize' }
+      );
+
+      assert.equal(await mintingManager.CryptoResolver(), cryptoResolver.address);
+    })
+
+    it('should be possible to set resolver after proxy upgrade', async () => {
+      assert.equal(await mintingManager.CryptoResolver(), ZERO_ADDRESS);
+
+      await upgrades.upgradeProxy(
+        mintingManager.address,
+        MintingManager,
+        [registry.address, ZERO_ADDRESS, ZERO_ADDRESS],
+        { initializer: 'initialize' }
+      );
+      
+      cryptoMintingController = await CryptoMintingController.deploy(ZERO_ADDRESS);
+      cryptoResolver = await CryptoResolver.deploy(ZERO_ADDRESS, cryptoMintingController.address);
+      await mintingManager.setResolver(cryptoResolver.address);
+
+      assert.equal(await mintingManager.CryptoResolver(), cryptoResolver.address);
     })
   })
 })
