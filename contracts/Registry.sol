@@ -35,10 +35,11 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         _;
     }
 
-    modifier validForwardedToken(uint256 tokenId) {
+    modifier protectTokenOperation(uint256 tokenId) {
         if (isTrustedForwarder(msg.sender)) {
             require(tokenId == _msgToken(), 'Registry: TOKEN_INVALID');
         }
+        _invalidateNonce(tokenId);
         _;
     }
 
@@ -67,7 +68,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
     function approve(address to, uint256 tokenId)
         public
         override(IERC721Upgradeable, ERC721Upgradeable)
-        validForwardedToken(tokenId)
+        protectTokenOperation(tokenId)
     {
         super.approve(to, tokenId);
     }
@@ -118,7 +119,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         external
         override
         onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
+        protectTokenOperation(tokenId)
     {
         _transfer(ownerOf(tokenId), to, tokenId);
     }
@@ -127,7 +128,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         public
         override(IERC721Upgradeable, ERC721Upgradeable)
         onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
+        protectTokenOperation(tokenId)
     {
         _transfer(from, to, tokenId);
     }
@@ -136,7 +137,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         public
         override(IERC721Upgradeable, ERC721Upgradeable)
         onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
+        protectTokenOperation(tokenId)
     {
         _safeTransfer(from, to, tokenId, _data);
     }
@@ -147,7 +148,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         public
         override
         onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
+        protectTokenOperation(tokenId)
     {
         _burn(tokenId);
     }
@@ -162,7 +163,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         external
         override
         onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
+        protectTokenOperation(tokenId)
     {
         _set(key, value, tokenId);
     }
@@ -171,7 +172,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         external
         override
         onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
+        protectTokenOperation(tokenId)
     {
         _setMany(keys, values, tokenId);
     }
@@ -180,7 +181,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         external
         override
         onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
+        protectTokenOperation(tokenId)
     {
         _reconfigure(keys, values, tokenId);
     }
@@ -189,7 +190,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         external
         override
         onlyApprovedOrOwner(tokenId)
-        validForwardedToken(tokenId)
+        protectTokenOperation(tokenId)
     {
         _reset(tokenId);
     }

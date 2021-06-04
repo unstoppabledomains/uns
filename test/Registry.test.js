@@ -282,6 +282,27 @@ describe('Registry', () => {
       assert.equal(receiver.address, await registry.ownerOf(tok))
     })
 
+    it('should revert transfer using meta-setOwner when nonce invalidated', async () => {
+      const owner = signers[1];
+      const receiver = signers[2];
+      const tok = await registry.childIdOf(root, 'res_label_0896');
+      await registry.mintSLD(owner.address, root, 'res_label_0896');
+
+      const req = {
+        from: owner.address,
+        gas: '100000',
+        tokenId: tok,
+        nonce: Number(await registry.nonceOf(owner.address)),
+        data: registry.interface.encodeFunctionData('setOwner', [receiver.address, tok]),
+      };
+      const sig = await signTypedData(registry.address, owner, req);
+
+      await registry.connect(owner).set('key', 'value', tok);
+
+      await expect(registry.execute(req, sig)).to.be
+        .revertedWith('RegistryForwarder: signature does not match request');
+    })
+
     it('should setApprovalForAll using meta-setApprovalForAll', async () => {
       const req = {
         from: owner.address,
@@ -499,6 +520,23 @@ describe('Registry', () => {
             expect(success).to.be.true;
 
             await registry.execute(req, sig);
+
+            await expect(registry.execute(req, sig)).to.be
+              .revertedWith('RegistryForwarder: signature does not match request');
+          }
+        })
+
+        it('should revert execution of all token-based functions when nonce invalidated', async () => {
+          for(const func of getFuncs()) {
+            const funcSig = funcFragmentToSig(func)
+            const funcSigHash = utils.id(`${funcSig}_nonceInvalidated`);
+            paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
+            await mintToken(owner, funcSigHash);
+
+            const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
+            const sig = await signTypedData(registry.address, owner, req);
+
+            await registry.connect(owner).set('key', 'value', paramValueMap.tokenId);
 
             await expect(registry.execute(req, sig)).to.be
               .revertedWith('RegistryForwarder: signature does not match request');
