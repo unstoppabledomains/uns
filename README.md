@@ -22,21 +22,6 @@ UNS registry smart contracts.
 
     Ref: https://eips.ethereum.org/EIPS/eip-721
 
-    ### Backward incompatibility:
-
-    Note: List of changes which makes UNS and CNS backward incompatibile
-
-    - Major `tokenURI()` difference
-
-      ```solidity
-      CNS.tokenURI() => prefix ? {prefix}{domain_name} : {domain_name}
-
-      UNS.tokenURI() => records['metadata.uri'].value || prefix ? {prefix}{tokin_id} : ''
-      ```
-
-    - `tokenURI()` returns empty string(by default) when `prefix` is empty string
-    - `event NewURI(uint256 indexed tokenId, string uri)` removed
-    - When `metadata.uri` recond is defined, `tokenURI()` returns value of the record instead of default uri [#178196957](https://www.pivotaltracker.com/story/show/178196957)
 
 4.  Implements IRegistry
 
@@ -45,40 +30,14 @@ UNS registry smart contracts.
 
         event NewURIPrefix(string prefix);
 
-        /**
-         * @dev Function to set the token URI Prefix for all tokens.
-         * @param prefix string URI to assign
-         */
         function setTokenURIPrefix(string calldata prefix) external;
 
-        /**
-         * @dev Returns whether the given spender can transfer a given token ID.
-         * @param spender address of the spender to query
-         * @param tokenId uint256 ID of the token to be transferred
-         * @return bool whether the msg.sender is approved for the given token ID,
-         * is an operator of the owner, or is the owner of the token
-         */
         function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool);
 
-        /**
-         * @dev Gets the resolver of the specified token ID.
-         * @param tokenId uint256 ID of the token to query the resolver of
-         * @return address currently marked as the resolver of the given token ID
-         */
         function resolverOf(uint256 tokenId) external view returns (address);
 
-        /**
-         * @dev Provides child token (subdomain) of provided tokenId.
-         * @param tokenId uint256 ID of the token
-         * @param label label of subdomain (for `aaa.bbb.crypto` it will be `aaa`)
-         */
         function childIdOf(uint256 tokenId, string calldata label) external pure returns (uint256);
 
-        /**
-         * @dev Transfer domain ownership without resetting domain records.
-         * @param to address of new domain owner
-         * @param tokenId uint256 ID of the token to be transferred
-         */
         function setOwner(address to, uint256 tokenId) external;
 
         /**
@@ -92,19 +51,6 @@ UNS registry smart contracts.
     }
     ```
 
-    ### Backward incompatibility:
-
-    Note: List of changes which makes UNS and CNS backward incompatibile
-
-    - `event NewURI(uint256 indexed tokenId, string uri)` removed
-    - `event Resolve(uint256 indexed tokenId, address indexed to)` removed
-    - `event Sync(address indexed resolver, uint256 indexed updateId, uint256 indexed tokenId)` removed
-    - `function resolveTo(address to, uint256 tokenId) external {}` removed
-    - `function controlledResolveTo(address to, uint256 tokenId) external {}` removed
-    - `function sync(uint256 tokenId, uint256 updateId) external {}` removed
-    - `function resolverOf(uint256 tokenId) external view returns (address) {}` returns registry's address when token exists
-    - ~~`function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external {}` added as a controlled function~~ Removed due to removing controllers
-    - ~~`string calldata label` replaced by `bytes32 child` = `keccak256(abi.encodePacked(label))`[#178199979](https://www.pivotaltracker.com/story/show/178199979)~~ Deprioritized due to backward compatibility
 
 5.  Records Storage
 
@@ -118,43 +64,15 @@ UNS registry smart contracts.
 
         event ResetRecords(uint256 indexed tokenId);
 
-        /**
-         * @dev Function to set record.
-         * @param key The key set the value of.
-         * @param value The value to set key to.
-         * @param tokenId ERC-721 token id to set.
-         */
         function set(string calldata key, string calldata value, uint256 tokenId) external;
 
-        /**
-         * @dev Set or update domain records
-         * @param keys New record keys
-         * @param values New record values
-         * @param tokenId ERC-721 token id of the domain
-         */
         function setMany(string[] memory keys, string[] memory values, uint256 tokenId) external;
 
-        /**
-         * @dev Reset all domain records and set new ones
-         * @param keys New record keys
-         * @param values New record values
-         * @param tokenId ERC-721 token id of the domain
-         */
         function reconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external;
 
-        /**
-         * @dev Function to reset all existing records on a domain.
-         * @param tokenId ERC-721 token id to set.
-         */
         function reset(uint256 tokenId) external;
     }
     ```
-
-    ### Backward incompatibility:
-
-    Note: List of changes which makes UNS and CNS backward incompatibile
-
-    - `function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external {}` removed
 
     ### Ideas:
 
@@ -315,3 +233,92 @@ UNS registry smart contracts.
 
 - Deploy registry `yarn deploy:proxy:localhost`
 - Upgrade registry `PROXY_ADDRESS={proxy_address} yarn upgrade:proxy:localhost`
+
+
+
+## Backward incompatibility:
+
+Note: List of changes which makes UNS and CNS backward incompatibile
+
+### Events
+
+Affected components: 
+
+* Website Backend
+  * UNS Mirror
+* Resolution Service
+  * UNS Mirror
+* Resolution Libs
+  * allRecords
+* Mobile App
+  * Importing domains from blockchain
+
+* `event NewURI(uint256 indexed tokenId, string uri)` 
+  * Removed
+* `event Resolve(uint256 indexed tokenId, address indexed to)` 
+  * Removed
+* `event Sync(address indexed resolver, uint256 indexed updateId, uint256 indexed tokenId)` 
+  * Removed
+* `event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value)` 
+  * Moved from Resolver to Registry
+* `event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key)` 
+  * Moved from Resolver to Regisry
+* `event ResetRecords(uint256 indexed tokenId)` 
+  * Moved from Resolver to Registry
+  * Registry now fires this event when records are reset on transfer.
+
+### Read API
+
+
+* `Registry.isController`
+  * Removed
+
+Affected Components: None
+
+### Resolvers Removal
+
+
+* `function resolveTo(address to, uint256 tokenId) external {}` 
+  * Removed - UNS uses a single Resolver which is Registry itself.
+* `function resolverOf(uint256 tokenId)`
+  * Now always returns Regsitry address itself
+
+Affected Components: 
+
+* Website Backend
+  * Records Management
+* Website Frontend
+  * Records Management
+* Mobile App
+  * Records Management
+
+### Minting API change
+
+Changes: 
+
+* `MintingController`
+  * Removed - minting permissions are now controlled by single upgradable `MintingManager` contract
+* `WhitelistedMinter`
+  * Removed - `MintingManager` now has methods to do that.
+* `MintingManager`
+  * Added - it's minting methods are similar to old `WhitelistedMinter` but they all have additional parameter - `tld`
+
+Affected Components: 
+
+* Website Backend
+  * Claim a domain
+    * Including Delegate Claiming fee
+
+### Internal package API changed
+
+Affected Components: None
+
+* `function controlledResolveTo(address to, uint256 tokenId) external {}` 
+  * Removed
+* `function sync(uint256 tokenId, uint256 updateId) external {}`
+  * Removed
+* `function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external {}` 
+  * Removed due to removing controllers
+
+
+
