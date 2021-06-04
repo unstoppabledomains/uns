@@ -35,6 +35,13 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         _;
     }
 
+    modifier validForwardedToken(uint256 tokenId) {
+        if (isTrustedForwarder(msg.sender)) {
+            require(tokenId == _msgToken(), 'Registry: TOKEN_INVALID');
+        }
+        _;
+    }
+
     function initialize(address mintingManager_) public initializer {
         _mintingManager = mintingManager_;
 

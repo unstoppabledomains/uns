@@ -519,7 +519,7 @@ describe('Registry', () => {
             const [success, returnData] = await registry.callStatic.execute(req, sig);
 
             expect(success).to.be.false;
-            expect(getReason(returnData)).to.be.eql('ERC2771RegistryContext: TOKEN_INVALID');
+            expect(getReason(returnData)).to.be.eql('Registry: TOKEN_INVALID');
           }
         })
 
@@ -534,7 +534,7 @@ describe('Registry', () => {
             const [success, returndata] = await registry.callStatic.execute(req, sig);
 
             expect(success).to.be.false;
-            expect(getReason(returndata)).to.be.eql('ERC2771RegistryContext: TOKEN_INVALID');
+            expect(getReason(returndata)).to.be.eql('Registry: TOKEN_INVALID');
           }
         })
       })

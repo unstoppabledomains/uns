@@ -3,15 +3,6 @@ const { utils, BigNumber } = ethers;
 describe('ERC2771RegistryContext', () => {
   let ERC2771RegistryContext, context;
 
-  const getReason = (returnData) => {
-    let reason;
-    if (returnData && returnData.slice(2, 10).toString('hex') === '08c379a0') {
-      var abiCoder = new utils.AbiCoder();
-      reason = abiCoder.decode(['string'], '0x' + returnData.slice(10))[0];
-    }
-    return reason;
-  }
-
   before(async () => {
     signers = await ethers.getSigners();
     [, ...accounts] = signers.map(s => s.address);
@@ -34,34 +25,20 @@ describe('ERC2771RegistryContext', () => {
   })
 
   describe('validate forwarded token(last 32bytes in calldata)', () => {
-    it('should successfully validate tokenId', async () => {
+    it('should forwarded tokenId when trusted forwarder', async () => {
       const tokenId = BigNumber.from(102);
-      const calldata = context.interface.encodeFunctionData('isValidForwardedToken', [tokenId]);
+      const calldata = context.interface.encodeFunctionData('msgToken', []);
 
       const encodedTokenId = utils.defaultAbiCoder.encode([ 'uint256' ], [ tokenId ]);
-      const [success, ] = await context.callStatic.execute(calldata + encodedTokenId.slice(2));
-
-      expect(success).to.be.true;
-    })
-
-    it('should fail when tokenId is validation', async () => {
-      const tokenId = BigNumber.from(926);
-      const calldata = context.interface.encodeFunctionData('isValidForwardedToken', [tokenId]);
-
-      const encodedTokenId = utils.defaultAbiCoder.encode([ 'uint256' ], [ 1 ]);
       const [success, returnData] = await context.callStatic.execute(calldata + encodedTokenId.slice(2));
 
-      expect(success).to.be.false;
-      expect(getReason(returnData)).to.be.eql('ERC2771RegistryContext: TOKEN_INVALID');
+      expect(success).to.be.true;
+      const [msgToken] = utils.defaultAbiCoder.decode(['uint256'], returnData);
+      assert.equal(msgToken, tokenId.toString())
     })
 
-    it('should skip token validation for untrusted forwarders', async () => {
-      const tokenId = BigNumber.from(1241);
-      const success = await context.isValidForwardedToken(tokenId);
-      expect(success).to.be.true;
-
-      const success2 = await context.connect(signers[2]).isValidForwardedToken(tokenId);
-      expect(success2).to.be.true;
+    it('should return zero tokenId when untrusted forwarder', async () => {
+      assert.equal(await context.callStatic.msgToken(), 0)
     })
   })
 

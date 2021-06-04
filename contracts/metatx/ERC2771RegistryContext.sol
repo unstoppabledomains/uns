@@ -33,15 +33,14 @@ abstract contract ERC2771RegistryContext is Initializable, ContextUpgradeable {
     }
 
     /**
-     * @dev Guarde whether tokenId param and forwarded _tokenId_ are the same in case of forwarding.
+     * @dev Return the tokenId of this call.
+     * If the call came through our trusted forwarder, return the original tokenId.
+     * otherwise, return zero tokenId.
      */
-    modifier validForwardedToken(uint256 tokenId) {
+    function _msgToken() internal view virtual returns (uint256 tokenId) {
         if (isTrustedForwarder(msg.sender)) {
-            uint256 _tokenId;
-            assembly { _tokenId := calldataload(sub(calldatasize(), 32)) }
-            require(tokenId == _tokenId, 'ERC2771RegistryContext: TOKEN_INVALID');
+            assembly { tokenId := calldataload(sub(calldatasize(), 32)) }
         }
-        _;
     }
 
     /**
