@@ -134,6 +134,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         onlyApprovedOrOwner(tokenId)
         protectTokenOperation(tokenId)
     {
+        _reset(tokenId);
         _transfer(from, to, tokenId);
     }
 
@@ -143,6 +144,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         onlyApprovedOrOwner(tokenId)
         protectTokenOperation(tokenId)
     {
+        _reset(tokenId);
         _safeTransfer(from, to, tokenId, _data);
     }
 
@@ -154,6 +156,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         onlyApprovedOrOwner(tokenId)
         protectTokenOperation(tokenId)
     {
+        _reset(tokenId);
         _burn(tokenId);
     }
 
