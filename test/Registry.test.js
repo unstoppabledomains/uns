@@ -56,7 +56,6 @@ describe('Registry', () => {
       const tok = await registry.childIdOf(root, 'tok_aa_23');
       await registry.mintSLD(coinbase.address, root, 'tok_aa_23');
       await registry.set('key_23', 'value_23', tok);
-
       assert.equal(await registry.get('key_23', tok), 'value_23');
 
       await expect(registry.transferFrom(coinbase.address, accounts[0], tok))
@@ -68,7 +67,6 @@ describe('Registry', () => {
       const tok = await registry.childIdOf(root, 'tok_aw_23');
       await registry.mintSLD(coinbase.address, root, 'tok_aw_23');
       await registry.set('key_13', 'value_23', tok);
-
       assert.equal(await registry.get('key_13', tok), 'value_23');
 
       await expect(registry['safeTransferFrom(address,address,uint256)'](coinbase.address, accounts[0], tok))
@@ -80,7 +78,6 @@ describe('Registry', () => {
       const tok = await registry.childIdOf(root, 'tok_ae_23');
       await registry.mintSLD(coinbase.address, root, 'tok_ae_23');
       await registry.set('key_12', 'value_23', tok);
-
       assert.equal(await registry.get('key_12', tok), 'value_23');
 
       await expect(registry['safeTransferFrom(address,address,uint256,bytes)'](coinbase.address, accounts[0], tok, '0x'))
@@ -92,12 +89,25 @@ describe('Registry', () => {
       const tok = await registry.childIdOf(root, 'tok_aq_23');
       await registry.mintSLD(coinbase.address, root, 'tok_aq_23');
       await registry.set('key_16', 'value_23', tok);
-
       assert.equal(await registry.get('key_16', tok), 'value_23');
 
       await expect(registry.setOwner(accounts[0], tok))
         .to.not.emit(registry, 'ResetRecords').withArgs(tok);
       assert.equal(await registry.get('key_16', tok), 'value_23');
+    })
+
+    it('should reset records on burn', async () => {
+      const tok = await registry.childIdOf(root, 'tok_hj_23');
+      await registry.mintSLD(coinbase.address, root, 'tok_hj_23');
+      await registry.set('key_31', 'value_23', tok);
+      assert.equal(await registry.get('key_31', tok), 'value_23');
+
+      await expect(registry.burn(tok))
+        .to.emit(registry, 'ResetRecords').withArgs(tok);
+      assert.equal(await registry.get('key_31', tok), '');
+
+      await registry.mintSLD(coinbase.address, root, 'tok_hj_23');
+      assert.equal(await registry.get('key_31', tok), '');
     })
 
     describe('childIdOf', () => {
