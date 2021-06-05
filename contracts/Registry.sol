@@ -84,6 +84,10 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         return _childId(tokenId, label);
     }
 
+    function exists(uint256 tokenId) external view override returns (bool) {
+        return _exists(tokenId);
+    }
+
     /// Minting
 
     function mintTLD(address to, uint256 tokenId) external onlyMintingManager {

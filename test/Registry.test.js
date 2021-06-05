@@ -53,6 +53,31 @@ describe('Registry', () => {
       await registry.setTokenURIPrefix('/');
       assert.equal(await registry.tokenURI(root), `/${root}`);
     })
+
+    describe('childIdOf', () => {
+      it('should returnvalid childId', async () => {
+        const tokenId = await registry.childIdOf(root, 'token_childId_12ew3');
+        assert.equal(tokenId.toHexString(), '0x946b4ed6eefc200afe9e6c32ab679714b7ed4c3f9f0be48cb3cf18dc854a6dc8');
+      })
+  
+      it('should revert when childId lable is empty', async () => {
+        await expect(registry.childIdOf(root, '')).to.be
+          .revertedWith('Registry: LABEL_EMPTY');
+      })
+    })
+
+    describe('exists', () => {
+      it('should return true when token exists', async () => {
+        const tok = await registry.childIdOf(root, 'token_exists_11ew3');
+        await registry.mintSLD(coinbase.address, root, 'token_exists_11ew3');
+        assert.equal(await registry.exists(tok), true);
+      })
+  
+      it('should return false when token exists', async () => {
+        const tok = await registry.childIdOf(root, 'token_doesnt_exists_1094u');
+        assert.equal(await registry.exists(tok), false);
+      })
+    })
   });
 
   describe('Registry (SLD minter)', () => {

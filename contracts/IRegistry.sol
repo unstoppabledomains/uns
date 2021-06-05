@@ -41,6 +41,12 @@ interface IRegistry is IERC721MetadataUpgradeable, ISLDMinter, IRecordStorage {
     function childIdOf(uint256 tokenId, string calldata label) external pure returns (uint256);
 
     /**
+     * @dev Existence of token.
+     * @param tokenId uint256 ID of the token
+     */
+    function exists(uint256 tokenId) external view returns (bool);
+
+    /**
      * @dev Transfer domain ownership without resetting domain records.
      * @param to address of new domain owner
      * @param tokenId uint256 ID of the token to be transferred
