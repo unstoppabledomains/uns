@@ -12,13 +12,14 @@ import './IRegistry.sol';
 import './RecordStorage.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/RegistryForwarder.sol';
+import './util/Multicall.sol';
 
 /**
  * @title Registry
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, OwnableUpgradeable, ERC2771RegistryContext, RecordStorage, RegistryForwarder, IRegistry {
+contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, OwnableUpgradeable, Multicall, ERC2771RegistryContext, RecordStorage, RegistryForwarder, IRegistry {
     using AddressUpgradeable for address;
 
     string internal _prefix;

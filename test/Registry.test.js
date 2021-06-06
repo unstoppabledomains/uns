@@ -251,7 +251,7 @@ describe('Registry', () => {
     })
   });
 
-  describe('Registry metatx', () => {
+  describe('Metatx', () => {
     const receiverAddress = '0x1234567890123456789012345678901234567890';
 
     const getReason = (returnData) => {
@@ -264,8 +264,6 @@ describe('Registry', () => {
     }
 
     it('should transfer using meta-setOwner', async () => {
-      const owner = signers[1];
-      const receiver = signers[2];
       const tok = await registry.childIdOf(root, 'res_label_113a');
       await registry.mintSLD(owner.address, root, 'res_label_113a');
 
@@ -552,6 +550,7 @@ describe('Registry', () => {
 
         const excluded = [
           'execute',
+          'multicall',
           'initialize',
           'transferOwnership',  // might influence tests
           'renounceOwnership',  // might influence tests
@@ -637,4 +636,52 @@ describe('Registry', () => {
       })
     })
   });
+
+  describe('Multicall', () => {
+    it('should mint multiple domains', async () => {
+      const tok1 = await registry.childIdOf(root, 'mul_z13');
+      const tok2 = await registry.childIdOf(root, 'mul_z20');
+
+      await registry.multicall([
+        registry.interface.encodeFunctionData('mintSLD', [owner.address, root, 'mul_z13']),
+        registry.interface.encodeFunctionData('mintSLD', [receiver.address, root, 'mul_z20'])
+      ]);
+
+      assert.equal(owner.address, await registry.ownerOf(tok1));
+      assert.equal(receiver.address, await registry.ownerOf(tok2));
+    });
+
+    it('should set multiple records', async () => {
+      const tok = await registry.childIdOf(root, 'mul_m39');
+      await registry.mintSLD(owner.address, root, 'mul_m39');
+
+      await registry.connect(owner).multicall([
+        registry.interface.encodeFunctionData('set', ['key1', 'value1', tok]),
+        registry.interface.encodeFunctionData('set', ['key2', 'value2', tok])
+      ]);
+
+      assert.equal(owner.address, await registry.ownerOf(tok));
+      assert.equal('value1', await registry.get('key1', tok));
+      assert.equal('value2', await registry.get('key2', tok));
+    });
+
+    it.skip('should ', async () => {
+      const tok1 = await registry.childIdOf(root, 'mul_s79');
+      await registry.mintSLD(coinbase.address, root, 'mul_s79');
+
+      const tok2 = await registry.childIdOf(root, 'mul_l20');
+      await registry.mintSLD(coinbase.address, root, 'mul_l20');
+
+      const s = await registry.multicall([
+        registry.interface.encodeFunctionData('set', ['key1', 'value1', tok1]),
+        registry.interface.encodeFunctionData('set', ['key2', 'value2', tok1])
+      ]);
+      s.receipt = await s.wait();
+      console.log(s.receipt.gasUsed.toString());
+
+      const t = await registry.setMany(['key1', 'key2'], ['value1', 'value2'], tok2);
+      t.receipt = await t.wait();
+      console.log(t.receipt.gasUsed.toString());
+    });
+  })
 })
