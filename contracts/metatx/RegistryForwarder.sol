@@ -68,5 +68,5 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
         _nonces[tokenId] = _nonces[tokenId] + 1;
     }
 
-    uint256[49] private __gap;
+    uint256[50] private __gap;
 }

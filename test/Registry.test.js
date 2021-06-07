@@ -91,9 +91,20 @@ describe('Registry', () => {
       await registry.set('key_16', 'value_23', tok);
       assert.equal(await registry.get('key_16', tok), 'value_23');
 
-      await expect(registry.setOwner(accounts[0], tok))
+      await expect(registry.setOwner(owner.address, tok))
         .to.not.emit(registry, 'ResetRecords').withArgs(tok);
       assert.equal(await registry.get('key_16', tok), 'value_23');
+    })
+
+    it('should emit Transfer event on set owner', async () => {
+      const tok = await registry.childIdOf(root, 'tok_aq_sj');
+      await registry.mintSLD(coinbase.address, root, 'tok_aq_sj');
+      await registry.set('key_82', 'value_23', tok);
+      assert.equal(await registry.get('key_82', tok), 'value_23');
+
+      await expect(registry.setOwner(receiver.address, tok))
+        .to.emit(registry, 'Transfer').withArgs(coinbase.address, receiver.address, tok);
+      assert.equal(await registry.get('key_82', tok), 'value_23');
     })
 
     it('should reset records on burn', async () => {
