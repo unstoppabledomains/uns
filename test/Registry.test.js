@@ -200,9 +200,15 @@ describe('Registry', () => {
       return tok;
     }
 
+    const initializeKey = async (key) => {
+      const keyHash = BigNumber.from(utils.id(key));
+      await registry.addKey(key);
+      return keyHash;
+    }
+
     it('should resolve tokens', async () => {
       const tok = await registry.childIdOf(root, 'label_931')
-  
+
       // should fail to set name if not owner
       await expect(
         registry.set('key', 'value', tok)
@@ -210,7 +216,7 @@ describe('Registry', () => {
 
       await registry.mintSLD(coinbase.address, root, 'label_931')
       await registry.set('key', 'value', tok)
-  
+
       assert.equal(
         await registry.get('key', tok),
         'value',
@@ -283,7 +289,7 @@ describe('Registry', () => {
       const expectedValue = 'get-key-by-hash-value'
       await registry.set(key, expectedValue, tok)
       const result = await registry.getByHash(utils.id(key), tok)
-  
+
       assert.equal(result.value, expectedValue)
       assert.equal(result.key, key)
     })
@@ -295,7 +301,7 @@ describe('Registry', () => {
       await registry.setMany(keys, expectedValues, tok)
       const hashedKeys = keys.map(key => BigNumber.from(utils.id(key)));
       const result = await registry.getManyByHash(hashedKeys, tok)
-  
+
       assert.deepEqual(result, [keys, expectedValues])
     })
 
@@ -340,6 +346,73 @@ describe('Registry', () => {
       await expect(
         registry.connect(signers[1]).reconfigure(['new-key'], ['new-value'], tok)
       ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    })
+
+    it('should revert adding key when key is registered', async () => {
+      const expectedKey = 'key_ok_13';
+      await registry.addKey(expectedKey);
+
+      await expect(
+        registry.addKey(expectedKey)
+      ).to.be.revertedWith('RecordStorage: KEY_EXIST');
+    })
+
+    it('should set record by hash', async () => {
+      const tok = await initializeDomain('sk_2q1');
+      const expectedKey = 'key_23c';
+      const keyHash = await initializeKey(expectedKey);
+
+      await registry.setByHash(keyHash, 'value', tok);
+
+      const [key, value] = await registry.getByHash(keyHash, tok);
+      assert.deepEqual([key, value], [expectedKey, 'value']);
+    })
+
+    it('should revert setting record by hash when key is not registered', async () => {
+      const tok = await initializeDomain('sk_2p3');
+      const expectedKey = 'key_23f3c';
+      const keyHash = BigNumber.from(utils.id(expectedKey));
+
+      await expect(
+        registry.setByHash(keyHash, 'value', tok)
+      ).to.be.revertedWith('RecordStorage: KEY_NOT_FOUND');
+    })
+
+    it('should set records(1) by hash', async () => {
+      const tok = await initializeDomain('sk_q93');
+      const expectedKey = 'key_2w12c';
+      const keyHash = await initializeKey(expectedKey);
+
+      await registry.setManyByHash([keyHash], ['value'], tok);
+
+      assert.deepEqual(await registry.getByHash(keyHash, tok), [expectedKey, 'value']);
+    })
+
+    it('should set records(2) by hash', async () => {
+      const tok = await initializeDomain('sk_8s6b1');
+      const key1 = 'key_3m3c';
+      const key2 = 'key_9v3f';
+      const key1Hash = await initializeKey(key1);
+      const key2Hash = await initializeKey(key2);
+
+      await registry.setManyByHash([key1Hash, key2Hash], ['value1', 'value2'], tok);
+
+      assert.deepEqual(
+        await registry.getManyByHash([key1Hash, key2Hash], tok),
+        [[key1, key2],['value1', 'value2']]
+      );
+    })
+
+    it('should revert setting records by hash when at least one key is not registered', async () => {
+      const tok = await initializeDomain('sk_30q13');
+      const key1 = 'key_2d83c';
+      const key2 = 'key_4o83f';
+      const key1Hash = await initializeKey(key1);
+      const key2Hash = BigNumber.from(utils.id(key2));
+
+      await expect(
+        registry.setManyByHash([key1Hash, key2Hash], ['value1', 'value2'], tok)
+      ).to.be.revertedWith('RecordStorage: KEY_NOT_FOUND');
     })
   });
 
@@ -554,9 +627,11 @@ describe('Registry', () => {
         const paramValueMap = {
           label: 'label',
           '_data': '0x',
-          key: 'key1',
+          key: 'key_t1',
+          keys: ['key_t1'],
+          keyHash: BigNumber.from(utils.id('key_t1')),
+          keyHashes: [BigNumber.from(utils.id('key_t1'))],
           value: 'value',
-          keys: ['key1'],
           values: ['value1']
         }
 
@@ -575,6 +650,8 @@ describe('Registry', () => {
         before(async () => {
           paramValueMap.from = owner.address;
           paramValueMap.to = receiver.address;
+
+          await registry.addKey(paramValueMap.key);
         })
 
         it('should execute all functions successfully', async () => {
@@ -674,7 +751,8 @@ describe('Registry', () => {
           label: 'label',
           '_data': '0x',
           role: '0x1000000000000000000000000000000000000000000000000000000000000000',
-          keys: ['key1'],
+          key: 'key_nt1',
+          keys: ['key_nt1'],
           values: ['value1'],
           approved: true,
           prefix: '/'
@@ -721,6 +799,7 @@ describe('Registry', () => {
           for(const func of getFuncs()) {
             const funcSig = funcFragmentToSig(func);
             paramValueMap.label = utils.id(`${funcSig}_doubleUse`);
+            paramValueMap.key = utils.id(`${funcSig}_doubleUse`);
 
             const tokenIdForwarder = await registry.childIdOf(root, utils.id(`_${funcSig}`));
             const req = await buidRequest(func, coinbase.address, tokenIdForwarder, paramValueMap);
