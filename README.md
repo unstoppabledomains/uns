@@ -231,7 +231,7 @@ UNS registry smart contracts.
 - Deploy registry `yarn deploy:proxy:localhost`
 - Upgrade registry `PROXY_ADDRESS={proxy_address} yarn upgrade:proxy:localhost`
 
-
+<div id="backward-incompatibility"></div>
 
 ## Backward incompatibility:
 
