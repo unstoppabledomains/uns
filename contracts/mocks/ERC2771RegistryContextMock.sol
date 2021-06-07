@@ -9,8 +9,8 @@ contract ERC2771RegistryContextMock is ERC2771RegistryContext {
         __ERC2771RegistryContext_init();
     }
 
-    function isValidForwardedToken(uint256 tokenId) public view validForwardedToken(tokenId) returns(bool) {
-        return true;
+    function msgToken() public view returns(uint256) {
+        return _msgToken();
     }
 
     function msgSender() public view returns(address) {

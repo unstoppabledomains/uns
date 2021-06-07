@@ -122,13 +122,10 @@ UNS registry smart contracts.
             return forwarder == address(this);
         }
 
-        modifier validForwardedToken(uint256 tokenId) {
+        function _msgToken() internal view virtual returns (uint256 tokenId) {
             if (isTrustedForwarder(msg.sender)) {
-                uint256 _tokenId;
-                assembly { _tokenId := calldataload(sub(calldatasize(), 32)) }
-                require(tokenId == _tokenId, 'ERC2771Context: TOKEN_INVALID');
+                assembly { tokenId := calldataload(sub(calldatasize(), 32)) }
             }
-            _;
         }
 
         function _msgSender() internal view virtual override returns (address sender) {
