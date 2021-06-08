@@ -12,17 +12,16 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
     // Mapping from token ID to current preset id
     mapping (uint256 => uint256) internal _presets;
 
-    function get(string calldata key, uint256 tokenId) public view override returns (string memory value) {
+    function get(string calldata key, uint256 tokenId) external view override returns (string memory value) {
         value = _get(key, tokenId);
     }
 
     function getMany(
         string[] calldata keys,
         uint256 tokenId
-    ) public view override returns (string[] memory values) {
-        uint256 keyCount = keys.length;
-        values = new string[](keyCount);
-        for (uint256 i = 0; i < keyCount; i++) {
+    ) external view override returns (string[] memory values) {
+        values = new string[](keys.length);
+        for (uint256 i = 0; i < keys.length; i++) {
             values[i] = _get(keys[i], tokenId);
         }
     }
@@ -30,24 +29,22 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
     function getByHash(
         uint256 keyHash,
         uint256 tokenId
-    ) public view override returns (string memory key, string memory value) {
-        key = getKey(keyHash);
-        value = _get(keyHash, tokenId);
+    ) external view override returns (string memory key, string memory value) {
+        (key, value) = _getByHash(keyHash, tokenId);
     }
 
     function getManyByHash(
         uint256[] calldata keyHashes,
         uint256 tokenId
-    ) public view override returns (string[] memory keys, string[] memory values) {
-        uint256 keyCount = keyHashes.length;
-        keys = new string[](keyCount);
-        values = new string[](keyCount);
-        for (uint256 i = 0; i < keyCount; i++) {
-            (keys[i], values[i]) = getByHash(keyHashes[i], tokenId);
+    ) external view override returns (string[] memory keys, string[] memory values) {
+        keys = new string[](keyHashes.length);
+        values = new string[](keyHashes.length);
+        for (uint256 i = 0; i < keyHashes.length; i++) {
+            (keys[i], values[i]) = _getByHash(keyHashes[i], tokenId);
         }
     }
 
-    function addKey(string memory key) public {
+    function addKey(string memory key) external {
         uint256 keyHash = uint256(keccak256(abi.encodePacked(key)));
         require(!_existsKey(keyHash), 'RecordStorage: KEY_EXIST');
 
@@ -65,8 +62,7 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
     }
 
     function _setMany(string[] calldata keys, string[] calldata values, uint256 tokenId) internal {
-        uint256 keyCount = keys.length;
-        for (uint256 i = 0; i < keyCount; i++) {
+        for (uint256 i = 0; i < keys.length; i++) {
             _set(keys[i], values[i], tokenId);
         }
     }
@@ -81,8 +77,7 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
     }
 
     function _setManyByHash(uint256[] calldata keyHashes, string[] calldata values, uint256 tokenId) internal {
-        uint256 keyCount = keyHashes.length;
-        for (uint256 i = 0; i < keyCount; i++) {
+        for (uint256 i = 0; i < keyHashes.length; i++) {
             _setByHash(keyHashes[i], values[i], tokenId);
         }
     }
@@ -99,6 +94,11 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
 
     function _get(string memory key, uint256 tokenId) private view returns (string memory) {
         return _get(uint256(keccak256(abi.encodePacked(key))), tokenId);
+    }
+
+    function _getByHash(uint256 keyHash, uint256 tokenId) private view returns (string memory key, string memory value) {
+        key = getKey(keyHash);
+        value = _get(keyHash, tokenId);
     }
 
     function _get(uint256 keyHash, uint256 tokenId) private view returns (string memory) {
