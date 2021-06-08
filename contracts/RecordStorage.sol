@@ -44,21 +44,10 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         }
     }
 
-    function addKey(string memory key) external {
-        uint256 keyHash = uint256(keccak256(abi.encodePacked(key)));
-        require(!_existsKey(keyHash), 'RecordStorage: KEY_EXIST');
-
-        _addKey(keyHash, key);
-    }
-
     function _set(string calldata key, string calldata value, uint256 tokenId) internal {
         uint256 keyHash = uint256(keccak256(abi.encodePacked(key)));
-        _records[tokenId][_presets[tokenId]][keyHash] = value;
-
-        if (!_existsKey(keyHash)) {
-            _addKey(keyHash, key);
-        }
-        emit Set(tokenId, key, value, key, value);
+        _addKey(keyHash, key);
+        _set(keyHash, key, value, tokenId);
     }
 
     function _setMany(string[] calldata keys, string[] calldata values, uint256 tokenId) internal {
@@ -69,11 +58,7 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
 
     function _setByHash(uint256 keyHash, string calldata value, uint256 tokenId) internal {
         require(_existsKey(keyHash), 'RecordStorage: KEY_NOT_FOUND');
-
-        _records[tokenId][_presets[tokenId]][keyHash] = value;
-
-        string memory key = getKey(keyHash);
-        emit Set(tokenId, key, value, key, value);
+        _set(keyHash, getKey(keyHash), value, tokenId);
     }
 
     function _setManyByHash(uint256[] calldata keyHashes, string[] calldata values, uint256 tokenId) internal {
@@ -103,5 +88,14 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
 
     function _get(uint256 keyHash, uint256 tokenId) private view returns (string memory) {
         return _records[tokenId][_presets[tokenId]][keyHash];
+    }
+
+    function _set(uint256 keyHash, string memory key, string memory value, uint256 tokenId) private {
+        if (bytes(_records[tokenId][_presets[tokenId]][keyHash]).length == 0) {
+            emit NewKey(tokenId, key, key);
+        }
+
+        _records[tokenId][_presets[tokenId]][keyHash] = value;
+        emit Set(tokenId, key, value, key, value);
     }
 }

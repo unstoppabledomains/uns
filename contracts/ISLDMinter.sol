@@ -38,5 +38,5 @@ interface ISLDMinter {
      * @param keys Record keys.
      * @param values Record values.
      */
-    function mintSLDWithRecords(address to, uint256 tld, string memory label, string[] memory keys, string[] memory values) external;
+    function mintSLDWithRecords(address to, uint256 tld, string calldata label, string[] calldata keys, string[] calldata values) external;
 }
