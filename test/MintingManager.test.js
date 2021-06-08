@@ -42,11 +42,11 @@ describe('MintingManager', () => {
     beforeEach(async () => {
       registry = await Registry.deploy();
       mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
-      await mintingManager.addMinter(coinbase.address);
-
       await registry.initialize(mintingManager.address);
       await registry.setTokenURIPrefix('/');
+
+      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.addMinter(coinbase.address);
     })
 
     describe('close minter account', () => {
@@ -152,9 +152,10 @@ describe('MintingManager', () => {
 
       registry = await Registry.deploy();
       mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
       await registry.initialize(mintingManager.address);
       await registry.setTokenURIPrefix('/');
+
+      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
     })
 
     beforeEach(() => {
@@ -228,11 +229,11 @@ describe('MintingManager', () => {
     beforeEach(async () => {
       registry = await Registry.deploy();
       mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
-      await mintingManager.addMinter(coinbase.address);
-
       await registry.initialize(mintingManager.address);
       await registry.setTokenURIPrefix('/');
+
+      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.addMinter(coinbase.address);
     })
 
     describe('mint second level domain', () => {
@@ -437,11 +438,11 @@ describe('MintingManager', () => {
       cryptoResolver = await CryptoResolver.deploy(cryptoRegistry.address, cryptoMintingController.address);
 
       mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(registry.address, cryptoMintingController.address, cryptoResolver.address);
-      await mintingManager.addMinter(coinbase.address);
-
       await registry.initialize(mintingManager.address);
       await registry.setTokenURIPrefix('/');
+
+      await mintingManager.initialize(registry.address, cryptoMintingController.address, cryptoResolver.address);
+      await mintingManager.addMinter(coinbase.address);
 
       await cryptoMintingController.addMinter(mintingManager.address);
     })
@@ -517,11 +518,11 @@ describe('MintingManager', () => {
       cryptoResolver = await CryptoResolver.deploy(cryptoRegistry.address, cryptoMintingController.address);
 
       mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(registry.address, cryptoMintingController.address, cryptoResolver.address);
-      await mintingManager.addMinter(coinbase.address);
-
       await registry.initialize(mintingManager.address);
       await registry.setTokenURIPrefix('/');
+
+      await mintingManager.initialize(registry.address, cryptoMintingController.address, cryptoResolver.address);
+      await mintingManager.addMinter(coinbase.address);
 
       await cryptoMintingController.addMinter(mintingManager.address);
     })
@@ -607,8 +608,11 @@ describe('MintingManager', () => {
 
   describe('CryptoResolver management', () => {
     beforeEach(async () => {
+      registry = await Registry.deploy();
       mintingManager = await MintingManager.deploy();
-      await mintingManager.initialize(ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+
+      await registry.initialize(mintingManager.address);
+      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
     })
 
     it('should return zero resolver when initialized by zero address', async () => {
@@ -637,14 +641,12 @@ describe('MintingManager', () => {
     beforeEach(async () => {
       registry = await Registry.deploy();
 
-      mintingManager = await upgrades.deployProxy(
-        MintingManager,
-        [registry.address, ZERO_ADDRESS, ZERO_ADDRESS],
-        { initializer: 'initialize' }
-      );
+      mintingManager = await upgrades.deployProxy(MintingManager, [], { initializer: false });
+      await registry.initialize(mintingManager.address);
+
+      await mintingManager.initialize(registry.address, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.addMinter(coinbase.address);
 
-      await registry.initialize(mintingManager.address);
       await registry.setTokenURIPrefix('/');
     })
 

@@ -75,7 +75,6 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
 
     /// Registry Constants
 
-    // NOTE: obsolete, kept for backward compatibility
     function root() public pure returns (uint256) {
         return 0;
     }
@@ -90,31 +89,22 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
 
     /// Minting
 
-    function mintTLD(address to, uint256 tokenId) external onlyMintingManager {
-        _mint(to, tokenId);
-    }
-
-    function mintSLD(address to, uint256 tld, string memory label) external override onlyMintingManager {
-        _mintChild(to, tld, label);
-    }
-
-    function safeMintSLD(address to, uint256 tld, string calldata label) external override onlyMintingManager {
-        safeMintSLD(to, tld, label, '');
-    }
-
-    function safeMintSLD(address to, uint256 tld, string memory label, bytes memory _data)
-        public override onlyMintingManager
+    function mint(address to, uint256 tokenId, string calldata uri)
+        external override onlyMintingManager
     {
-        _safeMint(to, _childId(tld, label), _data);
+        _mint(to, tokenId, uri);
     }
 
-    function mintSLDWithRecords(address to, uint256 tld, string memory label, string[] memory keys, string[] memory values)
-        external
-        override
-        onlyMintingManager
+    function safeMint(address to, uint256 tokenId, string calldata uri)
+        external override onlyMintingManager
     {
-        _mintChild(to, tld, label);
-        _setMany(keys, values, _childId(tld, label));
+        _safeMint(to, tokenId, uri, '');
+    }
+
+    function safeMint(address to, uint256 tokenId, string calldata uri, bytes calldata _data)
+        external override onlyMintingManager
+    {
+        _safeMint(to, tokenId, uri, _data);
     }
 
     /// Transfering
@@ -175,7 +165,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         _set(key, value, tokenId);
     }
 
-    function setMany(string[] memory keys, string[] memory values, uint256 tokenId)
+    function setMany(string[] calldata keys, string[] calldata values, uint256 tokenId)
         external
         override
         onlyApprovedOrOwner(tokenId)
@@ -184,7 +174,17 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         _setMany(keys, values, tokenId);
     }
 
-    function reconfigure(string[] memory keys, string[] memory values, uint256 tokenId)
+    function preconfigure(string[] calldata keys, string[] calldata values, uint256 tokenId)
+        external
+        override
+        onlyMintingManager
+        protectTokenOperation(tokenId)
+    {
+        require(!_exists(tokenId), 'Registry: TOKEN_EXISTS');
+        _setMany(keys, values, tokenId);
+    }
+
+    function reconfigure(string[] calldata keys, string[] calldata values, uint256 tokenId)
         external
         override
         onlyApprovedOrOwner(tokenId)
@@ -219,8 +219,14 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
     }
 
-    function _mintChild(address to, uint256 tokenId, string memory label) internal {
-        _mint(to, _childId(tokenId, label));
+    function _mint(address to, uint256 tokenId, string memory uri) internal {
+        _mint(to, tokenId);
+        emit NewURI(tokenId, uri);
+    }
+
+    function _safeMint(address to, uint256 tokenId, string memory uri, bytes memory _data) internal {
+        _safeMint(to, tokenId, _data);
+        emit NewURI(tokenId, uri);
     }
 
     function _baseURI()
