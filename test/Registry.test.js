@@ -312,7 +312,7 @@ describe('Registry', () => {
 
       await expect(registry.set(key, value, tok))
         .to.emit(registry, 'NewKey')
-        .withArgs(tok, utils.id(key), key);
+        .withArgs(utils.id(key), key);
 
       await expect(registry.set(key, value, tok))
         .not.to.emit(registry, 'NewKey')
@@ -346,6 +346,14 @@ describe('Registry', () => {
       await expect(
         registry.connect(signers[1]).reconfigure(['new-key'], ['new-value'], tok)
       ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    })
+
+    it('should emit NewKey event on add key', async () => {
+      const key = 'key_ok_064';
+
+      await expect(registry.addKey(key))
+        .to.emit(registry, 'NewKey')
+        .withArgs(utils.id(key), key);
     })
 
     it('should revert adding key when key is registered', async () => {

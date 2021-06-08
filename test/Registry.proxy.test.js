@@ -163,7 +163,7 @@ describe('Registry (proxy)', () => {
 
       await expect(registry.set(key, value, tok))
         .to.emit(registry, 'NewKey')
-        .withArgs(tok, utils.id(key), key);
+        .withArgs(utils.id(key), key);
 
       await expect(registry.set(key, value, tok))
         .not.to.emit(registry, 'NewKey')

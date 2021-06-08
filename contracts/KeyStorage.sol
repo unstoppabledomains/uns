@@ -3,6 +3,8 @@
 pragma solidity ^0.8.0;
 
 abstract contract KeyStorage {
+    event NewKey(string indexed keyIndex, string key);
+
     mapping (uint256 => string) private _keys;
 
     function getKey(uint256 keyHash) public view returns (string memory) {
@@ -22,5 +24,6 @@ abstract contract KeyStorage {
 
     function _addKey(uint256 keyHash, string memory key) internal {
         _keys[keyHash] = key;
+        emit NewKey(key, key);
     }
 }

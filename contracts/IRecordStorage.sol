@@ -7,8 +7,6 @@ import './IRecordReader.sol';
 interface IRecordStorage is IRecordReader {
     event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value);
 
-    event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key);
-
     event ResetRecords(uint256 indexed tokenId);
 
     /**

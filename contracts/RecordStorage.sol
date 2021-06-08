@@ -60,7 +60,6 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
 
         if (!_existsKey(keyHash)) {
             _addKey(keyHash, key);
-            emit NewKey(tokenId, key, key);
         }
         emit Set(tokenId, key, value, key, value);
     }
