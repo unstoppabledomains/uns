@@ -26,7 +26,7 @@ UNS registry smart contracts.
 4.  Implements IRegistry
 
     ```solidity
-    interface IRegistry /_ is IERC721Metadata, ISLDMinter, IRecordStorage _/ {
+    interface IRegistry /_ is IERC721Metadata, IRecordStorage _/ {
 
         event NewURIPrefix(string prefix);
 
@@ -170,7 +170,7 @@ UNS registry smart contracts.
 8. TLD management
 
     ```solidity
-    contract IMintingManager is ISLDMinter, IClaimer {
+    contract IMintingManager {
         /**
          * @dev Mapping TLD `hashname` to TLD label
          *
