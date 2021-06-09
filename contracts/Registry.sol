@@ -107,6 +107,33 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         _safeMint(to, tokenId, uri, _data);
     }
 
+    function mintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values)
+        external override onlyMintingManager
+    {
+        _mint(to, tokenId, uri);
+        if(keys.length > 0) {
+            _setMany(keys, values, tokenId);
+        }
+    }
+
+    function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values)
+        external override onlyMintingManager
+    {
+        _safeMint(to, tokenId, uri, '');
+        if(keys.length > 0) {
+            _setMany(keys, values, tokenId);
+        }
+    }
+
+    function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values, bytes calldata _data)
+        external override onlyMintingManager
+    {
+        _safeMint(to, tokenId, uri, _data);
+        if(keys.length > 0) {
+            _setMany(keys, values, tokenId);
+        }
+    }
+
     /// Transfering
 
     function setOwner(address to, uint256 tokenId)
@@ -188,16 +215,6 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         protectTokenOperation(tokenId)
     {
         _setManyByHash(keyHashes, values, tokenId);
-    }
-
-    function preconfigure(string[] calldata keys, string[] calldata values, uint256 tokenId)
-        external
-        override
-        onlyMintingManager
-        protectTokenOperation(tokenId)
-    {
-        require(!_exists(tokenId), 'Registry: TOKEN_EXISTS');
-        _setMany(keys, values, tokenId);
     }
 
     function reconfigure(string[] calldata keys, string[] calldata values, uint256 tokenId)

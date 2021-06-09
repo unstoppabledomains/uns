@@ -53,6 +53,16 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
      */
     bytes4 private constant _SIG_MINT_WITH_RECORDS = 0x39ccf4d0;
 
+    /**
+     * @dev bytes4(keccak256('safeMintSLDWithRecords(address,uint256,string,string[],string[])')) == 0x27bbd225
+     */
+    bytes4 private constant _SIG_SAFE_MINT_WITH_RECORDS = 0x27bbd225;
+
+    /**
+     * @dev bytes4(keccak256('safeMintSLDWithRecords(address,uint256,string,string[],string[],bytes)')) == 0x6a2d2256
+     */
+    bytes4 private constant _SIG_SAFE_MINT_WITH_RECORDS_DATA = 0x6a2d2256;
+
     modifier validTld(uint256 tld) {
         require(bytes(_tlds[tld]).length > 0, 'MintingManager: TLD_NOT_VALID');
         _;
@@ -123,6 +133,27 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         _mintSLDWithRecords(to, tld, label, keys, values);
     }
 
+    function safeMintSLDWithRecords(
+        address to,
+        uint256 tld,
+        string calldata label,
+        string[] calldata keys,
+        string[] calldata values
+    ) external override onlyMinter validTld(tld) {
+        _safeMintSLDWithRecords(to, tld, label, keys, values, '');
+    }
+
+    function safeMintSLDWithRecords(
+        address to,
+        uint256 tld,
+        string calldata label,
+        string[] calldata keys,
+        string[] calldata values,
+        bytes calldata _data
+    ) external override onlyMinter validTld(tld) {
+        _safeMintSLDWithRecords(to, tld, label, keys, values, _data);
+    }
+
     function claim(uint256 tld, string calldata label) external override validTld(tld) {
         _mintSLD(_msgSender(), tld, _freeSLDLabel(label));
     }
@@ -154,7 +185,9 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         bool isSupported = funcSig == _SIG_MINT ||
             funcSig == _SIG_SAFE_MINT ||
             funcSig == _SIG_SAFE_MINT_DATA ||
-            funcSig == _SIG_MINT_WITH_RECORDS;
+            funcSig == _SIG_MINT_WITH_RECORDS ||
+            funcSig == _SIG_SAFE_MINT_WITH_RECORDS ||
+            funcSig == _SIG_SAFE_MINT_WITH_RECORDS_DATA;
 
         require(isSupported, 'MintingManager: UNSUPPORTED_RELAY_CALL');
     }
@@ -194,8 +227,26 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
                 CryptoResolver.preconfigure(keys, values, tokenId);
             }
         } else {
-            UnsRegistry.preconfigure(keys, values, tokenId);
-            UnsRegistry.mint(to, tokenId, _uri(tld, label));
+            UnsRegistry.mintWithRecords(to, tokenId, _uri(tld, label), keys, values);
+        }
+    }
+
+    function _safeMintSLDWithRecords(
+        address to,
+        uint256 tld,
+        string memory label,
+        string[] calldata keys,
+        string[] calldata values,
+        bytes memory _data
+    ) private {
+        uint256 tokenId = _childId(tld, label);
+        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            CryptoMinter.safeMintSLDWithResolver(to, label, address(CryptoResolver), _data);
+            if(keys.length > 0) {
+                CryptoResolver.preconfigure(keys, values, tokenId);
+            }
+        } else {
+            UnsRegistry.safeMintWithRecords(to, tokenId, _uri(tld, label), keys, values, _data);
         }
     }
 

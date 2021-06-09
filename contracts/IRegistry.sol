@@ -89,4 +89,35 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
      * @param _data bytes data to send along with a safe transfer check
      */
     function safeMint(address to, uint256 tokenId, string calldata uri, bytes calldata _data) external;
+
+    /**
+     * @dev Mints token with records
+     * @param to address to mint the new SLD to
+     * @param tokenId id of token
+     * @param keys New record keys
+     * @param values New record values
+     * @param uri domain URI
+     */
+    function mintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values) external;
+
+    /**
+     * @dev Safely mints token with records
+     * @param to address to mint the new SLD to
+     * @param tokenId id of token
+     * @param keys New record keys
+     * @param values New record values
+     * @param uri domain URI
+     */
+    function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values) external;
+
+    /**
+     * @dev Safely mints token with records
+     * @param to address to mint the new SLD to
+     * @param tokenId id of token
+     * @param keys New record keys
+     * @param values New record values
+     * @param uri domain URI
+     * @param _data bytes data to send along with a safe transfer check
+     */
+    function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values, bytes calldata _data) external;
 }

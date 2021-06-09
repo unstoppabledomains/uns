@@ -308,23 +308,6 @@ describe('Registry', () => {
       ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     })
 
-    it('should revert preconfigure of existing domain', async () => {
-      const tok = await initializeDomain('sos_51');
-
-      await expect(
-        registry.preconfigure(['new-key'], ['new-value'], tok)
-      ).to.be.revertedWith('Registry: TOKEN_EXISTS');
-    })
-
-    it('should preconfigure non-existing domain', async () => {
-      const tok = await registry.childIdOf(root, 'sos_13w4');
-
-      await registry.preconfigure(['new-key'], ['new-value'], tok);
-      await registry.mint(coinbase.address, tok, 'sos_13w4');
-
-      assert.equal(await registry.get('new-key', tok), 'new-value');
-    })
-
     it('should set record by hash', async () => {
       const tok = await initializeDomain('sk_2q1');
       const expectedKey = 'key_23c';

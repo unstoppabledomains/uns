@@ -28,14 +28,6 @@ interface IRecordStorage is IRecordReader {
     function setMany(string[] memory keys, string[] memory values, uint256 tokenId) external;
 
     /**
-     * @dev Preconfigure records for new token
-     * @param keys New record keys
-     * @param values New record values
-     * @param tokenId ERC-721 token id of the domain
-     */
-    function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external;
-
-    /**
      * @dev Reset all domain records and set new ones
      * @param keys New record keys
      * @param values New record values
