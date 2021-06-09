@@ -141,7 +141,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
     /// Burning
 
     function burn(uint256 tokenId)
-        public
+        external
         override
         onlyApprovedOrOwner(tokenId)
         protectTokenOperation(tokenId)
@@ -172,6 +172,22 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         protectTokenOperation(tokenId)
     {
         _setMany(keys, values, tokenId);
+    }
+
+    function setByHash(uint256 keyHash, string calldata value, uint256 tokenId)
+        external
+        onlyApprovedOrOwner(tokenId)
+        protectTokenOperation(tokenId)
+    {
+        _setByHash(keyHash, value, tokenId);
+    }
+
+    function setManyByHash(uint256[] calldata keyHashes, string[] calldata values, uint256 tokenId)
+        external
+        onlyApprovedOrOwner(tokenId)
+        protectTokenOperation(tokenId)
+    {
+        _setManyByHash(keyHashes, values, tokenId);
     }
 
     function preconfigure(string[] calldata keys, string[] calldata values, uint256 tokenId)

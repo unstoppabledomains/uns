@@ -1,5 +1,5 @@
+const namehash = require('eth-ens-namehash');
 const { ZERO_ADDRESS } = require('./helpers/constants');
-const { signTypedData } = require('./helpers/metatx');
 
 const { utils, BigNumber } = ethers;
 
@@ -24,9 +24,9 @@ describe('Registry', () => {
     await registry.setTokenURIPrefix('/');
   })
 
-  describe('Registry', () => {
-    it('should construct itself correctly', async () => {
-      assert.equal(root.toHexString(), '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
+  describe('General', () => {
+    it('should return zero root', async () => {
+      assert.equal(await registry.root(), 0);
     })
 
     it('should resolve properly', async () => {
@@ -52,50 +52,6 @@ describe('Registry', () => {
       assert.equal(await registry.tokenURI(root), `/${root}`);
     })
 
-    it('should reset records on transfer', async () => {
-      const tok = await registry.childIdOf(root, 'tok_aa_23');
-      await registry.mint(coinbase.address, tok, 'tok_aa_23');
-      await registry.set('key_23', 'value_23', tok);
-      assert.equal(await registry.get('key_23', tok), 'value_23');
-
-      await expect(registry.transferFrom(coinbase.address, accounts[0], tok))
-        .to.emit(registry, 'ResetRecords').withArgs(tok);
-      assert.equal(await registry.get('key_23', tok), '');
-    })
-
-    it('should reset records on safe transfer', async () => {
-      const tok = await registry.childIdOf(root, 'tok_aw_23');
-      await registry.mint(coinbase.address, tok, 'tok_aw_23');
-      await registry.set('key_13', 'value_23', tok);
-      assert.equal(await registry.get('key_13', tok), 'value_23');
-
-      await expect(registry['safeTransferFrom(address,address,uint256)'](coinbase.address, accounts[0], tok))
-        .to.emit(registry, 'ResetRecords').withArgs(tok);
-      assert.equal(await registry.get('key_13', tok), '');
-    })
-
-    it('should reset records on safe transfer with data', async () => {
-      const tok = await registry.childIdOf(root, 'tok_ae_23');
-      await registry.mint(coinbase.address, tok, 'tok_ae_23');
-      await registry.set('key_12', 'value_23', tok);
-      assert.equal(await registry.get('key_12', tok), 'value_23');
-
-      await expect(registry['safeTransferFrom(address,address,uint256,bytes)'](coinbase.address, accounts[0], tok, '0x'))
-        .to.emit(registry, 'ResetRecords').withArgs(tok);
-      assert.equal(await registry.get('key_12', tok), '');
-    })
-
-    it('should not reset records on set owner', async () => {
-      const tok = await registry.childIdOf(root, 'tok_aq_23');
-      await registry.mint(coinbase.address, tok, 'tok_aq_23');
-      await registry.set('key_16', 'value_23', tok);
-      assert.equal(await registry.get('key_16', tok), 'value_23');
-
-      await expect(registry.setOwner(owner.address, tok))
-        .to.not.emit(registry, 'ResetRecords').withArgs(tok);
-      assert.equal(await registry.get('key_16', tok), 'value_23');
-    })
-
     it('should emit Transfer event on set owner', async () => {
       const tok = await registry.childIdOf(root, 'tok_aq_sj');
       await registry.mint(coinbase.address, tok, 'tok_aq_sj');
@@ -107,24 +63,10 @@ describe('Registry', () => {
       assert.equal(await registry.get('key_82', tok), 'value_23');
     })
 
-    it('should reset records on burn', async () => {
-      const tok = await registry.childIdOf(root, 'tok_hj_23');
-      await registry.mint(coinbase.address, tok, 'tok_hj_23');
-      await registry.set('key_31', 'value_23', tok);
-      assert.equal(await registry.get('key_31', tok), 'value_23');
-
-      await expect(registry.burn(tok))
-        .to.emit(registry, 'ResetRecords').withArgs(tok);
-      assert.equal(await registry.get('key_31', tok), '');
-
-      await registry.mint(coinbase.address, tok, 'tok_hj_23');
-      assert.equal(await registry.get('key_31', tok), '');
-    })
-
     describe('childIdOf', () => {
-      it('should returnvalid childId', async () => {
-        const tokenId = await registry.childIdOf(root, 'token_childId_12ew3');
-        assert.equal(tokenId.toHexString(), '0x946b4ed6eefc200afe9e6c32ab679714b7ed4c3f9f0be48cb3cf18dc854a6dc8');
+      it('should return valid childId', async () => {
+        const tokenId = await registry.childIdOf(root, '12ew3');
+        assert.equal(tokenId.toHexString(), namehash.hash('12ew3.crypto'));
       })
   
       it('should revert when childId lable is empty', async () => {
@@ -145,9 +87,27 @@ describe('Registry', () => {
         assert.equal(await registry.exists(tok), false);
       })
     })
+
+    describe('supportsInterface', () => {
+      it('should support IERC165Upgradeable interface', async () => {
+        assert.equal(await registry.supportsInterface('0x01ffc9a7'), true);
+      })
+
+      it('should support IERC721Upgradeable interface', async () => {
+        assert.equal(await registry.supportsInterface('0x80ac58cd'), true);
+      })
+
+      it('should support IERC721MetadataUpgradeable interface', async () => {
+        assert.equal(await registry.supportsInterface('0x5b5e139f'), true);
+      })
+
+      it('should not support random interface', async () => {
+        assert.equal(await registry.supportsInterface('0x01010101'), false);
+      })
+    })
   });
 
-  describe('Registry (SLD minter)', () => {
+  describe('Registry (minting)', () => {
     it('minting SLDs', async () => {
       const tok = await registry.childIdOf(root, 'label_22');
       await registry.mint(coinbase.address, tok, 'label_22');
@@ -200,9 +160,15 @@ describe('Registry', () => {
       return tok;
     }
 
+    const initializeKey = async (key) => {
+      const keyHash = BigNumber.from(utils.id(key));
+      await registry.addKey(key);
+      return keyHash;
+    }
+
     it('should resolve tokens', async () => {
       const tok = await registry.childIdOf(root, 'label_931')
-  
+
       // should fail to set name if not owner
       await expect(
         registry.set('key', 'value', tok)
@@ -210,7 +176,7 @@ describe('Registry', () => {
 
       await registry.mint(coinbase.address, tok, 'label_931')
       await registry.set('key', 'value', tok)
-  
+
       assert.equal(
         await registry.get('key', tok),
         'value',
@@ -283,7 +249,7 @@ describe('Registry', () => {
       const expectedValue = 'get-key-by-hash-value'
       await registry.set(key, expectedValue, tok)
       const result = await registry.getByHash(utils.id(key), tok)
-  
+
       assert.equal(result.value, expectedValue)
       assert.equal(result.key, key)
     })
@@ -295,7 +261,7 @@ describe('Registry', () => {
       await registry.setMany(keys, expectedValues, tok)
       const hashedKeys = keys.map(key => BigNumber.from(utils.id(key)));
       const result = await registry.getManyByHash(hashedKeys, tok)
-  
+
       assert.deepEqual(result, [keys, expectedValues])
     })
 
@@ -342,483 +308,120 @@ describe('Registry', () => {
       ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     })
 
-    it('should revert preconfigure of existing domain', async () => {
-      const tok = await initializeDomain('sos_51');
+    it('should set record by hash', async () => {
+      const tok = await initializeDomain('sk_2q1');
+      const expectedKey = 'key_23c';
+      const keyHash = await initializeKey(expectedKey);
+
+      await registry.setByHash(keyHash, 'value', tok);
+
+      const [key, value] = await registry.getByHash(keyHash, tok);
+      assert.deepEqual([key, value], [expectedKey, 'value']);
+    })
+
+    it('should revert setting record by hash when key is not registered', async () => {
+      const tok = await initializeDomain('sk_2p3');
+      const expectedKey = 'key_23f3c';
+      const keyHash = BigNumber.from(utils.id(expectedKey));
 
       await expect(
-        registry.preconfigure(['new-key'], ['new-value'], tok)
-      ).to.be.revertedWith('Registry: TOKEN_EXISTS');
+        registry.setByHash(keyHash, 'value', tok)
+      ).to.be.revertedWith('RecordStorage: KEY_NOT_FOUND');
     })
 
-    it('should preconfigure non-existing domain', async () => {
-      const tok = await registry.childIdOf(root, 'sos_13w4');
+    it('should set records(1) by hash', async () => {
+      const tok = await initializeDomain('sk_q93');
+      const expectedKey = 'key_2w12c';
+      const keyHash = await initializeKey(expectedKey);
 
-      await registry.preconfigure(['new-key'], ['new-value'], tok);
-      await registry.mint(coinbase.address, tok, 'sos_13w4');
+      await registry.setManyByHash([keyHash], ['value'], tok);
 
-      assert.equal(await registry.get('new-key', tok), 'new-value');
-    })
-  });
-
-  describe('Registry metatx', () => {
-    const receiverAddress = '0x1234567890123456789012345678901234567890';
-
-    const getReason = (returnData) => {
-      let reason;
-      if (returnData && returnData.slice(2, 10).toString('hex') === '08c379a0') {
-        var abiCoder = new utils.AbiCoder();
-        reason = abiCoder.decode(['string'], '0x' + returnData.slice(10))[0];
-      }
-      return reason;
-    }
-
-    it('should transfer using meta-setOwner', async () => {
-      const owner = signers[1];
-      const receiver = signers[2];
-      const tok = await registry.childIdOf(root, 'res_label_113a');
-      await registry.mint(owner.address, tok, 'res_label_113a');
-
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await registry.nonceOf(owner.address)),
-        data: registry.interface.encodeFunctionData('setOwner', [receiver.address, tok]),
-      };
-      const sig = await signTypedData(registry.address, owner, req);
-      await registry.execute(req, sig);
-
-      assert.equal(receiver.address, await registry.ownerOf(tok))
+      assert.deepEqual(await registry.getByHash(keyHash, tok), [expectedKey, 'value']);
     })
 
-    it('should revert transfer using meta-setOwner when nonce invalidated', async () => {
-      const owner = signers[1];
-      const receiver = signers[2];
-      const tok = await registry.childIdOf(root, 'res_label_0896');
-      await registry.mint(owner.address, tok, 'res_label_0896');
+    it('should set records(2) by hash', async () => {
+      const tok = await initializeDomain('sk_8s6b1');
+      const key1 = 'key_3m3c';
+      const key2 = 'key_9v3f';
+      const key1Hash = await initializeKey(key1);
+      const key2Hash = await initializeKey(key2);
 
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await registry.nonceOf(owner.address)),
-        data: registry.interface.encodeFunctionData('setOwner', [receiver.address, tok]),
-      };
-      const sig = await signTypedData(registry.address, owner, req);
+      await registry.setManyByHash([key1Hash, key2Hash], ['value1', 'value2'], tok);
 
-      await registry.connect(owner).set('key', 'value', tok);
-
-      await expect(registry.execute(req, sig)).to.be
-        .revertedWith('RegistryForwarder: signature does not match request');
+      assert.deepEqual(
+        await registry.getManyByHash([key1Hash, key2Hash], tok),
+        [[key1, key2],['value1', 'value2']]
+      );
     })
 
-    it('should setApprovalForAll using meta-setApprovalForAll', async () => {
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: 0,
-        nonce: Number(await registry.nonceOf(owner.address)),
-        data: registry.interface.encodeFunctionData('setApprovalForAll', [operator.address, true]),
-      };
-      const sig = await signTypedData(registry.address, owner, req);
-      const [success, ] = await registry.callStatic.execute(req, sig);
-      expect(success).to.be.true;
+    it('should revert setting records by hash when at least one key is not registered', async () => {
+      const tok = await initializeDomain('sk_30q13');
+      const key1 = 'key_2d83c';
+      const key2 = 'key_4o83f';
+      const key1Hash = await initializeKey(key1);
+      const key2Hash = BigNumber.from(utils.id(key2));
+
+      await expect(
+        registry.setManyByHash([key1Hash, key2Hash], ['value1', 'value2'], tok)
+      ).to.be.revertedWith('RecordStorage: KEY_NOT_FOUND');
     })
 
-    it('should revert meta-setApprovalForAll for non-onwer', async () => {
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: 0,
-        nonce: Number(await registry.nonceOf(owner.address)),
-        data: registry.interface.encodeFunctionData('setApprovalForAll', [operator.address, true]),
-      };
-      const sig = await signTypedData(registry.address, nonOwner, req);
-      await expect(registry.execute(req, sig)).to.be
-        .revertedWith('RegistryForwarder: signature does not match request');
+    it('should reset records on transfer', async () => {
+      const tok = await registry.childIdOf(root, 'tok_aa_23');
+      await registry.mintSLD(coinbase.address, root, 'tok_aa_23');
+      await registry.set('key_23', 'value_23', tok);
+      assert.equal(await registry.get('key_23', tok), 'value_23');
+
+      await expect(registry.transferFrom(coinbase.address, accounts[0], tok))
+        .to.emit(registry, 'ResetRecords').withArgs(tok);
+      assert.equal(await registry.get('key_23', tok), '');
     })
 
-    it('should transfer using meta-transferFrom', async () => {
-      const tok = await registry.childIdOf(root, 'meta_1591');
-      await registry.mint(owner.address, tok, 'meta_1591');
+    it('should reset records on safe transfer', async () => {
+      const tok = await registry.childIdOf(root, 'tok_aw_23');
+      await registry.mintSLD(coinbase.address, root, 'tok_aw_23');
+      await registry.set('key_13', 'value_23', tok);
+      assert.equal(await registry.get('key_13', tok), 'value_23');
 
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await registry.nonceOf(tok)),
-        data: registry.interface.encodeFunctionData('transferFrom', [owner.address, receiverAddress, tok]),
-      };
-      const sig = await signTypedData(registry.address, owner, req);
-      await registry.execute(req, sig);
-
-      assert.equal(await registry.ownerOf(tok), receiverAddress);
+      await expect(registry['safeTransferFrom(address,address,uint256)'](coinbase.address, accounts[0], tok))
+        .to.emit(registry, 'ResetRecords').withArgs(tok);
+      assert.equal(await registry.get('key_13', tok), '');
     })
 
-    it('should revert meta-transferFrom for non-onwer', async () => {
-      const tok = await registry.childIdOf(root, 'meta_6458');
-      await registry.mint(owner.address, tok, 'meta_6458');
+    it('should reset records on safe transfer with data', async () => {
+      const tok = await registry.childIdOf(root, 'tok_ae_23');
+      await registry.mintSLD(coinbase.address, root, 'tok_ae_23');
+      await registry.set('key_12', 'value_23', tok);
+      assert.equal(await registry.get('key_12', tok), 'value_23');
 
-      const req = {
-        from: nonOwner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await registry.nonceOf(tok)),
-        data: registry.interface.encodeFunctionData('transferFrom', [nonOwner.address, receiverAddress, tok]),
-      };
-      const sig = await signTypedData(registry.address, nonOwner, req);
-      const [success, ] = await registry.callStatic.execute(req, sig);
-      expect(success).to.be.false;
+      await expect(registry['safeTransferFrom(address,address,uint256,bytes)'](coinbase.address, accounts[0], tok, '0x'))
+        .to.emit(registry, 'ResetRecords').withArgs(tok);
+      assert.equal(await registry.get('key_12', tok), '');
     })
 
-    it('should transfer using meta-safeTransferFrom', async () => {
-      const tok = await registry.childIdOf(root, 'meta_10235');
-      await registry.mint(owner.address, tok, 'meta_10235');
+    it('should reset records on burn', async () => {
+      const tok = await registry.childIdOf(root, 'tok_hj_23');
+      await registry.mintSLD(coinbase.address, root, 'tok_hj_23');
+      await registry.set('key_31', 'value_23', tok);
+      assert.equal(await registry.get('key_31', tok), 'value_23');
 
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await registry.nonceOf(tok)),
-        data: registry.interface.encodeFunctionData(
-          'safeTransferFrom(address,address,uint256)',
-          [owner.address, receiverAddress, tok]
-        ),
-      };
-      const sig = await signTypedData(registry.address, owner, req);
-      await registry.execute(req, sig);
+      await expect(registry.burn(tok))
+        .to.emit(registry, 'ResetRecords').withArgs(tok);
+      assert.equal(await registry.get('key_31', tok), '');
 
-      assert.equal(await registry.ownerOf(tok), receiverAddress);
+      await registry.mintSLD(coinbase.address, root, 'tok_hj_23');
+      assert.equal(await registry.get('key_31', tok), '');
     })
 
-    it('should revert meta-safeTransferFrom for non-onwer', async () => {
-      const tok = await registry.childIdOf(root, 'meta_e5iuw');
-      await registry.mint(owner.address, tok, 'meta_e5iuw');
+    it('should not reset records on set owner', async () => {
+      const tok = await registry.childIdOf(root, 'tok_aq_23');
+      await registry.mintSLD(coinbase.address, root, 'tok_aq_23');
+      await registry.set('key_16', 'value_23', tok);
+      assert.equal(await registry.get('key_16', tok), 'value_23');
 
-      const req = {
-        from: nonOwner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await registry.nonceOf(tok)),
-        data: registry.interface.encodeFunctionData(
-          'safeTransferFrom(address,address,uint256)',
-          [nonOwner.address, receiverAddress, tok]
-        ),
-      };
-      const sig = await signTypedData(registry.address, nonOwner, req);
-      const [success, ] = await registry.callStatic.execute(req, sig);
-      expect(success).to.be.false;
-    })
-
-    // TODO: add tests for safeTransferFrom(address,address,uint256,bytes)
-
-    it('should burn using meta-burn', async () => {
-      const tok = await registry.childIdOf(root, 'meta_ar093');
-      await registry.mint(owner.address, tok, 'meta_ar093');
-
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await registry.nonceOf(tok)),
-        data: registry.interface.encodeFunctionData('burn', [tok]),
-      };
-      const sig = await signTypedData(registry.address, owner, req);
-      await registry.execute(req, sig);
-  
-      await expect(registry.ownerOf(tok)).to.be.revertedWith('ERC721: owner query for nonexistent token');
-    })
-
-    it('should revert meta-burn for non-onwer', async () => {
-      const tok = await registry.childIdOf(root, 'meta_53dg3');
-      await registry.mint(owner.address, tok, 'meta_53dg3');
-
-      const req = {
-        from: nonOwner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await registry.nonceOf(tok)),
-        data: registry.interface.encodeFunctionData('burn', [tok]),
-      };
-      const sig = await signTypedData(registry.address, nonOwner, req);
-      const [success, ] = await registry.callStatic.execute(req, sig);
-      expect(success).to.be.false;
-    })
-
-    describe('ABI-based tests', () => {
-      const registryFuncs = () => {
-        return Registry.interface.fragments
-          .filter(x => x.type === 'function' && !['view', 'pure'].includes(x.stateMutability))
-      }
-
-      const buidRequest = async (fragment, from, tokenId, paramsMap) => {
-        const funcSig = funcFragmentToSig(fragment);
-        const req = {
-          from,
-          gas: '200000',
-          tokenId,
-          nonce: Number(await registry.nonceOf(tokenId)),
-          data: registry.interface.encodeFunctionData(funcSig, fragment.inputs.map(x => paramsMap[x.name])),
-        };
-        return req;
-      }
-
-      const funcFragmentToSig = (fragment) => {
-        return `${fragment.name}(${fragment.inputs.map(x => `${x.type} ${x.name}`).join(',')})`;
-      };
-
-      describe('Token-based functions (token should not be minted)', () => {
-        const paramValueMap = {
-          uri: 'label',
-          '_data': '0x',
-          keys: ['key1'],
-          values: ['value1']
-        }
-        
-        const included = ['mint', 'safeMint', 'preconfigure'];
-
-        const getFuncs = () => {
-          return registryFuncs()
-            .filter(x => x.inputs.filter(i => i.name === 'tokenId').length)
-            .filter(x => included.includes(x.name));
-        }
-
-        before(async () => {
-          paramValueMap.to = receiver.address;
-        })
-
-        it('should execute all functions successfully', async () => {
-          for(const func of getFuncs()) {
-            const funcSigHash = utils.id(`${funcFragmentToSig(func)}_excl`);
-            paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
-
-            const req = await buidRequest(func, coinbase.address, paramValueMap.tokenId, paramValueMap);
-            const sig = await signTypedData(registry.address, coinbase, req);
-            const [success, returnData] = await registry.callStatic.execute(req, sig);
-
-            if(!success) {
-              console.error(getReason(returnData));
-            }
-            expect(success).to.be.true;
-          }
-        })
-      })
-
-      describe('Token-based functions (token should be minted)', () => {
-        const paramValueMap = {
-          uri: 'label',
-          '_data': '0x',
-          key: 'key1',
-          value: 'value',
-          keys: ['key1'],
-          values: ['value1']
-        }
-
-        const excluded = ['mint', 'safeMint', 'preconfigure'];
-
-        const getFuncs = () => {
-          return registryFuncs()
-            .filter(x => x.inputs.filter(i => i.name === 'tokenId').length)
-            .filter(x => !excluded.includes(x.name));
-        }
-
-        const mintToken = async (owner, tokenId, label) => {
-          await registry.mint(owner.address, tokenId, label);
-        }
-
-        before(async () => {
-          paramValueMap.from = owner.address;
-          paramValueMap.to = receiver.address;
-        })
-
-        it('should execute all functions successfully', async () => {
-          for(const func of getFuncs()) {
-            const funcSigHash = utils.id(`${funcFragmentToSig(func)}_ok`);
-            paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
-            await mintToken(owner, paramValueMap.tokenId, funcSigHash);
-
-            const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
-            const sig = await signTypedData(registry.address, owner, req);
-            const [success, returnData] = await registry.callStatic.execute(req, sig);
-
-            if(!success) {
-              console.error(getReason(returnData));
-            }
-            expect(success).to.be.true;
-          }
-        })
-
-        it('should revert execution of all token-based functions when used signature', async () => {
-          for(const func of getFuncs()) {
-            const funcSig = funcFragmentToSig(func)
-            const funcSigHash = utils.id(`${funcSig}_doubleUse`);
-            paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
-            await mintToken(owner, paramValueMap.tokenId, funcSigHash);
-
-            const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
-            const sig = await signTypedData(registry.address, owner, req);
-
-            const [success, returnData] = await registry.callStatic.execute(req, sig);
-            if(!success) {
-              console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
-              console.error(getReason(returnData));
-            }
-            expect(success).to.be.true;
-
-            await registry.execute(req, sig);
-
-            await expect(registry.execute(req, sig)).to.be
-              .revertedWith('RegistryForwarder: signature does not match request');
-          }
-        })
-
-        it('should revert execution of all token-based functions when nonce invalidated', async () => {
-          for(const func of getFuncs()) {
-            const funcSig = funcFragmentToSig(func)
-            const funcSigHash = utils.id(`${funcSig}_nonceInvalidated`);
-            paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
-            await mintToken(owner, paramValueMap.tokenId, funcSigHash);
-
-            const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
-            const sig = await signTypedData(registry.address, owner, req);
-
-            await registry.connect(owner).set('key', 'value', paramValueMap.tokenId);
-
-            await expect(registry.execute(req, sig)).to.be
-              .revertedWith('RegistryForwarder: signature does not match request');
-          }
-        })
-
-        it('should fail execution of all token-based functions when tokenId does not match', async () => {
-          for(const func of getFuncs()) {
-            const funcSig = funcFragmentToSig(func);
-            const funcSigHash = utils.id(`${funcSig}_wrongToken`);
-
-            paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
-            await mintToken(owner, paramValueMap.tokenId, funcSigHash);
-
-            const tokenIdForwarder = await registry.childIdOf(root, utils.id(`_${funcSig}`));
-            const req = await buidRequest(func, owner.address, tokenIdForwarder, paramValueMap);
-            const sig = await signTypedData(registry.address, owner, req);
-            const [success, returnData] = await registry.callStatic.execute(req, sig);
-
-            expect(success).to.be.false;
-            expect(getReason(returnData)).to.be.eql('Registry: TOKEN_INVALID');
-          }
-        })
-
-        it('should fail execution of all token-based functions when tokenId is empty', async () => {
-          for(const func of getFuncs()) {
-            const funcSigHash = utils.id(`${funcFragmentToSig(func)}_emptyTokenId`);
-            paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
-            await mintToken(owner, paramValueMap.tokenId, funcSigHash);
-
-            const req = await buidRequest(func, owner.address, 0, paramValueMap);
-            const sig = await signTypedData(registry.address, owner, req);
-            const [success, returndata] = await registry.callStatic.execute(req, sig);
-
-            expect(success).to.be.false;
-            expect(getReason(returndata)).to.be.eql('Registry: TOKEN_INVALID');
-          }
-        })
-      })
-
-      describe('Non-Token functions', () => {
-        const paramValueMap = {
-          label: 'label',
-          '_data': '0x',
-          role: '0x1000000000000000000000000000000000000000000000000000000000000000',
-          keys: ['key1'],
-          values: ['value1'],
-          approved: true,
-          prefix: '/'
-        };
-
-        const excluded = [
-          'execute',
-          'initialize',
-          'transferOwnership',  // might influence tests
-          'renounceOwnership',  // might influence tests
-        ];
-
-        before(async () => {
-          paramValueMap.tld = root;
-          paramValueMap.account = accessControl.address;
-          paramValueMap.to = owner.address;
-          paramValueMap.operator = operator.address;
-        })
-
-        const getFuncs = () => {
-          return registryFuncs()
-            .filter(x => !x.inputs.filter(i => i.name === 'tokenId').length)
-            .filter(x => !excluded.includes(x.name));
-        }
-
-        it('should execute all functions successfully', async () => {
-          for(const func of getFuncs()) {
-            const funcSig = funcFragmentToSig(func);
-            paramValueMap.label = utils.id(`${funcSig}_label`);
-
-            const req = await buidRequest(func, coinbase.address, 0, paramValueMap);
-            const sig = await signTypedData(registry.address, coinbase, req);
-            const [success, returnData] = await registry.callStatic.execute(req, sig);
-
-            if(!success) {
-              console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
-              console.error(getReason(returnData));
-            }
-            expect(success).to.be.true;
-          }
-        })
-
-        it('should revert execution of all functions when used signature', async () => {
-          for(const func of getFuncs()) {
-            const funcSig = funcFragmentToSig(func);
-            paramValueMap.label = utils.id(`${funcSig}_doubleUse`);
-
-            const tokenIdForwarder = await registry.childIdOf(root, utils.id(`_${funcSig}`));
-            const req = await buidRequest(func, coinbase.address, tokenIdForwarder, paramValueMap);
-            const sig = await signTypedData(registry.address, coinbase, req);
-
-            const [success, returnData] = await registry.callStatic.execute(req, sig);
-            if(!success) {
-              console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
-              console.error(getReason(returnData));
-            }
-            expect(success).to.be.true;
-
-            await registry.execute(req, sig);
-
-            await expect(registry.execute(req, sig)).to.be
-              .revertedWith('RegistryForwarder: signature does not match request');
-          }
-        })
-
-        it('should revert execution of all functions when used signature and tokenId is empty', async () => {
-          for(const func of getFuncs()) {
-            const funcSig = funcFragmentToSig(func);
-            paramValueMap.label = utils.id(`${funcSig}_doubleUse_0`);
-
-            const tokenId = 0;
-            const nonce = await registry.nonceOf(tokenId);
-            const req = await buidRequest(func, coinbase.address, tokenId, paramValueMap);
-            const sig = await signTypedData(registry.address, coinbase, req);
-
-            const [success, returnData] = await registry.callStatic.execute(req, sig);
-            if(!success) {
-              console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
-              console.error(getReason(returnData));
-            }
-            expect(success).to.be.true;
-
-            await registry.execute(req, sig);
-
-            expect(await registry.nonceOf(tokenId)).to.be.equal(nonce.add(1));
-            await expect(registry.execute(req, sig)).to.be
-              .revertedWith('RegistryForwarder: signature does not match request');
-          }
-        })
-      })
+      await expect(registry.setOwner(owner.address, tok))
+        .to.not.emit(registry, 'ResetRecords').withArgs(tok);
+      assert.equal(await registry.get('key_16', tok), 'value_23');
     })
   });
 })

@@ -40,13 +40,6 @@ UNS registry smart contracts.
 
         function setOwner(address to, uint256 tokenId) external;
 
-        /**
-        * @dev Burns `tokenId`. See {ERC721-_burn}.
-        *
-        * Requirements:
-        *
-        * - The caller must own `tokenId` or be an approved operator.
-        */
         function burn(uint256 tokenId) external;
     }
     ```
@@ -73,29 +66,6 @@ UNS registry smart contracts.
         function reset(uint256 tokenId) external;
     }
     ```
-
-    ### Ideas:
-
-    1. `bytes32 key` instead of `string key`
-
-       ```solidity
-       mapping (uint256 => mapping (uint256 =>  mapping (string => string))) internal _records;
-       ```
-
-       Replace by:
-
-       ```solidity
-       mapping (uint256 => mapping (uint256 =>  mapping (bytes32 => string))) internal _records;
-       ```
-
-       Pros:
-
-       - less dynamic types -> cheaper usage
-
-       Cons:
-
-       - key max length is 32 characters
-       - usage will always require conversion between string and bytes32
 
 6.  Support meta-transactions
 
@@ -185,13 +155,7 @@ UNS registry smart contracts.
       - does it make sence to have `req.gas`?
       - do we need `expiry` check?
 
-7.  Controllers
-
-    - Removed SignatureController
-    - Removed URIPrefixController
-    - Removed MintingController
-
-8.  Upgradable registry
+7.  Upgradable registry
 
     TBD:
 
@@ -203,7 +167,7 @@ UNS registry smart contracts.
     - [Writing Upgradeable Contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable)
     - [UUPS Proxies: Tutorial (Solidity + JavaScript)](https://forum.openzeppelin.com/t/uups-proxies-tutorial-solidity-javascript/7786)
 
-9. TLD management
+8. TLD management
 
     ```solidity
     contract IMintingManager is ISLDMinter, IClaimer {
@@ -216,8 +180,8 @@ UNS registry smart contracts.
     }
     ```
 
-10. Multicalls
-11. Roles model
+9. Multicalls
+10. Roles model
 
 ## Main stack
 
