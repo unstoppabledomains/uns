@@ -604,6 +604,26 @@ describe('MintingManager', () => {
         expect(await registry.get('key1', tokenId)).to.be.eql('value1');
       })
     })
+
+    describe('mintSLDWithRecords(address,uint256,string,string[],string[]) no records', () => {
+      it('should mint with records .crypto domain in CNS registry', async () => {
+        await mintingManager['mintSLDWithRecords(address,uint256,string,string[],string[])']
+          (coinbase.address, cryptoRoot, 'test-m439', [], []);
+
+        const tokenId = await cryptoRegistry.childIdOf(cryptoRoot, 'test-m439');
+        expect(await cryptoRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
+        await expect(registry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+
+      it('should mint with records .wallet domain in UNS registry', async () => {
+        await mintingManager['mintSLDWithRecords(address,uint256,string,string[],string[])']
+          (coinbase.address, walletRoot, 'test-m942', [], []);
+
+        const tokenId = await cryptoRegistry.childIdOf(walletRoot, 'test-m942');
+        assert.equal(await registry.ownerOf(tokenId), coinbase.address);
+        await expect(cryptoRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+    })
   })
 
   describe('CryptoResolver management', () => {
