@@ -1,3 +1,4 @@
+const namehash = require('eth-ens-namehash');
 const { ZERO_ADDRESS } = require('./helpers/constants');
 
 const { utils, BigNumber } = ethers;
@@ -63,9 +64,9 @@ describe('Registry', () => {
     })
 
     describe('childIdOf', () => {
-      it('should returnvalid childId', async () => {
-        const tokenId = await registry.childIdOf(root, 'token_childId_12ew3');
-        assert.equal(tokenId.toHexString(), '0x946b4ed6eefc200afe9e6c32ab679714b7ed4c3f9f0be48cb3cf18dc854a6dc8');
+      it('should return valid childId', async () => {
+        const tokenId = await registry.childIdOf(root, '12ew3');
+        assert.equal(tokenId.toHexString(), namehash.hash('12ew3.crypto'));
       })
   
       it('should revert when childId lable is empty', async () => {
