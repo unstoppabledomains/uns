@@ -94,21 +94,21 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         _mint(to, tokenId);
     }
 
-    function mintSLD(address to, uint256 tld, string memory label) external override onlyMintingManager {
+    function mintSLD(address to, uint256 tld, string calldata label) external override onlyMintingManager {
         _mintChild(to, tld, label);
     }
 
     function safeMintSLD(address to, uint256 tld, string calldata label) external override onlyMintingManager {
-        safeMintSLD(to, tld, label, '');
+        _safeMint(to, _childId(tld, label), '');
     }
 
-    function safeMintSLD(address to, uint256 tld, string memory label, bytes memory _data)
-        public override onlyMintingManager
+    function safeMintSLD(address to, uint256 tld, string calldata label, bytes calldata _data)
+        external override onlyMintingManager
     {
         _safeMint(to, _childId(tld, label), _data);
     }
 
-    function mintSLDWithRecords(address to, uint256 tld, string memory label, string[] memory keys, string[] memory values)
+    function mintSLDWithRecords(address to, uint256 tld, string calldata label, string[] calldata keys, string[] calldata values)
         external
         override
         onlyMintingManager
@@ -151,7 +151,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
     /// Burning
 
     function burn(uint256 tokenId)
-        public
+        external
         override
         onlyApprovedOrOwner(tokenId)
         protectTokenOperation(tokenId)
@@ -175,7 +175,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         _set(key, value, tokenId);
     }
 
-    function setMany(string[] memory keys, string[] memory values, uint256 tokenId)
+    function setMany(string[] calldata keys, string[] calldata values, uint256 tokenId)
         external
         override
         onlyApprovedOrOwner(tokenId)
@@ -184,7 +184,23 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         _setMany(keys, values, tokenId);
     }
 
-    function reconfigure(string[] memory keys, string[] memory values, uint256 tokenId)
+    function setByHash(uint256 keyHash, string calldata value, uint256 tokenId)
+        external
+        onlyApprovedOrOwner(tokenId)
+        protectTokenOperation(tokenId)
+    {
+        _setByHash(keyHash, value, tokenId);
+    }
+
+    function setManyByHash(uint256[] calldata keyHashes, string[] calldata values, uint256 tokenId)
+        external
+        onlyApprovedOrOwner(tokenId)
+        protectTokenOperation(tokenId)
+    {
+        _setManyByHash(keyHashes, values, tokenId);
+    }
+
+    function reconfigure(string[] calldata keys, string[] calldata values, uint256 tokenId)
         external
         override
         onlyApprovedOrOwner(tokenId)
