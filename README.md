@@ -246,6 +246,7 @@ Note: List of changes which makes UNS and CNS backward incompatibile
   * UNS has a single resolver which is Registry, so one can assume that resolver is always set to registry address
 * `event Sync(address indexed resolver, uint256 indexed updateId, uint256 indexed tokenId)` 
   * Removed
+  * There is no need for this event because there is only one resolver and changes can be tracked by `Set` event instead
 * `event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value)` 
   * Moved from Resolver to Registry
 * `event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key)` 
