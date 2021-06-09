@@ -18,7 +18,7 @@ describe('Registry (metatx)', () => {
 
     registry = await Registry.deploy();
     await registry.initialize(coinbase.address);
-    await registry.mintTLD('0xdead000000000000000000000000000000000000', root);
+    await registry.mint('0xdead000000000000000000000000000000000000', root, 'crypto');
     await registry.setTokenURIPrefix('/');
   })
 
@@ -29,7 +29,7 @@ describe('Registry (metatx)', () => {
       const owner = signers[1];
       const receiver = signers[2];
       const tok = await registry.childIdOf(root, 'res_label_113a');
-      await registry.mintSLD(owner.address, root, 'res_label_113a');
+      await registry.mint(owner.address, tok, 'res_label_113a');
 
       const req = {
         from: owner.address,
@@ -48,7 +48,7 @@ describe('Registry (metatx)', () => {
       const owner = signers[1];
       const receiver = signers[2];
       const tok = await registry.childIdOf(root, 'res_label_0896');
-      await registry.mintSLD(owner.address, root, 'res_label_0896');
+      await registry.mint(owner.address, tok, 'res_label_0896');
 
       const req = {
         from: owner.address,
@@ -93,7 +93,7 @@ describe('Registry (metatx)', () => {
 
     it('should transfer using meta-transferFrom', async () => {
       const tok = await registry.childIdOf(root, 'meta_1591');
-      await registry.mintSLD(owner.address, root, 'meta_1591');
+      await registry.mint(owner.address, tok, 'meta_1591');
 
       const req = {
         from: owner.address,
@@ -110,7 +110,7 @@ describe('Registry (metatx)', () => {
 
     it('should revert meta-transferFrom for non-onwer', async () => {
       const tok = await registry.childIdOf(root, 'meta_6458');
-      await registry.mintSLD(owner.address, root, 'meta_6458');
+      await registry.mint(owner.address, tok, 'meta_6458');
 
       const req = {
         from: nonOwner.address,
@@ -126,7 +126,7 @@ describe('Registry (metatx)', () => {
 
     it('should transfer using meta-safeTransferFrom', async () => {
       const tok = await registry.childIdOf(root, 'meta_10235');
-      await registry.mintSLD(owner.address, root, 'meta_10235');
+      await registry.mint(owner.address, tok, 'meta_10235');
 
       const req = {
         from: owner.address,
@@ -146,7 +146,7 @@ describe('Registry (metatx)', () => {
 
     it('should revert meta-safeTransferFrom for non-onwer', async () => {
       const tok = await registry.childIdOf(root, 'meta_e5iuw');
-      await registry.mintSLD(owner.address, root, 'meta_e5iuw');
+      await registry.mint(owner.address, tok, 'meta_e5iuw');
 
       const req = {
         from: nonOwner.address,
@@ -167,7 +167,7 @@ describe('Registry (metatx)', () => {
 
     it('should burn using meta-burn', async () => {
       const tok = await registry.childIdOf(root, 'meta_ar093');
-      await registry.mintSLD(owner.address, root, 'meta_ar093');
+      await registry.mint(owner.address, tok, 'meta_ar093');
 
       const req = {
         from: owner.address,
@@ -184,7 +184,7 @@ describe('Registry (metatx)', () => {
 
     it('should revert meta-burn for non-onwer', async () => {
       const tok = await registry.childIdOf(root, 'meta_53dg3');
-      await registry.mintSLD(owner.address, root, 'meta_53dg3');
+      await registry.mint(owner.address, tok, 'meta_53dg3');
 
       const req = {
         from: nonOwner.address,
@@ -214,13 +214,14 @@ describe('Registry (metatx)', () => {
         .filter(x => x.type === 'function' && !['view', 'pure'].includes(x.stateMutability))
     }
 
-    const buidRequest = async (fragment, from, reqId, paramsMap) => {
+    const buidRequest = async (fragment, from, tokenId, paramsMap) => {
       const funcSig = funcFragmentToSig(fragment);
+
       const req = {
         from,
         gas: '200000',
-        tokenId: reqId,
-        nonce: Number(await registry.nonceOf(reqId)),
+        tokenId,
+        nonce: Number(await registry.nonceOf(tokenId)),
         data: registry.interface.encodeFunctionData(funcSig, fragment.inputs.map(x => paramsMap[x.name])),
       };
       return req;
@@ -230,7 +231,44 @@ describe('Registry (metatx)', () => {
       return `${fragment.name}(${fragment.inputs.map(x => `${x.type} ${x.name}`).join(',')})`;
     };
 
-    describe('Token-based functions', () => {
+    describe('Token-based functions (token should not be minted)', () => {
+      const paramValueMap = {
+        uri: 'label',
+        '_data': '0x',
+        keys: ['key1'],
+        values: ['value1']
+      }
+
+      const included = ['mint', 'safeMint', 'preconfigure'];
+
+      const getFuncs = () => {
+        return registryFuncs()
+          .filter(x => x.inputs.filter(i => i.name === 'tokenId').length)
+          .filter(x => included.includes(x.name));
+      }
+
+      before(async () => {
+        paramValueMap.to = receiver.address;
+      })
+
+      it('should execute all functions successfully', async () => {
+        for(const func of getFuncs()) {
+          const funcSigHash = utils.id(`${funcFragmentToSig(func)}_excl`);
+          paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
+
+          const req = await buidRequest(func, coinbase.address, paramValueMap.tokenId, paramValueMap);
+          const sig = await signTypedData(registry.address, coinbase, req);
+          const [success, returnData] = await registry.callStatic.execute(req, sig);
+
+          if(!success) {
+            console.error(getReason(returnData));
+          }
+          expect(success).to.be.true;
+        }
+      })
+    })
+
+    describe('Token-based functions (token should be minted)', () => {
       const paramValueMap = {
         label: 'label',
         '_data': '0x',
@@ -242,7 +280,7 @@ describe('Registry (metatx)', () => {
         values: ['value1']
       }
 
-      const excluded = ['mintTLD'];
+      const excluded = ['mint', 'safeMint', 'preconfigure'];
 
       const getFuncs = () => {
         return registryFuncs()
@@ -250,8 +288,8 @@ describe('Registry (metatx)', () => {
           .filter(x => !excluded.includes(x.name));
       }
 
-      const mintToken = async (owner, label) => {
-        await registry.mintSLD(owner.address, root, label);
+      const mintToken = async (owner, tokenId, label) => {
+        await registry.mint(owner.address, tokenId, label);
       }
 
       before(async () => {
@@ -265,7 +303,7 @@ describe('Registry (metatx)', () => {
         for(const func of getFuncs()) {
           const funcSigHash = utils.id(`${funcFragmentToSig(func)}_ok`);
           paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
-          await mintToken(owner, funcSigHash);
+          await mintToken(owner, paramValueMap.tokenId, funcSigHash);
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
           const sig = await signTypedData(registry.address, owner, req);
@@ -283,7 +321,7 @@ describe('Registry (metatx)', () => {
           const funcSig = funcFragmentToSig(func)
           const funcSigHash = utils.id(`${funcSig}_doubleUse`);
           paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
-          await mintToken(owner, funcSigHash);
+          await mintToken(owner, paramValueMap.tokenId, funcSigHash);
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
           const sig = await signTypedData(registry.address, owner, req);
@@ -307,7 +345,7 @@ describe('Registry (metatx)', () => {
           const funcSig = funcFragmentToSig(func)
           const funcSigHash = utils.id(`${funcSig}_nonceInvalidated`);
           paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
-          await mintToken(owner, funcSigHash);
+          await mintToken(owner, paramValueMap.tokenId, funcSigHash);
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
           const sig = await signTypedData(registry.address, owner, req);
@@ -325,7 +363,7 @@ describe('Registry (metatx)', () => {
           const funcSigHash = utils.id(`${funcSig}_wrongToken`);
 
           paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
-          await mintToken(owner, funcSigHash);
+          await mintToken(owner, paramValueMap.tokenId, funcSigHash);
 
           const tokenIdForwarder = await registry.childIdOf(root, utils.id(`_${funcSig}`));
           const req = await buidRequest(func, owner.address, tokenIdForwarder, paramValueMap);
@@ -341,7 +379,7 @@ describe('Registry (metatx)', () => {
         for(const func of getFuncs()) {
           const funcSigHash = utils.id(`${funcFragmentToSig(func)}_emptyTokenId`);
           paramValueMap.tokenId = await registry.childIdOf(root, funcSigHash);
-          await mintToken(owner, funcSigHash);
+          await mintToken(owner, paramValueMap.tokenId, funcSigHash);
 
           const req = await buidRequest(func, owner.address, 0, paramValueMap);
           const sig = await signTypedData(registry.address, owner, req);
