@@ -111,9 +111,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         external override onlyMintingManager
     {
         _mint(to, tokenId, uri);
-        if(keys.length > 0) {
-            _setMany(keys, values, tokenId);
-        }
+        _setMany(keys, values, tokenId);
     }
 
     function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values)
@@ -260,9 +258,7 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         internal
     {
         _safeMint(to, tokenId, uri, _data);
-        if(keys.length > 0) {
-            _setMany(keys, values, tokenId);
-        }
+        _setMany(keys, values, tokenId);
     }
 
     function _baseURI()

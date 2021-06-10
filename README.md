@@ -27,6 +27,7 @@ UNS registry smart contracts.
 
     ```solidity
     interface IRegistry /_ is IERC721Metadata, IRecordStorage _/ {
+        event NewURI(uint256 indexed tokenId, string uri);
 
         event NewURIPrefix(string prefix);
 
@@ -203,8 +204,6 @@ Note: List of changes which makes UNS and CNS backward incompatibile
 
 ### Events
 
-* `event NewURI(uint256 indexed tokenId, string uri)` 
-  * Removed
 * `event Resolve(uint256 indexed tokenId, address indexed to)` 
   * Removed
   * UNS has a single resolver which is Registry, so one can assume that resolver is always set to registry address
