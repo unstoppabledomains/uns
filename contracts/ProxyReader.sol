@@ -136,10 +136,12 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         view
         override
         returns (
+            address resolver,
             address owner,
             string[] memory values
         )
     {
+        resolver = _resolverOf(tokenId);
         owner = _ownerOf(tokenId);
         values = _registry.getMany(keys, tokenId);
     }
@@ -149,15 +151,18 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         view
         override
         returns (
+            address[] memory resolvers,
             address[] memory owners,
             string[][] memory values
         )
     {
+
+        resolvers = new address[](tokenIds.length);
         owners = new address[](tokenIds.length);
         values = new string[][](tokenIds.length);
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            (owners[i], values[i]) = this.getData(keys, tokenIds[i]);
+            (resolvers[i], owners[i], values[i]) = this.getData(keys, tokenIds[i]);
         }
     }
 
@@ -166,11 +171,13 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         view
         override
         returns (
+            address resolver,
             address owner,
             string[] memory keys,
             string[] memory values
         )
     {
+        resolver = _resolverOf(tokenId);
         owner = _ownerOf(tokenId);
         (keys, values) = _registry.getManyByHash(keyHashes, tokenId);
     }
@@ -180,17 +187,19 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         view
         override
         returns (
+            address[] memory resolvers,
             address[] memory owners,
             string[][] memory keys,
             string[][] memory values
         )
     {
+        resolvers = new address[](tokenIds.length);
         owners = new address[](tokenIds.length);
         keys = new string[][](tokenIds.length);
         values = new string[][](tokenIds.length);
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            (owners[i], keys[i], values[i]) = this.getDataByHash(keyHashes, tokenIds[i]);
+            (resolvers[i], owners[i], keys[i], values[i]) = this.getDataByHash(keyHashes, tokenIds[i]);
         }
     }
 
@@ -207,8 +216,16 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function _ownerOf(uint256 tokenId) private view returns (address) {
-        try _registry.ownerOf(tokenId) returns (address owner) {
-            return owner;
+        try _registry.ownerOf(tokenId) returns (address _owner) {
+            return _owner;
+        } catch {
+            return address(0x0);
+        }
+    }
+
+    function _resolverOf(uint256 tokenId) private view returns (address) {
+        try _registry.resolverOf(tokenId) returns (address _resolver) {
+            return _resolver;
         } catch {
             return address(0x0);
         }

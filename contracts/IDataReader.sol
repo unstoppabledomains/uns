@@ -12,6 +12,7 @@ interface IDataReader {
         external
         view
         returns (
+            address resolver,
             address owner,
             string[] memory values
         );
@@ -25,6 +26,7 @@ interface IDataReader {
         external
         view
         returns (
+            address[] memory resolvers,
             address[] memory owners,
             string[][] memory values
         );
@@ -38,6 +40,7 @@ interface IDataReader {
         external
         view
         returns (
+            address resolver,
             address owner,
             string[] memory keys,
             string[] memory values
@@ -52,6 +55,7 @@ interface IDataReader {
         external
         view
         returns (
+            address[] memory resolvers,
             address[] memory owners,
             string[][] memory keys,
             string[][] memory values
