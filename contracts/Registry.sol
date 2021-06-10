@@ -119,19 +119,13 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
     function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values)
         external override onlyMintingManager
     {
-        _safeMint(to, tokenId, uri, '');
-        if(keys.length > 0) {
-            _setMany(keys, values, tokenId);
-        }
+        _safeMintWithRecords(to, tokenId, uri, keys, values, '');
     }
 
     function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values, bytes calldata _data)
         external override onlyMintingManager
     {
-        _safeMint(to, tokenId, uri, _data);
-        if(keys.length > 0) {
-            _setMany(keys, values, tokenId);
-        }
+        _safeMintWithRecords(to, tokenId, uri, keys, values, _data);
     }
 
     /// Transfering
@@ -260,6 +254,13 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
     function _safeMint(address to, uint256 tokenId, string memory uri, bytes memory _data) internal {
         _safeMint(to, tokenId, _data);
         emit NewURI(tokenId, uri);
+    }
+
+    function _safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values, bytes memory _data) private {
+        _safeMint(to, tokenId, uri, _data);
+        if(keys.length > 0) {
+            _setMany(keys, values, tokenId);
+        }
     }
 
     function _baseURI()
