@@ -31,12 +31,6 @@ interface IRegistryReader {
     function childIdOf(uint256 tokenId, string calldata label) external view returns (uint256);
 
     /**
-     * @dev Returns registry's owner.
-     * @return owner address
-     */
-    function owner() external view returns (address);
-
-    /**
      * @dev Returns the number of NFTs in `owner`'s account. ERC721 related function.
      */
     function balanceOf(address owner) external view returns (uint256);
