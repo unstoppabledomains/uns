@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol';
+import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 import './cns/ICryptoRegistry.sol';
 import './cns/ICryptoResolver.sol';
@@ -12,6 +13,8 @@ import './IRegistry.sol';
 import './IRegistryReader.sol';
 
 contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IDataReader {
+    using SafeMathUpgradeable for uint256;
+
     string public constant NAME = 'Unstoppable Proxy Reader';
     string public constant VERSION = '0.2.0';
 
@@ -69,6 +72,9 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         }
     }
 
+    /**
+     * @dev returns token id of child. The function is universal for all registries.
+     */
     function childIdOf(uint256 tokenId, string calldata label)
         external
         view
@@ -79,7 +85,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function balanceOf(address owner) external view override returns (uint256) {
-        return _unsRegistry.balanceOf(owner);
+        return _unsRegistry.balanceOf(owner).add(_cryptoRegistry.balanceOf(owner));
     }
 
     function ownerOf(uint256 tokenId) external view override returns (address) {
@@ -122,13 +128,15 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         external
         view
         override
-        returns (string memory)
+        returns (string memory value)
     {
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.get(key, tokenId);
         } else {
             address resolver = _cryptoResolverOf(tokenId);
-            return resolver != address(0x0) ? ICryptoResolver(resolver).get(key, tokenId) : '';
+            if(resolver != address(0x0)) {
+                value = ICryptoResolver(resolver).get(key, tokenId);
+            }
         }
     }
 

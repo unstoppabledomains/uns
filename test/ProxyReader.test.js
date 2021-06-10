@@ -89,12 +89,6 @@ describe('ProxyReader', () => {
       assert.equal(result, expected);
     });
 
-    it('should proxy balanceOf call', async () => {
-      const result = await proxy.balanceOf(accounts[0]);
-      const expected = await registry.balanceOf(accounts[0]);
-      assert.equal(result.toString(), expected.toString());
-    });
-
     it('should proxy isApprovedForAll call', async () => {
       const result = await proxy.isApprovedForAll(accounts[0], accounts[1]);
       const expected = await registry.isApprovedForAll(accounts[0], accounts[1]);
@@ -251,6 +245,20 @@ describe('ProxyReader', () => {
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult.toString(), '82856763987730893573226808376519199326595862773989062576563108342755511775491');
+      });
+    })
+
+    describe('balanceOf', () => {
+      it('should aggregate balance from all registries', async () => {
+        const _domainName = 'hey_hoy_23bkkcbv';
+        const account = accounts[7];
+        await cryptoMintingController.mintSLD(account, _domainName);
+        await registry.mintSLD(account, walletRoot, _domainName);
+
+        const proxyResult = await proxy.balanceOf(account);
+        const resolverResult1 = await registry.balanceOf(account);
+        const resolverResult2 = await cryptoRegistry.balanceOf(account);
+        assert.equal(proxyResult.toString(), resolverResult1.add(resolverResult2).toString());
       });
     })
   });
