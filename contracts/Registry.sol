@@ -256,7 +256,9 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         emit NewURI(tokenId, uri);
     }
 
-    function _safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values, bytes memory _data) private {
+    function _safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values, bytes memory _data)
+        internal
+    {
         _safeMint(to, tokenId, uri, _data);
         if(keys.length > 0) {
             _setMany(keys, values, tokenId);
