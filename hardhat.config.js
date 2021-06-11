@@ -67,7 +67,12 @@ module.exports = {
   gasReporter: {
     currency: 'USD',
     outputFile: argv.ci ? 'gas-report.txt' : undefined,
-    excludeContracts: ['SimpleMock', 'LinkTokenMock'],
+    excludeContracts: [
+      'ERC721ReceiverMock',
+      'ERC2771RegistryContextMock',
+      'ERC20Upgradeable',
+      'LinkTokenMock',
+    ],
   },
   contractSizer: {
     alphaSort: true,

@@ -16,7 +16,8 @@
     "deploy:proxy:localhost": "PROXY=true hardhat run --network localhost scripts/deploy.js",
     "upgrade:proxy:localhost": "hardhat run --network localhost scripts/upgrade.js",
     "start:node": "hardhat node",
-    "gas-report": "env ENABLE_GAS_REPORT=true yarn test"
+    "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
+    "make:uml": "npx sol2uml ./contracts -b Registry,MintingManager,ProxyReader -o ./assets/uns.svg -i ./contracts/mocks"
   },
   "devDependencies": {
     "@chainlink/contracts": "^0.1.7",

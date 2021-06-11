@@ -4,7 +4,7 @@ const { ZERO_ADDRESS } = require('./helpers/constants');
 const { utils, BigNumber } = ethers;
 
 describe('Registry', () => {
-  let Registry, SimpleMock;
+  let Registry, ERC721ReceiverMock;
   let registry, root;
   let signers, coinbase, accounts;
 
@@ -14,7 +14,7 @@ describe('Registry', () => {
     [, ...accounts] = signers.map(s => s.address);
 
     Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
-    SimpleMock = await ethers.getContractFactory('SimpleMock');
+    ERC721ReceiverMock = await ethers.getContractFactory('ERC721ReceiverMock');
 
     root = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
 
@@ -146,10 +146,10 @@ describe('Registry', () => {
         registry.callStatic['safeMint(address,uint256,string)'](registry.address, tok, 'label_93')
       ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
   
-      const simple = await SimpleMock.deploy();
-      await registry.functions['safeMint(address,uint256,string)'](simple.address, tok, 'label_93');
+      const tokenReceiver = await ERC721ReceiverMock.deploy();
+      await registry.functions['safeMint(address,uint256,string)'](tokenReceiver.address, tok, 'label_93');
   
-      assert.equal(simple.address, await registry.ownerOf(tok));
+      assert.equal(tokenReceiver.address, await registry.ownerOf(tok));
     })
 
     it('should safely mint(data) domains', async () => {
@@ -170,10 +170,10 @@ describe('Registry', () => {
         registry.callStatic['safeMint(address,uint256,string)'](registry.address, tok, 'label_s23')
       ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
 
-      const simple = await SimpleMock.deploy();
-      await registry.functions['safeMint(address,uint256,string)'](simple.address, tok, 'label_s23');
+      const tokenReceiver = await ERC721ReceiverMock.deploy();
+      await registry.functions['safeMint(address,uint256,string)'](tokenReceiver.address, tok, 'label_s23');
 
-      assert.equal(simple.address, await registry.ownerOf(tok));
+      assert.equal(tokenReceiver.address, await registry.ownerOf(tok));
     })
 
     it('should mint domain with no records', async () => {
