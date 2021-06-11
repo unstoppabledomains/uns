@@ -6,11 +6,11 @@ import './IRecordStorage.sol';
 import './KeyStorage.sol';
 
 abstract contract RecordStorage is KeyStorage, IRecordStorage {
-    /// @dev mapping of presetIds to keyIds to values
-    mapping(uint256 => mapping(uint256 => string)) internal _records;
+    // Mapping from token ID to preset id to key to value
+    mapping (uint256 => mapping (uint256 =>  mapping (uint256 => string))) internal _records;
 
-    /// @dev mapping of tokenIds to presetIds
-    mapping(uint256 => uint256) internal _tokenPresets;
+    // Mapping from token ID to current preset id
+    mapping (uint256 => uint256) internal _presets;
 
     function get(string calldata key, uint256 tokenId) external view override returns (string memory value) {
         value = _get(key, tokenId);
@@ -73,7 +73,7 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
     }
 
     function _reset(uint256 tokenId) internal {
-        _tokenPresets[tokenId] = uint256(keccak256(abi.encodePacked(block.timestamp, tokenId)));
+        _presets[tokenId] = block.timestamp;
         emit ResetRecords(tokenId);
     }
 
@@ -87,15 +87,15 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
     }
 
     function _get(uint256 keyHash, uint256 tokenId) private view returns (string memory) {
-        return _records[_tokenPresets[tokenId]][keyHash];
+        return _records[tokenId][_presets[tokenId]][keyHash];
     }
 
     function _set(uint256 keyHash, string memory key, string memory value, uint256 tokenId) private {
-        if (bytes(_records[_tokenPresets[tokenId]][keyHash]).length == 0) {
+        if (bytes(_records[tokenId][_presets[tokenId]][keyHash]).length == 0) {
             emit NewKey(tokenId, key, key);
         }
 
-        _records[_tokenPresets[tokenId]][keyHash] = value;
+        _records[tokenId][_presets[tokenId]][keyHash] = value;
         emit Set(tokenId, key, value, key, value);
     }
 }
