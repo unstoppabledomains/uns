@@ -3,8 +3,6 @@
 pragma solidity ^0.8.0;
 
 interface IRegistryReader {
-    function name() external view returns (string memory);
-    function symbol() external view returns (string memory);
     function tokenURI(uint256 tokenId) external view returns (string memory);
 
     /**
@@ -49,12 +47,6 @@ interface IRegistryReader {
      * @dev ERC721 related function.
      */
     function isApprovedForAll(address owner, address operator) external view returns (bool);
-
-    /**
-     * @dev Registry related function.
-     * @return root hash.
-     */
-    function root() external view returns (uint256);
 
     /**
      * @dev Returns whether token exists or not.

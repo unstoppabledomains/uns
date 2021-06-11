@@ -26,16 +26,6 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         _cnsRegistry = cnsRegistry;
     }
 
-    // Deprecated
-    function name() external view override returns (string memory) {
-        return _unsRegistry.name();
-    }
-
-    // Deprecated
-    function symbol() external view override returns (string memory) {
-        return _unsRegistry.symbol();
-    }
-
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IRegistryReader).interfaceId
             || interfaceId == type(IRecordReader).interfaceId
@@ -110,19 +100,9 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         return _unsRegistry.isApprovedForAll(owner, operator);
     }
 
-    // Deprecated
-    function root() external pure override returns (uint256) {
-        return 0;
-    }
-
     function exists(uint256 tokenId) external view override returns (bool) {
         return _unsRegistry.exists(tokenId)
             || _cnsOwnerOf(tokenId) != address(0x0);
-    }
-
-    // Deprecated
-    function registry() external view returns (address) {
-        return address(_unsRegistry);
     }
 
     function get(string calldata key, uint256 tokenId)

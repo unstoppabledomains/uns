@@ -59,8 +59,6 @@ describe('ProxyReader', () => {
   describe('IRegistryReader', () => {
     it('should support IRegistryReader interface', async () => {
       /*
-      * bytes4(keccak256(abi.encodePacked('name()'))) == 0x06fdde03
-      * bytes4(keccak256(abi.encodePacked('symbol()'))) == 0x95d89b41
       * bytes4(keccak256(abi.encodePacked('tokenURI(uint256)'))) == 0xc87b56dd
       * bytes4(keccak256(abi.encodePacked('isApprovedOrOwner(address,uint256)'))) == 0x430c2081
       * bytes4(keccak256(abi.encodePacked('resolverOf(uint256)'))) == 0xb3f9e4cb
@@ -69,38 +67,20 @@ describe('ProxyReader', () => {
       * bytes4(keccak256(abi.encodePacked('ownerOf(uint256)'))) == 0x6352211e
       * bytes4(keccak256(abi.encodePacked('getApproved(uint256)'))) == 0x081812fc
       * bytes4(keccak256(abi.encodePacked('isApprovedForAll(address,address)'))) == 0xe985e9c5
-      * bytes4(keccak256(abi.encodePacked('root()'))) == 0xebf0c717
       * bytes4(keccak256(abi.encodePacked('exists(uint256)'))) == 0x4f558e79
       *
-      * => 0x06fdde03 ^ 0x95d89b41 ^ 0xc87b56dd ^ 0x430c2081 ^
-      *    0xb3f9e4cb ^ 0x68b62d32 ^ 0x70a08231 ^ 0x6352211e ^
-      *    0x081812fc ^ 0xe985e9c5 ^ 0xebf0c717 ^ 0x4f558e79 == 0x95d7eb9f
+      * => 0xc87b56dd ^ 0x430c2081 ^ 0xb3f9e4cb ^ 0x68b62d32 ^
+      *    0x70a08231 ^ 0x6352211e ^ 0x081812fc ^ 0xe985e9c5 ^
+      *    0x4f558e79 == 0xed0269ca
       */
-      const isSupport = await proxy.supportsInterface('0x95d7eb9f');
+      const isSupport = await proxy.supportsInterface('0xed0269ca');
       assert.isTrue(isSupport);
-    });
-
-    it('should proxy name call', async () => {
-      const result = await proxy.name();
-      const expected = await registry.name();
-      assert.equal(result, expected);
-    });
-
-    it('should proxy symbol call', async () => {
-      const result = await proxy.symbol();
-      const expected = await registry.symbol();
-      assert.equal(result, expected);
     });
 
     it('should proxy isApprovedForAll call', async () => {
       const result = await proxy.isApprovedForAll(accounts[0], accounts[1]);
       const expected = await registry.isApprovedForAll(accounts[0], accounts[1]);
       assert.equal(result, expected);
-    });
-
-    it('should proxy root call', async () => {
-      const result = await proxy.root();
-      assert.equal(result.toString(), '0');
     });
 
     describe('getApproved', () => {

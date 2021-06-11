@@ -3,10 +3,6 @@
 pragma solidity ^0.8.0;
 
 interface ICryptoRegistry {
-    function name() external view returns (string memory);
-
-    function symbol() external view returns (string memory);
-
     function tokenURI(uint256 tokenId) external view returns (string memory);
 
     function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool);
@@ -22,6 +18,4 @@ interface ICryptoRegistry {
     function getApproved(uint256 tokenId) external view returns (address);
 
     function isApprovedForAll(address owner, address operator) external view returns (bool);
-
-    function root() external view returns (uint256);
 }
