@@ -39,7 +39,7 @@ describe('ProxyReader', () => {
 
     // mint .crypto
     tokenId_wallet = await registry.childIdOf(walletRoot, domainName);
-    await registry.mintSLD(coinbase.address, walletRoot, domainName);
+    await registry.mint(coinbase.address, tokenId_wallet, domainName);
 
     // mint .wallet
     tokenId_crypto = await registry.childIdOf(cryptoRoot, domainName);
@@ -262,7 +262,8 @@ describe('ProxyReader', () => {
         const _domainName = 'hey_hoy_23bkkcbv';
         const account = accounts[7];
         await cryptoMintingController.mintSLD(account, _domainName);
-        await registry.mintSLD(account, walletRoot, _domainName);
+        const tokenId = await proxy.childIdOf(walletRoot, _domainName);
+        await registry.mint(account, tokenId, _domainName);
 
         const proxyResult = await proxy.balanceOf(account);
         const resolverResult1 = await registry.balanceOf(account);
@@ -291,7 +292,7 @@ describe('ProxyReader', () => {
       it('should return true for .wallet domain', async () => {
         const _domainName = 'hey_hoy_97hds';
         const tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
-        await registry.mintSLD(accounts[3], walletRoot, _domainName);
+        await registry.mint(accounts[3], tokenId_wallet, _domainName);
 
         assert.equal(await proxy.exists(tokenId_wallet), true);
       })
@@ -308,7 +309,7 @@ describe('ProxyReader', () => {
       it('should return true when both registries known domain', async () => {
         const _domainName = 'hey_hoy_74tbcvl';
         const tokenId = await registry.childIdOf(cryptoRoot, _domainName);
-        await registry.mintSLD(accounts[3], cryptoRoot, _domainName);
+        await registry.mint(accounts[3], tokenId, _domainName);
         await cryptoMintingController.mintSLD(accounts[3], _domainName);
 
         assert.equal(await proxy.exists(tokenId), true);
@@ -523,7 +524,7 @@ describe('ProxyReader', () => {
         // arrange
         const _domainName = 'hey_hoy_121';
         const _tokenId = await registry.childIdOf(walletRoot, _domainName);
-        await registry.mintSLD(coinbase.address, walletRoot, _domainName);
+        await registry.mint(coinbase.address, _tokenId, _domainName);
 
         // act
         const data = await proxy.callStatic.getData(keys, _tokenId);
@@ -558,9 +559,8 @@ describe('ProxyReader', () => {
         const _domainName = 'test_1291'
         const _tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
         const _tokenId_crypto = await registry.childIdOf(cryptoRoot, _domainName);
-        await registry.mintSLD(coinbase.address, walletRoot, _domainName);
+        await registry.mint(coinbase.address, _tokenId_wallet, _domainName);
         await cryptoMintingController.mintSLDWithResolver(coinbase.address, _domainName, cryptoResolver.address);
-
         for (let i = 0; i < keys.length; i++) {
             await registry.set(keys[i], values[i], _tokenId_wallet);
             await cryptoResolver.set(keys[i], values[i], _tokenId_crypto);
@@ -647,7 +647,7 @@ describe('ProxyReader', () => {
         const hashes = keys.map(utils.id);
         const _domainName = 'hey_hoy_292';
         const _tokenId = await registry.childIdOf(walletRoot, _domainName);
-        await registry.mintSLD(coinbase.address, walletRoot, _domainName);
+        await registry.mint(coinbase.address, _tokenId, _domainName);
         for (let i = 0; i < keys.length; i++) {
             await registry.set(keys[i], values[i], _tokenId);
         }
@@ -697,7 +697,7 @@ describe('ProxyReader', () => {
         const _domainName = 'test_1082q'
         const _tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
         const _tokenId_crypto = await registry.childIdOf(cryptoRoot, _domainName);
-        await registry.mintSLD(coinbase.address, walletRoot, _domainName);
+        await registry.mint(coinbase.address, _tokenId_wallet, _domainName);
         await cryptoMintingController.mintSLDWithResolver(coinbase.address, _domainName, cryptoResolver.address);
 
         for (let i = 0; i < keys.length; i++) {
@@ -748,10 +748,10 @@ describe('ProxyReader', () => {
 
       it('should return owners for multiple .crypto|.wallet domains', async () => {
         // arrange
-        const _domainName = 'test_1211'
+        const _domainName = 'test_125t'
         const _tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
         const _tokenId_crypto = await registry.childIdOf(cryptoRoot, _domainName);
-        await registry.mintSLD(accounts[0], walletRoot, _domainName);
+        await registry.mint(accounts[0], _tokenId_wallet, _domainName);
         await cryptoMintingController.mintSLDWithResolver(coinbase.address, _domainName, cryptoResolver.address);
 
         // act

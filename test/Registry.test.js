@@ -20,7 +20,7 @@ describe('Registry', () => {
 
     registry = await Registry.deploy();
     await registry.initialize(coinbase.address);
-    await registry.mintTLD('0xdead000000000000000000000000000000000000', root);
+    await registry.mint('0xdead000000000000000000000000000000000000', root, 'crypto');
     await registry.setTokenURIPrefix('/');
   })
 
@@ -32,13 +32,13 @@ describe('Registry', () => {
     it('should resolve properly', async () => {
       const tok = await registry.childIdOf(root, 'resolution');
 
-      await registry.mintSLD(coinbase.address, root, 'resolution');
+      await registry.mint(coinbase.address, tok, 'resolution');
       assert.equal(await registry.resolverOf(tok), registry.address);
 
       await registry.burn(tok);
       assert.equal(await registry.resolverOf(tok), ZERO_ADDRESS);
 
-      await registry.mintSLD(coinbase.address, root, 'resolution');
+      await registry.mint(coinbase.address, tok, 'resolution');
       assert.equal(await registry.resolverOf(tok), registry.address);
     })
 
@@ -54,7 +54,7 @@ describe('Registry', () => {
 
     it('should emit Transfer event on set owner', async () => {
       const tok = await registry.childIdOf(root, 'tok_aq_sj');
-      await registry.mintSLD(coinbase.address, root, 'tok_aq_sj');
+      await registry.mint(coinbase.address, tok, 'tok_aq_sj');
       await registry.set('key_82', 'value_23', tok);
       assert.equal(await registry.get('key_82', tok), 'value_23');
 
@@ -78,7 +78,7 @@ describe('Registry', () => {
     describe('exists', () => {
       it('should return true when token exists', async () => {
         const tok = await registry.childIdOf(root, 'token_exists_11ew3');
-        await registry.mintSLD(coinbase.address, root, 'token_exists_11ew3');
+        await registry.mint(coinbase.address, tok, 'token_exists_11ew3');
         assert.equal(await registry.exists(tok), true);
       })
   
@@ -108,55 +108,128 @@ describe('Registry', () => {
   });
 
   describe('Registry (minting)', () => {
-    it('minting SLDs', async () => {
-      await registry.mintSLD(coinbase.address, root, 'label_22');
-  
+    it('should mint domains', async () => {
       const tok = await registry.childIdOf(root, 'label_22');
+      await registry.mint(coinbase.address, tok, 'label_22');
+  
       assert.equal(coinbase.address, await registry.ownerOf(tok));
   
       // should fail to mint existing token
       await expect(
-        registry.callStatic.mintSLD(coinbase.address, root, 'label_22')
+        registry.callStatic.mint(coinbase.address, tok, 'label_22')
       ).to.be.revertedWith('ERC721: token already minted');
       await expect(
-        registry.callStatic.mintSLD(accounts[0], root, 'label_22')
+        registry.callStatic.mint(accounts[0], tok, 'label_22')
       ).to.be.revertedWith('ERC721: token already minted');
   
       await registry.burn(tok);
-      await registry.mintSLD(coinbase.address, root, 'label_22');
+      await registry.mint(coinbase.address, tok, 'label_22');
   
       assert.equal(coinbase.address, await registry.ownerOf(tok));
     })
 
-    it('safe minting SLDs', async () => {
+    it('should safely mint domains', async () => {
       const tok = await registry.childIdOf(root, 'label_93');
-      await registry.functions['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label_93');
+      await registry.functions['safeMint(address,uint256,string)'](coinbase.address, tok, 'label_93');
   
       assert.equal(coinbase.address, await registry.ownerOf(tok));
   
       // should fail to safely mint existing token contract
       await expect(
-        registry.callStatic['safeMintSLD(address,uint256,string)'](coinbase.address, root, 'label_93')
+        registry.callStatic['safeMint(address,uint256,string)'](coinbase.address, tok, 'label_93')
       ).to.be.revertedWith('ERC721: token already minted');
   
       await registry.burn(tok)
   
       // should fail to safely mint token to non reciever contract
       await expect(
-        registry.callStatic['safeMintSLD(address,uint256,string)'](registry.address, root, 'label_93')
+        registry.callStatic['safeMint(address,uint256,string)'](registry.address, tok, 'label_93')
       ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
   
       const simple = await SimpleMock.deploy();
-      await registry.functions['safeMintSLD(address,uint256,string)'](simple.address, root, 'label_93');
+      await registry.functions['safeMint(address,uint256,string)'](simple.address, tok, 'label_93');
   
       assert.equal(simple.address, await registry.ownerOf(tok));
+    })
+
+    it('should safely mint(data) domains', async () => {
+      const tok = await registry.childIdOf(root, 'label_s23');
+      await registry.functions['safeMint(address,uint256,string,bytes)'](coinbase.address, tok, 'label_93', '0x');
+
+      assert.equal(coinbase.address, await registry.ownerOf(tok));
+
+      // should fail to safely mint existing token contract
+      await expect(
+        registry.callStatic['safeMint(address,uint256,string)'](coinbase.address, tok, 'label_s23')
+      ).to.be.revertedWith('ERC721: token already minted');
+
+      await registry.burn(tok)
+
+      // should fail to safely mint token to non reciever contract
+      await expect(
+        registry.callStatic['safeMint(address,uint256,string)'](registry.address, tok, 'label_s23')
+      ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
+
+      const simple = await SimpleMock.deploy();
+      await registry.functions['safeMint(address,uint256,string)'](simple.address, tok, 'label_s23');
+
+      assert.equal(simple.address, await registry.ownerOf(tok));
+    })
+
+    it('should mint domain with no records', async () => {
+      const tok = await registry.childIdOf(root, 'label_12324');
+      await registry.mintWithRecords(coinbase.address, tok, 'label_12324', [], []);
+
+      assert.equal(coinbase.address, await registry.ownerOf(tok));
+    })
+
+    it('should mint domain with record', async () => {
+      const tok = await registry.childIdOf(root, 'label_38f6');
+      await registry.mintWithRecords(coinbase.address, tok, 'label_38f6', ['key_1'], ['value_1']);
+
+      assert.equal(coinbase.address, await registry.ownerOf(tok));
+      expect(await registry.get('key_1', tok)).to.be.eql('value_1');
+    })
+
+    it('should safely mint domain with no records', async () => {
+      const tok = await registry.childIdOf(root, 'label_312er');
+      await registry['safeMintWithRecords(address,uint256,string,string[],string[])']
+        (coinbase.address, tok, 'label_312er', [], []);
+
+      assert.equal(coinbase.address, await registry.ownerOf(tok));
+    })
+
+    it('should safely mint domain with record', async () => {
+      const tok = await registry.childIdOf(root, 'label_dvf321');
+      await registry['safeMintWithRecords(address,uint256,string,string[],string[])']
+        (coinbase.address, tok, 'label_dvf321', ['key_1'], ['value_1']);
+
+      assert.equal(coinbase.address, await registry.ownerOf(tok));
+      expect(await registry.get('key_1', tok)).to.be.eql('value_1');
+    })
+
+    it('should safely mint(data) domain with no records', async () => {
+      const tok = await registry.childIdOf(root, 'label_134qwf');
+      await registry['safeMintWithRecords(address,uint256,string,string[],string[],bytes)']
+        (coinbase.address, tok, 'label_134qwf', [], [], '0x');
+  
+      assert.equal(coinbase.address, await registry.ownerOf(tok));
+    })
+
+    it('should safely mint(data) domain with record', async () => {
+      const tok = await registry.childIdOf(root, 'label_dsf311');
+      await registry['safeMintWithRecords(address,uint256,string,string[],string[],bytes)']
+        (coinbase.address, tok, 'label_dsf311', ['key_1'], ['value_1'], '0x');
+
+      assert.equal(coinbase.address, await registry.ownerOf(tok));
+      expect(await registry.get('key_1', tok)).to.be.eql('value_1');
     })
   });
 
   describe('Registry (records management)', () => {
     const initializeDomain = async (name) => {
       const tok = await registry.childIdOf(root, name);
-      await registry.mintSLD(coinbase.address, root, name);
+      await registry.mint(coinbase.address, tok, name);
       return tok;
     }
 
@@ -174,7 +247,7 @@ describe('Registry', () => {
         registry.set('key', 'value', tok)
       ).to.be.revertedWith('ERC721: operator query for nonexistent token');
 
-      await registry.mintSLD(coinbase.address, root, 'label_931')
+      await registry.mint(coinbase.address, tok, 'label_931')
       await registry.set('key', 'value', tok)
 
       assert.equal(
@@ -368,7 +441,7 @@ describe('Registry', () => {
 
     it('should reset records on transfer', async () => {
       const tok = await registry.childIdOf(root, 'tok_aa_23');
-      await registry.mintSLD(coinbase.address, root, 'tok_aa_23');
+      await registry.mint(coinbase.address, tok, 'tok_aa_23');
       await registry.set('key_23', 'value_23', tok);
       assert.equal(await registry.get('key_23', tok), 'value_23');
 
@@ -379,7 +452,7 @@ describe('Registry', () => {
 
     it('should reset records on safe transfer', async () => {
       const tok = await registry.childIdOf(root, 'tok_aw_23');
-      await registry.mintSLD(coinbase.address, root, 'tok_aw_23');
+      await registry.mint(coinbase.address, tok, 'tok_aw_23');
       await registry.set('key_13', 'value_23', tok);
       assert.equal(await registry.get('key_13', tok), 'value_23');
 
@@ -390,7 +463,7 @@ describe('Registry', () => {
 
     it('should reset records on safe transfer with data', async () => {
       const tok = await registry.childIdOf(root, 'tok_ae_23');
-      await registry.mintSLD(coinbase.address, root, 'tok_ae_23');
+      await registry.mint(coinbase.address, tok, 'tok_ae_23');
       await registry.set('key_12', 'value_23', tok);
       assert.equal(await registry.get('key_12', tok), 'value_23');
 
@@ -401,7 +474,7 @@ describe('Registry', () => {
 
     it('should reset records on burn', async () => {
       const tok = await registry.childIdOf(root, 'tok_hj_23');
-      await registry.mintSLD(coinbase.address, root, 'tok_hj_23');
+      await registry.mint(coinbase.address, tok, 'tok_hj_23');
       await registry.set('key_31', 'value_23', tok);
       assert.equal(await registry.get('key_31', tok), 'value_23');
 
@@ -409,13 +482,13 @@ describe('Registry', () => {
         .to.emit(registry, 'ResetRecords').withArgs(tok);
       assert.equal(await registry.get('key_31', tok), '');
 
-      await registry.mintSLD(coinbase.address, root, 'tok_hj_23');
+      await registry.mint(coinbase.address, tok, 'tok_hj_23');
       assert.equal(await registry.get('key_31', tok), '');
     })
 
     it('should not reset records on set owner', async () => {
       const tok = await registry.childIdOf(root, 'tok_aq_23');
-      await registry.mintSLD(coinbase.address, root, 'tok_aq_23');
+      await registry.mint(coinbase.address, tok, 'tok_aq_23');
       await registry.set('key_16', 'value_23', tok);
       assert.equal(await registry.get('key_16', tok), 'value_23');
 

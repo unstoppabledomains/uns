@@ -4,10 +4,11 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol';
 
-import './ISLDMinter.sol';
 import './IRecordStorage.sol';
 
-interface IRegistry is IERC721MetadataUpgradeable, ISLDMinter, IRecordStorage {
+interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
+
+    event NewURI(uint256 indexed tokenId, string uri);
 
     event NewURIPrefix(string prefix);
 
@@ -61,4 +62,62 @@ interface IRegistry is IERC721MetadataUpgradeable, ISLDMinter, IRecordStorage {
      * - The caller must own `tokenId` or be an approved operator.
      */
     function burn(uint256 tokenId) external;
+
+    /**
+     * @dev Mints token.
+     * @param to address to mint the new SLD to.
+     * @param tokenId id of token.
+     * @param uri domain URI.
+     */
+    function mint(address to, uint256 tokenId, string calldata uri) external;
+
+    /**
+     * @dev Safely mints token.
+     * Implements a ERC721Reciever check unlike mint.
+     * @param to address to mint the new SLD to.
+     * @param tokenId id of token.
+     * @param uri domain URI.
+     */
+    function safeMint(address to, uint256 tokenId, string calldata uri) external;
+
+    /**
+     * @dev Safely mints token.
+     * Implements a ERC721Reciever check unlike mint.
+     * @param to address to mint the new SLD to.
+     * @param tokenId id of token.
+     * @param uri domain URI.
+     * @param _data bytes data to send along with a safe transfer check
+     */
+    function safeMint(address to, uint256 tokenId, string calldata uri, bytes calldata _data) external;
+
+    /**
+     * @dev Mints token with records
+     * @param to address to mint the new SLD to
+     * @param tokenId id of token
+     * @param keys New record keys
+     * @param values New record values
+     * @param uri domain URI
+     */
+    function mintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values) external;
+
+    /**
+     * @dev Safely mints token with records
+     * @param to address to mint the new SLD to
+     * @param tokenId id of token
+     * @param keys New record keys
+     * @param values New record values
+     * @param uri domain URI
+     */
+    function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values) external;
+
+    /**
+     * @dev Safely mints token with records
+     * @param to address to mint the new SLD to
+     * @param tokenId id of token
+     * @param keys New record keys
+     * @param values New record values
+     * @param uri domain URI
+     * @param _data bytes data to send along with a safe transfer check
+     */
+    function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values, bytes calldata _data) external;
 }
