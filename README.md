@@ -26,7 +26,8 @@ UNS registry smart contracts.
 4.  Implements IRegistry
 
     ```solidity
-    interface IRegistry /_ is IERC721Metadata, ISLDMinter, IRecordStorage _/ {
+    interface IRegistry /_ is IERC721Metadata, IRecordStorage _/ {
+        event NewURI(uint256 indexed tokenId, string uri);
 
         event NewURIPrefix(string prefix);
 
@@ -170,7 +171,7 @@ UNS registry smart contracts.
 8. TLD management
 
     ```solidity
-    contract IMintingManager is ISLDMinter, IClaimer {
+    contract IMintingManager {
         /**
          * @dev Mapping TLD `hashname` to TLD label
          *
@@ -203,8 +204,6 @@ Note: List of changes which makes UNS and CNS backward incompatibile
 
 ### Events
 
-* `event NewURI(uint256 indexed tokenId, string uri)` 
-  * Removed
 * `event Resolve(uint256 indexed tokenId, address indexed to)` 
   * Removed
   * UNS has a single resolver which is Registry, so one can assume that resolver is always set to registry address

@@ -53,6 +53,16 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
      */
     bytes4 private constant _SIG_MINT_WITH_RECORDS = 0x39ccf4d0;
 
+    /**
+     * @dev bytes4(keccak256('safeMintSLDWithRecords(address,uint256,string,string[],string[])')) == 0x27bbd225
+     */
+    bytes4 private constant _SIG_SAFE_MINT_WITH_RECORDS = 0x27bbd225;
+
+    /**
+     * @dev bytes4(keccak256('safeMintSLDWithRecords(address,uint256,string,string[],string[],bytes)')) == 0x6a2d2256
+     */
+    bytes4 private constant _SIG_SAFE_MINT_WITH_RECORDS_DATA = 0x6a2d2256;
+
     modifier validTld(uint256 tld) {
         require(bytes(_tlds[tld]).length > 0, 'MintingManager: TLD_NOT_VALID');
         _;
@@ -76,6 +86,14 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         _tlds[0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f] = 'crypto';
         _tlds[0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230] = 'wallet';
         _tlds[0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2] = 'coin';
+
+        if(!UnsRegistry.exists(0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230)) {
+            UnsRegistry.mint(address(0xdead), 0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230, 'wallet');
+        }
+
+        if(!UnsRegistry.exists(0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2)) {
+            UnsRegistry.mint(address(0xdead), 0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2, 'coin');
+        }
     }
 
     function mintSLD(address to, uint256 tld, string calldata label)
@@ -115,6 +133,27 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         _mintSLDWithRecords(to, tld, label, keys, values);
     }
 
+    function safeMintSLDWithRecords(
+        address to,
+        uint256 tld,
+        string calldata label,
+        string[] calldata keys,
+        string[] calldata values
+    ) external override onlyMinter validTld(tld) {
+        _safeMintSLDWithRecords(to, tld, label, keys, values, '');
+    }
+
+    function safeMintSLDWithRecords(
+        address to,
+        uint256 tld,
+        string calldata label,
+        string[] calldata keys,
+        string[] calldata values,
+        bytes calldata _data
+    ) external override onlyMinter validTld(tld) {
+        _safeMintSLDWithRecords(to, tld, label, keys, values, _data);
+    }
+
     function claim(uint256 tld, string calldata label) external override validTld(tld) {
         _mintSLD(_msgSender(), tld, _freeSLDLabel(label));
     }
@@ -146,7 +185,9 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         bool isSupported = funcSig == _SIG_MINT ||
             funcSig == _SIG_SAFE_MINT ||
             funcSig == _SIG_SAFE_MINT_DATA ||
-            funcSig == _SIG_MINT_WITH_RECORDS;
+            funcSig == _SIG_MINT_WITH_RECORDS ||
+            funcSig == _SIG_SAFE_MINT_WITH_RECORDS ||
+            funcSig == _SIG_SAFE_MINT_WITH_RECORDS_DATA;
 
         require(isSupported, 'MintingManager: UNSUPPORTED_RELAY_CALL');
     }
@@ -155,7 +196,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
             CryptoMinter.mintSLD(to, label);
         } else {
-            UnsRegistry.mintSLD(to, tld, label);
+            UnsRegistry.mint(to, _childId(tld, label),  _uri(tld, label));
         }
     }
 
@@ -168,7 +209,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
             CryptoMinter.safeMintSLD(to, label, _data);
         } else {
-            UnsRegistry.safeMintSLD(to, tld, label, _data);
+            UnsRegistry.safeMint(to, _childId(tld, label),  _uri(tld, label), _data);
         }
     }
 
@@ -179,19 +220,47 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         string[] calldata keys,
         string[] calldata values
     ) private {
+        uint256 tokenId = _childId(tld, label);
         if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
             CryptoMinter.mintSLDWithResolver(to, label, address(CryptoResolver));
             if(keys.length > 0) {
-                uint256 tokenId = UnsRegistry.childIdOf(tld, label);
                 CryptoResolver.preconfigure(keys, values, tokenId);
             }
         } else {
-            UnsRegistry.mintSLDWithRecords(to, tld, label, keys, values);
+            UnsRegistry.mintWithRecords(to, tokenId, _uri(tld, label), keys, values);
         }
+    }
+
+    function _safeMintSLDWithRecords(
+        address to,
+        uint256 tld,
+        string memory label,
+        string[] calldata keys,
+        string[] calldata values,
+        bytes memory _data
+    ) private {
+        uint256 tokenId = _childId(tld, label);
+        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            CryptoMinter.safeMintSLDWithResolver(to, label, address(CryptoResolver), _data);
+            if(keys.length > 0) {
+                CryptoResolver.preconfigure(keys, values, tokenId);
+            }
+        } else {
+            UnsRegistry.safeMintWithRecords(to, tokenId, _uri(tld, label), keys, values, _data);
+        }
+    }
+
+    function _childId(uint256 tokenId, string memory label) internal pure returns (uint256) {
+        require(bytes(label).length != 0, 'MintingManager: LABEL_EMPTY');
+        return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
     }
 
     function _freeSLDLabel(string calldata label) private pure returns(string memory) {
         return string(abi.encodePacked('udtestdev-', label));
+    }
+
+    function  _uri(uint256 tld, string memory label) private view returns(string memory) {
+        return string(abi.encodePacked(label, '.', _tlds[tld]));
     }
 
     // Reserved storage space to allow for layout changes in the future.
