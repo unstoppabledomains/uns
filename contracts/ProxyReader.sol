@@ -115,6 +115,11 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         return 0;
     }
 
+    function exists(uint256 tokenId) external view override returns (bool) {
+        return _unsRegistry.exists(tokenId)
+            || _cnsOwnerOf(tokenId) != address(0x0);
+    }
+
     // Deprecated
     function registry() external view returns (address) {
         return address(_unsRegistry);

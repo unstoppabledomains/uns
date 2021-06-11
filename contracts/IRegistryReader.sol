@@ -55,4 +55,9 @@ interface IRegistryReader {
      * @return root hash.
      */
     function root() external view returns (uint256);
+
+    /**
+     * @dev Returns whether token exists or not.
+     */
+    function exists(uint256 tokenId) external view returns (bool);
 }

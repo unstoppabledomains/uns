@@ -70,12 +70,13 @@ describe('ProxyReader', () => {
       * bytes4(keccak256(abi.encodePacked('getApproved(uint256)'))) == 0x081812fc
       * bytes4(keccak256(abi.encodePacked('isApprovedForAll(address,address)'))) == 0xe985e9c5
       * bytes4(keccak256(abi.encodePacked('root()'))) == 0xebf0c717
+      * bytes4(keccak256(abi.encodePacked('exists(uint256)'))) == 0x4f558e79
       *
       * => 0x06fdde03 ^ 0x95d89b41 ^ 0xc87b56dd ^ 0x430c2081 ^
       *    0xb3f9e4cb ^ 0x68b62d32 ^ 0x70a08231 ^ 0x6352211e ^
-      *    0x081812fc ^ 0xe985e9c5 ^ 0xebf0c717 == 0xda8265e6
+      *    0x081812fc ^ 0xe985e9c5 ^ 0xebf0c717 ^ 0x4f558e79 == 0x95d7eb9f
       */
-      const isSupport = await proxy.supportsInterface('0xda8265e6');
+      const isSupport = await proxy.supportsInterface('0x95d7eb9f');
       assert.isTrue(isSupport);
     });
 
@@ -268,6 +269,54 @@ describe('ProxyReader', () => {
         const resolverResult2 = await cryptoRegistry.balanceOf(account);
         assert.equal(proxyResult.toString(), resolverResult1.add(resolverResult2).toString());
       });
+    })
+
+    describe('exists', () => {
+      it('should return false for zero tokenId', async () => {
+        assert.equal(await proxy.exists(0), false);
+      })
+
+      it('should return false for unknown .wallet domain', async () => {
+        const unknownTokenId = await registry.childIdOf(walletRoot, 'unknown');
+
+        assert.equal(await proxy.exists(unknownTokenId), false);
+      })
+
+      it('should return false for unknown .crypto domain', async () => {
+        const unknownTokenId = await cryptoRegistry.childIdOf(cryptoRoot, 'unknown');
+
+        assert.equal(await proxy.exists(unknownTokenId), false);
+      })
+
+      it('should return true for .wallet domain', async () => {
+        const _domainName = 'hey_hoy_97hds';
+        const tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
+        await registry.mintSLD(accounts[3], walletRoot, _domainName);
+
+        assert.equal(await proxy.exists(tokenId_wallet), true);
+      })
+
+      it('should return true for .crypto domain', async () => {
+        const _domainName = 'hey_hoy_97hds';
+        const tokenId_crypto = await cryptoRegistry.childIdOf(cryptoRoot, _domainName);
+        await cryptoMintingController.mintSLD(accounts[3], _domainName);
+
+        assert.equal(await proxy.exists(tokenId_crypto), true);
+      })
+
+      // the scenario is not possible in real setup
+      it('should return true when both registries known domain', async () => {
+        const _domainName = 'hey_hoy_74tbcvl';
+        const tokenId = await registry.childIdOf(cryptoRoot, _domainName);
+        await registry.mintSLD(accounts[3], cryptoRoot, _domainName);
+        await cryptoMintingController.mintSLD(accounts[3], _domainName);
+
+        assert.equal(await proxy.exists(tokenId), true);
+      })
+
+      it('should return true for .crypto TLD', async () => {
+        assert.equal(await proxy.exists(cryptoRoot), true);
+      })
     })
   });
 
