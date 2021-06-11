@@ -249,6 +249,11 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         emit NewURI(tokenId, uri);
     }
 
+    function _mint(address to, uint256 tokenId) internal override {
+        _reset(tokenId);
+        super._mint(to, tokenId);
+    }
+
     function _safeMint(address to, uint256 tokenId, string memory uri, bytes memory _data) internal {
         _safeMint(to, tokenId, _data);
         emit NewURI(tokenId, uri);
