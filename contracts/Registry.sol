@@ -43,8 +43,8 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         _;
     }
 
-    function initialize(address mintingManager_) public initializer {
-        _mintingManager = mintingManager_;
+    function initialize(address mintingManager) public initializer {
+        _mintingManager = mintingManager;
 
         __ERC721_init_unchained('uns', 'UD');
         __Ownable_init_unchained();

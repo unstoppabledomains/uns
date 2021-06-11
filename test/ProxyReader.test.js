@@ -77,10 +77,10 @@ describe('ProxyReader', () => {
       assert.isTrue(isSupport);
     });
 
-    it('should proxy isApprovedForAll call', async () => {
-      const result = await proxy.isApprovedForAll(accounts[0], accounts[1]);
-      const expected = await registry.isApprovedForAll(accounts[0], accounts[1]);
-      assert.equal(result, expected);
+    it('should revert isApprovedForAll call', async () => {
+      await expect(
+        proxy.isApprovedForAll(accounts[0], accounts[1])
+      ).to.be.revertedWith('ProxyReader: UNSUPPORTED_METHOD');
     });
 
     describe('getApproved', () => {

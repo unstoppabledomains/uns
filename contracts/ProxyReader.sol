@@ -41,12 +41,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         }
     }
 
-    function isApprovedOrOwner(address spender, uint256 tokenId)
-        external
-        view
-        override
-        returns (bool)
-    {
+    function isApprovedOrOwner(address spender, uint256 tokenId) external view override returns (bool) {
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.isApprovedOrOwner(spender, tokenId);
         } else {
@@ -65,12 +60,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     /**
      * @dev returns token id of child. The function is universal for all registries.
      */
-    function childIdOf(uint256 tokenId, string calldata label)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function childIdOf(uint256 tokenId, string calldata label) external view override returns (uint256) {
         return _unsRegistry.childIdOf(tokenId, label);
     }
 
@@ -91,13 +81,8 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     // Deprecated
-    function isApprovedForAll(address owner, address operator)
-        external
-        view
-        override
-        returns (bool)
-    {
-        return _unsRegistry.isApprovedForAll(owner, operator);
+    function isApprovedForAll(address, address) external pure override returns (bool) {
+        revert('ProxyReader: UNSUPPORTED_METHOD');
     }
 
     function exists(uint256 tokenId) external view override returns (bool) {
@@ -105,12 +90,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
             || _cnsOwnerOf(tokenId) != address(0x0);
     }
 
-    function get(string calldata key, uint256 tokenId)
-        external
-        view
-        override
-        returns (string memory value)
-    {
+    function get(string calldata key, uint256 tokenId) external view override returns (string memory value) {
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.get(key, tokenId);
         } else {
@@ -121,12 +101,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         }
     }
 
-    function getMany(string[] calldata keys, uint256 tokenId)
-        external
-        view
-        override
-        returns (string[] memory values)
-    {
+    function getMany(string[] calldata keys, uint256 tokenId) external view override returns (string[] memory values) {
         values = new string[](keys.length);
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.getMany(keys, tokenId);
@@ -138,12 +113,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         }
     }
 
-    function getByHash(uint256 keyHash, uint256 tokenId)
-        external
-        view
-        override
-        returns (string memory key, string memory value)
-    {
+    function getByHash(uint256 keyHash, uint256 tokenId) external view override returns (string memory key, string memory value) {
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.getByHash(keyHash, tokenId);
         } else {
@@ -155,9 +125,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function getManyByHash(uint256[] calldata keyHashes, uint256 tokenId)
-        external
-        view
-        override
+        external view override
         returns (string[] memory keys, string[] memory values)
     {
         keys = new string[](keyHashes.length);
@@ -173,9 +141,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function getData(string[] calldata keys, uint256 tokenId)
-        external
-        view
-        override
+        external view override
         returns (
             address resolver,
             address owner,
@@ -186,9 +152,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function getDataForMany(string[] calldata keys, uint256[] calldata tokenIds)
-        external
-        view
-        override
+        external view override
         returns (
             address[] memory resolvers,
             address[] memory owners,
@@ -205,9 +169,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function getDataByHash(uint256[] calldata keyHashes, uint256 tokenId)
-        external
-        view
-        override
+        external view override
         returns (
             address resolver,
             address owner,
@@ -219,9 +181,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function getDataByHashForMany(uint256[] calldata keyHashes, uint256[] calldata tokenIds)
-        external
-        view
-        override
+        external view override
         returns (
             address[] memory resolvers,
             address[] memory owners,
@@ -240,9 +200,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function ownerOfForMany(uint256[] calldata tokenIds)
-        external
-        view
-        override
+        external view override
         returns (address[] memory owners)
     {
         owners = new address[](tokenIds.length);
