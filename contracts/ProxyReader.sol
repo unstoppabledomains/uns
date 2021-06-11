@@ -19,11 +19,11 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     string public constant VERSION = '0.2.0';
 
     IRegistry private immutable _unsRegistry;
-    ICryptoRegistry private immutable _cryptoRegistry;
+    ICryptoRegistry private immutable _cnsRegistry;
 
-    constructor(IRegistry unsRegistry, ICryptoRegistry cryptoRegistry) {
+    constructor(IRegistry unsRegistry, ICryptoRegistry cnsRegistry) {
         _unsRegistry = unsRegistry;
-        _cryptoRegistry = cryptoRegistry;
+        _cnsRegistry = cnsRegistry;
     }
 
     // Deprecated
@@ -47,7 +47,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.tokenURI(tokenId);
         } else {
-            return _cryptoRegistry.tokenURI(tokenId);
+            return _cnsRegistry.tokenURI(tokenId);
         }
     }
 
@@ -60,7 +60,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.isApprovedOrOwner(spender, tokenId);
         } else {
-            return _cryptoRegistry.isApprovedOrOwner(spender, tokenId);
+            return _cnsRegistry.isApprovedOrOwner(spender, tokenId);
         }
     }
 
@@ -68,7 +68,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.resolverOf(tokenId);
         } else {
-            return _cryptoRegistry.resolverOf(tokenId);
+            return _cnsRegistry.resolverOf(tokenId);
         }
     }
 
@@ -85,22 +85,18 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function balanceOf(address owner) external view override returns (uint256) {
-        return _unsRegistry.balanceOf(owner).add(_cryptoRegistry.balanceOf(owner));
+        return _unsRegistry.balanceOf(owner).add(_cnsRegistry.balanceOf(owner));
     }
 
     function ownerOf(uint256 tokenId) external view override returns (address) {
-        if(_unsRegistry.exists(tokenId)) {
-            return _unsRegistry.ownerOf(tokenId);
-        } else {
-            return _cryptoRegistry.ownerOf(tokenId);
-        }
+        return _ownerOf(tokenId);
     }
 
     function getApproved(uint256 tokenId) external view override returns (address) {
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.getApproved(tokenId);
         } else {
-            return _cryptoRegistry.getApproved(tokenId);
+            return _cnsRegistry.getApproved(tokenId);
         }
     }
 
@@ -133,7 +129,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.get(key, tokenId);
         } else {
-            address resolver = _cryptoResolverOf(tokenId);
+            address resolver = _cnsResolverOf(tokenId);
             if(resolver != address(0x0)) {
                 value = ICryptoResolver(resolver).get(key, tokenId);
             }
@@ -150,7 +146,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.getMany(keys, tokenId);
         } else {
-            address resolver = _cryptoResolverOf(tokenId);
+            address resolver = _cnsResolverOf(tokenId);
             if(resolver != address(0x0) && keys.length > 0) {
                 values = ICryptoResolver(resolver).getMany(keys, tokenId);
             }
@@ -166,7 +162,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.getByHash(keyHash, tokenId);
         } else {
-            address resolver = _cryptoResolverOf(tokenId);
+            address resolver = _cnsResolverOf(tokenId);
             if (resolver != address(0x0)) {
                 (key, value) = ICryptoResolver(resolver).getByHash(keyHash, tokenId);
             }
@@ -184,7 +180,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         if(_unsRegistry.exists(tokenId)) {
             return _unsRegistry.getManyByHash(keyHashes, tokenId);
         } else {
-            address resolver = _cryptoResolverOf(tokenId);
+            address resolver = _cnsResolverOf(tokenId);
             if(resolver != address(0x0) && keyHashes.length > 0) {
                 (keys, values) = ICryptoResolver(resolver).getManyByHash(keyHashes, tokenId);
             }
@@ -266,9 +262,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     {
         owners = new address[](tokenIds.length);
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            owners[i] = _unsRegistry.exists(tokenIds[i]) ?
-                _unsRegistry.ownerOf(tokenIds[i]) :
-                _cryptoOwnerOf(tokenIds[i]);
+            owners[i] = _ownerOf(tokenIds[i]);
         }
     }
 
@@ -281,8 +275,8 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
             owner = _unsRegistry.ownerOf(tokenId);
             values = _unsRegistry.getMany(keys, tokenId);
         } else {
-            resolver = _cryptoResolverOf(tokenId);
-            owner = _cryptoOwnerOf(tokenId);
+            resolver = _cnsResolverOf(tokenId);
+            owner = _cnsOwnerOf(tokenId);
             if(resolver != address(0x0) && keys.length > 0) {
                 values = ICryptoResolver(resolver).getMany(keys, tokenId);
             }
@@ -299,24 +293,32 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
             owner = _unsRegistry.ownerOf(tokenId);
             (keys, values) = _unsRegistry.getManyByHash(keyHashes, tokenId);
         } else {
-            resolver = _cryptoResolverOf(tokenId);
-            owner = _cryptoOwnerOf(tokenId);
+            resolver = _cnsResolverOf(tokenId);
+            owner = _cnsOwnerOf(tokenId);
             if(resolver != address(0x0) && keys.length > 0) {
                 (keys, values) = ICryptoResolver(resolver).getManyByHash(keyHashes, tokenId);
             }
         }
     }
 
-    function _cryptoOwnerOf(uint256 tokenId) private view returns (address) {
-        try _cryptoRegistry.ownerOf(tokenId) returns (address _owner) {
+    function _ownerOf(uint256 tokenId) private view returns (address) {
+        if(_unsRegistry.exists(tokenId)) {
+            return _unsRegistry.ownerOf(tokenId);
+        } else {
+            return _cnsOwnerOf(tokenId);
+        }
+    }
+
+    function _cnsOwnerOf(uint256 tokenId) private view returns (address) {
+        try _cnsRegistry.ownerOf(tokenId) returns (address _owner) {
             return _owner;
         } catch {
             return address(0x0);
         }
     }
 
-    function _cryptoResolverOf(uint256 tokenId) private view returns (address) {
-        try _cryptoRegistry.resolverOf(tokenId) returns (address _resolver) {
+    function _cnsResolverOf(uint256 tokenId) private view returns (address) {
+        try _cnsRegistry.resolverOf(tokenId) returns (address _resolver) {
             return _resolver;
         } catch {
             return address(0x0);

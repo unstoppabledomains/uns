@@ -26,10 +26,12 @@ describe('ProxyReader', () => {
     CryptoMintingController = await ethers.getContractFactory('contracts/cns/CryptoMintingController.sol:CryptoMintingController');
     ProxyReader = await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader');
 
+    // deploy UNS
     registry = await Registry.deploy();
     await registry.initialize(coinbase.address);
     await registry.setTokenURIPrefix('/');
 
+    // deploy CNS
     cryptoRegistry = await CryptoRegistry.deploy();
     cryptoMintingController = await CryptoMintingController.deploy(cryptoRegistry.address);
     await cryptoRegistry.addController(cryptoMintingController.address);
@@ -177,6 +179,12 @@ describe('ProxyReader', () => {
     })
 
     describe('ownerOf', () => {
+      it('should return empty owner for unknown domain', async () => {
+        const unknownTokenId = await registry.childIdOf(cryptoRoot, 'unknown');
+        const owners = await proxy.callStatic.ownerOf(unknownTokenId);
+        assert.deepEqual(owners, ZERO_ADDRESS);
+      });
+
       it('should return owner of .wallet domain', async () => {
         const proxyResult = await proxy.ownerOf(tokenId_wallet);
         const resolverResult = await registry.ownerOf(tokenId_wallet);
@@ -425,10 +433,22 @@ describe('ProxyReader', () => {
     });
 
     describe('getData', () => {
-      it('should return zero owner for non-existing token', async () => {
+      it('should return empty data for non-existing .wallet domain', async () => {
         // arrange
         const _domainName = 'hey_hoy_1037';
-        const _tokenId = await registry.childIdOf(cryptoRoot, _domainName);
+        const _tokenId = await registry.childIdOf(walletRoot, _domainName);
+
+        // act
+        const data = await proxy.callStatic.getData(keys, _tokenId);
+
+        // asserts
+        assert.deepEqual(data, [ZERO_ADDRESS, ZERO_ADDRESS, ['','']]);
+      });
+
+      it('should return empty data for non-existing .crypto domain', async () => {
+        // arrange
+        const _domainName = 'hey_hoy_1037';
+        const _tokenId = await cryptoRegistry.childIdOf(cryptoRoot, _domainName);
 
         // act
         const data = await proxy.callStatic.getData(keys, _tokenId);
@@ -469,6 +489,19 @@ describe('ProxyReader', () => {
         const data = await proxy.callStatic.getDataForMany([], [])
 
         assert.deepEqual(data, [[],[],[]]);
+      });
+
+      it('should return empty data for non-existing .crypto|.wallet domains', async () => {
+        // arrange
+        const _domainName = 'hey_hoy_1037';
+        const _tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
+        const _tokenId_crypto = await registry.childIdOf(cryptoRoot, _domainName);
+
+        // act
+        const data = await proxy.callStatic.getDataForMany(keys, [_tokenId_wallet, _tokenId_crypto]);
+
+        // asserts
+        assert.deepEqual(data, [[ZERO_ADDRESS, ZERO_ADDRESS], [ZERO_ADDRESS, ZERO_ADDRESS], [['',''], ['','']]]);
       });
 
       it('should return data for multiple .crypto|.wallet domains', async () => {
@@ -512,6 +545,32 @@ describe('ProxyReader', () => {
     });
 
     describe('getDataByHash', () => {
+      it('should return empty data for non-existing .wallet domain', async () => {
+        // arrange
+        const hashes = keys.map(utils.id);
+        const _domainName = 'hey_hoy_29224';
+        const _tokenId = await registry.childIdOf(walletRoot, _domainName);
+
+        // act
+        const data = await proxy.callStatic.getDataByHash(hashes, _tokenId);
+
+        // asserts
+        assert.deepEqual(data, [ZERO_ADDRESS, ZERO_ADDRESS, ['',''], ['','']]);
+      });
+
+      it('should return empty data for non-existing .crypto domain', async () => {
+        // arrange
+        const hashes = keys.map(utils.id);
+        const _domainName = 'hey_hoy_29228';
+        const _tokenId = await cryptoRegistry.childIdOf(cryptoRoot, _domainName);
+
+        // act
+        const data = await proxy.callStatic.getDataByHash(hashes, _tokenId);
+
+        // asserts
+        assert.deepEqual(data, [ZERO_ADDRESS, ZERO_ADDRESS, ['',''], ['','']]);
+      });
+
       it('should return data by hashes for .crypto domain', async () => {
         // arrange
         const hashes = keys.map(utils.id);
@@ -562,6 +621,25 @@ describe('ProxyReader', () => {
         const data = await proxy.callStatic.getDataByHashForMany([], [])
 
         assert.deepEqual(data, [[], [], [], []]);
+      });
+
+      it('should return empty data for non-existing .crypto|.wallet domains', async () => {
+        // arrange
+        const hashes = keys.map(utils.id);
+        const _domainName = 'hey_hoy_1037';
+        const _tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
+        const _tokenId_crypto = await registry.childIdOf(cryptoRoot, _domainName);
+
+        // act
+        const data = await proxy.callStatic.getDataByHashForMany(hashes, [_tokenId_wallet, _tokenId_crypto]);
+
+        // asserts
+        assert.deepEqual(data, [
+          [ZERO_ADDRESS, ZERO_ADDRESS],
+          [ZERO_ADDRESS, ZERO_ADDRESS],
+          [['',''], ['','']],
+          [['',''], ['','']]
+        ]);
       });
 
       it('should return data for multiple .crypto|.wallet domains', async () => {
