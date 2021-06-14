@@ -134,8 +134,6 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         onlyApprovedOrOwner(tokenId)
         protectTokenOperation(tokenId)
     {
-        // TODO: ensure no double override
-        _overridePresets[tokenId] = uint256(keccak256(abi.encodePacked(ownerOf(tokenId), tokenId)));
         _transfer(ownerOf(tokenId), to, tokenId);
     }
 
@@ -172,12 +170,6 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
     }
 
     /// Resolution
-
-    function getPreset(uint256 tokenId) internal view override returns(uint256) {
-        return _overridePresets[tokenId] == 0 && _exists(tokenId)
-            ? uint256(keccak256(abi.encodePacked(ownerOf(tokenId), tokenId)))
-            : _overridePresets[tokenId];
-    }
 
     function resolverOf(uint256 tokenId) external view override returns (address) {
         return _exists(tokenId) ? address(this) : address(0x0);
@@ -255,6 +247,11 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
     function _mint(address to, uint256 tokenId, string memory uri) internal {
         _mint(to, tokenId);
         emit NewURI(tokenId, uri);
+    }
+
+    function _mint(address to, uint256 tokenId) internal override {
+        _reset(tokenId);
+        super._mint(to, tokenId);
     }
 
     function _safeMint(address to, uint256 tokenId, string memory uri, bytes memory _data) internal {
