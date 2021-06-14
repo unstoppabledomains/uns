@@ -35,6 +35,25 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
         __EIP712_init_unchained("RegistryForwarder", "0.0.1");
     }
 
+    /*
+     * 0x23b872dd == bytes4(keccak256('transferFrom(address,address,uint256)'))
+     */
+    function transferFromFor(address from, address to, uint256 tokenId, bytes calldata signature) external {
+        bytes memory data = abi.encodeWithSelector(0x23b872dd, from, to, tokenId);
+        address signer = _recover(keccak256(data), tokenId, signature);
+
+        (bool success,) = address(this).call(abi.encodePacked(data, signer, tokenId));
+        if (success == false) {
+            /* solium-disable-next-line security/no-inline-assembly */
+            assembly {
+                let ptr := mload(0x40)
+                let size := returndatasize()
+                returndatacopy(ptr, 0, size)
+                revert(ptr, size)
+            }
+        }
+    }
+
     function nonceOf(uint256 tokenId) public view returns (uint256) {
         return _nonces[tokenId];
     }
@@ -62,6 +81,15 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
         assert(gasleft() > req.gas / 63);
 
         return (success, returndata);
+    }
+
+    function _recover(bytes32 digest, uint256 tokenId, bytes memory signature) internal returns(address signer) {
+        signer = keccak256(abi.encodePacked(digest, address(this), _nonces[tokenId]))
+            .toEthSignedMessageHash()
+            .recover(signature);
+        require(signer != address(0), "RegistryForwarder: INVALID_SIGNER");
+
+        _invalidateNonce(tokenId);
     }
 
     function _invalidateNonce(uint256 tokenId) internal {

@@ -9,7 +9,7 @@ describe('Registry (metatx)', () => {
 
   before(async () => {
     signers = await ethers.getSigners();
-    [coinbase, owner, nonOwner, receiver, accessControl, operator] = signers;
+    [coinbase, owner, nonOwner, receiver, accessControl, operator, spender] = signers;
     [, ...accounts] = signers.map(s => s.address);
 
     Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
@@ -280,7 +280,7 @@ describe('Registry (metatx)', () => {
         values: ['value1']
       }
 
-      const excluded = ['mint', 'safeMint', 'mintWithRecords', 'safeMintWithRecords'];
+      const excluded = ['mint', 'safeMint', 'mintWithRecords', 'safeMintWithRecords', 'transferFromFor'];
 
       const getFuncs = () => {
         return registryFuncs()
@@ -487,6 +487,53 @@ describe('Registry (metatx)', () => {
           await expect(registry.execute(req, sig)).to.be
             .revertedWith('RegistryForwarder: signature does not match request');
         }
+      })
+    })
+  })
+
+  describe('Old metatx', () => {
+    const sign = async (data, address, nonce, signer) => {
+      return signer.signMessage(
+        utils.arrayify(
+          utils.solidityKeccak256(
+            [ 'bytes32', 'address', 'uint256' ],
+            [ utils.keccak256(data), address, nonce ]
+          )
+        )
+      )
+    }
+
+    describe('transferFromFor', () => {
+      it('should transfer', async () => {
+        const tok = await registry.childIdOf(root, 'transferFromFor_label');
+        await registry.mint(owner.address, tok, 'transferFromFor_label');
+  
+        const data = registry.interface.encodeFunctionData(
+          'transferFrom(address,address,uint256)',
+          [owner.address, receiver.address, tok]
+        );
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await registry.connect(spender).transferFromFor(owner.address, receiver.address, tok, signature);
+
+        assert.equal(await registry.ownerOf(tok), receiver.address);
+      })
+
+      it('should revert transfer by non-owner', async () => {
+        const tok = await registry.childIdOf(root, 'label_wr');
+        await registry.mint(owner.address, tok, 'label_wr');
+
+        const data = registry.interface.encodeFunctionData(
+          'transferFrom(address,address,uint256)',
+          [owner.address, receiver.address, tok]
+        );
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), nonOwner);
+
+        await expect(
+          registry.connect(spender).transferFromFor(owner.address, nonOwner.address, tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
       })
     })
   })
