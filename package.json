@@ -11,6 +11,7 @@
     "coverage": "hardhat coverage",
     "test": "hardhat test",
     "lint": "prettier --list-different 'contracts/**/*.sol'",
+    "predeploy:localhost": "hardhat run --network localhost scripts/predeploy.js",
     "deploy:localhost": "hardhat run --network localhost scripts/deploy.js",
     "deploy:rinkeby": "hardhat run --network rinkeby scripts/deploy.js",
     "deploy:proxy:localhost": "PROXY=true hardhat run --network localhost scripts/deploy.js",

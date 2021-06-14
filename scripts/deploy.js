@@ -1,4 +1,4 @@
-const { ethers, upgrades } = require("hardhat");
+const { ethers, upgrades } = require('hardhat');
 const argv = require('yargs/yargs')()
   .env('')
   .boolean('proxy')
@@ -45,11 +45,11 @@ async function main() {
   let registry;
   if (argv.proxy) {
     registry = await upgrades.deployProxy(Registry);
-    console.log("Registry PROXY deployed to:", registry.address);
+    console.log('Registry PROXY deployed to:', registry.address);
   } else {
     registry = await Registry.deploy();
     await registry.initialize();
-    console.log("Registry deployed to:", registry.address);
+    console.log('Registry deployed to:', registry.address);
   }
 
   if (network === 'live') {
@@ -57,7 +57,7 @@ async function main() {
   }
 
   const whitelistedMinter = await WhitelistedMinter.deploy(registry.address);
-  console.log("WhitelistedMinter deployed to:", whitelistedMinter.address);
+  console.log('WhitelistedMinter deployed to:', whitelistedMinter.address);
   await registry.addMinter(whitelistedMinter.address);
 
   if (network === 'rinkeby') {
@@ -75,18 +75,18 @@ async function main() {
   }
 
   const proxyReader = await ProxyReader.deploy(registry.address);
-  console.log("ProxyReader deployed to:", proxyReader.address);
+  console.log('ProxyReader deployed to:', proxyReader.address);
 
   if (network === 'rinkeby') {
     const twitterValidationOperator = await TwitterValidationOperator.deploy(
       registry.address,
       '0x01BE23585060835E02B77ef475b0Cc51aA1e0709',
       rinkebyAccounts.admins);
-    console.log("TwitterValidationOperator deployed to:", twitterValidationOperator.address);
+    console.log('TwitterValidationOperator deployed to:', twitterValidationOperator.address);
   }
 
   const freeMinter = await FreeMinter.deploy(registry.address);
-  console.log("FreeMinter deployed to:", freeMinter.address);
+  console.log('FreeMinter deployed to:', freeMinter.address);
   await registry.addMinter(freeMinter.address);
 
   console.log('Migrated!');
