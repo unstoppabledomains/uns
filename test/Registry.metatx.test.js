@@ -239,7 +239,12 @@ describe('Registry (metatx)', () => {
         values: ['value1']
       }
 
-      const included = ['mint', 'safeMint', 'mintWithRecords', 'safeMintWithRecords'];
+      const included = [
+        'mint',
+        'safeMint',
+        'mintWithRecords',
+        'safeMintWithRecords'
+      ];
 
       const getFuncs = () => {
         return registryFuncs()
@@ -280,7 +285,19 @@ describe('Registry (metatx)', () => {
         values: ['value1']
       }
 
-      const excluded = ['mint', 'safeMint', 'mintWithRecords', 'safeMintWithRecords', 'transferFromFor'];
+      const excluded = [
+        'mint',
+        'safeMint',
+        'mintWithRecords',
+        'safeMintWithRecords',
+        'transferFromFor',
+        'safeTransferFromFor',
+        'burnFor',
+        'resetFor',
+        'setFor',
+        'setManyFor',
+        'reconfigureFor',
+      ];
 
       const getFuncs = () => {
         return registryFuncs()

@@ -39,19 +39,79 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
      * 0x23b872dd == bytes4(keccak256('transferFrom(address,address,uint256)'))
      */
     function transferFromFor(address from, address to, uint256 tokenId, bytes calldata signature) external {
-        bytes memory data = abi.encodeWithSelector(0x23b872dd, from, to, tokenId);
-        address signer = _recover(keccak256(data), tokenId, signature);
+        _executeFor(abi.encodeWithSelector(0x23b872dd, from, to, tokenId), tokenId, signature);
+    }
 
-        (bool success,) = address(this).call(abi.encodePacked(data, signer, tokenId));
-        if (success == false) {
-            /* solium-disable-next-line security/no-inline-assembly */
-            assembly {
-                let ptr := mload(0x40)
-                let size := returndatasize()
-                returndatacopy(ptr, 0, size)
-                revert(ptr, size)
-            }
-        }
+    /*
+     * 0xb88d4fde == bytes4(keccak256('safeTransferFrom(address,address,uint256,bytes)'))
+     */
+    function safeTransferFromFor(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes calldata _data,
+        bytes calldata signature
+    )
+        external
+    {
+        _executeFor(abi.encodeWithSelector(0xb88d4fde, from, to, tokenId, _data), tokenId, signature);
+    }
+
+    /*
+     * 0x42842e0e == bytes4(keccak256('safeTransferFrom(address,address,uint256)'))
+     */
+    function safeTransferFromFor(address from, address to, uint256 tokenId, bytes calldata signature) external {
+        _executeFor(abi.encodeWithSelector(0x42842e0e, from, to, tokenId), tokenId, signature);
+    }
+
+    /*
+     * 0x42966c68 == bytes4(keccak256('burn(uint256)'))
+     */
+    function burnFor(uint256 tokenId, bytes calldata signature) external {
+        _executeFor(abi.encodeWithSelector(0x42966c68, tokenId), tokenId, signature);
+    }
+
+    /*
+     * 0x310bd74b == bytes4(keccak256('reset(uint256)'))
+     */
+    function resetFor(uint256 tokenId, bytes calldata signature) external {
+        _executeFor(abi.encodeWithSelector(0x310bd74b, tokenId), tokenId, signature);
+    }
+
+    /*
+     * 0x47c81699 == bytes4(keccak256('set(string,string,uint256)'))
+     */
+    function setFor(
+        string calldata key,
+        string calldata value,
+        uint256 tokenId,
+        bytes calldata signature
+    ) external {
+        _executeFor(abi.encodeWithSelector(0x47c81699, key, value, tokenId), tokenId, signature);
+    }
+
+    /*
+     * 0xce92b33e == bytes4(keccak256('setMany(string[],string[],uint256)'))
+     */
+    function setManyFor(
+        string[] calldata keys,
+        string[] calldata values,
+        uint256 tokenId,
+        bytes calldata signature
+    ) public {
+        _executeFor(abi.encodeWithSelector(0xce92b33e, keys, values, tokenId), tokenId, signature);
+    }
+
+    /*
+     * 0xec129eea == bytes4(keccak256('reconfigure(string[],string[],uint256)'))
+     */
+    function reconfigureFor(
+        string[] calldata keys,
+        string[] calldata values,
+        uint256 tokenId,
+        bytes calldata signature
+    ) public {
+        _executeFor(abi.encodeWithSelector(0xec129eea, keys, values, tokenId), tokenId, signature);
     }
 
     function nonceOf(uint256 tokenId) public view returns (uint256) {
@@ -94,6 +154,38 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
 
     function _invalidateNonce(uint256 tokenId) internal {
         _nonces[tokenId] = _nonces[tokenId] + 1;
+    }
+
+    function _executeFor(bytes memory data, uint256 tokenId, bytes memory signature) private returns (bytes memory) {
+        uint256 gas = gasleft();
+        address from = _recover(keccak256(data), tokenId, signature);
+
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, bytes memory returndata) = address(this).call{gas: gas}(abi.encodePacked(data, from, tokenId));
+        // Validate that the relayer has sent enough gas for the call.
+        // See https://ronan.eth.link/blog/ethereum-gas-dangers/
+        assert(gasleft() > gas / 63);
+
+        return _verifyCallResult(success, returndata, "RegistryForwarder: low-level call failed");
+    }
+
+    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage) private pure returns(bytes memory) {
+        if (success) {
+            return returndata;
+        } else {
+            // Look for revert reason and bubble it up if present
+            if (returndata.length > 0) {
+                // The easiest way to bubble the revert reason is using memory via assembly
+
+                // solhint-disable-next-line no-inline-assembly
+                assembly {
+                    let returndata_size := mload(returndata)
+                    revert(add(32, returndata), returndata_size)
+                }
+            } else {
+                revert(errorMessage);
+            }
+        }
     }
 
     uint256[50] private __gap;
