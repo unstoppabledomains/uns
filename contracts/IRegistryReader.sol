@@ -3,8 +3,6 @@
 pragma solidity ^0.8.0;
 
 interface IRegistryReader {
-    function name() external view returns (string memory);
-    function symbol() external view returns (string memory);
     function tokenURI(uint256 tokenId) external view returns (string memory);
 
     /**
@@ -31,12 +29,6 @@ interface IRegistryReader {
     function childIdOf(uint256 tokenId, string calldata label) external view returns (uint256);
 
     /**
-     * @dev Returns registry's owner.
-     * @return owner address
-     */
-    function owner() external view returns (address);
-
-    /**
      * @dev Returns the number of NFTs in `owner`'s account. ERC721 related function.
      */
     function balanceOf(address owner) external view returns (uint256);
@@ -57,8 +49,7 @@ interface IRegistryReader {
     function isApprovedForAll(address owner, address operator) external view returns (bool);
 
     /**
-     * @dev Registry related function.
-     * @return root hash.
+     * @dev Returns whether token exists or not.
      */
-    function root() external view returns (uint256);
+    function exists(uint256 tokenId) external view returns (bool);
 }

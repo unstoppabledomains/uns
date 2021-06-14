@@ -1,8 +1,7 @@
 module.exports = {
   skipFiles: [
-    'mocks/SimpleMock.sol',
+    'mocks/ERC721ReceiverMock.sol',
     'mocks/RelayMock.sol',
     'mocks/LinkTokenMock.sol',
-    'mocks/ForwarderMock.sol',
   ],
 }

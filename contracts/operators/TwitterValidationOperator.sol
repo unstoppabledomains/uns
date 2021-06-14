@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 
-import "../util/ERC677Receiver.sol";
+import "../utils/ERC677Receiver.sol";
 import "../roles/WhitelistedRole.sol";
 import "../roles/CapperRole.sol";
 import "../IRegistry.sol";
