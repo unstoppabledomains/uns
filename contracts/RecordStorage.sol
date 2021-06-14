@@ -44,6 +44,10 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         }
     }
 
+    function _presetOf(uint256 tokenId) internal virtual view returns(uint256) {
+        return _tokenPresets[tokenId] == 0 ? tokenId : _tokenPresets[tokenId];
+    }
+
     function _set(string calldata key, string calldata value, uint256 tokenId) internal {
         uint256 keyHash = uint256(keccak256(abi.encodePacked(key)));
         _addKey(keyHash, key);
@@ -87,15 +91,15 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
     }
 
     function _get(uint256 keyHash, uint256 tokenId) private view returns (string memory) {
-        return _records[_tokenPresets[tokenId]][keyHash];
+        return _records[_presetOf(tokenId)][keyHash];
     }
 
     function _set(uint256 keyHash, string memory key, string memory value, uint256 tokenId) private {
-        if (bytes(_records[_tokenPresets[tokenId]][keyHash]).length == 0) {
+        if (bytes(_records[_presetOf(tokenId)][keyHash]).length == 0) {
             emit NewKey(tokenId, key, key);
         }
 
-        _records[_tokenPresets[tokenId]][keyHash] = value;
+        _records[_presetOf(tokenId)][keyHash] = value;
         emit Set(tokenId, key, value, key, value);
     }
 }
