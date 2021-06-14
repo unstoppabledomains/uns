@@ -482,7 +482,7 @@ describe('Registry', () => {
         .to.emit(registry, 'ResetRecords').withArgs(tok);
       assert.equal(await registry.get('key_31', tok), '');
 
-      await registry.mint(coinbase.address, tok, 'tok_hj_23');
+      await registry.mint(receiver.address, tok, 'tok_hj_23');
       assert.equal(await registry.get('key_31', tok), '');
     })
 
