@@ -77,7 +77,7 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
     }
 
     function _reset(uint256 tokenId) internal {
-        _tokenPresets[tokenId] = uint256(keccak256(abi.encodePacked(block.timestamp, tokenId)));
+        _tokenPresets[tokenId] = uint256(keccak256(abi.encodePacked(_presetOf(tokenId))));
         emit ResetRecords(tokenId);
     }
 
