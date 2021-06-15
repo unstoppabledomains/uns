@@ -112,7 +112,7 @@ describe('RegistryForwarder', () => {
 
       await expect(
         forwarder.execute({...req, tokenId: BigNumber.from(11)}, sig)
-      ).to.be.revertedWith('RegistryForwarder: signature does not match request');
+      ).to.be.revertedWith('RegistryForwarder: SIGNATURE_INVALID');
     })
 
     it('should fail execution when signature is tampered', async () => {
@@ -127,7 +127,7 @@ describe('RegistryForwarder', () => {
 
       await expect(
         forwarder.execute({...req, gas: '100001' }, sig)
-      ).to.be.revertedWith('RegistryForwarder: signature does not match request');
+      ).to.be.revertedWith('RegistryForwarder: SIGNATURE_INVALID');
     })
   })
 })

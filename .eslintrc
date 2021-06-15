@@ -10,8 +10,7 @@
   "env": {
     "browser" : true,
     "node" : true,
-    "mocha" : true,
-    "jest" : true
+    "mocha" : true
   },
   "globals" : {
     "artifacts": false,

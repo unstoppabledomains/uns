@@ -135,7 +135,7 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
     }
 
     function execute(ForwardRequest calldata req, bytes calldata signature) public returns (bool, bytes memory) {
-        require(verify(req, signature), 'RegistryForwarder: signature does not match request');
+        require(verify(req, signature), 'RegistryForwarder: SIGNATURE_INVALID');
         _nonces[req.tokenId] = req.nonce + 1;
 
         // solhint-disable-next-line avoid-low-level-calls
@@ -177,7 +177,7 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
         // See https://ronan.eth.link/blog/ethereum-gas-dangers/
         assert(gasleft() > gas / 63);
 
-        return _verifyCallResult(success, returndata, 'RegistryForwarder: low-level call failed');
+        return _verifyCallResult(success, returndata, 'RegistryForwarder: CALL_FAILED');
     }
 
     function _verifyCallResult(

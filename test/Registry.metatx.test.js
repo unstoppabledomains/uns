@@ -63,7 +63,7 @@ describe('Registry (metatx)', () => {
       await registry.connect(owner).set('key', 'value', tok);
 
       await expect(registry.execute(req, sig)).to.be
-        .revertedWith('RegistryForwarder: signature does not match request');
+        .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
     })
 
     it('should setApprovalForAll using meta-setApprovalForAll', async () => {
@@ -89,7 +89,7 @@ describe('Registry (metatx)', () => {
       };
       const sig = await signTypedData(registry.address, nonOwner, req);
       await expect(registry.execute(req, sig)).to.be
-        .revertedWith('RegistryForwarder: signature does not match request');
+        .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
     })
 
     it('should transfer using meta-transferFrom', async () => {
@@ -354,7 +354,7 @@ describe('Registry (metatx)', () => {
           await registry.execute(req, sig);
 
           await expect(registry.execute(req, sig)).to.be
-            .revertedWith('RegistryForwarder: signature does not match request');
+            .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
         }
       })
 
@@ -371,7 +371,7 @@ describe('Registry (metatx)', () => {
           await registry.connect(owner).set('key', 'value', paramValueMap.tokenId);
 
           await expect(registry.execute(req, sig)).to.be
-            .revertedWith('RegistryForwarder: signature does not match request');
+            .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
         }
       })
 
@@ -478,7 +478,7 @@ describe('Registry (metatx)', () => {
           await registry.execute(req, sig);
 
           await expect(registry.execute(req, sig)).to.be
-            .revertedWith('RegistryForwarder: signature does not match request');
+            .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
         }
       })
 
@@ -503,7 +503,7 @@ describe('Registry (metatx)', () => {
 
           expect(await registry.nonceOf(tokenId)).to.be.equal(nonce.add(1));
           await expect(registry.execute(req, sig)).to.be
-            .revertedWith('RegistryForwarder: signature does not match request');
+            .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
         }
       })
     })
