@@ -1,4 +1,5 @@
 const { signTypedData } = require('./helpers/metatx');
+const { EMPTY_SIGNATURE } = require('./helpers/constants');
 
 const { utils, BigNumber } = ethers;
 
@@ -522,23 +523,24 @@ describe('Registry (metatx)', () => {
 
     describe('transferFromFor', () => {
       it('should transfer', async () => {
-        const tok = await registry.childIdOf(root, 'transferFromFor_label');
-        await registry.mint(owner.address, tok, 'transferFromFor_label');
-  
+        const tok = await registry.childIdOf(root, 'label_34fw');
+        await registry.mint(owner.address, tok, '');
+
         const data = registry.interface.encodeFunctionData(
           'transferFrom(address,address,uint256)',
           [owner.address, receiver.address, tok]
         );
         const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
 
-        await registry.connect(spender).transferFromFor(owner.address, receiver.address, tok, signature);
+        await registry.connect(spender)
+          .transferFromFor(owner.address, receiver.address, tok, signature);
 
         assert.equal(await registry.ownerOf(tok), receiver.address);
       })
 
       it('should revert transfer by non-owner', async () => {
         const tok = await registry.childIdOf(root, 'label_wr');
-        await registry.mint(owner.address, tok, 'label_wr');
+        await registry.mint(owner.address, tok, '');
 
         const data = registry.interface.encodeFunctionData(
           'transferFrom(address,address,uint256)',
@@ -549,6 +551,412 @@ describe('Registry (metatx)', () => {
         await expect(
           registry.connect(spender).transferFromFor(owner.address, nonOwner.address, tok, signature)
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+
+      it('should revert when signature is invalid', async () => {
+        const tok = await registry.childIdOf(root, 'label_mv6rg');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData(
+          'transferFrom(address,address,uint256)',
+          [owner.address, receiver.address, tok]
+        );
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await expect(
+          registry.connect(spender).transferFromFor(owner.address, nonOwner.address, tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        await expect(
+          registry.connect(spender).transferFromFor(owner.address, nonOwner.address, tok, '0x')
+        ).to.be.revertedWith('ECDSA: invalid signature length');
+
+        await expect(
+          registry.connect(spender).transferFromFor(owner.address, nonOwner.address, tok, EMPTY_SIGNATURE)
+        ).to.be.revertedWith('ECDSA: invalid signature');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+    })
+
+    describe('safeTransferFromFor', () => {
+      const funcSig = 'safeTransferFromFor(address,address,uint256,bytes)';
+
+      it('should transfer', async () => {
+        const tok = await registry.childIdOf(root, 'label_fc24');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData(
+          'safeTransferFrom(address,address,uint256)',
+          [owner.address, receiver.address, tok]
+        );
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await registry.connect(spender)[funcSig](owner.address, receiver.address, tok, signature);
+
+        assert.equal(await registry.ownerOf(tok), receiver.address);
+      })
+
+      it('should revert transfer by non-owner', async () => {
+        const tok = await registry.childIdOf(root, 'label_dfgb34');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData(
+          'safeTransferFrom(address,address,uint256)',
+          [owner.address, receiver.address, tok]
+        );
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), nonOwner);
+
+        await expect(
+          registry.connect(spender)[funcSig](owner.address, nonOwner.address, tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+
+      it('should revert when signature is invalid', async () => {
+        const tok = await registry.childIdOf(root, 'label_sdr654');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData(
+          'safeTransferFrom(address,address,uint256)',
+          [owner.address, receiver.address, tok]
+        );
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await expect(
+          registry.connect(spender)[funcSig](owner.address, nonOwner.address, tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        await expect(
+          registry.connect(spender)[funcSig](owner.address, nonOwner.address, tok, '0x')
+        ).to.be.revertedWith('ECDSA: invalid signature length');
+
+        await expect(
+          registry.connect(spender)[funcSig](owner.address, nonOwner.address, tok, EMPTY_SIGNATURE)
+        ).to.be.revertedWith('ECDSA: invalid signature');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+    })
+
+    describe('safeTransferFromFor _data', () => {
+      const funcSig = 'safeTransferFromFor(address,address,uint256,bytes,bytes)';
+
+      it('should transfer', async () => {
+        const tok = await registry.childIdOf(root, 'label_vnm4');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData(
+          'safeTransferFrom(address,address,uint256,bytes)',
+          [owner.address, receiver.address, tok, '0x']
+        );
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await registry.connect(spender)[funcSig](owner.address, receiver.address, tok, '0x', signature);
+
+        assert.equal(await registry.ownerOf(tok), receiver.address);
+      })
+
+      it('should revert transfer by non-owner', async () => {
+        const tok = await registry.childIdOf(root, 'label_sv32');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData(
+          'safeTransferFrom(address,address,uint256,bytes)',
+          [owner.address, receiver.address, tok, '0x']
+        );
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), nonOwner);
+
+        await expect(
+          registry.connect(spender)[funcSig](owner.address, receiver.address, tok, '0x', signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+
+      it('should revert when signature is invalid', async () => {
+        const tok = await registry.childIdOf(root, 'label_sdff34');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData(
+          'safeTransferFrom(address,address,uint256,bytes)',
+          [owner.address, receiver.address, tok, '0x']
+        );
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await expect(
+          registry.connect(spender)[funcSig](owner.address, nonOwner.address, tok, '0x', signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        await expect(
+          registry.connect(spender)[funcSig](owner.address, nonOwner.address, tok, '0x', '0x')
+        ).to.be.revertedWith('ECDSA: invalid signature length');
+
+        await expect(
+          registry.connect(spender)[funcSig](owner.address, nonOwner.address, tok, '0x', EMPTY_SIGNATURE)
+        ).to.be.revertedWith('ECDSA: invalid signature');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+    })
+
+    describe('burnFor', () => {
+      it('should burn', async () => {
+        const tok = await registry.childIdOf(root, 'label_vcxw4');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('burn(uint256)', [tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await registry.connect(spender).burnFor(tok, signature);
+
+        await expect(registry.ownerOf(tok)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      })
+
+      it('should revert burn by non-owner', async () => {
+        const tok = await registry.childIdOf(root, 'label_aa31v');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('burn(uint256)', [tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), nonOwner);
+
+        await expect(
+          registry.connect(spender).burnFor(tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+
+      it('should revert when signature is invalid', async () => {
+        const tok = await registry.childIdOf(root, 'label_lld431');
+        await registry.mint(owner.address, tok, '');
+
+        const wrongTok = await registry.childIdOf(root, 'label_lld431_wrong');
+        await registry.mint(owner.address, wrongTok, '');
+
+        const data = registry.interface.encodeFunctionData('burn(uint256)', [tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await expect(
+          registry.connect(spender).burnFor(wrongTok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        await expect(
+          registry.connect(spender).burnFor(tok, '0x')
+        ).to.be.revertedWith('ECDSA: invalid signature length');
+
+        await expect(
+          registry.connect(spender).burnFor(tok, EMPTY_SIGNATURE)
+        ).to.be.revertedWith('ECDSA: invalid signature');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+    })
+
+    describe('resetFor', () => {
+      it('should reset', async () => {
+        const tok = await registry.childIdOf(root, 'label_wfv331');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('reset(uint256)', [tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await registry.connect(spender).resetFor(tok, signature);
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+
+      it('should revert reset by non-owner', async () => {
+        const tok = await registry.childIdOf(root, 'label_cvs11');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('burn(uint256)', [tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), nonOwner);
+
+        await expect(
+          registry.connect(spender).resetFor(tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+
+      it('should revert when signature is invalid', async () => {
+        const tok = await registry.childIdOf(root, 'label_lg212');
+        await registry.mint(owner.address, tok, '');
+
+        const wrongTok = await registry.childIdOf(root, 'label_lg212_wrong');
+        await registry.mint(owner.address, wrongTok, '');
+
+        const data = registry.interface.encodeFunctionData('burn(uint256)', [tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await expect(
+          registry.connect(spender).resetFor(wrongTok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        await expect(
+          registry.connect(spender).resetFor(tok, '0x')
+        ).to.be.revertedWith('ECDSA: invalid signature length');
+
+        await expect(
+          registry.connect(spender).resetFor(tok, EMPTY_SIGNATURE)
+        ).to.be.revertedWith('ECDSA: invalid signature');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+    })
+
+    describe('setFor', () => {
+      it('should set', async () => {
+        const tok = await registry.childIdOf(root, 'label_llsk113');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('set(string,string,uint256)', ['key1', 'v1', tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await registry.connect(spender).setFor('key1', 'v1', tok, signature);
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+        assert.equal(await registry.get('key1', tok), 'v1');
+      })
+
+      it('should revert set by non-owner', async () => {
+        const tok = await registry.childIdOf(root, 'label_cvl8s');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('set(string,string,uint256)', ['', '', tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), nonOwner);
+
+        await expect(
+          registry.connect(spender).setFor('', '', tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+
+      it('should revert when signature is invalid', async () => {
+        const tok = await registry.childIdOf(root, 'label_vldm3');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('set(string,string,uint256)', ['', '', tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await expect(
+          registry.connect(spender).setFor('aaa', '', tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        await expect(
+          registry.connect(spender).setFor('', '', tok, '0x')
+        ).to.be.revertedWith('ECDSA: invalid signature length');
+
+        await expect(
+          registry.connect(spender).setFor('', '', tok, EMPTY_SIGNATURE)
+        ).to.be.revertedWith('ECDSA: invalid signature');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+    })
+
+    describe('setManyFor', () => {
+      it('should set many', async () => {
+        const tok = await registry.childIdOf(root, 'label_dwe110');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('setMany(string[],string[],uint256)', [['key1'], ['1v'], tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await registry.connect(spender).setManyFor(['key1'], ['1v'], tok, signature);
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+        assert.equal(await registry.get('key1', tok), '1v');
+      })
+
+      it('should revert setMany by non-owner', async () => {
+        const tok = await registry.childIdOf(root, 'label_kcmn23');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('setMany(string[],string[],uint256)', [[''], [''], tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), nonOwner);
+
+        await expect(
+          registry.connect(spender).setManyFor([''], [''], tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+
+      it('should revert when signature is invalid', async () => {
+        const tok = await registry.childIdOf(root, 'label_sdn31');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('setMany(string[],string[],uint256)', [['key'], [''], tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await expect(
+          registry.connect(spender).setManyFor([''], [''], tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        await expect(
+          registry.connect(spender).setManyFor([''], [''], tok, '0x')
+        ).to.be.revertedWith('ECDSA: invalid signature length');
+
+        await expect(
+          registry.connect(spender).setManyFor([''], [''], tok, EMPTY_SIGNATURE)
+        ).to.be.revertedWith('ECDSA: invalid signature');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+    })
+
+    describe('reconfigureFor', () => {
+      it('should reconfigure', async () => {
+        const tok = await registry.childIdOf(root, 'label_cbc24');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('reconfigure(string[],string[],uint256)', [['key2'], ['1v'], tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await registry.connect(spender).reconfigureFor(['key2'], ['1v'], tok, signature);
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+        assert.equal(await registry.get('key2', tok), '1v');
+      })
+
+      it('should revert reconfigure by non-owner', async () => {
+        const tok = await registry.childIdOf(root, 'label_safv3');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('reconfigure(string[],string[],uint256)', [[''], [''], tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), nonOwner);
+
+        await expect(
+          registry.connect(spender).reconfigureFor([''], [''], tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        assert.equal(await registry.ownerOf(tok), owner.address);
+      })
+
+      it('should revert when signature is invalid', async () => {
+        const tok = await registry.childIdOf(root, 'label_sfv421');
+        await registry.mint(owner.address, tok, '');
+
+        const data = registry.interface.encodeFunctionData('reconfigure(string[],string[],uint256)', [['1'], [''], tok]);
+        const signature = await sign(data, registry.address, await registry.nonceOf(tok), owner);
+
+        await expect(
+          registry.connect(spender).reconfigureFor([''], [''], tok, signature)
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        await expect(
+          registry.connect(spender).reconfigureFor([''], [''], tok, '0x')
+        ).to.be.revertedWith('ECDSA: invalid signature length');
+
+        await expect(
+          registry.connect(spender).reconfigureFor([''], [''], tok, EMPTY_SIGNATURE)
+        ).to.be.revertedWith('ECDSA: invalid signature');
 
         assert.equal(await registry.ownerOf(tok), owner.address);
       })
