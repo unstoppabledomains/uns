@@ -8,7 +8,8 @@ import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
 import './cns/ICryptoResolver.sol';
-import './cns/ICryptoSLDMinter.sol';
+import './cns/ICryptoMintingController.sol';
+import './cns/ICryptoURIPrefixController.sol';
 import './IMintingManager.sol';
 import './IRegistry.sol';
 import './metatx/Relayer.sol';
@@ -23,7 +24,8 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     string public constant VERSION = '0.1.0';
 
     IRegistry public UnsRegistry;
-    ICryptoSLDMinter public CryptoMinter;
+    ICryptoMintingController public CryptoMintingController;
+    ICryptoURIPrefixController public CryptoURIPrefixController;
     ICryptoResolver public CryptoResolver;
 
     /**
@@ -63,18 +65,20 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
      */
     bytes4 private constant _SIG_SAFE_MINT_WITH_RECORDS_DATA = 0x6a2d2256;
 
-    modifier validTld(uint256 tld) {
-        require(bytes(_tlds[tld]).length > 0, 'MintingManager: TLD_NOT_VALID');
+    modifier onlyRegisteredTld(uint256 tld) {
+        require(bytes(_tlds[tld]).length > 0, 'MintingManager: TLD_NOT_REGISTERED');
         _;
     }
 
     function initialize(
         IRegistry unsRegistry,
-        ICryptoSLDMinter cryptoMinter,
+        ICryptoMintingController cryptoMintingController,
+        ICryptoURIPrefixController cryptoURIPrefixController,
         ICryptoResolver cryptoResolver
     ) public initializer {
         UnsRegistry = unsRegistry;
-        CryptoMinter = cryptoMinter;
+        CryptoMintingController = cryptoMintingController;
+        CryptoURIPrefixController = cryptoURIPrefixController;
         CryptoResolver = cryptoResolver;
 
         __Ownable_init_unchained();
@@ -100,7 +104,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         external
         override
         onlyMinter
-        validTld(tld)
+        onlyRegisteredTld(tld)
     {
         _mintSLD(to, tld, label);
     }
@@ -109,7 +113,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         external
         override
         onlyMinter
-        validTld(tld)
+        onlyRegisteredTld(tld)
     {
         _safeMintSLD(to, tld, label, '');
     }
@@ -119,7 +123,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         uint256 tld,
         string calldata label,
         bytes calldata _data
-    ) external override onlyMinter validTld(tld) {
+    ) external override onlyMinter onlyRegisteredTld(tld) {
         _safeMintSLD(to, tld, label, _data);
     }
 
@@ -129,7 +133,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMinter validTld(tld) {
+    ) external override onlyMinter onlyRegisteredTld(tld) {
         _mintSLDWithRecords(to, tld, label, keys, values);
     }
 
@@ -139,7 +143,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMinter validTld(tld) {
+    ) external override onlyMinter onlyRegisteredTld(tld) {
         _safeMintSLDWithRecords(to, tld, label, keys, values, '');
     }
 
@@ -150,15 +154,15 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         string[] calldata keys,
         string[] calldata values,
         bytes calldata _data
-    ) external override onlyMinter validTld(tld) {
+    ) external override onlyMinter onlyRegisteredTld(tld) {
         _safeMintSLDWithRecords(to, tld, label, keys, values, _data);
     }
 
-    function claim(uint256 tld, string calldata label) external override validTld(tld) {
+    function claim(uint256 tld, string calldata label) external override onlyRegisteredTld(tld) {
         _mintSLD(_msgSender(), tld, _freeSLDLabel(label));
     }
 
-    function claimTo(address to, uint256 tld, string calldata label) external override validTld(tld) {
+    function claimTo(address to, uint256 tld, string calldata label) external override onlyRegisteredTld(tld) {
         _mintSLD(to, tld, _freeSLDLabel(label));
     }
 
@@ -168,12 +172,19 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override validTld(tld) {
+    ) external override onlyRegisteredTld(tld) {
         _mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
     }
 
     function setResolver(address resolver) external onlyOwner {
         CryptoResolver = ICryptoResolver(resolver);
+    }
+
+    function setTokenURIPrefix(string calldata prefix) external override onlyOwner {
+        UnsRegistry.setTokenURIPrefix(prefix);
+        if(address(CryptoURIPrefixController) != address(0x0)) {
+            CryptoURIPrefixController.setTokenURIPrefix(prefix);
+        }
     }
 
     function _verifyRelaySigner(address signer) internal view override {
@@ -194,7 +205,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
 
     function _mintSLD(address to, uint256 tld, string memory label) private {
         if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
-            CryptoMinter.mintSLD(to, label);
+            CryptoMintingController.mintSLD(to, label);
         } else {
             UnsRegistry.mint(to, _childId(tld, label),  _uri(tld, label));
         }
@@ -207,7 +218,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         bytes memory _data
     ) private {
         if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
-            CryptoMinter.safeMintSLD(to, label, _data);
+            CryptoMintingController.safeMintSLD(to, label, _data);
         } else {
             UnsRegistry.safeMint(to, _childId(tld, label),  _uri(tld, label), _data);
         }
@@ -222,7 +233,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     ) private {
         uint256 tokenId = _childId(tld, label);
         if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
-            CryptoMinter.mintSLDWithResolver(to, label, address(CryptoResolver));
+            CryptoMintingController.mintSLDWithResolver(to, label, address(CryptoResolver));
             if(keys.length > 0) {
                 CryptoResolver.preconfigure(keys, values, tokenId);
             }
@@ -241,7 +252,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     ) private {
         uint256 tokenId = _childId(tld, label);
         if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
-            CryptoMinter.safeMintSLDWithResolver(to, label, address(CryptoResolver), _data);
+            CryptoMintingController.safeMintSLDWithResolver(to, label, address(CryptoResolver), _data);
             if(keys.length > 0) {
                 CryptoResolver.preconfigure(keys, values, tokenId);
             }

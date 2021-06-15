@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-interface ICryptoSLDMinter {
+interface ICryptoMintingController {
     function mintSLD(address to, string calldata label) external;
 
     function safeMintSLD(address to, string calldata label) external;
