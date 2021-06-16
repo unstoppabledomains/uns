@@ -1,30 +1,24 @@
-const { ethers } = require('hardhat');
-const argv = require('yargs/yargs')()
-  .env('')
-  .string('proxyAddress')
-  .argv;
+const { ethers, network } = require('hardhat');
+const NetworkConfig = require('./../network-config/uns-config.json');
 
 async function main() {
+  const unsConfig = NetworkConfig.networks[network.config.chainId];
+  if(!unsConfig) {
+    throw `UNS config not found for network ${network.config.chainId}`;
+  }
+
   const {
-    UNS_REGISTRY_PROXY,
-    UNS_MINTING_MANAGERE_PROXY
-  } = process.env;
-
-  if (!UNS_REGISTRY_PROXY) {
-    throw 'Registry proxy address (UNS_REGISTRY_PROXY) should be set explicitly';
-  }
-
-  if (!UNS_MINTING_MANAGERE_PROXY) {
-    throw 'MintingManager proxy address (UNS_MINTING_MANAGERE_PROXY) should be set explicitly';
-  }
+    Registry: UnsRegistry,
+    MintingManager: UnsMintingManager
+  } = cnsConfig.contracts;
 
   const Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
   const MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
 
-  const registry = await upgrades.upgradeProxy(UNS_REGISTRY_PROXY, Registry);
+  const registry = await upgrades.upgradeProxy(UnsRegistry.address, Registry);
   console.log('Registry PROXY upgraded:', registry.address);
 
-  mintingManager = await await upgrades.upgradeProxy(UNS_MINTING_MANAGERE_PROXY, MintingManager);
+  mintingManager = await await upgrades.upgradeProxy(UnsMintingManager.address, MintingManager);
   console.log('MintingManager PROXY upgraded:', mintingManager.address);
 }
 

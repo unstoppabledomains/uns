@@ -1,3 +1,4 @@
+const { ethers } = require('hardhat');
 const { utils, BigNumber } = ethers;
 
 describe.skip('E2E', () => {
@@ -160,7 +161,7 @@ describe.skip('E2E', () => {
     assert.equal(await cryptoRegistry.ownerOf(tokenId_crypto), coinbase.address);
   })
 
-  it.only('should burn .wallet domain through oll metatx(For)', async () => {
+  it('should burn .wallet domain through oll metatx(For)', async () => {
     const _domainName = `${domainPrefix}_test_e2e_wallet_974`;
 
     // mint

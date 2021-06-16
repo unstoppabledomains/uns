@@ -1,4 +1,6 @@
-const { ethers, upgrades } = require('hardhat');
+const { ethers, upgrades, network } = require('hardhat');
+const NetworkConfig = require('dot-crypto/src/network-config/network-config.json');
+
 const argv = require('yargs/yargs')()
   .env('')
   .boolean('proxy')
@@ -35,16 +37,21 @@ async function main() {
   const CryptoMintingController = await ethers.getContractFactory('contracts/cns/CryptoMintingController.sol:CryptoMintingController');
   const CryptoURIPrefixController = await ethers.getContractFactory('contracts/cns/CryptoURIPrefixController.sol:CryptoURIPrefixController');
 
-  const {
-    HARDHAT_NETWORK,
-    CNS_ADMIN_PRIVATE_KEY,
-    CNS_MINTING_CONTROLLER,
-    CNS_URI_CONTROLLER,
-    CNS_RESOLVER,
-    CNS_REGISTRY
-  } = process.env;
+  const { CNS_ADMIN_PRIVATE_KEY } = process.env;
 
-  console.log('Network', HARDHAT_NETWORK);
+  const cnsConfig = NetworkConfig.networks[network.config.chainId];
+  if(!cnsConfig) {
+    throw `CNS config not found for network ${network.config.chainId}`;
+  }
+
+  const {
+    Registry: CnsRegistry,
+    Resolver: CnsResolver,
+    MintingController: CnsMintingController,
+    URIPrefixController: CnsURIPrefixController,
+  } = cnsConfig.contracts;
+
+  console.log('Network', network.name);
 
   let registry, mintingManager;
   if (argv.proxy) {
@@ -66,9 +73,9 @@ async function main() {
 
   const mintingManagerInitTx = await mintingManager.initialize(
     registry.address,
-    CNS_MINTING_CONTROLLER,
-    CNS_URI_CONTROLLER,
-    CNS_RESOLVER
+    CnsMintingController.address,
+    CnsURIPrefixController.address,
+    CnsResolver.address
   );
   await mintingManagerInitTx.wait();
 
@@ -76,18 +83,18 @@ async function main() {
 
   // CNS configuration
   const cnsAdmin = new ethers.Wallet(CNS_ADMIN_PRIVATE_KEY, ethers.provider);
-  const cnsMintingController = await CryptoMintingController.attach(CNS_MINTING_CONTROLLER).connect(cnsAdmin);
+  const cnsMintingController = await CryptoMintingController.attach(CnsMintingController.address).connect(cnsAdmin);
   if(!(await cnsMintingController.isMinter(mintingManager.address))) {
     await cnsMintingController.addMinter(mintingManager.address);
   }
 
-  const cnsURIPrefixController = await CryptoURIPrefixController.attach(CNS_URI_CONTROLLER).connect(cnsAdmin);
+  const cnsURIPrefixController = await CryptoURIPrefixController.attach(CnsURIPrefixController.address).connect(cnsAdmin);
   if(!(await cnsURIPrefixController.isWhitelisted(mintingManager.address))) {
     await cnsURIPrefixController.addWhitelisted(mintingManager.address);
   }
 
   // Deploy ProxyReader
-  const proxyReader = await ProxyReader.deploy(registry.address, CNS_REGISTRY);
+  const proxyReader = await ProxyReader.deploy(registry.address, CnsRegistry.address);
   console.log('ProxyReader deployed to:', proxyReader.address);
 
   console.log('Migrated!');
