@@ -204,30 +204,15 @@ Variables [`RINKEBY_INFURA_KEY`, `RINKEBY_UNS_PRIVATE_KEY`] are required for ope
 Deployment UNS includes CNS registry. In order to deploy UNS you need to prepare `.env` config file
 ```
 CNS_ADMIN_PRIVATE_KEY=
-CNS_REGISTRY=
-CNS_MINTING_CONTROLLER=
-CNS_URI_CONTROLLER=
-CNS_RESOLVER=
 ```
 
 - `CNS_ADMIN_PRIVATE_KEY` - Private key of account which has rights for:
   - Adding minters to CNS MintingController
   - Adding whitelisted accounts to CNS URIPrefixController
-- `CNS_REGISTRY` - Address of CNS Registry
-- `CNS_MINTING_CONTROLLER` - Address of CNS MintingController
-- `CNS_URI_CONTROLLER` - Address of CNS URIPrefixController
-- `CNS_RESOLVER` - Address of CNS Default Resolver
 
 ## Upgrade
 
-The operation is possible when you deployed smart contracts through Proxy Upgradable pattern. It requires `.env` config file
-```
-UNS_REGISTRY_PROXY=
-UNS_MINTING_MANAGERE_PROXY=
-```
-
-- `UNS_REGISTRY_PROXY` - Address of UNS Registry Proxy
-- `UNS_MINTING_MANAGERE_PROXY` - Address of UNS MintingController Proxy
+The operation is possible when you deployed smart contracts through Proxy Upgradable pattern.
 
 ## Upgradeable proxy
 
