@@ -85,4 +85,10 @@ interface IMintingManager {
      * @param label SLD label to mint
      */
     function claimToWithRecords(address to, uint256 tld, string calldata label, string[] calldata keys, string[] calldata values) external;
+
+    /**
+     * @dev Function to set the token URI Prefix for all tokens.
+     * @param prefix string URI to assign
+     */
+    function setTokenURIPrefix(string calldata prefix) external;
 }

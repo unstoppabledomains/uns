@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
@@ -18,8 +17,11 @@ import './metatx/RegistryForwarder.sol';
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, OwnableUpgradeable, ERC2771RegistryContext, RecordStorage, RegistryForwarder, IRegistry {
+contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, ERC2771RegistryContext, RecordStorage, RegistryForwarder, IRegistry {
     using AddressUpgradeable for address;
+
+    string public constant NAME = 'UNS: Registry';
+    string public constant VERSION = '0.1.0';
 
     string internal _prefix;
 
@@ -47,14 +49,13 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, Ownab
         _mintingManager = mintingManager;
 
         __ERC721_init_unchained('uns', 'UD');
-        __Ownable_init_unchained();
         __ERC2771RegistryContext_init_unchained();
         __RegistryForwarder_init_unchained();
     }
 
     /// ERC721 Metadata extension
 
-    function setTokenURIPrefix(string calldata prefix) external override onlyOwner {
+    function setTokenURIPrefix(string calldata prefix) external override onlyMintingManager {
         _prefix = prefix;
         emit NewURIPrefix(prefix);
     }
