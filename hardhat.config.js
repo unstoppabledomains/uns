@@ -14,7 +14,9 @@ require('@openzeppelin/hardhat-upgrades');
 require('@nomiclabs/hardhat-truffle5');
 require('@nomiclabs/hardhat-waffle');
 require('@nomiclabs/hardhat-solhint');
+require("@nomiclabs/hardhat-etherscan");
 require('solidity-coverage');
+require('dotenv').config();
 
 if (argv.enableGasReport) {
   require('hardhat-gas-reporter');
@@ -58,9 +60,10 @@ module.exports = {
       blockGasLimit: 10000000,
     },
     rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_TEST_KEY}`,
-      accounts: process.env.RINKEBY_UD_PRIVATE_KEY
-        ? [process.env.RINKEBY_UD_PRIVATE_KEY]
+      url: `https://rinkeby.infura.io/v3/${process.env.RINKEBY_INFURA_KEY}`,
+      chainId: 4,
+      accounts: process.env.RINKEBY_UNS_PRIVATE_KEY
+        ? [process.env.RINKEBY_UNS_PRIVATE_KEY]
         : undefined
     },
   },
@@ -79,4 +82,10 @@ module.exports = {
     runOnCompile: true,
     disambiguatePaths: false,
   },
+  mocha: {
+    timeout: 100000
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY
+  }
 };
