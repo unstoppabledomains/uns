@@ -32,9 +32,12 @@ async function main() {
   const Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
   const MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
   const ProxyReader = await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader');
+  const CryptoMintingController = await ethers.getContractFactory('contracts/cns/CryptoMintingController.sol:CryptoMintingController');
+  const CryptoURIPrefixController = await ethers.getContractFactory('contracts/cns/CryptoURIPrefixController.sol:CryptoURIPrefixController');
 
   const {
     HARDHAT_NETWORK,
+    CNS_ADMIN_PRIVATE_KEY,
     CNS_MINTING_CONTROLLER,
     CNS_URI_CONTROLLER,
     CNS_RESOLVER,
@@ -61,13 +64,29 @@ async function main() {
   const registryInitTx = await registry.initialize(mintingManager.address);
   await registryInitTx.wait();
 
-  const mintingManagerInitTx = await mintingManager.initialize(registry.address, CNS_MINTING_CONTROLLER, CNS_RESOLVER);
+  const mintingManagerInitTx = await mintingManager.initialize(
+    registry.address,
+    CNS_MINTING_CONTROLLER,
+    CNS_URI_CONTROLLER,
+    CNS_RESOLVER
+  );
   await mintingManagerInitTx.wait();
 
   await mintingManager.addMinters([...rinkebyAccounts.workers, ...rinkebyAccounts.priorityWorkers]);
 
-  // TODO: CNS configuration
+  // CNS configuration
+  const cnsAdmin = new ethers.Wallet(CNS_ADMIN_PRIVATE_KEY, ethers.provider);
+  const cnsMintingController = await CryptoMintingController.attach(CNS_MINTING_CONTROLLER).connect(cnsAdmin);
+  if(!(await cnsMintingController.isMinter(mintingManager.address))) {
+    await cnsMintingController.addMinter(mintingManager.address);
+  }
 
+  const cnsURIPrefixController = await CryptoURIPrefixController.attach(CNS_URI_CONTROLLER).connect(cnsAdmin);
+  if(!(await cnsURIPrefixController.isWhitelisted(mintingManager.address))) {
+    await cnsURIPrefixController.addWhitelisted(mintingManager.address);
+  }
+
+  // Deploy ProxyReader
   const proxyReader = await ProxyReader.deploy(registry.address, CNS_REGISTRY);
   console.log('ProxyReader deployed to:', proxyReader.address);
 
