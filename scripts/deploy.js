@@ -18,10 +18,6 @@ const rinkebyAccounts = {
     '0x903aA579B9eF13862Fda73275B349017d8fD09eB',
     '0x7Ac8596cfbb0504DFDEC08d5088B67E7fbfae47f',
     '0xB83180632b72f988585AF02FC27229bF2Eabd139',
-  ],
-  admins: [
-    '0xec6A3Fb3f8869D50F73829db434525697852Ce3A',
-    '0x4C863E316Ce7A19ba23fDF801a369E1F3cc835AA',
   ]
 };
 
@@ -33,61 +29,47 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
-  const Registry = await ethers.getContractFactory('Registry');
-  const WhitelistedMinter = await ethers.getContractFactory('WhitelistedMinter');
-  const ProxyReader = await ethers.getContractFactory('ProxyReader');
-  const TwitterValidationOperator = await ethers.getContractFactory('TwitterValidationOperator');
-  const FreeMinter = await ethers.getContractFactory('FreeMinter');
+  const Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
+  const MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
+  const ProxyReader = await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader');
 
-  console.log('Network', process.env.HARDHAT_NETWORK);
-  const network = process.env.HARDHAT_NETWORK;
+  const {
+    HARDHAT_NETWORK,
+    CNS_MINTING_CONTROLLER,
+    CNS_URI_CONTROLLER,
+    CNS_RESOLVER,
+    CNS_REGISTRY
+  } = process.env;
 
-  let registry;
+  console.log('Network', HARDHAT_NETWORK);
+
+  let registry, mintingManager;
   if (argv.proxy) {
-    registry = await upgrades.deployProxy(Registry);
+    registry = await upgrades.deployProxy(Registry, [], { initializer: false });
     console.log('Registry PROXY deployed to:', registry.address);
+
+    mintingManager = await upgrades.deployProxy(MintingManager, [], { initializer: false });
+    console.log('MintingManager PROXY deployed to:', mintingManager.address);
   } else {
     registry = await Registry.deploy();
-    await registry.initialize();
     console.log('Registry deployed to:', registry.address);
+
+    mintingManager = await MintingManager.deploy();
+    console.log('MintingManager deployed to:', mintingManager.address);
   }
 
-  if (network === 'live') {
-    await registry.renounceController();
-  }
+  const registryInitTx = await registry.initialize(mintingManager.address);
+  await registryInitTx.wait();
 
-  const whitelistedMinter = await WhitelistedMinter.deploy(registry.address);
-  console.log('WhitelistedMinter deployed to:', whitelistedMinter.address);
-  await registry.addMinter(whitelistedMinter.address);
+  const mintingManagerInitTx = await mintingManager.initialize(registry.address, CNS_MINTING_CONTROLLER, CNS_RESOLVER);
+  await mintingManagerInitTx.wait();
 
-  if (network === 'rinkeby') {
-    for(const admin of rinkebyAccounts.admins) {
-      await whitelistedMinter.addWhitelistAdmin(admin);
-      await domainZoneOperator.addWhitelistAdmin(admin);
-    }
-    
-    await whitelistedMinter.bulkAddWhitelisted([
-      ...rinkebyAccounts.workers,
-      ...rinkebyAccounts.priorityWorkers
-    ]);
+  await mintingManager.addMinters([...rinkebyAccounts.workers, ...rinkebyAccounts.priorityWorkers]);
 
-    await domainZoneOperator.bulkAddWhitelisted(rinkebyAccounts.priorityWorkers);
-  }
+  // TODO: CNS configuration
 
-  const proxyReader = await ProxyReader.deploy(registry.address);
+  const proxyReader = await ProxyReader.deploy(registry.address, CNS_REGISTRY);
   console.log('ProxyReader deployed to:', proxyReader.address);
-
-  if (network === 'rinkeby') {
-    const twitterValidationOperator = await TwitterValidationOperator.deploy(
-      registry.address,
-      '0x01BE23585060835E02B77ef475b0Cc51aA1e0709',
-      rinkebyAccounts.admins);
-    console.log('TwitterValidationOperator deployed to:', twitterValidationOperator.address);
-  }
-
-  const freeMinter = await FreeMinter.deploy(registry.address);
-  console.log('FreeMinter deployed to:', freeMinter.address);
-  await registry.addMinter(freeMinter.address);
 
   console.log('Migrated!');
 }

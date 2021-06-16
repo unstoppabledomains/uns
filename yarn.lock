@@ -642,17 +642,17 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-2.3.0.tgz#043961a6e37b87e0eb80647c7528a7c62c41361f"
   integrity sha512-lf8C3oULQAnsu3OTRP4tP5/ddfil6l65Lg3JQCwAIgc99vZ1jz5qeBoETGGGmczxt+bIyMI06WPP2apC74EZag==
 
-"@openzeppelin/hardhat-upgrades@^1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/hardhat-upgrades/-/hardhat-upgrades-1.7.0.tgz#3086273b477818822b889ced9b4bd6d431c35e33"
-  integrity sha512-fInSIsIu2jYOqMzw0uQF6cBB0xDDUl7YSKEGU3Jp31UGe4jQg11d/echw0gc4BvLvxWEzhMpmqwDqV1KJPqNyQ==
+"@openzeppelin/hardhat-upgrades@^1.8.2":
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/hardhat-upgrades/-/hardhat-upgrades-1.8.2.tgz#553c116f291bf1492dfb73ed3feda079b5b400a7"
+  integrity sha512-G+z1WdsjBYQX4j0yPU+pM3rcmVgQNI6g3N05prxpXgAj8QhSDDisfWH2hC1XW8FLm7+dijz7FpUaEEdidpOA9Q==
   dependencies:
-    "@openzeppelin/upgrades-core" "^1.7.0"
+    "@openzeppelin/upgrades-core" "^1.7.3"
 
-"@openzeppelin/upgrades-core@^1.7.0":
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/upgrades-core/-/upgrades-core-1.7.1.tgz#a63f06a6a904dcf543eb9fca32a127ec8e92fcad"
-  integrity sha512-il1BrWOmYGxhtmq0hEG4oXlCvcyCrKQzCgmFiv2lqM+qLhp3C/JaXSysVHLohKXrb3XLPNP0pC39KrMDzPW70Q==
+"@openzeppelin/upgrades-core@^1.7.3":
+  version "1.7.6"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/upgrades-core/-/upgrades-core-1.7.6.tgz#2c5e89b272aaf2164f51ca99167ffeecdab13749"
+  integrity sha512-xXoUJGWI2MHLtMwS2GN3PiymZ9WIj+uRAMrm8HIz0genGSIO6PwPMlmaUyq3O8/JzTMgpVV92aMcPjOkvI5SmQ==
   dependencies:
     bn.js "^5.1.2"
     cbor "^7.0.0"
@@ -660,8 +660,6 @@
     compare-versions "^3.6.0"
     debug "^4.1.1"
     ethereumjs-util "^7.0.3"
-    fp-ts "^2.7.1"
-    io-ts "^2.2.9"
     proper-lockfile "^4.1.1"
     solidity-ast "^0.4.15"
 
@@ -3295,6 +3293,11 @@ domutils@^2.5.2, domutils@^2.6.0:
   version "1.1.0"
   resolved "https://github.com/unstoppabledomains/dot-crypto.git#957b652a69e529b6e81068c5548edc4e027da681"
 
+dotenv@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-10.0.0.tgz#3d4227b8fb95f81096cdd2b66653fb2c7085ba81"
+  integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
+
 dotignore@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/dotignore/-/dotignore-0.1.2.tgz#f942f2200d28c3a76fbdd6f0ee9f3257c8a2e905"
@@ -4560,11 +4563,6 @@ fp-ts@^1.0.0:
   resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-1.19.5.tgz#3da865e585dfa1fdfd51785417357ac50afc520a"
   integrity sha512-wDNqTimnzs8QqpldiId9OavWK2NptormjXnRJTQecNjzwfyp6P/8s/zG8e4h3ja3oqkKaY72UlTjQYt/1yXf9A==
 
-fp-ts@^2.7.1:
-  version "2.10.5"
-  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.10.5.tgz#7c77868fe8bd9b229743303c1bec505b959f631b"
-  integrity sha512-X2KfTIV0cxIk3d7/2Pvp/pxL/xr2MV1WooyEzKtTWYSc1+52VF4YzjBTXqeOlSiZsPCxIBpDGfT9Dyo7WEY0DQ==
-
 fragment-cache@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/fragment-cache/-/fragment-cache-0.2.1.tgz#4290fad27f13e89be7f33799c6bc5a0abfff0d19"
@@ -5372,11 +5370,6 @@ io-ts@1.10.4:
   integrity sha512-b23PteSnYXSONJ6JQXRAlvJhuw8KOtkqa87W4wDtvMrud/DTJd5X+NpOOI+O/zZwVq6v0VLAaJ+1EDViKEuN9g==
   dependencies:
     fp-ts "^1.0.0"
-
-io-ts@^2.2.9:
-  version "2.2.16"
-  resolved "https://registry.yarnpkg.com/io-ts/-/io-ts-2.2.16.tgz#597dffa03db1913fc318c9c6df6931cb4ed808b2"
-  integrity sha512-y5TTSa6VP6le0hhmIyN0dqEXkrZeJLeC5KApJq6VLci3UEKF80lZ+KuoUs02RhBxNWlrqSNxzfI7otLX1Euv8Q==
 
 ipaddr.js@1.9.1:
   version "1.9.1"

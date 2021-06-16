@@ -15,6 +15,7 @@ require('@nomiclabs/hardhat-truffle5');
 require('@nomiclabs/hardhat-waffle');
 require('@nomiclabs/hardhat-solhint');
 require('solidity-coverage');
+require('dotenv').config();
 
 if (argv.enableGasReport) {
   require('hardhat-gas-reporter');
@@ -59,8 +60,9 @@ module.exports = {
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.INFURA_TEST_KEY}`,
-      accounts: process.env.RINKEBY_UD_PRIVATE_KEY
-        ? [process.env.RINKEBY_UD_PRIVATE_KEY]
+      chainId: 4,
+      accounts: process.env.RINKEBY_UNS_PRIVATE_KEY
+        ? [process.env.RINKEBY_UNS_PRIVATE_KEY]
         : undefined
     },
   },
