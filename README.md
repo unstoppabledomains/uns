@@ -204,6 +204,8 @@ Note: List of changes which makes UNS and CNS backward incompatibile
 
 ### Events
 
+* `event Approved ApprovedForAll Transfer NewURI`
+  * Unchanged
 * `event Resolve(uint256 indexed tokenId, address indexed to)` 
   * Removed
   * UNS has a single resolver which is Registry, so one can assume that resolver is always set to registry address
@@ -226,8 +228,6 @@ Note: List of changes which makes UNS and CNS backward incompatibile
   * UNS Mirror
 * Resolution Libs
   * allRecords
-* Mobile App
-  * Importing domains from blockchain
 
 ### Read API
 
