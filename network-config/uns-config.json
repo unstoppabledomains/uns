@@ -1,0 +1,19 @@
+{
+    "version": "0.1.0",
+    "networks": {
+        "4": {
+            "Registry": {
+                "address": ""
+            },
+            "MintingManager": {
+                "address": ""
+            },
+            "ProxyReader": {
+                "address": ""
+            },
+            "ProxyAdmin": {
+                "address": ""
+            }
+        }
+    }
+}
