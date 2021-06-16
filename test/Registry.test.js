@@ -497,16 +497,4 @@ describe('Registry', () => {
       assert.equal(await registry.get('key_16', tok), 'value_23');
     })
   });
-
-  it.only('should', async () => {
-    console.log('crypto', namehash.hash('crypto'))
-    console.log('wallet', namehash.hash('wallet'))
-    console.log('x', namehash.hash('x'))
-    console.log('nft', namehash.hash('nft'))
-    console.log('blockchain', namehash.hash('blockchain'))
-    console.log('bitcoin', namehash.hash('bitcoin'))
-    console.log('888', namehash.hash('888'))
-    console.log('dao', namehash.hash('dao'))
-    console.log('coin', namehash.hash('coin'))
-  })
 })
