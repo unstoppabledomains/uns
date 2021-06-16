@@ -15,8 +15,8 @@ import './IRegistryReader.sol';
 contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IDataReader {
     using SafeMathUpgradeable for uint256;
 
-    string public constant NAME = 'Unstoppable Proxy Reader';
-    string public constant VERSION = '0.2.0';
+    string public constant NAME = 'UNS: Proxy Reader';
+    string public constant VERSION = '0.1.0';
 
     IRegistry private immutable _unsRegistry;
     ICryptoRegistry private immutable _cnsRegistry;
