@@ -3,7 +3,7 @@
     "networks": {
         "1": {
             "contracts": {
-                "Registry": {
+                "CNSRegistry": {
                     "address": "0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x8a958b"
