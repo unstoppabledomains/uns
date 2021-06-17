@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: MIT
+// @author Unstoppable Domains, Inc.
+// @date June 16th, 2021
 
 pragma solidity 0.5.12;
 

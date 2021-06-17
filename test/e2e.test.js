@@ -6,9 +6,9 @@ describe.skip('E2E', () => {
     UNS_WORKER_PRIVATE_KEY,
     UNS_REGISTRY_PROXY,
     UNS_MINTING_MANAGERE_PROXY,
+    UNS_PROXY_READER,
     CNS_REGISTRY,
     CNS_RESOLVER,
-    UNS_PROXY_READER,
   } = process.env;
 
   const domainPrefix = 'ug0e2';
