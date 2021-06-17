@@ -194,21 +194,21 @@ UNS registry smart contracts.
 ## Environment variables
 
 - `RINKEBY_INFURA_KEY` - Infura key for connecting to Ethereum Node
-- `RINKEBY_UNS_PRIVATE_KEY` - Private key of account for contracts deployment. The value should have `0x` prefix.
+- `RINKEBY_UNS_PRIVATE_KEY` - Private key of account for contracts deployment
 - `ETHERSCAN_API_KEY` - Etherscan API Key for smart contracts verification
+- `CNS_ADMIN_PRIVATE_KEY` - Private key of account which has rights for:
+  - Adding minters to CNS MintingController
+  - Adding whitelisted accounts to CNS URIPrefixController
+- `UNS_WORKER_PRIVATE_KEY` - Private key of account which has rights for minting domains
+
+NOTE: All private keys should be in HEX format with `0x` prefix
+
 
 Variables [`RINKEBY_INFURA_KEY`, `RINKEBY_UNS_PRIVATE_KEY`] are required for operating with Rinkeby network, including deployment and making smart contract calls.
 
 ## Deployment
 
-Deployment UNS includes CNS registry. In order to deploy UNS you need to prepare `.env` config file
-```
-CNS_ADMIN_PRIVATE_KEY=
-```
-
-- `CNS_ADMIN_PRIVATE_KEY` - Private key of account which has rights for:
-  - Adding minters to CNS MintingController
-  - Adding whitelisted accounts to CNS URIPrefixController
+Deployment UNS includes CNS registry.
 
 ## Upgrade
 
@@ -223,15 +223,7 @@ The operation is possible when you deployed smart contracts through Proxy Upgrad
 
 ## E2E tests
 
-This type of testing is needed to ensure everything is OK after deployment to testnet. It requires `.env` config file
-```
-UNS_WORKER_PRIVATE_KEY=
-UNS_REGISTRY_PROXY=
-UNS_MINTING_MANAGERE_PROXY=
-CNS_REGISTRY=
-CNS_RESOLVER=
-UNS_PROXY_READER=
-```
+This type of testing is needed to ensure everything is OK after deployment to testnet.
 
 - `UNS_WORKER_PRIVATE_KEY` - Private key of account which has rights for minting domains
 - `UNS_REGISTRY_PROXY` - Address of UNS Registry Proxy
