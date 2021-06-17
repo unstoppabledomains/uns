@@ -104,7 +104,8 @@
                 "WhitelistedMinter": {
                     "address": "0xbcB32f13f90978a9e059E8Cb40FaA9e6619d98e7",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x7232c6"
+                    "deploymentBlock": "0x7232c6",
+                    "deprecated": true
                 },
                 "URIPrefixController": {
                     "address": "0xe1d2e4B9f0518CA5c803073C3dFa886470627237",
