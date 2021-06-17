@@ -158,15 +158,14 @@ UNS registry smart contracts.
 
 7.  Upgradable registry
 
-    TBD:
-
-    - [Transparent vs UUPS Proxies](https://docs.openzeppelin.com/contracts/4.x/api/proxy#transparent-vs-uups)
+    > By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits significantly from the technology’s immutability, still a certain degree of mutability is needed for bug fixing and potential product improvements.
 
     Refs:
 
     - [IMPORTANT: Storage layout](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#modifying-your-contracts)
     - [Writing Upgradeable Contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable)
     - [UUPS Proxies: Tutorial (Solidity + JavaScript)](https://forum.openzeppelin.com/t/uups-proxies-tutorial-solidity-javascript/7786)
+    - [Transparent vs UUPS Proxies](https://docs.openzeppelin.com/contracts/4.x/api/proxy#transparent-vs-uups)
 
 8. TLD management
 
@@ -204,15 +203,7 @@ UNS registry smart contracts.
 NOTE: All private keys should be in HEX format with `0x` prefix
 
 
-Variables [`RINKEBY_INFURA_KEY`, `RINKEBY_UNS_PRIVATE_KEY`] are required for operating with Rinkeby network, including deployment and making smart contract calls.
-
-## Deployment
-
-Deployment UNS includes CNS registry.
-
-## Upgrade
-
-The operation is possible when you deployed smart contracts through Proxy Upgradable pattern.
+Variables [`RINKEBY_INFURA_KEY`, `RINKEBY_UNS_PRIVATE_KEY`, `CNS_ADMIN_PRIVATE_KEY`] are required for operating with Rinkeby network, including deployment and making smart contract calls.
 
 ## Upgradeable proxy
 
