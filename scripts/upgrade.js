@@ -1,5 +1,5 @@
 const { ethers, network } = require('hardhat');
-const NetworkConfig = require('./../network-config/uns-config.json');
+const NetworkConfig = require('./../config.json');
 
 async function main() {
   const unsConfig = NetworkConfig.networks[network.config.chainId];
