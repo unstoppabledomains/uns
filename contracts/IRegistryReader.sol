@@ -53,4 +53,9 @@ interface IRegistryReader {
      * @dev Returns whether token exists or not.
      */
     function exists(uint256 tokenId) external view returns (bool);
+
+    /**
+     * @dev Returns registry address for specified token. Requires the token to exist.
+     */
+    function registryOf(uint256 tokenId) external view returns (address);
 }
