@@ -210,13 +210,16 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         }
     }
 
-    function registryOf(uint256 tokenId) external view override returns (address) {
-        require(this.exists(tokenId), 'ProxyReader: TOKEN_DOES_NOT_EXIST');
+    /**
+     * @dev Returns registry address for specified token or zero address if token does not exist.
+     */
+    function registryOf(uint256 tokenId) external view returns (address) {
         if(_unsRegistry.exists(tokenId)) {
             return address(_unsRegistry);
-        } else {
+        } else if (_cnsOwnerOf(tokenId) != address(0x0)) {
             return address(_cnsRegistry);
         }
+        return address(0x0);
     }
 
     function _getData(string[] calldata keys, uint256 tokenId)
