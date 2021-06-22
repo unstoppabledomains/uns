@@ -281,6 +281,155 @@
           {
             "contract": "AccessControlUpgradeable",
             "label": "_roles",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)81_storage)",
+            "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:73"
+          },
+          {
+            "contract": "AccessControlUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:252"
+          },
+          {
+            "contract": "MintingManager",
+            "label": "UnsRegistry",
+            "type": "t_contract(IRegistry)1569",
+            "src": "contracts/MintingManager.sol:27"
+          },
+          {
+            "contract": "MintingManager",
+            "label": "CryptoMintingController",
+            "type": "t_contract(ICryptoMintingController)2601",
+            "src": "contracts/MintingManager.sol:28"
+          },
+          {
+            "contract": "MintingManager",
+            "label": "CryptoURIPrefixController",
+            "type": "t_contract(ICryptoURIPrefixController)2668",
+            "src": "contracts/MintingManager.sol:29"
+          },
+          {
+            "contract": "MintingManager",
+            "label": "CryptoResolver",
+            "type": "t_contract(ICryptoResolver)2660",
+            "src": "contracts/MintingManager.sol:30"
+          },
+          {
+            "contract": "MintingManager",
+            "label": "_tlds",
+            "type": "t_mapping(t_uint256,t_string_storage)",
+            "src": "contracts/MintingManager.sol:37"
+          },
+          {
+            "contract": "MintingManager",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "contracts/MintingManager.sol:309"
+          }
+        ],
+        "types": {
+          "t_contract(IRegistry)1569": {
+            "label": "contract IRegistry"
+          },
+          "t_contract(ICryptoMintingController)2601": {
+            "label": "contract ICryptoMintingController"
+          },
+          "t_contract(ICryptoURIPrefixController)2668": {
+            "label": "contract ICryptoURIPrefixController"
+          },
+          "t_contract(ICryptoResolver)2660": {
+            "label": "contract ICryptoResolver"
+          },
+          "t_mapping(t_uint256,t_string_storage)": {
+            "label": "mapping(uint256 => string)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)81_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_struct(RoleData)81_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32"
+              }
+            ]
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          }
+        }
+      }
+    },
+    "8113dd371177d7e1cc542c7b5a940e95dae1aa41585b8fb3e14b0ec08cde5fb6": {
+      "address": "0xb8Efb23b97408147ca63AE0494B2242c5029FFC4",
+      "txHash": "0xe0fbd37d1e64b11f719b280c61925625c7110e017f6a4e815100ca686919d98b",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:35"
+          },
+          {
+            "contract": "AccessControlUpgradeable",
+            "label": "_roles",
             "type": "t_mapping(t_bytes32,t_struct(RoleData)176_storage)",
             "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:73"
           },
@@ -299,19 +448,19 @@
           {
             "contract": "MintingManager",
             "label": "CryptoMintingController",
-            "type": "t_contract(ICryptoMintingController)7535",
+            "type": "t_contract(ICryptoMintingController)7471",
             "src": "contracts/MintingManager.sol:28"
           },
           {
             "contract": "MintingManager",
             "label": "CryptoURIPrefixController",
-            "type": "t_contract(ICryptoURIPrefixController)7633",
+            "type": "t_contract(ICryptoURIPrefixController)7569",
             "src": "contracts/MintingManager.sol:29"
           },
           {
             "contract": "MintingManager",
             "label": "CryptoResolver",
-            "type": "t_contract(ICryptoResolver)7625",
+            "type": "t_contract(ICryptoResolver)7561",
             "src": "contracts/MintingManager.sol:30"
           },
           {
@@ -324,20 +473,20 @@
             "contract": "MintingManager",
             "label": "__gap",
             "type": "t_array(t_uint256)50_storage",
-            "src": "contracts/MintingManager.sol:309"
+            "src": "contracts/MintingManager.sol:279"
           }
         ],
         "types": {
           "t_contract(IRegistry)3964": {
             "label": "contract IRegistry"
           },
-          "t_contract(ICryptoMintingController)7535": {
+          "t_contract(ICryptoMintingController)7471": {
             "label": "contract ICryptoMintingController"
           },
-          "t_contract(ICryptoURIPrefixController)7633": {
+          "t_contract(ICryptoURIPrefixController)7569": {
             "label": "contract ICryptoURIPrefixController"
           },
-          "t_contract(ICryptoResolver)7625": {
+          "t_contract(ICryptoResolver)7561": {
             "label": "contract ICryptoResolver"
           },
           "t_mapping(t_uint256,t_string_storage)": {

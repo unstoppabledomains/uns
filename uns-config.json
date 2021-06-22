@@ -75,7 +75,7 @@
                 },
                 "MintingManager": {
                     "address": "0xdAAf99A920D31F4f5720e4667b12b24e54A03070",
-                    "implementation": "0xf709D8b2c9881378d50653521a9fB64E45419914",
+                    "implementation": "0xb8efb23b97408147ca63ae0494b2242c5029ffc4",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x85e629"
                 },
