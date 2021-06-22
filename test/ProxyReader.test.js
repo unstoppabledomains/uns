@@ -37,6 +37,9 @@ describe('ProxyReader', () => {
     await cryptoRegistry.addController(cryptoMintingController.address);
     cryptoResolver = await CryptoResolver.deploy(cryptoRegistry.address, cryptoMintingController.address);
 
+    // mint .wallet TLD
+    await registry.mint(coinbase.address, walletRoot, 'wallet');
+
     // mint .crypto
     tokenId_wallet = await registry.childIdOf(walletRoot, domainName);
     await registry.mint(coinbase.address, tokenId_wallet, domainName);
@@ -297,6 +300,10 @@ describe('ProxyReader', () => {
 
       it('should return true for .crypto TLD', async () => {
         assert.equal(await proxy.exists(cryptoRoot), true);
+      })
+
+      it('should return true for .wallet TLD', async () => {
+        assert.equal(await proxy.exists(walletRoot), true);
       })
     })
   });
@@ -751,6 +758,55 @@ describe('ProxyReader', () => {
         // assert
         assert.deepEqual(owners, [coinbase.address, ZERO_ADDRESS]);
       });
+    });
+  });
+
+  describe('registryOf', () => {
+    it('should return zero for zero tokenId', async () => {
+      const address = await proxy.registryOf(0);
+      assert.deepEqual(address, ZERO_ADDRESS);
+    });
+
+    it('should return error for unknown .wallet domain', async () => {
+      const unknownTokenId = await registry.childIdOf(walletRoot, 'unknown');
+
+      const address = await proxy.registryOf(unknownTokenId);
+      assert.deepEqual(address, ZERO_ADDRESS);
+    });
+
+    it('should return error for unknown .crypto domain', async () => {
+      const unknownTokenId = await cryptoRegistry.childIdOf(cryptoRoot, 'unknown');
+
+      const address = await proxy.registryOf(unknownTokenId);
+      assert.deepEqual(address, ZERO_ADDRESS);
+    });
+
+    it('should return value for .wallet domain', async () => {
+      const _domainName = 'hey_hoy_98hds';
+      const tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
+      await registry.mint(accounts[3], tokenId_wallet, _domainName);
+
+      const address = await proxy.registryOf(tokenId_wallet);
+      assert.equal(address, registry.address);
+    });
+
+    it('should return value for .crypto domain', async () => {
+      const _domainName = 'hey_hoy_98hds';
+      const tokenId_crypto = await cryptoRegistry.childIdOf(cryptoRoot, _domainName);
+      await cryptoMintingController.mintSLD(accounts[3], _domainName);
+
+      const address = await proxy.registryOf(tokenId_crypto);
+      assert.equal(address, cryptoRegistry.address);
+    });
+
+    it('should return value for .crypto TLD', async () => {
+      const address = await proxy.registryOf(cryptoRoot);
+      assert.equal(address, cryptoRegistry.address);
+    });
+
+    it('should return value for .wallet TLD', async () => {
+      const address = await proxy.registryOf(walletRoot);
+      assert.equal(address, registry.address);
     });
   });
 });
