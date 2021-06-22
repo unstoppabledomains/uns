@@ -30,9 +30,9 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     ICryptoResolver public CryptoResolver;
 
     /**
-     * @dev Mapping TLD `hashname` to TLD label
+     * @dev Mapping TLD `namehash` to TLD label
      *
-     * `hashname` = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(label)))))
+     * `namehash` = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(label)))))
      */
     mapping(uint256 => string) internal _tlds;
 
@@ -89,45 +89,15 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         _addMinter(address(this));
 
         _tlds[0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f] = 'crypto';
-        _tlds[0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230] = 'wallet';
-        _tlds[0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2] = 'coin';
-        _tlds[0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d] = 'x';
-        _tlds[0xb75cf4f3d8bc3deb317ed5216d898899d5cc6a783f65f6768eb9bcb89428670d] = 'nft';
-        _tlds[0x4118ebbd893ecbb9f5d7a817c7d8039c1bd991b56ea243e2ae84d0a1b2c950a7] = 'blockchain';
-        _tlds[0x042fb01c1e43fb4a32f85b41c821e17d2faeac58cfc5fb23f80bc00c940f85e3] = 'bitcoin';
-        _tlds[0x5c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e] = '888';
-        _tlds[0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553] = 'dao';
 
-        if(!UnsRegistry.exists(0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230)) {
-            UnsRegistry.mint(address(0xdead), 0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230, 'wallet');
-        }
+        string[8] memory tlds = ['wallet', 'coin', 'x', 'nft', 'blockchain', 'bitcoin', '888', 'dao'];
+        for (uint256 i = 0; i < tlds.length; i++) {
+            uint256 namehash = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(tlds[i])))));
+            _tlds[namehash] = tlds[i];
 
-        if(!UnsRegistry.exists(0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2)) {
-            UnsRegistry.mint(address(0xdead), 0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2, 'coin');
-        }
-
-        if(!UnsRegistry.exists(0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d)) {
-            UnsRegistry.mint(address(0xdead), 0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d, 'x');
-        }
-
-        if(!UnsRegistry.exists(0xb75cf4f3d8bc3deb317ed5216d898899d5cc6a783f65f6768eb9bcb89428670d)) {
-            UnsRegistry.mint(address(0xdead), 0xb75cf4f3d8bc3deb317ed5216d898899d5cc6a783f65f6768eb9bcb89428670d, 'nft');
-        }
-
-        if(!UnsRegistry.exists(0x4118ebbd893ecbb9f5d7a817c7d8039c1bd991b56ea243e2ae84d0a1b2c950a7)) {
-            UnsRegistry.mint(address(0xdead), 0x4118ebbd893ecbb9f5d7a817c7d8039c1bd991b56ea243e2ae84d0a1b2c950a7, 'blockchain');
-        }
-
-        if(!UnsRegistry.exists(0x042fb01c1e43fb4a32f85b41c821e17d2faeac58cfc5fb23f80bc00c940f85e3)) {
-            UnsRegistry.mint(address(0xdead), 0x042fb01c1e43fb4a32f85b41c821e17d2faeac58cfc5fb23f80bc00c940f85e3, 'bitcoin');
-        }
-
-        if(!UnsRegistry.exists(0x5c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e)) {
-            UnsRegistry.mint(address(0xdead), 0x5c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e, '888');
-        }
-
-        if(!UnsRegistry.exists(0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553)) {
-            UnsRegistry.mint(address(0xdead), 0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553, 'dao');
+            if(!UnsRegistry.exists(namehash)) {
+                UnsRegistry.mint(address(0xdead), namehash, tlds[i]);
+            }
         }
     }
 
@@ -236,7 +206,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
 
     function _mintSLD(address to, uint256 tld, string memory label) private {
         if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
-            CryptoMintingController.mintSLD(to, label);
+            CryptoMintingController.mintSLDWithResolver(to, label, address(CryptoResolver));
         } else {
             UnsRegistry.mint(to, _childId(tld, label),  _uri(tld, label));
         }
@@ -249,7 +219,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         bytes memory _data
     ) private {
         if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
-            CryptoMintingController.safeMintSLD(to, label, _data);
+            CryptoMintingController.safeMintSLDWithResolver(to, label, address(CryptoResolver), _data);
         } else {
             UnsRegistry.safeMint(to, _childId(tld, label),  _uri(tld, label), _data);
         }
