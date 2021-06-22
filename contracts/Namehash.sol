@@ -2,6 +2,8 @@
 
 pragma solidity ^0.8.0;
 
+import "hardhat/console.sol";
+
 library Strings {
     /**
      * Concat (High gas cost)
@@ -342,6 +344,24 @@ contract Namehash {
         bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
         for (uint i = split.length; i > 0; i--) {
             namehash = keccak256(abi.encodePacked(namehash, keccak256(abi.encodePacked(split[i-1]))));
+        }
+        return namehash;
+    }
+
+    function compute(string calldata name) public pure returns (bytes32) {
+        bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
+        uint256 j = bytes(name).length;
+        for (uint256 i = bytes(name).length; i > 0; i--) {
+            // console.log('=>', i);
+            if(bytes(name)[i - 1] == bytes('.')[0]) {
+                // console.log('::', i, j, name[i:j]);
+                namehash = keccak256(abi.encodePacked(namehash, keccak256(abi.encodePacked(name[i:j]))));
+                j = i - 1;
+            }
+            if(i == 1) {
+                namehash = keccak256(abi.encodePacked(namehash, keccak256(abi.encodePacked(name[:j]))));
+                // console.log('=:', 0, j, name[:j]);
+            }
         }
         return namehash;
     }
