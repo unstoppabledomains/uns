@@ -122,7 +122,7 @@
                 "Resolver": {
                     "address": "0x95AE1515367aa64C462c71e87157771165B1287A",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x7232cf",
+                    "deploymentBlock": "0x7232cf"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x1CB337b3b208dc29a6AcE8d11Bb591b66c5Dd83d",
