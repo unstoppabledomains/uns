@@ -7,5 +7,5 @@ pragma experimental ABIEncoderV2;
 import 'dot-crypto/contracts/util/WhitelistedMinter.sol';
 
 contract CryptoWhitelistedMinter is WhitelistedMinter {
-    constructor (MintingController minter) WhitelistedMinter(minter) public { }
+    constructor(MintingController minter) public WhitelistedMinter(minter) {}
 }

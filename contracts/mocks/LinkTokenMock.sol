@@ -5,10 +5,13 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 
 import '../utils/ERC677Receiver.sol';
 
 contract LinkTokenMock is ERC20Upgradeable, AccessControlUpgradeable {
+    using AddressUpgradeable for address;
+
     bytes32 public constant MINTER_ROLE = keccak256('MINTER_ROLE');
 
     modifier onlyMinter() {
@@ -30,38 +33,30 @@ contract LinkTokenMock is ERC20Upgradeable, AccessControlUpgradeable {
     }
 
     /**
-    * @dev transfer token to a contract address with additional data if the recipient is a contact.
-    * @param _to The address to transfer to.
-    * @param _value The amount to be transferred.
-    * @param _data The extra data to be passed to the receiving contract.
-    */
-    function transferAndCall(address _to, uint256 _value, bytes memory _data)
-        public
-        returns (bool success)
-    {
-        super.transfer(_to, _value);
-        emit Transfer(msg.sender, _to, _value);
-        if (isContract(_to)) {
-            contractFallback(_to, _value, _data);
+     * @dev transfer token to a contract address with additional data if the recipient is a contact.
+     * @param to The address to transfer to.
+     * @param value The amount to be transferred.
+     * @param data The extra data to be passed to the receiving contract.
+     */
+    function transferAndCall(
+        address to,
+        uint256 value,
+        bytes memory data
+    ) public returns (bool success) {
+        super.transfer(to, value);
+        emit Transfer(msg.sender, to, value);
+        if (to.isContract()) {
+            _contractFallback(to, value, data);
         }
         return true;
     }
 
-
-    function contractFallback(address _to, uint256 _value, bytes memory _data)
-        private
-    {
-        ERC677Receiver receiver = ERC677Receiver(_to);
-        receiver.onTokenTransfer(msg.sender, _value, _data);
-    }
-
-    function isContract(address _addr)
-        private
-        view
-        returns (bool hasCode)
-    {
-        uint length;
-        assembly {length := extcodesize(_addr)}
-        return length > 0;
+    function _contractFallback(
+        address to,
+        uint256 value,
+        bytes memory data
+    ) private {
+        ERC677Receiver receiver = ERC677Receiver(to);
+        receiver.onTokenTransfer(msg.sender, value, data);
     }
 }

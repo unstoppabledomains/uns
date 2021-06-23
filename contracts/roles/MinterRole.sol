@@ -14,14 +14,15 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
         _;
     }
 
+    // solhint-disable-next-line func-name-mixedcase
     function __MinterRole_init() internal initializer {
         __Ownable_init_unchained();
         __AccessControl_init_unchained();
         __MinterRole_init_unchained();
     }
 
-    function __MinterRole_init_unchained() internal initializer {
-    }
+    // solhint-disable-next-line func-name-mixedcase
+    function __MinterRole_init_unchained() internal initializer {}
 
     function isMinter(address account) public view returns (bool) {
         return hasRole(MINTER_ROLE, account);

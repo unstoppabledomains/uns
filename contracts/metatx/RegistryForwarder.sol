@@ -23,15 +23,17 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
         bytes data;
     }
 
-    bytes32 private constant TYPEHASH =
+    bytes32 private constant _TYPEHASH =
         keccak256('ForwardRequest(address from,uint256 gas,uint256 tokenId,uint256 nonce,bytes data)');
 
     mapping(uint256 => uint256) private _nonces;
 
+    // solhint-disable-next-line func-name-mixedcase
     function __RegistryForwarder_init() internal initializer {
         __RegistryForwarder_init_unchained();
     }
 
+    // solhint-disable-next-line func-name-mixedcase
     function __RegistryForwarder_init_unchained() internal initializer {
         __EIP712_init_unchained('RegistryForwarder', '0.0.1');
     }
@@ -67,10 +69,10 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
         address from,
         address to,
         uint256 tokenId,
-        bytes calldata _data,
+        bytes calldata data,
         bytes calldata signature
     ) external {
-        _executeFor(abi.encodeWithSelector(0xb88d4fde, from, to, tokenId, _data), tokenId, signature);
+        _executeFor(abi.encodeWithSelector(0xb88d4fde, from, to, tokenId, data), tokenId, signature);
     }
 
     /*
@@ -130,8 +132,9 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
     function verify(ForwardRequest calldata req, bytes calldata signature) public view returns (bool) {
         address signer =
             _hashTypedDataV4(
-                keccak256(abi.encode(TYPEHASH, req.from, req.gas, req.tokenId, req.nonce, keccak256(req.data)))
-            ).recover(signature);
+                keccak256(abi.encode(_TYPEHASH, req.from, req.gas, req.tokenId, req.nonce, keccak256(req.data)))
+            )
+                .recover(signature);
         return _nonces[req.tokenId] == req.nonce && signer == req.from;
     }
 

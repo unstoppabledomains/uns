@@ -8,7 +8,6 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721Metad
 import './IRecordStorage.sol';
 
 interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
-
     event NewURI(uint256 indexed tokenId, string uri);
 
     event NewURIPrefix(string prefix);
@@ -70,7 +69,11 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
      * @param tokenId id of token.
      * @param uri domain URI.
      */
-    function mint(address to, uint256 tokenId, string calldata uri) external;
+    function mint(
+        address to,
+        uint256 tokenId,
+        string calldata uri
+    ) external;
 
     /**
      * @dev Safely mints token.
@@ -79,7 +82,11 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
      * @param tokenId id of token.
      * @param uri domain URI.
      */
-    function safeMint(address to, uint256 tokenId, string calldata uri) external;
+    function safeMint(
+        address to,
+        uint256 tokenId,
+        string calldata uri
+    ) external;
 
     /**
      * @dev Safely mints token.
@@ -87,9 +94,14 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
      * @param to address to mint the new SLD to.
      * @param tokenId id of token.
      * @param uri domain URI.
-     * @param _data bytes data to send along with a safe transfer check
+     * @param data bytes data to send along with a safe transfer check
      */
-    function safeMint(address to, uint256 tokenId, string calldata uri, bytes calldata _data) external;
+    function safeMint(
+        address to,
+        uint256 tokenId,
+        string calldata uri,
+        bytes calldata data
+    ) external;
 
     /**
      * @dev Mints token with records
@@ -99,7 +111,13 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
      * @param values New record values
      * @param uri domain URI
      */
-    function mintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values) external;
+    function mintWithRecords(
+        address to,
+        uint256 tokenId,
+        string calldata uri,
+        string[] calldata keys,
+        string[] calldata values
+    ) external;
 
     /**
      * @dev Safely mints token with records
@@ -109,7 +127,13 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
      * @param values New record values
      * @param uri domain URI
      */
-    function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values) external;
+    function safeMintWithRecords(
+        address to,
+        uint256 tokenId,
+        string calldata uri,
+        string[] calldata keys,
+        string[] calldata values
+    ) external;
 
     /**
      * @dev Safely mints token with records
@@ -118,7 +142,14 @@ interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
      * @param keys New record keys
      * @param values New record values
      * @param uri domain URI
-     * @param _data bytes data to send along with a safe transfer check
+     * @param data bytes data to send along with a safe transfer check
      */
-    function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values, bytes calldata _data) external;
+    function safeMintWithRecords(
+        address to,
+        uint256 tokenId,
+        string calldata uri,
+        string[] calldata keys,
+        string[] calldata values,
+        bytes calldata data
+    ) external;
 }

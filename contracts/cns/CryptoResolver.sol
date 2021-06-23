@@ -7,5 +7,5 @@ pragma experimental ABIEncoderV2;
 import 'dot-crypto/contracts/Resolver.sol';
 
 contract CryptoResolver is Resolver {
-    constructor (Registry registry, MintingController controller) Resolver(registry, controller) public { }
+    constructor(Registry registry, MintingController controller) public Resolver(registry, controller) {}
 }

@@ -4,7 +4,7 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol';
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import '@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol';
 
 import './cns/ICryptoRegistry.sol';
 import './cns/ICryptoResolver.sol';
@@ -28,14 +28,15 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IRegistryReader).interfaceId
-            || interfaceId == type(IRecordReader).interfaceId
-            || interfaceId == type(IDataReader).interfaceId
-            || super.supportsInterface(interfaceId);
+        return
+            interfaceId == type(IRegistryReader).interfaceId ||
+            interfaceId == type(IRecordReader).interfaceId ||
+            interfaceId == type(IDataReader).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 
     function tokenURI(uint256 tokenId) external view override returns (string memory) {
-        if(_unsRegistry.exists(tokenId)) {
+        if (_unsRegistry.exists(tokenId)) {
             return _unsRegistry.tokenURI(tokenId);
         } else {
             return _cnsRegistry.tokenURI(tokenId);
@@ -43,7 +44,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function isApprovedOrOwner(address spender, uint256 tokenId) external view override returns (bool) {
-        if(_unsRegistry.exists(tokenId)) {
+        if (_unsRegistry.exists(tokenId)) {
             return _unsRegistry.isApprovedOrOwner(spender, tokenId);
         } else {
             return _cnsRegistry.isApprovedOrOwner(spender, tokenId);
@@ -51,7 +52,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function resolverOf(uint256 tokenId) external view override returns (address) {
-        if(_unsRegistry.exists(tokenId)) {
+        if (_unsRegistry.exists(tokenId)) {
             return _unsRegistry.resolverOf(tokenId);
         } else {
             return _cnsRegistry.resolverOf(tokenId);
@@ -74,7 +75,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function getApproved(uint256 tokenId) external view override returns (address) {
-        if(_unsRegistry.exists(tokenId)) {
+        if (_unsRegistry.exists(tokenId)) {
             return _unsRegistry.getApproved(tokenId);
         } else {
             return _cnsRegistry.getApproved(tokenId);
@@ -87,16 +88,15 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function exists(uint256 tokenId) external view override returns (bool) {
-        return _unsRegistry.exists(tokenId)
-            || _cnsOwnerOf(tokenId) != address(0x0);
+        return _unsRegistry.exists(tokenId) || _cnsOwnerOf(tokenId) != address(0x0);
     }
 
     function get(string calldata key, uint256 tokenId) external view override returns (string memory value) {
-        if(_unsRegistry.exists(tokenId)) {
+        if (_unsRegistry.exists(tokenId)) {
             return _unsRegistry.get(key, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
-            if(resolver != address(0x0)) {
+            if (resolver != address(0x0)) {
                 value = ICryptoResolver(resolver).get(key, tokenId);
             }
         }
@@ -104,18 +104,23 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
 
     function getMany(string[] calldata keys, uint256 tokenId) external view override returns (string[] memory values) {
         values = new string[](keys.length);
-        if(_unsRegistry.exists(tokenId)) {
+        if (_unsRegistry.exists(tokenId)) {
             return _unsRegistry.getMany(keys, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
-            if(resolver != address(0x0) && keys.length > 0) {
+            if (resolver != address(0x0) && keys.length > 0) {
                 values = ICryptoResolver(resolver).getMany(keys, tokenId);
             }
         }
     }
 
-    function getByHash(uint256 keyHash, uint256 tokenId) external view override returns (string memory key, string memory value) {
-        if(_unsRegistry.exists(tokenId)) {
+    function getByHash(uint256 keyHash, uint256 tokenId)
+        external
+        view
+        override
+        returns (string memory key, string memory value)
+    {
+        if (_unsRegistry.exists(tokenId)) {
             return _unsRegistry.getByHash(keyHash, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
@@ -126,23 +131,27 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function getManyByHash(uint256[] calldata keyHashes, uint256 tokenId)
-        external view override
+        external
+        view
+        override
         returns (string[] memory keys, string[] memory values)
     {
         keys = new string[](keyHashes.length);
         values = new string[](keyHashes.length);
-        if(_unsRegistry.exists(tokenId)) {
+        if (_unsRegistry.exists(tokenId)) {
             return _unsRegistry.getManyByHash(keyHashes, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
-            if(resolver != address(0x0) && keyHashes.length > 0) {
+            if (resolver != address(0x0) && keyHashes.length > 0) {
                 (keys, values) = ICryptoResolver(resolver).getManyByHash(keyHashes, tokenId);
             }
         }
     }
 
     function getData(string[] calldata keys, uint256 tokenId)
-        external view override
+        external
+        view
+        override
         returns (
             address resolver,
             address owner,
@@ -153,7 +162,9 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function getDataForMany(string[] calldata keys, uint256[] calldata tokenIds)
-        external view override
+        external
+        view
+        override
         returns (
             address[] memory resolvers,
             address[] memory owners,
@@ -170,7 +181,9 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function getDataByHash(uint256[] calldata keyHashes, uint256 tokenId)
-        external view override
+        external
+        view
+        override
         returns (
             address resolver,
             address owner,
@@ -182,7 +195,9 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function getDataByHashForMany(uint256[] calldata keyHashes, uint256[] calldata tokenIds)
-        external view override
+        external
+        view
+        override
         returns (
             address[] memory resolvers,
             address[] memory owners,
@@ -200,10 +215,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         }
     }
 
-    function ownerOfForMany(uint256[] calldata tokenIds)
-        external view override
-        returns (address[] memory owners)
-    {
+    function ownerOfForMany(uint256[] calldata tokenIds) external view override returns (address[] memory owners) {
         owners = new address[](tokenIds.length);
         for (uint256 i = 0; i < tokenIds.length; i++) {
             owners[i] = _ownerOf(tokenIds[i]);
@@ -214,7 +226,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
      * @dev Returns registry address for specified token or zero address if token does not exist.
      */
     function registryOf(uint256 tokenId) external view returns (address) {
-        if(_unsRegistry.exists(tokenId)) {
+        if (_unsRegistry.exists(tokenId)) {
             return address(_unsRegistry);
         } else if (_cnsOwnerOf(tokenId) != address(0x0)) {
             return address(_cnsRegistry);
@@ -223,42 +235,55 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function _getData(string[] calldata keys, uint256 tokenId)
-        private view returns (address resolver, address owner, string[] memory values)
+        private
+        view
+        returns (
+            address resolver,
+            address owner,
+            string[] memory values
+        )
     {
         values = new string[](keys.length);
-        if(_unsRegistry.exists(tokenId)) {
+        if (_unsRegistry.exists(tokenId)) {
             resolver = _unsRegistry.resolverOf(tokenId);
             owner = _unsRegistry.ownerOf(tokenId);
             values = _unsRegistry.getMany(keys, tokenId);
         } else {
             resolver = _cnsResolverOf(tokenId);
             owner = _cnsOwnerOf(tokenId);
-            if(resolver != address(0x0) && keys.length > 0) {
+            if (resolver != address(0x0) && keys.length > 0) {
                 values = ICryptoResolver(resolver).getMany(keys, tokenId);
             }
         }
     }
 
     function _getDataByHash(uint256[] calldata keyHashes, uint256 tokenId)
-        private view returns (address resolver, address owner, string[] memory keys, string[] memory values)
+        private
+        view
+        returns (
+            address resolver,
+            address owner,
+            string[] memory keys,
+            string[] memory values
+        )
     {
         keys = new string[](keyHashes.length);
         values = new string[](keyHashes.length);
-        if(_unsRegistry.exists(tokenId)) {
+        if (_unsRegistry.exists(tokenId)) {
             resolver = _unsRegistry.resolverOf(tokenId);
             owner = _unsRegistry.ownerOf(tokenId);
             (keys, values) = _unsRegistry.getManyByHash(keyHashes, tokenId);
         } else {
             resolver = _cnsResolverOf(tokenId);
             owner = _cnsOwnerOf(tokenId);
-            if(resolver != address(0x0) && keys.length > 0) {
+            if (resolver != address(0x0) && keys.length > 0) {
                 (keys, values) = ICryptoResolver(resolver).getManyByHash(keyHashes, tokenId);
             }
         }
     }
 
     function _ownerOf(uint256 tokenId) private view returns (address) {
-        if(_unsRegistry.exists(tokenId)) {
+        if (_unsRegistry.exists(tokenId)) {
             return _unsRegistry.ownerOf(tokenId);
         } else {
             return _cnsOwnerOf(tokenId);

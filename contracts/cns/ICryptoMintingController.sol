@@ -8,11 +8,28 @@ interface ICryptoMintingController {
 
     function safeMintSLD(address to, string calldata label) external;
 
-    function safeMintSLD(address to, string calldata label, bytes calldata _data) external;
+    function safeMintSLD(
+        address to,
+        string calldata label,
+        bytes calldata data
+    ) external;
 
-    function mintSLDWithResolver(address to, string memory label, address resolver) external;
+    function mintSLDWithResolver(
+        address to,
+        string memory label,
+        address resolver
+    ) external;
 
-    function safeMintSLDWithResolver(address to, string calldata label, address resolver) external;
+    function safeMintSLDWithResolver(
+        address to,
+        string calldata label,
+        address resolver
+    ) external;
 
-    function safeMintSLDWithResolver(address to, string calldata label, address resolver, bytes calldata _data) external;
+    function safeMintSLDWithResolver(
+        address to,
+        string calldata label,
+        address resolver,
+        bytes calldata data
+    ) external;
 }

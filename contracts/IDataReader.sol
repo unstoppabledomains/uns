@@ -65,8 +65,5 @@ interface IDataReader {
     /**
      * @param tokenIds Array of token ids to fetch.
      */
-    function ownerOfForMany(uint256[] calldata tokenIds)
-        external
-        view
-        returns (address[] memory owners);
+    function ownerOfForMany(uint256[] calldata tokenIds) external view returns (address[] memory owners);
 }

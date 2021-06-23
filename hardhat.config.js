@@ -14,7 +14,7 @@ require('@openzeppelin/hardhat-upgrades');
 require('@nomiclabs/hardhat-truffle5');
 require('@nomiclabs/hardhat-waffle');
 require('@nomiclabs/hardhat-solhint');
-require("@nomiclabs/hardhat-etherscan");
+require('@nomiclabs/hardhat-etherscan');
 require('solidity-coverage');
 
 if (argv.enableGasReport) {
@@ -51,7 +51,7 @@ module.exports = {
             runs: 200,
           },
         },
-      }
+      },
     ],
   },
   networks: {
@@ -63,7 +63,7 @@ module.exports = {
       chainId: 4,
       accounts: process.env.RINKEBY_UNS_PRIVATE_KEY
         ? [process.env.RINKEBY_UNS_PRIVATE_KEY]
-        : undefined
+        : undefined,
     },
   },
   gasReporter: {
@@ -82,9 +82,9 @@ module.exports = {
     disambiguatePaths: false,
   },
   mocha: {
-    timeout: 100000
+    timeout: 100000,
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY
-  }
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  },
 };

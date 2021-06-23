@@ -1,10 +1,10 @@
-const { ethers, network } = require('hardhat');
+const { ethers, upgrades, network } = require('hardhat');
 const NetworkConfig = require('./../uns-config.json');
 
-async function main() {
+async function main () {
   const unsConfig = NetworkConfig.networks[network.config.chainId];
-  if(!unsConfig) {
-    throw `UNS config not found for network ${network.config.chainId}`;
+  if (!unsConfig) {
+    throw new Error(`UNS config not found for network ${network.config.chainId}`);
   }
 
   const {

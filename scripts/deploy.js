@@ -20,28 +20,30 @@ const rinkebyAccounts = {
     '0x903aA579B9eF13862Fda73275B349017d8fD09eB',
     '0x7Ac8596cfbb0504DFDEC08d5088B67E7fbfae47f',
     '0xB83180632b72f988585AF02FC27229bF2Eabd139',
-  ]
+  ],
 };
 
-async function main() {
+async function main () {
   // Hardhat always runs the compile task when running scripts with its command
   // line interface.
   //
-  // If this script is run directly using `node` you may want to call compile 
+  // If this script is run directly using `node` you may want to call compile
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
   const Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
   const MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
   const ProxyReader = await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader');
-  const CryptoMintingController = await ethers.getContractFactory('contracts/cns/CryptoMintingController.sol:CryptoMintingController');
-  const CryptoURIPrefixController = await ethers.getContractFactory('contracts/cns/CryptoURIPrefixController.sol:CryptoURIPrefixController');
+  const CryptoMintingController =
+    await ethers.getContractFactory('contracts/cns/CryptoMintingController.sol:CryptoMintingController');
+  const CryptoURIPrefixController =
+    await ethers.getContractFactory('contracts/cns/CryptoURIPrefixController.sol:CryptoURIPrefixController');
 
   const { CNS_ADMIN_PRIVATE_KEY } = process.env;
 
   const cnsConfig = NetworkConfig.networks[network.config.chainId];
-  if(!cnsConfig) {
-    throw `CNS config not found for network ${network.config.chainId}`;
+  if (!cnsConfig) {
+    throw new Error(`CNS config not found for network ${network.config.chainId}`);
   }
 
   const {
@@ -75,7 +77,7 @@ async function main() {
     registry.address,
     CnsMintingController.address,
     CnsURIPrefixController.address,
-    CnsResolver.address
+    CnsResolver.address,
   );
   await mintingManagerInitTx.wait();
 
@@ -84,12 +86,14 @@ async function main() {
   // CNS configuration
   const cnsAdmin = new ethers.Wallet(CNS_ADMIN_PRIVATE_KEY, ethers.provider);
   const cnsMintingController = await CryptoMintingController.attach(CnsMintingController.address).connect(cnsAdmin);
-  if(!(await cnsMintingController.isMinter(mintingManager.address))) {
+  if (!(await cnsMintingController.isMinter(mintingManager.address))) {
     await cnsMintingController.addMinter(mintingManager.address);
   }
 
-  const cnsURIPrefixController = await CryptoURIPrefixController.attach(CnsURIPrefixController.address).connect(cnsAdmin);
-  if(!(await cnsURIPrefixController.isWhitelisted(mintingManager.address))) {
+  const cnsURIPrefixController = await CryptoURIPrefixController
+    .attach(CnsURIPrefixController.address)
+    .connect(cnsAdmin);
+  if (!(await cnsURIPrefixController.isWhitelisted(mintingManager.address))) {
     await cnsURIPrefixController.addWhitelisted(mintingManager.address);
   }
 

@@ -24,10 +24,10 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.1.0';
 
-    IRegistry public UnsRegistry;
-    ICryptoMintingController public CryptoMintingController;
-    ICryptoURIPrefixController public CryptoURIPrefixController;
-    ICryptoResolver public CryptoResolver;
+    IRegistry public unsRegistry;
+    ICryptoMintingController public cnsMintingController;
+    ICryptoURIPrefixController public cnsURIPrefixController;
+    ICryptoResolver public cnsResolver;
 
     /**
      * @dev Mapping TLD `namehash` to TLD label
@@ -72,15 +72,15 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     }
 
     function initialize(
-        IRegistry unsRegistry,
-        ICryptoMintingController cryptoMintingController,
-        ICryptoURIPrefixController cryptoURIPrefixController,
-        ICryptoResolver cryptoResolver
+        IRegistry unsRegistry_,
+        ICryptoMintingController cnsMintingController_,
+        ICryptoURIPrefixController cnsURIPrefixController_,
+        ICryptoResolver cnsResolver_
     ) public initializer {
-        UnsRegistry = unsRegistry;
-        CryptoMintingController = cryptoMintingController;
-        CryptoURIPrefixController = cryptoURIPrefixController;
-        CryptoResolver = cryptoResolver;
+        unsRegistry = unsRegistry_;
+        cnsMintingController = cnsMintingController_;
+        cnsURIPrefixController = cnsURIPrefixController_;
+        cnsResolver = cnsResolver_;
 
         __Ownable_init_unchained();
         __MinterRole_init_unchained();
@@ -95,27 +95,25 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
             uint256 namehash = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(tlds[i])))));
             _tlds[namehash] = tlds[i];
 
-            if(!UnsRegistry.exists(namehash)) {
-                UnsRegistry.mint(address(0xdead), namehash, tlds[i]);
+            if (!unsRegistry.exists(namehash)) {
+                unsRegistry.mint(address(0xdead), namehash, tlds[i]);
             }
         }
     }
 
-    function mintSLD(address to, uint256 tld, string calldata label)
-        external
-        override
-        onlyMinter
-        onlyRegisteredTld(tld)
-    {
+    function mintSLD(
+        address to,
+        uint256 tld,
+        string calldata label
+    ) external override onlyMinter onlyRegisteredTld(tld) {
         _mintSLD(to, tld, label);
     }
 
-    function safeMintSLD(address to, uint256 tld, string calldata label)
-        external
-        override
-        onlyMinter
-        onlyRegisteredTld(tld)
-    {
+    function safeMintSLD(
+        address to,
+        uint256 tld,
+        string calldata label
+    ) external override onlyMinter onlyRegisteredTld(tld) {
         _safeMintSLD(to, tld, label, '');
     }
 
@@ -123,9 +121,9 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         address to,
         uint256 tld,
         string calldata label,
-        bytes calldata _data
+        bytes calldata data
     ) external override onlyMinter onlyRegisteredTld(tld) {
-        _safeMintSLD(to, tld, label, _data);
+        _safeMintSLD(to, tld, label, data);
     }
 
     function mintSLDWithRecords(
@@ -154,16 +152,20 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         string calldata label,
         string[] calldata keys,
         string[] calldata values,
-        bytes calldata _data
+        bytes calldata data
     ) external override onlyMinter onlyRegisteredTld(tld) {
-        _safeMintSLDWithRecords(to, tld, label, keys, values, _data);
+        _safeMintSLDWithRecords(to, tld, label, keys, values, data);
     }
 
     function claim(uint256 tld, string calldata label) external override onlyRegisteredTld(tld) {
         _mintSLD(_msgSender(), tld, _freeSLDLabel(label));
     }
 
-    function claimTo(address to, uint256 tld, string calldata label) external override onlyRegisteredTld(tld) {
+    function claimTo(
+        address to,
+        uint256 tld,
+        string calldata label
+    ) external override onlyRegisteredTld(tld) {
         _mintSLD(to, tld, _freeSLDLabel(label));
     }
 
@@ -178,13 +180,13 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     }
 
     function setResolver(address resolver) external onlyOwner {
-        CryptoResolver = ICryptoResolver(resolver);
+        cnsResolver = ICryptoResolver(resolver);
     }
 
     function setTokenURIPrefix(string calldata prefix) external override onlyOwner {
-        UnsRegistry.setTokenURIPrefix(prefix);
-        if(address(CryptoURIPrefixController) != address(0x0)) {
-            CryptoURIPrefixController.setTokenURIPrefix(prefix);
+        unsRegistry.setTokenURIPrefix(prefix);
+        if (address(cnsURIPrefixController) != address(0x0)) {
+            cnsURIPrefixController.setTokenURIPrefix(prefix);
         }
     }
 
@@ -194,21 +196,26 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     }
 
     function _verifyRelayCall(bytes4 funcSig, bytes calldata) internal pure override {
-        bool isSupported = funcSig == _SIG_MINT ||
-            funcSig == _SIG_SAFE_MINT ||
-            funcSig == _SIG_SAFE_MINT_DATA ||
-            funcSig == _SIG_MINT_WITH_RECORDS ||
-            funcSig == _SIG_SAFE_MINT_WITH_RECORDS ||
-            funcSig == _SIG_SAFE_MINT_WITH_RECORDS_DATA;
+        bool isSupported =
+            funcSig == _SIG_MINT ||
+                funcSig == _SIG_SAFE_MINT ||
+                funcSig == _SIG_SAFE_MINT_DATA ||
+                funcSig == _SIG_MINT_WITH_RECORDS ||
+                funcSig == _SIG_SAFE_MINT_WITH_RECORDS ||
+                funcSig == _SIG_SAFE_MINT_WITH_RECORDS_DATA;
 
         require(isSupported, 'MintingManager: UNSUPPORTED_RELAY_CALL');
     }
 
-    function _mintSLD(address to, uint256 tld, string memory label) private {
-        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
-            CryptoMintingController.mintSLDWithResolver(to, label, address(CryptoResolver));
+    function _mintSLD(
+        address to,
+        uint256 tld,
+        string memory label
+    ) private {
+        if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            cnsMintingController.mintSLDWithResolver(to, label, address(cnsResolver));
         } else {
-            UnsRegistry.mint(to, _childId(tld, label),  _uri(tld, label));
+            unsRegistry.mint(to, _childId(tld, label), _uri(tld, label));
         }
     }
 
@@ -216,12 +223,12 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         address to,
         uint256 tld,
         string calldata label,
-        bytes memory _data
+        bytes memory data
     ) private {
-        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
-            CryptoMintingController.safeMintSLDWithResolver(to, label, address(CryptoResolver), _data);
+        if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            cnsMintingController.safeMintSLDWithResolver(to, label, address(cnsResolver), data);
         } else {
-            UnsRegistry.safeMint(to, _childId(tld, label),  _uri(tld, label), _data);
+            unsRegistry.safeMint(to, _childId(tld, label), _uri(tld, label), data);
         }
     }
 
@@ -233,13 +240,13 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         string[] calldata values
     ) private {
         uint256 tokenId = _childId(tld, label);
-        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
-            CryptoMintingController.mintSLDWithResolver(to, label, address(CryptoResolver));
-            if(keys.length > 0) {
-                CryptoResolver.preconfigure(keys, values, tokenId);
+        if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            cnsMintingController.mintSLDWithResolver(to, label, address(cnsResolver));
+            if (keys.length > 0) {
+                cnsResolver.preconfigure(keys, values, tokenId);
             }
         } else {
-            UnsRegistry.mintWithRecords(to, tokenId, _uri(tld, label), keys, values);
+            unsRegistry.mintWithRecords(to, tokenId, _uri(tld, label), keys, values);
         }
     }
 
@@ -249,16 +256,16 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         string memory label,
         string[] calldata keys,
         string[] calldata values,
-        bytes memory _data
+        bytes memory data
     ) private {
         uint256 tokenId = _childId(tld, label);
-        if(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
-            CryptoMintingController.safeMintSLDWithResolver(to, label, address(CryptoResolver), _data);
-            if(keys.length > 0) {
-                CryptoResolver.preconfigure(keys, values, tokenId);
+        if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+            cnsMintingController.safeMintSLDWithResolver(to, label, address(cnsResolver), data);
+            if (keys.length > 0) {
+                cnsResolver.preconfigure(keys, values, tokenId);
             }
         } else {
-            UnsRegistry.safeMintWithRecords(to, tokenId, _uri(tld, label), keys, values, _data);
+            unsRegistry.safeMintWithRecords(to, tokenId, _uri(tld, label), keys, values, data);
         }
     }
 
@@ -267,11 +274,11 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
     }
 
-    function _freeSLDLabel(string calldata label) private pure returns(string memory) {
+    function _freeSLDLabel(string calldata label) private pure returns (string memory) {
         return string(abi.encodePacked('udtestdev-', label));
     }
 
-    function  _uri(uint256 tld, string memory label) private view returns(string memory) {
+    function _uri(uint256 tld, string memory label) private view returns (string memory) {
         return string(abi.encodePacked(label, '.', _tlds[tld]));
     }
 
