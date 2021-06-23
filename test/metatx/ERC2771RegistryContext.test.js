@@ -1,7 +1,11 @@
+const { ethers } = require('hardhat');
+const { expect } = require('chai');
+
 const { utils, BigNumber } = ethers;
 
 describe('ERC2771RegistryContext', () => {
   let ERC2771RegistryContext, context;
+  let signers, accounts;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -11,18 +15,18 @@ describe('ERC2771RegistryContext', () => {
 
     context = await ERC2771RegistryContext.deploy();
     await context.initialize();
-  })
+  });
 
   describe('isTrustedForwarder', () => {
     it('should return false untrusterd forwarders', async () => {
-      expect(await context.isTrustedForwarder(accounts[0])).to.be.false;
-      expect(await context.isTrustedForwarder(accounts[9])).to.be.false;
-    })
-  
+      expect(await context.isTrustedForwarder(accounts[0])).to.be.eq(false);
+      expect(await context.isTrustedForwarder(accounts[9])).to.be.eq(false);
+    });
+
     it('should return true trusted forwarder (self-address)', async () => {
-      expect(await context.isTrustedForwarder(context.address)).to.be.true;
-    })
-  })
+      expect(await context.isTrustedForwarder(context.address)).to.be.eq(true);
+    });
+  });
 
   describe('validate forwarded token(last 32bytes in calldata)', () => {
     it('should forwarded tokenId when trusted forwarder', async () => {
@@ -32,15 +36,15 @@ describe('ERC2771RegistryContext', () => {
       const encodedTokenId = utils.defaultAbiCoder.encode([ 'uint256' ], [ tokenId ]);
       const [success, returnData] = await context.callStatic.execute(calldata + encodedTokenId.slice(2));
 
-      expect(success).to.be.true;
+      expect(success).to.be.eq(true);
       const [msgToken] = utils.defaultAbiCoder.decode(['uint256'], returnData);
-      assert.equal(msgToken, tokenId.toString())
-    })
+      assert.equal(msgToken, tokenId.toString());
+    });
 
     it('should return zero tokenId when untrusted forwarder', async () => {
-      assert.equal(await context.callStatic.msgToken(), 0)
-    })
-  })
+      assert.equal(await context.callStatic.msgToken(), 0);
+    });
+  });
 
   describe('validate msg.from (calldata = "{bytes:data}{address:from}{bytes32:tokenId}")', () => {
     it('should return sender address when trusted forwarder', async () => {
@@ -51,10 +55,10 @@ describe('ERC2771RegistryContext', () => {
       const encodedData = calldata + encodedAddress.slice(2) + encodedTokenId.slice(2);
       const [success, returnData] = await context.callStatic.execute(encodedData);
 
-      expect(success).to.be.true;
+      expect(success).to.be.eq(true);
       const [address] = utils.defaultAbiCoder.decode(['address'], returnData);
       expect(address).to.be.eql(signers[0].address);
-    })
+    });
 
     it('should return sender address when untrusted forwarder', async () => {
       const sender = await context.callStatic.msgSender();
@@ -62,8 +66,8 @@ describe('ERC2771RegistryContext', () => {
 
       const sender2 = await context.connect(signers[2]).callStatic.msgSender();
       expect(sender2).to.be.eql(signers[2].address);
-    })
-  })
+    });
+  });
 
   describe('validate msg.data (calldata = "{bytes:data}{address:from}{bytes32:tokenId}")', () => {
     it('should return data when trusted forwarder', async () => {
@@ -74,14 +78,14 @@ describe('ERC2771RegistryContext', () => {
       const encodedData = calldata + encodedAddress.slice(2) + encodedTokenId.slice(2);
       const [success, returnData] = await context.callStatic.execute(encodedData);
 
-      expect(success).to.be.true;
+      expect(success).to.be.eq(true);
       const [,, funcSig] = utils.defaultAbiCoder.decode(['bytes32', 'bytes32', 'bytes4'], returnData);
       expect(funcSig).to.be.eql(calldata);
-    })
+    });
 
     it('should return data when untrusted forwarder', async () => {
       const data = await context.callStatic.msgData();
       expect(data).to.be.eql('0xc4c2bfdc');
-    })
-  })
+    });
+  });
 });

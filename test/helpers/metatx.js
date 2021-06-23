@@ -17,6 +17,6 @@ const signTypedData = async (contract, signer, value) => {
   };
 
   return signer._signTypedData(domain, types, value);
-}
+};
 
-module.exports = { signTypedData }
+module.exports = { signTypedData };

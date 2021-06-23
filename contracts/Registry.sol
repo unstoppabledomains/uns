@@ -18,7 +18,15 @@ import './metatx/RegistryForwarder.sol';
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, ERC2771RegistryContext, RecordStorage, RegistryForwarder, IRegistry {
+contract Registry is
+    Initializable,
+    ContextUpgradeable,
+    ERC721Upgradeable,
+    ERC2771RegistryContext,
+    RecordStorage,
+    RegistryForwarder,
+    IRegistry
+{
     using AddressUpgradeable for address;
 
     string public constant NAME = 'UNS: Registry';
@@ -91,41 +99,61 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, ERC27
 
     /// Minting
 
-    function mint(address to, uint256 tokenId, string calldata uri)
-        external override onlyMintingManager
-    {
+    function mint(
+        address to,
+        uint256 tokenId,
+        string calldata uri
+    ) external override onlyMintingManager {
         _mint(to, tokenId, uri);
     }
 
-    function safeMint(address to, uint256 tokenId, string calldata uri)
-        external override onlyMintingManager
-    {
+    function safeMint(
+        address to,
+        uint256 tokenId,
+        string calldata uri
+    ) external override onlyMintingManager {
         _safeMint(to, tokenId, uri, '');
     }
 
-    function safeMint(address to, uint256 tokenId, string calldata uri, bytes calldata _data)
-        external override onlyMintingManager
-    {
-        _safeMint(to, tokenId, uri, _data);
+    function safeMint(
+        address to,
+        uint256 tokenId,
+        string calldata uri,
+        bytes calldata data
+    ) external override onlyMintingManager {
+        _safeMint(to, tokenId, uri, data);
     }
 
-    function mintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values)
-        external override onlyMintingManager
-    {
+    function mintWithRecords(
+        address to,
+        uint256 tokenId,
+        string calldata uri,
+        string[] calldata keys,
+        string[] calldata values
+    ) external override onlyMintingManager {
         _mint(to, tokenId, uri);
         _setMany(keys, values, tokenId);
     }
 
-    function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values)
-        external override onlyMintingManager
-    {
+    function safeMintWithRecords(
+        address to,
+        uint256 tokenId,
+        string calldata uri,
+        string[] calldata keys,
+        string[] calldata values
+    ) external override onlyMintingManager {
         _safeMintWithRecords(to, tokenId, uri, keys, values, '');
     }
 
-    function safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values, bytes calldata _data)
-        external override onlyMintingManager
-    {
-        _safeMintWithRecords(to, tokenId, uri, keys, values, _data);
+    function safeMintWithRecords(
+        address to,
+        uint256 tokenId,
+        string calldata uri,
+        string[] calldata keys,
+        string[] calldata values,
+        bytes calldata data
+    ) external override onlyMintingManager {
+        _safeMintWithRecords(to, tokenId, uri, keys, values, data);
     }
 
     /// Transfering
@@ -139,7 +167,11 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, ERC27
         _transfer(ownerOf(tokenId), to, tokenId);
     }
 
-    function transferFrom(address from, address to, uint256 tokenId)
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    )
         public
         override(IERC721Upgradeable, ERC721Upgradeable)
         onlyApprovedOrOwner(tokenId)
@@ -149,24 +181,24 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, ERC27
         _transfer(from, to, tokenId);
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data)
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    )
         public
         override(IERC721Upgradeable, ERC721Upgradeable)
         onlyApprovedOrOwner(tokenId)
         protectTokenOperation(tokenId)
     {
         _reset(tokenId);
-        _safeTransfer(from, to, tokenId, _data);
+        _safeTransfer(from, to, tokenId, data);
     }
 
     /// Burning
 
-    function burn(uint256 tokenId)
-        external
-        override
-        onlyApprovedOrOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
+    function burn(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _reset(tokenId);
         _burn(tokenId);
     }
@@ -177,55 +209,47 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, ERC27
         return _exists(tokenId) ? address(this) : address(0x0);
     }
 
-    function set(string calldata key, string calldata value, uint256 tokenId)
-        external
-        override
-        onlyApprovedOrOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
+    function set(
+        string calldata key,
+        string calldata value,
+        uint256 tokenId
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _set(key, value, tokenId);
     }
 
-    function setMany(string[] calldata keys, string[] calldata values, uint256 tokenId)
-        external
-        override
-        onlyApprovedOrOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
+    function setMany(
+        string[] calldata keys,
+        string[] calldata values,
+        uint256 tokenId
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _setMany(keys, values, tokenId);
     }
 
-    function setByHash(uint256 keyHash, string calldata value, uint256 tokenId)
-        external
-        onlyApprovedOrOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
+    function setByHash(
+        uint256 keyHash,
+        string calldata value,
+        uint256 tokenId
+    ) external onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _setByHash(keyHash, value, tokenId);
     }
 
-    function setManyByHash(uint256[] calldata keyHashes, string[] calldata values, uint256 tokenId)
-        external
-        onlyApprovedOrOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
+    function setManyByHash(
+        uint256[] calldata keyHashes,
+        string[] calldata values,
+        uint256 tokenId
+    ) external onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _setManyByHash(keyHashes, values, tokenId);
     }
 
-    function reconfigure(string[] calldata keys, string[] calldata values, uint256 tokenId)
-        external
-        override
-        onlyApprovedOrOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
+    function reconfigure(
+        string[] calldata keys,
+        string[] calldata values,
+        uint256 tokenId
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _reconfigure(keys, values, tokenId);
     }
 
-    function reset(uint256 tokenId)
-        external
-        override
-        onlyApprovedOrOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
+    function reset(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _reset(tokenId);
     }
 
@@ -233,7 +257,9 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, ERC27
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(bytes4 interfaceId)
-        public view override(ERC721Upgradeable, IERC165Upgradeable)
+        public
+        view
+        override(ERC721Upgradeable, IERC165Upgradeable)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
@@ -246,41 +272,46 @@ contract Registry is Initializable, ContextUpgradeable, ERC721Upgradeable, ERC27
         return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
     }
 
-    function _mint(address to, uint256 tokenId, string memory uri) internal {
+    function _mint(
+        address to,
+        uint256 tokenId,
+        string memory uri
+    ) internal {
         _mint(to, tokenId);
         emit NewURI(tokenId, uri);
     }
 
-    function _safeMint(address to, uint256 tokenId, string memory uri, bytes memory _data) internal {
-        _safeMint(to, tokenId, _data);
+    function _safeMint(
+        address to,
+        uint256 tokenId,
+        string memory uri,
+        bytes memory data
+    ) internal {
+        _safeMint(to, tokenId, data);
         emit NewURI(tokenId, uri);
     }
 
-    function _safeMintWithRecords(address to, uint256 tokenId, string calldata uri, string[] calldata keys, string[] calldata values, bytes memory _data)
-        internal
-    {
-        _safeMint(to, tokenId, uri, _data);
+    function _safeMintWithRecords(
+        address to,
+        uint256 tokenId,
+        string calldata uri,
+        string[] calldata keys,
+        string[] calldata values,
+        bytes memory data
+    ) internal {
+        _safeMint(to, tokenId, uri, data);
         _setMany(keys, values, tokenId);
     }
 
-    function _baseURI()
-        internal view override(ERC721Upgradeable)
-        returns (string memory)
-    {
+    function _baseURI() internal view override(ERC721Upgradeable) returns (string memory) {
         return _prefix;
     }
 
-    function _msgSender()
-        internal view override(ContextUpgradeable, ERC2771RegistryContext)
-        returns (address sender)
-    {
+    function _msgSender() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (address sender) {
         return super._msgSender();
     }
 
-    function _msgData()
-        internal view override(ContextUpgradeable, ERC2771RegistryContext)
-        returns (bytes calldata)
-    {
+    function _msgData() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (bytes calldata) {
         return super._msgData();
     }
 

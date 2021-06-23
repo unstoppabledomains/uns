@@ -17,11 +17,9 @@ abstract contract Relayer is ContextUpgradeable {
      * It allows anybody send transaction on-chain when minter has provided proper parameters.
      * The function allows to relaying calls of fixed functions. The restriction defined in function `verifyCall`
      */
-    function relay(bytes calldata data, bytes calldata signature) external returns(bytes memory) {
+    function relay(bytes calldata data, bytes calldata signature) external returns (bytes memory) {
         bytes32 digest = keccak256(data);
-        address signer = keccak256(abi.encodePacked(digest, address(this)))
-            .toEthSignedMessageHash()
-            .recover(signature);
+        address signer = keccak256(abi.encodePacked(digest, address(this))).toEthSignedMessageHash().recover(signature);
 
         bytes4 funcSig;
         bytes memory _data = data;
@@ -53,6 +51,5 @@ abstract contract Relayer is ContextUpgradeable {
         require(signer != address(0), 'Relayer: SIGNATURE_IS_INVALID');
     }
 
-    function _verifyRelayCall(bytes4 funcSig, bytes calldata data) internal pure virtual {
-    }
+    function _verifyRelayCall(bytes4 funcSig, bytes calldata data) internal pure virtual {}
 }

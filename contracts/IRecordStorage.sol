@@ -18,7 +18,11 @@ interface IRecordStorage is IRecordReader {
      * @param value The value to set key to.
      * @param tokenId ERC-721 token id to set.
      */
-    function set(string calldata key, string calldata value, uint256 tokenId) external;
+    function set(
+        string calldata key,
+        string calldata value,
+        uint256 tokenId
+    ) external;
 
     /**
      * @dev Set or update domain records
@@ -26,7 +30,11 @@ interface IRecordStorage is IRecordReader {
      * @param values New record values
      * @param tokenId ERC-721 token id of the domain
      */
-    function setMany(string[] memory keys, string[] memory values, uint256 tokenId) external;
+    function setMany(
+        string[] memory keys,
+        string[] memory values,
+        uint256 tokenId
+    ) external;
 
     /**
      * @dev Reset all domain records and set new ones
@@ -34,7 +42,11 @@ interface IRecordStorage is IRecordReader {
      * @param values New record values
      * @param tokenId ERC-721 token id of the domain
      */
-    function reconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external;
+    function reconfigure(
+        string[] memory keys,
+        string[] memory values,
+        uint256 tokenId
+    ) external;
 
     /**
      * @dev Function to reset all existing records on a domain.

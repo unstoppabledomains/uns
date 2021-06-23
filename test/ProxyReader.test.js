@@ -1,3 +1,6 @@
+const { ethers } = require('hardhat');
+const { expect } = require('chai');
+
 const { ZERO_ADDRESS } = require('./helpers/constants');
 
 const { utils, BigNumber } = ethers;
@@ -13,7 +16,7 @@ describe('ProxyReader', () => {
   let Registry, CryptoRegistry, CryptoResolver, CryptoMintingController, ProxyReader;
   let registry, cryptoRegistry, cryptoResolver, cryptoMintingController, proxy;
   let signers, coinbase, accounts;
-  let tokenId_wallet, tokenId_crypto;
+  let walletTokenId, cryptoTokenId;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -23,7 +26,8 @@ describe('ProxyReader', () => {
     Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
     CryptoRegistry = await ethers.getContractFactory('contracts/cns/CryptoRegistry.sol:CryptoRegistry');
     CryptoResolver = await ethers.getContractFactory('contracts/cns/CryptoResolver.sol:CryptoResolver');
-    CryptoMintingController = await ethers.getContractFactory('contracts/cns/CryptoMintingController.sol:CryptoMintingController');
+    CryptoMintingController =
+      await ethers.getContractFactory('contracts/cns/CryptoMintingController.sol:CryptoMintingController');
     ProxyReader = await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader');
 
     // deploy UNS
@@ -41,11 +45,11 @@ describe('ProxyReader', () => {
     await registry.mint(coinbase.address, walletRoot, 'wallet');
 
     // mint .crypto
-    tokenId_wallet = await registry.childIdOf(walletRoot, domainName);
-    await registry.mint(coinbase.address, tokenId_wallet, domainName);
+    walletTokenId = await registry.childIdOf(walletRoot, domainName);
+    await registry.mint(coinbase.address, walletTokenId, domainName);
 
     // mint .wallet
-    tokenId_crypto = await registry.childIdOf(cryptoRoot, domainName);
+    cryptoTokenId = await registry.childIdOf(cryptoRoot, domainName);
     await cryptoMintingController.mintSLDWithResolver(coinbase.address, domainName, cryptoResolver.address);
 
     proxy = await ProxyReader.deploy(registry.address, cryptoRegistry.address);
@@ -82,85 +86,85 @@ describe('ProxyReader', () => {
 
     it('should revert isApprovedForAll call', async () => {
       await expect(
-        proxy.isApprovedForAll(accounts[0], accounts[1])
+        proxy.isApprovedForAll(accounts[0], accounts[1]),
       ).to.be.revertedWith('ProxyReader: UNSUPPORTED_METHOD');
     });
 
     describe('getApproved', () => {
       it('should return approved zero-address .wallet domain', async () => {
-        const proxyResult = await proxy.getApproved(tokenId_wallet);
-        const resolverResult = await registry.getApproved(tokenId_wallet);
+        const proxyResult = await proxy.getApproved(walletTokenId);
+        const resolverResult = await registry.getApproved(walletTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, ZERO_ADDRESS);
       });
 
       it('should return approved zero-address .crypto domain', async () => {
-        const proxyResult = await proxy.getApproved(tokenId_crypto);
-        const resolverResult = await cryptoRegistry.getApproved(tokenId_crypto);
+        const proxyResult = await proxy.getApproved(cryptoTokenId);
+        const resolverResult = await cryptoRegistry.getApproved(cryptoTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, ZERO_ADDRESS);
       });
 
       it('should return approved address .wallet domain', async () => {
-        await registry.approve(accounts[0], tokenId_wallet);
+        await registry.approve(accounts[0], walletTokenId);
 
-        const proxyResult = await proxy.getApproved(tokenId_wallet);
-        const resolverResult = await registry.getApproved(tokenId_wallet);
+        const proxyResult = await proxy.getApproved(walletTokenId);
+        const resolverResult = await registry.getApproved(walletTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, accounts[0]);
       });
 
       it('should return approved address .crypto domain', async () => {
-        await cryptoRegistry.approve(accounts[0], tokenId_crypto);
+        await cryptoRegistry.approve(accounts[0], cryptoTokenId);
 
-        const proxyResult = await proxy.getApproved(tokenId_crypto);
-        const resolverResult = await cryptoRegistry.getApproved(tokenId_crypto);
+        const proxyResult = await proxy.getApproved(cryptoTokenId);
+        const resolverResult = await cryptoRegistry.getApproved(cryptoTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, accounts[0]);
       });
-    })
+    });
 
     describe('isApprovedOrOwner', () => {
       it('should return false for not-approved .wallet domain', async () => {
-        const proxyResult = await proxy.isApprovedOrOwner(accounts[1], tokenId_wallet);
-        const resolverResult = await registry.isApprovedOrOwner(accounts[1], tokenId_wallet);
+        const proxyResult = await proxy.isApprovedOrOwner(accounts[1], walletTokenId);
+        const resolverResult = await registry.isApprovedOrOwner(accounts[1], walletTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, false);
       });
 
       it('should return false for not-approved .crypto domain', async () => {
-        const proxyResult = await proxy.isApprovedOrOwner(accounts[1], tokenId_crypto);
-        const resolverResult = await cryptoRegistry.isApprovedOrOwner(accounts[1], tokenId_crypto);
+        const proxyResult = await proxy.isApprovedOrOwner(accounts[1], cryptoTokenId);
+        const resolverResult = await cryptoRegistry.isApprovedOrOwner(accounts[1], cryptoTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, false);
       });
 
       it('should return whether approved address .wallet domain', async () => {
-        await registry.approve(accounts[0], tokenId_wallet);
+        await registry.approve(accounts[0], walletTokenId);
 
-        const proxyResult = await proxy.isApprovedOrOwner(accounts[0], tokenId_wallet);
-        const resolverResult = await registry.isApprovedOrOwner(accounts[0], tokenId_wallet);
+        const proxyResult = await proxy.isApprovedOrOwner(accounts[0], walletTokenId);
+        const resolverResult = await registry.isApprovedOrOwner(accounts[0], walletTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, true);
       });
 
       it('should return whether approved address .crypto domain', async () => {
-        await cryptoRegistry.approve(accounts[0], tokenId_crypto);
+        await cryptoRegistry.approve(accounts[0], cryptoTokenId);
 
-        const proxyResult = await proxy.isApprovedOrOwner(accounts[0], tokenId_crypto);
-        const resolverResult = await cryptoRegistry.isApprovedOrOwner(accounts[0], tokenId_crypto);
+        const proxyResult = await proxy.isApprovedOrOwner(accounts[0], cryptoTokenId);
+        const resolverResult = await cryptoRegistry.isApprovedOrOwner(accounts[0], cryptoTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, true);
       });
-    })
+    });
 
     describe('ownerOf', () => {
       it('should return empty owner for unknown domain', async () => {
@@ -170,57 +174,59 @@ describe('ProxyReader', () => {
       });
 
       it('should return owner of .wallet domain', async () => {
-        const proxyResult = await proxy.ownerOf(tokenId_wallet);
-        const resolverResult = await registry.ownerOf(tokenId_wallet);
+        const proxyResult = await proxy.ownerOf(walletTokenId);
+        const resolverResult = await registry.ownerOf(walletTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, coinbase.address);
       });
 
       it('should return owner of .crypto domain', async () => {
-        const proxyResult = await proxy.ownerOf(tokenId_crypto);
-        const resolverResult = await cryptoRegistry.ownerOf(tokenId_crypto);
+        const proxyResult = await proxy.ownerOf(cryptoTokenId);
+        const resolverResult = await cryptoRegistry.ownerOf(cryptoTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, coinbase.address);
       });
-    })
+    });
 
     describe('resolverOf', () => {
       it('should return resolver of .wallet domain', async () => {
-        const proxyResult = await proxy.resolverOf(tokenId_wallet);
-        const resolverResult = await registry.resolverOf(tokenId_wallet);
+        const proxyResult = await proxy.resolverOf(walletTokenId);
+        const resolverResult = await registry.resolverOf(walletTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, registry.address);
       });
 
       it('should return resolver of .crypto domain', async () => {
-        const proxyResult = await proxy.resolverOf(tokenId_crypto);
-        const resolverResult = await cryptoRegistry.resolverOf(tokenId_crypto);
+        const proxyResult = await proxy.resolverOf(cryptoTokenId);
+        const resolverResult = await cryptoRegistry.resolverOf(cryptoTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, cryptoResolver.address);
       });
-    })
+    });
 
     describe('tokenURI', () => {
       it('should return tokenURI of .wallet domain', async () => {
-        const proxyResult = await proxy.tokenURI(tokenId_wallet);
-        const resolverResult = await registry.tokenURI(tokenId_wallet);
+        const proxyResult = await proxy.tokenURI(walletTokenId);
+        const resolverResult = await registry.tokenURI(walletTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
-        assert.deepEqual(resolverResult, '/40559307672254207728557027035302885851369665055277251407821151545011532191308');
+        assert.deepEqual(
+          resolverResult,
+          '/40559307672254207728557027035302885851369665055277251407821151545011532191308');
       });
 
       it('should return tokenURI of .crypto domain', async () => {
-        const proxyResult = await proxy.tokenURI(tokenId_crypto);
-        const resolverResult = await cryptoRegistry.tokenURI(tokenId_crypto);
+        const proxyResult = await proxy.tokenURI(cryptoTokenId);
+        const resolverResult = await cryptoRegistry.tokenURI(cryptoTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, 'test_42.crypto');
       });
-    })
+    });
 
     describe('childIdOf', () => {
       it('should return childIdOf of .wallet domain', async () => {
@@ -228,7 +234,9 @@ describe('ProxyReader', () => {
         const resolverResult = await registry.childIdOf(walletRoot, 'test');
 
         assert.deepEqual(proxyResult, resolverResult);
-        assert.deepEqual(resolverResult.toString(), '50586162622368517199428676025463367639931450566950616867100918499864570754504');
+        assert.deepEqual(
+          resolverResult.toString(),
+          '50586162622368517199428676025463367639931450566950616867100918499864570754504');
       });
 
       it('should return childIdOf of .crypto domain', async () => {
@@ -236,9 +244,11 @@ describe('ProxyReader', () => {
         const resolverResult = await cryptoRegistry.childIdOf(cryptoRoot, 'test');
 
         assert.deepEqual(proxyResult, resolverResult);
-        assert.deepEqual(resolverResult.toString(), '82856763987730893573226808376519199326595862773989062576563108342755511775491');
+        assert.deepEqual(
+          resolverResult.toString(),
+          '82856763987730893573226808376519199326595862773989062576563108342755511775491');
       });
-    })
+    });
 
     describe('balanceOf', () => {
       it('should aggregate balance from all registries', async () => {
@@ -253,40 +263,40 @@ describe('ProxyReader', () => {
         const resolverResult2 = await cryptoRegistry.balanceOf(account);
         assert.equal(proxyResult.toString(), resolverResult1.add(resolverResult2).toString());
       });
-    })
+    });
 
     describe('exists', () => {
       it('should return false for zero tokenId', async () => {
         assert.equal(await proxy.exists(0), false);
-      })
+      });
 
       it('should return false for unknown .wallet domain', async () => {
         const unknownTokenId = await registry.childIdOf(walletRoot, 'unknown');
 
         assert.equal(await proxy.exists(unknownTokenId), false);
-      })
+      });
 
       it('should return false for unknown .crypto domain', async () => {
         const unknownTokenId = await cryptoRegistry.childIdOf(cryptoRoot, 'unknown');
 
         assert.equal(await proxy.exists(unknownTokenId), false);
-      })
+      });
 
       it('should return true for .wallet domain', async () => {
         const _domainName = 'hey_hoy_97hds';
-        const tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
-        await registry.mint(accounts[3], tokenId_wallet, _domainName);
+        const walletTokenId = await registry.childIdOf(walletRoot, _domainName);
+        await registry.mint(accounts[3], walletTokenId, _domainName);
 
-        assert.equal(await proxy.exists(tokenId_wallet), true);
-      })
+        assert.equal(await proxy.exists(walletTokenId), true);
+      });
 
       it('should return true for .crypto domain', async () => {
         const _domainName = 'hey_hoy_97hds';
-        const tokenId_crypto = await cryptoRegistry.childIdOf(cryptoRoot, _domainName);
+        const cryptoTokenId = await cryptoRegistry.childIdOf(cryptoRoot, _domainName);
         await cryptoMintingController.mintSLD(accounts[3], _domainName);
 
-        assert.equal(await proxy.exists(tokenId_crypto), true);
-      })
+        assert.equal(await proxy.exists(cryptoTokenId), true);
+      });
 
       // the scenario is not possible in real setup
       it('should return true when both registries known domain', async () => {
@@ -296,16 +306,16 @@ describe('ProxyReader', () => {
         await cryptoMintingController.mintSLD(accounts[3], _domainName);
 
         assert.equal(await proxy.exists(tokenId), true);
-      })
+      });
 
       it('should return true for .crypto TLD', async () => {
         assert.equal(await proxy.exists(cryptoRoot), true);
-      })
+      });
 
       it('should return true for .wallet TLD', async () => {
         assert.equal(await proxy.exists(walletRoot), true);
-      })
-    })
+      });
+    });
   });
 
   describe('IRecordReader', () => {
@@ -324,29 +334,29 @@ describe('ProxyReader', () => {
 
     describe('get', () => {
       it('should return value of record for .wallet domain', async () => {
-        await registry.set('get_key_39', 'value1', tokenId_wallet);
+        await registry.set('get_key_39', 'value1', walletTokenId);
 
-        const proxyResult = await proxy.get('get_key_39', tokenId_wallet);
-        const resolverResult = await registry.get('get_key_39', tokenId_wallet);
+        const proxyResult = await proxy.get('get_key_39', walletTokenId);
+        const resolverResult = await registry.get('get_key_39', walletTokenId);
 
         assert.equal(proxyResult, resolverResult);
         assert.equal(resolverResult, 'value1');
       });
 
       it('should return value of record for .crypto domain', async () => {
-        await cryptoResolver.set('get_key_134', 'value12', tokenId_crypto);
+        await cryptoResolver.set('get_key_134', 'value12', cryptoTokenId);
 
-        const proxyResult = await proxy.get('get_key_134', tokenId_crypto);
-        const resolverResult = await cryptoResolver.get('get_key_134', tokenId_crypto);
+        const proxyResult = await proxy.get('get_key_134', cryptoTokenId);
+        const resolverResult = await cryptoResolver.get('get_key_134', cryptoTokenId);
 
         assert.equal(proxyResult, resolverResult);
         assert.equal(resolverResult, 'value12');
       });
-    })
+    });
 
     describe('getMany', () => {
       it('should return list with empty value for unregistered key', async () => {
-        const result = await proxy.getMany([keys[0]], tokenId_wallet);
+        const result = await proxy.getMany([keys[0]], walletTokenId);
         assert.equal(result.length, 1);
         assert.equal(result[0], '');
       });
@@ -354,10 +364,10 @@ describe('ProxyReader', () => {
       it('should return list with single value for .wallet domain', async () => {
         const [key] = keys;
         const [value] = values;
-        await registry.set(key, value, tokenId_wallet);
+        await registry.set(key, value, walletTokenId);
 
-        const proxyResult = await proxy.getMany([key], tokenId_wallet);
-        const resolverResult = await registry.getMany([key], tokenId_wallet);
+        const proxyResult = await proxy.getMany([key], walletTokenId);
+        const resolverResult = await registry.getMany([key], walletTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, [value]);
@@ -366,10 +376,10 @@ describe('ProxyReader', () => {
       it('should return list with single value for .crypto domain', async () => {
         const [key] = keys;
         const [value] = values;
-        await cryptoResolver.set(key, value, tokenId_crypto);
+        await cryptoResolver.set(key, value, cryptoTokenId);
 
-        const proxyResult = await proxy.getMany([key], tokenId_crypto);
-        const resolverResult = await cryptoResolver.getMany([key], tokenId_crypto);
+        const proxyResult = await proxy.getMany([key], cryptoTokenId);
+        const resolverResult = await cryptoResolver.getMany([key], cryptoTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, [value]);
@@ -377,19 +387,19 @@ describe('ProxyReader', () => {
 
       it('should return list with multiple values for .wallet domain', async () => {
         for (let i = 0; i < keys.length; i++) {
-          await registry.set(keys[i], values[i], tokenId_wallet);
+          await registry.set(keys[i], values[i], walletTokenId);
         }
 
-        const result = await proxy.getMany(keys, tokenId_wallet);
+        const result = await proxy.getMany(keys, walletTokenId);
         assert.deepEqual(result, values);
       });
 
       it('should return list with multiple values for .crypto domain', async () => {
         for (let i = 0; i < keys.length; i++) {
-          await cryptoResolver.set(keys[i], values[i], tokenId_crypto);
+          await cryptoResolver.set(keys[i], values[i], cryptoTokenId);
         }
 
-        const result = await proxy.getMany(keys, tokenId_crypto);
+        const result = await proxy.getMany(keys, cryptoTokenId);
         assert.deepEqual(result, values);
       });
     });
@@ -397,10 +407,10 @@ describe('ProxyReader', () => {
     describe('getByHash', () => {
       it('should return value of record for .wallet domain', async () => {
         const keyHash = utils.id('get_key_4235');
-        await registry.set('get_key_4235', 'value1454', tokenId_wallet);
+        await registry.set('get_key_4235', 'value1454', walletTokenId);
 
-        const proxyResult = await proxy.getByHash(keyHash, tokenId_wallet);
-        const resolverResult = await registry.getByHash(keyHash, tokenId_wallet);
+        const proxyResult = await proxy.getByHash(keyHash, walletTokenId);
+        const resolverResult = await registry.getByHash(keyHash, walletTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, ['get_key_4235', 'value1454']);
@@ -408,20 +418,20 @@ describe('ProxyReader', () => {
 
       it('should return value of record for .crypto domain', async () => {
         const keyHash = utils.id('get_key_0946');
-        await cryptoResolver.set('get_key_0946', 'value4521', tokenId_crypto);
+        await cryptoResolver.set('get_key_0946', 'value4521', cryptoTokenId);
 
-        const proxyResult = await proxy.getByHash(keyHash, tokenId_crypto);
-        const resolverResult = await cryptoResolver.getByHash(keyHash, tokenId_crypto);
+        const proxyResult = await proxy.getByHash(keyHash, cryptoTokenId);
+        const resolverResult = await cryptoResolver.getByHash(keyHash, cryptoTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, ['get_key_0946', 'value4521']);
       });
-    })
+    });
 
     describe('getManyByHash', () => {
       it('should return list with empty value for unregistered key', async () => {
         const keyHash = utils.id('key_aaaaaa');
-        const result = await proxy.getManyByHash([keyHash], tokenId_wallet);
+        const result = await proxy.getManyByHash([keyHash], walletTokenId);
         assert.deepEqual(result[0], ['']);
       });
 
@@ -429,10 +439,10 @@ describe('ProxyReader', () => {
         const [key] = keys;
         const [value] = values;
         const keyHash = utils.id(key);
-        await registry.set(key, value, tokenId_wallet);
+        await registry.set(key, value, walletTokenId);
 
-        const proxyResult = await proxy.getManyByHash([keyHash], tokenId_wallet);
-        const resolverResult = await registry.getManyByHash([keyHash], tokenId_wallet);
+        const proxyResult = await proxy.getManyByHash([keyHash], walletTokenId);
+        const resolverResult = await registry.getManyByHash([keyHash], walletTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, [[key], [value]]);
@@ -442,15 +452,15 @@ describe('ProxyReader', () => {
         const [key] = keys;
         const [value] = values;
         const keyHash = utils.id(key);
-        await cryptoResolver.set(key, value, tokenId_crypto);
+        await cryptoResolver.set(key, value, cryptoTokenId);
 
-        const proxyResult = await proxy.getManyByHash([keyHash], tokenId_crypto);
-        const resolverResult = await cryptoResolver.getManyByHash([keyHash], tokenId_crypto);
+        const proxyResult = await proxy.getManyByHash([keyHash], cryptoTokenId);
+        const resolverResult = await cryptoResolver.getManyByHash([keyHash], cryptoTokenId);
 
         assert.deepEqual(proxyResult, resolverResult);
         assert.deepEqual(resolverResult, [[key], [value]]);
       });
-    })
+    });
   });
 
   describe('IDataReader', () => {
@@ -479,7 +489,7 @@ describe('ProxyReader', () => {
         const data = await proxy.callStatic.getData(keys, _tokenId);
 
         // asserts
-        assert.deepEqual(data, [ZERO_ADDRESS, ZERO_ADDRESS, ['','']]);
+        assert.deepEqual(data, [ZERO_ADDRESS, ZERO_ADDRESS, ['', '']]);
       });
 
       it('should return empty data for non-existing .crypto domain', async () => {
@@ -491,7 +501,7 @@ describe('ProxyReader', () => {
         const data = await proxy.callStatic.getData(keys, _tokenId);
 
         // asserts
-        assert.deepEqual(data, [ZERO_ADDRESS, ZERO_ADDRESS, ['','']]);
+        assert.deepEqual(data, [ZERO_ADDRESS, ZERO_ADDRESS, ['', '']]);
       });
 
       it('should return data for .crypto domain', async () => {
@@ -504,7 +514,7 @@ describe('ProxyReader', () => {
         const data = await proxy.callStatic.getData(keys, _tokenId);
 
         // asserts
-        assert.deepEqual(data, [cryptoResolver.address, coinbase.address, ['','']]);
+        assert.deepEqual(data, [cryptoResolver.address, coinbase.address, ['', '']]);
       });
 
       it('should return data for .wallet domain', async () => {
@@ -517,50 +527,50 @@ describe('ProxyReader', () => {
         const data = await proxy.callStatic.getData(keys, _tokenId);
 
         // asserts
-        assert.deepEqual(data, [registry.address, coinbase.address, ['','']]);
+        assert.deepEqual(data, [registry.address, coinbase.address, ['', '']]);
       });
     });
 
     describe('getDataForMany', () => {
       it('should return empty lists for empty list of domains', async () => {
-        const data = await proxy.callStatic.getDataForMany([], [])
+        const data = await proxy.callStatic.getDataForMany([], []);
 
-        assert.deepEqual(data, [[],[],[]]);
+        assert.deepEqual(data, [[], [], []]);
       });
 
       it('should return empty data for non-existing .crypto|.wallet domains', async () => {
         // arrange
         const _domainName = 'hey_hoy_1037';
-        const _tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
-        const _tokenId_crypto = await registry.childIdOf(cryptoRoot, _domainName);
+        const _walletTokenId = await registry.childIdOf(walletRoot, _domainName);
+        const _cryptoTokenId = await registry.childIdOf(cryptoRoot, _domainName);
 
         // act
-        const data = await proxy.callStatic.getDataForMany(keys, [_tokenId_wallet, _tokenId_crypto]);
+        const data = await proxy.callStatic.getDataForMany(keys, [_walletTokenId, _cryptoTokenId]);
 
         // asserts
-        assert.deepEqual(data, [[ZERO_ADDRESS, ZERO_ADDRESS], [ZERO_ADDRESS, ZERO_ADDRESS], [['',''], ['','']]]);
+        assert.deepEqual(data, [[ZERO_ADDRESS, ZERO_ADDRESS], [ZERO_ADDRESS, ZERO_ADDRESS], [['', ''], ['', '']]]);
       });
 
       it('should return data for multiple .crypto|.wallet domains', async () => {
         // arrange
-        const _domainName = 'test_1291'
-        const _tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
-        const _tokenId_crypto = await registry.childIdOf(cryptoRoot, _domainName);
-        await registry.mint(coinbase.address, _tokenId_wallet, _domainName);
+        const _domainName = 'test_1291';
+        const _walletTokenId = await registry.childIdOf(walletRoot, _domainName);
+        const _cryptoTokenId = await registry.childIdOf(cryptoRoot, _domainName);
+        await registry.mint(coinbase.address, _walletTokenId, _domainName);
         await cryptoMintingController.mintSLDWithResolver(coinbase.address, _domainName, cryptoResolver.address);
         for (let i = 0; i < keys.length; i++) {
-            await registry.set(keys[i], values[i], _tokenId_wallet);
-            await cryptoResolver.set(keys[i], values[i], _tokenId_crypto);
+          await registry.set(keys[i], values[i], _walletTokenId);
+          await cryptoResolver.set(keys[i], values[i], _cryptoTokenId);
         }
 
         // act
-        const data = await proxy.callStatic.getDataForMany(keys, [_tokenId_wallet, _tokenId_crypto]);
+        const data = await proxy.callStatic.getDataForMany(keys, [_walletTokenId, _cryptoTokenId]);
 
         // assert
         assert.deepEqual(data, [
           [registry.address, cryptoResolver.address],
           [coinbase.address, coinbase.address],
-          [['test.value1', 'test.value2'], ['test.value1', 'test.value2']]
+          [['test.value1', 'test.value2'], ['test.value1', 'test.value2']],
         ]);
       });
 
@@ -569,13 +579,13 @@ describe('ProxyReader', () => {
         const unknownTokenId = await registry.childIdOf(cryptoRoot, 'unknown');
 
         // act
-        const data = await proxy.callStatic.getDataForMany([], [tokenId_wallet, unknownTokenId]);
-        
+        const data = await proxy.callStatic.getDataForMany([], [walletTokenId, unknownTokenId]);
+
         // assert
         assert.deepEqual(data, [
           [registry.address, ZERO_ADDRESS],
           [coinbase.address, ZERO_ADDRESS],
-          [[], []]
+          [[], []],
         ]);
       });
     });
@@ -591,7 +601,7 @@ describe('ProxyReader', () => {
         const data = await proxy.callStatic.getDataByHash(hashes, _tokenId);
 
         // asserts
-        assert.deepEqual(data, [ZERO_ADDRESS, ZERO_ADDRESS, ['',''], ['','']]);
+        assert.deepEqual(data, [ZERO_ADDRESS, ZERO_ADDRESS, ['', ''], ['', '']]);
       });
 
       it('should return empty data for non-existing .crypto domain', async () => {
@@ -604,7 +614,7 @@ describe('ProxyReader', () => {
         const data = await proxy.callStatic.getDataByHash(hashes, _tokenId);
 
         // asserts
-        assert.deepEqual(data, [ZERO_ADDRESS, ZERO_ADDRESS, ['',''], ['','']]);
+        assert.deepEqual(data, [ZERO_ADDRESS, ZERO_ADDRESS, ['', ''], ['', '']]);
       });
 
       it('should return data by hashes for .crypto domain', async () => {
@@ -614,7 +624,7 @@ describe('ProxyReader', () => {
         const _tokenId = await cryptoRegistry.childIdOf(cryptoRoot, _domainName);
         await cryptoMintingController.mintSLDWithResolver(coinbase.address, _domainName, cryptoResolver.address);
         for (let i = 0; i < keys.length; i++) {
-            await cryptoResolver.set(keys[i], values[i], _tokenId);
+          await cryptoResolver.set(keys[i], values[i], _tokenId);
         }
 
         // act
@@ -625,7 +635,7 @@ describe('ProxyReader', () => {
           cryptoResolver.address,
           coinbase.address,
           keys,
-          values
+          values,
         ]);
       });
 
@@ -636,7 +646,7 @@ describe('ProxyReader', () => {
         const _tokenId = await registry.childIdOf(walletRoot, _domainName);
         await registry.mint(coinbase.address, _tokenId, _domainName);
         for (let i = 0; i < keys.length; i++) {
-            await registry.set(keys[i], values[i], _tokenId);
+          await registry.set(keys[i], values[i], _tokenId);
         }
 
         // act
@@ -647,14 +657,14 @@ describe('ProxyReader', () => {
           registry.address,
           coinbase.address,
           keys,
-          values
+          values,
         ]);
       });
     });
 
     describe('getDataByHashForMany', () => {
       it('should return empty lists for empty list of domains', async () => {
-        const data = await proxy.callStatic.getDataByHashForMany([], [])
+        const data = await proxy.callStatic.getDataByHashForMany([], []);
 
         assert.deepEqual(data, [[], [], [], []]);
       });
@@ -663,44 +673,44 @@ describe('ProxyReader', () => {
         // arrange
         const hashes = keys.map(utils.id);
         const _domainName = 'hey_hoy_1037';
-        const _tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
-        const _tokenId_crypto = await registry.childIdOf(cryptoRoot, _domainName);
+        const _walletTokenId = await registry.childIdOf(walletRoot, _domainName);
+        const _cryptoTokenId = await registry.childIdOf(cryptoRoot, _domainName);
 
         // act
-        const data = await proxy.callStatic.getDataByHashForMany(hashes, [_tokenId_wallet, _tokenId_crypto]);
+        const data = await proxy.callStatic.getDataByHashForMany(hashes, [_walletTokenId, _cryptoTokenId]);
 
         // asserts
         assert.deepEqual(data, [
           [ZERO_ADDRESS, ZERO_ADDRESS],
           [ZERO_ADDRESS, ZERO_ADDRESS],
-          [['',''], ['','']],
-          [['',''], ['','']]
+          [['', ''], ['', '']],
+          [['', ''], ['', '']],
         ]);
       });
 
       it('should return data for multiple .crypto|.wallet domains', async () => {
         // arrange
         const hashes = keys.map(utils.id);
-        const _domainName = 'test_1082q'
-        const _tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
-        const _tokenId_crypto = await registry.childIdOf(cryptoRoot, _domainName);
-        await registry.mint(coinbase.address, _tokenId_wallet, _domainName);
+        const _domainName = 'test_1082q';
+        const _walletTokenId = await registry.childIdOf(walletRoot, _domainName);
+        const _cryptoTokenId = await registry.childIdOf(cryptoRoot, _domainName);
+        await registry.mint(coinbase.address, _walletTokenId, _domainName);
         await cryptoMintingController.mintSLDWithResolver(coinbase.address, _domainName, cryptoResolver.address);
 
         for (let i = 0; i < keys.length; i++) {
-            await registry.set(keys[i], values[i], _tokenId_wallet);
-            await cryptoResolver.set(keys[i], values[i], _tokenId_crypto);
+          await registry.set(keys[i], values[i], _walletTokenId);
+          await cryptoResolver.set(keys[i], values[i], _cryptoTokenId);
         }
 
         // act
-        const data = await proxy.callStatic.getDataByHashForMany(hashes, [_tokenId_wallet, _tokenId_crypto]);
+        const data = await proxy.callStatic.getDataByHashForMany(hashes, [_walletTokenId, _cryptoTokenId]);
 
         // assert
         assert.deepEqual(data, [
           [registry.address, cryptoResolver.address],
           [coinbase.address, coinbase.address],
           [['test.key1', 'test.key2'], ['test.key1', 'test.key2']],
-          [['test.value1', 'test.value2'], ['test.value1', 'test.value2']]
+          [['test.value1', 'test.value2'], ['test.value1', 'test.value2']],
         ]);
       });
 
@@ -709,14 +719,14 @@ describe('ProxyReader', () => {
         const unknownTokenId = await registry.childIdOf(cryptoRoot, 'unknown');
 
         // act
-        const data = await proxy.callStatic.getDataByHashForMany([], [tokenId_wallet, unknownTokenId]);
+        const data = await proxy.callStatic.getDataByHashForMany([], [walletTokenId, unknownTokenId]);
 
         // assert
         assert.deepEqual(data, [
           [registry.address, ZERO_ADDRESS],
           [coinbase.address, ZERO_ADDRESS],
           [[], []],
-          [[], []]
+          [[], []],
         ]);
       });
     });
@@ -735,14 +745,14 @@ describe('ProxyReader', () => {
 
       it('should return owners for multiple .crypto|.wallet domains', async () => {
         // arrange
-        const _domainName = 'test_125t'
-        const _tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
-        const _tokenId_crypto = await registry.childIdOf(cryptoRoot, _domainName);
-        await registry.mint(accounts[0], _tokenId_wallet, _domainName);
+        const _domainName = 'test_125t';
+        const _walletTokenId = await registry.childIdOf(walletRoot, _domainName);
+        const _cryptoTokenId = await registry.childIdOf(cryptoRoot, _domainName);
+        await registry.mint(accounts[0], _walletTokenId, _domainName);
         await cryptoMintingController.mintSLDWithResolver(coinbase.address, _domainName, cryptoResolver.address);
 
         // act
-        const owners = await proxy.callStatic.ownerOfForMany([tokenId_wallet, _tokenId_wallet, _tokenId_crypto]);
+        const owners = await proxy.callStatic.ownerOfForMany([walletTokenId, _walletTokenId, _cryptoTokenId]);
 
         // assert
         assert.deepEqual(owners, [coinbase.address, accounts[0], coinbase.address]);
@@ -753,7 +763,7 @@ describe('ProxyReader', () => {
         const unknownTokenId = await registry.childIdOf(cryptoRoot, 'unknown');
 
         // act
-        const owners = await proxy.callStatic.ownerOfForMany([tokenId_wallet, unknownTokenId]);
+        const owners = await proxy.callStatic.ownerOfForMany([walletTokenId, unknownTokenId]);
 
         // assert
         assert.deepEqual(owners, [coinbase.address, ZERO_ADDRESS]);
@@ -783,19 +793,19 @@ describe('ProxyReader', () => {
 
     it('should return value for .wallet domain', async () => {
       const _domainName = 'hey_hoy_98hds';
-      const tokenId_wallet = await registry.childIdOf(walletRoot, _domainName);
-      await registry.mint(accounts[3], tokenId_wallet, _domainName);
+      const _walletTokenId = await registry.childIdOf(walletRoot, _domainName);
+      await registry.mint(accounts[3], _walletTokenId, _domainName);
 
-      const address = await proxy.registryOf(tokenId_wallet);
+      const address = await proxy.registryOf(_walletTokenId);
       assert.equal(address, registry.address);
     });
 
     it('should return value for .crypto domain', async () => {
       const _domainName = 'hey_hoy_98hds';
-      const tokenId_crypto = await cryptoRegistry.childIdOf(cryptoRoot, _domainName);
+      const _cryptoTokenId = await cryptoRegistry.childIdOf(cryptoRoot, _domainName);
       await cryptoMintingController.mintSLD(accounts[3], _domainName);
 
-      const address = await proxy.registryOf(tokenId_crypto);
+      const address = await proxy.registryOf(_cryptoTokenId);
       assert.equal(address, cryptoRegistry.address);
     });
 

@@ -4,7 +4,11 @@
 pragma solidity ^0.8.0;
 
 interface ICryptoResolver {
-    function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external;
+    function preconfigure(
+        string[] memory keys,
+        string[] memory values,
+        uint256 tokenId
+    ) external;
 
     function get(string calldata key, uint256 tokenId) external view returns (string memory);
 
@@ -12,5 +16,8 @@ interface ICryptoResolver {
 
     function getByHash(uint256 keyHash, uint256 tokenId) external view returns (string memory key, string memory value);
 
-    function getManyByHash(uint256[] calldata keyHashes, uint256 tokenId) external view returns (string[] memory keys, string[] memory values);
+    function getManyByHash(uint256[] calldata keyHashes, uint256 tokenId)
+        external
+        view
+        returns (string[] memory keys, string[] memory values);
 }

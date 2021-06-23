@@ -10,7 +10,11 @@ interface IMintingManager {
      * @param tld id of parent token.
      * @param label SLD label to mint.
      */
-    function mintSLD(address to, uint256 tld, string calldata label) external;
+    function mintSLD(
+        address to,
+        uint256 tld,
+        string calldata label
+    ) external;
 
     /**
      * @dev Safely mints a Second Level Domain (SLD).
@@ -19,7 +23,11 @@ interface IMintingManager {
      * @param tld id of parent token.
      * @param label SLD label to mint.
      */
-    function safeMintSLD(address to, uint256 tld, string calldata label) external;
+    function safeMintSLD(
+        address to,
+        uint256 tld,
+        string calldata label
+    ) external;
 
     /**
      * @dev Safely mints a Second Level Domain (SLD).
@@ -27,9 +35,14 @@ interface IMintingManager {
      * @param to address to mint the new SLD to.
      * @param tld id of parent token.
      * @param label SLD label to mint.
-     * @param _data bytes data to send along with a safe transfer check.
+     * @param data bytes data to send along with a safe transfer check.
      */
-    function safeMintSLD(address to, uint256 tld, string calldata label, bytes calldata _data) external;
+    function safeMintSLD(
+        address to,
+        uint256 tld,
+        string calldata label,
+        bytes calldata data
+    ) external;
 
     /**
      * @dev Mints a Second Level Domain (SLD) with records.
@@ -39,7 +52,13 @@ interface IMintingManager {
      * @param keys Record keys.
      * @param values Record values.
      */
-    function mintSLDWithRecords(address to, uint256 tld, string calldata label, string[] calldata keys, string[] calldata values) external;
+    function mintSLDWithRecords(
+        address to,
+        uint256 tld,
+        string calldata label,
+        string[] calldata keys,
+        string[] calldata values
+    ) external;
 
     /**
      * @dev Mints a Second Level Domain (SLD) with records.
@@ -50,7 +69,13 @@ interface IMintingManager {
      * @param keys Record keys.
      * @param values Record values.
      */
-    function safeMintSLDWithRecords(address to, uint256 tld, string calldata label, string[] calldata keys, string[] calldata values) external;
+    function safeMintSLDWithRecords(
+        address to,
+        uint256 tld,
+        string calldata label,
+        string[] calldata keys,
+        string[] calldata values
+    ) external;
 
     /**
      * @dev Mints a Second Level Domain (SLD) with records.
@@ -60,9 +85,16 @@ interface IMintingManager {
      * @param label SLD label to mint.
      * @param keys Record keys.
      * @param values Record values.
-     * @param _data bytes data to send along with a safe transfer check.
+     * @param data bytes data to send along with a safe transfer check.
      */
-    function safeMintSLDWithRecords(address to, uint256 tld, string calldata label, string[] calldata keys, string[] calldata values, bytes calldata _data) external;
+    function safeMintSLDWithRecords(
+        address to,
+        uint256 tld,
+        string calldata label,
+        string[] calldata keys,
+        string[] calldata values,
+        bytes calldata data
+    ) external;
 
     /**
      * @dev Claims free domain. The fuction adds prefix `udtestdev-` to label.
@@ -77,7 +109,11 @@ interface IMintingManager {
      * @param tld id of parent token
      * @param label SLD label to mint
      */
-    function claimTo(address to, uint256 tld, string calldata label) external;
+    function claimTo(
+        address to,
+        uint256 tld,
+        string calldata label
+    ) external;
 
     /**
      * @dev Claims free domain. The fuction adds prefix `udtestdev-` to label.
@@ -85,7 +121,13 @@ interface IMintingManager {
      * @param tld id of parent token
      * @param label SLD label to mint
      */
-    function claimToWithRecords(address to, uint256 tld, string calldata label, string[] calldata keys, string[] calldata values) external;
+    function claimToWithRecords(
+        address to,
+        uint256 tld,
+        string calldata label,
+        string[] calldata keys,
+        string[] calldata values
+    ) external;
 
     /**
      * @dev Function to set the token URI Prefix for all tokens.
