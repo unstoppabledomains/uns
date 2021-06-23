@@ -51,9 +51,8 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
         __WhitelistedRole_init_unchained();
         uint256 cappersCount = paymentCappers.length;
         for (uint256 i = 0; i < cappersCount; i++) {
-            addCapper(paymentCappers[i]);
+            _addCapper(paymentCappers[i]);
         }
-        renounceCapper();
     }
 
     /**
