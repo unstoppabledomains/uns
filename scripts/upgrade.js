@@ -1,5 +1,5 @@
 const { ethers, upgrades, network } = require('hardhat');
-const NetworkConfig = require('./../config.json');
+const NetworkConfig = require('./../uns-config.json');
 
 async function main () {
   const unsConfig = NetworkConfig.networks[network.config.chainId];
@@ -8,8 +8,8 @@ async function main () {
   }
 
   const {
-    Registry: UnsRegistry,
-    MintingManager: UnsMintingManager,
+    UnsRegistry,
+    MintingManager: UnsMintingManager
   } = unsConfig.contracts;
 
   const Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
@@ -18,7 +18,7 @@ async function main () {
   const registry = await upgrades.upgradeProxy(UnsRegistry.address, Registry);
   console.log('Registry PROXY upgraded:', registry.address);
 
-  const mintingManager = await await upgrades.upgradeProxy(UnsMintingManager.address, MintingManager);
+  const mintingManager = await upgrades.upgradeProxy(UnsMintingManager.address, MintingManager);
   console.log('MintingManager PROXY upgraded:', mintingManager.address);
 }
 
