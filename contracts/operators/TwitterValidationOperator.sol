@@ -215,7 +215,7 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
         } else if (_cnsOwnerOf(tokenId) != address(0x0)) {
             return _cnsRegistry;
         }
-        revert('TwitterValidationOperator: REGISTRY_NOT_FOUND');
+        revert('TwitterValidationOperator: TOKEN_NOT_FOUND');
     }
 
     function _cnsOwnerOf(uint256 tokenId) private view returns (address) {

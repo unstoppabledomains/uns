@@ -375,7 +375,7 @@ describe('TwitterValidationOperator', () => {
 
       await expect(
         operator.onTokenTransfer(coinbase.address, 0, validationData),
-      ).to.be.revertedWith('TwitterValidationOperator: REGISTRY_NOT_FOUND');
+      ).to.be.revertedWith('TwitterValidationOperator: TOKEN_NOT_FOUND');
     });
 
     it('should fail if calling onTokenTransfer when code is empty', async () => {
