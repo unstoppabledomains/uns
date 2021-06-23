@@ -53,14 +53,14 @@ describe('TwitterValidationOperator', () => {
     await unsRegistry.mint(coinbase.address, tokenId, '');
     await unsRegistry.approve(operator.address, tokenId);
     return tokenId;
-  }
+  };
 
   const mintCNSToken = async (root, label) => {
     const tokenId = await cnsRegistry.childIdOf(root, label);
     await cnsMintingController.mintSLDWithResolver(coinbase.address, label, cnsResolver.address);
     await cnsRegistry.approve(operator.address, tokenId);
     return tokenId;
-  }
+  };
 
   describe('generic', () => {
     beforeEach(async () => {
@@ -68,19 +68,19 @@ describe('TwitterValidationOperator', () => {
         unsRegistry.address,
         cnsRegistry.address,
         linkToken.address,
-        [paymentCapper.address]
+        [paymentCapper.address],
       );
       await operator.addWhitelisted(whitelisted.address);
       await operator.connect(paymentCapper).setPaymentPerValidation(1, 2);
       await linkToken.transfer(operator.address, operatorInitialBalance);
-    })
+    });
 
     it('should set twitter username and signature for .wallet domain', async () => {
-      const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_q103`)
+      const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_q103`);
       const _operator = await operator.connect(whitelisted);
 
       await _operator.setValidation('rainberk', signature, walletTokenId, 0);
-      let validationRecords = await unsRegistry.getMany(keys, walletTokenId);
+      const validationRecords = await unsRegistry.getMany(keys, walletTokenId);
       assert.deepEqual(validationRecords, ['rainberk', signature]);
 
       await _operator.setValidation('apple', signature, walletTokenId, 0);
@@ -290,7 +290,7 @@ describe('TwitterValidationOperator', () => {
         .setValidation('rainberk', signature, walletTokenId, 1);
       assert.equal((await operator.withdrawableTokens()).toNumber(), userPaymentPerValidation);
     });
-  })
+  });
 
   describe('non-generic', () => {
     it('should unlock predefined payment amount for valiation', async () => {
@@ -299,7 +299,7 @@ describe('TwitterValidationOperator', () => {
         unsRegistry.address,
         cnsRegistry.address,
         linkToken.address,
-        [paymentCapper.address]
+        [paymentCapper.address],
       );
       await operator.connect(paymentCapper).setPaymentPerValidation(paymentPerValidation, 0);
       await operator.addWhitelisted(whitelisted.address);
@@ -318,7 +318,7 @@ describe('TwitterValidationOperator', () => {
         unsRegistry.address,
         cnsRegistry.address,
         linkToken.address,
-        [paymentCapper.address]
+        [paymentCapper.address],
       );
       await operator.addWhitelisted(whitelisted.address);
       await operator.connect(paymentCapper).setPaymentPerValidation(paymentPerValidation, 0);
@@ -335,7 +335,7 @@ describe('TwitterValidationOperator', () => {
         unsRegistry.address,
         cnsRegistry.address,
         linkToken.address,
-        [paymentCapper.address]
+        [paymentCapper.address],
       );
       await operator.addWhitelisted(whitelisted.address);
 
@@ -351,7 +351,7 @@ describe('TwitterValidationOperator', () => {
         unsRegistry.address,
         cnsRegistry.address,
         linkToken.address,
-        [paymentCapper.address]
+        [paymentCapper.address],
       );
       await unsRegistry.setApprovalForAll(operator.address, true);
       await operator.addWhitelisted(whitelisted.address);
@@ -368,7 +368,7 @@ describe('TwitterValidationOperator', () => {
         unsRegistry.address,
         cnsRegistry.address,
         coinbase.address,
-        [paymentCapper.address]
+        [paymentCapper.address],
       );
       await operator.addWhitelisted(whitelisted.address);
       await operator.connect(paymentCapper).setPaymentPerValidation(0, 0);
@@ -382,19 +382,19 @@ describe('TwitterValidationOperator', () => {
       const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_qlewa`);
       const validationData = web3.eth.abi.encodeParameters(
         ['uint256', 'string'], [walletTokenId.toString(), '']);
-  
+
       operator = await TwitterValidationOperator.deploy(
         unsRegistry.address,
         cnsRegistry.address,
         coinbase.address,
-        [paymentCapper.address]
+        [paymentCapper.address],
       );
       await operator.addWhitelisted(whitelisted.address);
       await operator.connect(paymentCapper).setPaymentPerValidation(0, 0);
-  
+
       await expect(
         operator.onTokenTransfer(coinbase.address, 0, validationData),
       ).to.be.revertedWith('TwitterValidationOperator: CODE_IS_EMPTY');
     });
-  })
+  });
 });
