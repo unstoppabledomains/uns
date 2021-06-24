@@ -85,7 +85,7 @@
                         "0x9F19473F6a98a715176291c930558E1954fd3D1e",
                         "0x3A2e74CF832cbA3d77E72708d55370119E4323a6"
                     ],
-                    "deploymentBlock": "0x85e62c"
+                    "deploymentBlock": "0x8671b4"
                 },
                 "ProxyAdmin": {
                     "address": "0xaf9815005A208d1460b6fC60B4f90B9f2185E88c",
@@ -126,9 +126,11 @@
                     "deploymentBlock": "0x7232cf"
                 },
                 "TwitterValidationOperator": {
-                    "address": "0x1CB337b3b208dc29a6AcE8d11Bb591b66c5Dd83d",
-                    "legacyAddresses": [],
-                    "deploymentBlock": "0x7232d3"
+                    "address": "0x9ea4A63184ebE9CBA55CD1af473D98075Aa02b4C",
+                    "legacyAddresses": [
+                        "0x1CB337b3b208dc29a6AcE8d11Bb591b66c5Dd83d"
+                    ],
+                    "deploymentBlock": "0x86935e"
                 },
                 "FreeMinter": {
                     "address": "0x84214215904cDEbA9044ECf95F3eBF009185AAf4",

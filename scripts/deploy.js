@@ -1,5 +1,6 @@
 const { ethers, upgrades, network } = require('hardhat');
-const NetworkConfig = require('dot-crypto/src/network-config/network-config.json');
+const CNSNetworkConfig = require('dot-crypto/src/network-config/network-config.json');
+const UNSNetworkConfig = require('./../uns-config.json');
 
 const argv = require('yargs/yargs')()
   .env('')
@@ -39,21 +40,24 @@ async function main () {
   const CryptoURIPrefixController =
     await ethers.getContractFactory('contracts/cns/CryptoURIPrefixController.sol:CryptoURIPrefixController');
 
-  const { CNS_ADMIN_PRIVATE_KEY } = process.env;
-
-  const cnsConfig = NetworkConfig.networks[network.config.chainId];
-  if (!cnsConfig) {
-    throw new Error(`CNS config not found for network ${network.config.chainId}`);
+  const config = network.name === 'localhost'
+    ? UNSNetworkConfig.networks[network.config.chainId]
+    : CNSNetworkConfig.networks[network.config.chainId];
+  if (!config) {
+    throw new Error(`Config not found for network ${network.config.chainId}`);
   }
 
   const {
-    Registry: CnsRegistry,
+    CNSRegistry: CnsRegistry,
     Resolver: CnsResolver,
     MintingController: CnsMintingController,
     URIPrefixController: CnsURIPrefixController,
-  } = cnsConfig.contracts;
+  } = config.contracts;
 
   console.log('Network', network.name);
+  const [deployer, cnsAdmin] = await ethers.getSigners();
+  console.log('Account:', deployer.address);
+  console.log('CNS admin:', cnsAdmin.address);
 
   let registry, mintingManager;
   if (argv.proxy) {
@@ -84,8 +88,9 @@ async function main () {
   await mintingManager.addMinters([...rinkebyAccounts.workers, ...rinkebyAccounts.priorityWorkers]);
 
   // CNS configuration
-  const cnsAdmin = new ethers.Wallet(CNS_ADMIN_PRIVATE_KEY, ethers.provider);
-  const cnsMintingController = await CryptoMintingController.attach(CnsMintingController.address).connect(cnsAdmin);
+  const cnsMintingController = await CryptoMintingController
+    .attach(CnsMintingController.address)
+    .connect(cnsAdmin);
   if (!(await cnsMintingController.isMinter(mintingManager.address))) {
     await cnsMintingController.addMinter(mintingManager.address);
   }
@@ -101,7 +106,7 @@ async function main () {
   const proxyReader = await ProxyReader.deploy(registry.address, CnsRegistry.address);
   console.log('ProxyReader deployed to:', proxyReader.address);
 
-  console.log('Migrated!');
+  console.log('Deployed!');
 }
 
 main()

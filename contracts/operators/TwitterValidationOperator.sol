@@ -6,16 +6,17 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol';
 import '@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol';
 
+import '../cns/ICryptoResolver.sol';
 import '../utils/ERC677Receiver.sol';
 import '../roles/WhitelistedRole.sol';
 import '../roles/CapperRole.sol';
 import '../IRegistry.sol';
 
 contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receiver {
-    string public constant NAME = 'Chainlink Twitter Validation Operator';
-    string public constant VERSION = '0.2.0';
-
     using SafeMathUpgradeable for uint256;
+
+    string public constant NAME = 'UNS: Chainlink Twitter Validation Operator';
+    string public constant VERSION = '0.1.0';
 
     event Validation(uint256 indexed tokenId, uint256 requestId, uint256 paymentAmount);
     event ValidationRequest(uint256 indexed tokenId, address indexed owner, uint256 requestId, string code);
@@ -28,32 +29,37 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
     uint256 private _frozenTokens;
     uint256 private _lastRequestId = 1;
     mapping(uint256 => uint256) private _userRequests;
-    IRegistry private _registry;
+    IRegistry private _unsRegistry;
+    IRegistry private _cnsRegistry;
     LinkTokenInterface private _linkToken;
 
     /**
      * @notice Deploy with the address of the LINK token, domains registry and payment amount in LINK for one valiation
      * @dev Sets the LinkToken address, Registry address and payment in LINK tokens for one validation
-     * @param registry The address of the .crypto Registry
+     * @param unsRegistry The address of the UNS Registry
+     * @param cnsRegistry The address of the CNS Registry
      * @param linkToken The address of the LINK token
      * @param paymentCappers Addresses allowed to update payment amount per validation
      */
     constructor(
-        IRegistry registry,
+        IRegistry unsRegistry,
+        IRegistry cnsRegistry,
         LinkTokenInterface linkToken,
         address[] memory paymentCappers
     ) {
-        require(address(registry) != address(0), 'TwitterValidationOperator: INVALID_REGISTRY_ADDRESS');
+        require(address(unsRegistry) != address(0), 'TwitterValidationOperator: UNS_REGISTRY_IS_EMPTY');
+        require(address(cnsRegistry) != address(0), 'TwitterValidationOperator: CNS_REGISTRY_IS_EMPTY');
         require(address(linkToken) != address(0), 'TwitterValidationOperator: INVALID_LINK_TOKEN_ADDRESS');
         require(paymentCappers.length > 0, 'TwitterValidationOperator: NO_CAPPERS_PROVIDED');
-        _registry = registry;
+
+        _unsRegistry = unsRegistry;
+        _cnsRegistry = cnsRegistry;
         _linkToken = linkToken;
         __WhitelistedRole_init_unchained();
-        uint256 cappersCount = paymentCappers.length;
-        for (uint256 i = 0; i < cappersCount; i++) {
-            addCapper(paymentCappers[i]);
+
+        for (uint256 i = 0; i < paymentCappers.length; i++) {
+            _addCapper(paymentCappers[i]);
         }
-        renounceCapper();
     }
 
     /**
@@ -106,11 +112,17 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
         uint256 tokenId,
         uint256 requestId
     ) external onlyWhitelisted hasAvailableBalance {
-        uint256 _payment = _calculatePaymentForValidation(requestId);
-        withdrawableTokens = withdrawableTokens.add(_payment);
-        _registry.set('social.twitter.username', username, tokenId);
-        _registry.set('validation.social.twitter.username', signature, tokenId);
-        emit Validation(tokenId, requestId, _payment);
+        uint256 payment = _calculatePaymentForValidation(requestId);
+        withdrawableTokens = withdrawableTokens.add(payment);
+
+        IRegistry registry = _getRegistry(tokenId);
+        ICryptoResolver resolver = ICryptoResolver(registry.resolverOf(tokenId));
+        require(address(resolver) != address(0), 'TwitterValidationOperator: RESOLVER_IS_EMPTY');
+
+        resolver.set('social.twitter.username', username, tokenId);
+        resolver.set('validation.social.twitter.username', signature, tokenId);
+
+        emit Validation(tokenId, requestId, payment);
     }
 
     /**
@@ -159,20 +171,21 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
         uint256 value,
         bytes calldata data
     ) external override linkTokenOnly correctTokensAmount(value) {
-        (uint256 _tokenId, string memory _code) = abi.decode(data, (uint256, string));
+        (uint256 tokenId, string memory code) = abi.decode(data, (uint256, string));
+        IRegistry registry = _getRegistry(tokenId);
         require(
-            _registry.isApprovedOrOwner(sender, _tokenId),
+            registry.isApprovedOrOwner(sender, tokenId),
             'TwitterValidationOperator: SENDER_DOES_NOT_HAVE_ACCESS_TO_DOMAIN'
         );
-        require(bytes(_code).length > 0, 'TwitterValidationOperator: CODE_IS_EMPTY');
+        require(bytes(code).length > 0, 'TwitterValidationOperator: CODE_IS_EMPTY');
         require(
-            _registry.isApprovedOrOwner(address(this), _tokenId),
+            registry.isApprovedOrOwner(address(this), tokenId),
             'TwitterValidationOperator: OPERATOR_SHOULD_BE_APPROVED'
         );
         _frozenTokens = _frozenTokens.add(value);
         _userRequests[_lastRequestId] = value;
 
-        emit ValidationRequest(_tokenId, _registry.ownerOf(_tokenId), _lastRequestId, _code);
+        emit ValidationRequest(tokenId, registry.ownerOf(tokenId), _lastRequestId, code);
         _lastRequestId = _lastRequestId.add(1);
     }
 
@@ -192,6 +205,23 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
             delete _userRequests[requestId];
         } else {
             paymentPerValidation = operatorPaymentPerValidation;
+        }
+    }
+
+    function _getRegistry(uint256 tokenId) private view returns (IRegistry) {
+        if (_unsRegistry.exists(tokenId)) {
+            return _unsRegistry;
+        } else if (_cnsOwnerOf(tokenId) != address(0x0)) {
+            return _cnsRegistry;
+        }
+        revert('TwitterValidationOperator: TOKEN_NOT_FOUND');
+    }
+
+    function _cnsOwnerOf(uint256 tokenId) private view returns (address) {
+        try _cnsRegistry.ownerOf(tokenId) returns (address owner) {
+            return owner;
+        } catch {
+            return address(0x0);
         }
     }
 }

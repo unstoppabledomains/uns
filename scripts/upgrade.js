@@ -9,7 +9,7 @@ async function main () {
 
   const {
     UnsRegistry,
-    MintingManager: UnsMintingManager
+    MintingManager: UnsMintingManager,
   } = unsConfig.contracts;
 
   const Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');

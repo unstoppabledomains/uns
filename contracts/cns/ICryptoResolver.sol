@@ -20,4 +20,10 @@ interface ICryptoResolver {
         external
         view
         returns (string[] memory keys, string[] memory values);
+
+    function set(
+        string calldata key,
+        string calldata value,
+        uint256 tokenId
+    ) external;
 }
