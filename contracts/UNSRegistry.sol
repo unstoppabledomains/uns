@@ -8,24 +8,24 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 
-import './IRegistry.sol';
+import './IUNSRegistry.sol';
 import './RecordStorage.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/RegistryForwarder.sol';
 
 /**
- * @title Registry
+ * @title UNSRegistry
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract Registry is
+contract UNSRegistry is
     Initializable,
     ContextUpgradeable,
     ERC721Upgradeable,
     ERC2771RegistryContext,
     RecordStorage,
     RegistryForwarder,
-    IRegistry
+    IUNSRegistry
 {
     using AddressUpgradeable for address;
 

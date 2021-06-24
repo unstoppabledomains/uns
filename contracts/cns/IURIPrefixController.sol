@@ -3,6 +3,6 @@
 
 pragma solidity ^0.8.0;
 
-interface ICryptoURIPrefixController {
+interface IURIPrefixController {
     function setTokenURIPrefix(string calldata prefix) external;
 }

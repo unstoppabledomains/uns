@@ -1,6 +1,6 @@
 # UNS
 
-UNS registry smart contracts.
+UNS Registry smart contracts.
 
 ## Specifications
 
@@ -23,10 +23,10 @@ UNS registry smart contracts.
     Ref: https://eips.ethereum.org/EIPS/eip-721
 
 
-4.  Implements IRegistry
+4.  Implements IUNSRegistry
 
     ```solidity
-    interface IRegistry /_ is IERC721Metadata, IRecordStorage _/ {
+    interface IUNSRegistry /_ is IERC721Metadata, IRecordStorage _/ {
         event NewURI(uint256 indexed tokenId, string uri);
 
         event NewURIPrefix(string prefix);

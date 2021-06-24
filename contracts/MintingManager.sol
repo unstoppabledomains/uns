@@ -8,11 +8,11 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
-import './cns/ICryptoResolver.sol';
-import './cns/ICryptoMintingController.sol';
-import './cns/ICryptoURIPrefixController.sol';
+import './cns/IResolver.sol';
+import './cns/IMintingController.sol';
+import './cns/IURIPrefixController.sol';
 import './IMintingManager.sol';
-import './IRegistry.sol';
+import './IUNSRegistry.sol';
 import './metatx/Relayer.sol';
 import './roles/MinterRole.sol';
 
@@ -24,10 +24,10 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.1.0';
 
-    IRegistry public unsRegistry;
-    ICryptoMintingController public cnsMintingController;
-    ICryptoURIPrefixController public cnsURIPrefixController;
-    ICryptoResolver public cnsResolver;
+    IUNSRegistry public unsRegistry;
+    IMintingController public cnsMintingController;
+    IURIPrefixController public cnsURIPrefixController;
+    IResolver public cnsResolver;
 
     /**
      * @dev Mapping TLD `namehash` to TLD label
@@ -72,10 +72,10 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     }
 
     function initialize(
-        IRegistry unsRegistry_,
-        ICryptoMintingController cnsMintingController_,
-        ICryptoURIPrefixController cnsURIPrefixController_,
-        ICryptoResolver cnsResolver_
+        IUNSRegistry unsRegistry_,
+        IMintingController cnsMintingController_,
+        IURIPrefixController cnsURIPrefixController_,
+        IResolver cnsResolver_
     ) public initializer {
         unsRegistry = unsRegistry_;
         cnsMintingController = cnsMintingController_;
@@ -180,7 +180,7 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     }
 
     function setResolver(address resolver) external onlyOwner {
-        cnsResolver = ICryptoResolver(resolver);
+        cnsResolver = IResolver(resolver);
     }
 
     function setTokenURIPrefix(string calldata prefix) external override onlyOwner {

@@ -6,11 +6,11 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol';
 import '@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol';
 
-import '../cns/ICryptoResolver.sol';
+import '../cns/IResolver.sol';
 import '../utils/ERC677Receiver.sol';
 import '../roles/WhitelistedRole.sol';
 import '../roles/CapperRole.sol';
-import '../IRegistry.sol';
+import '../IUNSRegistry.sol';
 
 contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receiver {
     using SafeMathUpgradeable for uint256;
@@ -29,8 +29,8 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
     uint256 private _frozenTokens;
     uint256 private _lastRequestId = 1;
     mapping(uint256 => uint256) private _userRequests;
-    IRegistry private _unsRegistry;
-    IRegistry private _cnsRegistry;
+    IUNSRegistry private _unsRegistry;
+    IUNSRegistry private _cnsRegistry;
     LinkTokenInterface private _linkToken;
 
     /**
@@ -42,8 +42,8 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
      * @param paymentCappers Addresses allowed to update payment amount per validation
      */
     constructor(
-        IRegistry unsRegistry,
-        IRegistry cnsRegistry,
+        IUNSRegistry unsRegistry,
+        IUNSRegistry cnsRegistry,
         LinkTokenInterface linkToken,
         address[] memory paymentCappers
     ) {
@@ -115,8 +115,8 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
         uint256 payment = _calculatePaymentForValidation(requestId);
         withdrawableTokens = withdrawableTokens.add(payment);
 
-        IRegistry registry = _getRegistry(tokenId);
-        ICryptoResolver resolver = ICryptoResolver(registry.resolverOf(tokenId));
+        IUNSRegistry registry = _getRegistry(tokenId);
+        IResolver resolver = IResolver(registry.resolverOf(tokenId));
         require(address(resolver) != address(0), 'TwitterValidationOperator: RESOLVER_IS_EMPTY');
 
         resolver.set('social.twitter.username', username, tokenId);
@@ -172,7 +172,7 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
         bytes calldata data
     ) external override linkTokenOnly correctTokensAmount(value) {
         (uint256 tokenId, string memory code) = abi.decode(data, (uint256, string));
-        IRegistry registry = _getRegistry(tokenId);
+        IUNSRegistry registry = _getRegistry(tokenId);
         require(
             registry.isApprovedOrOwner(sender, tokenId),
             'TwitterValidationOperator: SENDER_DOES_NOT_HAVE_ACCESS_TO_DOMAIN'
@@ -208,7 +208,7 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
         }
     }
 
-    function _getRegistry(uint256 tokenId) private view returns (IRegistry) {
+    function _getRegistry(uint256 tokenId) private view returns (IUNSRegistry) {
         if (_unsRegistry.exists(tokenId)) {
             return _unsRegistry;
         } else if (_cnsOwnerOf(tokenId) != address(0x0)) {

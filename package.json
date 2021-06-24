@@ -24,7 +24,7 @@
     "upgrade:proxy:rinkeby": "hardhat run --network rinkeby scripts/upgrade.js",
     "start:node": "hardhat node",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
-    "make:uml": "npx sol2uml ./contracts -b Registry,MintingManager,ProxyReader -o ./assets/uns.svg -i ./contracts/mocks"
+    "make:uml": "npx sol2uml ./contracts -b UNSRegistry,MintingManager,ProxyReader -o ./assets/uns.svg -i ./contracts/mocks"
   },
   "devDependencies": {
     "@chainlink/contracts": "^0.1.7",
