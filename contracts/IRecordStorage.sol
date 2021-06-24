@@ -13,10 +13,10 @@ interface IRecordStorage is IRecordReader {
     event ResetRecords(uint256 indexed tokenId);
 
     /**
-     * @dev Function to set record.
-     * @param key The key set the value of.
-     * @param value The value to set key to.
-     * @param tokenId ERC-721 token id to set.
+     * @dev Set record by key
+     * @param key The key set the value of
+     * @param value The value to set key to
+     * @param tokenId ERC-721 token id to set
      */
     function set(
         string calldata key,
@@ -25,14 +25,38 @@ interface IRecordStorage is IRecordReader {
     ) external;
 
     /**
-     * @dev Set or update domain records
-     * @param keys New record keys
-     * @param values New record values
+     * @dev Set records by keys
+     * @param keys The keys set the values of
+     * @param values Records values
      * @param tokenId ERC-721 token id of the domain
      */
     function setMany(
         string[] memory keys,
         string[] memory values,
+        uint256 tokenId
+    ) external;
+
+    /**
+     * @dev Set record by key hash
+     * @param keyHash The key hash set the value of
+     * @param value The value to set key to
+     * @param tokenId ERC-721 token id to set
+     */
+    function setByHash(
+        uint256 keyHash,
+        string calldata value,
+        uint256 tokenId
+    ) external;
+
+    /**
+     * @dev Set records by key hashes
+     * @param keyHashes The key hashes set the values of
+     * @param values Records values
+     * @param tokenId ERC-721 token id of the domain
+     */
+    function setManyByHash(
+        uint256[] calldata keyHashes,
+        string[] calldata values,
         uint256 tokenId
     ) external;
 

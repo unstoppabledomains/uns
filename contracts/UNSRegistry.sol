@@ -229,7 +229,7 @@ contract UNSRegistry is
         uint256 keyHash,
         string calldata value,
         uint256 tokenId
-    ) external onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _setByHash(keyHash, value, tokenId);
     }
 
@@ -237,7 +237,7 @@ contract UNSRegistry is
         uint256[] calldata keyHashes,
         string[] calldata values,
         uint256 tokenId
-    ) external onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _setManyByHash(keyHashes, values, tokenId);
     }
 

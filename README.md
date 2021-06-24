@@ -62,6 +62,10 @@ UNS Registry smart contracts.
 
         function setMany(string[] memory keys, string[] memory values, uint256 tokenId) external;
 
+        function setByHash(uint256 keyHash, string calldata value, uint256 tokenId) external;
+
+        function setManyByHash(uint256[] calldata keyHashes, string[] calldata values, uint256 tokenId) external;
+
         function reconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external;
 
         function reset(uint256 tokenId) external;
