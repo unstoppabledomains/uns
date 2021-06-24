@@ -22,7 +22,8 @@ async function main () {
     UNSRegistry.address,
     CNSRegistry.address,
     '0x01BE23585060835E02B77ef475b0Cc51aA1e0709',
-    [deployer.address]);
+    [deployer.address],
+  );
   console.log('TwitterValidationOperator deployed to:', operator.address);
 }
 
