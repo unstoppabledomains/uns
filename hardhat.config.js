@@ -29,27 +29,21 @@ if (argv.enableContractSizer) {
   require('hardhat-contract-sizer');
 }
 
-const cp = async (hre, name, out) => {
-  const target = path.join(__dirname, hre.config.paths.flatArtifacts, `${out || name}.json`);
-  const artifact = await hre.artifacts.readArtifact(name);
-
-  await fs.outputFile(target, JSON.stringify(artifact, null, '  '));
-};
-
 task(TASK_COMPILE, 'hook compile task to perform post-compile task', async (_, hre, runSuper) => {
+  const { root, flatArtifacts } = hre.config.paths;
+  const outputDir = path.resolve(root, flatArtifacts);
+
   await runSuper();
-  await cp(hre, 'UNSRegistry');
-  await cp(hre, 'Registry', 'CNSRegistry');
-  await cp(hre, 'MintingManager');
-  await cp(hre, 'ProxyReader');
-  await cp(hre, 'SignatureController');
-  await cp(hre, 'MintingController');
-  await cp(hre, 'WhitelistedMinter');
-  await cp(hre, 'URIPrefixController');
-  await cp(hre, 'DomainZoneController');
-  await cp(hre, 'Resolver');
-  await cp(hre, 'TwitterValidationOperator');
-  await cp(hre, 'FreeMinter');
+
+  fs.rmdirSync(outputDir, { recursive: true });
+
+  for (const fullName of await hre.artifacts.getAllFullyQualifiedNames()) {
+    const artifact = await hre.artifacts.readArtifact(fullName);
+    if (!artifact.abi.length) continue;
+
+    const target = path.join(outputDir, `${artifact.contractName}.json`);
+    await fs.outputFile(target, JSON.stringify(artifact, null, '  '));
+  }
 });
 
 /**
