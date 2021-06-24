@@ -1,5 +1,5 @@
-const { TASK_COMPILE } = require('hardhat/builtin-tasks/task-names');
 const { task } = require('hardhat/config');
+const { TASK_COMPILE } = require('hardhat/builtin-tasks/task-names');
 const path = require('path');
 const fs = require('fs-extra');
 
@@ -30,13 +30,13 @@ if (argv.enableContractSizer) {
 }
 
 const cp = async (hre, name, out) => {
-  const _path = path.join(__dirname, hre.config.paths.flatArtifacts, `${out || name}.json`);
+  const target = path.join(__dirname, hre.config.paths.flatArtifacts, `${out || name}.json`);
   const artifact = await hre.artifacts.readArtifact(name);
 
-  await fs.outputFile(_path, JSON.stringify(artifact, null, '  '));
+  await fs.outputFile(target, JSON.stringify(artifact, null, '  '));
 };
 
-task(TASK_COMPILE, 'hook compile task to include post-compile', async function (args, hre, runSuper) {
+task(TASK_COMPILE, 'hook compile task to perform post-compile task', async (_, hre, runSuper) => {
   await runSuper();
   await cp(hre, 'UNSRegistry');
   await cp(hre, 'Registry', 'CNSRegistry');
