@@ -7,7 +7,7 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721Metad
 
 import './IRecordStorage.sol';
 
-interface IRegistry is IERC721MetadataUpgradeable, IRecordStorage {
+interface IUNSRegistry is IERC721MetadataUpgradeable, IRecordStorage {
     event NewURI(uint256 indexed tokenId, string uri);
 
     event NewURIPrefix(string prefix);

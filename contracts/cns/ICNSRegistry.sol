@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol';
 
-interface ICryptoRegistry is IERC721MetadataUpgradeable {
+interface ICNSRegistry is IERC721MetadataUpgradeable {
     function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool);
 
     function resolverOf(uint256 tokenId) external view returns (address);

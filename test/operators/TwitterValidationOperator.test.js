@@ -17,19 +17,19 @@ describe('TwitterValidationOperator', () => {
 
   const keys = ['social.twitter.username', 'validation.social.twitter.username'];
 
-  let Registry, TwitterValidationOperator, CryptoRegistry, CryptoResolver, CryptoMintingController, LinkTokenMock;
-  let linkToken, unsRegistry, cnsRegistry, cnsMintingController, cnsResolver, operator;
+  let UNSRegistry, CNSRegistry, Resolver, MintingController, TwitterValidationOperator, LinkTokenMock;
+  let unsRegistry, cnsRegistry, cnsResolver, cnsMintingController, operator, linkToken;
   let signers, coinbase, whitelisted, paymentCapper, fundsReceiver, validationRequester;
 
   before(async () => {
     signers = await ethers.getSigners();
     [coinbase, whitelisted, paymentCapper, fundsReceiver, validationRequester] = signers;
 
-    Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
-    CryptoRegistry = await ethers.getContractFactory('contracts/cns/CryptoRegistry.sol:CryptoRegistry');
-    CryptoResolver = await ethers.getContractFactory('contracts/cns/CryptoResolver.sol:CryptoResolver');
-    CryptoMintingController =
-      await ethers.getContractFactory('contracts/cns/CryptoMintingController.sol:CryptoMintingController');
+    UNSRegistry = await ethers.getContractFactory('contracts/UNSRegistry.sol:UNSRegistry');
+    CNSRegistry = await ethers.getContractFactory('dot-crypto/contracts/Registry.sol:Registry');
+    Resolver = await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver');
+    MintingController =
+      await ethers.getContractFactory('dot-crypto/contracts/controllers/MintingController.sol:MintingController');
     TwitterValidationOperator = await ethers.getContractFactory('TwitterValidationOperator');
     LinkTokenMock = await ethers.getContractFactory('LinkTokenMock');
 
@@ -38,14 +38,14 @@ describe('TwitterValidationOperator', () => {
     await linkToken.mint(coinbase.address, 100500);
 
     // deploy UNS
-    unsRegistry = await Registry.deploy();
+    unsRegistry = await UNSRegistry.deploy();
     await unsRegistry.initialize(coinbase.address);
 
     // deploy CNS
-    cnsRegistry = await CryptoRegistry.deploy();
-    cnsMintingController = await CryptoMintingController.deploy(cnsRegistry.address);
+    cnsRegistry = await CNSRegistry.deploy();
+    cnsMintingController = await MintingController.deploy(cnsRegistry.address);
     await cnsRegistry.addController(cnsMintingController.address);
-    cnsResolver = await CryptoResolver.deploy(cnsRegistry.address, cnsMintingController.address);
+    cnsResolver = await Resolver.deploy(cnsRegistry.address, cnsMintingController.address);
   });
 
   const mintUNSToken = async (root, label) => {

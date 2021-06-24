@@ -6,11 +6,11 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol';
 
-import './cns/ICryptoRegistry.sol';
-import './cns/ICryptoResolver.sol';
+import './cns/ICNSRegistry.sol';
+import './cns/IResolver.sol';
 import './IDataReader.sol';
 import './IRecordReader.sol';
-import './IRegistry.sol';
+import './IUNSRegistry.sol';
 import './IRegistryReader.sol';
 
 contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IDataReader {
@@ -19,10 +19,10 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     string public constant NAME = 'UNS: Proxy Reader';
     string public constant VERSION = '0.1.0';
 
-    IRegistry private immutable _unsRegistry;
-    ICryptoRegistry private immutable _cnsRegistry;
+    IUNSRegistry private immutable _unsRegistry;
+    ICNSRegistry private immutable _cnsRegistry;
 
-    constructor(IRegistry unsRegistry, ICryptoRegistry cnsRegistry) {
+    constructor(IUNSRegistry unsRegistry, ICNSRegistry cnsRegistry) {
         _unsRegistry = unsRegistry;
         _cnsRegistry = cnsRegistry;
     }
@@ -97,7 +97,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         } else {
             address resolver = _cnsResolverOf(tokenId);
             if (resolver != address(0x0)) {
-                value = ICryptoResolver(resolver).get(key, tokenId);
+                value = IResolver(resolver).get(key, tokenId);
             }
         }
     }
@@ -109,7 +109,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         } else {
             address resolver = _cnsResolverOf(tokenId);
             if (resolver != address(0x0) && keys.length > 0) {
-                values = ICryptoResolver(resolver).getMany(keys, tokenId);
+                values = IResolver(resolver).getMany(keys, tokenId);
             }
         }
     }
@@ -125,7 +125,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         } else {
             address resolver = _cnsResolverOf(tokenId);
             if (resolver != address(0x0)) {
-                (key, value) = ICryptoResolver(resolver).getByHash(keyHash, tokenId);
+                (key, value) = IResolver(resolver).getByHash(keyHash, tokenId);
             }
         }
     }
@@ -143,7 +143,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         } else {
             address resolver = _cnsResolverOf(tokenId);
             if (resolver != address(0x0) && keyHashes.length > 0) {
-                (keys, values) = ICryptoResolver(resolver).getManyByHash(keyHashes, tokenId);
+                (keys, values) = IResolver(resolver).getManyByHash(keyHashes, tokenId);
             }
         }
     }
@@ -252,7 +252,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
             resolver = _cnsResolverOf(tokenId);
             owner = _cnsOwnerOf(tokenId);
             if (resolver != address(0x0) && keys.length > 0) {
-                values = ICryptoResolver(resolver).getMany(keys, tokenId);
+                values = IResolver(resolver).getMany(keys, tokenId);
             }
         }
     }
@@ -277,7 +277,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
             resolver = _cnsResolverOf(tokenId);
             owner = _cnsOwnerOf(tokenId);
             if (resolver != address(0x0) && keys.length > 0) {
-                (keys, values) = ICryptoResolver(resolver).getManyByHash(keyHashes, tokenId);
+                (keys, values) = IResolver(resolver).getManyByHash(keyHashes, tokenId);
             }
         }
     }
