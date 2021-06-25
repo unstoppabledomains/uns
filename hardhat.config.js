@@ -40,7 +40,7 @@ task(TASK_COMPILE, 'hook compile task to perform post-compile task', async (_, h
 
   for (const artifactPath of await hre.artifacts.getArtifactPaths()) {
     const artifact = fs.readFileSync(artifactPath);
-    const {abi, contractName} = JSON.parse(artifact);
+    const { abi, contractName } = JSON.parse(artifact);
     if (!abi.length) continue;
 
     const target = path.join(outputDir, `${contractName}.json`);
