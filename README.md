@@ -1,6 +1,6 @@
 # UNS
 
-UNS Registry smart contracts.
+UNS Registry smart contracts.  All rights reserved Unstoppable Domains Inc., 2021.
 
 ## Specifications
 
