@@ -1,7 +1,7 @@
 const { task } = require('hardhat/config');
 const { TASK_COMPILE } = require('hardhat/builtin-tasks/task-names');
 const path = require('path');
-const fs = require('fs-extra');
+const fs = require('fs');
 
 /// ENVVAR
 // - ENABLE_GAS_REPORT
@@ -36,13 +36,15 @@ task(TASK_COMPILE, 'hook compile task to perform post-compile task', async (_, h
   await runSuper();
 
   fs.rmdirSync(outputDir, { recursive: true });
+  fs.mkdirSync(outputDir, { recursive: true });
 
-  for (const fullName of await hre.artifacts.getAllFullyQualifiedNames()) {
-    const artifact = await hre.artifacts.readArtifact(fullName);
-    if (!artifact.abi.length) continue;
+  for (const artifactPath of await hre.artifacts.getArtifactPaths()) {
+    const artifact = fs.readFileSync(artifactPath);
+    const {abi, contractName} = JSON.parse(artifact);
+    if (!abi.length) continue;
 
-    const target = path.join(outputDir, `${artifact.contractName}.json`);
-    await fs.outputFile(target, JSON.stringify(artifact, null, '  '));
+    const target = path.join(outputDir, `${contractName}.json`);
+    fs.copyFileSync(artifactPath, target);
   }
 });
 
