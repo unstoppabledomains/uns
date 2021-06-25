@@ -3,10 +3,28 @@
     "networks": {
         "1": {
             "contracts": {
+                "UNSRegistry": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "implementation": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
                 "CNSRegistry": {
                     "address": "0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x8a958b"
+                },
+                "MintingManager": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "implementation": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                 "ProxyAdmin": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "implementation": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 },
                 "SignatureController": {
                     "address": "0x82EF94294C95aD0930055f31e53A34509227c5f7",
