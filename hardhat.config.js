@@ -1,8 +1,12 @@
+const { task } = require('hardhat/config');
+const { TASK_COMPILE } = require('hardhat/builtin-tasks/task-names');
+const path = require('path');
+const fs = require('fs');
+
 /// ENVVAR
 // - ENABLE_GAS_REPORT
 // - ENABLE_CONTRACT_SIZER
 // - CI
-
 const argv = require('yargs/yargs')()
   .env('')
   .boolean('enableGasReport')
@@ -24,6 +28,25 @@ if (argv.enableGasReport) {
 if (argv.enableContractSizer) {
   require('hardhat-contract-sizer');
 }
+
+task(TASK_COMPILE, 'hook compile task to perform post-compile task', async (_, hre, runSuper) => {
+  const { root, flatArtifacts } = hre.config.paths;
+  const outputDir = path.resolve(root, flatArtifacts);
+
+  await runSuper();
+
+  fs.rmdirSync(outputDir, { recursive: true });
+  fs.mkdirSync(outputDir, { recursive: true });
+
+  for (const artifactPath of await hre.artifacts.getArtifactPaths()) {
+    const artifact = fs.readFileSync(artifactPath);
+    const { abi, contractName } = JSON.parse(artifact);
+    if (!abi.length) continue;
+
+    const target = path.join(outputDir, `${contractName}.json`);
+    fs.copyFileSync(artifactPath, target);
+  }
+});
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -53,6 +76,10 @@ module.exports = {
         },
       },
     ],
+  },
+  paths: {
+    artifacts: './.artifacts',
+    flatArtifacts: './artifacts',
   },
   networks: {
     hardhat: {

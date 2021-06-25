@@ -30,4 +30,4 @@ allFiredEvents
 
 # hardhat
 cache
-artifacts
+.artifacts

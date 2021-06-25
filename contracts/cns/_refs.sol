@@ -6,7 +6,9 @@ pragma experimental ABIEncoderV2;
 
 import 'dot-crypto/contracts/Registry.sol';
 import 'dot-crypto/contracts/Resolver.sol';
+import 'dot-crypto/contracts/controllers/DomainZoneController.sol';
 import 'dot-crypto/contracts/controllers/MintingController.sol';
 import 'dot-crypto/contracts/controllers/SignatureController.sol';
 import 'dot-crypto/contracts/controllers/URIPrefixController.sol';
+import 'dot-crypto/contracts/util/WhitelistedMinter.sol';
 import 'dot-crypto/contracts/util/FreeMinter.sol';
