@@ -12,6 +12,20 @@ async function deploy (opts) {
   return unsConfig;
 }
 
+async function snapshot() {
+  return await network.provider.request({
+    method: 'evm_snapshot',
+    params: [],
+  });
+}
+
+async function revert(snapshotId) {
+  return await network.provider.request({
+    method: 'evm_revert',
+    params: [snapshotId],
+  });
+}
+
 async function deployCNS (opts) {
   const { CNSRegistry, SignatureController, MintingController, URIPrefixController, Resolver } = opts.artifacts;
   const [, cnsAdmin] = await ethers.getSigners();
@@ -79,18 +93,20 @@ async function deployUNS (opts, config) {
   );
   await mintingManagerInitTx.wait();
 
-  if (_unsConfig.minters.length) {
-    await mintingManager.addMinters(_unsConfig.minters);
+  const minters = _unsConfig.minters[network.name];
+  if (minters.length) {
+    await mintingManager.addMinters(minters);
   }
 
   const proxyReader = await ProxyReader.deploy(unsRegistry.address, contracts.CNSRegistry.address);
 
   let operator;
-  if (_unsConfig.linkToken.length) {
+  const linkToken = _unsConfig.linkToken[network.name];
+  if (linkToken.length) {
     operator = await TwitterValidationOperator.deploy(
       unsRegistry.address,
       contracts.CNSRegistry.address,
-      _unsConfig.linkToken,
+      linkToken,
       [deployer.address],
     );
   }
@@ -210,4 +226,6 @@ async function _configCNS (opts, config) {
 module.exports = {
   deploy,
   upgrade,
+  snapshot,
+  revert
 };

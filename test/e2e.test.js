@@ -1,9 +1,11 @@
-const { ethers } = require('hardhat');
+const { ethers, network } = require('hardhat');
 const { expect } = require('chai');
+
+const { deploy, snapshot, revert } = require('./../deploy');
 
 const { utils, BigNumber } = ethers;
 
-describe.skip('E2E', () => {
+describe.only('E2E', () => {
   const {
     UNS_WORKER_PRIVATE_KEY,
     UNS_REGISTRY_PROXY,
@@ -18,8 +20,8 @@ describe.skip('E2E', () => {
   const walletRoot = BigNumber.from('0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230');
 
   let UNSRegistry, MintingManager, CNSRegistry, Resolver, ProxyReader;
-  let unsRegistry, mintingManager, cnsRegistry, resolver, proxyReader, worker;
-  let signers, coinbase;
+  let unsRegistry, mintingManager, cnsRegistry, resolver, proxyReader, minter;
+  let signers, coinbase, snapshotId;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -31,14 +33,36 @@ describe.skip('E2E', () => {
     Resolver = await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver');
     ProxyReader = await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader');
 
-    unsRegistry = await UNSRegistry.attach(UNS_REGISTRY_PROXY);
-    mintingManager = await MintingManager.attach(UNS_MINTING_MANAGERE_PROXY);
-    cnsRegistry = await CNSRegistry.attach(CNS_REGISTRY);
-    resolver = await Resolver.attach(CNS_RESOLVER);
-    proxyReader = await ProxyReader.attach(UNS_PROXY_READER);
+    // unsRegistry = await UNSRegistry.attach(UNS_REGISTRY_PROXY);
+    // mintingManager = await MintingManager.attach(UNS_MINTING_MANAGERE_PROXY);
+    // cnsRegistry = await CNSRegistry.attach(CNS_REGISTRY);
+    // resolver = await Resolver.attach(CNS_RESOLVER);
+    // proxyReader = await ProxyReader.attach(UNS_PROXY_READER);
 
-    worker = new ethers.Wallet(UNS_WORKER_PRIVATE_KEY, ethers.provider);
+    // worker = new ethers.Wallet(UNS_WORKER_PRIVATE_KEY, ethers.provider);
+
+    const [deployer] = await ethers.getSigners();
+
+    const unsConfig = await deploy();
+    const {contracts} = unsConfig.networks[network.config.chainId];
+
+    unsRegistry = await UNSRegistry.attach(contracts.UNSRegistry.address);
+    mintingManager = await MintingManager.attach(contracts.MintingManager.address);
+    cnsRegistry = await CNSRegistry.attach(contracts.CNSRegistry.address);
+    resolver = await Resolver.attach(contracts.Resolver.address);
+    proxyReader = await ProxyReader.attach(contracts.ProxyReader.address);
+
+    minter = deployer;
   });
+
+  beforeEach(async () => {
+    snapshotId = await snapshot();
+    console.log('snapshotId', snapshotId)
+  })
+
+  afterEach(async () => {
+    await revert(snapshotId);
+  })
 
   const sign = async (data, address, signer) => {
     return signer.signMessage(
@@ -62,11 +86,35 @@ describe.skip('E2E', () => {
     );
   };
 
+  describe.only('snapsots', () => {
+    it('should mint a token', async () => {
+      const _domainName = `${domainPrefix}_test_e2e_wallet_0`;
+  
+      let tx = await mintingManager.connect(minter)
+        .mintSLD(coinbase.address, walletRoot, _domainName);
+      await tx.wait();
+  
+      const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
+      assert.equal(await unsRegistry.ownerOf(_walletTokenId), coinbase.address);
+    })
+
+    it('should mint same token as prev test', async () => {
+      const _domainName = `${domainPrefix}_test_e2e_wallet_0`;
+  
+      let tx = await mintingManager.connect(minter)
+        .mintSLD(coinbase.address, walletRoot, _domainName);
+      await tx.wait();
+  
+      const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
+      assert.equal(await unsRegistry.ownerOf(_walletTokenId), coinbase.address);
+    })
+  })
+
   it('should mint .wallet and resolve records', async () => {
     const _domainName = `${domainPrefix}_test_e2e_wallet_131`;
 
     // mint
-    let tx = await mintingManager.connect(worker)
+    let tx = await mintingManager.connect(minter)
       .mintSLD(coinbase.address, walletRoot, _domainName);
     await tx.wait();
 
@@ -86,7 +134,7 @@ describe.skip('E2E', () => {
     const _domainName = `${domainPrefix}_test_e2e_crypto_131`;
 
     // mint
-    let tx = await mintingManager.connect(worker)
+    let tx = await mintingManager.connect(minter)
       .mintSLDWithRecords(coinbase.address, cryptoRoot, _domainName, [], []);
     await tx.wait();
 
@@ -106,9 +154,9 @@ describe.skip('E2E', () => {
     const _domainName = `${domainPrefix}_test_e2e_221`;
 
     // mint
-    let tx = await mintingManager.connect(worker).mintSLD(coinbase.address, cryptoRoot, _domainName);
+    let tx = await mintingManager.connect(minter).mintSLD(coinbase.address, cryptoRoot, _domainName);
     await tx.wait();
-    tx = await mintingManager.connect(worker).mintSLD(coinbase.address, walletRoot, _domainName);
+    tx = await mintingManager.connect(minter).mintSLD(coinbase.address, walletRoot, _domainName);
     await tx.wait();
 
     tx = await mintingManager.setTokenURIPrefix(`/${domainPrefix}_custom_prefix/`);
@@ -130,7 +178,7 @@ describe.skip('E2E', () => {
       'mintSLD(address,uint256,string)',
       [coinbase.address, walletRoot, _domainName],
     );
-    const signature = sign(data, mintingManager.address, worker);
+    const signature = sign(data, mintingManager.address, minter);
 
     // min
     const tx = await mintingManager.connect(coinbase).relay(data, signature);
@@ -147,7 +195,7 @@ describe.skip('E2E', () => {
       'mintSLD(address,uint256,string)',
       [coinbase.address, cryptoRoot, _domainName],
     );
-    const signature = sign(data, mintingManager.address, worker);
+    const signature = sign(data, mintingManager.address, minter);
 
     // min
     const tx = await mintingManager.connect(coinbase).relay(data, signature);
@@ -157,11 +205,11 @@ describe.skip('E2E', () => {
     assert.equal(await cnsRegistry.ownerOf(_cryptoTokenId), coinbase.address);
   });
 
-  it('should burn .wallet domain through oll metatx(For)', async () => {
+  it('should burn .wallet domain through old metatx(For)', async () => {
     const _domainName = `${domainPrefix}_test_e2e_wallet_974`;
 
     // mint
-    let tx = await mintingManager.connect(worker)
+    let tx = await mintingManager.connect(minter)
       .mintSLD(coinbase.address, walletRoot, _domainName);
     await tx.wait();
 
@@ -171,7 +219,7 @@ describe.skip('E2E', () => {
     const data = unsRegistry.interface.encodeFunctionData('burn(uint256)', [_walletTokenId]);
     const signature = await signFor(data, unsRegistry.address, await unsRegistry.nonceOf(_walletTokenId), coinbase);
 
-    tx = await unsRegistry.connect(worker).burnFor(_walletTokenId, signature);
+    tx = await unsRegistry.connect(minter).burnFor(_walletTokenId, signature);
     await tx.wait();
 
     await expect(unsRegistry.ownerOf(_walletTokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
