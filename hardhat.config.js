@@ -86,6 +86,14 @@ module.exports = {
       url: 'http://localhost:8545',
       chainId: 31337,
     },
+    sandbox: {
+      url: 'http://localhost:7545',
+      mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
+      chainId: 1337,
+      dbPath: './.sandbox',
+      snapshotPath: './sandbox/db.tgz',
+      logger: console
+    },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.RINKEBY_INFURA_KEY}`,
       chainId: 4,
@@ -119,6 +127,7 @@ module.exports = {
     minters: {
       hardhat: ['0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'],
       localhost: ['0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'],
+      sandbox: ['0xfe84Ab89b7Fc902Ff3CfD756403a8f085B1639Aa'],
       rinkeby: [
         '0xb3B86785A51B950fd54ABdF420ff3B60E091870c',
         '0x7EF88A779651f26a4967026a32Cae4F01fF8D151',
@@ -135,6 +144,7 @@ module.exports = {
     linkToken: {
       hardhat: '',
       localhost: '',
+      sandbox: '',
       rinkeby: '0x01BE23585060835E02B77ef475b0Cc51aA1e0709',
     },
   },

@@ -1,11 +1,11 @@
 const { ethers, network } = require('hardhat');
 const { expect } = require('chai');
 
-const { deploy, snapshot, revert } = require('./../deploy');
+const { deploy, snapshot, revert } = require('../src/deploy');
 
 const { utils, BigNumber } = ethers;
 
-describe.only('E2E', () => {
+describe.skip('E2E', () => {
   const {
     UNS_WORKER_PRIVATE_KEY,
     UNS_REGISTRY_PROXY,
@@ -44,7 +44,7 @@ describe.only('E2E', () => {
     const [deployer] = await ethers.getSigners();
 
     const unsConfig = await deploy();
-    const {contracts} = unsConfig.networks[network.config.chainId];
+    const { contracts } = unsConfig.networks[network.config.chainId];
 
     unsRegistry = await UNSRegistry.attach(contracts.UNSRegistry.address);
     mintingManager = await MintingManager.attach(contracts.MintingManager.address);
@@ -57,12 +57,12 @@ describe.only('E2E', () => {
 
   beforeEach(async () => {
     snapshotId = await snapshot();
-    console.log('snapshotId', snapshotId)
-  })
+    console.log('snapshotId', snapshotId);
+  });
 
   afterEach(async () => {
     await revert(snapshotId);
-  })
+  });
 
   const sign = async (data, address, signer) => {
     return signer.signMessage(
@@ -86,29 +86,29 @@ describe.only('E2E', () => {
     );
   };
 
-  describe.only('snapsots', () => {
+  describe('snapsots', () => {
     it('should mint a token', async () => {
       const _domainName = `${domainPrefix}_test_e2e_wallet_0`;
-  
-      let tx = await mintingManager.connect(minter)
+
+      const tx = await mintingManager.connect(minter)
         .mintSLD(coinbase.address, walletRoot, _domainName);
       await tx.wait();
-  
+
       const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
       assert.equal(await unsRegistry.ownerOf(_walletTokenId), coinbase.address);
-    })
+    });
 
     it('should mint same token as prev test', async () => {
       const _domainName = `${domainPrefix}_test_e2e_wallet_0`;
-  
-      let tx = await mintingManager.connect(minter)
+
+      const tx = await mintingManager.connect(minter)
         .mintSLD(coinbase.address, walletRoot, _domainName);
       await tx.wait();
-  
+
       const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
       assert.equal(await unsRegistry.ownerOf(_walletTokenId), coinbase.address);
-    })
-  })
+    });
+  });
 
   it('should mint .wallet and resolve records', async () => {
     const _domainName = `${domainPrefix}_test_e2e_wallet_131`;

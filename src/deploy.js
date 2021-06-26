@@ -12,14 +12,14 @@ async function deploy (opts) {
   return unsConfig;
 }
 
-async function snapshot() {
+async function snapshot () {
   return await network.provider.request({
     method: 'evm_snapshot',
     params: [],
   });
 }
 
-async function revert(snapshotId) {
+async function revert (snapshotId) {
   return await network.provider.request({
     method: 'evm_revert',
     params: [snapshotId],
@@ -30,22 +30,22 @@ async function deployCNS (opts) {
   const { CNSRegistry, SignatureController, MintingController, URIPrefixController, Resolver } = opts.artifacts;
   const [, cnsAdmin] = await ethers.getSigners();
 
-  const registry = await CNSRegistry.connect(cnsAdmin).deploy();
-  const signatureController = await SignatureController.connect(cnsAdmin).deploy(registry.address);
-  const mintingController = await MintingController.connect(cnsAdmin).deploy(registry.address);
-  const uriPrefixController = await URIPrefixController.connect(cnsAdmin).deploy(registry.address);
+  const cnsRegistry = await CNSRegistry.connect(cnsAdmin).deploy();
+  const signatureController = await SignatureController.connect(cnsAdmin).deploy(cnsRegistry.address);
+  const mintingController = await MintingController.connect(cnsAdmin).deploy(cnsRegistry.address);
+  const uriPrefixController = await URIPrefixController.connect(cnsAdmin).deploy(cnsRegistry.address);
 
-  await registry.connect(cnsAdmin).addController(signatureController.address);
-  await registry.connect(cnsAdmin).addController(mintingController.address);
-  await registry.connect(cnsAdmin).addController(uriPrefixController.address);
+  await cnsRegistry.connect(cnsAdmin).addController(signatureController.address);
+  await cnsRegistry.connect(cnsAdmin).addController(mintingController.address);
+  await cnsRegistry.connect(cnsAdmin).addController(uriPrefixController.address);
 
-  const resolver = await Resolver.connect(cnsAdmin).deploy(registry.address, mintingController.address);
+  const resolver = await Resolver.connect(cnsAdmin).deploy(cnsRegistry.address, mintingController.address);
 
   return {
     networks: {
       [network.config.chainId]: {
         contracts: {
-          CNSRegistry: { address: registry.address },
+          CNSRegistry: { address: cnsRegistry.address },
           SignatureController: { address: signatureController.address },
           MintingController: { address: mintingController.address },
           URIPrefixController: { address: uriPrefixController.address },
@@ -227,5 +227,5 @@ module.exports = {
   deploy,
   upgrade,
   snapshot,
-  revert
+  revert,
 };
