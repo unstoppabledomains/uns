@@ -6,14 +6,14 @@ const { deploy, snapshot, revert } = require('../src/deploy');
 const { utils, BigNumber } = ethers;
 
 describe.skip('E2E', () => {
-  const {
-    UNS_WORKER_PRIVATE_KEY,
-    UNS_REGISTRY_PROXY,
-    UNS_MINTING_MANAGERE_PROXY,
-    UNS_PROXY_READER,
-    CNS_REGISTRY,
-    CNS_RESOLVER,
-  } = process.env;
+  // const {
+  //   UNS_WORKER_PRIVATE_KEY,
+  //   UNS_REGISTRY_PROXY,
+  //   UNS_MINTING_MANAGERE_PROXY,
+  //   UNS_PROXY_READER,
+  //   CNS_REGISTRY,
+  //   CNS_RESOLVER,
+  // } = process.env;
 
   const domainPrefix = 'ug0e2';
   const cryptoRoot = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');

@@ -92,7 +92,7 @@ module.exports = {
       chainId: 1337,
       dbPath: './.sandbox',
       snapshotPath: './sandbox/db.tgz',
-      logger: console
+      logger: console,
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.RINKEBY_INFURA_KEY}`,

@@ -315,3 +315,139 @@ Changes:
   * Removed due to removing controllers
 
 #### Affected Components: None
+
+---
+## Sandbox
+
+The tool allows to spin-up blockchain environment(emulator) with pre-deployed UNS(including CNS) smart contracts. It is useful for unit/integration testing. In order to simplify test setup, the state of the environment can be restored to initial state of the sandbox.
+
+### Network config
+
+- URL: http://localhost:7545
+- CHAIN_ID: 1337
+
+### Accounts
+
+The emulator uses mnemonic for preparing list of accounts. It always has strict list of accounts:
+
+```
+Available Accounts
+==================
+(0) 0xfe84Ab89b7Fc902Ff3CfD756403a8f085B1639Aa (100 ETH)    // UNS deployer and Minter
+(1) 0x9DC64b2558b458A15C7f01c192D874Ef460f0A29 (100 ETH)    // CNS deployer
+(2) 0x94F57ed7e9af03A10e8EB23CE1B3c7914a182b0f (100 ETH)
+(3) 0x936188f2C3C8E8c95e425b6fe41c2ac9E701585e (100 ETH)
+(4) 0x95f29431AEb52C0D5DbEEEC36010b8e2CA69CB3D (100 ETH)
+(5) 0x19356cc2300833E690088a5a09A2044A3CC2A1E2 (100 ETH)
+(6) 0x8861CdFa38838531275cE12F9e795C3b9fF29cBE (100 ETH)
+(7) 0x0712e8e819712C3bfdb098CE51C87a4Ac0296fd8 (100 ETH)
+(8) 0xAA33d7188Eb4b4A51C37199eaaD2f73cf2bF0204 (100 ETH)
+(9) 0xead34b583404E3Cb0C9b97C2d1C486BE67Be9F30 (100 ETH)
+
+Private Keys
+==================
+(0) 0x6b657c280147dd393162442cda5f55b8af7c59986237f4c602531d1e994d5a6d
+(1) 0x6c9ad2b70a3ca6e989a0715b710f3ed689b1cfe4c1494ede70241762ffb76c9b
+(2) 0x50f58d79e0b89e2f4070721184eaa96fd5c3d096d4885969cf3fac70aaf522cd
+(3) 0xfa30d0923973acd541d3dd3e9f8c2d253b7ecd52b316478f9dd24c88d7eff16d
+(4) 0x407a6090c4b168dab2680cba8c4e6ff54b9d58ada126607b4451c9a4646f029b
+(5) 0xe820b165e308ac2a2b32cc2fd4d694373b9910ce216ebeddcec10dbc2091c618
+(6) 0x0402143af3ed84c7d05ce13b8601733a6e9c01d287f30e481f180bb38174aae7
+(7) 0x5ca5f7763a6b5d49deca6620803ec47c4dd910380e8e9cf7780857b95318a1a3
+(8) 0x6708567060a74fe47d7f9b9e7a5af1bc30ffbc641566c96f6413323591042a3c
+(9) 0xf15dabfb20f3e891e7a9308bb3acb5498200b968ca4feebf8e2e9e561ee71778    
+
+HD Wallet
+==================
+Mnemonic:      mimic dune forward party defy island absorb insane deputy obvious brother immense
+Base HD Path:  m/44'/60'/0'/0/{account_index}
+```
+
+### Sandbox UNS config
+
+```
+{
+    "version": "0.1.0",
+    "networks": {
+        "1337": {
+            "contracts": {
+                "CNSRegistry": {
+                    "address": "0xA310F8e781F8aE80690649be920991AEc9a6595D"
+                },
+                "SignatureController": {
+                    "address": "0xBd8b374200A7D99F15f4e90621dA1BEAEcb705a0"
+                },
+                "MintingController": {
+                    "address": "0x4513073d9B3af7e62be59B57205a2368F76dE9C7"
+                },
+                "URIPrefixController": {
+                    "address": "0xeE1f42382091e260f5B9c152E17639d729Ab829F"
+                },
+                "Resolver": {
+                    "address": "0x76CBBE3B425A7D258B30457785d54de8c8322bfa"
+                },
+                "UNSRegistry": {
+                    "address": "0x4a3C194eB88966178bfDD81744ddDafED611B830",
+                    "implementation": "0xC58206842E4030a3B2CaBC78780Ae7635173C533"
+                },
+                "MintingManager": {
+                    "address": "0x4Be0126fB2885a6D2909166D5801E606470C9aB0",
+                    "implementation": "0x4872CC1be60A9DB9c880A0A437Da7a6AF134F08f"
+                },
+                "ProxyAdmin": {
+                    "address": "0x7bB6Cd9be29fab783c0b494A06FED8b2E2596B7a"
+                },
+                "ProxyReader": {
+                    "address": "0xAc52F68f31577E44aE0C7E95A42dC9eb574B9383"
+                },
+                "TwitterValidationOperator": {
+                    "address": ""
+                },
+                "FreeMinter": {
+                    "address": ""
+                },
+            }
+        }
+    }
+}
+
+```
+
+### Example of usage
+
+```
+const Sandbox = require('./sandbox');
+
+describe('Test', async () => {
+  before(async () => {
+    sandbox = await Sandbox.create();
+    await sandbox.start();
+  })
+
+  beforeEach(async () => {
+    await sandbox.reset();
+  });
+
+  after(async () => {
+    await sandbox.stop();
+  });
+
+  it('test1', async () => {
+    ...
+  })
+
+  it('test2', async () => {
+    ...
+  })
+})
+```
+
+### Sandbox DB snapshot
+
+Sandbox has database snapshot of blockchain in order to spin-up the environment.
+The snapshot is prebuilded and included in a package with the sandbox.
+A new deployment script might be a reason to rebuild the sandbox snapshot. In order to do this there is a yarn command:
+
+```
+yarn rebuild:sandbox
+```

@@ -30,7 +30,7 @@ describe('Sandbox', async () => {
 
     unsRegistry = await UNSRegistry.attach(contracts.UNSRegistry.address);
     mintingManager = await MintingManager.attach(contracts.MintingManager.address);
-  })
+  });
 
   beforeEach(async () => {
     await sandbox.reset();
@@ -61,4 +61,4 @@ describe('Sandbox', async () => {
     const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
     expect(await unsRegistry.ownerOf(_walletTokenId)).to.be.eq(coinbase.address);
   });
-})
+});

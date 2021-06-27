@@ -7,7 +7,7 @@ const { deploy } = require('../src/deploy');
 
 class Sandbox {
   constructor (service, options) {
-    if(network.name !== 'sandbox') {
+    if (network.name !== 'sandbox') {
       throw new Error(`Network ${network.name} is not supported`);
     }
 
@@ -23,7 +23,7 @@ class Sandbox {
     const { accounts, ...config } = network.config;
     const networkOptions = {
       ...defaultOptions,
-      ...config
+      ...config,
     };
 
     const { dbPath, snapshotPath } = networkOptions;
@@ -57,7 +57,7 @@ class Sandbox {
     }
   }
 
-  async reset() {
+  async reset () {
     await this._revert(this.snapshotId);
     this.snapshotId = await this._snapshot();
   }
@@ -84,7 +84,7 @@ class Sandbox {
       params: [],
     });
   }
-  
+
   async _revert (snapshotId) {
     return await this.provider.request({
       method: 'evm_revert',
@@ -97,7 +97,7 @@ module.exports = Sandbox;
 
 // NOTE: Node module execution is used for rebuilding sandbox package
 if (require.main === module) {
-  void (async () => {
+  (async () => {
     try {
       const sandbox = await Sandbox.create({ clean: true, extract: false });
       await sandbox.rebuild();
