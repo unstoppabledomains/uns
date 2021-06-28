@@ -1,7 +1,8 @@
 const { ethers, network } = require('hardhat');
 const { expect } = require('chai');
 
-const { deploy, snapshot, revert } = require('../src/deploy');
+const { snapshot, revert } = require('../src/snapshot');
+const Deployer = require('../src/deployer');
 
 const { utils, BigNumber } = ethers;
 
@@ -33,17 +34,11 @@ describe.skip('E2E', () => {
     Resolver = await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver');
     ProxyReader = await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader');
 
-    // unsRegistry = await UNSRegistry.attach(UNS_REGISTRY_PROXY);
-    // mintingManager = await MintingManager.attach(UNS_MINTING_MANAGERE_PROXY);
-    // cnsRegistry = await CNSRegistry.attach(CNS_REGISTRY);
-    // resolver = await Resolver.attach(CNS_RESOLVER);
-    // proxyReader = await ProxyReader.attach(UNS_PROXY_READER);
+    const [unsDeployer] = await ethers.getSigners();
+    minter = unsDeployer;
 
-    // worker = new ethers.Wallet(UNS_WORKER_PRIVATE_KEY, ethers.provider);
-
-    const [deployer] = await ethers.getSigners();
-
-    const unsConfig = await deploy();
+    const deployer = await Deployer.create();
+    const unsConfig = await deployer.execute(['uns']);
     const { contracts } = unsConfig.networks[network.config.chainId];
 
     unsRegistry = await UNSRegistry.attach(contracts.UNSRegistry.address);
@@ -51,8 +46,6 @@ describe.skip('E2E', () => {
     cnsRegistry = await CNSRegistry.attach(contracts.CNSRegistry.address);
     resolver = await Resolver.attach(contracts.Resolver.address);
     proxyReader = await ProxyReader.attach(contracts.ProxyReader.address);
-
-    minter = deployer;
   });
 
   beforeEach(async () => {

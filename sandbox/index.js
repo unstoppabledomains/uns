@@ -3,7 +3,7 @@ const { GanacheService } = require('@nomiclabs/hardhat-ganache/dist/src/ganache-
 const fs = require('fs');
 const tar = require('tar');
 
-const { deploy } = require('../src/deploy');
+const Deployer = require('../src/deployer');
 
 class Sandbox {
   constructor (service, options) {
@@ -64,7 +64,8 @@ class Sandbox {
 
   async rebuild () {
     await this.start();
-    await deploy({ proxy: true });
+    const deployer = await Deployer.create();
+    await deployer.execute(['uns']);
     await this.stop();
 
     const { db_path: dbPath, snapshotPath } = this.options.network;
