@@ -1,6 +1,7 @@
 const { ethers, network, config: hhConfig, upgrades } = require('hardhat');
 const path = require('path');
 const fs = require('fs');
+const merge = require('lodash.merge');
 
 const defaultOptions = {
   basePath: './.deployer',
@@ -29,7 +30,7 @@ class Deployer {
   constructor (options, artifacts, accounts, minters, linkToken) {
     this.options = {
       ...defaultOptions,
-      ...options
+      ...options,
     };
     this.artifacts = artifacts;
     this.accounts = accounts;
@@ -44,7 +45,7 @@ class Deployer {
       this._upgradeUNSTask(),
     ];
 
-    const {basePath} = this.options;
+    const { basePath } = this.options;
     if (!fs.existsSync(basePath)) {
       fs.mkdirSync(basePath);
     }
@@ -57,24 +58,24 @@ class Deployer {
     return new Deployer(
       options,
       await _getArtifacts(),
-      {unsDeployer, cnsDeployer},
+      { unsDeployer, cnsDeployer },
       _unsConfig.minters[network.name],
       _unsConfig.linkToken[network.name],
     );
   }
 
-  async execute(tags) {
+  async execute (tags, config) {
     tags = tags || [];
-    for(const task of this.tasks) {
-      if(!tags.some(t => task.tags.includes(t.toLowerCase()))) continue;
+    for (const task of this.tasks) {
+      if (!tags.some(t => task.tags.includes(t.toLowerCase()))) continue;
 
-      const deps = task.ensureDependencies();
+      const deps = task.ensureDependencies(config);
       await task.run(deps);
     }
     return this.config();
   }
 
-  config() {
+  config () {
     const config = this._getNetworkConfig();
 
     const contracts = {};
@@ -83,21 +84,21 @@ class Deployer {
         address: value.address,
         implementation: value.implementation,
         deploymentBlock: value.transaction && value.transaction.blockNumber,
-      }
+      };
     };
 
     return {
       networks: {
         [this.network.chainId]: {
-          contracts
-        }
-      }
+          contracts,
+        },
+      },
     };
   }
 
-  _deployCNSTask() {
+  _deployCNSTask () {
     return {
-      tags: ['cns', 'uns'],
+      tags: ['cns', 'full'],
       run: async () => {
         const { cnsDeployer } = this.accounts;
         const {
@@ -105,7 +106,7 @@ class Deployer {
           SignatureController,
           MintingController,
           URIPrefixController,
-          Resolver
+          Resolver,
         } = this.artifacts;
 
         // CNS registry
@@ -132,21 +133,21 @@ class Deployer {
         await this._saveContractConfig('Resolver', resolver);
       },
       ensureDependencies: () => {
-        return;
-      }
-    }
+
+      },
+    };
   }
 
-  _deployUNSTask() {
+  _deployUNSTask () {
     return {
-      tags: ['uns'],
+      tags: ['uns', 'full'],
       run: async (dependencies) => {
         const { unsDeployer } = this.accounts;
         const {
           CNSRegistry,
           MintingController,
           URIPrefixController,
-          Resolver
+          Resolver,
         } = dependencies;
 
         let unsRegistry, mintingManager, unsRegistryImpl, mintingManagerImpl, proxyAdmin;
@@ -191,7 +192,7 @@ class Deployer {
         await this._saveContractConfig('ProxyReader', proxyReader);
 
         if (this.linkToken.length) {
-          operator = await this.artifacts.TwitterValidationOperator
+          const operator = await this.artifacts.TwitterValidationOperator
             .connect(unsDeployer)
             .deploy(
               unsRegistry.address,
@@ -199,22 +200,23 @@ class Deployer {
               this.linkToken,
               [unsDeployer.address],
             );
+          await this._saveContractConfig('TwitterValidationOperator', operator);
         }
       },
-      ensureDependencies: () => {
-        const config = this._getNetworkConfig();
+      ensureDependencies: (config) => {
+        config = merge(this._getNetworkConfig(), config);
 
         const {
           CNSRegistry,
           MintingController,
           URIPrefixController,
-          Resolver
+          Resolver,
         } = config.contracts || {};
         const deps = {
           CNSRegistry,
           MintingController,
           URIPrefixController,
-          Resolver
+          Resolver,
         };
 
         for (const [key, value] of Object.entries(deps)) {
@@ -224,13 +226,13 @@ class Deployer {
         };
 
         return deps;
-      }
-    }
+      },
+    };
   }
 
-  _configureCNSTask() {
+  _configureCNSTask () {
     return {
-      tags: ['uns'],
+      tags: ['uns', 'full'],
       run: async (dependencies) => {
         const { cnsDeployer } = this.accounts;
         const {
@@ -253,8 +255,8 @@ class Deployer {
           await uriPrefixController.addWhitelisted(MintingManager.address);
         }
       },
-      ensureDependencies: () => {
-        const config = this._getNetworkConfig();
+      ensureDependencies: (config) => {
+        config = merge(this._getNetworkConfig(), config);
 
         const {
           MintingController,
@@ -274,11 +276,11 @@ class Deployer {
         };
 
         return deps;
-      }
-    }
+      },
+    };
   }
 
-  _upgradeUNSTask() {
+  _upgradeUNSTask () {
     return {
       tags: ['upgrade'],
       run: async (dependencies) => {
@@ -299,18 +301,15 @@ class Deployer {
         const mintingManagerImpl = await proxyAdmin.callStatic.getProxyImplementation(mintingManager.address);
         await this._saveContractConfig('MintingManager', mintingManager, mintingManagerImpl);
       },
-      ensureDependencies: () => {
-        const config = this._getNetworkConfig();
+      ensureDependencies: (config) => {
+        config = merge(this._getNetworkConfig(), config);
 
-        const {
-          UNSRegistry,
-          MintingManager,
-        } = config.contracts || {};
-        const deps = {
-          UNSRegistry,
-          MintingManager,
-        };
+        const { UNSRegistry, MintingManager, ProxyAdmin } = config.contracts || {};
+        if (!ProxyAdmin || !ProxyAdmin.address) {
+          throw new Error('Current network configuration does not support upgrading');
+        }
 
+        const deps = { UNSRegistry, MintingManager };
         for (const [key, value] of Object.entries(deps)) {
           if (!value || !value.address) {
             throw new Error(`${key} contract not found for network ${network.config.chainId}`);
@@ -318,30 +317,29 @@ class Deployer {
         };
 
         return deps;
-      }
-    }
+      },
+    };
   }
 
-  _getNetworkConfig() {
+  _getNetworkConfig () {
     const configPath = path.resolve(this.options.basePath, `${this.network.chainId}.json`);
     const file = fs.existsSync(configPath) ? fs.readFileSync(configPath) : '{}';
     return JSON.parse(file.length ? file : '{}');
   }
 
-  async _saveContractConfig(name, contract, implAddress) {
+  async _saveContractConfig (name, contract, implAddress) {
     const config = this._getNetworkConfig();
 
-    const _config = {
-      ...config,
+    const _config = merge(config, {
       contracts: {
-        ...config.contracts || {},
         [name]: {
           address: contract.address,
           implementation: implAddress,
           transaction: contract.deployTransaction && await contract.deployTransaction.wait(),
-        }
-      }
-    }
+        },
+      },
+    });
+
     const configPath = path.resolve(this.options.basePath, `${this.network.chainId}.json`);
     fs.writeFileSync(configPath, JSON.stringify(_config, null, 2));
   }

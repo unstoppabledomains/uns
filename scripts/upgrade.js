@@ -1,25 +1,22 @@
-const { ethers, upgrades, network } = require('hardhat');
+const { network } = require('hardhat');
+
+const { mergeNetworkConfig } = require('../src/config');
+const Deployer = require('../src/deployer');
 const NetworkConfig = require('./../uns-config.json');
 
 async function main () {
+  console.log('Network', network.name);
+
   const unsConfig = NetworkConfig.networks[network.config.chainId];
   if (!unsConfig) {
     throw new Error(`UNS config not found for network ${network.config.chainId}`);
   }
 
-  const {
-    UnsRegistry,
-    MintingManager: UnsMintingManager,
-  } = unsConfig.contracts;
+  const deployer = await Deployer.create();
+  const deployConfig = await deployer.execute(['upgrade'], unsConfig);
+  console.log('Config:', JSON.stringify(deployConfig));
 
-  const Registry = await ethers.getContractFactory('contracts/Registry.sol:Registry');
-  const MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
-
-  const registry = await upgrades.upgradeProxy(UnsRegistry.address, Registry);
-  console.log('Registry PROXY upgraded:', registry.address);
-
-  const mintingManager = await upgrades.upgradeProxy(UnsMintingManager.address, MintingManager);
-  console.log('MintingManager PROXY upgraded:', mintingManager.address);
+  mergeNetworkConfig(deployConfig);
 }
 
 main()

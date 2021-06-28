@@ -65,7 +65,7 @@ class Sandbox {
   async rebuild () {
     await this.start();
     const deployer = await Deployer.create();
-    await deployer.execute(['uns']);
+    await deployer.execute(['full']);
     await this.stop();
 
     const { db_path: dbPath, snapshotPath } = this.options.network;

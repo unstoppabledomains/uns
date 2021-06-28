@@ -38,7 +38,7 @@ describe.skip('E2E', () => {
     minter = unsDeployer;
 
     const deployer = await Deployer.create();
-    const unsConfig = await deployer.execute(['uns']);
+    const unsConfig = await deployer.execute(['full']);
     const { contracts } = unsConfig.networks[network.config.chainId];
 
     unsRegistry = await UNSRegistry.attach(contracts.UNSRegistry.address);
