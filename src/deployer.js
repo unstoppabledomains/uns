@@ -19,6 +19,8 @@ async function _getArtifacts () {
       await ethers.getContractFactory('dot-crypto/contracts/controllers/MintingController.sol:MintingController'),
     URIPrefixController:
       await ethers.getContractFactory('dot-crypto/contracts/controllers/URIPrefixController.sol:URIPrefixController'),
+    WhitelistedMinter:
+      await ethers.getContractFactory('dot-crypto/contracts/util/WhitelistedMinter.sol:WhitelistedMinter'),
     Resolver: await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver'),
     UNSRegistry: await ethers.getContractFactory('contracts/UNSRegistry.sol:UNSRegistry'),
     MintingManager: await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager'),

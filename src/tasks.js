@@ -10,6 +10,7 @@ const deployCNSTask = {
       SignatureController,
       MintingController,
       URIPrefixController,
+      WhitelistedMinter,
       Resolver,
     } = ctx.artifacts;
 
@@ -32,9 +33,32 @@ const deployCNSTask = {
     await cnsRegistry.connect(cnsDeployer).addController(mintingController.address);
     await cnsRegistry.connect(cnsDeployer).addController(uriPrefixController.address);
 
+    const whitelistedMinter = await WhitelistedMinter
+      .connect(cnsDeployer)
+      .deploy(mintingController.address);
+    await ctx.saveContractConfig('WhitelistedMinter', whitelistedMinter);
+
+    await mintingController.connect(cnsDeployer).addMinter(whitelistedMinter.address);
+    if (ctx.minters.length) {
+      await whitelistedMinter.connect(cnsDeployer).bulkAddWhitelisted(ctx.minters);
+    }
+
     // CNS Resolver
-    const resolver = await Resolver.connect(cnsDeployer).deploy(cnsRegistry.address, mintingController.address);
+    const resolver = await Resolver
+      .connect(cnsDeployer)
+      .deploy(cnsRegistry.address, mintingController.address);
     await ctx.saveContractConfig('Resolver', resolver);
+
+    // Stub unsupported contracts
+    await ctx.saveContractConfig('DomainZoneController', {
+      address: '0x0000000000000000000000000000000000000000',
+    });
+    await ctx.saveContractConfig('TwitterValidationOperator', {
+      address: '0x0000000000000000000000000000000000000000',
+    });
+    await ctx.saveContractConfig('FreeMinter', {
+      address: '0x0000000000000000000000000000000000000000',
+    });
   },
   ensureDependencies: () => {
 
