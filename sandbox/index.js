@@ -48,7 +48,7 @@ class Sandbox {
     }
 
     const service = new GanacheService(networkOptions);
-    return new Sandbox(service, options);
+    return new Sandbox(service, { ...options, network: networkOptions });
   }
 
   async start () {
