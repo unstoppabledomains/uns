@@ -18,7 +18,6 @@ const defaultGanacheOptions = {
   chainId: 1337,
   dbPath: './.sandbox',
   snapshotPath: './sandbox/db.tgz',
-  logger: console,
 };
 
 class Sandbox {
@@ -30,7 +29,7 @@ class Sandbox {
   }
 
   static async create (options) {
-    options = options || { clean: true, extract: true };
+    options = { clean: true, extract: true, ...options };
     const networkOptions = {
       ...defaultGanacheOptions,
       ...options.network,
