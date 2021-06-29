@@ -1,7 +1,6 @@
 const fs = require('fs');
 const tar = require('tar');
 
-const Deployer = require('../src/deployer');
 const GanacheService = require('./ganache-service');
 
 const defaultGanacheOptions = {
@@ -73,24 +72,6 @@ class Sandbox {
     this.snapshotId = await this._snapshot();
   }
 
-  async rebuild () {
-    await this.start();
-    const deployer = await Deployer.create();
-    const deployConfig = await deployer.execute(['full']);
-    console.log('Config:', JSON.stringify(deployConfig));
-    await this.stop();
-
-    const { db_path: dbPath, snapshotPath } = this.options.network;
-    await tar.create(
-      {
-        gzip: true,
-        file: snapshotPath,
-        filter: p => p.indexOf('_tmp') === -1,
-      },
-      [dbPath],
-    );
-  }
-
   async _snapshot () {
     return await new Promise((resolve, reject) => {
       this.provider.sendAsync({
@@ -119,16 +100,3 @@ class Sandbox {
 }
 
 module.exports = Sandbox;
-
-// NOTE: Node module execution is used for rebuilding sandbox package
-if (require.main === module) {
-  (async () => {
-    try {
-      const sandbox = await Sandbox.create({ clean: true, extract: false });
-      await sandbox.rebuild();
-    } catch (error) {
-      console.error(error);
-    }
-    process.exit();
-  })();
-}
