@@ -107,6 +107,7 @@
                 },
                 "ProxyAdmin": {
                     "address": "0xaf9815005A208d1460b6fC60B4f90B9f2185E88c",
+                    "legacyAddresses": [],
                     "deploymentBlock": "0x85e627"
                 },
                 "SignatureController": {
