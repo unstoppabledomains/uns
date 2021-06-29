@@ -1,29 +1,40 @@
-const { network } = require('hardhat');
-const { GanacheService } = require('@nomiclabs/hardhat-ganache/dist/src/ganache-service');
 const fs = require('fs');
 const tar = require('tar');
 
 const Deployer = require('../src/deployer');
+const GanacheService = require('./ganache-service');
+
+const defaultGanacheOptions = {
+  url: 'http://localhost:7545',
+  gasPrice: 20000000000,
+  gasLimit: 6721975,
+  defaultBalanceEther: 100,
+  totalAccounts: 10,
+  hardfork: 'petersburg',
+  allowUnlimitedContractSize: false,
+  locked: false,
+  hdPath: 'm/44\'/60\'/0\'/0/',
+  keepAliveTimeout: 5000,
+  mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
+  chainId: 1337,
+  dbPath: './.sandbox',
+  snapshotPath: './sandbox/db.tgz',
+  logger: console,
+};
 
 class Sandbox {
   constructor (service, options) {
-    if (network.name !== 'sandbox') {
-      throw new Error(`Network ${network.name} is not supported`);
-    }
-
     this.ganacheService = service;
     this.options = options || {};
-    this.provider = network.provider;
+    this.provider = service.provider;
     this.snapshotId = undefined;
   }
 
   static async create (options) {
     options = options || { clean: true, extract: true };
-    const defaultOptions = GanacheService.getDefaultOptions();
-    const { accounts, ...config } = network.config;
     const networkOptions = {
-      ...defaultOptions,
-      ...config,
+      ...defaultGanacheOptions,
+      ...options.network,
     };
 
     const { dbPath, snapshotPath } = networkOptions;
@@ -36,8 +47,8 @@ class Sandbox {
       await tar.extract({ file: snapshotPath });
     }
 
-    const service = await GanacheService.create(networkOptions);
-    return new Sandbox(service, { ...options, network: networkOptions });
+    const service = new GanacheService(networkOptions);
+    return new Sandbox(service, options);
   }
 
   async start () {
@@ -81,16 +92,28 @@ class Sandbox {
   }
 
   async _snapshot () {
-    return await this.provider.request({
-      method: 'evm_snapshot',
-      params: [],
+    return await new Promise((resolve, reject) => {
+      this.provider.sendAsync({
+        method: 'evm_snapshot',
+        params: [],
+      }, (err, res) => {
+        if (err) reject(err);
+
+        const { result } = res;
+        resolve(result);
+      });
     });
   }
 
   async _revert (snapshotId) {
-    return await this.provider.request({
-      method: 'evm_revert',
-      params: [snapshotId],
+    await new Promise((resolve, reject) => {
+      this.provider.send({
+        method: 'evm_revert',
+        params: [snapshotId],
+      }, (err) => {
+        if (err) reject(err);
+        resolve();
+      });
     });
   }
 }
