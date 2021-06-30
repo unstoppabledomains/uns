@@ -3,6 +3,8 @@ const { TASK_COMPILE } = require('hardhat/builtin-tasks/task-names');
 const path = require('path');
 const fs = require('fs');
 
+const Sandbox = require('./sandbox');
+
 /// ENVVAR
 // - ENABLE_GAS_REPORT
 // - ENABLE_CONTRACT_SIZER
@@ -86,14 +88,7 @@ module.exports = {
       url: 'http://localhost:8545',
       chainId: 31337,
     },
-    sandbox: {
-      url: 'http://localhost:7545',
-      mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
-      chainId: 1337,
-      dbPath: './.sandbox',
-      snapshotPath: './sandbox/db.tgz',
-      logger: console,
-    },
+    sandbox: Sandbox.defaultOptions(),
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.RINKEBY_INFURA_KEY}`,
       chainId: 4,

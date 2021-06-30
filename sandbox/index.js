@@ -8,39 +8,30 @@ const createKeccakHash = require('keccak');
 
 const GanacheService = require('./ganache-service');
 
-const defaultGanacheOptions = {
-  url: 'http://localhost:7545',
-  gasPrice: 20000000000,
-  gasLimit: 6721975,
-  defaultBalanceEther: 1000,
-  totalAccounts: 10,
-  hardfork: 'petersburg',
-  allowUnlimitedContractSize: false,
-  locked: false,
-  hdPath: 'm/44\'/60\'/0\'/0/',
-  keepAliveTimeout: 5000,
-  mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
-  chainId: 1337,
-  dbPath: './.sandbox',
-  snapshotPath: path.join(__dirname, 'db.tgz'),
-};
-
 class Sandbox {
-  constructor (service, options) {
-    this.ganacheService = service;
-    this.options = options || {};
-    this.provider = service.provider;
-    this.snapshotId = undefined;
-
-    const { owner, ...accounts } = this._getAccounts(this.options.network);
-    this.owner = owner;
-    this.accounts = accounts;
+  static defaultOptions () {
+    return {
+      url: 'http://localhost:7545',
+      gasPrice: 20000000000,
+      gasLimit: 6721975,
+      defaultBalanceEther: 1000,
+      totalAccounts: 10,
+      hardfork: 'petersburg',
+      allowUnlimitedContractSize: false,
+      locked: false,
+      hdPath: 'm/44\'/60\'/0\'/0/',
+      keepAliveTimeout: 5000,
+      mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
+      chainId: 1337,
+      dbPath: './.sandbox',
+      snapshotPath: path.join(__dirname, 'db.tgz'),
+    };
   }
 
   static async create (options) {
     options = { clean: true, extract: true, ...options };
     const networkOptions = {
-      ...defaultGanacheOptions,
+      ...Sandbox.defaultOptions(),
       ...options.network,
     };
 
@@ -62,6 +53,17 @@ class Sandbox {
     const sandbox = await Sandbox.create(options);
     await sandbox.start();
     return sandbox;
+  }
+
+  constructor (service, options) {
+    this.ganacheService = service;
+    this.options = options || {};
+    this.provider = service.provider;
+    this.snapshotId = undefined;
+
+    const { owner, ...accounts } = this._getAccounts(this.options.network);
+    this.owner = owner;
+    this.accounts = accounts;
   }
 
   async start () {
