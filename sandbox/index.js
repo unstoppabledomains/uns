@@ -76,6 +76,9 @@ class Sandbox {
   }
 
   async reset () {
+    if(!this.snapshotId) {
+      throw new Error('Snapshot not found. Most probably Sandbox has not been started.');
+    }
     await this._revert(this.snapshotId);
     this.snapshotId = await this._snapshot();
   }
