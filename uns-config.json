@@ -20,7 +20,7 @@
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
                 },
-                 "ProxyAdmin": {
+                "ProxyAdmin": {
                     "address": "0x0000000000000000000000000000000000000000",
                     "implementation": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],

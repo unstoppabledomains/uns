@@ -2,6 +2,9 @@ const { ethers, network, config: hhConfig } = require('hardhat');
 const path = require('path');
 const fs = require('fs');
 const merge = require('lodash.merge');
+const debug = require('debug');
+
+const log = debug('UNS:deployer');
 
 const { deployCNSTask, deployUNSTask, configureCNSTask, upgradeUNSTask } = require('./tasks');
 
@@ -31,6 +34,19 @@ async function _getArtifacts () {
 }
 
 class Deployer {
+  static async create (options) {
+    const [unsDeployer, cnsDeployer] = await ethers.getSigners();
+    const _unsConfig = hhConfig.uns;
+
+    return new Deployer(
+      options,
+      await _getArtifacts(),
+      { unsDeployer, cnsDeployer },
+      _unsConfig.minters[network.name],
+      _unsConfig.linkToken[network.name],
+    );
+  }
+
   constructor (options, artifacts, accounts, minters, linkToken) {
     this.options = {
       ...defaultOptions,
@@ -53,30 +69,31 @@ class Deployer {
     if (!fs.existsSync(basePath)) {
       fs.mkdirSync(basePath);
     }
-  }
 
-  static async create (options) {
-    const [unsDeployer, cnsDeployer] = await ethers.getSigners();
-    const _unsConfig = hhConfig.uns;
-
-    return new Deployer(
-      options,
-      await _getArtifacts(),
-      { unsDeployer, cnsDeployer },
-      _unsConfig.minters[network.name],
-      _unsConfig.linkToken[network.name],
-    );
+    log('Initialized deployer', {
+      options: this.options,
+      artifacts: Object.keys(artifacts),
+      accounts: Object.values(accounts).map(a => a.address),
+      minters,
+      linkToken,
+    });
   }
 
   async execute (tags, config) {
     tags = tags || [];
+
+    log('Execution started');
     for (const task of this.tasks) {
       if (!tags.some(t => task.tags.includes(t.toLowerCase()))) continue;
 
+      log('Executing task', { tags: task.tags });
       const dependencies = task.ensureDependencies(this, config);
       await task.run(this, dependencies);
     }
-    return this.getNetworkConfig();
+
+    const _config = this.getNetworkConfig();
+    log('Execution completed', JSON.stringify(_config));
+    return _config;
   }
 
   getNetworkConfig () {

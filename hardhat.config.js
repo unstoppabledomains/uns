@@ -88,7 +88,7 @@ module.exports = {
       url: 'http://localhost:8545',
       chainId: 31337,
     },
-    sandbox: Sandbox.defaultOptions(),
+    sandbox: Sandbox.defaultNetworkOptions(),
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.RINKEBY_INFURA_KEY}`,
       chainId: 4,

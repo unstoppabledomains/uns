@@ -14,8 +14,6 @@ async function main () {
 
   const deployer = await Deployer.create();
   const deployConfig = await deployer.execute(['upgrade'], unsConfig);
-  console.log('Config:', JSON.stringify(deployConfig));
-
   mergeNetworkConfig(deployConfig);
 }
 

@@ -28,8 +28,6 @@ async function main () {
 
   const deployer = await Deployer.create({ proxy: argv.proxy });
   const deployConfig = await deployer.execute(['uns'], config);
-  console.log('Config:', JSON.stringify(deployConfig));
-
   mergeNetworkConfig(deployConfig);
 
   console.log('Deployed!');

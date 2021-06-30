@@ -7,11 +7,10 @@ const Deployer = require('../src/deployer');
 if (require.main === module) {
   (async () => {
     try {
-      const sandbox = await Sandbox.create({ clean: true, extract: false });
-      await sandbox.start();
+      const sandbox = await Sandbox.create({ extract: false });
+      await sandbox.start({ noSnapshot: true });
       const deployer = await Deployer.create();
-      const deployConfig = await deployer.execute(['full']);
-      console.log('Config:', JSON.stringify(deployConfig));
+      await deployer.execute(['full']);
       await sandbox.stop();
 
       const { db_path: dbPath, snapshotPath } = sandbox.options.network;

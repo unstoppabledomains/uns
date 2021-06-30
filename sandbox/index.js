@@ -5,11 +5,14 @@ const HDKey = require('hdkey');
 const { mnemonicToSeed } = require('bip39');
 const secp256k1 = require('secp256k1');
 const createKeccakHash = require('keccak');
+const debug = require('debug');
 
 const GanacheService = require('./ganache-service');
 
+const log = debug('UNS:sandbox');
+
 class Sandbox {
-  static defaultOptions () {
+  static defaultNetworkOptions () {
     return {
       url: 'http://localhost:7545',
       gasPrice: 20000000000,
@@ -29,20 +32,31 @@ class Sandbox {
   }
 
   static async create (options) {
-    options = { clean: true, extract: true, ...options };
+    options = {
+      clean: true,
+      extract: true,
+      verbose: false,
+      ...options,
+    };
     const networkOptions = {
-      ...Sandbox.defaultOptions(),
+      ...Sandbox.defaultNetworkOptions(),
       ...options.network,
     };
+
+    if (options.verbose) {
+      debug.enable('UNS:sandbox*');
+    }
 
     const { dbPath, snapshotPath } = networkOptions;
     if (options.clean) {
       fs.rmdirSync(dbPath, { recursive: true });
       fs.mkdirSync(dbPath, { recursive: true });
+      log(`Cleaned sandbox database. Path: ${dbPath}`);
     }
 
     if (options.extract) {
       await tar.extract({ file: snapshotPath });
+      log(`Prepared sandbox database. Source: ${snapshotPath}`);
     }
 
     const service = new GanacheService(networkOptions);
@@ -61,19 +75,33 @@ class Sandbox {
     this.provider = service.provider;
     this.snapshotId = undefined;
 
-    const { owner, ...accounts } = this._getAccounts(this.options.network);
+    const [ owner, ...accounts ] = this._getAccounts(this.options.network);
     this.owner = owner;
     this.accounts = accounts;
+
+    log('Initialized sandbox', {
+      options: this.options,
+      owner: this.owner.address,
+      accounts: Object.values(this.accounts).map(a => a.address),
+    });
   }
 
-  async start () {
+  async start (options) {
+    options = options || { noSnapshot: false };
+
     await this.ganacheService.startServer();
+    log('Started sandbox');
+
+    if (options.noSnapshot) return;
+
     this.snapshotId = await this._snapshot();
+    log('Created snapshot', this.snapshotId);
   }
 
   async stop () {
     try {
       await this.ganacheService.stopServer();
+      log('Stopped sandbox');
     } catch (e) {
       if (e.message.includes('Server is not running')) {
         GanacheService.error = undefined;
@@ -87,8 +115,12 @@ class Sandbox {
     if (!this.snapshotId) {
       throw new Error('Snapshot not found. Most probably Sandbox has not been started.');
     }
+
     await this._revert(this.snapshotId);
+    log('Reverted snapshot', this.snapshotId);
+
     this.snapshotId = await this._snapshot();
+    log('Created snapshot', this.snapshotId);
   }
 
   async _snapshot () {

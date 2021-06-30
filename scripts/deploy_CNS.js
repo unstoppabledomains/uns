@@ -8,8 +8,6 @@ async function main () {
 
   const deployer = await Deployer.create();
   const deployConfig = await deployer.execute(['cns']);
-  console.log('Config:', JSON.stringify(deployConfig));
-
   mergeNetworkConfig(deployConfig);
 
   console.log('Deployed!');
