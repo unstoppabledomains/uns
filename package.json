@@ -50,9 +50,11 @@
     "eslint-plugin-promise": "^5.1.0",
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.1.4",
+    "ganache-core": "^2.13.2",
     "hardhat": "^2.2.1",
     "hardhat-contract-sizer": "^2.0.3",
     "hardhat-gas-reporter": "^1.0.4",
+    "hdkey": "^2.0.1",
     "lodash.merge": "^4.6.2",
     "node-fetch": "^2.6.1",
     "prettier": "^2.3.0",
@@ -61,9 +63,5 @@
     "solidity-coverage": "^0.7.16",
     "tar": "^6.1.0",
     "yargs": "^16.2.0"
-  },
-  "dependencies": {
-    "ganache-core": "2.13.2",
-    "web3": "1.2.11"
   }
 }

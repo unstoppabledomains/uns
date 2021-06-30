@@ -82,13 +82,21 @@ class Deployer {
   getNetworkConfig () {
     const config = this.getDeployConfig();
 
+    const emptyConfig = {
+      address: '0x0000000000000000000000000000000000000000',
+      legacyAddresses: [],
+      deploymentBlock: '0x0',
+    };
+
     const contracts = {};
     for (const [key, value] of Object.entries(config.contracts || {})) {
       contracts[key] = {
+        ...emptyConfig,
         address: value.address,
         implementation: value.implementation,
-        deploymentBlock: value.transaction &&
-          ethers.BigNumber.from(value.transaction.blockNumber).toHexString(),
+        deploymentBlock: value.transaction
+          ? ethers.BigNumber.from(value.transaction.blockNumber).toHexString()
+          : '0x0',
       };
     };
 

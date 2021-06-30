@@ -1,7 +1,6 @@
 const { ethers, network } = require('hardhat');
 const { expect } = require('chai');
 
-const { snapshot, revert } = require('../src/snapshot');
 const Deployer = require('../src/deployer');
 
 const { utils, BigNumber } = ethers;
@@ -22,7 +21,7 @@ describe.skip('E2E', () => {
 
   let UNSRegistry, MintingManager, CNSRegistry, Resolver, ProxyReader;
   let unsRegistry, mintingManager, cnsRegistry, resolver, proxyReader, minter;
-  let signers, coinbase, snapshotId;
+  let signers, coinbase;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -48,15 +47,6 @@ describe.skip('E2E', () => {
     proxyReader = await ProxyReader.attach(contracts.ProxyReader.address);
   });
 
-  beforeEach(async () => {
-    snapshotId = await snapshot();
-    console.log('snapshotId', snapshotId);
-  });
-
-  afterEach(async () => {
-    await revert(snapshotId);
-  });
-
   const sign = async (data, address, signer) => {
     return signer.signMessage(
       utils.arrayify(
@@ -78,30 +68,6 @@ describe.skip('E2E', () => {
       ),
     );
   };
-
-  describe('snapsots', () => {
-    it('should mint a token', async () => {
-      const _domainName = `${domainPrefix}_test_e2e_wallet_0`;
-
-      const tx = await mintingManager.connect(minter)
-        .mintSLD(coinbase.address, walletRoot, _domainName);
-      await tx.wait();
-
-      const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
-      assert.equal(await unsRegistry.ownerOf(_walletTokenId), coinbase.address);
-    });
-
-    it('should mint same token as prev test', async () => {
-      const _domainName = `${domainPrefix}_test_e2e_wallet_0`;
-
-      const tx = await mintingManager.connect(minter)
-        .mintSLD(coinbase.address, walletRoot, _domainName);
-      await tx.wait();
-
-      const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
-      assert.equal(await unsRegistry.ownerOf(_walletTokenId), coinbase.address);
-    });
-  });
 
   it('should mint .wallet and resolve records', async () => {
     const _domainName = `${domainPrefix}_test_e2e_wallet_131`;

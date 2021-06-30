@@ -333,16 +333,16 @@ The emulator uses mnemonic for preparing list of accounts. It always has strict 
 ```
 Available Accounts
 ==================
-(0) 0xfe84Ab89b7Fc902Ff3CfD756403a8f085B1639Aa (100 ETH)    // UNS deployer and Minter
-(1) 0x9DC64b2558b458A15C7f01c192D874Ef460f0A29 (100 ETH)    // CNS deployer
-(2) 0x94F57ed7e9af03A10e8EB23CE1B3c7914a182b0f (100 ETH)
-(3) 0x936188f2C3C8E8c95e425b6fe41c2ac9E701585e (100 ETH)
-(4) 0x95f29431AEb52C0D5DbEEEC36010b8e2CA69CB3D (100 ETH)
-(5) 0x19356cc2300833E690088a5a09A2044A3CC2A1E2 (100 ETH)
-(6) 0x8861CdFa38838531275cE12F9e795C3b9fF29cBE (100 ETH)
-(7) 0x0712e8e819712C3bfdb098CE51C87a4Ac0296fd8 (100 ETH)
-(8) 0xAA33d7188Eb4b4A51C37199eaaD2f73cf2bF0204 (100 ETH)
-(9) 0xead34b583404E3Cb0C9b97C2d1C486BE67Be9F30 (100 ETH)
+(0) 0xfe84Ab89b7Fc902Ff3CfD756403a8f085B1639Aa (1000 ETH)    // UNS deployer & Minter
+(1) 0x9DC64b2558b458A15C7f01c192D874Ef460f0A29 (1000 ETH)    // CNS deployer & WhitelistedAdmin
+(2) 0x94F57ed7e9af03A10e8EB23CE1B3c7914a182b0f (1000 ETH)
+(3) 0x936188f2C3C8E8c95e425b6fe41c2ac9E701585e (1000 ETH)
+(4) 0x95f29431AEb52C0D5DbEEEC36010b8e2CA69CB3D (1000 ETH)
+(5) 0x19356cc2300833E690088a5a09A2044A3CC2A1E2 (1000 ETH)
+(6) 0x8861CdFa38838531275cE12F9e795C3b9fF29cBE (1000 ETH)
+(7) 0x0712e8e819712C3bfdb098CE51C87a4Ac0296fd8 (1000 ETH)
+(8) 0xAA33d7188Eb4b4A51C37199eaaD2f73cf2bF0204 (1000 ETH)
+(9) 0xead34b583404E3Cb0C9b97C2d1C486BE67Be9F30 (1000 ETH)    // Funding account
 
 Private Keys
 ==================
@@ -365,55 +365,7 @@ Base HD Path:  m/44'/60'/0'/0/{account_index}
 
 ### Sandbox UNS config
 
-```
-{
-  "version": "0.1.0",
-  "networks": {
-    "1337": {
-      "contracts": {
-        "CNSRegistry": {
-          "address": "0xA310F8e781F8aE80690649be920991AEc9a6595D",
-          "deploymentBlock": "0x01"
-        },
-        "SignatureController": {
-          "address": "0xBd8b374200A7D99F15f4e90621dA1BEAEcb705a0",
-          "deploymentBlock": "0x02"
-        },
-        "MintingController": {
-          "address": "0x4513073d9B3af7e62be59B57205a2368F76dE9C7",
-          "deploymentBlock": "0x03"
-        },
-        "URIPrefixController": {
-          "address": "0xeE1f42382091e260f5B9c152E17639d729Ab829F",
-          "deploymentBlock": "0x04"
-        },
-        "Resolver": {
-          "address": "0x76CBBE3B425A7D258B30457785d54de8c8322bfa",
-          "deploymentBlock": "0x08"
-        },
-        "ProxyAdmin": {
-          "address": "0x7bB6Cd9be29fab783c0b494A06FED8b2E2596B7a"
-        },
-        "UNSRegistry": {
-          "address": "0x4a3C194eB88966178bfDD81744ddDafED611B830",
-          "implementation": "0xC58206842E4030a3B2CaBC78780Ae7635173C533",
-          "deploymentBlock": "0x0b"
-        },
-        "MintingManager": {
-          "address": "0x4Be0126fB2885a6D2909166D5801E606470C9aB0",
-          "implementation": "0x4872CC1be60A9DB9c880A0A437Da7a6AF134F08f",
-          "deploymentBlock": "0x0d"
-        },
-        "ProxyReader": {
-          "address": "0xAc52F68f31577E44aE0C7E95A42dC9eb574B9383",
-          "deploymentBlock": "0x11"
-        }
-      }
-    }
-  }
-}
-
-```
+[>> config file](./uns-config.json)
 
 ### Example of usage
 
@@ -421,6 +373,8 @@ Base HD Path:  m/44'/60'/0'/0/{account_index}
 const Sandbox = require('./sandbox');
 
 describe('Test', async () => {
+  let sandbox = undefined;
+
   before(async () => {
     sandbox = await Sandbox.create();
     await sandbox.start();
