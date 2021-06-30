@@ -1,6 +1,7 @@
-# UNS
+# UNS (Unstoppable Naming Service)
 
-UNS Registry smart contracts.
+UNS Registry smart contracts.  
+Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
 
 ## Specifications
 
