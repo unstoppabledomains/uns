@@ -58,6 +58,12 @@ class Sandbox {
     return new Sandbox(service, { ...options, network: networkOptions });
   }
 
+  static async start (options) {
+    const sandbox = await Sandbox.create(options);
+    await sandbox.start();
+    return sandbox;
+  }
+
   async start () {
     await this.ganacheService.startServer();
     this.snapshotId = await this._snapshot();
@@ -76,7 +82,7 @@ class Sandbox {
   }
 
   async reset () {
-    if(!this.snapshotId) {
+    if (!this.snapshotId) {
       throw new Error('Snapshot not found. Most probably Sandbox has not been started.');
     }
     await this._revert(this.snapshotId);

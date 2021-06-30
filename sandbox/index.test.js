@@ -17,8 +17,7 @@ describe('Sandbox', async () => {
   let signers, coinbase, sandbox;
 
   before(async () => {
-    sandbox = await Sandbox.create();
-    await sandbox.start();
+    sandbox = await Sandbox.start();
 
     signers = await ethers.getSigners();
     [coinbase] = signers;
