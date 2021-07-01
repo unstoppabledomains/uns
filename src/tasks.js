@@ -33,21 +33,23 @@ const deployCNSTask = {
     await cnsRegistry.connect(cnsDeployer).addController(mintingController.address);
     await cnsRegistry.connect(cnsDeployer).addController(uriPrefixController.address);
 
+    // CNS Resolver
+    const resolver = await Resolver
+      .connect(cnsDeployer)
+      .deploy(cnsRegistry.address, mintingController.address);
+    await ctx.saveContractConfig('Resolver', resolver);
+
+    // CNS WhitelistedMinter
     const whitelistedMinter = await WhitelistedMinter
       .connect(cnsDeployer)
       .deploy(mintingController.address);
     await ctx.saveContractConfig('WhitelistedMinter', whitelistedMinter);
 
     await mintingController.connect(cnsDeployer).addMinter(whitelistedMinter.address);
+    await whitelistedMinter.connect(cnsDeployer).setDefaultResolver(resolver.address);
     if (ctx.minters.length) {
       await whitelistedMinter.connect(cnsDeployer).bulkAddWhitelisted(ctx.minters);
     }
-
-    // CNS Resolver
-    const resolver = await Resolver
-      .connect(cnsDeployer)
-      .deploy(cnsRegistry.address, mintingController.address);
-    await ctx.saveContractConfig('Resolver', resolver);
 
     // Stub unsupported contracts
     await ctx.saveContractConfig('DomainZoneController', {
