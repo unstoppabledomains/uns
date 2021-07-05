@@ -6,7 +6,7 @@ const { ZERO_ADDRESS } = require('./helpers/constants');
 
 const { utils, BigNumber } = ethers;
 
-describe('Registry', () => {
+describe('UNSRegistry', () => {
   let UNSRegistry, ERC721ReceiverMock;
   let unsRegistry, root;
   let signers, coinbase, owner, receiver, accounts;
@@ -107,6 +107,11 @@ describe('Registry', () => {
       it('should not support random interface', async () => {
         assert.equal(await unsRegistry.supportsInterface('0x01010101'), false);
       });
+    });
+
+    it('should have right metadata', async () => {
+      expect(await unsRegistry.name()).to.be.eql('Unstoppable Domains');
+      expect(await unsRegistry.symbol()).to.be.eql('UD');
     });
   });
 

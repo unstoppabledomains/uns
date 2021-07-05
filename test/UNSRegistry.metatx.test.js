@@ -6,7 +6,7 @@ const { EMPTY_SIGNATURE } = require('./helpers/constants');
 
 const { utils, BigNumber } = ethers;
 
-describe('Registry (metatx)', () => {
+describe('UNSRegistry (metatx)', () => {
   let UNSRegistry;
   let unsRegistry, root;
   let signers, coinbase, owner, nonOwner, receiver, accessControl, operator, spender;
