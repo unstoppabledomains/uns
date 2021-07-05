@@ -3,7 +3,7 @@ const { expect } = require('chai');
 
 const { utils, BigNumber } = ethers;
 
-describe('Registry (proxy)', () => {
+describe('UNSRegistry (proxy)', () => {
   let UNSRegistry, unsRegistry, root;
   let signers, coinbase, accounts;
 
