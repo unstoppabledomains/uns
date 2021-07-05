@@ -160,7 +160,7 @@ const deployUNSTask = {
 };
 
 const configureCNSTask = {
-  tags: ['uns', 'full'],
+  tags: ['uns_config_cns', 'full'],
   run: async (ctx, { MintingController, URIPrefixController, MintingManager }) => {
     const { cnsDeployer } = ctx.accounts;
 

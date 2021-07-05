@@ -6,7 +6,7 @@ const Deployer = require('../src/deployer');
 const UNSNetworkConfig = require('./../uns-config.json');
 
 async function main () {
-  console.log('Network', network.name);
+  console.log('Network:', network.name);
 
   const config = ['localhost', 'hardhat'].includes(network.name)
     ? UNSNetworkConfig.networks[network.config.chainId]
@@ -16,7 +16,7 @@ async function main () {
   }
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['uns', 'uns_config_cns'], config);
+  const deployConfig = await deployer.execute(['uns'], config);
   mergeNetworkConfig(deployConfig);
 
   console.log('Deployed!');

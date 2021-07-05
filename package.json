@@ -21,10 +21,8 @@
     "lint:sol:fix": "prettier --write \"contracts/**/*.sol\"",
     "deploy:localhost": "hardhat run --network localhost scripts/deploy.js",
     "deploy:rinkeby": "hardhat run --network rinkeby scripts/deploy.js",
-    "deploy:proxy:localhost": "env PROXY=true hardhat run --network localhost scripts/deploy.js",
-    "deploy:proxy:rinkeby": "env PROXY=true hardhat run --network rinkeby scripts/deploy.js",
-    "upgrade:proxy:localhost": "hardhat run --network localhost scripts/upgrade.js",
-    "upgrade:proxy:rinkeby": "hardhat run --network rinkeby scripts/upgrade.js",
+    "upgrade:localhost": "hardhat run --network localhost scripts/upgrade.js",
+    "upgrade:rinkeby": "hardhat run --network rinkeby scripts/upgrade.js",
     "start:node": "hardhat node",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
     "make:uml": "npx sol2uml ./contracts -b UNSRegistry,MintingManager,ProxyReader -o ./assets/uns.svg -i ./contracts/mocks"
