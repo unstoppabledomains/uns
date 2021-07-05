@@ -57,7 +57,7 @@ contract UNSRegistry is
     function initialize(address mintingManager) public initializer {
         _mintingManager = mintingManager;
 
-        __ERC721_init_unchained('uns', 'UD');
+        __ERC721_init_unchained('Unstoppable Domains', 'UD');
         __ERC2771RegistryContext_init_unchained();
         __RegistryForwarder_init_unchained();
     }
