@@ -65,12 +65,15 @@ class Deployer {
       upgradeUNSTask,
     ];
 
+    this.log = log;
+    debug.enable('UNS:deployer');
+
     const { basePath } = this.options;
     if (!fs.existsSync(basePath)) {
       fs.mkdirSync(basePath);
     }
 
-    log('Initialized deployer', {
+    this.log('Initialized deployer', {
       options: this.options,
       artifacts: Object.keys(artifacts),
       accounts: Object.values(accounts).map(a => a.address),
@@ -82,17 +85,17 @@ class Deployer {
   async execute (tags, config) {
     tags = tags || [];
 
-    log('Execution started');
+    this.log('Execution started');
     for (const task of this.tasks) {
       if (!tags.some(t => task.tags.includes(t.toLowerCase()))) continue;
 
-      log('Executing task', { tags: task.tags });
+      this.log('Executing task', { tags: task.tags });
       const dependencies = task.ensureDependencies(this, config);
       await task.run(this, dependencies);
     }
 
     const _config = this.getNetworkConfig();
-    log('Execution completed', JSON.stringify(_config));
+    this.log('Execution completed', JSON.stringify(_config));
     return _config;
   }
 

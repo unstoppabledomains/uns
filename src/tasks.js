@@ -48,7 +48,16 @@ const deployCNSTask = {
     await mintingController.connect(cnsDeployer).addMinter(whitelistedMinter.address);
     await whitelistedMinter.connect(cnsDeployer).setDefaultResolver(resolver.address);
     if (ctx.minters.length) {
-      await whitelistedMinter.connect(cnsDeployer).bulkAddWhitelisted(ctx.minters);
+      const chunkSize = 100;
+      for (let i = 0, j = ctx.minters.length; i < j; i += chunkSize) {
+        const array = ctx.minters.slice(i, i + chunkSize);
+
+        ctx.log('Whitelisting...', array);
+        const bulkAddWhitelistedTx = await whitelistedMinter.connect(cnsDeployer)
+          .bulkAddWhitelisted(ctx.minters);
+        await bulkAddWhitelistedTx.wait();
+        ctx.log(`Whitelisted ${array.length} minters`);
+      }
     }
 
     // Stub unsupported contracts
@@ -113,7 +122,15 @@ const deployUNSTask = {
     await mintingManagerInitTx.wait();
 
     if (ctx.minters.length) {
-      await mintingManager.connect(unsDeployer).addMinters(ctx.minters);
+      const chunkSize = 100;
+      for (let i = 0, j = ctx.minters.length; i < j; i += chunkSize) {
+        const array = ctx.minters.slice(i, i + chunkSize);
+
+        ctx.log('Adding minters...', array);
+        const addMintersTx = await mintingManager.connect(unsDeployer).addMinters(ctx.minters);
+        await addMintersTx.wait();
+        ctx.log(`Added ${array.length} minters`);
+      }
     }
 
     const proxyReader = await ctx.artifacts.ProxyReader

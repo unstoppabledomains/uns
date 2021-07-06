@@ -102,6 +102,7 @@ module.exports = {
       accounts: process.env.MAINNET_UNS_PRIVATE_KEY
         ? [process.env.MAINNET_UNS_PRIVATE_KEY]
         : undefined,
+      loggingEnabled: true,
     },
   },
   gasReporter: {
