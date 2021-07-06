@@ -54,7 +54,7 @@ const deployCNSTask = {
 
         ctx.log('Whitelisting...', array);
         const bulkAddWhitelistedTx = await whitelistedMinter.connect(cnsDeployer)
-          .bulkAddWhitelisted(ctx.minters);
+          .bulkAddWhitelisted(array);
         await bulkAddWhitelistedTx.wait();
         ctx.log(`Whitelisted ${array.length} minters`);
       }
@@ -127,7 +127,7 @@ const deployUNSTask = {
         const array = ctx.minters.slice(i, i + chunkSize);
 
         ctx.log('Adding minters...', array);
-        const addMintersTx = await mintingManager.connect(unsDeployer).addMinters(ctx.minters);
+        const addMintersTx = await mintingManager.connect(unsDeployer).addMinters(array);
         await addMintersTx.wait();
         ctx.log(`Added ${array.length} minters`);
       }
