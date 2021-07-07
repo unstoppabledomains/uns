@@ -76,7 +76,7 @@ class Deployer {
     this.log('Initialized deployer', {
       options: this.options,
       artifacts: Object.keys(artifacts),
-      accounts: Object.values(accounts).map(a => a.address),
+      accounts: Object.values(accounts).filter(a => !!a).map(a => a.address),
       minters,
       linkToken,
     });
