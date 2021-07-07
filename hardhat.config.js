@@ -87,6 +87,7 @@ module.exports = {
     localhost: {
       url: 'http://localhost:8545',
       chainId: 31337,
+      loggingEnabled: true,
     },
     sandbox: Sandbox.defaultNetworkOptions(),
     rinkeby: {
@@ -95,6 +96,15 @@ module.exports = {
       accounts: process.env.RINKEBY_UNS_PRIVATE_KEY
         ? [process.env.RINKEBY_UNS_PRIVATE_KEY, process.env.CNS_ADMIN_PRIVATE_KEY]
         : undefined,
+    },
+    mainnet: {
+      url: `https://mainnet.infura.io/v3/${process.env.MAINNET_INFURA_KEY}`,
+      chainId: 1,
+      gasPrice: 20000000000,
+      accounts: process.env.MAINNET_UNS_PRIVATE_KEY
+        ? [process.env.MAINNET_UNS_PRIVATE_KEY]
+        : undefined,
+      loggingEnabled: true,
     },
   },
   gasReporter: {
@@ -135,12 +145,14 @@ module.exports = {
         '0x7Ac8596cfbb0504DFDEC08d5088B67E7fbfae47f',
         '0xB83180632b72f988585AF02FC27229bF2Eabd139',
       ],
+      mainnet: [],
     },
     linkToken: {
       hardhat: '',
       localhost: '',
       sandbox: '',
       rinkeby: '0x01BE23585060835E02B77ef475b0Cc51aA1e0709',
+      mainnet: '0x514910771af9ca656af840dff83e8264ecf986ca',
     },
   },
 };

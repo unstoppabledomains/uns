@@ -212,8 +212,8 @@ Variables [`RINKEBY_INFURA_KEY`, `RINKEBY_UNS_PRIVATE_KEY`, `CNS_ADMIN_PRIVATE_K
 
 ## Upgradeable proxy
 
-- Deploy contracts `yarn deploy:proxy:__network__`
-- Upgrade Registry and MintingManager `yarn upgrade:proxy:__network__`
+- Deploy contracts `yarn deploy:__network__`
+- Upgrade Registry and MintingManager `yarn upgrade:__network__`
 
 `__network__` = [`localhost`, `rinkeby`]
 
