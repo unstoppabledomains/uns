@@ -35,8 +35,11 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
             super.supportsInterface(interfaceId);
     }
 
-    function getAllRegistries() public view returns (address[] memory addrs) {
-        return [address(_unsRegistry), address(_cnsRegistry)];
+    function getAllRegistries() public view returns (address[] memory addresses) {
+        addresses = new address[](2);
+        addresses[0] = address(_unsRegistry);
+        addresses[1] = address(_cnsRegistry);
+        return addresses;
     }
 
     function tokenURI(uint256 tokenId) external view override returns (string memory) {
