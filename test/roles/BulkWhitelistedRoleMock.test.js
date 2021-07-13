@@ -19,14 +19,15 @@ describe('BulkWhitelistedRoleMock', () => {
 
   it('should add and remove multiple accounts', async () => {
     await bulkWhitelistedRole.bulkAddWhitelisted(accounts);
-    assert.isAbove(accounts.length, 0);
+    expect(accounts.length).to.be.above(0);
+
     for (const account of accounts) {
-      assert.isTrue(await bulkWhitelistedRole.isWhitelisted(account));
+      expect(await bulkWhitelistedRole.isWhitelisted(account)).to.be.equal(true);
     }
 
     await bulkWhitelistedRole.bulkRemoveWhitelisted(accounts);
     for (const account of accounts) {
-      assert.isFalse(await bulkWhitelistedRole.isWhitelisted(account));
+      expect(await bulkWhitelistedRole.isWhitelisted(account)).to.be.equal(false);
     }
   });
 

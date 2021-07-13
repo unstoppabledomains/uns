@@ -17,7 +17,6 @@ const argv = require('yargs/yargs')()
   .argv;
 
 require('@openzeppelin/hardhat-upgrades');
-require('@nomiclabs/hardhat-truffle5');
 require('@nomiclabs/hardhat-waffle');
 require('@nomiclabs/hardhat-solhint');
 require('@nomiclabs/hardhat-etherscan');

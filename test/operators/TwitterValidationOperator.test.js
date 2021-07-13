@@ -3,7 +3,7 @@ const { expect } = require('chai');
 
 const { ZERO_ADDRESS } = require('../helpers/constants');
 
-const { BigNumber } = ethers;
+const { utils, BigNumber } = ethers;
 
 describe('TwitterValidationOperator', () => {
   const domainName = 'twitter-validation';
@@ -81,11 +81,11 @@ describe('TwitterValidationOperator', () => {
 
       await _operator.setValidation('rainberk', signature, walletTokenId, 0);
       const validationRecords = await unsRegistry.getMany(keys, walletTokenId);
-      assert.deepEqual(validationRecords, ['rainberk', signature]);
+      expect(validationRecords).to.be.eql(['rainberk', signature]);
 
       await _operator.setValidation('apple', signature, walletTokenId, 0);
 
-      assert.deepEqual(await unsRegistry.getMany(keys, walletTokenId), ['apple', signature]);
+      expect(await unsRegistry.getMany(keys, walletTokenId)).to.be.eql(['apple', signature]);
     });
 
     it('should set twitter username and signature for .crypto domain', async () => {
@@ -94,7 +94,7 @@ describe('TwitterValidationOperator', () => {
 
       await _operator.setValidation('google', signature, cryptoTokenId, 0);
 
-      assert.deepEqual(await cnsResolver.getMany(keys, cryptoTokenId), ['google', signature]);
+      expect(await cnsResolver.getMany(keys, cryptoTokenId)).to.be.eql(['google', signature]);
     });
 
     it('should unlock LINK tokens after validation', async () => {
@@ -104,9 +104,9 @@ describe('TwitterValidationOperator', () => {
 
       await operator.connect(whitelisted).setValidation('rainberk', 'signature', walletTokenId, 0);
 
-      const expectedAmount = withdrawalAmount.add(paymentPerValidation).toNumber();
-      const actualAmount = (await operator.withdrawableTokens()).toNumber();
-      assert.equal(actualAmount, expectedAmount);
+      const expectedAmount = withdrawalAmount.add(paymentPerValidation);
+      const actualAmount = await operator.withdrawableTokens();
+      expect(actualAmount).to.be.equal(expectedAmount);
     });
 
     it('should withdraw allowed LINK tokens', async () => {
@@ -116,17 +116,17 @@ describe('TwitterValidationOperator', () => {
       const withdrawableTokens = await operator.withdrawableTokens();
       await operator.withdraw(fundsReceiver.address, withdrawableTokens);
 
-      const expectedBalance = funderInitialBalance.add(withdrawableTokens).toNumber();
-      const actualBalance = (await linkToken.balanceOf(fundsReceiver.address)).toNumber();
-      assert.isAbove(actualBalance, 0);
-      assert.equal(actualBalance, expectedBalance);
+      const expectedBalance = funderInitialBalance.add(withdrawableTokens);
+      const actualBalance = await linkToken.balanceOf(fundsReceiver.address);
+      expect(actualBalance).to.be.above(0);
+      expect(actualBalance).to.be.equal(expectedBalance);
     });
 
     it('should not allow to withdraw more LINK tokens that were unlocked', async () => {
       const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_q93w3`);
       await operator.connect(whitelisted)
         .setValidation('rainberk', 'signature', walletTokenId, 0);
-      const withdrawableTokens = (await operator.withdrawableTokens()).toNumber();
+      const withdrawableTokens = await operator.withdrawableTokens();
 
       await expect(
         operator.withdraw(fundsReceiver.address, withdrawableTokens + 1),
@@ -153,14 +153,14 @@ describe('TwitterValidationOperator', () => {
     it('should unlock LINK tokens for each validation', async () => {
       const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_q18k9`);
       const _operator = await operator.connect(whitelisted);
-      const paymentPerValidation = (await operator.operatorPaymentPerValidation()).toNumber();
+      const paymentPerValidation = (await operator.operatorPaymentPerValidation());
 
       await _operator.setValidation('rainberk', 'signature', walletTokenId, 0);
       await _operator.setValidation('rainberk', 'signature', walletTokenId, 0);
       await _operator.setValidation('rainberk', 'signature', walletTokenId, 0);
 
-      const tokensAvailable = (await operator.withdrawableTokens()).toNumber();
-      assert.equal(tokensAvailable, paymentPerValidation * 3);
+      const tokensAvailable = await operator.withdrawableTokens();
+      expect(tokensAvailable).to.be.equal(paymentPerValidation.mul(3));
     });
 
     it('should not allow set price per validation from Admin', async () => {
@@ -176,7 +176,7 @@ describe('TwitterValidationOperator', () => {
     });
 
     it('should pass canSetValidation check', async () => {
-      assert.isTrue(await operator.connect(whitelisted).canSetValidation());
+      expect(await operator.connect(whitelisted).canSetValidation()).to.be.equal(true);
     });
 
     it('should fail canSetValidation from non-whitelisted address', async () => {
@@ -194,8 +194,9 @@ describe('TwitterValidationOperator', () => {
       const operatorPaymentAmount = 10;
       const userPaymentAmount = 20;
       await operator.connect(paymentCapper).setPaymentPerValidation(operatorPaymentAmount, userPaymentAmount);
-      assert.equal((await operator.operatorPaymentPerValidation()).toNumber(), operatorPaymentAmount);
-      assert.equal((await operator.userPaymentPerValidation()).toNumber(), userPaymentAmount);
+
+      expect(await operator.operatorPaymentPerValidation()).to.be.equal(operatorPaymentAmount);
+      expect(await operator.userPaymentPerValidation()).to.be.equal(userPaymentAmount);
     });
 
     it('should initiate validation via LINK token transfer', async () => {
@@ -207,7 +208,8 @@ describe('TwitterValidationOperator', () => {
       const operatorInitialBalance = await linkToken.balanceOf(operator.address);
       const userPaymentPerValidation = 2;
       const validationCode = 'adDweFs12fdSAd231aAdW21';
-      const validationData = web3.eth.abi.encodeParameters(['uint256', 'string'], [tokenId.toString(), validationCode]);
+      const validationData = utils.defaultAbiCoder
+        .encode(['uint256', 'string'], [tokenId, validationCode]);
       await linkToken.transfer(validationRequester.address, userPaymentPerValidation);
 
       await expect(
@@ -222,15 +224,15 @@ describe('TwitterValidationOperator', () => {
         );
 
       const operatorBalance = await linkToken.balanceOf(operator.address);
-      assert.equal(operatorBalance.sub(operatorInitialBalance).toNumber(), userPaymentPerValidation);
-      assert.equal((await operator.availableBalance()).toNumber(), operatorInitialBalance.toNumber());
+      expect(operatorBalance.sub(operatorInitialBalance)).to.be.equal(userPaymentPerValidation);
+      expect(await operator.availableBalance()).to.be.equal(operatorInitialBalance);
     });
 
     it('should fail if trying initiate verification with incorrect LINK tokens amount', async () => {
       const userPaymentPerValidation = 1;
       const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_q71l2`);
-      const validationData = web3.eth.abi.encodeParameters(
-        ['uint256', 'string'], [walletTokenId.toString(), 'adDweFs12']);
+      const validationData = utils.defaultAbiCoder
+        .encode(['uint256', 'string'], [walletTokenId, 'adDweFs12']);
 
       await expect(
         linkToken.transferAndCall(operator.address, userPaymentPerValidation, validationData),
@@ -240,8 +242,8 @@ describe('TwitterValidationOperator', () => {
     it('should fail if calling onTokenTransfer method directly not via LINK token smart contact', async () => {
       const userPaymentPerValidation = 2;
       const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_qpol2`);
-      const validationData = web3.eth.abi.encodeParameters(
-        ['uint256', 'string'], [walletTokenId.toString(), 'adDweFs12']);
+      const validationData = utils.defaultAbiCoder
+        .encode(['uint256', 'string'], [walletTokenId, 'adDweFs12']);
 
       await expect(
         operator.onTokenTransfer(coinbase.address, userPaymentPerValidation, validationData),
@@ -252,8 +254,8 @@ describe('TwitterValidationOperator', () => {
       const userPaymentPerValidation = 2;
       const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_qm9l2`);
       await unsRegistry.approve(ZERO_ADDRESS, walletTokenId);
-      const validationData = web3.eth.abi.encodeParameters(
-        ['uint256', 'string'], [walletTokenId.toString(), 'adDweFs12']);
+      const validationData = utils.defaultAbiCoder
+        .encode(['uint256', 'string'], [walletTokenId, 'adDweFs12']);
 
       await expect(
         linkToken.transferAndCall(operator.address, userPaymentPerValidation, validationData),
@@ -264,8 +266,8 @@ describe('TwitterValidationOperator', () => {
       const userPaymentPerValidation = 2;
       const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_qk9a2`);
       await linkToken.transfer(validationRequester.address, userPaymentPerValidation);
-      const validationData = web3.eth.abi.encodeParameters(
-        ['uint256', 'string'], [walletTokenId.toString(), 'adDweFs12']);
+      const validationData = utils.defaultAbiCoder
+        .encode(['uint256', 'string'], [walletTokenId, 'adDweFs12']);
 
       await expect(
         linkToken.connect(validationRequester)
@@ -276,19 +278,20 @@ describe('TwitterValidationOperator', () => {
     it('should set validation initiated from blockchain', async () => {
       const userPaymentPerValidation = 2;
       const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_ql0a2`);
-      const validationData = web3.eth.abi.encodeParameters(
-        ['uint256', 'string'], [walletTokenId.toString(), 'adDweFs12']);
+      const validationData = utils.defaultAbiCoder
+        .encode(['uint256', 'string'], [walletTokenId, 'adDweFs12']);
+
       await linkToken.transferAndCall(operator.address, userPaymentPerValidation, validationData);
       await operator.connect(whitelisted)
         .setValidation('rainberk', signature, walletTokenId, 1);
       const operatorBalance = await linkToken.balanceOf(operator.address);
-      assert.equal((await operator.withdrawableTokens()).toNumber(), userPaymentPerValidation);
-      assert.equal((await operator.availableBalance()).toNumber(), operatorBalance.toNumber());
+      expect(await operator.withdrawableTokens()).to.be.equal(userPaymentPerValidation);
+      expect(await operator.availableBalance()).to.be.equal(operatorBalance);
 
       // Should not release additional tokens
       await operator.connect(whitelisted)
         .setValidation('rainberk', signature, walletTokenId, 1);
-      assert.equal((await operator.withdrawableTokens()).toNumber(), userPaymentPerValidation);
+      expect(await operator.withdrawableTokens()).to.be.equal(userPaymentPerValidation);
     });
   });
 
@@ -308,8 +311,8 @@ describe('TwitterValidationOperator', () => {
       const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_q10k5`);
       await operator.connect(whitelisted).setValidation('rainberk', 'signature', walletTokenId, 0);
 
-      const tokensAvailable = (await operator.withdrawableTokens()).toNumber();
-      assert.equal(tokensAvailable, paymentPerValidation);
+      const tokensAvailable = (await operator.withdrawableTokens());
+      expect(tokensAvailable).to.be.equal(paymentPerValidation);
     });
 
     it('should not allow validate if operator does not have enough LINK tokens on balance', async () => {
@@ -342,8 +345,8 @@ describe('TwitterValidationOperator', () => {
       const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_q7ofd`);
       await operator.connect(whitelisted).setValidation('rainberk', 'signature', walletTokenId, 0);
 
-      const paymentPerValidation = (await operator.operatorPaymentPerValidation()).toNumber();
-      assert.equal(paymentPerValidation, 0);
+      const paymentPerValidation = await operator.operatorPaymentPerValidation();
+      expect(paymentPerValidation).to.be.equal(0);
     });
 
     it('should work with Registry.setApprovalForAll approval', async () => {
@@ -361,8 +364,8 @@ describe('TwitterValidationOperator', () => {
     });
 
     it('should fail if calling onTokenTransfer when tokenId is invalid', async () => {
-      const validationData = web3.eth.abi.encodeParameters(
-        ['uint256', 'string'], [0, 'adDweFs12']);
+      const validationData = utils.defaultAbiCoder
+        .encode(['uint256', 'string'], [0, 'adDweFs12']);
 
       operator = await TwitterValidationOperator.deploy(
         unsRegistry.address,
@@ -380,8 +383,8 @@ describe('TwitterValidationOperator', () => {
 
     it('should fail if calling onTokenTransfer when code is empty', async () => {
       const walletTokenId = await mintUNSToken(walletRoot, `${domainName}_qlewa`);
-      const validationData = web3.eth.abi.encodeParameters(
-        ['uint256', 'string'], [walletTokenId.toString(), '']);
+      const validationData = utils.defaultAbiCoder
+        .encode(['uint256', 'string'], [walletTokenId, '']);
 
       operator = await TwitterValidationOperator.deploy(
         unsRegistry.address,

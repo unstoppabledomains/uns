@@ -76,8 +76,7 @@ describe('MintingManager', () => {
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'label'),
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
 
-        const actualBalance = await faucet.getBalance();
-        assert.equal(actualBalance, initBalance.toString());
+        expect(await faucet.getBalance()).to.be.equal(initBalance);
       });
 
       it('close minter with forwarding funds', async () => {
@@ -90,9 +89,7 @@ describe('MintingManager', () => {
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'label'),
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
 
-        const actualBalance = await faucet.getBalance();
-        const expectedBalance = BigNumber.from(initBalance).add(value);
-        assert.equal(actualBalance, expectedBalance.toString());
+        expect(await faucet.getBalance()).to.be.equal(BigNumber.from(initBalance).add(value));
       });
     });
 
@@ -118,8 +115,7 @@ describe('MintingManager', () => {
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'label'),
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
 
-        const actualBalance = await receiver.getBalance();
-        assert.equal(actualBalance, initBalance.toString());
+        expect(await receiver.getBalance()).to.be.equal(initBalance);
       });
 
       it('rotate minter without forwarding funds', async () => {
@@ -131,8 +127,7 @@ describe('MintingManager', () => {
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'label'),
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
 
-        const actualBalance = await receiver.getBalance();
-        assert.equal(actualBalance, initBalance.toString());
+        expect(await receiver.getBalance()).to.be.equal(initBalance);
       });
 
       it('rotate minter with forwarding funds', async () => {
@@ -145,9 +140,7 @@ describe('MintingManager', () => {
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'label'),
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
 
-        const actualBalance = await receiver.getBalance();
-        const expectedBalance = BigNumber.from(initBalance).add(value);
-        assert.equal(actualBalance, expectedBalance.toString());
+        expect(await receiver.getBalance()).to.be.equal(BigNumber.from(initBalance).add(value));
       });
     });
   });
@@ -172,15 +165,15 @@ describe('MintingManager', () => {
       it('should mint prefixed domain', async () => {
         await mintingManager.connect(developer).functions['claim(uint256,string)'](walletRoot, domainSuffix);
         const tokenId = await unsRegistry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`);
-        const tokenUri = await unsRegistry.tokenURI(tokenId);
-        assert.equal(tokenUri, `/${tokenId}`);
+
+        expect(await unsRegistry.tokenURI(tokenId)).to.be.equal(`/${tokenId}`);
       });
 
       it('should send domain to requester', async () => {
         await mintingManager.connect(developer).functions['claim(uint256,string)'](walletRoot, domainSuffix);
         const tokenId = await unsRegistry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`);
-        const owner = await unsRegistry.ownerOf(tokenId);
-        assert.equal(owner, developer.address);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(developer.address);
       });
 
       it('should not allow to mint the same domain twice', async () => {
@@ -198,8 +191,8 @@ describe('MintingManager', () => {
         await mintingManager.connect(developer)
           .functions['claimTo(address,uint256,string)'](receiver.address, walletRoot, domainSuffix);
         const tokenId = await unsRegistry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`);
-        const owner = await unsRegistry.ownerOf(tokenId);
-        assert.equal(owner, receiver.address);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
       });
     });
 
@@ -210,20 +203,18 @@ describe('MintingManager', () => {
         const minter = mintingManager.connect(developer);
         await minter.functions[funcSig](receiver.address, walletRoot, domainSuffix, ['key'], ['value']);
         const tokenId = await unsRegistry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`);
-        const owner = await unsRegistry.ownerOf(tokenId);
-        const values = await unsRegistry.getMany(['key'], tokenId);
-        assert.equal(owner, receiver.address);
-        assert.deepEqual(values, ['value']);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+        expect(await unsRegistry.getMany(['key'], tokenId)).to.be.eql(['value']);
       });
 
       it('should mint domain with empty keys', async () => {
         const minter = mintingManager.connect(developer);
         await minter.functions[funcSig](receiver.address, walletRoot, domainSuffix, [], []);
         const tokenId = await unsRegistry.childIdOf(walletRoot, `${DomainNamePrefix}${domainSuffix}`);
-        const owner = await unsRegistry.ownerOf(tokenId);
-        const values = await unsRegistry.getMany(['key1', 'key2'], tokenId);
-        assert.equal(owner, receiver.address);
-        assert.deepEqual(values, ['', '']);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+        expect(await unsRegistry.getMany(['key1', 'key2'], tokenId)).to.be.eql(['', '']);
       });
     });
   });
@@ -257,7 +248,8 @@ describe('MintingManager', () => {
       it('mint domain', async () => {
         await mintingManager.mintSLD(coinbase.address, walletRoot, 'test-1dp');
         const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-1dp');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
       });
     });
 
@@ -279,7 +271,8 @@ describe('MintingManager', () => {
       it('safe mint domain', async () => {
         await mintingManager[funcSig](coinbase.address, walletRoot, 'test-2oa');
         const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-2oa');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
       });
     });
 
@@ -300,9 +293,9 @@ describe('MintingManager', () => {
 
       it('safe mint domain', async () => {
         await mintingManager[funcSig](coinbase.address, walletRoot, 'test-3oa', '0x');
-
         const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-3oa');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
       });
     });
   });
@@ -355,7 +348,7 @@ describe('MintingManager', () => {
         .withArgs(spender.address, coinbase.address, '0x4c1819e0', utils.keccak256(data));
 
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-p1-p1sapr');
-      assert.equal(await unsRegistry.ownerOf(tokenId), receiver.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
 
     it('relay meta-safe mint with data', async () => {
@@ -370,7 +363,7 @@ describe('MintingManager', () => {
         .withArgs(spender.address, coinbase.address, '0x58839d6b', utils.keccak256(data));
 
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-p1-p1saor');
-      assert.equal(await unsRegistry.ownerOf(tokenId), receiver.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
 
     it('relay meta-mint with no records', async () => {
@@ -385,7 +378,7 @@ describe('MintingManager', () => {
         .withArgs(spender.address, coinbase.address, '0x39ccf4d0', utils.keccak256(data));
 
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-p1-p1adr');
-      assert.equal(await unsRegistry.ownerOf(tokenId), receiver.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
 
     it('relay meta-mint with records', async () => {
@@ -400,7 +393,7 @@ describe('MintingManager', () => {
         .withArgs(spender.address, coinbase.address, '0x39ccf4d0', utils.keccak256(data));
 
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-p1-nsd64i2');
-      assert.equal(await unsRegistry.ownerOf(tokenId), receiver.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
 
     it('relay meta-safe mint with no records', async () => {
@@ -415,7 +408,7 @@ describe('MintingManager', () => {
         .withArgs(spender.address, coinbase.address, '0x27bbd225', utils.keccak256(data));
 
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-p1-psd123');
-      assert.equal(await unsRegistry.ownerOf(tokenId), receiver.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
 
     it('relay meta-safe mint with records', async () => {
@@ -430,7 +423,7 @@ describe('MintingManager', () => {
         .withArgs(spender.address, coinbase.address, '0x27bbd225', utils.keccak256(data));
 
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-p1-mvih4');
-      assert.equal(await unsRegistry.ownerOf(tokenId), receiver.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
 
     it('relay meta-safe mint(data) with no records', async () => {
@@ -445,7 +438,7 @@ describe('MintingManager', () => {
         .withArgs(spender.address, coinbase.address, '0x6a2d2256', utils.keccak256(data));
 
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-p1-mds024');
-      assert.equal(await unsRegistry.ownerOf(tokenId), receiver.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
 
     it('relay meta-safe mint(data) with records', async () => {
@@ -460,7 +453,7 @@ describe('MintingManager', () => {
         .withArgs(spender.address, coinbase.address, '0x6a2d2256', utils.keccak256(data));
 
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-p1-nw833');
-      assert.equal(await unsRegistry.ownerOf(tokenId), receiver.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
 
     describe('Gas consumption', () => {
@@ -548,37 +541,20 @@ describe('MintingManager', () => {
     });
 
     it('should have registered all tlds', async () => {
-      // wallet
-      assert.equal(
-        await unsRegistry.exists('0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230'), true);
+      const tlds = {
+        wallet: '0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230',
+        coin: '0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2',
+        x: '0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d',
+        nft: '0xb75cf4f3d8bc3deb317ed5216d898899d5cc6a783f65f6768eb9bcb89428670d',
+        blockchain: '0x4118ebbd893ecbb9f5d7a817c7d8039c1bd991b56ea243e2ae84d0a1b2c950a7',
+        bitcoin: '0x042fb01c1e43fb4a32f85b41c821e17d2faeac58cfc5fb23f80bc00c940f85e3',
+        888: '0x5c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e',
+        dao: '0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553',
+      };
 
-      // coin
-      assert.equal(
-        await unsRegistry.exists('0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2'), true);
-
-      // x
-      assert.equal(
-        await unsRegistry.exists('0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d'), true);
-
-      // nft
-      assert.equal(
-        await unsRegistry.exists('0xb75cf4f3d8bc3deb317ed5216d898899d5cc6a783f65f6768eb9bcb89428670d'), true);
-
-      // blockchain
-      assert.equal(
-        await unsRegistry.exists('0x4118ebbd893ecbb9f5d7a817c7d8039c1bd991b56ea243e2ae84d0a1b2c950a7'), true);
-
-      // bitcoin
-      assert.equal(
-        await unsRegistry.exists('0x042fb01c1e43fb4a32f85b41c821e17d2faeac58cfc5fb23f80bc00c940f85e3'), true);
-
-      // 888
-      assert.equal(
-        await unsRegistry.exists('0x5c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e'), true);
-
-      // dao
-      assert.equal(
-        await unsRegistry.exists('0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553'), true);
+      Object.values(tlds).forEach(async (tld) => {
+        expect(await unsRegistry.exists(tld)).to.be.equal(true);
+      });
     });
 
     describe('claim(uint256,string)', () => {
@@ -597,11 +573,10 @@ describe('MintingManager', () => {
         await mintingManager['claim(uint256,string)'](walletRoot, 'test-c029');
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, `${DomainNamePrefix}test-c029`);
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
-        const tokenUri = await unsRegistry.tokenURI(tokenId);
-        assert.equal(tokenUri, `/${tokenId}`);
+        expect(await unsRegistry.tokenURI(tokenId)).to.be.equal(`/${tokenId}`);
       });
     });
 
@@ -620,7 +595,7 @@ describe('MintingManager', () => {
         await mintingManager['claimTo(address,uint256,string)'](coinbase.address, walletRoot, 'test-cdsi47');
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, `${DomainNamePrefix}test-cdsi47`);
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
       });
     });
@@ -643,7 +618,7 @@ describe('MintingManager', () => {
         await mintingManager[funcSig](coinbase.address, walletRoot, 'test-c846', ['key9'], ['value2']);
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, `${DomainNamePrefix}test-c846`);
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
         expect(await unsRegistry.get('key9', tokenId)).to.be.eql('value2');
@@ -666,11 +641,10 @@ describe('MintingManager', () => {
         await mintingManager['mintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'test-m241');
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, 'test-m241');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
-        const tokenUri = await unsRegistry.tokenURI(tokenId);
-        assert.equal(tokenUri, `/${tokenId}`);
+        expect(await unsRegistry.tokenURI(tokenId)).to.be.equal(`/${tokenId}`);
       });
     });
 
@@ -689,7 +663,7 @@ describe('MintingManager', () => {
         await mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'test-m675');
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, 'test-m675');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
       });
     });
@@ -711,7 +685,7 @@ describe('MintingManager', () => {
         await mintingManager[funcSig](coinbase.address, walletRoot, 'test-m999', '0x');
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, 'test-m999');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
       });
     });
@@ -734,7 +708,7 @@ describe('MintingManager', () => {
         await mintingManager[funcSig](coinbase.address, walletRoot, 'test-mcm332', ['key1'], ['value1']);
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, 'test-mcm332');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
         expect(await unsRegistry.get('key1', tokenId)).to.be.eql('value1');
@@ -758,7 +732,7 @@ describe('MintingManager', () => {
         await mintingManager[funcSig](coinbase.address, walletRoot, 'test-mdmc3w', [], []);
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, 'test-mdmc3w');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
       });
     });
@@ -781,7 +755,7 @@ describe('MintingManager', () => {
         await mintingManager[funcSig](coinbase.address, walletRoot, 'test-sffg2', ['key1'], ['value1']);
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, 'test-sffg2');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
         expect(await unsRegistry.get('key1', tokenId)).to.be.eql('value1');
@@ -805,7 +779,7 @@ describe('MintingManager', () => {
         await mintingManager[funcSig](coinbase.address, walletRoot, 'test-msg220', [], []);
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, 'test-msg220');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
       });
     });
@@ -828,7 +802,7 @@ describe('MintingManager', () => {
         await mintingManager[funcSig](coinbase.address, walletRoot, 'test-mw24', ['key1'], ['value1'], '0x');
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, 'test-mw24');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
         expect(await unsRegistry.get('key1', tokenId)).to.be.eql('value1');
@@ -852,7 +826,7 @@ describe('MintingManager', () => {
         await mintingManager[funcSig](coinbase.address, walletRoot, 'test-msdb3', [], [], '0x');
 
         const tokenId = await cnsRegistry.childIdOf(walletRoot, 'test-msdb3');
-        assert.equal(await unsRegistry.ownerOf(tokenId), coinbase.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
       });
     });
@@ -868,7 +842,7 @@ describe('MintingManager', () => {
     });
 
     it('should return zero resolver when initialized by zero address', async () => {
-      assert.equal(await mintingManager.cnsResolver(), ZERO_ADDRESS);
+      expect(await mintingManager.cnsResolver()).to.be.equal(ZERO_ADDRESS);
     });
 
     it('should update resolver', async () => {
@@ -876,7 +850,7 @@ describe('MintingManager', () => {
       resolver = await Resolver.deploy(ZERO_ADDRESS, mintingController.address);
       await mintingManager.setResolver(resolver.address);
 
-      assert.equal(await mintingManager.cnsResolver(), resolver.address);
+      expect(await mintingManager.cnsResolver()).to.be.equal(resolver.address);
     });
 
     it('should revert update resolver when call by non-owner', async () => {
@@ -913,11 +887,11 @@ describe('MintingManager', () => {
         { initializer: 'initialize' },
       );
 
-      assert.equal(await mintingManager.cnsResolver(), resolver.address);
+      expect(await mintingManager.cnsResolver()).to.be.equal(resolver.address);
     });
 
     it('should be possible to set resolver after proxy upgrade', async () => {
-      assert.equal(await mintingManager.cnsResolver(), ZERO_ADDRESS);
+      expect(await mintingManager.cnsResolver()).to.be.equal(ZERO_ADDRESS);
 
       await upgrades.upgradeProxy(
         mintingManager.address,
@@ -930,7 +904,7 @@ describe('MintingManager', () => {
       resolver = await Resolver.deploy(ZERO_ADDRESS, mintingController.address);
       await mintingManager.setResolver(resolver.address);
 
-      assert.equal(await mintingManager.cnsResolver(), resolver.address);
+      expect(await mintingManager.cnsResolver()).to.be.equal(resolver.address);
     });
   });
 });

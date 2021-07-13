@@ -1,8 +1,10 @@
+const { ethers } = require('hardhat');
+
 const signTypedData = async (contract, signer, value) => {
   const domain = {
     name: 'RegistryForwarder',
     version: '0.0.1',
-    chainId: await web3.eth.getChainId(),
+    chainId: (await ethers.provider.getNetwork()).chainId,
     verifyingContract: contract,
   };
 
