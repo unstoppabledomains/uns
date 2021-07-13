@@ -22,11 +22,7 @@ describe('UNSRegistry (proxy)', () => {
 
   describe('Registry', () => {
     it('should construct itself correctly', async () => {
-      assert.equal(
-        root.toHexString(),
-        '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
-        'good root',
-      );
+      expect(root).to.be.equal('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
     });
 
     it('should resolve properly', async () => {
@@ -43,13 +39,13 @@ describe('UNSRegistry (proxy)', () => {
 
     it('should set URI prefix', async () => {
       const tok = root;
-      assert.equal(await unsRegistry.tokenURI(tok), `/${tok}`);
+      expect(await unsRegistry.tokenURI(tok)).to.be.equal(`/${tok}`);
 
       await unsRegistry.setTokenURIPrefix('prefix-');
-      assert.equal(await unsRegistry.tokenURI(tok), `prefix-${tok}`);
+      expect(await unsRegistry.tokenURI(tok)).to.be.equal(`prefix-${tok}`);
 
       await unsRegistry.setTokenURIPrefix('/');
-      assert.equal(await unsRegistry.tokenURI(tok), `/${tok}`);
+      expect(await unsRegistry.tokenURI(tok)).to.be.equal(`/${tok}`);
     });
   });
 
@@ -70,21 +66,14 @@ describe('UNSRegistry (proxy)', () => {
 
       await unsRegistry.mint(coinbase, tok, 'label_931');
       await unsRegistry.set('key', 'value', tok);
-
-      assert.equal(
-        await unsRegistry.get('key', tok),
-        'value',
-        'should resolve to resolver',
-      );
+      expect(await unsRegistry.get('key', tok)).to.be.equal('value');
 
       // should setMany
       await unsRegistry.setMany(['key1'], ['value1'], tok);
       await unsRegistry.setMany(['key2', 'key3'], ['value2', 'value3'], tok);
       await unsRegistry.setMany(['key4', 'key5', 'key6'], ['value4', 'value5', 'value6'], tok);
-      assert.deepEqual(
-        await unsRegistry.getMany(['key1', 'key2', 'key3', 'key4', 'key5', 'key6'], tok),
-        ['value1', 'value2', 'value3', 'value4', 'value5', 'value6'],
-      );
+      expect(await unsRegistry.getMany(['key1', 'key2', 'key3', 'key4', 'key5', 'key6'], tok))
+        .to.be.eql(['value1', 'value2', 'value3', 'value4', 'value5', 'value6']);
 
       // should reset
       await expect(unsRegistry.reset(tok))
@@ -100,20 +89,22 @@ describe('UNSRegistry (proxy)', () => {
     it('should get key by hash', async () => {
       const tok = await initializeDomain('heyhash');
       const expectedKey = 'new-hashed-key';
-      await unsRegistry.set(expectedKey, 'value', tok);
-      const keyFromHash = await unsRegistry.getKey(BigNumber.from(utils.id(expectedKey)));
 
-      assert.equal(keyFromHash, expectedKey);
+      await unsRegistry.set(expectedKey, 'value', tok);
+
+      const keyFromHash = await unsRegistry.getKey(BigNumber.from(utils.id(expectedKey)));
+      expect(keyFromHash).to.be.equal(expectedKey);
     });
 
     it('should get many keys by hashes', async () => {
       const tok = await initializeDomain('heyhash-many');
       const expectedKeys = ['keyhash-many-1', 'keyhash-many-2'];
+
       await unsRegistry.setMany(expectedKeys, ['value', 'value'], tok);
+
       const expectedKeyHashes = expectedKeys.map(key => BigNumber.from(utils.id(key)));
       const keysFromHashes = await unsRegistry.getKeys(expectedKeyHashes);
-
-      assert.deepEqual(keysFromHashes, expectedKeys);
+      expect(keysFromHashes).to.be.eql(expectedKeys);
     });
 
     it('should not consume additional gas if key hash was set before', async () => {
@@ -122,13 +113,13 @@ describe('UNSRegistry (proxy)', () => {
       newKeyHashTx.receipt = await newKeyHashTx.wait();
       let exitsKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tok);
       exitsKeyHashTx.receipt = await exitsKeyHashTx.wait();
-      assert.isAbove(newKeyHashTx.receipt.gasUsed, exitsKeyHashTx.receipt.gasUsed);
+      expect(newKeyHashTx.receipt.gasUsed).to.be.above(exitsKeyHashTx.receipt.gasUsed);
 
       newKeyHashTx = await unsRegistry.setMany(['keyhash-gas-1', 'keyhash-gas-2'], ['value-1', 'value-2'], tok);
       newKeyHashTx.receipt = await newKeyHashTx.wait();
       exitsKeyHashTx = await unsRegistry.setMany(['keyhash-gas-1', 'keyhash-gas-2'], ['value-1', 'value-2'], tok);
       exitsKeyHashTx.receipt = await exitsKeyHashTx.wait();
-      assert.isAbove(newKeyHashTx.receipt.gasUsed, exitsKeyHashTx.receipt.gasUsed);
+      expect(newKeyHashTx.receipt.gasUsed).to.be.above(exitsKeyHashTx.receipt.gasUsed);
 
       newKeyHashTx = await unsRegistry.setMany(
         ['keyhash-gas-3', 'keyhash-gas-4', 'keyhash-gas-5'], ['value-1', 'value-2', 'value-3'], tok);
@@ -136,29 +127,31 @@ describe('UNSRegistry (proxy)', () => {
       exitsKeyHashTx = await unsRegistry.setMany(
         ['keyhash-gas-3', 'keyhash-gas-4', 'keyhash-gas-5'], ['value-1', 'value-2', 'value-3'], tok);
       exitsKeyHashTx.receipt = await exitsKeyHashTx.wait();
-      assert.isAbove(newKeyHashTx.receipt.gasUsed, exitsKeyHashTx.receipt.gasUsed);
+      expect(newKeyHashTx.receipt.gasUsed).to.be.above(exitsKeyHashTx.receipt.gasUsed);
     });
 
     it('should get value by key hash', async () => {
       const tok = await initializeDomain('get-key-by-hash');
       const key = 'get-key-by-hash-key';
       const expectedValue = 'get-key-by-hash-value';
-      await unsRegistry.set(key, expectedValue, tok);
-      const result = await unsRegistry.getByHash(utils.id(key), tok);
 
-      assert.equal(result.value, expectedValue);
-      assert.equal(result.key, key);
+      await unsRegistry.set(key, expectedValue, tok);
+
+      const result = await unsRegistry.getByHash(utils.id(key), tok);
+      expect(result.value).to.be.equal(expectedValue);
+      expect(result.key).to.be.equal(key);
     });
 
     it('should get multiple values by hashes', async () => {
       const tok = await initializeDomain('get-many-keys-by-hash');
       const keys = ['key-to-hash-1', 'key-to-hash-2'];
       const expectedValues = ['value-42', 'value-43'];
+
       await unsRegistry.setMany(keys, expectedValues, tok);
+
       const hashedKeys = keys.map(key => BigNumber.from(utils.id(key)));
       const result = await unsRegistry.getManyByHash(hashedKeys, tok);
-
-      assert.deepEqual(result, [keys, expectedValues]);
+      expect(result).to.be.eql([keys, expectedValues]);
     });
 
     it('should emit NewKey event new keys added', async () => {
@@ -195,8 +188,8 @@ describe('UNSRegistry (proxy)', () => {
       await unsRegistry.set('old-key', 'old-value', tok);
       await unsRegistry.reconfigure(['new-key'], ['new-value'], tok);
 
-      assert.equal(await unsRegistry.get('old-key', tok), '');
-      assert.equal(await unsRegistry.get('new-key', tok), 'new-value');
+      expect(await unsRegistry.get('old-key', tok)).to.be.equal('');
+      expect(await unsRegistry.get('new-key', tok)).to.be.equal('new-value');
 
       // should fail when trying to reconfigure non-owned domain
       await expect(

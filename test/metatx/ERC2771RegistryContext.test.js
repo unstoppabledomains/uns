@@ -38,11 +38,11 @@ describe('ERC2771RegistryContext', () => {
 
       expect(success).to.be.eq(true);
       const [msgToken] = utils.defaultAbiCoder.decode(['uint256'], returnData);
-      assert.equal(msgToken, tokenId.toString());
+      expect(msgToken).to.be.equal(tokenId);
     });
 
     it('should return zero tokenId when untrusted forwarder', async () => {
-      assert.equal(await context.callStatic.msgToken(), 0);
+      expect(await context.callStatic.msgToken()).to.be.equal(0);
     });
   });
 

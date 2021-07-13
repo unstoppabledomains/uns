@@ -44,7 +44,7 @@ describe('UNSRegistry (metatx)', () => {
       const sig = await signTypedData(unsRegistry.address, owner, req);
       await unsRegistry.execute(req, sig);
 
-      assert.equal(receiver.address, await unsRegistry.ownerOf(tok));
+      expect(await unsRegistry.ownerOf(tok)).to.be.equal(receiver.address);
     });
 
     it('should revert transfer using meta-setOwner when nonce invalidated', async () => {
@@ -78,7 +78,7 @@ describe('UNSRegistry (metatx)', () => {
       };
       const sig = await signTypedData(unsRegistry.address, owner, req);
       const [success ] = await unsRegistry.callStatic.execute(req, sig);
-      expect(success).to.be.eq(true);
+      expect(success).to.be.equal(true);
     });
 
     it('should revert meta-setApprovalForAll for non-onwer', async () => {
@@ -108,7 +108,7 @@ describe('UNSRegistry (metatx)', () => {
       const sig = await signTypedData(unsRegistry.address, owner, req);
       await unsRegistry.execute(req, sig);
 
-      assert.equal(await unsRegistry.ownerOf(tok), receiverAddress);
+      expect(await unsRegistry.ownerOf(tok)).to.be.equal(receiverAddress);
     });
 
     it('should revert meta-transferFrom for non-onwer', async () => {
@@ -124,7 +124,7 @@ describe('UNSRegistry (metatx)', () => {
       };
       const sig = await signTypedData(unsRegistry.address, nonOwner, req);
       const [success ] = await unsRegistry.callStatic.execute(req, sig);
-      expect(success).to.be.eq(false);
+      expect(success).to.be.equal(false);
     });
 
     it('should transfer using meta-safeTransferFrom', async () => {
@@ -144,7 +144,7 @@ describe('UNSRegistry (metatx)', () => {
       const sig = await signTypedData(unsRegistry.address, owner, req);
       await unsRegistry.execute(req, sig);
 
-      assert.equal(await unsRegistry.ownerOf(tok), receiverAddress);
+      expect(await unsRegistry.ownerOf(tok)).to.be.equal(receiverAddress);
     });
 
     it('should revert meta-safeTransferFrom for non-onwer', async () => {
@@ -163,7 +163,7 @@ describe('UNSRegistry (metatx)', () => {
       };
       const sig = await signTypedData(unsRegistry.address, nonOwner, req);
       const [success ] = await unsRegistry.callStatic.execute(req, sig);
-      expect(success).to.be.eq(false);
+      expect(success).to.be.equal(false);
     });
 
     // TODO: add tests for safeTransferFrom(address,address,uint256,bytes)
@@ -198,7 +198,7 @@ describe('UNSRegistry (metatx)', () => {
       };
       const sig = await signTypedData(unsRegistry.address, nonOwner, req);
       const [success ] = await unsRegistry.callStatic.execute(req, sig);
-      expect(success).to.be.eq(false);
+      expect(success).to.be.equal(false);
     });
   });
 
@@ -271,7 +271,7 @@ describe('UNSRegistry (metatx)', () => {
           if (!success) {
             console.error(getReason(returnData));
           }
-          expect(success).to.be.eq(true);
+          expect(success).to.be.equal(true);
         }
       });
     });
@@ -332,7 +332,7 @@ describe('UNSRegistry (metatx)', () => {
           if (!success) {
             console.error(getReason(returnData));
           }
-          expect(success).to.be.eq(true);
+          expect(success).to.be.equal(true);
         }
       });
 
@@ -351,7 +351,7 @@ describe('UNSRegistry (metatx)', () => {
             console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
             console.error(getReason(returnData));
           }
-          expect(success).to.be.eq(true);
+          expect(success).to.be.equal(true);
 
           await unsRegistry.execute(req, sig);
 
@@ -390,8 +390,8 @@ describe('UNSRegistry (metatx)', () => {
           const sig = await signTypedData(unsRegistry.address, owner, req);
           const [success, returnData] = await unsRegistry.callStatic.execute(req, sig);
 
-          expect(success).to.be.eq(false);
-          expect(getReason(returnData)).to.be.eql('Registry: TOKEN_INVALID');
+          expect(success).to.be.equal(false);
+          expect(getReason(returnData)).to.be.equal('Registry: TOKEN_INVALID');
         }
       });
 
@@ -405,8 +405,8 @@ describe('UNSRegistry (metatx)', () => {
           const sig = await signTypedData(unsRegistry.address, owner, req);
           const [success, returndata] = await unsRegistry.callStatic.execute(req, sig);
 
-          expect(success).to.be.eq(false);
-          expect(getReason(returndata)).to.be.eql('Registry: TOKEN_INVALID');
+          expect(success).to.be.equal(false);
+          expect(getReason(returndata)).to.be.equal('Registry: TOKEN_INVALID');
         }
       });
     });
@@ -456,7 +456,7 @@ describe('UNSRegistry (metatx)', () => {
             console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
             console.error(getReason(returnData));
           }
-          expect(success).to.be.eq(true);
+          expect(success).to.be.equal(true);
         }
       });
 
@@ -475,7 +475,7 @@ describe('UNSRegistry (metatx)', () => {
             console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
             console.error(getReason(returnData));
           }
-          expect(success).to.be.eq(true);
+          expect(success).to.be.equal(true);
 
           await unsRegistry.execute(req, sig);
 
@@ -499,7 +499,7 @@ describe('UNSRegistry (metatx)', () => {
             console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
             console.error(getReason(returnData));
           }
-          expect(success).to.be.eq(true);
+          expect(success).to.be.equal(true);
 
           await unsRegistry.execute(req, sig);
 
@@ -537,7 +537,7 @@ describe('UNSRegistry (metatx)', () => {
         await unsRegistry.connect(spender)
           .transferFromFor(owner.address, receiver.address, tok, signature);
 
-        assert.equal(await unsRegistry.ownerOf(tok), receiver.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(receiver.address);
       });
 
       it('should revert transfer by non-owner', async () => {
@@ -554,7 +554,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).transferFromFor(owner.address, nonOwner.address, tok, signature),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
 
       it('should revert when signature is invalid', async () => {
@@ -579,7 +579,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).transferFromFor(owner.address, nonOwner.address, tok, EMPTY_SIGNATURE),
         ).to.be.revertedWith('ECDSA: invalid signature');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
     });
 
@@ -598,7 +598,7 @@ describe('UNSRegistry (metatx)', () => {
 
         await unsRegistry.connect(spender)[funcSig](owner.address, receiver.address, tok, signature);
 
-        assert.equal(await unsRegistry.ownerOf(tok), receiver.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(receiver.address);
       });
 
       it('should revert transfer by non-owner', async () => {
@@ -615,7 +615,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender)[funcSig](owner.address, nonOwner.address, tok, signature),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
 
       it('should revert when signature is invalid', async () => {
@@ -640,7 +640,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender)[funcSig](owner.address, nonOwner.address, tok, EMPTY_SIGNATURE),
         ).to.be.revertedWith('ECDSA: invalid signature');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
     });
 
@@ -659,7 +659,7 @@ describe('UNSRegistry (metatx)', () => {
 
         await unsRegistry.connect(spender)[funcSig](owner.address, receiver.address, tok, '0x', signature);
 
-        assert.equal(await unsRegistry.ownerOf(tok), receiver.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(receiver.address);
       });
 
       it('should revert transfer by non-owner', async () => {
@@ -676,7 +676,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender)[funcSig](owner.address, receiver.address, tok, '0x', signature),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
 
       it('should revert when signature is invalid', async () => {
@@ -701,7 +701,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender)[funcSig](owner.address, nonOwner.address, tok, '0x', EMPTY_SIGNATURE),
         ).to.be.revertedWith('ECDSA: invalid signature');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
     });
 
@@ -729,7 +729,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).burnFor(tok, signature),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
 
       it('should revert when signature is invalid', async () => {
@@ -754,7 +754,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).burnFor(tok, EMPTY_SIGNATURE),
         ).to.be.revertedWith('ECDSA: invalid signature');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
     });
 
@@ -768,7 +768,7 @@ describe('UNSRegistry (metatx)', () => {
 
         await unsRegistry.connect(spender).resetFor(tok, signature);
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
 
       it('should revert reset by non-owner', async () => {
@@ -782,7 +782,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).resetFor(tok, signature),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
 
       it('should revert when signature is invalid', async () => {
@@ -807,7 +807,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).resetFor(tok, EMPTY_SIGNATURE),
         ).to.be.revertedWith('ECDSA: invalid signature');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
     });
 
@@ -821,8 +821,8 @@ describe('UNSRegistry (metatx)', () => {
 
         await unsRegistry.connect(spender).setFor('key1', 'v1', tok, signature);
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
-        assert.equal(await unsRegistry.get('key1', tok), 'v1');
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
+        expect(await unsRegistry.get('key1', tok)).to.be.equal('v1');
       });
 
       it('should revert set by non-owner', async () => {
@@ -836,7 +836,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).setFor('', '', tok, signature),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
 
       it('should revert when signature is invalid', async () => {
@@ -858,7 +858,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).setFor('', '', tok, EMPTY_SIGNATURE),
         ).to.be.revertedWith('ECDSA: invalid signature');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
     });
 
@@ -874,8 +874,8 @@ describe('UNSRegistry (metatx)', () => {
 
         await unsRegistry.connect(spender).setManyFor(['key1'], ['1v'], tok, signature);
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
-        assert.equal(await unsRegistry.get('key1', tok), '1v');
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
+        expect(await unsRegistry.get('key1', tok)).to.be.equal('1v');
       });
 
       it('should revert setMany by non-owner', async () => {
@@ -889,7 +889,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).setManyFor([''], [''], tok, signature),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
 
       it('should revert when signature is invalid', async () => {
@@ -911,7 +911,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).setManyFor([''], [''], tok, EMPTY_SIGNATURE),
         ).to.be.revertedWith('ECDSA: invalid signature');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
     });
 
@@ -926,8 +926,8 @@ describe('UNSRegistry (metatx)', () => {
 
         await unsRegistry.connect(spender).reconfigureFor(['key2'], ['1v'], tok, signature);
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
-        assert.equal(await unsRegistry.get('key2', tok), '1v');
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
+        expect(await unsRegistry.get('key2', tok)).to.be.equal('1v');
       });
 
       it('should revert reconfigure by non-owner', async () => {
@@ -942,7 +942,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).reconfigureFor([''], [''], tok, signature),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
 
       it('should revert when signature is invalid', async () => {
@@ -965,7 +965,7 @@ describe('UNSRegistry (metatx)', () => {
           unsRegistry.connect(spender).reconfigureFor([''], [''], tok, EMPTY_SIGNATURE),
         ).to.be.revertedWith('ECDSA: invalid signature');
 
-        assert.equal(await unsRegistry.ownerOf(tok), owner.address);
+        expect(await unsRegistry.ownerOf(tok)).to.be.equal(owner.address);
       });
     });
   });

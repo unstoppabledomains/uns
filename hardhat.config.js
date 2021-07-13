@@ -17,7 +17,6 @@ const argv = require('yargs/yargs')()
   .argv;
 
 require('@openzeppelin/hardhat-upgrades');
-require('@nomiclabs/hardhat-truffle5');
 require('@nomiclabs/hardhat-waffle');
 require('@nomiclabs/hardhat-solhint');
 require('@nomiclabs/hardhat-etherscan');
@@ -144,6 +143,7 @@ module.exports = {
         '0x903aA579B9eF13862Fda73275B349017d8fD09eB',
         '0x7Ac8596cfbb0504DFDEC08d5088B67E7fbfae47f',
         '0xB83180632b72f988585AF02FC27229bF2Eabd139',
+        '0x1daf08a27304a78434e22ab79bea508e341f910d',
       ],
       mainnet: [],
     },
