@@ -15,7 +15,7 @@ abstract contract Relayer is ContextUpgradeable {
      * Relay allows execute transaction on behalf of whitelisted minter.
      * The function verify signature of call data parameter before execution.
      * It allows anybody send transaction on-chain when minter has provided proper parameters.
-     * The function allows to relaying calls of fixed functions. The restriction defined in function `verifyCall`
+     * The function allows to relaying calls of fixed functions. The restriction defined in function `_verifyRelayCall`
      */
     function relay(bytes calldata data, bytes calldata signature) external returns (bytes memory) {
         bytes32 digest = keccak256(data);
