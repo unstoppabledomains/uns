@@ -3675,9 +3675,9 @@ domutils@^2.5.2, domutils@^2.6.0:
     domelementtype "^2.2.0"
     domhandler "^4.2.0"
 
-"dot-crypto@https://github.com/unstoppabledomains/dot-crypto.git":
-  version "1.1.0"
-  resolved "https://github.com/unstoppabledomains/dot-crypto.git#957b652a69e529b6e81068c5548edc4e027da681"
+"dot-crypto@https://github.com/unstoppabledomains/dot-crypto.git#2.0.0":
+  version "2.0.0"
+  resolved "https://github.com/unstoppabledomains/dot-crypto.git#7e80306d269db9eed9560e941353ef3bdcd39eaa"
 
 dotignore@~0.1.2:
   version "0.1.2"

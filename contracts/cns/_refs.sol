@@ -4,7 +4,7 @@
 pragma solidity 0.5.12;
 pragma experimental ABIEncoderV2;
 
-import 'dot-crypto/contracts/Registry.sol';
+import 'dot-crypto/contracts/CNSRegistry.sol';
 import 'dot-crypto/contracts/Resolver.sol';
 import 'dot-crypto/contracts/controllers/DomainZoneController.sol';
 import 'dot-crypto/contracts/controllers/MintingController.sol';

@@ -130,11 +130,9 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
     }
 
     function verify(ForwardRequest calldata req, bytes calldata signature) public view returns (bool) {
-        address signer =
-            _hashTypedDataV4(
-                keccak256(abi.encode(_TYPEHASH, req.from, req.gas, req.tokenId, req.nonce, keccak256(req.data)))
-            )
-                .recover(signature);
+        address signer = _hashTypedDataV4(
+            keccak256(abi.encode(_TYPEHASH, req.from, req.gas, req.tokenId, req.nonce, keccak256(req.data)))
+        ).recover(signature);
         return _nonces[req.tokenId] == req.nonce && signer == req.from;
     }
 
@@ -143,8 +141,9 @@ abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
         _nonces[req.tokenId] = req.nonce + 1;
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) =
-            address(this).call{gas: req.gas}(abi.encodePacked(req.data, req.from, req.tokenId));
+        (bool success, bytes memory returndata) = address(this).call{gas: req.gas}(
+            abi.encodePacked(req.data, req.from, req.tokenId)
+        );
         // Validate that the relayer has sent enough gas for the call.
         // See https://ronan.eth.link/blog/ethereum-gas-dangers/
         assert(gasleft() > req.gas / 63);

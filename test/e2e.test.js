@@ -29,7 +29,7 @@ describe.skip('E2E', () => {
 
     UNSRegistry = await ethers.getContractFactory('contracts/UNSRegistry.sol:UNSRegistry');
     MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
-    CNSRegistry = await ethers.getContractFactory('dot-crypto/contracts/Registry.sol:Registry');
+    CNSRegistry = await ethers.getContractFactory('dot-crypto/contracts/CNSRegistry.sol:CNSRegistry');
     Resolver = await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver');
     ProxyReader = await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader');
 
