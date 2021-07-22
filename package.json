@@ -40,7 +40,7 @@
     "@openzeppelin/hardhat-upgrades": "^1.8.2",
     "chai": "^4.3.4",
     "debug": "^4.3.1",
-    "dot-crypto": "https://github.com/unstoppabledomains/dot-crypto.git",
+    "dot-crypto": "https://github.com/unstoppabledomains/dot-crypto.git#2.0.0",
     "eslint": "^7.28.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.23.4",

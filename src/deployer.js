@@ -15,7 +15,7 @@ const defaultOptions = {
 
 async function _getArtifacts () {
   return {
-    CNSRegistry: await ethers.getContractFactory('contracts/cns/CNSRegistry.sol:CNSRegistry'),
+    CNSRegistry: await ethers.getContractFactory('dot-crypto/contracts/CNSRegistry.sol:CNSRegistry'),
     SignatureController:
       await ethers.getContractFactory('dot-crypto/contracts/controllers/SignatureController.sol:SignatureController'),
     MintingController:

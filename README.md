@@ -7,77 +7,27 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
 
 1.  Implements ERC721
 
-    ERC-721 Non-Fungible Token Standard
-
-    Ref: https://eips.ethereum.org/EIPS/eip-721
+    [ERC-721](https://eips.ethereum.org/EIPS/eip-721) Non-Fungible Token Standard
 
 2.  Implements ERC165
 
-    ERC-165 Standard Interface Detection
-
-    Ref: https://eips.ethereum.org/EIPS/eip-165
+    [ERC-165](https://eips.ethereum.org/EIPS/eip-165) Standard Interface Detection
 
 3.  Implements IERC721Metadata
 
-    IERC721Metadata is an extension of ERC-721. IERC721Metadata allows smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
+    > IERC721Metadata is an extension of ERC-721. IERC721Metadata allows smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
 
     Ref: https://eips.ethereum.org/EIPS/eip-721
 
+4.  Implements [IUNSRegistry](./contracts/IUNSRegistry.sol)
 
-4.  Implements IUNSRegistry
+5.  Record Storage (aka Resolver)
 
-    ```solidity
-    interface IUNSRegistry /_ is IERC721Metadata, IRecordStorage _/ {
-        event NewURI(uint256 indexed tokenId, string uri);
-
-        event NewURIPrefix(string prefix);
-
-        function setTokenURIPrefix(string calldata prefix) external;
-
-        function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool);
-
-        function resolverOf(uint256 tokenId) external view returns (address);
-
-        function childIdOf(uint256 tokenId, string calldata label) external pure returns (uint256);
-
-        function setOwner(address to, uint256 tokenId) external;
-
-        function burn(uint256 tokenId) external;
-    }
-    ```
-
-
-5.  Records Storage
-
-    Records Storage early known as Resolver
-
-    ```solidity
-    interface IRecordStorage {
-        event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value);
-
-        event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key);
-
-        event ResetRecords(uint256 indexed tokenId);
-
-        function set(string calldata key, string calldata value, uint256 tokenId) external;
-
-        function setMany(string[] memory keys, string[] memory values, uint256 tokenId) external;
-
-        function setByHash(uint256 keyHash, string calldata value, uint256 tokenId) external;
-
-        function setManyByHash(uint256[] calldata keyHashes, string[] calldata values, uint256 tokenId) external;
-
-        function reconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external;
-
-        function reset(uint256 tokenId) external;
-    }
-    ```
+    Record Storage implements [IRecordStorage](./contracts/IRecordStorage.sol)
 
 6.  Support meta-transactions
 
-    EIP-2771: Secure Protocol for Native Meta Transactions
-
-    Ref: https://eips.ethereum.org/EIPS/eip-2771
+    [EIP-2771](https://eips.ethereum.org/EIPS/eip-2771): Secure Protocol for Native Meta Transactions
 
     ### Recipient:
 
@@ -92,36 +42,7 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
 
     The implementation should allow replacement of `_msgSender` and `_msgData` in case of forwarding.
 
-    ```solidity
-    abstract contract ERC2771Context is Context {
-        function isTrustedForwarder(address forwarder) public view virtual returns(bool) {
-            return forwarder == address(this);
-        }
-
-        function _msgToken() internal view virtual returns (uint256 tokenId) {
-            if (isTrustedForwarder(msg.sender)) {
-                assembly { tokenId := calldataload(sub(calldatasize(), 32)) }
-            }
-        }
-
-        function _msgSender() internal view virtual override returns (address sender) {
-            if (isTrustedForwarder(msg.sender)) {
-                // The assembly code is more direct than the Solidity version using `abi.decode`.
-                assembly { sender := shr(96, calldataload(sub(calldatasize(), 52))) }
-            } else {
-                return super._msgSender();
-            }
-        }
-
-        function _msgData() internal view virtual override returns (bytes calldata) {
-            if (isTrustedForwarder(msg.sender)) {
-                return msg.data[:msg.data.length-52];
-            } else {
-                return super._msgData();
-            }
-        }
-    }
-    ```
+    Implementation [ERC2771RegistryContext.sol](./contracts/metatx/ERC2771RegistryContext.sol)
 
     ### Forwarder:
 
@@ -152,18 +73,30 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
     }
     ```
 
+    Implementation [RegistryForwarder.sol](./contracts/metatx/RegistryForwarder.sol)
+
     ### TBD:
 
     - `RegistryForwarder` implementation:
 
-      - [design flaw](https://github.com/unstoppabledomains/uns/pull/2/commits/53990cbf9ea6d21a3cd1b299d600786bd0ef84fc#diff-509d7bcab22bd6041f0ee0295fc0c0e9ce606c73aac737abcf5b6f78908e860cR37-R54): `req.tokenId` does not coupled with `req.data.tokenId`, leads to security breach ([solution](https://github.com/unstoppabledomains/uns/pull/2/commits/75c07d061c35a0bbbcc9f54081b0c9bc4e8b99f4#diff-ca840be5bb23f8405058ac3d81aa16ee9bbe19cd811b1d83bd32ef71239d0e20R54))
       - should `execute` function be `payable`?
       - does it make sence to have `req.gas`?
       - do we need `expiry` check?
 
-7.  Upgradable registry
+7.  Upgradability
 
     > By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits significantly from the technology’s immutability, still a certain degree of mutability is needed for bug fixing and potential product improvements.
+
+    Upgradability comes from two patterns:
+    1. Initializable
+        > Since a proxied contract can't have a constructor, it's common to move constructor logic to an
+        external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer
+        function so it can only be called once.
+    2. Context
+        > Provides information about the current execution context, including the
+        sender of the transaction and its data.
+
+    UNS uses [Transparent Proxy](https://blog.openzeppelin.com/the-transparent-proxy-pattern/) for upgradability.
 
     Refs:
 
@@ -173,6 +106,8 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
     - [Transparent vs UUPS Proxies](https://docs.openzeppelin.com/contracts/4.x/api/proxy#transparent-vs-uups)
 
 8. TLD management
+
+    UNS TLD management is delegated to MintingManager contract.
 
     ```solidity
     contract IMintingManager {
@@ -185,14 +120,19 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
     }
     ```
 
-9. Multicalls
+9. Domin minting
+
+    **Unstoppable Domains, Inc.** reserves all rights of domains minting and defines rules of domain minting through MintingManager contract.
+
 10. Roles model
+
+    TBD
 
 ## Main stack
 
 - Solidity `^0.8.0`
 - OpenZeppelin contracts-upgradeable `^4.1.0`
-- Hardhat `^2.2.1`
+- Hardhat `^2.4.1`
 - ethers.js `^5.1.4`
 
 ## Environment variables
@@ -215,7 +155,7 @@ Variables [`RINKEBY_INFURA_KEY`, `RINKEBY_UNS_PRIVATE_KEY`, `CNS_ADMIN_PRIVATE_K
 - Deploy contracts `yarn deploy:__network__`
 - Upgrade Registry and MintingManager `yarn upgrade:__network__`
 
-`__network__` = [`localhost`, `rinkeby`]
+`__network__` = [`localhost`, `rinkeby`, `mainnet`]
 
 ## E2E tests
 
@@ -230,7 +170,7 @@ This type of testing is needed to ensure everything is OK after deployment to te
 
 <div id="backward-incompatibility"></div>
 
-## Backward incompatibility:
+## Backward incompatibility
 
 Note: List of changes which makes UNS and CNS backward incompatibile
 
@@ -263,7 +203,6 @@ Note: List of changes which makes UNS and CNS backward incompatibile
 
 ### Read API
 
-
 * `Registry.isController`
   * Removed
 
@@ -272,7 +211,6 @@ Note: List of changes which makes UNS and CNS backward incompatibile
 None
 
 ### Resolvers Removal
-
 
 * `function resolveTo(address to, uint256 tokenId) external {}` 
   * Removed - UNS uses a single Resolver which is Registry itself.

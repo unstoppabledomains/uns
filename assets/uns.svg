@@ -310,9 +310,9 @@
 <path fill="none" stroke="#000000" d="M3937.0583,-789.0116C3937.0583,-852.0331 3937.0583,-913.1903 3937.0583,-963.7247"/>
 <polygon fill="none" stroke="#000000" points="3926.5584,-963.7384 3937.0583,-993.7385 3947.5584,-963.7385 3926.5584,-963.7384"/>
 </g>
-<!-- 27 -->
+<!-- 26 -->
 <g id="node20" class="node">
-<title>27</title>
+<title>26</title>
 <polygon fill="#f2f2f2" stroke="#000000" points="4857.8854,-909.9 4857.8854,-1269.9 5140.2312,-1269.9 5140.2312,-909.9 4857.8854,-909.9"/>
 <text text-anchor="middle" x="4999.0583" y="-1253.3" font-family="Times,serif" font-size="14.00" fill="#000000">&lt;&lt;Abstract&gt;&gt;</text>
 <text text-anchor="middle" x="4999.0583" y="-1236.5" font-family="Times,serif" font-size="14.00" fill="#000000">MinterRole</text>
@@ -337,9 +337,9 @@
 <text text-anchor="start" x="4865.8854" y="-934.9" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;removeMinters(accounts: address[])</text>
 <text text-anchor="start" x="4865.8854" y="-918.1" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;renounceMinter()</text>
 </g>
-<!-- 7&#45;&gt;27 -->
+<!-- 7&#45;&gt;26 -->
 <g id="edge4" class="edge">
-<title>7&#45;&gt;27</title>
+<title>7&#45;&gt;26</title>
 <path fill="none" stroke="#000000" d="M4397.296,-570.8076C4552.3501,-640.7782 4718.8868,-733.7165 4849.0583,-850.6 4861.1433,-861.4514 4872.6123,-873.5012 4883.4224,-886.2575"/>
 <polygon fill="none" stroke="#000000" points="4875.2885,-892.8992 4902.1596,-909.8757 4891.7402,-879.8476 4875.2885,-892.8992"/>
 </g>

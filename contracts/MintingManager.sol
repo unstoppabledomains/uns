@@ -196,13 +196,12 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
     }
 
     function _verifyRelayCall(bytes4 funcSig, bytes calldata) internal pure override {
-        bool isSupported =
-            funcSig == _SIG_MINT ||
-                funcSig == _SIG_SAFE_MINT ||
-                funcSig == _SIG_SAFE_MINT_DATA ||
-                funcSig == _SIG_MINT_WITH_RECORDS ||
-                funcSig == _SIG_SAFE_MINT_WITH_RECORDS ||
-                funcSig == _SIG_SAFE_MINT_WITH_RECORDS_DATA;
+        bool isSupported = funcSig == _SIG_MINT ||
+            funcSig == _SIG_SAFE_MINT ||
+            funcSig == _SIG_SAFE_MINT_DATA ||
+            funcSig == _SIG_MINT_WITH_RECORDS ||
+            funcSig == _SIG_SAFE_MINT_WITH_RECORDS ||
+            funcSig == _SIG_SAFE_MINT_WITH_RECORDS_DATA;
 
         require(isSupported, 'MintingManager: UNSUPPORTED_RELAY_CALL');
     }
