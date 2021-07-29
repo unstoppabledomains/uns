@@ -14,13 +14,13 @@ describe('Sandbox', async () => {
 
   let UNSRegistry, MintingManager;
   let unsRegistry, mintingManager;
-  let signers, coinbase, sandbox;
+  let signers, owner, minter, sandbox;
 
   before(async () => {
     sandbox = await Sandbox.start({ verbose: true });
 
     signers = await ethers.getSigners();
-    [coinbase] = signers;
+    [owner, minter] = signers;
 
     UNSRegistry = await ethers.getContractFactory('contracts/UNSRegistry.sol:UNSRegistry');
     MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
@@ -42,22 +42,22 @@ describe('Sandbox', async () => {
   it('should mint a token', async () => {
     const _domainName = `${domainPrefix}_wallet_0`;
 
-    const tx = await mintingManager.connect(coinbase)
-      .mintSLD(coinbase.address, walletRoot, _domainName);
+    const tx = await mintingManager.connect(minter)
+      .mintSLD(owner.address, walletRoot, _domainName);
     await tx.wait();
 
     const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
-    expect(await unsRegistry.ownerOf(_walletTokenId)).to.be.eq(coinbase.address);
+    expect(await unsRegistry.ownerOf(_walletTokenId)).to.be.eq(owner.address);
   });
 
   it('should mint same token as prev test', async () => {
     const _domainName = `${domainPrefix}_wallet_0`;
 
-    const tx = await mintingManager.connect(coinbase)
-      .mintSLD(coinbase.address, walletRoot, _domainName);
+    const tx = await mintingManager.connect(minter)
+      .mintSLD(owner.address, walletRoot, _domainName);
     await tx.wait();
 
     const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
-    expect(await unsRegistry.ownerOf(_walletTokenId)).to.be.eq(coinbase.address);
+    expect(await unsRegistry.ownerOf(_walletTokenId)).to.be.eq(owner.address);
   });
 });

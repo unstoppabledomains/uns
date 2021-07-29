@@ -75,14 +75,17 @@ class Sandbox {
     this.provider = service.provider;
     this.snapshotId = undefined;
 
-    const [ owner, ...accounts ] = this._getAccounts(this.options.network);
-    this.owner = owner;
-    this.accounts = accounts;
+    const accounts = this._getAccounts(this.options.network);
+    this.accounts = {
+      owner: accounts[0],
+      minter: accounts[1],
+      faucet: accounts[9],
+      ...accounts,
+    };
 
     log('Initialized sandbox', {
       options: this.options,
-      owner: this.owner.address,
-      accounts: Object.values(this.accounts).map(a => a.address),
+      accounts: this.accounts,
     });
   }
 
