@@ -77,10 +77,8 @@ class Sandbox {
 
     const accounts = this._getAccounts(this.options.network);
     this.accounts = {
-      unsDeployer: accounts[0],
-      unsMinter: accounts[0],
-      cnsDeployer: accounts[1],
-      cnsMiner: accounts[1],
+      owner: accounts[0],
+      miner: accounts[1],
       faucet: accounts[9],
       ...accounts,
     };

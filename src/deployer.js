@@ -35,13 +35,13 @@ async function _getArtifacts () {
 
 class Deployer {
   static async create (options) {
-    const [unsDeployer, cnsDeployer] = await ethers.getSigners();
+    const [owner] = await ethers.getSigners();
     const _unsConfig = hhConfig.uns;
 
     return new Deployer(
       options,
       await _getArtifacts(),
-      { unsDeployer, cnsDeployer },
+      { owner },
       _unsConfig.minters[network.name],
       _unsConfig.linkToken[network.name],
     );

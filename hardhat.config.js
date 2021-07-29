@@ -93,7 +93,7 @@ module.exports = {
       url: `https://rinkeby.infura.io/v3/${process.env.RINKEBY_INFURA_KEY}`,
       chainId: 4,
       accounts: process.env.RINKEBY_UNS_PRIVATE_KEY
-        ? [process.env.RINKEBY_UNS_PRIVATE_KEY, process.env.CNS_ADMIN_PRIVATE_KEY]
+        ? [process.env.RINKEBY_UNS_PRIVATE_KEY]
         : undefined,
     },
     mainnet: {

@@ -140,15 +140,11 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
 - `RINKEBY_INFURA_KEY` - Infura key for connecting to Ethereum Node
 - `RINKEBY_UNS_PRIVATE_KEY` - Private key of account for contracts deployment
 - `ETHERSCAN_API_KEY` - Etherscan API Key for smart contracts verification
-- `CNS_ADMIN_PRIVATE_KEY` - Private key of account which has rights for:
-  - Adding minters to CNS MintingController
-  - Adding whitelisted accounts to CNS URIPrefixController
-- `UNS_WORKER_PRIVATE_KEY` - Private key of account which has rights for minting domains
 
 NOTE: All private keys should be in HEX format with `0x` prefix
 
 
-Variables [`RINKEBY_INFURA_KEY`, `RINKEBY_UNS_PRIVATE_KEY`, `CNS_ADMIN_PRIVATE_KEY`] are required for operating with Rinkeby network, including deployment and making smart contract calls.
+Variables [`RINKEBY_INFURA_KEY`, `RINKEBY_UNS_PRIVATE_KEY`] are required for operating with Rinkeby network, including deployment and making smart contract calls.
 
 ## Upgradeable proxy
 
@@ -156,17 +152,6 @@ Variables [`RINKEBY_INFURA_KEY`, `RINKEBY_UNS_PRIVATE_KEY`, `CNS_ADMIN_PRIVATE_K
 - Upgrade Registry and MintingManager `yarn upgrade:__network__`
 
 `__network__` = [`localhost`, `rinkeby`, `mainnet`]
-
-## E2E tests
-
-This type of testing is needed to ensure everything is OK after deployment to testnet.
-
-- `UNS_WORKER_PRIVATE_KEY` - Private key of account which has rights for minting domains
-- `UNS_REGISTRY_PROXY` - Address of UNS Registry Proxy
-- `UNS_MINTING_MANAGERE_PROXY` - Address of UNS MintingController Proxy
-- `CNS_REGISTRY` - Address of CNS Registry
-- `CNS_RESOLVER` - Address of CNS Default Resolver
-- `UNS_PROXY_READER` - Address of UNS ProxyReader
 
 <div id="backward-incompatibility"></div>
 
