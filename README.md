@@ -257,8 +257,8 @@ The emulator uses mnemonic for preparing list of accounts. It always has strict 
 ```
 Available Accounts
 ==================
-(0) 0xfe84Ab89b7Fc902Ff3CfD756403a8f085B1639Aa (1000 ETH)    // UNS deployer & Minter
-(1) 0x9DC64b2558b458A15C7f01c192D874Ef460f0A29 (1000 ETH)    // CNS deployer & WhitelistedAdmin
+(0) 0xfe84Ab89b7Fc902Ff3CfD756403a8f085B1639Aa (1000 ETH)    // CNS & UNS deployer
+(1) 0x9DC64b2558b458A15C7f01c192D874Ef460f0A29 (1000 ETH)    // Minter
 (2) 0x94F57ed7e9af03A10e8EB23CE1B3c7914a182b0f (1000 ETH)
 (3) 0x936188f2C3C8E8c95e425b6fe41c2ac9E701585e (1000 ETH)
 (4) 0x95f29431AEb52C0D5DbEEEC36010b8e2CA69CB3D (1000 ETH)
