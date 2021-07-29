@@ -29,6 +29,16 @@ contract UNSRegistry is
 {
     using AddressUpgradeable for address;
 
+    /**
+     * @dev ERC-1967: Emitted when the implementation is upgraded. Required for ABI decoding only.
+     */
+    event Upgraded(address indexed implementation);
+
+    /**
+     * @dev ERC-1967: Emitted when the admin account has changed. Required for ABI decoding only.
+     */
+    event AdminChanged(address previousAdmin, address newAdmin);
+
     string public constant NAME = 'UNS: Registry';
     string public constant VERSION = '0.1.0';
 
