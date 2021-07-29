@@ -87,11 +87,7 @@ class Sandbox {
 
     log('Initialized sandbox', {
       options: this.options,
-      accounts: Object.entries(this.accounts).reduce((acc, pair) => {
-        const [key, value] = pair;
-        acc[key] = value.address;
-        return acc;
-      }, {}),
+      accounts: this.accounts,
     });
   }
 
