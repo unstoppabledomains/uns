@@ -78,7 +78,7 @@ class Sandbox {
     const accounts = this._getAccounts(this.options.network);
     this.accounts = {
       owner: accounts[0],
-      miner: accounts[1],
+      minter: accounts[1],
       faucet: accounts[9],
       ...accounts,
     };
