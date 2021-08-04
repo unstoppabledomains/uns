@@ -22,7 +22,7 @@ import './roles/MinterRole.sol';
  */
 contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable, MinterRole, Relayer, IMintingManager {
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.1.0';
+    string public constant VERSION = '0.1.1';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;

@@ -224,6 +224,13 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "initAdmin",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",

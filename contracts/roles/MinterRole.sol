@@ -22,7 +22,16 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __MinterRole_init_unchained() internal initializer {}
+    function __MinterRole_init_unchained() internal initializer {
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    }
+
+    /**
+     * @dev [TEMP] Function initialize default admin role.
+     */
+    function initAdmin() public onlyOwner {
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    }
 
     function isMinter(address account) public view returns (bool) {
         return hasRole(MINTER_ROLE, account);
@@ -49,7 +58,7 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
     }
 
     function renounceMinter() public {
-        _removeMinter(_msgSender());
+        renounceRole(MINTER_ROLE, _msgSender());
     }
 
     /**
@@ -78,6 +87,6 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
     }
 
     function _removeMinter(address account) internal {
-        renounceRole(MINTER_ROLE, account);
+        revokeRole(MINTER_ROLE, account);
     }
 }
