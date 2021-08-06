@@ -32,4 +32,9 @@ allFiredEvents
 cache
 .artifacts
 
+# openzeppelin
+.openzeppelin/unknown-*.json
+
 .sandbox
+.deployer
+
