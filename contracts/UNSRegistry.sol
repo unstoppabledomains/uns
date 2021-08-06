@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 
 import './IUNSRegistry.sol';
@@ -27,8 +26,6 @@ contract UNSRegistry is
     RegistryForwarder,
     IUNSRegistry
 {
-    using AddressUpgradeable for address;
-
     /**
      * @dev ERC-1967: Emitted when the implementation is upgraded. Required for ABI decoding only.
      */
@@ -40,7 +37,7 @@ contract UNSRegistry is
     event AdminChanged(address previousAdmin, address newAdmin);
 
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.1.0';
+    string public constant VERSION = '0.1.1';
 
     string internal _prefix;
 
