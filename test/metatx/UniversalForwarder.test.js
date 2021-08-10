@@ -42,6 +42,7 @@ describe('UniversalForwarder', () => {
       await ethers.getContractFactory('dot-crypto/contracts/controllers/SignatureController.sol:SignatureController');
 
     forwarder = await UniversalForwarder.deploy();
+    await forwarder.initialize();
 
     registry = await CNSRegistry.deploy();
     mintingController = await MintingController.deploy(registry.address);
@@ -66,22 +67,47 @@ describe('UniversalForwarder', () => {
       'transferFromFor(address,address,uint256,bytes)',
       [owner.address, receiver.address, tokenId, signature],
     );
+    console.log('proxyData', proxyData);
 
     const req = {
       from: owner.address,
       to: signatureController.address,
       gas: '200000',
       nonce: 0,
-      data: proxyData,
+      data: data,
     };
-    const [success, returnData] = await forwarder.callStatic.execute(req, '0x');
+    const [success, returnData] = await forwarder.callStatic.execute(req, signature);
     if (!success) {
       console.error(getReason(returnData));
     }
     expect(success).to.be.equal(true);
 
     // assert execution result
-    await forwarder.execute(req, '0x');
+    await forwarder.execute(req, signature);
     expect(await registry.ownerOf(tokenId)).to.be.equal(receiver.address);
+  });
+
+  it('aaa', async () => {
+    const _domainName = 'test_foo_11';
+    const tokenId = await registry.childIdOf(cryptoRoot, _domainName);
+
+    const data = registry.interface.encodeFunctionData(
+      'transferFrom(address,address,uint256)',
+      [owner.address, receiver.address, tokenId],
+    );
+    console.log('DATA', data);
+
+    const signature = await sign(data, signatureController.address, await signatureController.nonceOf(tokenId), owner);
+    console.log('SIG', signature);
+
+    const req = {
+      from: owner.address,
+      to: signatureController.address,
+      gas: '200000',
+      nonce: 0,
+      data: data,
+    };
+    const ad = await forwarder.callStatic.build(req, signature);
+    console.log(ad);
   });
 });

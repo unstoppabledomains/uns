@@ -18,42 +18,50 @@ contract UniversalForwarder is Initializable, EIP712Upgradeable {
         bytes data;
     }
 
+    struct ForwardingRule {
+        bytes4 selector;
+        uint256 sigOffset;
+    }
+
     bytes32 private constant _TYPEHASH =
         keccak256('ForwardRequest(address from,address to,uint256 gas,uint256 nonce,bytes data)');
 
-    // mapping(address => uint256) private _nonces;
+    mapping(bytes4 => ForwardingRule) private _rules;
 
-    // solhint-disable-next-line func-name-mixedcase
-    function __UniversalForwarder_init() internal initializer {
-        __UniversalForwarder_init_unchained();
-    }
-
-    // solhint-disable-next-line func-name-mixedcase
-    function __UniversalForwarder_init_unchained() internal initializer {
+    function initialize() public initializer {
         __EIP712_init_unchained('UniversalForwarder', '0.0.1');
+        _rules[0x23b872dd] = ForwardingRule(0xef2c3088, 0x80); // transferFrom -> transferFromFor
     }
 
-    // function getNonce(address from) public view returns (uint256) {
-    //     return _nonces[from];
-    // }
-
-    // function verify(ForwardRequest calldata req, bytes calldata signature) public view returns (bool) {
-    //     address signer = _hashTypedDataV4(
-    //         keccak256(abi.encode(_TYPEHASH, req.from, req.to, req.gas, req.nonce, keccak256(req.data)))
-    //     ).recover(signature);
-    //     return _nonces[req.from] == req.nonce && signer == req.from;
-    // }
-
-    function execute(ForwardRequest calldata req, bytes calldata /* signature */) public returns (bool, bytes memory) {
-        // require(verify(req, signature), 'UniversalForwarder: SIGNATURE_INVALID');
-        // _nonces[req.from] = req.nonce + 1;
-
+    function execute(ForwardRequest calldata req, bytes calldata signature) public returns (bool, bytes memory) {
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = req.to.call{gas: req.gas}(req.data);
+        (bool success, bytes memory returndata) = req.to.call{gas: req.gas}(build(req, signature));
         // Validate that the relayer has sent enough gas for the call.
         // See https://ronan.eth.link/blog/ethereum-gas-dangers/
         assert(gasleft() > req.gas / 63);
 
         return (success, returndata);
+    }
+
+    function build(ForwardRequest calldata req, bytes calldata signature) public view returns (bytes memory) {
+        bytes4 funcSig;
+        bytes memory _data = req.data;
+        /* solium-disable-next-line security/no-inline-assembly */
+        assembly {
+            funcSig := mload(add(_data, add(0x20, 0)))
+        }
+
+        bytes memory data = req.data;
+        if (_rules[funcSig].selector != 0) {
+            data = abi.encodePacked(
+                _rules[funcSig].selector,
+                req.data[4:],
+                _rules[funcSig].sigOffset,
+                signature.length,
+                signature
+            );
+        }
+
+        return data;
     }
 }
