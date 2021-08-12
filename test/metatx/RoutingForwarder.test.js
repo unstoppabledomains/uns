@@ -14,10 +14,10 @@ const sign = async (data, address, nonce, signer) => {
   );
 };
 
-describe('StackedForwarder', () => {
+describe('RoutingForwarder', () => {
   const cryptoRoot = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
 
-  let StackedForwarder, CNSRegistry, MintingController, SignatureController;
+  let RoutingForwarder, CNSRegistry, MintingController, SignatureController;
   let forwarder, registry, mintingController, signatureController;
   let signers, owner, receiver;
 
@@ -25,15 +25,12 @@ describe('StackedForwarder', () => {
     signers = await ethers.getSigners();
     [owner, receiver] = signers;
 
-    StackedForwarder = await ethers.getContractFactory('StackedForwarder');
+    RoutingForwarder = await ethers.getContractFactory('RoutingForwarder');
     CNSRegistry = await ethers.getContractFactory('dot-crypto/contracts/CNSRegistry.sol:CNSRegistry');
     MintingController =
       await ethers.getContractFactory('dot-crypto/contracts/controllers/MintingController.sol:MintingController');
     SignatureController =
       await ethers.getContractFactory('dot-crypto/contracts/controllers/SignatureController.sol:SignatureController');
-
-    forwarder = await StackedForwarder.deploy();
-    await forwarder.initialize();
 
     registry = await CNSRegistry.deploy();
     mintingController = await MintingController.deploy(registry.address);
@@ -41,6 +38,9 @@ describe('StackedForwarder', () => {
 
     await registry.addController(mintingController.address);
     await registry.addController(signatureController.address);
+
+    forwarder = await RoutingForwarder.deploy();
+    await forwarder.initialize(signatureController.address);
   });
 
   it('should execute', async () => {
@@ -56,18 +56,18 @@ describe('StackedForwarder', () => {
 
     const req = {
       from: owner.address,
-      to: signatureController.address,
-      nonce: 0,
+      nonce: await forwarder.nonceOf(tokenId),
       tokenId,
       data: data,
     };
 
+    // verify signature
+    const isValid = await forwarder.verify(req, signature);
+    expect(isValid).to.be.equal(true);
+
     // assert execution result
     await forwarder.execute(req, signature);
     expect(await registry.ownerOf(tokenId)).to.be.equal(receiver.address);
-
-    const isValid = await forwarder.verify(req, signature);
-    expect(isValid).to.be.equal(true);
   });
 
   it('should build valid `transferFrom` calldata', async () => {
@@ -86,7 +86,6 @@ describe('StackedForwarder', () => {
 
     const req = {
       from: owner.address,
-      to: signatureController.address,
       nonce: 0,
       tokenId,
       data: data,

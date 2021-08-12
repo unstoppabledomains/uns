@@ -9,11 +9,11 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import './IUniversalForwarder.sol';
 
 /**
- * @title StackedForwarder
- * @dev StackedForwarder simplifies operation with legacy meta-transactions.
+ * @title RoutingForwarder
+ * @dev RoutingForwarder simplifies operation with legacy meta-transactions.
  * It works on top of existing contracts infrastructure.
  */
-contract StackedForwarder is Initializable, IUniversalForwarder {
+contract RoutingForwarder is Initializable, IUniversalForwarder {
     using ECDSAUpgradeable for bytes32;
 
     struct ForwardingRule {
@@ -21,9 +21,11 @@ contract StackedForwarder is Initializable, IUniversalForwarder {
         uint256 sigOffset;
     }
 
+    IUniversalForwarder private _target;
     mapping(bytes4 => ForwardingRule) private _rules;
 
-    function initialize() public initializer {
+    function initialize(IUniversalForwarder target) public initializer {
+        _target = target;
         _rules[bytes4(keccak256('transferFrom(address,address,uint256)'))] = ForwardingRule(
             bytes4(keccak256('transferFromFor(address,address,uint256,bytes)')),
             0x20 * 4
@@ -31,13 +33,12 @@ contract StackedForwarder is Initializable, IUniversalForwarder {
     }
 
     function nonceOf(uint256 tokenId) public view override returns (uint256) {
-        //TODO: figure out how to fetch nonce when target address is absent
-        return 0;
+        return _target.nonceOf(tokenId);
     }
 
     function verify(ForwardRequest calldata req, bytes calldata signature) external view override returns (bool) {
         uint256 nonce = nonceOf(req.tokenId);
-        address signer = keccak256(abi.encodePacked(keccak256(req.data), req.to, nonce))
+        address signer = keccak256(abi.encodePacked(keccak256(req.data), address(_target), nonce))
             .toEthSignedMessageHash()
             .recover(signature);
         return nonce == req.nonce && signer == req.from;
@@ -47,12 +48,12 @@ contract StackedForwarder is Initializable, IUniversalForwarder {
         uint256 gas = gasleft();
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = req.to.call{gas: gas}(buildData(req, signature));
+        (bool success, bytes memory returndata) = address(_target).call{gas: gas}(buildData(req, signature));
         // Validate that the relayer has sent enough gas for the call.
         // See https://ronan.eth.link/blog/ethereum-gas-dangers/
         assert(gasleft() > gas / 63);
 
-        return _verifyCallResult(success, returndata, 'StackedForwarder: CALL_FAILED');
+        return _verifyCallResult(success, returndata, 'RoutingForwarder: CALL_FAILED');
     }
 
     function buildData(ForwardRequest calldata req, bytes calldata signature) public view returns (bytes memory) {
