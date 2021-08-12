@@ -3,7 +3,7 @@
 
 pragma solidity ^0.8.0;
 
-interface IUniversalForwarder {
+interface IForwarder {
     struct ForwardRequest {
         address from;
         uint256 nonce;

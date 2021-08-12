@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IUniversalForwarder",
-  "sourceName": "contracts/metatx/IUniversalForwarder.sol",
+  "contractName": "BaseForwarder",
+  "sourceName": "contracts/metatx/BaseForwarder.sol",
   "abi": [
     {
       "inputs": [
@@ -28,7 +28,7 @@
               "type": "bytes"
             }
           ],
-          "internalType": "struct IUniversalForwarder.ForwardRequest",
+          "internalType": "struct IForwarder.ForwardRequest",
           "name": "req",
           "type": "tuple"
         },
@@ -93,7 +93,7 @@
               "type": "bytes"
             }
           ],
-          "internalType": "struct IUniversalForwarder.ForwardRequest",
+          "internalType": "struct IForwarder.ForwardRequest",
           "name": "req",
           "type": "tuple"
         },

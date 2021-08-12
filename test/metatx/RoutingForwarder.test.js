@@ -90,8 +90,29 @@ describe('RoutingForwarder', () => {
       tokenId,
       data: data,
     };
-    const calldata = await forwarder.callStatic.buildData(req, signature);
+    const calldata = await forwarder.callStatic.buildRouteData(req, signature);
 
     expect(`${calldata}00000000000000000000000000000000000000000000000000000000000000`).to.be.equal(expectedCalldata);
+  });
+
+  it('should return false on verification of unknown function execute', async () => {
+    const tokenId = await registry.childIdOf(cryptoRoot, 'test_foo_13');
+
+    const data = registry.interface.encodeFunctionData(
+      'setOwner(address,uint256)',
+      [receiver.address, tokenId],
+    );
+    const signature = await sign(data, signatureController.address, await signatureController.nonceOf(tokenId), owner);
+
+    const req = {
+      from: owner.address,
+      nonce: await forwarder.nonceOf(tokenId),
+      tokenId,
+      data: data,
+    };
+
+    // verify signature
+    const isValid = await forwarder.verify(req, signature);
+    expect(isValid).to.be.equal(false);
   });
 });
