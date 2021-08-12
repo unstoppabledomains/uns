@@ -30,6 +30,34 @@ contract RoutingForwarder is Initializable, IUniversalForwarder {
             bytes4(keccak256('transferFromFor(address,address,uint256,bytes)')),
             0x20 * 4
         );
+        _rules[bytes4(keccak256('safeTransferFrom(address,address,uint256)'))] = ForwardingRule(
+            bytes4(keccak256('safeTransferFromFor(address,address,uint256,bytes)')),
+            0x20 * 4
+        );
+        _rules[bytes4(keccak256('safeTransferFrom(address,address,uint256,bytes)'))] = ForwardingRule(
+            bytes4(keccak256('safeTransferFromFor(address,address,uint256,bytes,bytes)')),
+            0x20 * 5
+        );
+        _rules[bytes4(keccak256('burn(uint256)'))] = ForwardingRule(
+            bytes4(keccak256('burnFor(uint256,bytes)')),
+            0x20 * 2
+        );
+        _rules[bytes4(keccak256('reset(uint256)'))] = ForwardingRule(
+            bytes4(keccak256('resetFor(uint256,bytes)')),
+            0x20 * 2
+        );
+        _rules[bytes4(keccak256('set(string,string,uint256)'))] = ForwardingRule(
+            bytes4(keccak256('setFor(string,string,uint256,bytes)')),
+            0x20 * 4
+        );
+        _rules[bytes4(keccak256('setMany(string[],string[],uint256)'))] = ForwardingRule(
+            bytes4(keccak256('setManyFor(string[],string[],uint256,bytes)')),
+            0x20 * 4
+        );
+        _rules[bytes4(keccak256('reconfigure(string[],string[],uint256)'))] = ForwardingRule(
+            bytes4(keccak256('reconfigureFor(string[],string[],uint256,bytes)')),
+            0x20 * 4
+        );
     }
 
     function nonceOf(uint256 tokenId) public view override returns (uint256) {
@@ -64,6 +92,7 @@ contract RoutingForwarder is Initializable, IUniversalForwarder {
             selector := mload(add(_data, add(0x20, 0)))
         }
 
+        // TODO: decide what to do on calls with undefined rules
         bytes memory data = req.data;
         if (_rules[selector].selector != 0) {
             data = abi.encodePacked(
