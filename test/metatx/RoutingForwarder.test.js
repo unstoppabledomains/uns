@@ -1,18 +1,9 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
-const { utils, BigNumber } = ethers;
+const { sign } = require('./../helpers/metatx');
 
-const sign = async (data, address, nonce, signer) => {
-  return signer.signMessage(
-    utils.arrayify(
-      utils.solidityKeccak256(
-        [ 'bytes32', 'address', 'uint256' ],
-        [ utils.keccak256(data), address, nonce ],
-      ),
-    ),
-  );
-};
+const { BigNumber } = ethers;
 
 describe('RoutingForwarder', () => {
   const cryptoRoot = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
@@ -43,76 +34,127 @@ describe('RoutingForwarder', () => {
     await forwarder.initialize(signatureController.address);
   });
 
-  it('should execute', async () => {
-    const domainName = 'test_foo';
-    await mintingController.mintSLD(owner.address, domainName);
-    const tokenId = await registry.childIdOf(cryptoRoot, domainName);
+  const mintDomain = async (label, owner) => {
+    await mintingController.mintSLD(owner, label);
+    return await registry.childIdOf(cryptoRoot, label);
+  };
 
-    const data = registry.interface.encodeFunctionData(
+  const buildExecuteParams = async (selector, params, from, tokenId) => {
+    const data = registry.interface.encodeFunctionData(selector, params);
+    const nonce = await forwarder.nonceOf(tokenId);
+    const signature = await sign(data, signatureController.address, nonce, from);
+    return { req: { from: from.address, nonce, tokenId, data }, signature };
+  };
+
+  const buildTransfer = async (from, toAddress, tokenId) => {
+    return await buildExecuteParams(
       'transferFrom(address,address,uint256)',
-      [owner.address, receiver.address, tokenId],
-    );
-    const signature = await sign(data, signatureController.address, await signatureController.nonceOf(tokenId), owner);
-
-    const req = {
-      from: owner.address,
-      nonce: await forwarder.nonceOf(tokenId),
+      [from.address, toAddress, tokenId],
+      from,
       tokenId,
-      data: data,
-    };
+    );
+  };
 
-    // verify signature
-    const isValid = await forwarder.verify(req, signature);
-    expect(isValid).to.be.equal(true);
+  const executeTransfer = async (from, toAddress, tokenId) => {
+    const { req, signature } = await buildTransfer(from, toAddress, tokenId);
+    return await forwarder.execute(req, signature);
+  };
 
-    // assert execution result
+  it('should verify & execute correctly', async () => {
+    const tokenId = await mintDomain('test_foo', owner.address);
+    const { req, signature } = await buildTransfer(owner, receiver.address, tokenId);
+
+    expect(await forwarder.verify(req, signature)).to.be.equal(true);
+
     await forwarder.execute(req, signature);
     expect(await registry.ownerOf(tokenId)).to.be.equal(receiver.address);
   });
 
-  it('should build valid `transferFrom` calldata', async () => {
-    const tokenId = await registry.childIdOf(cryptoRoot, 'test_foo_12');
+  describe('nonceOf', () => {
+    it('should match nonces', async () => {
+      const tokenId = await mintDomain('test_foon', owner.address);
+      let nonceF = await forwarder.nonceOf(tokenId);
+      let nonceS = await signatureController.nonceOf(tokenId);
 
-    const data = registry.interface.encodeFunctionData(
-      'transferFrom(address,address,uint256)',
-      [owner.address, receiver.address, tokenId],
-    );
-    const signature = await sign(data, signatureController.address, await signatureController.nonceOf(tokenId), owner);
+      expect(nonceF).to.be.equal(0);
+      expect(nonceF).to.be.equal(nonceS);
 
-    const expectedCalldata = signatureController.interface.encodeFunctionData(
-      'transferFromFor(address,address,uint256,bytes)',
-      [owner.address, receiver.address, tokenId, signature],
-    );
+      await executeTransfer(owner, receiver.address, tokenId);
 
-    const req = {
-      from: owner.address,
-      nonce: 0,
-      tokenId,
-      data: data,
-    };
-    const calldata = await forwarder.callStatic.buildRouteData(req, signature);
-
-    expect(`${calldata}00000000000000000000000000000000000000000000000000000000000000`).to.be.equal(expectedCalldata);
+      nonceF = await forwarder.nonceOf(tokenId);
+      nonceS = await signatureController.nonceOf(tokenId);
+      expect(nonceF).to.be.equal(1);
+      expect(nonceF).to.be.equal(nonceS);
+    });
   });
 
-  it('should return false on verification of unknown function execute', async () => {
-    const tokenId = await registry.childIdOf(cryptoRoot, 'test_foo_13');
+  describe('buildRouteData', () => {
+    it('should build valid `transferFrom` route calldata', async () => {
+      const tokenId = await registry.childIdOf(cryptoRoot, 'test_foob_1');
+      const { req, signature } = await buildTransfer(owner, receiver.address, tokenId);
 
-    const data = registry.interface.encodeFunctionData(
-      'setOwner(address,uint256)',
-      [receiver.address, tokenId],
-    );
-    const signature = await sign(data, signatureController.address, await signatureController.nonceOf(tokenId), owner);
+      const expectedData = signatureController.interface.encodeFunctionData(
+        'transferFromFor(address,address,uint256,bytes)',
+        [owner.address, receiver.address, tokenId, signature],
+      );
 
-    const req = {
-      from: owner.address,
-      nonce: await forwarder.nonceOf(tokenId),
-      tokenId,
-      data: data,
-    };
+      const calldata = await forwarder.callStatic.buildRouteData(req, signature);
 
-    // verify signature
-    const isValid = await forwarder.verify(req, signature);
-    expect(isValid).to.be.equal(false);
+      expect(`${calldata}00000000000000000000000000000000000000000000000000000000000000`).to.be.equal(expectedData);
+    });
+
+    it('should revert when unknown function call', async () => {
+      const tokenId = await mintDomain('test_foob_2', owner.address);
+
+      const data = registry.interface.encodeFunctionData(
+        'setOwner(address,uint256)',
+        [receiver.address, tokenId],
+      );
+      const nonce = await forwarder.nonceOf(tokenId);
+      const signature = await sign(data, signatureController.address, nonce, owner);
+      const req = { from: owner.address, nonce, tokenId, data };
+
+      await expect(
+        forwarder.callStatic.buildRouteData(req, signature),
+      ).to.be.revertedWith('RoutingForwarder: ROUTE_UNKNOWN');
+    });
+  });
+
+  describe('verify', () => {
+    it('should verify successfully', async () => {
+      const tokenId = await mintDomain('test_foo_10', owner.address);
+      const { req, signature } = await buildTransfer(owner, receiver.address, tokenId);
+
+      expect(await forwarder.verify(req, signature)).to.be.equal(true);
+    });
+
+    it('should fail verification when unknown function call', async () => {
+      const tokenId = await mintDomain('test_foo_13', owner.address);
+
+      const data = registry.interface.encodeFunctionData(
+        'setOwner(address,uint256)',
+        [receiver.address, tokenId],
+      );
+      const nonce = await forwarder.nonceOf(tokenId);
+      const signature = await sign(data, signatureController.address, nonce, owner);
+      const req = { from: owner.address, nonce, tokenId, data };
+
+      expect(await forwarder.verify(req, signature)).to.be.equal(false);
+    });
+
+    it('should fail verification when nonce is incorrect', async () => {
+      const tokenId = await mintDomain('test_foo_14', owner.address);
+      const { req, signature } = await buildTransfer(owner, receiver.address, tokenId);
+
+      expect(await forwarder.verify({ ...req, nonce: 100 }, signature)).to.be.equal(false);
+    });
+
+    it('should fail verification when signature used', async () => {
+      const tokenId = await mintDomain('test_foo_15', owner.address);
+      const { req, signature } = await buildTransfer(owner, receiver.address, tokenId);
+      await forwarder.execute(req, signature);
+
+      expect(await forwarder.verify(req, signature)).to.be.equal(false);
+    });
   });
 });

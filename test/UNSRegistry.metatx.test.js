@@ -1,7 +1,7 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
-const { signTypedData } = require('./helpers/metatx');
+const { sign, signTypedData } = require('./helpers/metatx');
 const { EMPTY_SIGNATURE } = require('./helpers/constants');
 
 const { utils, BigNumber } = ethers;
@@ -512,17 +512,6 @@ describe('UNSRegistry (metatx)', () => {
   });
 
   describe('Old metatx', () => {
-    const sign = async (data, address, nonce, signer) => {
-      return signer.signMessage(
-        utils.arrayify(
-          utils.solidityKeccak256(
-            [ 'bytes32', 'address', 'uint256' ],
-            [ utils.keccak256(data), address, nonce ],
-          ),
-        ),
-      );
-    };
-
     describe('transferFromFor', () => {
       it('should transfer', async () => {
         const tok = await unsRegistry.childIdOf(root, 'label_34fw');

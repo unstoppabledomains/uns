@@ -1,10 +1,23 @@
 const { ethers } = require('hardhat');
 
+const { utils, provider } = ethers;
+
+const sign = async (data, address, nonce, signer) => {
+  return signer.signMessage(
+    utils.arrayify(
+      utils.solidityKeccak256(
+        [ 'bytes32', 'address', 'uint256' ],
+        [ utils.keccak256(data), address, nonce ],
+      ),
+    ),
+  );
+};
+
 const signTypedData = async (contract, signer, value) => {
   const domain = {
     name: 'RegistryForwarder',
     version: '0.0.1',
-    chainId: (await ethers.provider.getNetwork()).chainId,
+    chainId: (await provider.getNetwork()).chainId,
     verifyingContract: contract,
   };
 
@@ -21,4 +34,4 @@ const signTypedData = async (contract, signer, value) => {
   return signer._signTypedData(domain, types, value);
 };
 
-module.exports = { signTypedData };
+module.exports = { sign, signTypedData };
