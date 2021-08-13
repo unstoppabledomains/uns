@@ -1,44 +1,49 @@
 const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
 
+const { sign } = require('./helpers/metatx');
+
 const { utils, BigNumber } = ethers;
 
 describe('UNSRegistry (proxy)', () => {
-  let UNSRegistry, unsRegistry, root;
-  let signers, coinbase, accounts;
+  const cryptoRoot = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
 
-  before(async () => {
+  let UNSRegistryV01, UNSRegistryV02, unsRegistry;
+  let signers, owner, receiver, spender;
+
+  const mintDomain = async (label, owner) => {
+    const tokenId = await unsRegistry.childIdOf(cryptoRoot, label);
+    await unsRegistry.mint(owner, tokenId, 'resolution');
+    return tokenId;
+  };
+
+  beforeEach(async () => {
     signers = await ethers.getSigners();
-    [coinbase, ...accounts] = signers.map(s => s.address);
+    [owner, receiver, spender] = signers;
 
-    UNSRegistry = await ethers.getContractFactory('UNSRegistryV01');
+    UNSRegistryV01 = await ethers.getContractFactory('UNSRegistryV01');
+    UNSRegistryV02 = await ethers.getContractFactory('UNSRegistryV02');
 
-    root = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
-
-    unsRegistry = await upgrades.deployProxy(UNSRegistry, [coinbase], { initializer: 'initialize' });
-    await unsRegistry.mint('0xdead000000000000000000000000000000000000', root, 'crypto');
+    unsRegistry = await upgrades.deployProxy(UNSRegistryV01, [owner.address], { initializer: 'initialize' });
+    await unsRegistry.mint('0xdead000000000000000000000000000000000000', cryptoRoot, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
   });
 
   describe('Registry', () => {
     it('should construct itself correctly', async () => {
-      expect(root).to.be.equal('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
+      expect(cryptoRoot).to.be.equal('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
     });
 
     it('should resolve properly', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'resolution');
+      const tokenId = await mintDomain('resolution', owner.address);
+      await unsRegistry.burn(tokenId);
 
-      await unsRegistry.mint(coinbase, tok, 'resolution');
-
-      await unsRegistry.burn(tok);
-
-      await unsRegistry.mint(coinbase, tok, 'resolution');
-
-      await unsRegistry.transferFrom(coinbase, accounts[0], tok);
+      await unsRegistry.mint(owner.address, tokenId, 'resolution');
+      await unsRegistry.transferFrom(owner.address, receiver.address, tokenId);
     });
 
     it('should set URI prefix', async () => {
-      const tok = root;
+      const tok = cryptoRoot;
       expect(await unsRegistry.tokenURI(tok)).to.be.equal(`/${tok}`);
 
       await unsRegistry.setTokenURIPrefix('prefix-');
@@ -50,21 +55,15 @@ describe('UNSRegistry (proxy)', () => {
   });
 
   describe('Resolver', () => {
-    const initializeDomain = async (name) => {
-      const tok = await unsRegistry.childIdOf(root, name);
-      await unsRegistry.mint(coinbase, tok, name);
-      return tok;
-    };
-
     it('should resolve tokens', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'label_931');
+      const tok = await unsRegistry.childIdOf(cryptoRoot, 'label_931');
 
       // should fail to set name if not owner
       await expect(
         unsRegistry.set('key', 'value', tok),
       ).to.be.revertedWith('ERC721: operator query for nonexistent token');
 
-      await unsRegistry.mint(coinbase, tok, 'label_931');
+      await unsRegistry.mint(owner.address, tok, 'label_931');
       await unsRegistry.set('key', 'value', tok);
       expect(await unsRegistry.get('key', tok)).to.be.equal('value');
 
@@ -87,7 +86,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should get key by hash', async () => {
-      const tok = await initializeDomain('heyhash');
+      const tok = await mintDomain('heyhash', owner.address);
       const expectedKey = 'new-hashed-key';
 
       await unsRegistry.set(expectedKey, 'value', tok);
@@ -97,7 +96,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should get many keys by hashes', async () => {
-      const tok = await initializeDomain('heyhash-many');
+      const tok = await mintDomain('heyhash-many', owner.address);
       const expectedKeys = ['keyhash-many-1', 'keyhash-many-2'];
 
       await unsRegistry.setMany(expectedKeys, ['value', 'value'], tok);
@@ -108,7 +107,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should not consume additional gas if key hash was set before', async () => {
-      const tok = await initializeDomain('heyhash-gas');
+      const tok = await mintDomain('heyhash-gas', owner.address);
       let newKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tok);
       newKeyHashTx.receipt = await newKeyHashTx.wait();
       let exitsKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tok);
@@ -131,7 +130,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should get value by key hash', async () => {
-      const tok = await initializeDomain('get-key-by-hash');
+      const tok = await mintDomain('get-key-by-hash', owner.address);
       const key = 'get-key-by-hash-key';
       const expectedValue = 'get-key-by-hash-value';
 
@@ -143,7 +142,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should get multiple values by hashes', async () => {
-      const tok = await initializeDomain('get-many-keys-by-hash');
+      const tok = await mintDomain('get-many-keys-by-hash', owner.address);
       const keys = ['key-to-hash-1', 'key-to-hash-2'];
       const expectedValues = ['value-42', 'value-43'];
 
@@ -155,7 +154,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should emit NewKey event new keys added', async () => {
-      const tok = await initializeDomain('new-key');
+      const tok = await mintDomain('new-key', owner.address);
       const key = 'new-key';
       const value = 'value';
 
@@ -168,7 +167,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should emit correct Set event', async () => {
-      const tok = await initializeDomain('check-set-event');
+      const tok = await mintDomain('check-set-event', owner.address);
       const key = 'new-key';
       const value = 'value';
 
@@ -184,7 +183,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should reconfigure resolver with new values', async () => {
-      const tok = await initializeDomain('reconfigure');
+      const tok = await mintDomain('reconfigure', owner.address);
       await unsRegistry.set('old-key', 'old-value', tok);
       await unsRegistry.reconfigure(['new-key'], ['new-value'], tok);
 
@@ -195,6 +194,55 @@ describe('UNSRegistry (proxy)', () => {
       await expect(
         unsRegistry.connect(signers[1]).reconfigure(['new-key'], ['new-value'], tok),
       ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    });
+  });
+
+  describe('UNSRegistry V01 -> V02', () => {
+    const buildExecuteParams = async (selector, params, from, tokenId) => {
+      const data = unsRegistry.interface.encodeFunctionData(selector, params);
+      const nonce = await unsRegistry.nonceOf(tokenId);
+      const signature = await sign(data, unsRegistry.address, nonce, from);
+      return { req: { from: from.address, nonce, tokenId, data }, signature };
+    };
+
+    it('should keep main storage layout consistent after upgrade', async () => {
+      const tokenId = await mintDomain('up_state_domain_1', owner.address);
+      await unsRegistry.set('old-key', 'old-value', tokenId);
+      expect(await unsRegistry.get('old-key', tokenId)).to.be.equal('old-value');
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+
+      unsRegistry = await upgrades.upgradeProxy(unsRegistry.address, UNSRegistryV02);
+
+      expect(await unsRegistry.get('old-key', tokenId)).to.be.equal('old-value');
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+    });
+
+    it('should keep forwarding storage layout consistent after upgrade', async () => {
+      const tokenId = await mintDomain('up_state_domain_2', owner.address);
+      const params1 = await buildExecuteParams(
+        'transferFrom(address,address,uint256)',
+        [owner.address, receiver.address, tokenId],
+        owner, tokenId,
+      );
+      expect(params1.req.nonce).to.be.equal(0);
+
+      await unsRegistry.connect(spender)
+        .transferFromFor(owner.address, receiver.address, tokenId, params1.signature);
+      // Due to double increment in UNSRegistryV01 nonce equals 2
+      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(2);
+
+      unsRegistry = await upgrades.upgradeProxy(unsRegistry.address, UNSRegistryV02);
+
+      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(2);
+
+      // Token meta-transfer back to owner on UNSRegistryV02
+      const params2 = await buildExecuteParams(
+        'transferFrom(address,address,uint256)',
+        [receiver.address, owner.address, tokenId],
+        receiver, tokenId,
+      );
+      await unsRegistry.execute(params2.req, params2.signature);
+      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(3);
     });
   });
 });
