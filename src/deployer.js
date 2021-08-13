@@ -15,21 +15,16 @@ const defaultOptions = {
 
 async function _getArtifacts () {
   return {
-    CNSRegistry: await ethers.getContractFactory('dot-crypto/contracts/CNSRegistry.sol:CNSRegistry'),
-    SignatureController:
-      await ethers.getContractFactory('dot-crypto/contracts/controllers/SignatureController.sol:SignatureController'),
-    MintingController:
-      await ethers.getContractFactory('dot-crypto/contracts/controllers/MintingController.sol:MintingController'),
-    URIPrefixController:
-      await ethers.getContractFactory('dot-crypto/contracts/controllers/URIPrefixController.sol:URIPrefixController'),
-    WhitelistedMinter:
-      await ethers.getContractFactory('dot-crypto/contracts/util/WhitelistedMinter.sol:WhitelistedMinter'),
-    Resolver: await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver'),
-    UNSRegistry: await ethers.getContractFactory('contracts/UNSRegistry.sol:UNSRegistry'),
-    MintingManager: await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager'),
+    CNSRegistry: await ethers.getContractFactory('CNSRegistry'),
+    SignatureController: await ethers.getContractFactory('SignatureController'),
+    MintingController: await ethers.getContractFactory('MintingController'),
+    URIPrefixController: await ethers.getContractFactory('URIPrefixController'),
+    WhitelistedMinter: await ethers.getContractFactory('WhitelistedMinter'),
+    Resolver: await ethers.getContractFactory('Resolver'),
+    UNSRegistry: await ethers.getContractFactory('UNSRegistryV01'),
+    MintingManager: await ethers.getContractFactory('MintingManager'),
     ProxyReader: await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader'),
-    TwitterValidationOperator:
-      await ethers.getContractFactory('contracts/operators/TwitterValidationOperator.sol:TwitterValidationOperator'),
+    TwitterValidationOperator: await ethers.getContractFactory('TwitterValidationOperator'),
   };
 }
 

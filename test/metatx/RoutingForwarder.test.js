@@ -17,11 +17,9 @@ describe('RoutingForwarder', () => {
     [owner, receiver] = signers;
 
     RoutingForwarder = await ethers.getContractFactory('RoutingForwarder');
-    CNSRegistry = await ethers.getContractFactory('dot-crypto/contracts/CNSRegistry.sol:CNSRegistry');
-    MintingController =
-      await ethers.getContractFactory('dot-crypto/contracts/controllers/MintingController.sol:MintingController');
-    SignatureController =
-      await ethers.getContractFactory('dot-crypto/contracts/controllers/SignatureController.sol:SignatureController');
+    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
+    MintingController = await ethers.getContractFactory('MintingController');
+    SignatureController = await ethers.getContractFactory('SignatureController');
 
     registry = await CNSRegistry.deploy();
     mintingController = await MintingController.deploy(registry.address);

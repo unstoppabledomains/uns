@@ -25,11 +25,10 @@ describe('TwitterValidationOperator', () => {
     signers = await ethers.getSigners();
     [coinbase, whitelisted, paymentCapper, fundsReceiver, validationRequester] = signers;
 
-    UNSRegistry = await ethers.getContractFactory('contracts/UNSRegistry.sol:UNSRegistry');
-    CNSRegistry = await ethers.getContractFactory('dot-crypto/contracts/CNSRegistry.sol:CNSRegistry');
-    Resolver = await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver');
-    MintingController =
-      await ethers.getContractFactory('dot-crypto/contracts/controllers/MintingController.sol:MintingController');
+    UNSRegistry = await ethers.getContractFactory('UNSRegistryV01');
+    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
+    Resolver = await ethers.getContractFactory('Resolver');
+    MintingController = await ethers.getContractFactory('MintingController');
     TwitterValidationOperator = await ethers.getContractFactory('TwitterValidationOperator');
     LinkTokenMock = await ethers.getContractFactory('LinkTokenMock');
 

@@ -22,8 +22,8 @@ describe('Sandbox', async () => {
     signers = await ethers.getSigners();
     [owner, minter] = signers;
 
-    UNSRegistry = await ethers.getContractFactory('contracts/UNSRegistry.sol:UNSRegistry');
-    MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
+    UNSRegistry = await ethers.getContractFactory('UNSRegistryV01');
+    MintingManager = await ethers.getContractFactory('MintingManager');
 
     const { contracts } = UNSNetworkConfig.networks[network.config.chainId];
 
