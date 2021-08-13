@@ -11,15 +11,24 @@ abstract contract BaseForwarder is IForwarder {
     using ECDSAUpgradeable for bytes32;
 
     function _verify(
-        ForwardRequest calldata req,
+        ForwardRequest memory req,
         address target,
-        bytes calldata signature
+        bytes memory signature
     ) internal view returns (bool) {
         uint256 nonce = this.nonceOf(req.tokenId);
-        address signer = keccak256(abi.encodePacked(keccak256(req.data), target, nonce))
+        address signer = _recover(keccak256(req.data), target, nonce, signature);
+        return nonce == req.nonce && signer == req.from;
+    }
+
+    function _recover(
+        bytes32 digest,
+        address target,
+        uint256 nonce,
+        bytes memory signature
+    ) internal pure returns (address signer) {
+        return keccak256(abi.encodePacked(digest, target, nonce))
             .toEthSignedMessageHash()
             .recover(signature);
-        return nonce == req.nonce && signer == req.from;
     }
 
     function _verifyCallResult(
