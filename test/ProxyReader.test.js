@@ -44,11 +44,11 @@ describe('ProxyReader', () => {
     // mint .wallet TLD
     await unsRegistry.mint(coinbase.address, walletRoot, 'wallet');
 
-    // mint .crypto
+    // mint .wallet
     walletTokenId = await unsRegistry.childIdOf(walletRoot, domainName);
     await unsRegistry.mint(coinbase.address, walletTokenId, domainName);
 
-    // mint .wallet
+    // mint .crypto
     cryptoTokenId = await unsRegistry.childIdOf(cryptoRoot, domainName);
     await mintingController.mintSLDWithResolver(coinbase.address, domainName, resolver.address);
 
