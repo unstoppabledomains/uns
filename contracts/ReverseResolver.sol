@@ -37,7 +37,6 @@ contract ReverseResolver is Initializable, ContextUpgradeable {
         address sender = _msgSender();
         uint256 tokenId = reverses[sender];
         require(tokenId != 0, 'ReverseResolver: REVERSE_RECORD_IS_EMPTY');
-        require(_unsRegistry.isApprovedOrOwner(sender, tokenId), 'ReverseResolver: SENDER_IS_NOT_APPROVED_OR_OWNER');
         delete reverses[sender];
     }
 }

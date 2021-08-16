@@ -89,14 +89,13 @@ describe('ReverseResolver (proxy)', () => {
       ).to.be.revertedWith('ReverseResolver: REVERSE_RECORD_IS_EMPTY');
     });
 
-    it('`remove` should reject when removing a reverse record for a not owned domain', async () => {
+    it('`remove` should remove a reverse record for a not owned domain', async () => {
       await unsRegistry.mint(coinbase.address, cryptoRoot, 'crypto');
       await unsRegistry.setOwner(account.address, cryptoRoot);
+      await reverseResolver.connect(coinbase).remove();
       await expect(
-        reverseResolver.connect(coinbase).remove(),
-      ).to.be.revertedWith(
-        'ReverseResolver: SENDER_IS_NOT_APPROVED_OR_OWNER',
-      );
+        reverseResolver.connect(account).remove(),
+      ).to.be.revertedWith('ReverseResolver: REVERSE_RECORD_IS_EMPTY');
     });
   });
 });
