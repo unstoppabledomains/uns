@@ -30,14 +30,12 @@ describe('MintingManager', () => {
     signers = await ethers.getSigners();
     [coinbase] = signers;
 
-    UNSRegistry = await ethers.getContractFactory('contracts/UNSRegistry.sol:UNSRegistry');
-    CNSRegistry = await ethers.getContractFactory('dot-crypto/contracts/CNSRegistry.sol:CNSRegistry');
-    Resolver = await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver');
-    MintingController =
-      await ethers.getContractFactory('dot-crypto/contracts/controllers/MintingController.sol:MintingController');
-    URIPrefixController =
-      await ethers.getContractFactory('dot-crypto/contracts/controllers/URIPrefixController.sol:URIPrefixController');
-    MintingManager = await ethers.getContractFactory('contracts/MintingManager.sol:MintingManager');
+    UNSRegistry = await ethers.getContractFactory('UNSRegistryV01');
+    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
+    Resolver = await ethers.getContractFactory('Resolver');
+    MintingController = await ethers.getContractFactory('MintingController');
+    URIPrefixController = await ethers.getContractFactory('URIPrefixController');
+    MintingManager = await ethers.getContractFactory('MintingManager');
   });
 
   describe('MinterRole', () => {
