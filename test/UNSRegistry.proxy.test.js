@@ -22,7 +22,7 @@ describe('UNSRegistry (proxy)', () => {
     [owner, receiver, spender] = signers;
 
     UNSRegistryV01 = await ethers.getContractFactory('UNSRegistryV01');
-    UNSRegistryV02 = await ethers.getContractFactory('UNSRegistryV02');
+    UNSRegistryV02 = await ethers.getContractFactory('UNSRegistry');
 
     unsRegistry = await upgrades.deployProxy(UNSRegistryV01, [owner.address], { initializer: 'initialize' });
     await unsRegistry.mint('0xdead000000000000000000000000000000000000', cryptoRoot, 'crypto');

@@ -18,7 +18,7 @@ abstract contract EIP712UpgradeableGap {
  *
  * A base contract to be inherited by any contract that want to forward transactions.
  */
-abstract contract RegistryForwarderV1 is Initializable, EIP712UpgradeableGap, BaseForwarder {
+abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, BaseForwarder {
     mapping(uint256 => uint256) private _nonces;
 
     // solhint-disable-next-line func-name-mixedcase

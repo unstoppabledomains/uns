@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "RegistryForwarderV1",
-  "sourceName": "contracts/metatx/RegistryForwarderV1.sol",
+  "contractName": "RegistryForwarder",
+  "sourceName": "contracts/metatx/RegistryForwarder.sol",
   "abi": [
     {
       "inputs": [
