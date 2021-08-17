@@ -2,26 +2,35 @@ const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
 const { sign, signTypedData } = require('./helpers/metatx');
-const { EMPTY_SIGNATURE } = require('./helpers/constants');
+const { EMPTY_SIGNATURE, TLD } = require('./helpers/constants');
+const { mintDomain } = require('./helpers/registry');
 
 const { utils, BigNumber } = ethers;
 
 describe('UNSRegistry (metatx)', () => {
-  let UNSRegistry;
-  let unsRegistry, root;
+  let UNSRegistry, unsRegistry;
   let signers, coinbase, owner, nonOwner, receiver, accessControl, operator, spender;
+
+  const buildExecuteFuncParams = async (selector, params, from, tokenId) => {
+    const data = unsRegistry.interface.encodeFunctionData(selector, params);
+    return buildExecuteParams(data, from, tokenId);
+  };
+
+  const buildExecuteParams = async (data, from, tokenId) => {
+    const nonce = await unsRegistry.nonceOf(tokenId);
+    const signature = await sign(data, unsRegistry.address, nonce, from);
+    return { req: { from: from.address, tokenId, nonce, data }, signature };
+  };
 
   before(async () => {
     signers = await ethers.getSigners();
     [coinbase, owner, nonOwner, receiver, accessControl, operator, spender] = signers;
 
-    UNSRegistry = await ethers.getContractFactory('UNSRegistryV01');
-
-    root = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
+    UNSRegistry = await ethers.getContractFactory('UNSRegistry');
 
     unsRegistry = await UNSRegistry.deploy();
     await unsRegistry.initialize(coinbase.address);
-    await unsRegistry.mint('0xdead000000000000000000000000000000000000', root, 'crypto');
+    await unsRegistry.mint('0xdead000000000000000000000000000000000000', TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
   });
 
@@ -29,189 +38,119 @@ describe('UNSRegistry (metatx)', () => {
     const receiverAddress = '0x1234567890123456789012345678901234567890';
 
     it('should transfer using meta-setOwner', async () => {
-      const owner = signers[1];
-      const receiver = signers[2];
-      const tok = await unsRegistry.childIdOf(root, 'res_label_113a');
-      await unsRegistry.mint(owner.address, tok, 'res_label_113a');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'res_label_113a');
 
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await unsRegistry.nonceOf(owner.address)),
-        data: unsRegistry.interface.encodeFunctionData('setOwner', [receiver.address, tok]),
-      };
-      const sig = await signTypedData(unsRegistry.address, owner, req);
-      await unsRegistry.execute(req, sig);
+      const { req, signature } = await buildExecuteFuncParams(
+        'setOwner(address,uint256)',
+        [receiver.address, tokenId],
+        owner, tokenId);
+      await unsRegistry.execute(req, signature);
 
-      expect(await unsRegistry.ownerOf(tok)).to.be.equal(receiver.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
 
     it('should revert transfer using meta-setOwner when nonce invalidated', async () => {
-      const owner = signers[1];
-      const receiver = signers[2];
-      const tok = await unsRegistry.childIdOf(root, 'res_label_0896');
-      await unsRegistry.mint(owner.address, tok, 'res_label_0896');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'res_label_0896');
 
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await unsRegistry.nonceOf(owner.address)),
-        data: unsRegistry.interface.encodeFunctionData('setOwner', [receiver.address, tok]),
-      };
-      const sig = await signTypedData(unsRegistry.address, owner, req);
+      const { req, signature } = await buildExecuteFuncParams(
+        'setOwner(address,uint256)',
+        [receiver.address, tokenId],
+        owner, tokenId);
+      await unsRegistry.connect(owner).set('key', 'value', tokenId);
 
-      await unsRegistry.connect(owner).set('key', 'value', tok);
-
-      await expect(unsRegistry.execute(req, sig)).to.be
+      await expect(unsRegistry.execute(req, signature)).to.be
         .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
     });
 
     it('should setApprovalForAll using meta-setApprovalForAll', async () => {
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: 0,
-        nonce: Number(await unsRegistry.nonceOf(owner.address)),
-        data: unsRegistry.interface.encodeFunctionData('setApprovalForAll', [operator.address, true]),
-      };
-      const sig = await signTypedData(unsRegistry.address, owner, req);
-      const [success ] = await unsRegistry.callStatic.execute(req, sig);
-      expect(success).to.be.equal(true);
+      const { req, signature } = await buildExecuteFuncParams(
+        'setApprovalForAll(address,bool)',
+        [operator.address, true],
+        owner, 0);
+
+      await unsRegistry.execute(req, signature);
+      expect(await unsRegistry.isApprovedForAll(owner.address, operator.address)).to.be.equal(true);
     });
 
     it('should revert meta-setApprovalForAll for non-onwer', async () => {
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: 0,
-        nonce: Number(await unsRegistry.nonceOf(owner.address)),
-        data: unsRegistry.interface.encodeFunctionData('setApprovalForAll', [operator.address, true]),
-      };
-      const sig = await signTypedData(unsRegistry.address, nonOwner, req);
-      await expect(unsRegistry.execute(req, sig)).to.be
+      const { req, signature } = await buildExecuteFuncParams(
+        'setApprovalForAll(address,bool)',
+        [operator.address, true],
+        nonOwner, 0);
+
+      await expect(unsRegistry.execute({ ...req, from: owner.address }, signature)).to.be
         .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
     });
 
     it('should transfer using meta-transferFrom', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'meta_1591');
-      await unsRegistry.mint(owner.address, tok, 'meta_1591');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_1591');
 
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await unsRegistry.nonceOf(tok)),
-        data: unsRegistry.interface.encodeFunctionData('transferFrom', [owner.address, receiverAddress, tok]),
-      };
-      const sig = await signTypedData(unsRegistry.address, owner, req);
-      await unsRegistry.execute(req, sig);
+      const { req, signature } = await buildExecuteFuncParams(
+        'transferFrom(address,address,uint256)',
+        [owner.address, receiverAddress, tokenId],
+        owner, tokenId);
+      await unsRegistry.execute(req, signature);
 
-      expect(await unsRegistry.ownerOf(tok)).to.be.equal(receiverAddress);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiverAddress);
     });
 
     it('should revert meta-transferFrom for non-onwer', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'meta_6458');
-      await unsRegistry.mint(owner.address, tok, 'meta_6458');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_6458');
 
-      const req = {
-        from: nonOwner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await unsRegistry.nonceOf(tok)),
-        data: unsRegistry.interface.encodeFunctionData('transferFrom', [nonOwner.address, receiverAddress, tok]),
-      };
-      const sig = await signTypedData(unsRegistry.address, nonOwner, req);
-      const [success ] = await unsRegistry.callStatic.execute(req, sig);
-      expect(success).to.be.equal(false);
+      const { req, signature } = await buildExecuteFuncParams(
+        'transferFrom(address,address,uint256)',
+        [nonOwner.address, receiverAddress, tokenId],
+        nonOwner, tokenId);
+
+      await expect(unsRegistry.execute(req, signature)).to.be
+        .revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     });
 
     it('should transfer using meta-safeTransferFrom', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'meta_10235');
-      await unsRegistry.mint(owner.address, tok, 'meta_10235');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_10235');
 
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await unsRegistry.nonceOf(tok)),
-        data: unsRegistry.interface.encodeFunctionData(
-          'safeTransferFrom(address,address,uint256)',
-          [owner.address, receiverAddress, tok],
-        ),
-      };
-      const sig = await signTypedData(unsRegistry.address, owner, req);
-      await unsRegistry.execute(req, sig);
+      const { req, signature } = await buildExecuteFuncParams(
+        'safeTransferFrom(address,address,uint256)',
+        [owner.address, receiverAddress, tokenId],
+        owner, tokenId);
+      await unsRegistry.execute(req, signature);
 
-      expect(await unsRegistry.ownerOf(tok)).to.be.equal(receiverAddress);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiverAddress);
     });
 
     it('should revert meta-safeTransferFrom for non-onwer', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'meta_e5iuw');
-      await unsRegistry.mint(owner.address, tok, 'meta_e5iuw');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_e5iuw');
 
-      const req = {
-        from: nonOwner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await unsRegistry.nonceOf(tok)),
-        data: unsRegistry.interface.encodeFunctionData(
-          'safeTransferFrom(address,address,uint256)',
-          [nonOwner.address, receiverAddress, tok],
-        ),
-      };
-      const sig = await signTypedData(unsRegistry.address, nonOwner, req);
-      const [success ] = await unsRegistry.callStatic.execute(req, sig);
-      expect(success).to.be.equal(false);
+      const { req, signature } = await buildExecuteFuncParams(
+        'safeTransferFrom(address,address,uint256)',
+        [nonOwner.address, receiverAddress, tokenId],
+        nonOwner, tokenId);
+
+      await expect(unsRegistry.execute(req, signature)).to.be
+        .revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     });
 
     // TODO: add tests for safeTransferFrom(address,address,uint256,bytes)
 
     it('should burn using meta-burn', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'meta_ar093');
-      await unsRegistry.mint(owner.address, tok, 'meta_ar093');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_ar093');
+      const { req, signature } = await buildExecuteFuncParams('burn(uint256)', [tokenId], owner, tokenId);
+      await unsRegistry.execute(req, signature);
 
-      const req = {
-        from: owner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await unsRegistry.nonceOf(tok)),
-        data: unsRegistry.interface.encodeFunctionData('burn', [tok]),
-      };
-      const sig = await signTypedData(unsRegistry.address, owner, req);
-      await unsRegistry.execute(req, sig);
-
-      await expect(unsRegistry.ownerOf(tok)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      await expect(unsRegistry.ownerOf(tokenId)).to.be
+        .revertedWith('ERC721: owner query for nonexistent token');
     });
 
     it('should revert meta-burn for non-onwer', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'meta_53dg3');
-      await unsRegistry.mint(owner.address, tok, 'meta_53dg3');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_53dg3');
+      const { req, signature } = await buildExecuteFuncParams('burn(uint256)', [tokenId], nonOwner, tokenId);
 
-      const req = {
-        from: nonOwner.address,
-        gas: '100000',
-        tokenId: tok,
-        nonce: Number(await unsRegistry.nonceOf(tok)),
-        data: unsRegistry.interface.encodeFunctionData('burn', [tok]),
-      };
-      const sig = await signTypedData(unsRegistry.address, nonOwner, req);
-      const [success ] = await unsRegistry.callStatic.execute(req, sig);
-      expect(success).to.be.equal(false);
+      await expect(unsRegistry.execute(req, signature)).to.be
+        .revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     });
   });
 
   describe('ABI-based', () => {
-    const getReason = (returnData) => {
-      let reason;
-      if (returnData && returnData.slice(2, 10).toString('hex') === '08c379a0') {
-        const abiCoder = new utils.AbiCoder();
-        reason = abiCoder.decode(['string'], '0x' + returnData.slice(10))[0];
-      }
-      return reason;
-    };
-
     const registryFuncs = () => {
       return UNSRegistry.interface.fragments
         .filter(x => x.type === 'function' && !['view', 'pure'].includes(x.stateMutability));
@@ -262,16 +201,11 @@ describe('UNSRegistry (metatx)', () => {
       it('should execute all functions successfully', async () => {
         for (const func of getFuncs()) {
           const funcSigHash = utils.id(`${funcFragmentToSig(func)}_excl`);
-          paramValueMap.tokenId = await unsRegistry.childIdOf(root, funcSigHash);
+          paramValueMap.tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, funcSigHash);
 
           const req = await buidRequest(func, coinbase.address, paramValueMap.tokenId, paramValueMap);
-          const sig = await signTypedData(unsRegistry.address, coinbase, req);
-          const [success, returnData] = await unsRegistry.callStatic.execute(req, sig);
-
-          if (!success) {
-            console.error(getReason(returnData));
-          }
-          expect(success).to.be.equal(true);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+          await unsRegistry.execute(req, signature);
         }
       });
     });
@@ -308,10 +242,6 @@ describe('UNSRegistry (metatx)', () => {
           .filter(x => !excluded.includes(x.name));
       };
 
-      const mintToken = async (owner, tokenId, label) => {
-        await unsRegistry.mint(owner.address, tokenId, label);
-      };
-
       before(async () => {
         paramValueMap.from = owner.address;
         paramValueMap.to = receiver.address;
@@ -322,17 +252,11 @@ describe('UNSRegistry (metatx)', () => {
       it('should execute all functions successfully', async () => {
         for (const func of getFuncs()) {
           const funcSigHash = utils.id(`${funcFragmentToSig(func)}_ok`);
-          paramValueMap.tokenId = await unsRegistry.childIdOf(root, funcSigHash);
-          await mintToken(owner, paramValueMap.tokenId, funcSigHash);
+          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, funcSigHash);
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
-          const sig = await signTypedData(unsRegistry.address, owner, req);
-          const [success, returnData] = await unsRegistry.callStatic.execute(req, sig);
-
-          if (!success) {
-            console.error(getReason(returnData));
-          }
-          expect(success).to.be.equal(true);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+          await unsRegistry.execute(req, signature);
         }
       });
 
@@ -340,22 +264,13 @@ describe('UNSRegistry (metatx)', () => {
         for (const func of getFuncs()) {
           const funcSig = funcFragmentToSig(func);
           const funcSigHash = utils.id(`${funcSig}_doubleUse`);
-          paramValueMap.tokenId = await unsRegistry.childIdOf(root, funcSigHash);
-          await mintToken(owner, paramValueMap.tokenId, funcSigHash);
+          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, funcSigHash);
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
-          const sig = await signTypedData(unsRegistry.address, owner, req);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+          await unsRegistry.execute(req, signature);
 
-          const [success, returnData] = await unsRegistry.callStatic.execute(req, sig);
-          if (!success) {
-            console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
-            console.error(getReason(returnData));
-          }
-          expect(success).to.be.equal(true);
-
-          await unsRegistry.execute(req, sig);
-
-          await expect(unsRegistry.execute(req, sig)).to.be
+          await expect(unsRegistry.execute(req, signature)).to.be
             .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
         }
       });
@@ -364,15 +279,14 @@ describe('UNSRegistry (metatx)', () => {
         for (const func of getFuncs()) {
           const funcSig = funcFragmentToSig(func);
           const funcSigHash = utils.id(`${funcSig}_nonceInvalidated`);
-          paramValueMap.tokenId = await unsRegistry.childIdOf(root, funcSigHash);
-          await mintToken(owner, paramValueMap.tokenId, funcSigHash);
+          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, funcSigHash);
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
-          const sig = await signTypedData(unsRegistry.address, owner, req);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
 
           await unsRegistry.connect(owner).set('key', 'value', paramValueMap.tokenId);
 
-          await expect(unsRegistry.execute(req, sig)).to.be
+          await expect(unsRegistry.execute(req, signature)).to.be
             .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
         }
       });
@@ -381,32 +295,27 @@ describe('UNSRegistry (metatx)', () => {
         for (const func of getFuncs()) {
           const funcSig = funcFragmentToSig(func);
           const funcSigHash = utils.id(`${funcSig}_wrongToken`);
+          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, funcSigHash);
 
-          paramValueMap.tokenId = await unsRegistry.childIdOf(root, funcSigHash);
-          await mintToken(owner, paramValueMap.tokenId, funcSigHash);
-
-          const tokenIdForwarder = await unsRegistry.childIdOf(root, utils.id(`_${funcSig}`));
+          const tokenIdForwarder = await unsRegistry.childIdOf(TLD.CRYPTO, utils.id(`_${funcSig}`));
           const req = await buidRequest(func, owner.address, tokenIdForwarder, paramValueMap);
-          const sig = await signTypedData(unsRegistry.address, owner, req);
-          const [success, returnData] = await unsRegistry.callStatic.execute(req, sig);
 
-          expect(success).to.be.equal(false);
-          expect(getReason(returnData)).to.be.equal('Registry: TOKEN_INVALID');
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+          await expect(unsRegistry.execute(req, signature)).to.be
+            .revertedWith('Registry: TOKEN_INVALID');
         }
       });
 
       it('should fail execution of all token-based functions when tokenId is empty', async () => {
         for (const func of getFuncs()) {
           const funcSigHash = utils.id(`${funcFragmentToSig(func)}_emptyTokenId`);
-          paramValueMap.tokenId = await unsRegistry.childIdOf(root, funcSigHash);
-          await mintToken(owner, paramValueMap.tokenId, funcSigHash);
+          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, funcSigHash);
 
           const req = await buidRequest(func, owner.address, 0, paramValueMap);
-          const sig = await signTypedData(unsRegistry.address, owner, req);
-          const [success, returndata] = await unsRegistry.callStatic.execute(req, sig);
 
-          expect(success).to.be.equal(false);
-          expect(getReason(returndata)).to.be.equal('Registry: TOKEN_INVALID');
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+          await expect(unsRegistry.execute(req, signature)).to.be
+            .revertedWith('Registry: TOKEN_INVALID');
         }
       });
     });
@@ -431,7 +340,7 @@ describe('UNSRegistry (metatx)', () => {
       ];
 
       before(async () => {
-        paramValueMap.tld = root;
+        paramValueMap.tld = TLD.CRYPTO;
         paramValueMap.account = accessControl.address;
         paramValueMap.to = owner.address;
         paramValueMap.operator = operator.address;
@@ -449,14 +358,8 @@ describe('UNSRegistry (metatx)', () => {
           paramValueMap.label = utils.id(`${funcSig}_label`);
 
           const req = await buidRequest(func, coinbase.address, 0, paramValueMap);
-          const sig = await signTypedData(unsRegistry.address, coinbase, req);
-          const [success, returnData] = await unsRegistry.callStatic.execute(req, sig);
-
-          if (!success) {
-            console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
-            console.error(getReason(returnData));
-          }
-          expect(success).to.be.equal(true);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+          await unsRegistry.execute(req, signature);
         }
       });
 
@@ -466,20 +369,12 @@ describe('UNSRegistry (metatx)', () => {
           paramValueMap.label = utils.id(`${funcSig}_doubleUse`);
           paramValueMap.key = utils.id(`${funcSig}_doubleUse`);
 
-          const tokenIdForwarder = await unsRegistry.childIdOf(root, utils.id(`_${funcSig}`));
+          const tokenIdForwarder = await unsRegistry.childIdOf(TLD.CRYPTO, utils.id(`_${funcSig}`));
           const req = await buidRequest(func, coinbase.address, tokenIdForwarder, paramValueMap);
-          const sig = await signTypedData(unsRegistry.address, coinbase, req);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+          await unsRegistry.execute(req, signature);
 
-          const [success, returnData] = await unsRegistry.callStatic.execute(req, sig);
-          if (!success) {
-            console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
-            console.error(getReason(returnData));
-          }
-          expect(success).to.be.equal(true);
-
-          await unsRegistry.execute(req, sig);
-
-          await expect(unsRegistry.execute(req, sig)).to.be
+          await expect(unsRegistry.execute(req, signature)).to.be
             .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
         }
       });
@@ -492,19 +387,11 @@ describe('UNSRegistry (metatx)', () => {
           const tokenId = 0;
           const nonce = await unsRegistry.nonceOf(tokenId);
           const req = await buidRequest(func, coinbase.address, tokenId, paramValueMap);
-          const sig = await signTypedData(unsRegistry.address, coinbase, req);
-
-          const [success, returnData] = await unsRegistry.callStatic.execute(req, sig);
-          if (!success) {
-            console.log(funcSig, func.inputs.map(x => paramValueMap[x.name]));
-            console.error(getReason(returnData));
-          }
-          expect(success).to.be.equal(true);
-
-          await unsRegistry.execute(req, sig);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+          await unsRegistry.execute(req, signature);
 
           expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(nonce.add(1));
-          await expect(unsRegistry.execute(req, sig)).to.be
+          await expect(unsRegistry.execute(req, signature)).to.be
             .revertedWith('RegistryForwarder: SIGNATURE_INVALID');
         }
       });
@@ -514,7 +401,7 @@ describe('UNSRegistry (metatx)', () => {
   describe('Old metatx', () => {
     describe('transferFromFor', () => {
       it('should transfer', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_34fw');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_34fw');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(
@@ -530,7 +417,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert transfer by non-owner', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_wr');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_wr');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(
@@ -547,7 +434,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert when signature is invalid', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_mv6rg');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_mv6rg');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(
@@ -576,7 +463,7 @@ describe('UNSRegistry (metatx)', () => {
       const funcSig = 'safeTransferFromFor(address,address,uint256,bytes)';
 
       it('should transfer', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_fc24');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_fc24');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(
@@ -591,7 +478,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert transfer by non-owner', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_dfgb34');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_dfgb34');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(
@@ -608,7 +495,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert when signature is invalid', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_sdr654');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_sdr654');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(
@@ -637,7 +524,7 @@ describe('UNSRegistry (metatx)', () => {
       const funcSig = 'safeTransferFromFor(address,address,uint256,bytes,bytes)';
 
       it('should transfer', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_vnm4');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_vnm4');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(
@@ -652,7 +539,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert transfer by non-owner', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_sv32');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_sv32');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(
@@ -669,7 +556,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert when signature is invalid', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_sdff34');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_sdff34');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(
@@ -696,7 +583,7 @@ describe('UNSRegistry (metatx)', () => {
 
     describe('burnFor', () => {
       it('should burn', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_vcxw4');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_vcxw4');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData('burn(uint256)', [tok]);
@@ -708,7 +595,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert burn by non-owner', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_aa31v');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_aa31v');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData('burn(uint256)', [tok]);
@@ -722,10 +609,10 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert when signature is invalid', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_lld431');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_lld431');
         await unsRegistry.mint(owner.address, tok, '');
 
-        const wrongTok = await unsRegistry.childIdOf(root, 'label_lld431_wrong');
+        const wrongTok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_lld431_wrong');
         await unsRegistry.mint(owner.address, wrongTok, '');
 
         const data = unsRegistry.interface.encodeFunctionData('burn(uint256)', [tok]);
@@ -749,7 +636,7 @@ describe('UNSRegistry (metatx)', () => {
 
     describe('resetFor', () => {
       it('should reset', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_wfv331');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_wfv331');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData('reset(uint256)', [tok]);
@@ -761,7 +648,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert reset by non-owner', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_cvs11');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_cvs11');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData('burn(uint256)', [tok]);
@@ -775,10 +662,10 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert when signature is invalid', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_lg212');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_lg212');
         await unsRegistry.mint(owner.address, tok, '');
 
-        const wrongTok = await unsRegistry.childIdOf(root, 'label_lg212_wrong');
+        const wrongTok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_lg212_wrong');
         await unsRegistry.mint(owner.address, wrongTok, '');
 
         const data = unsRegistry.interface.encodeFunctionData('burn(uint256)', [tok]);
@@ -802,7 +689,7 @@ describe('UNSRegistry (metatx)', () => {
 
     describe('setFor', () => {
       it('should set', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_llsk113');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_llsk113');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData('set(string,string,uint256)', ['key1', 'v1', tok]);
@@ -815,7 +702,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert set by non-owner', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_cvl8s');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_cvl8s');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData('set(string,string,uint256)', ['', '', tok]);
@@ -829,7 +716,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert when signature is invalid', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_vldm3');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_vldm3');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData('set(string,string,uint256)', ['', '', tok]);
@@ -855,7 +742,7 @@ describe('UNSRegistry (metatx)', () => {
       const funcSig = 'setMany(string[],string[],uint256)';
 
       it('should set many', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_dwe110');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_dwe110');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(funcSig, [['key1'], ['1v'], tok]);
@@ -868,7 +755,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert setMany by non-owner', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_kcmn23');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_kcmn23');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(funcSig, [[''], [''], tok]);
@@ -882,7 +769,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert when signature is invalid', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_sdn31');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_sdn31');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface.encodeFunctionData(funcSig, [['key'], [''], tok]);
@@ -906,7 +793,7 @@ describe('UNSRegistry (metatx)', () => {
 
     describe('reconfigureFor', () => {
       it('should reconfigure', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_cbc24');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_cbc24');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface
@@ -920,7 +807,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert reconfigure by non-owner', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_safv3');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_safv3');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface
@@ -935,7 +822,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should revert when signature is invalid', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'label_sfv421');
+        const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_sfv421');
         await unsRegistry.mint(owner.address, tok, '');
 
         const data = unsRegistry.interface
