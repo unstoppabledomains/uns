@@ -8,9 +8,11 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import './BaseForwarder.sol';
 
 abstract contract EIP712UpgradeableGap {
+    /* solhint-disable var-name-mixedcase */
     bytes32 private _HASHED_NAME;
     bytes32 private _HASHED_VERSION;
     uint256[50] private __gap;
+    /* solhint-enable var-name-mixedcase */
 }
 
 /**
@@ -27,8 +29,7 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __RegistryForwarder_init_unchained() internal initializer {
-    }
+    function __RegistryForwarder_init_unchained() internal initializer {}
 
     /*
      * 0x23b872dd == bytes4(keccak256('transferFrom(address,address,uint256)'))
@@ -39,7 +40,8 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
         uint256 tokenId,
         bytes calldata signature
     ) external {
-        _executeFor(abi.encodeWithSelector(0x23b872dd, from, to, tokenId), tokenId, signature);
+        uint256 gas = gasleft();
+        _executeFor(abi.encodeWithSelector(0x23b872dd, from, to, tokenId), tokenId, signature, gas);
     }
 
     /*
@@ -51,7 +53,8 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
         uint256 tokenId,
         bytes calldata signature
     ) external {
-        _executeFor(abi.encodeWithSelector(0x42842e0e, from, to, tokenId), tokenId, signature);
+        uint256 gas = gasleft();
+        _executeFor(abi.encodeWithSelector(0x42842e0e, from, to, tokenId), tokenId, signature, gas);
     }
 
     /*
@@ -64,21 +67,24 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
         bytes calldata data,
         bytes calldata signature
     ) external {
-        _executeFor(abi.encodeWithSelector(0xb88d4fde, from, to, tokenId, data), tokenId, signature);
+        uint256 gas = gasleft();
+        _executeFor(abi.encodeWithSelector(0xb88d4fde, from, to, tokenId, data), tokenId, signature, gas);
     }
 
     /*
      * 0x42966c68 == bytes4(keccak256('burn(uint256)'))
      */
     function burnFor(uint256 tokenId, bytes calldata signature) external {
-        _executeFor(abi.encodeWithSelector(0x42966c68, tokenId), tokenId, signature);
+        uint256 gas = gasleft();
+        _executeFor(abi.encodeWithSelector(0x42966c68, tokenId), tokenId, signature, gas);
     }
 
     /*
      * 0x310bd74b == bytes4(keccak256('reset(uint256)'))
      */
     function resetFor(uint256 tokenId, bytes calldata signature) external {
-        _executeFor(abi.encodeWithSelector(0x310bd74b, tokenId), tokenId, signature);
+        uint256 gas = gasleft();
+        _executeFor(abi.encodeWithSelector(0x310bd74b, tokenId), tokenId, signature, gas);
     }
 
     /*
@@ -90,7 +96,8 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
         uint256 tokenId,
         bytes calldata signature
     ) external {
-        _executeFor(abi.encodeWithSelector(0x47c81699, key, value, tokenId), tokenId, signature);
+        uint256 gas = gasleft();
+        _executeFor(abi.encodeWithSelector(0x47c81699, key, value, tokenId), tokenId, signature, gas);
     }
 
     /*
@@ -102,7 +109,8 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
         uint256 tokenId,
         bytes calldata signature
     ) external {
-        _executeFor(abi.encodeWithSelector(0xce92b33e, keys, values, tokenId), tokenId, signature);
+        uint256 gas = gasleft();
+        _executeFor(abi.encodeWithSelector(0xce92b33e, keys, values, tokenId), tokenId, signature, gas);
     }
 
     /*
@@ -114,55 +122,36 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
         uint256 tokenId,
         bytes calldata signature
     ) public {
-        _executeFor(abi.encodeWithSelector(0xec129eea, keys, values, tokenId), tokenId, signature);
+        uint256 gas = gasleft();
+        _executeFor(abi.encodeWithSelector(0xec129eea, keys, values, tokenId), tokenId, signature, gas);
     }
 
-    function nonceOf(uint256 tokenId) override public view returns (uint256) {
+    function nonceOf(uint256 tokenId) public view override returns (uint256) {
         return _nonces[tokenId];
     }
 
-    function verify(ForwardRequest calldata req, bytes calldata signature) override public view returns (bool) {
+    function verify(ForwardRequest calldata req, bytes calldata signature) public view override returns (bool) {
         return _verify(req, address(this), signature);
     }
 
-    function execute(ForwardRequest calldata req, bytes calldata signature) override public returns (bytes memory) {
+    function execute(ForwardRequest calldata req, bytes calldata signature) public override returns (bytes memory) {
         uint256 gas = gasleft();
-
         require(verify(req, signature), 'RegistryForwarder: SIGNATURE_INVALID');
-        _nonces[req.tokenId] = req.nonce + 1;
-
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = address(this).call{gas: gas}(
-            abi.encodePacked(req.data, req.from, req.tokenId)
-        );
-        // Validate that the relayer has sent enough gas for the call.
-        // See https://ronan.eth.link/blog/ethereum-gas-dangers/
-        assert(gasleft() > gas / 63);
-
-        return _verifyCallResult(success, returndata, 'RegistryForwarder: CALL_FAILED');
+        return _execute(req.from, address(this), req.tokenId, gas, req.data, 'RegistryForwarder: CALL_FAILED');
     }
 
-    function _invalidateNonce(uint256 tokenId) internal {
+    function _invalidateNonce(uint256 tokenId) internal override {
         _nonces[tokenId] = _nonces[tokenId] + 1;
     }
 
     function _executeFor(
         bytes memory data,
         uint256 tokenId,
-        bytes memory signature
+        bytes memory signature,
+        uint256 gas
     ) private returns (bytes memory) {
-        uint256 gas = gasleft();
-
         address from = _recover(keccak256(data), address(this), _nonces[tokenId], signature);
-        _invalidateNonce(tokenId);
-
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = address(this).call{gas: gas}(abi.encodePacked(data, from, tokenId));
-        // Validate that the relayer has sent enough gas for the call.
-        // See https://ronan.eth.link/blog/ethereum-gas-dangers/
-        assert(gasleft() > gas / 63);
-
-        return _verifyCallResult(success, returndata, 'RegistryForwarder: CALL_FAILED');
+        return _execute(from, address(this), tokenId, gas, data, 'RegistryForwarder: CALL_FAILED');
     }
 
     uint256[50] private __gap;
