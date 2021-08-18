@@ -12,26 +12,6 @@ describe('RoutingForwarder', () => {
   let forwarder, registry, mintingController, signatureController;
   let signers, owner, receiver;
 
-  before(async () => {
-    signers = await ethers.getSigners();
-    [owner, receiver] = signers;
-
-    RoutingForwarder = await ethers.getContractFactory('RoutingForwarder');
-    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
-    MintingController = await ethers.getContractFactory('MintingController');
-    SignatureController = await ethers.getContractFactory('SignatureController');
-
-    registry = await CNSRegistry.deploy();
-    mintingController = await MintingController.deploy(registry.address);
-    signatureController = await SignatureController.deploy(registry.address);
-
-    await registry.addController(mintingController.address);
-    await registry.addController(signatureController.address);
-
-    forwarder = await RoutingForwarder.deploy();
-    await forwarder.initialize(signatureController.address);
-  });
-
   const mintDomain = async (label, owner) => {
     await mintingController.mintSLD(owner, label);
     return await registry.childIdOf(cryptoRoot, label);
@@ -57,6 +37,26 @@ describe('RoutingForwarder', () => {
     const { req, signature } = await buildTransfer(from, toAddress, tokenId);
     return await forwarder.execute(req, signature);
   };
+
+  before(async () => {
+    signers = await ethers.getSigners();
+    [owner, receiver] = signers;
+
+    RoutingForwarder = await ethers.getContractFactory('RoutingForwarder');
+    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
+    MintingController = await ethers.getContractFactory('MintingController');
+    SignatureController = await ethers.getContractFactory('SignatureController');
+
+    registry = await CNSRegistry.deploy();
+    mintingController = await MintingController.deploy(registry.address);
+    signatureController = await SignatureController.deploy(registry.address);
+
+    await registry.addController(mintingController.address);
+    await registry.addController(signatureController.address);
+
+    forwarder = await RoutingForwarder.deploy();
+    await forwarder.initialize(signatureController.address);
+  });
 
   it('should verify & execute correctly', async () => {
     const tokenId = await mintDomain('test_foo', owner.address);

@@ -7,9 +7,9 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 
-import './IUNSRegistry.sol';
-import './RecordStorage.sol';
-import './metatx/ERC2771RegistryContext.sol';
+import './../IUNSRegistry.sol';
+import './../RecordStorage.sol';
+import './../metatx/ERC2771RegistryContext.sol';
 import './metatx/RegistryForwarderV0.sol';
 
 /**

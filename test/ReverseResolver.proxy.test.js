@@ -22,28 +22,23 @@ describe('ReverseResolver (proxy)', () => {
   before(async () => {
     [coinbase, account] = await ethers.getSigners();
 
-    // Deploy UNS.
-    UNSRegistry = await ethers.getContractFactory(
-      'contracts/UNSRegistryV01.sol:UNSRegistryV01',
-    );
+    UNSRegistry = await ethers.getContractFactory('UNSRegistryV01');
+
     unsRegistry = await upgrades.deployProxy(UNSRegistry, [coinbase.address], {
       initializer: 'initialize',
     });
 
     // Deploy CNS.
-    CNSRegistry = await ethers.getContractFactory('dot-crypto/contracts/CNSRegistry.sol:CNSRegistry');
-    CNSMintingController =
-      await ethers.getContractFactory('dot-crypto/contracts/controllers/MintingController.sol:MintingController');
-    CNSResolver = await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver');
+    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
+    CNSMintingController = await ethers.getContractFactory('MintingController');
+    CNSResolver = await ethers.getContractFactory('Resolver');
     cnsRegistry = await CNSRegistry.deploy();
     cnsMintingController = await CNSMintingController.deploy(cnsRegistry.address);
     await cnsRegistry.addController(cnsMintingController.address);
     cnsResolver = await CNSResolver.deploy(cnsRegistry.address, cnsMintingController.address);
 
     // Deploy Reverse Resolver.
-    ReverseResolver = await ethers.getContractFactory(
-      'contracts/ReverseResolver.sol:ReverseResolver',
-    );
+    ReverseResolver = await ethers.getContractFactory('ReverseResolver');
     reverseResolver = await upgrades.deployProxy(
       ReverseResolver,
       [unsRegistry.address, '0x0000000000000000000000000000000000000000'],

@@ -10,6 +10,8 @@ import './IForwarder.sol';
 abstract contract BaseForwarder is IForwarder {
     using ECDSAUpgradeable for bytes32;
 
+    function _invalidateNonce(uint256 tokenId) internal virtual {}
+
     function _verify(
         ForwardRequest memory req,
         address target,
@@ -26,9 +28,25 @@ abstract contract BaseForwarder is IForwarder {
         uint256 nonce,
         bytes memory signature
     ) internal pure returns (address signer) {
-        return keccak256(abi.encodePacked(digest, target, nonce))
-            .toEthSignedMessageHash()
-            .recover(signature);
+        return keccak256(abi.encodePacked(digest, target, nonce)).toEthSignedMessageHash().recover(signature);
+    }
+
+    function _execute(
+        address from,
+        address to,
+        uint256 tokenId,
+        uint256 gas,
+        bytes memory data,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        _invalidateNonce(tokenId);
+
+        (bool success, bytes memory returndata) = to.call{gas: gas}(abi.encodePacked(data, from, tokenId));
+        // Validate that the relayer has sent enough gas for the call.
+        // See https://ronan.eth.link/blog/ethereum-gas-dangers/
+        assert(gasleft() > gas / 63);
+
+        return _verifyCallResult(success, returndata, errorMessage);
     }
 
     function _verifyCallResult(

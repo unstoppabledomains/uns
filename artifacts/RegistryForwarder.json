@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "RegistryForwarderV0",
-  "sourceName": "contracts/history/metatx/RegistryForwarderV0.sol",
+  "contractName": "RegistryForwarder",
+  "sourceName": "contracts/metatx/RegistryForwarder.sol",
   "abi": [
     {
       "inputs": [
@@ -32,7 +32,7 @@
             },
             {
               "internalType": "uint256",
-              "name": "gas",
+              "name": "nonce",
               "type": "uint256"
             },
             {
@@ -41,17 +41,12 @@
               "type": "uint256"
             },
             {
-              "internalType": "uint256",
-              "name": "nonce",
-              "type": "uint256"
-            },
-            {
               "internalType": "bytes",
               "name": "data",
               "type": "bytes"
             }
           ],
-          "internalType": "struct RegistryForwarderV0.ForwardRequest",
+          "internalType": "struct IForwarder.ForwardRequest",
           "name": "req",
           "type": "tuple"
         },
@@ -63,11 +58,6 @@
       ],
       "name": "execute",
       "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        },
         {
           "internalType": "bytes",
           "name": "",
@@ -298,7 +288,7 @@
             },
             {
               "internalType": "uint256",
-              "name": "gas",
+              "name": "nonce",
               "type": "uint256"
             },
             {
@@ -307,17 +297,12 @@
               "type": "uint256"
             },
             {
-              "internalType": "uint256",
-              "name": "nonce",
-              "type": "uint256"
-            },
-            {
               "internalType": "bytes",
               "name": "data",
               "type": "bytes"
             }
           ],
-          "internalType": "struct RegistryForwarderV0.ForwardRequest",
+          "internalType": "struct IForwarder.ForwardRequest",
           "name": "req",
           "type": "tuple"
         },

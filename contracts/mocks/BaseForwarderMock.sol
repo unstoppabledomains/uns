@@ -8,7 +8,7 @@ import '../metatx/BaseForwarder.sol';
 contract BaseForwarderMock is BaseForwarder {
     mapping(uint256 => uint256) private _nonces;
 
-    function nonceOf(uint256 tokenId) external override view returns (uint256) {
+    function nonceOf(uint256 tokenId) external view override returns (uint256) {
         return _nonces[tokenId];
     }
 
@@ -18,15 +18,8 @@ contract BaseForwarderMock is BaseForwarder {
 
     function execute(ForwardRequest calldata req, bytes calldata signature) public override returns (bytes memory) {
         uint256 gas = gasleft();
-
         require(verify(req, signature), 'BaseForwarderMock: SIGNATURE_INVALID');
-        _nonces[req.tokenId] = req.nonce + 1;
-
-        (bool success, bytes memory returndata) = address(this).call{gas: gas}(
-            abi.encodePacked(req.data, req.from, req.tokenId)
-        );
-
-        return _verifyCallResult(success, returndata, 'BaseForwarderMock: CALL_FAILED');
+        return _execute(req.from, address(this), req.tokenId, gas, req.data, 'BaseForwarderMock: CALL_FAILED');
     }
 
     function revertWithReason() public pure {
@@ -35,5 +28,9 @@ contract BaseForwarderMock is BaseForwarder {
 
     function revertWithoutReason() public pure {
         revert();
+    }
+
+    function _invalidateNonce(uint256 tokenId) internal override {
+        _nonces[tokenId] = _nonces[tokenId] + 1;
     }
 }
