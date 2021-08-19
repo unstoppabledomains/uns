@@ -137,7 +137,7 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
     function execute(ForwardRequest calldata req, bytes calldata signature) public override returns (bytes memory) {
         uint256 gas = gasleft();
         require(verify(req, signature), 'RegistryForwarder: SIGNATURE_INVALID');
-        return _execute(req.from, address(this), req.tokenId, gas, req.data, 'RegistryForwarder: CALL_FAILED');
+        return _execute(req.from, address(this), req.tokenId, gas, req.data, signature);
     }
 
     function _invalidateNonce(uint256 tokenId) internal override {
@@ -151,7 +151,7 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
         uint256 gas
     ) private returns (bytes memory) {
         address from = _recover(keccak256(data), address(this), _nonces[tokenId], signature);
-        return _execute(from, address(this), tokenId, gas, data, 'RegistryForwarder: CALL_FAILED');
+        return _execute(from, address(this), tokenId, gas, data, signature);
     }
 
     uint256[50] private __gap;
