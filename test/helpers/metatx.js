@@ -34,4 +34,13 @@ const signTypedData = async (contract, signer, value) => {
   return signer._signTypedData(domain, types, value);
 };
 
-module.exports = { sign, signTypedData };
+const buildExecuteFunc = (iface, toAddress, forwarder) => {
+  return async (selector, params, from, tokenId) => {
+    const data = iface.encodeFunctionData(selector, params);
+    const nonce = await forwarder.nonceOf(tokenId);
+    const signature = await sign(data, toAddress, nonce, from);
+    return { req: { from: from.address, nonce, tokenId, data }, signature };
+  };
+};
+
+module.exports = { sign, signTypedData, buildExecuteFunc };

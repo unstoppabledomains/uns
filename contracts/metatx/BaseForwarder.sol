@@ -47,7 +47,9 @@ abstract contract BaseForwarder is IForwarder {
         return _verifyCallResult(success, returndata, 'BaseForwarder: CALL_FAILED');
     }
 
-    function _invalidateNonce(uint256 tokenId) internal virtual {}
+    function _invalidateNonce(
+        uint256 /* tokenId */
+    ) internal virtual {}
 
     function _buildData(
         address from,
