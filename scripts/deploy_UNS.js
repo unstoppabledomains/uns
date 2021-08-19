@@ -8,7 +8,7 @@ const UNSNetworkConfig = require('./../uns-config.json');
 async function main () {
   console.log('Network:', network.name);
 
-  const config = ['localhost', 'hardhat'].includes(network.name)
+  const config = ['localhost', 'hardhat', 'mumbai'].includes(network.name)
     ? UNSNetworkConfig.networks[network.config.chainId]
     : CNSNetworkConfig.networks[network.config.chainId];
   if (!config) {
