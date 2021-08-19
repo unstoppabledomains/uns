@@ -331,3 +331,48 @@ A new deployment script might be a reason to rebuild the sandbox snapshot. In or
 ```
 yarn rebuild:sandbox
 ```
+
+## Deploying contracts
+
+Scripts for deploying contracts are located inside `./scripts` directory. In order to run them, you can use
+the following command:
+
+```
+yarn hardhat run --network <network> scripts/filename.js
+```
+
+As scripts make JSON-RPC calls to Infura and sign transactions, you'll need to specify 2 environment variables.
+Those variables' names depend on the network you want deploy the contracts to. Assuming you want to deploy new contracts
+to Rinkeby, you'll need the following variables:
+
+```
+export RINKEBY_UNS_PRIVATE_KEY=<HEX_PRIVATE_KEY>
+export RINKEBY_INFURA_KEY=<INFURA_PROJECT_ID>
+```
+
+The scripts located in `./scripts` directory are wrappers around Deployer tasks. You can see their definitions inside
+`src/tasks.js`.
+
+### Deploying CNS
+
+```
+yarn hardhat run --network <network> scripts/deploy_CNS.js
+```
+
+### Deploying UNS
+
+UNS depends on CNS, as CNS registry address is used as a MintingManager's initializer argument. Before deploying UNS,
+make sure that CNS is deployed and actual CNS contract addresses are specified in the `uns-config.json` file.
+
+```
+yarn hardhat run --network <network> scripts/deploy_UNS.js
+```
+
+### Deploying ProxyReader
+
+ProxyReader depends on both CNS and UNS, so make sure that actual contract addresses are specified in the
+`uns-config.json` file.
+
+```
+yarn hardhat run --network <network> scripts/deploy_ProxyReader.js
+```
