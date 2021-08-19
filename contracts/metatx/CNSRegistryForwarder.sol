@@ -9,11 +9,11 @@ import './IForwarder.sol';
 import './BaseRoutingForwarder.sol';
 
 /**
- * @title SignatureForwarder
- * @dev SignatureForwarder simplifies operation with legacy meta-transactions.
+ * @title CNSRegistryForwarder
+ * @dev CNSRegistryForwarder simplifies operation with legacy meta-transactions.
  * It works on top of existing SignatureController contract.
  */
-contract SignatureForwarder is Initializable, BaseRoutingForwarder {
+contract CNSRegistryForwarder is Initializable, BaseRoutingForwarder {
     IForwarder private _target;
 
     function initialize(IForwarder target) public initializer {

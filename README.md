@@ -73,14 +73,12 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
     }
     ```
 
-    Implementation [RegistryForwarder.sol](./contracts/metatx/RegistryForwarder.sol)
+    Implementation [UNSRegistryForwarder.sol](./contracts/metatx/UNSRegistryForwarder.sol)
 
     ### TBD:
 
     - `RegistryForwarder` implementation:
 
-      - should `execute` function be `payable`?
-      - does it make sence to have `req.gas`?
       - do we need `expiry` check?
 
 7.  Upgradability

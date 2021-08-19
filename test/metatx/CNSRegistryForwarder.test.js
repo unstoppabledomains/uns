@@ -4,8 +4,8 @@ const { expect } = require('chai');
 const { buildExecuteFunc } = require('../helpers/metatx');
 const { TLD } = require('../helpers/constants');
 
-describe('SignatureForwarder', () => {
-  let SignatureForwarder, CNSRegistry, MintingController, SignatureController;
+describe('CNSRegistryForwarder', () => {
+  let CNSRegistryForwarder, CNSRegistry, MintingController, SignatureController;
   let forwarder, registry, mintingController, signatureController;
   let signers, owner, receiver, buildExecuteParams;
 
@@ -27,7 +27,7 @@ describe('SignatureForwarder', () => {
     signers = await ethers.getSigners();
     [owner, receiver] = signers;
 
-    SignatureForwarder = await ethers.getContractFactory('SignatureForwarder');
+    CNSRegistryForwarder = await ethers.getContractFactory('CNSRegistryForwarder');
     CNSRegistry = await ethers.getContractFactory('CNSRegistry');
     MintingController = await ethers.getContractFactory('MintingController');
     SignatureController = await ethers.getContractFactory('SignatureController');
@@ -39,7 +39,7 @@ describe('SignatureForwarder', () => {
     await registry.addController(mintingController.address);
     await registry.addController(signatureController.address);
 
-    forwarder = await SignatureForwarder.deploy();
+    forwarder = await CNSRegistryForwarder.deploy();
     await forwarder.initialize(signatureController.address);
 
     buildExecuteParams = buildExecuteFunc(registry.interface, signatureController.address, forwarder);

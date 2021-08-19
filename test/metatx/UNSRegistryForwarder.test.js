@@ -5,8 +5,8 @@ const { sign } = require('../helpers/metatx');
 
 const { BigNumber } = ethers;
 
-describe('RegistryForwarder', () => {
-  let RegistryForwarder, forwarder;
+describe('UNSRegistryForwarder', () => {
+  let UNSRegistryForwarder, forwarder;
   let signers, owner;
 
   const buildExecuteFuncParams = async (selector, params, from, tokenId) => {
@@ -24,9 +24,9 @@ describe('RegistryForwarder', () => {
     signers = await ethers.getSigners();
     [owner] = signers;
 
-    RegistryForwarder = await ethers.getContractFactory('RegistryForwarderMock');
+    UNSRegistryForwarder = await ethers.getContractFactory('UNSRegistryForwarderMock');
 
-    forwarder = await RegistryForwarder.deploy();
+    forwarder = await UNSRegistryForwarder.deploy();
     await forwarder.initialize();
   });
 
@@ -77,7 +77,7 @@ describe('RegistryForwarder', () => {
 
       await expect(
         forwarder.execute({ ...req, nonce: nonce.add(1) }, signature),
-      ).to.be.revertedWith('RegistryForwarder: SIGNATURE_INVALID');
+      ).to.be.revertedWith('UNSRegistryForwarder: SIGNATURE_INVALID');
     });
   });
 });

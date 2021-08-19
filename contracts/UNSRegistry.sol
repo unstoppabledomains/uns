@@ -10,7 +10,7 @@ import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import './IUNSRegistry.sol';
 import './RecordStorage.sol';
 import './metatx/ERC2771RegistryContext.sol';
-import './metatx/RegistryForwarder.sol';
+import './metatx/UNSRegistryForwarder.sol';
 
 /**
  * @title UNSRegistry v0.2
@@ -23,7 +23,7 @@ contract UNSRegistry is
     ERC721Upgradeable,
     ERC2771RegistryContext,
     RecordStorage,
-    RegistryForwarder,
+    UNSRegistryForwarder,
     IUNSRegistry
 {
     /**
@@ -67,7 +67,7 @@ contract UNSRegistry is
 
         __ERC721_init_unchained('Unstoppable Domains', 'UD');
         __ERC2771RegistryContext_init_unchained();
-        __RegistryForwarder_init_unchained();
+        __UNSRegistryForwarder_init_unchained();
     }
 
     /// ERC721 Metadata extension

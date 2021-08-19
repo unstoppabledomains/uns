@@ -20,16 +20,16 @@ abstract contract EIP712UpgradeableGap {
  *
  * A base contract to be inherited by any contract that want to forward transactions.
  */
-abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, BaseForwarder {
+abstract contract UNSRegistryForwarder is Initializable, EIP712UpgradeableGap, BaseForwarder {
     mapping(uint256 => uint256) private _nonces;
 
     // solhint-disable-next-line func-name-mixedcase
-    function __RegistryForwarder_init() internal initializer {
-        __RegistryForwarder_init_unchained();
+    function __UNSRegistryForwarder_init() internal initializer {
+        __UNSRegistryForwarder_init_unchained();
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __RegistryForwarder_init_unchained() internal initializer {}
+    function __UNSRegistryForwarder_init_unchained() internal initializer {}
 
     /*
      * 0x23b872dd == bytes4(keccak256('transferFrom(address,address,uint256)'))
@@ -136,7 +136,7 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
 
     function execute(ForwardRequest calldata req, bytes calldata signature) public override returns (bytes memory) {
         uint256 gas = gasleft();
-        require(verify(req, signature), 'RegistryForwarder: SIGNATURE_INVALID');
+        require(verify(req, signature), 'UNSRegistryForwarder: SIGNATURE_INVALID');
         return _execute(req.from, address(this), req.tokenId, gas, req.data, signature);
     }
 

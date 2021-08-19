@@ -3,10 +3,10 @@
 
 pragma solidity ^0.8.0;
 
-import '../metatx/RegistryForwarder.sol';
+import '../metatx/UNSRegistryForwarder.sol';
 
-contract RegistryForwarderMock is RegistryForwarder {
+contract UNSRegistryForwarderMock is UNSRegistryForwarder {
     function initialize() public initializer {
-        __RegistryForwarder_init();
+        __UNSRegistryForwarder_init();
     }
 }
