@@ -1,6 +1,6 @@
 const { ethers } = require('hardhat');
 
-const { ZERO_ADDRESS, TLD } = require('./../helpers/constants');
+const { ZERO_ADDRESS, TLD } = require('../helpers/constants');
 
 const { utils } = ethers;
 
