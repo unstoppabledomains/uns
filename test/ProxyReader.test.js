@@ -23,7 +23,7 @@ describe('ProxyReader', () => {
     [coinbase] = signers;
     [, ...accounts] = signers.map(s => s.address);
 
-    UNSRegistry = await ethers.getContractFactory('UNSRegistryV01');
+    UNSRegistry = await ethers.getContractFactory('UNSRegistry');
     CNSRegistry = await ethers.getContractFactory('CNSRegistry');
     Resolver = await ethers.getContractFactory('Resolver');
     MintingController = await ethers.getContractFactory('MintingController');

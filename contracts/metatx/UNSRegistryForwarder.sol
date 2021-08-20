@@ -20,16 +20,16 @@ abstract contract EIP712UpgradeableGap {
  *
  * A base contract to be inherited by any contract that want to forward transactions.
  */
-abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, BaseForwarder {
+abstract contract UNSRegistryForwarder is Initializable, EIP712UpgradeableGap, BaseForwarder {
     mapping(uint256 => uint256) private _nonces;
 
     // solhint-disable-next-line func-name-mixedcase
-    function __RegistryForwarder_init() internal initializer {
-        __RegistryForwarder_init_unchained();
+    function __UNSRegistryForwarder_init() internal initializer {
+        __UNSRegistryForwarder_init_unchained();
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __RegistryForwarder_init_unchained() internal initializer {}
+    function __UNSRegistryForwarder_init_unchained() internal initializer {}
 
     /*
      * 0x23b872dd == bytes4(keccak256('transferFrom(address,address,uint256)'))
@@ -136,8 +136,8 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
 
     function execute(ForwardRequest calldata req, bytes calldata signature) public override returns (bytes memory) {
         uint256 gas = gasleft();
-        require(verify(req, signature), 'RegistryForwarder: SIGNATURE_INVALID');
-        return _execute(req.from, address(this), req.tokenId, gas, req.data, 'RegistryForwarder: CALL_FAILED');
+        require(verify(req, signature), 'UNSRegistryForwarder: SIGNATURE_INVALID');
+        return _execute(req.from, address(this), req.tokenId, gas, req.data, signature);
     }
 
     function _invalidateNonce(uint256 tokenId) internal override {
@@ -151,7 +151,7 @@ abstract contract RegistryForwarder is Initializable, EIP712UpgradeableGap, Base
         uint256 gas
     ) private returns (bytes memory) {
         address from = _recover(keccak256(data), address(this), _nonces[tokenId], signature);
-        return _execute(from, address(this), tokenId, gas, data, 'RegistryForwarder: CALL_FAILED');
+        return _execute(from, address(this), tokenId, gas, data, signature);
     }
 
     uint256[50] private __gap;

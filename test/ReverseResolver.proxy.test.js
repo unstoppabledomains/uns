@@ -22,7 +22,7 @@ describe('ReverseResolver (proxy)', () => {
   before(async () => {
     [coinbase, account] = await ethers.getSigners();
 
-    UNSRegistry = await ethers.getContractFactory('UNSRegistryV01');
+    UNSRegistry = await ethers.getContractFactory('UNSRegistry');
 
     unsRegistry = await upgrades.deployProxy(UNSRegistry, [coinbase.address], {
       initializer: 'initialize',

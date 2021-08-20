@@ -16,7 +16,7 @@ describe('UNSRegistry', () => {
     [coinbase, owner, , receiver] = signers;
     [, ...accounts] = signers.map(s => s.address);
 
-    UNSRegistry = await ethers.getContractFactory('UNSRegistryV01');
+    UNSRegistry = await ethers.getContractFactory('UNSRegistry');
     ERC721ReceiverMock = await ethers.getContractFactory('ERC721ReceiverMock');
 
     root = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
@@ -234,7 +234,7 @@ describe('UNSRegistry', () => {
     });
   });
 
-  describe('Registry (records management)', () => {
+  describe('UNS Registry (records management)', () => {
     const initializeDomain = async (name) => {
       const tok = await unsRegistry.childIdOf(root, name);
       await unsRegistry.mint(coinbase.address, tok, name);

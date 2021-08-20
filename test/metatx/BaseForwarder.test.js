@@ -40,6 +40,6 @@ describe('BaseForwarder', () => {
 
     await expect(
       forwarder.execute(req, signature),
-    ).to.be.revertedWith('BaseForwarderMock: CALL_FAILED');
+    ).to.be.revertedWith('BaseForwarder: CALL_FAILED');
   });
 });

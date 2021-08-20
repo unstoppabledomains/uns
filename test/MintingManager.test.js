@@ -1,4 +1,4 @@
-const { ethers, upgrades } = require('hardhat');
+const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
 const { ZERO_ADDRESS } = require('./helpers/constants');
@@ -30,7 +30,7 @@ describe('MintingManager', () => {
     signers = await ethers.getSigners();
     [coinbase] = signers;
 
-    UNSRegistry = await ethers.getContractFactory('UNSRegistryV01');
+    UNSRegistry = await ethers.getContractFactory('UNSRegistry');
     CNSRegistry = await ethers.getContractFactory('CNSRegistry');
     Resolver = await ethers.getContractFactory('Resolver');
     MintingController = await ethers.getContractFactory('MintingController');
@@ -453,62 +453,6 @@ describe('MintingManager', () => {
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-p1-nw833');
       expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
-
-    describe('Gas consumption', () => {
-      function percDiff (a, b) {
-        return -((a - b) / a) * 100;
-      }
-
-      const getCases = () => {
-        return [
-          {
-            func: 'mintSLD',
-            funcSig: 'mintSLD(address,uint256,string)',
-            params: [receiver.address, walletRoot, 't1-w1-'],
-          },
-          {
-            func: 'safeMintSLD',
-            funcSig: 'safeMintSLD(address,uint256,string)',
-            params: [receiver.address, walletRoot, 't1-m1-'],
-          },
-          {
-            func: 'safeMintSLD',
-            funcSig: 'safeMintSLD(address,uint256,string,bytes)',
-            params: [receiver.address, walletRoot, 't1-y1-', '0x'],
-          },
-        ];
-      };
-
-      it('Consumption', async () => {
-        const result = [];
-
-        const cases = getCases();
-        for (let i = 0; i < cases.length; i++) {
-          const { funcSig, params } = cases[i];
-          const [acc, root, token, ...rest] = params;
-          const relayParams = [acc, root, token + 'r', ...rest];
-
-          const callData = mintingManager.interface.encodeFunctionData(funcSig, relayParams);
-          const signature = sign(callData, mintingManager.address, coinbase);
-          const relayTx = await mintingManager.connect(spender).relay(callData, signature);
-          relayTx.receipt = await relayTx.wait();
-
-          const tx = await mintingManager[funcSig](...params);
-          tx.receipt = await tx.wait();
-
-          result.push({
-            funcSig,
-            records: Array.isArray(params[2]) ? params[2].length : '-',
-            send: tx.receipt.gasUsed.toString(),
-            relay: relayTx.receipt.gasUsed.toString(),
-            increase:
-              percDiff(tx.receipt.gasUsed, relayTx.receipt.gasUsed).toFixed(2) +
-              ' %',
-          });
-        }
-        console.table(result);
-      });
-    });
   });
 
   describe('Tld-based minting', () => {
@@ -858,51 +802,6 @@ describe('MintingManager', () => {
       await expect(
         mintingManager.connect(signers[5]).setResolver(resolver.address),
       ).to.be.revertedWith('Ownable: caller is not the owner');
-    });
-  });
-
-  describe('Upgradable', () => {
-    beforeEach(async () => {
-      unsRegistry = await UNSRegistry.deploy();
-
-      mintingManager = await upgrades.deployProxy(MintingManager, [], { initializer: false });
-      await unsRegistry.initialize(mintingManager.address);
-
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-      await mintingManager.addMinter(coinbase.address);
-      await mintingManager.setTokenURIPrefix('/');
-    });
-
-    it('should persist state after proxy upgrade', async () => {
-      mintingController = await MintingController.deploy(ZERO_ADDRESS);
-      resolver = await Resolver.deploy(ZERO_ADDRESS, mintingController.address);
-      await mintingManager.setResolver(resolver.address);
-
-      await upgrades.upgradeProxy(
-        mintingManager.address,
-        MintingManager,
-        [unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS],
-        { initializer: 'initialize' },
-      );
-
-      expect(await mintingManager.cnsResolver()).to.be.equal(resolver.address);
-    });
-
-    it('should be possible to set resolver after proxy upgrade', async () => {
-      expect(await mintingManager.cnsResolver()).to.be.equal(ZERO_ADDRESS);
-
-      await upgrades.upgradeProxy(
-        mintingManager.address,
-        MintingManager,
-        [unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS],
-        { initializer: 'initialize' },
-      );
-
-      mintingController = await MintingController.deploy(ZERO_ADDRESS);
-      resolver = await Resolver.deploy(ZERO_ADDRESS, mintingController.address);
-      await mintingManager.setResolver(resolver.address);
-
-      expect(await mintingManager.cnsResolver()).to.be.equal(resolver.address);
     });
   });
 });

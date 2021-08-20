@@ -19,7 +19,7 @@ contract BaseForwarderMock is BaseForwarder {
     function execute(ForwardRequest calldata req, bytes calldata signature) public override returns (bytes memory) {
         uint256 gas = gasleft();
         require(verify(req, signature), 'BaseForwarderMock: SIGNATURE_INVALID');
-        return _execute(req.from, address(this), req.tokenId, gas, req.data, 'BaseForwarderMock: CALL_FAILED');
+        return _execute(req.from, address(this), req.tokenId, gas, req.data, signature);
     }
 
     function revertWithReason() public pure {
