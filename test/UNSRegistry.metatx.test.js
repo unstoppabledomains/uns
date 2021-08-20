@@ -1,7 +1,7 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
-const { sign, signTypedData } = require('./helpers/metatx');
+const { sign } = require('./helpers/metatx');
 const { EMPTY_SIGNATURE, TLD } = require('./helpers/constants');
 const { mintDomain } = require('./helpers/registry');
 

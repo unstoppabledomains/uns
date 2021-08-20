@@ -30,7 +30,7 @@ describe('MintingManager', () => {
     signers = await ethers.getSigners();
     [coinbase] = signers;
 
-    UNSRegistry = await ethers.getContractFactory('UNSRegistryV01');
+    UNSRegistry = await ethers.getContractFactory('UNSRegistry');
     CNSRegistry = await ethers.getContractFactory('CNSRegistry');
     Resolver = await ethers.getContractFactory('Resolver');
     MintingController = await ethers.getContractFactory('MintingController');
@@ -452,62 +452,6 @@ describe('MintingManager', () => {
 
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-p1-nw833');
       expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
-    });
-
-    describe('Gas consumption', () => {
-      function percDiff (a, b) {
-        return -((a - b) / a) * 100;
-      }
-
-      const getCases = () => {
-        return [
-          {
-            func: 'mintSLD',
-            funcSig: 'mintSLD(address,uint256,string)',
-            params: [receiver.address, walletRoot, 't1-w1-'],
-          },
-          {
-            func: 'safeMintSLD',
-            funcSig: 'safeMintSLD(address,uint256,string)',
-            params: [receiver.address, walletRoot, 't1-m1-'],
-          },
-          {
-            func: 'safeMintSLD',
-            funcSig: 'safeMintSLD(address,uint256,string,bytes)',
-            params: [receiver.address, walletRoot, 't1-y1-', '0x'],
-          },
-        ];
-      };
-
-      it('Consumption', async () => {
-        const result = [];
-
-        const cases = getCases();
-        for (let i = 0; i < cases.length; i++) {
-          const { funcSig, params } = cases[i];
-          const [acc, root, token, ...rest] = params;
-          const relayParams = [acc, root, token + 'r', ...rest];
-
-          const callData = mintingManager.interface.encodeFunctionData(funcSig, relayParams);
-          const signature = sign(callData, mintingManager.address, coinbase);
-          const relayTx = await mintingManager.connect(spender).relay(callData, signature);
-          relayTx.receipt = await relayTx.wait();
-
-          const tx = await mintingManager[funcSig](...params);
-          tx.receipt = await tx.wait();
-
-          result.push({
-            funcSig,
-            records: Array.isArray(params[2]) ? params[2].length : '-',
-            send: tx.receipt.gasUsed.toString(),
-            relay: relayTx.receipt.gasUsed.toString(),
-            increase:
-              percDiff(tx.receipt.gasUsed, relayTx.receipt.gasUsed).toFixed(2) +
-              ' %',
-          });
-        }
-        console.table(result);
-      });
     });
   });
 
