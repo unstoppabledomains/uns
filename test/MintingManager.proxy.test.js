@@ -35,12 +35,7 @@ describe('MintingManager (proxy)', () => {
     resolver = await Resolver.deploy(ZERO_ADDRESS, mintingController.address);
     await mintingManager.setResolver(resolver.address);
 
-    await upgrades.upgradeProxy(
-      mintingManager.address,
-      MintingManagerV02,
-      [unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS],
-      { initializer: 'initialize' },
-    );
+    await upgrades.upgradeProxy(mintingManager.address, MintingManagerV02);
 
     expect(await mintingManager.cnsResolver()).to.be.equal(resolver.address);
   });
@@ -48,12 +43,7 @@ describe('MintingManager (proxy)', () => {
   it('should be possible to set resolver after proxy upgrade', async () => {
     expect(await mintingManager.cnsResolver()).to.be.equal(ZERO_ADDRESS);
 
-    await upgrades.upgradeProxy(
-      mintingManager.address,
-      MintingManagerV02,
-      [unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS],
-      { initializer: 'initialize' },
-    );
+    await upgrades.upgradeProxy(mintingManager.address, MintingManagerV02);
 
     mintingController = await MintingController.deploy(ZERO_ADDRESS);
     resolver = await Resolver.deploy(ZERO_ADDRESS, mintingController.address);
@@ -73,12 +63,9 @@ describe('MintingManager (proxy)', () => {
       await mintingManager.addMinter(minter.address);
       expect(await mintingManager.isMinter(minter.address)).to.be.equal(true);
 
-      mintingManager = await upgrades.upgradeProxy(
-        mintingManager.address,
-        MintingManagerV02,
-        [unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS],
-        { initializer: 'initialize' },
-      );
+      // NOTE: V01->V02 upgrade requires execution `transferOwnership(currentOwner)`
+      // straight after upgrade in order to init DefaultAdmin role!
+      mintingManager = await upgrades.upgradeProxy(mintingManager.address, MintingManagerV02);
       await mintingManager.transferOwnership(coinbase.address);
 
       expect(await mintingManager.isMinter(minter.address)).to.be.equal(true);
