@@ -101,6 +101,10 @@ contract MintingManager is Initializable, ContextUpgradeable, OwnableUpgradeable
         }
     }
 
+    function transferOwnership(address newOwner) public override(OwnableUpgradeable, MinterRole) {
+        MinterRole.transferOwnership(newOwner);
+    }
+
     function mintSLD(
         address to,
         uint256 tld,

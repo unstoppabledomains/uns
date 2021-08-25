@@ -33,6 +33,11 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
+    function transferOwnership(address newOwner) public override virtual onlyOwner {
+        super.transferOwnership(newOwner);
+        _setupRole(DEFAULT_ADMIN_ROLE, newOwner);
+    }
+
     function isMinter(address account) public view returns (bool) {
         return hasRole(MINTER_ROLE, account);
     }
