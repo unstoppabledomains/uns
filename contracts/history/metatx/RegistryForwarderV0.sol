@@ -12,7 +12,7 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
  *
  * A base contract to be inherited by any contract that want to forward transactions.
  */
-abstract contract RegistryForwarder is Initializable, EIP712Upgradeable {
+abstract contract RegistryForwarderV0 is Initializable, EIP712Upgradeable {
     using ECDSAUpgradeable for bytes32;
 
     struct ForwardRequest {

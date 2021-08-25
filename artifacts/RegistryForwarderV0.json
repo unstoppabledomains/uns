@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "RegistryForwarder",
-  "sourceName": "contracts/metatx/RegistryForwarder.sol",
+  "contractName": "RegistryForwarderV0",
+  "sourceName": "contracts/history/metatx/RegistryForwarderV0.sol",
   "abi": [
     {
       "inputs": [
@@ -51,7 +51,7 @@
               "type": "bytes"
             }
           ],
-          "internalType": "struct RegistryForwarder.ForwardRequest",
+          "internalType": "struct RegistryForwarderV0.ForwardRequest",
           "name": "req",
           "type": "tuple"
         },
@@ -317,7 +317,7 @@
               "type": "bytes"
             }
           ],
-          "internalType": "struct RegistryForwarder.ForwardRequest",
+          "internalType": "struct RegistryForwarderV0.ForwardRequest",
           "name": "req",
           "type": "tuple"
         },

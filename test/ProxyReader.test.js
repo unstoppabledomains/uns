@@ -23,11 +23,10 @@ describe('ProxyReader', () => {
     [coinbase] = signers;
     [, ...accounts] = signers.map(s => s.address);
 
-    UNSRegistry = await ethers.getContractFactory('contracts/UNSRegistry.sol:UNSRegistry');
-    CNSRegistry = await ethers.getContractFactory('dot-crypto/contracts/CNSRegistry.sol:CNSRegistry');
-    Resolver = await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver');
-    MintingController =
-      await ethers.getContractFactory('dot-crypto/contracts/controllers/MintingController.sol:MintingController');
+    UNSRegistry = await ethers.getContractFactory('UNSRegistry');
+    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
+    Resolver = await ethers.getContractFactory('Resolver');
+    MintingController = await ethers.getContractFactory('MintingController');
     ProxyReader = await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader');
 
     // deploy UNS
@@ -44,11 +43,11 @@ describe('ProxyReader', () => {
     // mint .wallet TLD
     await unsRegistry.mint(coinbase.address, walletRoot, 'wallet');
 
-    // mint .crypto
+    // mint .wallet
     walletTokenId = await unsRegistry.childIdOf(walletRoot, domainName);
     await unsRegistry.mint(coinbase.address, walletTokenId, domainName);
 
-    // mint .wallet
+    // mint .crypto
     cryptoTokenId = await unsRegistry.childIdOf(cryptoRoot, domainName);
     await mintingController.mintSLDWithResolver(coinbase.address, domainName, resolver.address);
 

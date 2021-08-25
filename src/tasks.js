@@ -91,8 +91,11 @@ const deployUNSTask = {
     if (ctx.options.proxy) {
       unsRegistry = await upgrades.deployProxy(
         ctx.artifacts.UNSRegistry.connect(owner), [], { initializer: false });
+      await unsRegistry.deployTransaction.wait();
+
       mintingManager = await upgrades.deployProxy(
         ctx.artifacts.MintingManager.connect(owner), [], { initializer: false });
+      await mintingManager.deployTransaction.wait();
 
       proxyAdmin = await upgrades.admin.getInstance();
       await ctx.saveContractConfig('ProxyAdmin', proxyAdmin);

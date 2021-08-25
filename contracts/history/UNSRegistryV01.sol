@@ -7,23 +7,23 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 
-import './IUNSRegistry.sol';
-import './RecordStorage.sol';
-import './metatx/ERC2771RegistryContext.sol';
-import './metatx/UNSRegistryForwarder.sol';
+import './../IUNSRegistry.sol';
+import './../RecordStorage.sol';
+import './../metatx/ERC2771RegistryContext.sol';
+import './metatx/RegistryForwarderV0.sol';
 
 /**
- * @title UNSRegistry v0.2
+ * @title UNSRegistry v0.1
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract UNSRegistry is
+contract UNSRegistryV01 is
     Initializable,
     ContextUpgradeable,
     ERC721Upgradeable,
     ERC2771RegistryContext,
     RecordStorage,
-    UNSRegistryForwarder,
+    RegistryForwarderV0,
     IUNSRegistry
 {
     /**
@@ -37,7 +37,7 @@ contract UNSRegistry is
     event AdminChanged(address previousAdmin, address newAdmin);
 
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.2.0';
+    string public constant VERSION = '0.1.1';
 
     string internal _prefix;
 
@@ -56,9 +56,8 @@ contract UNSRegistry is
     modifier protectTokenOperation(uint256 tokenId) {
         if (isTrustedForwarder(msg.sender)) {
             require(tokenId == _msgToken(), 'Registry: TOKEN_INVALID');
-        } else {
-            _invalidateNonce(tokenId);
         }
+        _invalidateNonce(tokenId);
         _;
     }
 
@@ -67,7 +66,7 @@ contract UNSRegistry is
 
         __ERC721_init_unchained('Unstoppable Domains', 'UD');
         __ERC2771RegistryContext_init_unchained();
-        __UNSRegistryForwarder_init_unchained();
+        __RegistryForwarder_init_unchained();
     }
 
     /// ERC721 Metadata extension

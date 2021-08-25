@@ -42,7 +42,7 @@ task(TASK_COMPILE, 'hook compile task to perform post-compile task', async (_, h
   for (const artifactPath of await hre.artifacts.getArtifactPaths()) {
     const artifact = fs.readFileSync(artifactPath);
     const { abi, contractName } = JSON.parse(artifact);
-    if (!abi.length) continue;
+    if (!abi.length || contractName.includes('Mock')) continue;
 
     const target = path.join(outputDir, `${contractName}.json`);
     fs.copyFileSync(artifactPath, target);
@@ -105,6 +105,14 @@ module.exports = {
         : undefined,
       loggingEnabled: true,
     },
+    mumbai: {
+      url: `https://polygon-mumbai.infura.io/v3/${process.env.MUMBAI_INFURA_KEY}`,
+      chainId: 80001,
+      accounts: process.env.MUMBAI_UNS_PRIVATE_KEY
+        ? [process.env.MUMBAI_UNS_PRIVATE_KEY]
+        : undefined,
+      loggingEnabled: true,
+    },
   },
   gasReporter: {
     currency: 'USD',
@@ -146,6 +154,7 @@ module.exports = {
         '0x1daf08a27304a78434e22ab79bea508e341f910d',
       ],
       mainnet: [],
+      mumbai: [],
     },
     linkToken: {
       hardhat: '',
@@ -153,6 +162,7 @@ module.exports = {
       sandbox: '',
       rinkeby: '0x01BE23585060835E02B77ef475b0Cc51aA1e0709',
       mainnet: '0x514910771af9ca656af840dff83e8264ecf986ca',
+      mumbai: '0x514910771af9ca656af840dff83e8264ecf986ca',
     },
   },
 };

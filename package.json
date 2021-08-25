@@ -22,6 +22,7 @@
     "deploy:localhost": "hardhat run --network localhost scripts/deploy.js",
     "deploy:rinkeby": "hardhat run --network rinkeby scripts/deploy.js",
     "deploy:mainnet": "hardhat run --network mainnet scripts/deploy_UNS.js",
+    "deploy:mumbai": "hardhat run --network mumbai scripts/deploy.js",
     "upgrade:localhost": "hardhat run --network localhost scripts/upgrade.js",
     "upgrade:rinkeby": "hardhat run --network rinkeby scripts/upgrade.js",
     "upgrade:mainnet": "hardhat run --network mainnet scripts/upgrade.js",
@@ -32,7 +33,7 @@
   "devDependencies": {
     "@chainlink/contracts": "^0.1.7",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@nomiclabs/hardhat-etherscan": "^2.1.3",
+    "@nomiclabs/hardhat-etherscan": "^2.1.4",
     "@nomiclabs/hardhat-solhint": "^2.0.0",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "2.3.0",
