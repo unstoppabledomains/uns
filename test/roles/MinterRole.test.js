@@ -129,19 +129,6 @@ describe('MinterRole', () => {
     });
   });
 
-  describe('initAdmin', () => {
-    it('should init admin', async () => {
-      const adminRole = await minterRole.DEFAULT_ADMIN_ROLE();
-
-      // the case is not valid for previos version of MinterRole contract
-      expect(await minterRole.hasRole(adminRole, coinbase.address)).to.be.equal(true);
-
-      await minterRole.connect(coinbase).initAdmin();
-
-      expect(await minterRole.hasRole(adminRole, coinbase.address)).to.be.equal(true);
-    });
-  });
-
   describe('renounce minter account', () => {
     it('should renounce minter account 1', async () => {
       await minterRole.connect(minter).renounceMinter();

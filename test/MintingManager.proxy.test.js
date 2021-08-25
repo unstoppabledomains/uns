@@ -4,24 +4,25 @@ const { expect } = require('chai');
 const { ZERO_ADDRESS } = require('./helpers/constants');
 
 describe('MintingManager (proxy)', () => {
-  let UNSRegistry, Resolver, MintingController, MintingManager;
+  let UNSRegistry, Resolver, MintingController, MintingManagerV01, MintingManagerV02;
   let unsRegistry, resolver, mintingController, mintingManager;
-  let signers, coinbase;
+  let signers, coinbase, minter;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [coinbase] = signers;
+    [coinbase, minter] = signers;
 
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
     Resolver = await ethers.getContractFactory('Resolver');
     MintingController = await ethers.getContractFactory('MintingController');
-    MintingManager = await ethers.getContractFactory('MintingManager');
+    MintingManagerV01 = await ethers.getContractFactory('MintingManagerV01');
+    MintingManagerV02 = await ethers.getContractFactory('MintingManager');
   });
 
   beforeEach(async () => {
     unsRegistry = await UNSRegistry.deploy();
 
-    mintingManager = await upgrades.deployProxy(MintingManager, [], { initializer: false });
+    mintingManager = await upgrades.deployProxy(MintingManagerV01, [], { initializer: false });
     await unsRegistry.initialize(mintingManager.address);
 
     await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
@@ -36,7 +37,7 @@ describe('MintingManager (proxy)', () => {
 
     await upgrades.upgradeProxy(
       mintingManager.address,
-      MintingManager,
+      MintingManagerV02,
       [unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS],
       { initializer: 'initialize' },
     );
@@ -49,7 +50,7 @@ describe('MintingManager (proxy)', () => {
 
     await upgrades.upgradeProxy(
       mintingManager.address,
-      MintingManager,
+      MintingManagerV02,
       [unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS],
       { initializer: 'initialize' },
     );
@@ -59,5 +60,31 @@ describe('MintingManager (proxy)', () => {
     await mintingManager.setResolver(resolver.address);
 
     expect(await mintingManager.cnsResolver()).to.be.equal(resolver.address);
+  });
+
+  describe('MintingManager V01 -> V02', () => {
+    it('revert removing minter in V01 version', async () => {
+      await expect(
+        mintingManager.removeMinter(ZERO_ADDRESS),
+      ).to.be.revertedWith('AccessControl: can only renounce roles for self');
+    });
+
+    it('should keep main storage layout consistent after upgrade', async () => {
+      await mintingManager.addMinter(minter.address);
+      expect(await mintingManager.isMinter(minter.address)).to.be.equal(true);
+
+      mintingManager = await upgrades.upgradeProxy(
+        mintingManager.address,
+        MintingManagerV02,
+        [unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS],
+        { initializer: 'initialize' },
+      );
+      await mintingManager.transferOwnership(coinbase.address);
+
+      expect(await mintingManager.isMinter(minter.address)).to.be.equal(true);
+
+      await mintingManager.removeMinter(minter.address);
+      expect(await mintingManager.isMinter(minter.address)).to.be.equal(false);
+    });
   });
 });

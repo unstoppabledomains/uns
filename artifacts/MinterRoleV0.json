@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "MinterRole",
-  "sourceName": "contracts/roles/MinterRole.sol",
+  "contractName": "MinterRoleV0",
+  "sourceName": "contracts/history/roles/MinterRoleV0.sol",
   "abi": [
     {
       "anonymous": false,

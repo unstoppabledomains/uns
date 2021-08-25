@@ -6,7 +6,7 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 
-abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
+abstract contract MinterRoleV0 is OwnableUpgradeable, AccessControlUpgradeable {
     bytes32 public constant MINTER_ROLE = keccak256('MINTER_ROLE');
 
     modifier onlyMinter() {
@@ -22,14 +22,7 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __MinterRole_init_unchained() internal initializer {
-        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-    }
-
-    function transferOwnership(address newOwner) public override virtual onlyOwner {
-        super.transferOwnership(newOwner);
-        _setupRole(DEFAULT_ADMIN_ROLE, newOwner);
-    }
+    function __MinterRole_init_unchained() internal initializer {}
 
     function isMinter(address account) public view returns (bool) {
         return hasRole(MINTER_ROLE, account);
@@ -56,7 +49,7 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
     }
 
     function renounceMinter() public {
-        renounceRole(MINTER_ROLE, _msgSender());
+        _removeMinter(_msgSender());
     }
 
     /**
@@ -85,6 +78,6 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
     }
 
     function _removeMinter(address account) internal {
-        revokeRole(MINTER_ROLE, account);
+        renounceRole(MINTER_ROLE, account);
     }
 }
