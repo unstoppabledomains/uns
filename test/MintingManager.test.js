@@ -38,108 +38,27 @@ describe('MintingManager', () => {
     MintingManager = await ethers.getContractFactory('MintingManager');
   });
 
-  describe('MinterRole', () => {
+  describe('Ownership', () => {
     before(async () => {
-      [, faucet, receiver] = signers;
-    });
+      [, , receiver, resolver] = signers;
 
-    beforeEach(async () => {
       unsRegistry = await UNSRegistry.deploy();
       mintingManager = await MintingManager.deploy();
       await unsRegistry.initialize(mintingManager.address);
 
       await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-      await mintingManager.addMinter(coinbase.address);
-      await mintingManager.setTokenURIPrefix('/');
     });
 
-    describe('close minter account', () => {
-      it('revert when closing by non-minter account', async () => {
-        await expect(
-          mintingManager.connect(receiver).closeMinter(receiver.address),
-        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-      });
+    it('should transfer ownership', async () => {
+      expect(await mintingManager.owner()).to.be.equal(coinbase.address);
 
-      it('revert when zero account', async () => {
-        await expect(
-          mintingManager.closeMinter(ZERO_ADDRESS),
-        ).to.be.revertedWith('MinterRole: RECEIVER_IS_EMPTY');
-      });
+      await mintingManager.transferOwnership(receiver.address);
 
-      it('close minter without forwarding funds', async () => {
-        const initBalance = await faucet.getBalance();
-        await mintingManager.closeMinter(faucet.address, { value: 0 });
+      expect(await mintingManager.owner()).to.be.equal(receiver.address);
 
-        await expect(
-          mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'label'),
-        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-
-        expect(await faucet.getBalance()).to.be.equal(initBalance);
-      });
-
-      it('close minter with forwarding funds', async () => {
-        const value = 1;
-        const initBalance = await faucet.getBalance();
-
-        await mintingManager.closeMinter(faucet.address, { value });
-
-        await expect(
-          mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'label'),
-        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-
-        expect(await faucet.getBalance()).to.be.equal(BigNumber.from(initBalance).add(value));
-      });
-    });
-
-    describe('rotate minter account', () => {
-      it('revert when rotateing by non-minter account', async () => {
-        await expect(
-          mintingManager.connect(receiver).rotateMinter(receiver.address),
-        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-      });
-
-      it('revert when zero account', async () => {
-        await expect(
-          mintingManager.rotateMinter(ZERO_ADDRESS),
-        ).to.be.revertedWith('MinterRole: RECEIVER_IS_EMPTY');
-      });
-
-      it('rotate minter without defining value', async () => {
-        const initBalance = await receiver.getBalance();
-
-        await mintingManager.rotateMinter(receiver.address);
-
-        await expect(
-          mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'label'),
-        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-
-        expect(await receiver.getBalance()).to.be.equal(initBalance);
-      });
-
-      it('rotate minter without forwarding funds', async () => {
-        const initBalance = await receiver.getBalance();
-
-        await mintingManager.rotateMinter(receiver.address, { value: 0 });
-
-        await expect(
-          mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'label'),
-        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-
-        expect(await receiver.getBalance()).to.be.equal(initBalance);
-      });
-
-      it('rotate minter with forwarding funds', async () => {
-        const value = 3;
-        const initBalance = await receiver.getBalance();
-
-        await mintingManager.rotateMinter(receiver.address, { value });
-
-        await expect(
-          mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, walletRoot, 'label'),
-        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-
-        expect(await receiver.getBalance()).to.be.equal(BigNumber.from(initBalance).add(value));
-      });
+      await expect(
+        mintingManager.connect(coinbase).setResolver(resolver.address),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
     });
   });
 

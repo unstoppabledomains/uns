@@ -8,21 +8,21 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
-import './cns/IResolver.sol';
-import './cns/IMintingController.sol';
-import './cns/IURIPrefixController.sol';
-import './IMintingManager.sol';
-import './IUNSRegistry.sol';
-import './metatx/Relayer.sol';
-import './roles/MinterRole.sol';
+import './../cns/IResolver.sol';
+import './../cns/IMintingController.sol';
+import './../cns/IURIPrefixController.sol';
+import './../IMintingManager.sol';
+import './../IUNSRegistry.sol';
+import './../metatx/Relayer.sol';
+import './roles/MinterRoleV0.sol';
 
 /**
- * @title MintingManager
+ * @title MintingManager v0.1
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract MintingManager is Initializable, ContextUpgradeable, MinterRole, Relayer, IMintingManager {
+contract MintingManagerV01 is Initializable, ContextUpgradeable, OwnableUpgradeable, MinterRoleV0, Relayer, IMintingManager {
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.2.0';
+    string public constant VERSION = '0.1.0';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
