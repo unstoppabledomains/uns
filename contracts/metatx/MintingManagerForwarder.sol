@@ -3,28 +3,32 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
-
 import './IForwarder.sol';
 import './BaseForwarder.sol';
 
-contract MintingManagerForwarder is Initializable, BaseForwarder {
+contract MintingManagerForwarder is BaseForwarder {
     address private _mintingManager;
+    mapping(uint256 => uint256) private _nonces;
 
-    function initialize(address mintingManager) public initializer {
+    constructor(address mintingManager) {
         _mintingManager = mintingManager;
     }
 
-    function nonceOf(uint256 /* tokenId */) external override pure returns (uint256) {
-        return 0;
+    function nonceOf(uint256 tokenId) external override view returns (uint256) {
+        return _nonces[tokenId];
     }
 
-    function verify(ForwardRequest calldata req, bytes calldata signature) external override view returns (bool) {
+    function verify(ForwardRequest calldata req, bytes calldata signature) public override view returns (bool) {
         return _verify(req, _mintingManager, signature);
     }
 
     function execute(ForwardRequest calldata req, bytes calldata signature) external override returns (bytes memory) {
         uint256 gas = gasleft();
+        require(verify(req, signature), 'MintingManagerForwarder: SIGNATURE_INVALID');
         return _execute(req.from, _mintingManager, req.tokenId, gas, req.data, signature);
+    }
+
+    function _invalidateNonce(uint256 tokenId) internal override {
+        _nonces[tokenId] = _nonces[tokenId] + 1;
     }
 }
