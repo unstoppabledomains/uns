@@ -1,16 +1,13 @@
 const { network } = require('hardhat');
-const CNSNetworkConfig = require('dot-crypto/src/network-config/network-config.json');
 
 const { mergeNetworkConfig } = require('../src/config');
 const Deployer = require('../src/deployer');
 const UNSNetworkConfig = require('./../uns-config.json');
 
 async function main () {
-  console.log('Network', network.name);
+  console.log('Network:', network.name);
 
-  const config = ['localhost', 'hardhat', 'mumbai'].includes(network.name)
-    ? UNSNetworkConfig.networks[network.config.chainId]
-    : CNSNetworkConfig.networks[network.config.chainId];
+  const config = UNSNetworkConfig.networks[network.config.chainId];
   if (!config) {
     throw new Error(`Config not found for network ${network.config.chainId}`);
   }

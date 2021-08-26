@@ -5,7 +5,7 @@ const Deployer = require('../src/deployer');
 const NetworkConfig = require('./../uns-config.json');
 
 async function main () {
-  console.log('Network', network.name);
+  console.log('Network:', network.name);
 
   const unsConfig = NetworkConfig.networks[network.config.chainId];
   if (!unsConfig) {

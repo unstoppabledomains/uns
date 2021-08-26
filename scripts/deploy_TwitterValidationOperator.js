@@ -13,7 +13,7 @@ async function main () {
 
   const { UNSRegistry, CNSRegistry } = unsConfig.contracts;
 
-  console.log('Network', network.name);
+  console.log('Network:', network.name);
   const [deployer] = await ethers.getSigners();
   console.log('Account:', deployer.address);
 

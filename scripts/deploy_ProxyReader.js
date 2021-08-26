@@ -12,7 +12,7 @@ async function main () {
 
   const { UNSRegistry, CNSRegistry } = unsConfig.contracts;
 
-  console.log('Network', network.name);
+  console.log('Network:', network.name);
 
   // Deploy ProxyReader
   const proxyReader = await ProxyReader.deploy(UNSRegistry.address, CNSRegistry.address);
