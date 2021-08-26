@@ -1,0 +1,1 @@
+[{"inputs":[{"internalType":"address payable[]","name":"accounts","type":"address[]"},{"internalType":"uint256[]","name":"values","type":"uint256[]"}],"stateMutability":"payable","type":"constructor"}]
