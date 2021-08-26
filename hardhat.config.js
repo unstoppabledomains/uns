@@ -49,7 +49,7 @@ task(TASK_COMPILE, 'hook compile task to perform post-compile task', async (_, h
   }
 });
 
-// NOTE: Order is matter
+// NOTE: Order matters
 require('hardhat-abi-exporter');
 
 const settings = {
