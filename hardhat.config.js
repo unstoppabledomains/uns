@@ -49,6 +49,9 @@ task(TASK_COMPILE, 'hook compile task to perform post-compile task', async (_, h
   }
 });
 
+// NOTE: Order is matter
+require('hardhat-abi-exporter');
+
 const settings = {
   optimizer: {
     enabled: true,
@@ -134,6 +137,13 @@ module.exports = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+  abiExporter: {
+    path: './artifacts/abi',
+    clear: true,
+    flat: true,
+    except: ['Mock'],
+    spacing: 0,
   },
   uns: {
     minters: {

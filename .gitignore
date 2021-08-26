@@ -1,8 +1,6 @@
 node_modules/
 build/
 .chaindata/
-abi/
-EthereumController.key
 .idea
 
 logs
@@ -37,4 +35,3 @@ cache
 
 .sandbox
 .deployer
-
