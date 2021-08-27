@@ -241,7 +241,7 @@ Changes:
 ---
 ## Sandbox
 
-[>> README](./sandbox/README.md.md)
+[>> README](./sandbox/README.md)
 
 ## Deploying contracts
 
