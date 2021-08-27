@@ -363,14 +363,7 @@ UNS depends on CNS, as CNS registry address is used as a MintingManager's initia
 make sure that CNS is deployed and actual CNS contract addresses are specified in the `uns-config.json` file.
 
 ```
-yarn hardhat run --network <network> scripts/deploy_UNS.js
+yarn hardhat run --network <network> scripts/deploy.js
 ```
 
-### Deploying ProxyReader
-
-ProxyReader depends on both CNS and UNS, so make sure that actual contract addresses are specified in the
-`uns-config.json` file.
-
-```
-yarn hardhat run --network <network> scripts/deploy_ProxyReader.js
-```
+Warning: In case of contracts' redeployment, make sure there is no deployment output file `.deployer/{chain_id}.json`
