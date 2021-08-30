@@ -14,11 +14,11 @@ contract MintingManagerForwarder is BaseForwarder {
         _mintingManager = mintingManager;
     }
 
-    function nonceOf(uint256 tokenId) external override view returns (uint256) {
+    function nonceOf(uint256 tokenId) external view override returns (uint256) {
         return _nonces[tokenId];
     }
 
-    function verify(ForwardRequest calldata req, bytes calldata signature) public override view returns (bool) {
+    function verify(ForwardRequest calldata req, bytes calldata signature) public view override returns (bool) {
         return _verify(req, _mintingManager, signature);
     }
 

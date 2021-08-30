@@ -52,9 +52,9 @@ describe('CNSRegistry (consumption)', () => {
     const tokenIdFor = await mintDomain(label + 'for', owner.address);
     const dataFor = registry.interface.encodeFunctionData(
       'transferFrom(address,address,uint256)',
-      [owner.address, receiver.address, tokenIdFor]
+      [owner.address, receiver.address, tokenIdFor],
     );
-    const nonceFor =  await signatureController.nonceOf(tokenIdFor);
+    const nonceFor = await signatureController.nonceOf(tokenIdFor);
     const signatureFor = await sign(dataFor, signatureController.address, nonceFor, owner);
     const forTx = await signatureController.connect(spender).transferFromFor(
       owner.address, receiver.address, tokenIdFor, signatureFor);

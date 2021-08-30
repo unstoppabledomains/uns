@@ -15,13 +15,7 @@ import './metatx/UNSRegistryForwarder.sol';
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract UNSRegistry is
-    ERC721Upgradeable,
-    ERC2771RegistryContext,
-    RecordStorage,
-    UNSRegistryForwarder,
-    IUNSRegistry
-{
+contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage, UNSRegistryForwarder, IUNSRegistry {
     /**
      * @dev ERC-1967: Emitted when the implementation is upgraded. Required for ABI decoding only.
      */

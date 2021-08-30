@@ -10,6 +10,5 @@ contract MinterRoleMock is MinterRole {
         __MinterRole_init();
     }
 
-    function olnyMinterFunc() external onlyMinter {
-    }
+    function olnyMinterFunc() external onlyMinter {}
 }
