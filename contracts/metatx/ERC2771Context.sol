@@ -3,8 +3,8 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
 /**
@@ -37,7 +37,7 @@ abstract contract ERC2771Context is Initializable, ContextUpgradeable {
      * @dev Return bool whether provided address is the trusted forwarder.
      */
     function isTrustedForwarder(address forwarder) public view virtual returns (bool) {
-        return forwarder == _getForwarder();
+        return forwarder == StorageSlotUpgradeable.getAddressSlot(_FORWARDER_SLOT).value;
     }
 
     /**
@@ -82,10 +82,6 @@ abstract contract ERC2771Context is Initializable, ContextUpgradeable {
         } else {
             return super._msgData();
         }
-    }
-
-    function _getForwarder() internal view virtual returns(address) {
-        return StorageSlotUpgradeable.getAddressSlot(_FORWARDER_SLOT).value;
     }
 
     function _setForwarder(address forwarder) internal virtual {

@@ -45,7 +45,7 @@ describe('MintingManager (metatx)', () => {
     expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
   });
 
-  it('should fail forwarding when forwarder not trusted', async () => {
+  it('should revert forwarding when forwarder not trusted', async () => {
     const tokenId = await unsRegistry.childIdOf(TLD.WALLET, 'test-qw11');
     const { req, signature } = await buildExecuteParams(
       'mintSLD(address,uint256,string)',
@@ -57,5 +57,29 @@ describe('MintingManager (metatx)', () => {
     await expect(
       forwarder.execute(req, signature),
     ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+  });
+
+  it('should revert execution when signature is not valid', async () => {
+    const tokenId = await unsRegistry.childIdOf(TLD.WALLET, 'test-qw1341');
+    const { req, signature } = await buildExecuteParams(
+      'mintSLD(address,uint256,string)',
+      [receiver.address, TLD.WALLET, 'test-qw1341'],
+      coinbase, tokenId);
+
+    await expect(forwarder.execute({ ...req, from: receiver.address }, signature)).to.be
+      .revertedWith('MintingManagerForwarder: SIGNATURE_INVALID');
+  });
+
+  it('should revert execution when used signature', async () => {
+    const tokenId = await unsRegistry.childIdOf(TLD.WALLET, 'test-qw1341');
+    const { req, signature } = await buildExecuteParams(
+      'mintSLD(address,uint256,string)',
+      [receiver.address, TLD.WALLET, 'test-qw1341'],
+      coinbase, tokenId);
+
+    await forwarder.execute(req, signature);
+
+    await expect(forwarder.execute(req, signature)).to.be
+      .revertedWith('MintingManagerForwarder: SIGNATURE_INVALID');
   });
 });
