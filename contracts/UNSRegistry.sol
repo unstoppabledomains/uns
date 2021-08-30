@@ -3,7 +3,6 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 
 import './IUNSRegistry.sol';
@@ -17,7 +16,6 @@ import './metatx/UNSRegistryForwarder.sol';
  * additional functions so other trusted contracts to interact with the tokens.
  */
 contract UNSRegistry is
-    Initializable,
     ERC721Upgradeable,
     ERC2771RegistryContext,
     RecordStorage,
