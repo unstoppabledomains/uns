@@ -73,5 +73,18 @@ describe('MintingManager (proxy)', () => {
       await mintingManager.removeMinter(minter.address);
       expect(await mintingManager.isMinter(minter.address)).to.be.equal(false);
     });
+
+    it('should have zero forwarder after upgrade', async () => {
+      mintingManager = await upgrades.upgradeProxy(mintingManager.address, MintingManagerV02);
+
+      expect(await mintingManager.isTrustedForwarder(ZERO_ADDRESS)).to.be.equal(true);
+    });
+
+    it('should be possible to set trusted forwarder', async () => {
+      mintingManager = await upgrades.upgradeProxy(mintingManager.address, MintingManagerV02);
+      await mintingManager.setForwarder(coinbase.address);
+
+      expect(await mintingManager.isTrustedForwarder(coinbase.address)).to.be.equal(true);
+    });
   });
 });
