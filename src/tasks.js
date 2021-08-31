@@ -302,18 +302,45 @@ const deployMMForwarderTask = {
   },
 };
 
-const upgradeUNSTask = {
-  tags: ['upgrade'],
+const upgradeUNSRegistryTask = {
+  tags: ['upgrade_registry'],
   priority: 100,
-  run: async (ctx, { UNSRegistry, MintingManager }) => {
+  run: async (ctx, { UNSRegistry }) => {
     const unsRegistry = await upgrades.upgradeProxy(UNSRegistry.address, ctx.artifacts.UNSRegistry);
-    const mintingManager = await upgrades.upgradeProxy(MintingManager.address, ctx.artifacts.MintingManager);
 
     const proxyAdmin = await upgrades.admin.getInstance();
     await ctx.saveContractConfig('ProxyAdmin', proxyAdmin);
 
     const unsRegistryImpl = await proxyAdmin.callStatic.getProxyImplementation(unsRegistry.address);
     await ctx.saveContractConfig('UNSRegistry', unsRegistry, unsRegistryImpl);
+  },
+  ensureDependencies: (ctx, config) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { UNSRegistry, ProxyAdmin } = config.contracts || {};
+    if (!ProxyAdmin || !ProxyAdmin.address) {
+      throw new Error('Current network configuration does not support upgrading');
+    }
+
+    const dependencies = { UNSRegistry };
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    };
+
+    return dependencies;
+  },
+};
+
+const upgradeMintingManagerTask = {
+  tags: ['upgrade_minting_manager'],
+  priority: 100,
+  run: async (ctx, { MintingManager }) => {
+    const mintingManager = await upgrades.upgradeProxy(MintingManager.address, ctx.artifacts.MintingManager);
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+    await ctx.saveContractConfig('ProxyAdmin', proxyAdmin);
 
     const mintingManagerImpl = await proxyAdmin.callStatic.getProxyImplementation(mintingManager.address);
     await ctx.saveContractConfig('MintingManager', mintingManager, mintingManagerImpl);
@@ -321,12 +348,12 @@ const upgradeUNSTask = {
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { UNSRegistry, MintingManager, ProxyAdmin } = config.contracts || {};
+    const { MintingManager, ProxyAdmin } = config.contracts || {};
     if (!ProxyAdmin || !ProxyAdmin.address) {
       throw new Error('Current network configuration does not support upgrading');
     }
 
-    const dependencies = { UNSRegistry, MintingManager };
+    const dependencies = { MintingManager };
     for (const [key, value] of Object.entries(dependencies)) {
       if (!value || !value.address) {
         throw new Error(`${key} contract not found for network ${network.config.chainId}`);
@@ -343,5 +370,6 @@ module.exports = [
   deployUNSTask,
   configureCNSTask,
   deployMMForwarderTask,
-  upgradeUNSTask,
+  upgradeUNSRegistryTask,
+  upgradeMintingManagerTask,
 ];

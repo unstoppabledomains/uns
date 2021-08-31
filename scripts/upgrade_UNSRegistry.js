@@ -13,7 +13,7 @@ async function main () {
   }
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['upgrade_registry', 'upgrade_minting_manager'], config);
+  const deployConfig = await deployer.execute(['upgrade_registry'], config);
   mergeNetworkConfig(deployConfig);
 }
 
