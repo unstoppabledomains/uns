@@ -46,7 +46,7 @@ describe('MintingManager', () => {
       mintingManager = await MintingManager.deploy();
       await unsRegistry.initialize(mintingManager.address);
 
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     });
 
     it('should transfer ownership', async () => {
@@ -70,7 +70,7 @@ describe('MintingManager', () => {
       mintingManager = await MintingManager.deploy();
       await unsRegistry.initialize(mintingManager.address);
 
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.setTokenURIPrefix('/');
     });
 
@@ -144,7 +144,7 @@ describe('MintingManager', () => {
       mintingManager = await MintingManager.deploy();
       await unsRegistry.initialize(mintingManager.address);
 
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.addMinter(coinbase.address);
       await mintingManager.setTokenURIPrefix('/');
     });
@@ -225,7 +225,7 @@ describe('MintingManager', () => {
       mintingManager = await MintingManager.deploy();
       await unsRegistry.initialize(mintingManager.address);
 
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.addMinter(coinbase.address);
       await mintingManager.setTokenURIPrefix('/');
     });
@@ -396,7 +396,8 @@ describe('MintingManager', () => {
         unsRegistry.address,
         mintingController.address,
         uriPrefixController.address,
-        resolver.address);
+        resolver.address,
+        ZERO_ADDRESS);
       await mintingManager.addMinter(coinbase.address);
       await mintingManager.setTokenURIPrefix('/');
     });
@@ -699,7 +700,7 @@ describe('MintingManager', () => {
       mintingManager = await MintingManager.deploy();
 
       await unsRegistry.initialize(mintingManager.address);
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     });
 
     it('should return zero resolver when initialized by zero address', async () => {

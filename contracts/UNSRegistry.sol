@@ -3,9 +3,7 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 
 import './IUNSRegistry.sol';
 import './RecordStorage.sol';
@@ -17,15 +15,7 @@ import './metatx/UNSRegistryForwarder.sol';
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract UNSRegistry is
-    Initializable,
-    ContextUpgradeable,
-    ERC721Upgradeable,
-    ERC2771RegistryContext,
-    RecordStorage,
-    UNSRegistryForwarder,
-    IUNSRegistry
-{
+contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage, UNSRegistryForwarder, IUNSRegistry {
     /**
      * @dev ERC-1967: Emitted when the implementation is upgraded. Required for ABI decoding only.
      */
@@ -315,7 +305,7 @@ contract UNSRegistry is
         return _prefix;
     }
 
-    function _msgSender() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (address sender) {
+    function _msgSender() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (address) {
         return super._msgSender();
     }
 

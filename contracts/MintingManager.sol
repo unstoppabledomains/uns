@@ -3,16 +3,12 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
-import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
-
 import './cns/IResolver.sol';
 import './cns/IMintingController.sol';
 import './cns/IURIPrefixController.sol';
 import './IMintingManager.sol';
 import './IUNSRegistry.sol';
+import './metatx/ERC2771Context.sol';
 import './metatx/Relayer.sol';
 import './roles/MinterRole.sol';
 
@@ -20,7 +16,7 @@ import './roles/MinterRole.sol';
  * @title MintingManager
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract MintingManager is Initializable, ContextUpgradeable, MinterRole, Relayer, IMintingManager {
+contract MintingManager is ERC2771Context, MinterRole, Relayer, IMintingManager {
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.2.0';
 
@@ -75,7 +71,8 @@ contract MintingManager is Initializable, ContextUpgradeable, MinterRole, Relaye
         IUNSRegistry unsRegistry_,
         IMintingController cnsMintingController_,
         IURIPrefixController cnsURIPrefixController_,
-        IResolver cnsResolver_
+        IResolver cnsResolver_,
+        address forwarder
     ) public initializer {
         unsRegistry = unsRegistry_;
         cnsMintingController = cnsMintingController_;
@@ -84,6 +81,7 @@ contract MintingManager is Initializable, ContextUpgradeable, MinterRole, Relaye
 
         __Ownable_init_unchained();
         __MinterRole_init_unchained();
+        __ERC2771Context_init_unchained(forwarder);
 
         // Relayer is required to be a minter
         _addMinter(address(this));
@@ -190,6 +188,10 @@ contract MintingManager is Initializable, ContextUpgradeable, MinterRole, Relaye
         }
     }
 
+    function setForwarder(address forwarder) external onlyOwner {
+        _setForwarder(forwarder);
+    }
+
     function _verifyRelaySigner(address signer) internal view override {
         super._verifyRelaySigner(signer);
         require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
@@ -279,6 +281,14 @@ contract MintingManager is Initializable, ContextUpgradeable, MinterRole, Relaye
 
     function _uri(uint256 tld, string memory label) private view returns (string memory) {
         return string(abi.encodePacked(label, '.', _tlds[tld]));
+    }
+
+    function _msgSender() internal view override(ContextUpgradeable, ERC2771Context) returns (address) {
+        return super._msgSender();
+    }
+
+    function _msgData() internal view override(ContextUpgradeable, ERC2771Context) returns (bytes calldata) {
+        return super._msgData();
     }
 
     // Reserved storage space to allow for layout changes in the future.
