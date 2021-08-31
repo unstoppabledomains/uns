@@ -140,7 +140,7 @@ const deployUNSTask = {
       await ctx.saveContractConfig('ProxyAdmin', proxyAdmin);
 
       unsRegistryImpl = await proxyAdmin.callStatic.getProxyImplementation(unsRegistry.address);
-      await ctx.saveContractConfig('UNSRegistry', unsRegistry, unsRegistryImpl);
+      await ctx.saveContractConfig('UNSRegistry', unsRegistry, unsRegistryImpl, unsRegistry);
 
       mintingManagerImpl = await proxyAdmin.callStatic.getProxyImplementation(mintingManager.address);
       await ctx.saveContractConfig('MintingManager', mintingManager, mintingManagerImpl);
@@ -155,11 +155,17 @@ const deployUNSTask = {
     const registryInitTx = await unsRegistry.connect(owner).initialize(mintingManager.address);
     await registryInitTx.wait();
 
+    const forwarder = await ctx.artifacts.MintingManagerForwarder
+      .connect(owner)
+      .deploy(mintingManager.address);
+    await ctx.saveForwarderConfig('MintingManager', forwarder);
+
     const mintingManagerInitTx = await mintingManager.connect(owner).initialize(
       unsRegistry.address,
       MintingController.address,
       URIPrefixController.address,
       Resolver.address,
+      forwarder.address,
     );
     await mintingManagerInitTx.wait();
 
@@ -262,6 +268,38 @@ const configureCNSTask = {
   },
 };
 
+const deployMMForwarderTask = {
+  tags: ['uns_mm_forwarder'],
+  priority: 100,
+  run: async (ctx, { MintingManager }) => {
+    const { owner } = ctx.accounts;
+
+    const forwarder = await ctx.artifacts.MintingManagerForwarder
+      .connect(owner)
+      .deploy(MintingManager.address);
+
+    const mintingManager = await ctx.artifacts.MintingManager
+      .attach(MintingManager.address)
+      .connect(owner);
+    await mintingManager.setForwarder(forwarder.address);
+    await ctx.saveForwarderConfig('MintingManager', forwarder);
+  },
+  ensureDependencies: (ctx, config) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { MintingManager } = config.contracts || {};
+    const dependencies = { MintingManager };
+
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    };
+
+    return dependencies;
+  },
+};
+
 const upgradeUNSTask = {
   tags: ['upgrade'],
   priority: 100,
@@ -302,5 +340,6 @@ module.exports = [
   deployCNSForwardersTask,
   deployUNSTask,
   configureCNSTask,
+  deployMMForwarderTask,
   upgradeUNSTask,
 ];

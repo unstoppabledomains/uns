@@ -26,6 +26,7 @@ async function _getArtifacts () {
     UNSRegistryV01: await ethers.getContractFactory('UNSRegistryV01'),
     UNSRegistry: await ethers.getContractFactory('UNSRegistry'),
     MintingManager: await ethers.getContractFactory('MintingManager'),
+    MintingManagerForwarder: await ethers.getContractFactory('MintingManagerForwarder'),
     ProxyReader: await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader'),
     TwitterValidationOperator: await ethers.getContractFactory('TwitterValidationOperator'),
   };
@@ -127,7 +128,7 @@ class Deployer {
     return JSON.parse(file.length ? file : '{}');
   }
 
-  async saveContractConfig (name, contract, implAddress) {
+  async saveContractConfig (name, contract, implAddress, forwarder) {
     const config = this.getDeployConfig();
 
     const _config = merge(config, {
@@ -136,6 +137,7 @@ class Deployer {
           address: contract.address,
           implementation: implAddress,
           transaction: contract.deployTransaction && await contract.deployTransaction.wait(),
+          forwarder: forwarder.address,
         },
       },
     });
