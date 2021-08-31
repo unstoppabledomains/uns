@@ -137,7 +137,7 @@ class Deployer {
           address: contract.address,
           implementation: implAddress,
           transaction: contract.deployTransaction && await contract.deployTransaction.wait(),
-          forwarder: forwarder.address,
+          forwarder: forwarder && forwarder.address,
         },
       },
     });
@@ -148,7 +148,6 @@ class Deployer {
   async saveForwarderConfig (name, contract) {
     const config = this.getDeployConfig();
 
-    console.log(name, contract.address, config.contracts[name]);
     const _config = merge(config, {
       contracts: {
         [name]: {
