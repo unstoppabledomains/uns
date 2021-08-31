@@ -23,7 +23,6 @@ async function _getArtifacts () {
     WhitelistedMinter: await ethers.getContractFactory('WhitelistedMinter'),
     Resolver: await ethers.getContractFactory('Resolver'),
     ResolverForwarder: await ethers.getContractFactory('ResolverForwarder'),
-    UNSRegistryV01: await ethers.getContractFactory('UNSRegistryV01'),
     UNSRegistry: await ethers.getContractFactory('UNSRegistry'),
     MintingManager: await ethers.getContractFactory('MintingManager'),
     MintingManagerForwarder: await ethers.getContractFactory('MintingManagerForwarder'),
@@ -106,9 +105,8 @@ class Deployer {
         ...emptyConfig,
         address: value.address,
         implementation: value.implementation,
-        deploymentBlock: value.transaction
-          ? ethers.BigNumber.from(value.transaction.blockNumber).toHexString()
-          : '0x0',
+        deploymentBlock: value.transaction &&
+          ethers.BigNumber.from(value.transaction.blockNumber).toHexString(),
         forwarder: value.forwarder,
       };
     };
@@ -151,7 +149,7 @@ class Deployer {
     const _config = merge(config, {
       contracts: {
         [name]: {
-          ...config.contracts[name],
+          ...((config.contracts || {})[name] || {}),
           forwarder: contract.address,
         },
       },
