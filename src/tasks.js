@@ -84,12 +84,14 @@ const deployCNSForwardersTask = {
     const { owner } = ctx.accounts;
     const { CNSRegistry, SignatureController } = dependencies;
 
-    const cnsRegistryForwarder = await ctx.artifacts.CNSRegistryForwarder.connect(owner).deploy();
-    await cnsRegistryForwarder.initialize(SignatureController.address);
+    const cnsRegistryForwarder = await ctx.artifacts.CNSRegistryForwarder
+      .connect(owner)
+      .deploy(SignatureController.address);
     await ctx.saveForwarderConfig('CNSRegistry', cnsRegistryForwarder);
 
-    const resolverForwarder = await ctx.artifacts.ResolverForwarder.connect(owner).deploy();
-    await resolverForwarder.initialize(CNSRegistry.address);
+    const resolverForwarder = await ctx.artifacts.ResolverForwarder
+      .connect(owner)
+      .deploy(CNSRegistry.address);
     await ctx.saveForwarderConfig('Resolver', resolverForwarder);
   },
   ensureDependencies: (ctx, config) => {
