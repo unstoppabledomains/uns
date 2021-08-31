@@ -3,6 +3,7 @@ const merge = require('lodash.merge');
 
 const deployCNSTask = {
   tags: ['cns', 'full'],
+  priority: 0,
   run: async (ctx) => {
     const { owner } = ctx.accounts;
     const {
@@ -76,8 +77,46 @@ const deployCNSTask = {
   },
 };
 
+const deployCNSForwardersTask = {
+  tags: ['cns_forwarders', 'full'],
+  priority: 5,
+  run: async (ctx, dependencies) => {
+    const { owner } = ctx.accounts;
+    const { CNSRegistry, SignatureController } = dependencies;
+
+    const cnsRegistryForwarder = await ctx.artifacts.CNSRegistryForwarder.connect(owner).deploy();
+    await cnsRegistryForwarder.initialize(SignatureController.address);
+    await ctx.saveForwarderConfig('CNSRegistry', cnsRegistryForwarder);
+
+    const resolverForwarder = await ctx.artifacts.ResolverForwarder.connect(owner).deploy();
+    await resolverForwarder.initialize(CNSRegistry.address);
+    await ctx.saveForwarderConfig('Resolver', resolverForwarder);
+  },
+  ensureDependencies: (ctx, config) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const {
+      CNSRegistry,
+      SignatureController,
+    } = config.contracts || {};
+    const dependencies = {
+      CNSRegistry,
+      SignatureController,
+    };
+
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    };
+
+    return dependencies;
+  },
+};
+
 const deployUNSTask = {
   tags: ['uns', 'full'],
+  priority: 10,
   run: async (ctx, dependencies) => {
     const { owner } = ctx.accounts;
     const {
@@ -181,6 +220,7 @@ const deployUNSTask = {
 
 const configureCNSTask = {
   tags: ['uns_config_cns', 'full'],
+  priority: 15,
   run: async (ctx, { MintingController, URIPrefixController, MintingManager }) => {
     const { owner } = ctx.accounts;
 
@@ -224,6 +264,7 @@ const configureCNSTask = {
 
 const upgradeUNSTask = {
   tags: ['upgrade'],
+  priority: 100,
   run: async (ctx, { UNSRegistry, MintingManager }) => {
     const unsRegistry = await upgrades.upgradeProxy(UNSRegistry.address, ctx.artifacts.UNSRegistry);
     const mintingManager = await upgrades.upgradeProxy(MintingManager.address, ctx.artifacts.MintingManager);
@@ -256,9 +297,10 @@ const upgradeUNSTask = {
   },
 };
 
-module.exports = {
+module.exports = [
   deployCNSTask,
+  deployCNSForwardersTask,
   deployUNSTask,
   configureCNSTask,
   upgradeUNSTask,
-};
+];

@@ -4,9 +4,9 @@ const fs = require('fs');
 const merge = require('lodash.merge');
 const debug = require('debug');
 
-const log = debug('UNS:deployer');
+const tasks = require('./tasks');
 
-const { deployCNSTask, deployUNSTask, configureCNSTask, upgradeUNSTask } = require('./tasks');
+const log = debug('UNS:deployer');
 
 const defaultOptions = {
   basePath: './.deployer',
@@ -16,11 +16,13 @@ const defaultOptions = {
 async function _getArtifacts () {
   return {
     CNSRegistry: await ethers.getContractFactory('CNSRegistry'),
+    CNSRegistryForwarder: await ethers.getContractFactory('CNSRegistryForwarder'),
     SignatureController: await ethers.getContractFactory('SignatureController'),
     MintingController: await ethers.getContractFactory('MintingController'),
     URIPrefixController: await ethers.getContractFactory('URIPrefixController'),
     WhitelistedMinter: await ethers.getContractFactory('WhitelistedMinter'),
     Resolver: await ethers.getContractFactory('Resolver'),
+    ResolverForwarder: await ethers.getContractFactory('ResolverForwarder'),
     UNSRegistryV01: await ethers.getContractFactory('UNSRegistryV01'),
     UNSRegistry: await ethers.getContractFactory('UNSRegistry'),
     MintingManager: await ethers.getContractFactory('MintingManager'),
@@ -52,14 +54,7 @@ class Deployer {
     this.accounts = accounts;
     this.minters = minters;
     this.linkToken = linkToken;
-
     this.network = network.config;
-    this.tasks = [
-      deployCNSTask,
-      deployUNSTask,
-      configureCNSTask,
-      upgradeUNSTask,
-    ];
 
     this.log = log;
     debug.enable('UNS:deployer');
@@ -82,7 +77,7 @@ class Deployer {
     tags = tags || [];
 
     this.log('Execution started');
-    for (const task of this.tasks) {
+    for (const task of tasks.sort((a, b) => a.priority - b.priority)) {
       if (!tags.some(t => task.tags.includes(t.toLowerCase()))) continue;
 
       this.log('Executing task', { tags: task.tags });
@@ -113,6 +108,7 @@ class Deployer {
         deploymentBlock: value.transaction
           ? ethers.BigNumber.from(value.transaction.blockNumber).toHexString()
           : '0x0',
+        forwarder: value.forwarder,
       };
     };
 
@@ -144,8 +140,28 @@ class Deployer {
       },
     });
 
+    this._saveConfig(_config);
+  }
+
+  async saveForwarderConfig (name, contract) {
+    const config = this.getDeployConfig();
+
+    console.log(name, contract.address, config.contracts[name]);
+    const _config = merge(config, {
+      contracts: {
+        [name]: {
+          ...config.contracts[name],
+          forwarder: contract.address,
+        },
+      },
+    });
+
+    this._saveConfig(_config);
+  }
+
+  async _saveConfig (config) {
     const configPath = path.resolve(this.options.basePath, `${this.network.chainId}.json`);
-    fs.writeFileSync(configPath, JSON.stringify(_config, null, 2));
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
   }
 }
 

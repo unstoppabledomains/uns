@@ -7,7 +7,7 @@ async function main () {
   console.log('Network:', network.name);
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['cns']);
+  const deployConfig = await deployer.execute(['cns', 'cns_forwarders']);
   mergeNetworkConfig(deployConfig);
 
   console.log('Deployed!');
