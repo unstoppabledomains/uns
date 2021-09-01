@@ -98,7 +98,8 @@
                     "address": "0xdAAf99A920D31F4f5720e4667b12b24e54A03070",
                     "implementation": "0x14B2048d45d0C47052EF1d6a795a8903c36467c7",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x85e629"
+                    "deploymentBlock": "0x85e629",
+                    "forwarder": "0xfB13e29C4D31a48B4Cd61131Cf3b681416e11681"
                 },
                 "ProxyReader": {
                     "address": "0x299974AeD8911bcbd2C61262605b89F591a53E83",
