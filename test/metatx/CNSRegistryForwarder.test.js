@@ -39,8 +39,7 @@ describe('CNSRegistryForwarder', () => {
     await registry.addController(mintingController.address);
     await registry.addController(signatureController.address);
 
-    forwarder = await CNSRegistryForwarder.deploy();
-    await forwarder.initialize(signatureController.address);
+    forwarder = await CNSRegistryForwarder.deploy(signatureController.address);
 
     buildExecuteParams = buildExecuteFunc(registry.interface, signatureController.address, forwarder);
   });

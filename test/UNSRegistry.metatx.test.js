@@ -1,26 +1,15 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
-const { sign } = require('./helpers/metatx');
+const { sign, buildExecuteFunc } = require('./helpers/metatx');
 const { EMPTY_SIGNATURE, TLD } = require('./helpers/constants');
 const { mintDomain } = require('./helpers/registry');
 
 const { utils, BigNumber } = ethers;
 
 describe('UNSRegistry (metatx)', () => {
-  let UNSRegistry, unsRegistry;
+  let UNSRegistry, unsRegistry, buildExecuteParams;
   let signers, coinbase, owner, nonOwner, receiver, accessControl, operator, spender;
-
-  const buildExecuteFuncParams = async (selector, params, from, tokenId) => {
-    const data = unsRegistry.interface.encodeFunctionData(selector, params);
-    return buildExecuteParams(data, from, tokenId);
-  };
-
-  const buildExecuteParams = async (data, from, tokenId) => {
-    const nonce = await unsRegistry.nonceOf(tokenId);
-    const signature = await sign(data, unsRegistry.address, nonce, from);
-    return { req: { from: from.address, tokenId, nonce, data }, signature };
-  };
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -32,6 +21,8 @@ describe('UNSRegistry (metatx)', () => {
     await unsRegistry.initialize(coinbase.address);
     await unsRegistry.mint('0xdead000000000000000000000000000000000000', TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
+
+    buildExecuteParams = buildExecuteFunc(unsRegistry.interface, unsRegistry.address, unsRegistry);
   });
 
   describe('General', () => {
@@ -40,7 +31,7 @@ describe('UNSRegistry (metatx)', () => {
     it('should transfer using meta-setOwner', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'res_label_113a');
 
-      const { req, signature } = await buildExecuteFuncParams(
+      const { req, signature } = await buildExecuteParams(
         'setOwner(address,uint256)',
         [receiver.address, tokenId],
         owner, tokenId);
@@ -52,7 +43,7 @@ describe('UNSRegistry (metatx)', () => {
     it('should revert transfer using meta-setOwner when nonce invalidated', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'res_label_0896');
 
-      const { req, signature } = await buildExecuteFuncParams(
+      const { req, signature } = await buildExecuteParams(
         'setOwner(address,uint256)',
         [receiver.address, tokenId],
         owner, tokenId);
@@ -63,7 +54,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should setApprovalForAll using meta-setApprovalForAll', async () => {
-      const { req, signature } = await buildExecuteFuncParams(
+      const { req, signature } = await buildExecuteParams(
         'setApprovalForAll(address,bool)',
         [operator.address, true],
         owner, 0);
@@ -73,7 +64,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert meta-setApprovalForAll for non-onwer', async () => {
-      const { req, signature } = await buildExecuteFuncParams(
+      const { req, signature } = await buildExecuteParams(
         'setApprovalForAll(address,bool)',
         [operator.address, true],
         nonOwner, 0);
@@ -85,7 +76,7 @@ describe('UNSRegistry (metatx)', () => {
     it('should transfer using meta-transferFrom', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_1591');
 
-      const { req, signature } = await buildExecuteFuncParams(
+      const { req, signature } = await buildExecuteParams(
         'transferFrom(address,address,uint256)',
         [owner.address, receiverAddress, tokenId],
         owner, tokenId);
@@ -97,7 +88,7 @@ describe('UNSRegistry (metatx)', () => {
     it('should revert meta-transferFrom for non-onwer', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_6458');
 
-      const { req, signature } = await buildExecuteFuncParams(
+      const { req, signature } = await buildExecuteParams(
         'transferFrom(address,address,uint256)',
         [nonOwner.address, receiverAddress, tokenId],
         nonOwner, tokenId);
@@ -109,7 +100,7 @@ describe('UNSRegistry (metatx)', () => {
     it('should transfer using meta-safeTransferFrom', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_10235');
 
-      const { req, signature } = await buildExecuteFuncParams(
+      const { req, signature } = await buildExecuteParams(
         'safeTransferFrom(address,address,uint256)',
         [owner.address, receiverAddress, tokenId],
         owner, tokenId);
@@ -121,7 +112,7 @@ describe('UNSRegistry (metatx)', () => {
     it('should revert meta-safeTransferFrom for non-onwer', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_e5iuw');
 
-      const { req, signature } = await buildExecuteFuncParams(
+      const { req, signature } = await buildExecuteParams(
         'safeTransferFrom(address,address,uint256)',
         [nonOwner.address, receiverAddress, tokenId],
         nonOwner, tokenId);
@@ -134,7 +125,7 @@ describe('UNSRegistry (metatx)', () => {
 
     it('should burn using meta-burn', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_ar093');
-      const { req, signature } = await buildExecuteFuncParams('burn(uint256)', [tokenId], owner, tokenId);
+      const { req, signature } = await buildExecuteParams('burn(uint256)', [tokenId], owner, tokenId);
       await unsRegistry.execute(req, signature);
 
       await expect(unsRegistry.ownerOf(tokenId)).to.be
@@ -143,7 +134,7 @@ describe('UNSRegistry (metatx)', () => {
 
     it('should revert meta-burn for non-onwer', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.CRYPTO, 'meta_53dg3');
-      const { req, signature } = await buildExecuteFuncParams('burn(uint256)', [tokenId], nonOwner, tokenId);
+      const { req, signature } = await buildExecuteParams('burn(uint256)', [tokenId], nonOwner, tokenId);
 
       await expect(unsRegistry.execute(req, signature)).to.be
         .revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');

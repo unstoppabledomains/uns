@@ -20,7 +20,14 @@ import './roles/MinterRoleV0.sol';
  * @title MintingManager v0.1
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract MintingManagerV01 is Initializable, ContextUpgradeable, OwnableUpgradeable, MinterRoleV0, Relayer, IMintingManager {
+contract MintingManagerV01 is
+    Initializable,
+    ContextUpgradeable,
+    OwnableUpgradeable,
+    MinterRoleV0,
+    Relayer,
+    IMintingManager
+{
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.1.0';
 

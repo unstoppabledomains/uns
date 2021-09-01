@@ -26,7 +26,7 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
-    function transferOwnership(address newOwner) public override virtual onlyOwner {
+    function transferOwnership(address newOwner) public virtual override onlyOwner {
         super.transferOwnership(newOwner);
         _setupRole(DEFAULT_ADMIN_ROLE, newOwner);
     }

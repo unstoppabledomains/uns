@@ -3,8 +3,6 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
-
 import './IForwarder.sol';
 import './BaseRoutingForwarder.sol';
 
@@ -13,10 +11,10 @@ import './BaseRoutingForwarder.sol';
  * @dev CNSRegistryForwarder simplifies operation with legacy meta-transactions.
  * It works on top of existing SignatureController contract.
  */
-contract CNSRegistryForwarder is Initializable, BaseRoutingForwarder {
+contract CNSRegistryForwarder is BaseRoutingForwarder {
     IForwarder private _target;
 
-    function initialize(IForwarder target) public initializer {
+    constructor(IForwarder target) {
         _target = target;
         _addRule('transferFrom(address,address,uint256)', 'transferFromFor(address,address,uint256,bytes)', 4);
         _addRule('safeTransferFrom(address,address,uint256)', 'safeTransferFromFor(address,address,uint256,bytes)', 4);
