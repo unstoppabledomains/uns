@@ -7,13 +7,13 @@ const NetworkConfig = require('./../uns-config.json');
 async function main () {
   console.log('Network:', network.name);
 
-  const unsConfig = NetworkConfig.networks[network.config.chainId];
-  if (!unsConfig) {
+  const config = NetworkConfig.networks[network.config.chainId];
+  if (!config) {
     throw new Error(`UNS config not found for network ${network.config.chainId}`);
   }
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['upgrade'], unsConfig);
+  const deployConfig = await deployer.execute(['upgrade_registry', 'upgrade_minting_manager'], config);
   mergeNetworkConfig(deployConfig);
 }
 

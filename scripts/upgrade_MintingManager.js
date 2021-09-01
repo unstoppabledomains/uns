@@ -2,15 +2,19 @@ const { network } = require('hardhat');
 
 const { mergeNetworkConfig } = require('../src/config');
 const Deployer = require('../src/deployer');
+const NetworkConfig = require('./../uns-config.json');
 
 async function main () {
   console.log('Network:', network.name);
 
-  const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['cns', 'cns_forwarders']);
-  mergeNetworkConfig(deployConfig);
+  const config = NetworkConfig.networks[network.config.chainId];
+  if (!config) {
+    throw new Error(`UNS config not found for network ${network.config.chainId}`);
+  }
 
-  console.log('Deployed!');
+  const deployer = await Deployer.create();
+  const deployConfig = await deployer.execute(['upgrade_minting_manager'], config);
+  mergeNetworkConfig(deployConfig);
 }
 
 main()

@@ -75,12 +75,6 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
 
     Implementation [UNSRegistryForwarder.sol](./contracts/metatx/UNSRegistryForwarder.sol)
 
-    ### TBD:
-
-    - `RegistryForwarder` implementation:
-
-      - do we need `expiry` check?
-
 7.  Upgradability
 
     > By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits significantly from the technology’s immutability, still a certain degree of mutability is needed for bug fixing and potential product improvements.
@@ -143,13 +137,6 @@ NOTE: All private keys should be in HEX format with `0x` prefix
 
 
 Variables [`RINKEBY_INFURA_KEY`, `RINKEBY_UNS_PRIVATE_KEY`] are required for operating with Rinkeby network, including deployment and making smart contract calls.
-
-## Upgradeable proxy
-
-- Deploy contracts `yarn deploy:__network__`
-- Upgrade Registry and MintingManager `yarn upgrade:__network__`
-
-`__network__` = [`localhost`, `rinkeby`, `mainnet`]
 
 <div id="backward-incompatibility"></div>
 
@@ -280,3 +267,12 @@ yarn hardhat run --network <network> scripts/deploy.js
 ```
 
 Warning: In case of contracts' redeployment, make sure there is no deployment output file `.deployer/{chain_id}.json`
+
+
+## Migrations
+
+### Universal forwarder (rinkeby)
+1. `yarn hardhat run --network rinkeby scripts/deploy_CNS_Forwarders.js`
+2. `yarn hardhat run --network rinkeby scripts/upgrade_MintingManager.js`
+3. `yarn hardhat run --network rinkeby scripts/deploy_MintingManagerForwarder.js`
+4. `yarn hardhat run --network rinkeby scripts/upgrade_UNSRegistry.js`

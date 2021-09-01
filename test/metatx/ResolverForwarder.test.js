@@ -32,8 +32,7 @@ describe('ResolverForwarder', () => {
     await registry.addController(mintingController.address);
     await registry.addController(signatureController.address);
 
-    forwarder = await ResolverForwarder.deploy();
-    await forwarder.initialize(registry.address);
+    forwarder = await ResolverForwarder.deploy(registry.address);
 
     buildExecuteParams = buildExecuteFunc(resolver.interface, resolver.address, forwarder);
   });

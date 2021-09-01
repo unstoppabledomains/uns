@@ -3,8 +3,6 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
-
 import './../cns/ICNSRegistry.sol';
 import './IForwarder.sol';
 import './BaseRoutingForwarder.sol';
@@ -14,10 +12,10 @@ import './BaseRoutingForwarder.sol';
  * @dev ResolverForwarder simplifies operation with legacy meta-transactions.
  * It works on top of existing Resolver contracts.
  */
-contract ResolverForwarder is Initializable, BaseRoutingForwarder {
+contract ResolverForwarder is BaseRoutingForwarder {
     ICNSRegistry private _cnsRegistry;
 
-    function initialize(ICNSRegistry cnsRegistry) public initializer {
+    constructor(ICNSRegistry cnsRegistry) {
         _cnsRegistry = cnsRegistry;
         _addRule('reset(uint256)', 'resetFor(uint256,bytes)', 2);
         _addRule('set(string,string,uint256)', 'setFor(string,string,uint256,bytes)', 4);
