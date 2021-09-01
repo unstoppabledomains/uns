@@ -313,7 +313,7 @@ const upgradeUNSRegistryTask = {
     await ctx.saveContractConfig('ProxyAdmin', proxyAdmin);
 
     const unsRegistryImpl = await proxyAdmin.callStatic.getProxyImplementation(unsRegistry.address);
-    await ctx.saveContractConfig('UNSRegistry', unsRegistry, unsRegistryImpl);
+    await ctx.saveContractConfig('UNSRegistry', unsRegistry, unsRegistryImpl, unsRegistry);
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);

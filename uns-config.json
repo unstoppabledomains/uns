@@ -84,9 +84,10 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086",
-                    "implementation": "0x0c97caecb791620c61e26c5a9754150a1cae2159",
+                    "implementation": "0xc479D7A65243f7Eb1641F06a6C04E5F06cb5c4F7",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x85e628"
+                    "deploymentBlock": "0x85e628",
+                    "forwarder": "0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086"
                 },
                 "CNSRegistry": {
                     "address": "0xAad76bea7CFEc82927239415BB18D2e93518ecBB",
