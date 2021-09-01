@@ -307,6 +307,7 @@ const upgradeUNSRegistryTask = {
   priority: 100,
   run: async (ctx, { UNSRegistry }) => {
     const unsRegistry = await upgrades.upgradeProxy(UNSRegistry.address, ctx.artifacts.UNSRegistry);
+    await unsRegistry.deployTransaction.wait();
 
     const proxyAdmin = await upgrades.admin.getInstance();
     await ctx.saveContractConfig('ProxyAdmin', proxyAdmin);
@@ -337,7 +338,12 @@ const upgradeMintingManagerTask = {
   tags: ['upgrade_minting_manager'],
   priority: 100,
   run: async (ctx, { MintingManager }) => {
-    const mintingManager = await upgrades.upgradeProxy(MintingManager.address, ctx.artifacts.MintingManager);
+    const mintingManager = await upgrades.upgradeProxy(
+      MintingManager.address,
+      ctx.artifacts.MintingManager,
+      { unsafeAllowRenames: true },
+    );
+    await mintingManager.deployTransaction.wait();
 
     const proxyAdmin = await upgrades.admin.getInstance();
     await ctx.saveContractConfig('ProxyAdmin', proxyAdmin);
