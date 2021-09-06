@@ -736,7 +736,7 @@ describe('MintingManager', () => {
       await mintingManager.setTokenURIPrefix('/');
     });
 
-    it('should revert when token blocked', async () => {
+    it('should revert minting when token blocked', async () => {
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-block-3pef');
       await mintingManager.blocklist(tokenId);
 
@@ -837,6 +837,16 @@ describe('MintingManager', () => {
 
       const res = await mintingManager.areBlocked([tokenId1, tokenId2]);
       expect(res).to.deep.equal([true, false]);
+    });
+
+    it('should revert minting when token burnt', async () => {
+      const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-block-1md0');
+      await mintingManager.mintSLD(coinbase.address, walletRoot, 'test-block-1md0');
+      await unsRegistry.burn(tokenId);
+
+      await expect(
+        mintingManager.mintSLD(coinbase.address, walletRoot, 'test-block-1md0'),
+      ).to.be.revertedWith('MintingManager: TOKEN_BLOCKED');
     });
   });
 });
