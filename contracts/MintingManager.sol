@@ -17,7 +17,7 @@ import './roles/MinterRole.sol';
  * @title MintingManager
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract MintingManager is ERC2771Context, MinterRole, Relayer, IMintingManager, BlocklistStorage {
+contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage, IMintingManager {
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.2.0';
 
