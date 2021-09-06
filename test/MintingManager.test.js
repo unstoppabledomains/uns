@@ -736,6 +736,47 @@ describe('MintingManager', () => {
       await mintingManager.setTokenURIPrefix('/');
     });
 
+    it('should emit Blocked event on blocklist', async () => {
+      const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-block-78bn');
+      await expect(mintingManager.blocklist(tokenId))
+        .to.emit(mintingManager, 'Blocked')
+        .withArgs(tokenId);
+    });
+
+    it('should allow blocking already blocked token', async () => {
+      const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-block-93md');
+      await mintingManager.blocklist(tokenId);
+
+      await mintingManager.blocklist(tokenId);
+    });
+
+    it('should block token after mint', async () => {
+      const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-block-49vh');
+      expect(await mintingManager.isBlocked(tokenId)).to.be.equal(false);
+
+      await mintingManager.mintSLD(coinbase.address, walletRoot, 'test-block-49vh');
+
+      expect(await mintingManager.isBlocked(tokenId)).to.be.equal(true);
+    });
+
+    it('should blocklist multiple tokens 1', async () => {
+      const tokenId1 = await unsRegistry.childIdOf(walletRoot, 'test-block-48hg-1');
+      const tokenId2 = await unsRegistry.childIdOf(walletRoot, 'test-block-48hg-2');
+      await mintingManager.blocklistAll([tokenId1, tokenId2]);
+
+      const res = await mintingManager.areBlocked([tokenId1, tokenId2]);
+      expect(res).to.deep.equal([true, true]);
+    });
+
+    it('should blocklist multiple tokens 2', async () => {
+      const tokenId1 = await unsRegistry.childIdOf(walletRoot, 'test-block-57hg-1');
+      const tokenId2 = await unsRegistry.childIdOf(walletRoot, 'test-block-57hg-2');
+      await mintingManager.blocklistAll([tokenId1]);
+
+      const res = await mintingManager.areBlocked([tokenId1, tokenId2]);
+      expect(res).to.deep.equal([true, false]);
+    });
+
     it('should revert minting when token blocked', async () => {
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-block-3pef');
       await mintingManager.blocklist(tokenId);
@@ -821,24 +862,6 @@ describe('MintingManager', () => {
       ).to.be.revertedWith('MintingManager: TOKEN_BLOCKED');
     });
 
-    it('should blocklist multiple tokens 1', async () => {
-      const tokenId1 = await unsRegistry.childIdOf(walletRoot, 'test-block-48hg-1');
-      const tokenId2 = await unsRegistry.childIdOf(walletRoot, 'test-block-48hg-2');
-      await mintingManager.blocklistAll([tokenId1, tokenId2]);
-
-      const res = await mintingManager.areBlocked([tokenId1, tokenId2]);
-      expect(res).to.deep.equal([true, true]);
-    });
-
-    it('should blocklist multiple tokens 2', async () => {
-      const tokenId1 = await unsRegistry.childIdOf(walletRoot, 'test-block-57hg-1');
-      const tokenId2 = await unsRegistry.childIdOf(walletRoot, 'test-block-57hg-2');
-      await mintingManager.blocklistAll([tokenId1]);
-
-      const res = await mintingManager.areBlocked([tokenId1, tokenId2]);
-      expect(res).to.deep.equal([true, false]);
-    });
-
     it('should revert minting when token burnt', async () => {
       const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-block-1md0');
       await mintingManager.mintSLD(coinbase.address, walletRoot, 'test-block-1md0');
@@ -847,6 +870,69 @@ describe('MintingManager', () => {
       await expect(
         mintingManager.mintSLD(coinbase.address, walletRoot, 'test-block-1md0'),
       ).to.be.revertedWith('MintingManager: TOKEN_BLOCKED');
+    });
+  });
+
+  describe('Blocklisting paused', () => {
+    before(async () => {
+      [, developer] = signers;
+
+      unsRegistry = await UNSRegistry.deploy();
+      mintingManager = await MintingManager.deploy();
+      await unsRegistry.initialize(mintingManager.address);
+
+      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.addMinter(coinbase.address);
+      await mintingManager.setTokenURIPrefix('/');
+      await mintingManager.pauseBlocklist(true);
+    });
+
+    it('should not block token after mint', async () => {
+      const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-blockp-49vh');
+      expect(await mintingManager.isBlocked(tokenId)).to.be.equal(false);
+
+      await mintingManager.mintSLD(coinbase.address, walletRoot, 'test-blockp-49vh');
+
+      expect(await mintingManager.isBlocked(tokenId)).to.be.equal(false);
+    });
+
+    it('should blocklist depends on pausable', async () => {
+      const tokenId = await unsRegistry.childIdOf(walletRoot, 'test-blockp-8vn0');
+
+      await expect(mintingManager.pauseBlocklist(false))
+        .to.emit(mintingManager, 'BlocklistPaused')
+        .withArgs(false);
+
+      await mintingManager.blocklist(tokenId);
+      expect(await mintingManager.isBlocked(tokenId)).to.be.equal(true);
+
+      await expect(mintingManager.pauseBlocklist(true))
+        .to.emit(mintingManager, 'BlocklistPaused')
+        .withArgs(true);
+      expect(await mintingManager.isBlocked(tokenId)).to.be.equal(false);
+    });
+
+    it('should revert blocklist when paused', async () => {
+      const tokenId1 = await unsRegistry.childIdOf(walletRoot, 'test-blockp-48hg-1');
+
+      await expect(
+        mintingManager.blocklist(tokenId1),
+      ).to.be.revertedWith('BlocklistStorage: PAUSED');
+    });
+
+    it('should revert blocklist multiple when paused', async () => {
+      const tokenId1 = await unsRegistry.childIdOf(walletRoot, 'test-blockp-57hg-1');
+      const tokenId2 = await unsRegistry.childIdOf(walletRoot, 'test-blockp-57hg-2');
+
+      await expect(
+        mintingManager.blocklistAll([tokenId1, tokenId2]),
+      ).to.be.revertedWith('BlocklistStorage: PAUSED');
+    });
+
+    it('should revert pauseBlocklist when called by non-owner', async () => {
+      await expect(
+        mintingManager.connect(developer).pauseBlocklist(false),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
     });
   });
 });

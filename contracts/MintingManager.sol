@@ -193,6 +193,10 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         _setForwarder(forwarder);
     }
 
+    function pauseBlocklist(bool state) external override onlyOwner {
+        _pauseBlocklist(state);
+    }
+
     function blocklist(uint256 tokenId) external override onlyMinter {
         _block(tokenId);
     }
@@ -303,8 +307,10 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
     }
 
     function _beforeTokenMint(uint256 tokenId) internal {
-        require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
-        _block(tokenId);
+        if (!_isBlocklistPaused()) {
+            require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
+            _block(tokenId);
+        }
     }
 
     function _msgSender() internal view override(ContextUpgradeable, ERC2771Context) returns (address) {
