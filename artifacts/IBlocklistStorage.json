@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "BlocklistStorage",
-  "sourceName": "contracts/BlocklistStorage.sol",
+  "contractName": "IBlocklistStorage",
+  "sourceName": "contracts/IBlocklistStorage.sol",
   "abi": [
     {
       "anonymous": false,
@@ -28,7 +28,7 @@
       "outputs": [
         {
           "internalType": "bool[]",
-          "name": "values",
+          "name": "",
           "type": "bool[]"
         }
       ],

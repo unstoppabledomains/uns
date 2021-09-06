@@ -99,7 +99,7 @@ describe('MintingManager', () => {
 
         await expect(
           minter.functions['claim(uint256,string)'](walletRoot, domainSuffix),
-        ).to.be.revertedWith('ERC721: token already minted');
+        ).to.be.revertedWith('MintingManager: TOKEN_BLOCKED');
       });
     });
 

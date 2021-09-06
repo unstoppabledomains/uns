@@ -3,6 +3,7 @@
 
 pragma solidity ^0.8.0;
 
+import './BlocklistStorage.sol';
 import './cns/IResolver.sol';
 import './cns/IMintingController.sol';
 import './cns/IURIPrefixController.sol';
@@ -16,7 +17,7 @@ import './roles/MinterRole.sol';
  * @title MintingManager
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract MintingManager is ERC2771Context, MinterRole, Relayer, IMintingManager {
+contract MintingManager is ERC2771Context, MinterRole, Relayer, IMintingManager, BlocklistStorage {
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.2.0';
 
@@ -192,6 +193,16 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, IMintingManager 
         _setForwarder(forwarder);
     }
 
+    function blocklist(uint256 tokenId) external override onlyMinter {
+        _block(tokenId);
+    }
+
+    function blocklistAll(uint256[] calldata tokenIds) external override onlyMinter {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            _block(tokenIds[i]);
+        }
+    }
+
     function _verifyRelaySigner(address signer) internal view override {
         super._verifyRelaySigner(signer);
         require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
@@ -213,10 +224,13 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, IMintingManager 
         uint256 tld,
         string memory label
     ) private {
+        uint256 tokenId = _childId(tld, label);
+        _beforeTokenMint(tokenId);
+
         if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
             cnsMintingController.mintSLDWithResolver(to, label, address(cnsResolver));
         } else {
-            unsRegistry.mint(to, _childId(tld, label), _uri(tld, label));
+            unsRegistry.mint(to, tokenId, _uri(tld, label));
         }
     }
 
@@ -226,10 +240,13 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, IMintingManager 
         string calldata label,
         bytes memory data
     ) private {
+        uint256 tokenId = _childId(tld, label);
+        _beforeTokenMint(tokenId);
+
         if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
             cnsMintingController.safeMintSLDWithResolver(to, label, address(cnsResolver), data);
         } else {
-            unsRegistry.safeMint(to, _childId(tld, label), _uri(tld, label), data);
+            unsRegistry.safeMint(to, tokenId, _uri(tld, label), data);
         }
     }
 
@@ -241,6 +258,8 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, IMintingManager 
         string[] calldata values
     ) private {
         uint256 tokenId = _childId(tld, label);
+        _beforeTokenMint(tokenId);
+
         if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
             cnsMintingController.mintSLDWithResolver(to, label, address(cnsResolver));
             if (keys.length > 0) {
@@ -260,6 +279,8 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, IMintingManager 
         bytes memory data
     ) private {
         uint256 tokenId = _childId(tld, label);
+        _beforeTokenMint(tokenId);
+
         if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
             cnsMintingController.safeMintSLDWithResolver(to, label, address(cnsResolver), data);
             if (keys.length > 0) {
@@ -281,6 +302,11 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, IMintingManager 
 
     function _uri(uint256 tld, string memory label) private view returns (string memory) {
         return string(abi.encodePacked(label, '.', _tlds[tld]));
+    }
+
+    function _beforeTokenMint(uint256 tokenId) internal {
+        require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
+        _block(tokenId);
     }
 
     function _msgSender() internal view override(ContextUpgradeable, ERC2771Context) returns (address) {

@@ -3,21 +3,22 @@
 
 pragma solidity ^0.8.0;
 
-abstract contract BlocklistStorage {
-    event Blocked(uint256 tokenId);
+import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
-    mapping(uint256 => bool) private _blocklist;
+import './IBlocklistStorage.sol';
 
-    modifier onlyAllowed(uint256 tokenId) {
-        require(isBlocked(tokenId) == false, 'BlocklistStorage: TOKEN_NOT_ALLOWED');
-        _;
+/**
+ * @dev Mechanism blocks tokens' minting
+ */
+abstract contract BlocklistStorage is IBlocklistStorage {
+    // This is the keccak-256 hash of "uns.blocklist." subtracted by 1
+    bytes32 internal constant _BLOCKLIST_SLOT_PREFIX = 0x1ec047073e2c8b15660901dbfdb6e3ff6365bd699dd9f95dcc6eab5448bebd69;
+
+    function isBlocked(uint256 tokenId) public override view returns (bool) {
+        return StorageSlotUpgradeable.getBooleanSlot(keccak256(abi.encodePacked(_BLOCKLIST_SLOT_PREFIX, tokenId))).value;
     }
 
-    function isBlocked(uint256 tokenId) public view returns (bool) {
-        return _blocklist[tokenId];
-    }
-
-    function areBlocked(uint256[] calldata tokenIds) public view returns (bool[] memory values) {
+    function areBlocked(uint256[] calldata tokenIds) public override view returns (bool[] memory values) {
         values = new bool[](tokenIds.length);
         for (uint256 i = 0; i < tokenIds.length; i++) {
             values[i] = isBlocked(tokenIds[i]);
@@ -25,7 +26,7 @@ abstract contract BlocklistStorage {
     }
 
     function _block(uint256 tokenId) internal {
-        _blocklist[tokenId] = true;
+        StorageSlotUpgradeable.getBooleanSlot(keccak256(abi.encodePacked(_BLOCKLIST_SLOT_PREFIX, tokenId))).value = true;
         emit Blocked(tokenId);
     }
 
