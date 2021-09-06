@@ -198,9 +198,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, IMintingManager,
     }
 
     function blocklistAll(uint256[] calldata tokenIds) external override onlyMinter {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            _block(tokenIds[i]);
-        }
+        _blockAll(tokenIds);
     }
 
     function _verifyRelaySigner(address signer) internal view override {
