@@ -89,13 +89,12 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
 
         string[9] memory tlds = ['crypto', 'wallet', 'coin', 'x', 'nft', 'blockchain', 'bitcoin', '888', 'dao'];
         for (uint256 i = 0; i < tlds.length; i++) {
-            uint256 namehash = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(tlds[i])))));
-            _tlds[namehash] = tlds[i];
-
-            if (!unsRegistry.exists(namehash)) {
-                unsRegistry.mint(address(0xdead), namehash, tlds[i]);
-            }
+            _addTld(tlds[i]);
         }
+    }
+
+    function addTld(string calldata tld) external override onlyOwner {
+        _addTld(tld);
     }
 
     function mintSLD(
@@ -316,6 +315,16 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         if (!_isBlocklistPaused()) {
             require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
             _block(tokenId);
+        }
+    }
+
+    function _addTld(string memory tld) private {
+        uint256 namehash = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(tld)))));
+        _tlds[namehash] = tld;
+        emit NewTld(namehash, tld);
+
+        if (!unsRegistry.exists(namehash)) {
+            unsRegistry.mint(address(0xdead), namehash, tld);
         }
     }
 

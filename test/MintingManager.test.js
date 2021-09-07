@@ -1,5 +1,6 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
+const namehash = require('eth-ens-namehash');
 
 const { ZERO_ADDRESS, TLD } = require('./helpers/constants');
 
@@ -56,6 +57,41 @@ describe('MintingManager', () => {
 
       await expect(
         mintingManager.connect(coinbase).setResolver(resolver.address),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
+  describe('TLD management', () => {
+    before(async () => {
+      [, spender] = signers;
+
+      unsRegistry = await UNSRegistry.deploy();
+      mintingManager = await MintingManager.deploy();
+      await unsRegistry.initialize(mintingManager.address);
+
+      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.addMinter(coinbase.address);
+    });
+
+    it('should add new TLD', async () => {
+      const _tld = 'test';
+      const _hashname = namehash.hash(_tld);
+
+      await expect(mintingManager.addTld(_tld))
+        .to.emit(mintingManager, 'NewTld')
+        .withArgs(_hashname, _tld);
+
+      await mintingManager.mintSLD(coinbase.address, _hashname, 'test-1');
+
+      const tokenId = await unsRegistry.childIdOf(_hashname, 'test-1');
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+    });
+
+    it('should revert adding TLD when non-owner', async () => {
+      const _tld = 'test1';
+
+      await expect(
+        mintingManager.connect(spender).addTld(_tld),
       ).to.be.revertedWith('Ownable: caller is not the owner');
     });
   });
