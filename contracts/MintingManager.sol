@@ -318,8 +318,17 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         }
     }
 
+    /**
+     * @dev The function adds TLD and mint token in UNS Registry.
+     * Current MintingManager has '.crypto' TLD registered, but UNS Registry does not have '.crypto' token.
+     * It leads to revert on mint.
+     * The function can be executed in order to mint '.crypto' token in UNS registry, while TLD already registered.
+     * Sideffect: It is possible to add the same TLD multiple times, it will burn gas.
+     * TODO: think about the implementation
+     */
     function _addTld(string memory tld) private {
         uint256 namehash = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(tld)))));
+
         _tlds[namehash] = tld;
         emit NewTld(namehash, tld);
 
@@ -329,7 +338,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
     }
 
     /**
-     * @dev namehash `.crypto` = 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f
+     * @dev namehash('crypto') = 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f
      */
     function _useCNS(uint256 tld) private view returns (bool) {
         return

@@ -276,3 +276,8 @@ Warning: In case of contracts' redeployment, make sure there is no deployment ou
 2. `yarn hardhat run --network rinkeby scripts/upgrade_MintingManager.js`
 3. `yarn hardhat run --network rinkeby scripts/deploy_MintingManagerForwarder.js`
 4. `yarn hardhat run --network rinkeby scripts/upgrade_UNSRegistry.js`
+5. ---next---
+6. Upgrade MintingManager
+7. *Add minting support .crypto in UNS `mintingManager.addTld('crypto')`
+8. Deploy ProxyReader
+
