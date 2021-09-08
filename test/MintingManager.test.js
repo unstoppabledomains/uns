@@ -85,6 +85,7 @@ describe('MintingManager', () => {
 
       const tokenId = await unsRegistry.childIdOf(_hashname, 'test-1');
       expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+      expect(await unsRegistry.exists(_hashname)).to.be.equal(true);
     });
 
     it('should revert adding TLD when non-owner', async () => {
