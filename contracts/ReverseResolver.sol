@@ -31,7 +31,7 @@ contract ReverseResolver is Initializable, ContextUpgradeable {
     }
 
     /**
-     TODO: does it make sense to emit event on register?
+     * TODO: does it make sense to emit event on register?
      */
     function register(uint256 tokenId) public {
         address sender = _msgSender();
