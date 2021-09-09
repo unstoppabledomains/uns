@@ -17,7 +17,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     using SafeMathUpgradeable for uint256;
 
     string public constant NAME = 'UNS: Proxy Reader';
-    string public constant VERSION = '0.1.0';
+    string public constant VERSION = '0.1.1';
 
     IUNSRegistry private immutable _unsRegistry;
     ICNSRegistry private immutable _cnsRegistry;
@@ -36,27 +36,18 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function tokenURI(uint256 tokenId) external view override returns (string memory) {
-        if (_unsRegistry.exists(tokenId)) {
-            return _unsRegistry.tokenURI(tokenId);
-        } else {
-            return _cnsRegistry.tokenURI(tokenId);
-        }
+        return _useUns(tokenId) ? _unsRegistry.tokenURI(tokenId) : _cnsRegistry.tokenURI(tokenId);
     }
 
     function isApprovedOrOwner(address spender, uint256 tokenId) external view override returns (bool) {
-        if (_unsRegistry.exists(tokenId)) {
-            return _unsRegistry.isApprovedOrOwner(spender, tokenId);
-        } else {
-            return _cnsRegistry.isApprovedOrOwner(spender, tokenId);
-        }
+        return
+            _useUns(tokenId)
+                ? _unsRegistry.isApprovedOrOwner(spender, tokenId)
+                : _cnsRegistry.isApprovedOrOwner(spender, tokenId);
     }
 
     function resolverOf(uint256 tokenId) external view override returns (address) {
-        if (_unsRegistry.exists(tokenId)) {
-            return _unsRegistry.resolverOf(tokenId);
-        } else {
-            return _cnsRegistry.resolverOf(tokenId);
-        }
+        return _useUns(tokenId) ? _unsRegistry.resolverOf(tokenId) : _cnsRegistry.resolverOf(tokenId);
     }
 
     /**
@@ -67,7 +58,11 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function balanceOf(address owner) external view override returns (uint256) {
-        return _unsRegistry.balanceOf(owner).add(_cnsRegistry.balanceOf(owner));
+        uint256 _balance = _unsRegistry.balanceOf(owner);
+        if(address(_cnsRegistry) != address(0)) {
+            _balance += _cnsRegistry.balanceOf(owner);
+        }
+        return _balance;
     }
 
     function ownerOf(uint256 tokenId) external view override returns (address) {
@@ -75,24 +70,19 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     }
 
     function getApproved(uint256 tokenId) external view override returns (address) {
-        if (_unsRegistry.exists(tokenId)) {
-            return _unsRegistry.getApproved(tokenId);
-        } else {
-            return _cnsRegistry.getApproved(tokenId);
-        }
+        return _useUns(tokenId) ? _unsRegistry.getApproved(tokenId) : _cnsRegistry.getApproved(tokenId);
     }
 
-    // Deprecated
     function isApprovedForAll(address, address) external pure override returns (bool) {
         revert('ProxyReader: UNSUPPORTED_METHOD');
     }
 
     function exists(uint256 tokenId) external view override returns (bool) {
-        return _unsRegistry.exists(tokenId) || _cnsOwnerOf(tokenId) != address(0x0);
+        return _useUns(tokenId) ? _unsRegistry.exists(tokenId) : _cnsOwnerOf(tokenId) != address(0x0);
     }
 
     function get(string calldata key, uint256 tokenId) external view override returns (string memory value) {
-        if (_unsRegistry.exists(tokenId)) {
+        if (_useUns(tokenId)) {
             return _unsRegistry.get(key, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
@@ -104,7 +94,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
 
     function getMany(string[] calldata keys, uint256 tokenId) external view override returns (string[] memory values) {
         values = new string[](keys.length);
-        if (_unsRegistry.exists(tokenId)) {
+        if (_useUns(tokenId)) {
             return _unsRegistry.getMany(keys, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
@@ -120,7 +110,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         override
         returns (string memory key, string memory value)
     {
-        if (_unsRegistry.exists(tokenId)) {
+        if (_useUns(tokenId)) {
             return _unsRegistry.getByHash(keyHash, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
@@ -138,7 +128,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     {
         keys = new string[](keyHashes.length);
         values = new string[](keyHashes.length);
-        if (_unsRegistry.exists(tokenId)) {
+        if (_useUns(tokenId)) {
             return _unsRegistry.getManyByHash(keyHashes, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
@@ -228,7 +218,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     function registryOf(uint256 tokenId) external view returns (address) {
         if (_unsRegistry.exists(tokenId)) {
             return address(_unsRegistry);
-        } else if (_cnsOwnerOf(tokenId) != address(0x0)) {
+        } else if (address(_cnsRegistry) != address(0) && _cnsOwnerOf(tokenId) != address(0x0)) {
             return address(_cnsRegistry);
         }
         return address(0x0);
@@ -244,9 +234,9 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         )
     {
         values = new string[](keys.length);
-        if (_unsRegistry.exists(tokenId)) {
+        if (_useUns(tokenId)) {
             resolver = _unsRegistry.resolverOf(tokenId);
-            owner = _unsRegistry.ownerOf(tokenId);
+            owner = _unsOwnerOf(tokenId);
             values = _unsRegistry.getMany(keys, tokenId);
         } else {
             resolver = _cnsResolverOf(tokenId);
@@ -269,9 +259,9 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     {
         keys = new string[](keyHashes.length);
         values = new string[](keyHashes.length);
-        if (_unsRegistry.exists(tokenId)) {
+        if (_useUns(tokenId)) {
             resolver = _unsRegistry.resolverOf(tokenId);
-            owner = _unsRegistry.ownerOf(tokenId);
+            owner = _unsOwnerOf(tokenId);
             (keys, values) = _unsRegistry.getManyByHash(keyHashes, tokenId);
         } else {
             resolver = _cnsResolverOf(tokenId);
@@ -282,16 +272,24 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
         }
     }
 
+    function _useUns(uint256 tokenId) private view returns (bool) {
+        return address(_cnsRegistry) == address(0) || _unsRegistry.exists(tokenId);
+    }
+
     function _ownerOf(uint256 tokenId) private view returns (address) {
-        if (_unsRegistry.exists(tokenId)) {
-            return _unsRegistry.ownerOf(tokenId);
-        } else {
-            return _cnsOwnerOf(tokenId);
-        }
+        return _useUns(tokenId) ? _unsOwnerOf(tokenId) : _cnsOwnerOf(tokenId);
     }
 
     function _cnsOwnerOf(uint256 tokenId) private view returns (address) {
         try _cnsRegistry.ownerOf(tokenId) returns (address _owner) {
+            return _owner;
+        } catch {
+            return address(0x0);
+        }
+    }
+
+    function _unsOwnerOf(uint256 tokenId) private view returns (address) {
+        try _unsRegistry.ownerOf(tokenId) returns (address _owner) {
             return _owner;
         } catch {
             return address(0x0);

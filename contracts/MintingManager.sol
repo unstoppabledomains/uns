@@ -87,17 +87,14 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         // Relayer is required to be a minter
         _addMinter(address(this));
 
-        _tlds[0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f] = 'crypto';
-
-        string[8] memory tlds = ['wallet', 'coin', 'x', 'nft', 'blockchain', 'bitcoin', '888', 'dao'];
+        string[9] memory tlds = ['crypto', 'wallet', 'coin', 'x', 'nft', 'blockchain', 'bitcoin', '888', 'dao'];
         for (uint256 i = 0; i < tlds.length; i++) {
-            uint256 namehash = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(tlds[i])))));
-            _tlds[namehash] = tlds[i];
-
-            if (!unsRegistry.exists(namehash)) {
-                unsRegistry.mint(address(0xdead), namehash, tlds[i]);
-            }
+            _addTld(tlds[i]);
         }
+    }
+
+    function addTld(string calldata tld) external override onlyOwner {
+        _addTld(tld);
     }
 
     function mintSLD(
@@ -229,7 +226,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         uint256 tokenId = _childId(tld, label);
         _beforeTokenMint(tokenId);
 
-        if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+        if (_useCNS(tld)) {
             cnsMintingController.mintSLDWithResolver(to, label, address(cnsResolver));
         } else {
             unsRegistry.mint(to, tokenId, _uri(tld, label));
@@ -245,7 +242,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         uint256 tokenId = _childId(tld, label);
         _beforeTokenMint(tokenId);
 
-        if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+        if (_useCNS(tld)) {
             cnsMintingController.safeMintSLDWithResolver(to, label, address(cnsResolver), data);
         } else {
             unsRegistry.safeMint(to, tokenId, _uri(tld, label), data);
@@ -262,7 +259,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         uint256 tokenId = _childId(tld, label);
         _beforeTokenMint(tokenId);
 
-        if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+        if (_useCNS(tld)) {
             cnsMintingController.mintSLDWithResolver(to, label, address(cnsResolver));
             if (keys.length > 0) {
                 cnsResolver.preconfigure(keys, values, tokenId);
@@ -283,7 +280,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         uint256 tokenId = _childId(tld, label);
         _beforeTokenMint(tokenId);
 
-        if (tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f) {
+        if (_useCNS(tld)) {
             cnsMintingController.safeMintSLDWithResolver(to, label, address(cnsResolver), data);
             if (keys.length > 0) {
                 cnsResolver.preconfigure(keys, values, tokenId);
@@ -298,6 +295,14 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
     }
 
+    function _msgSender() internal view override(ContextUpgradeable, ERC2771Context) returns (address) {
+        return super._msgSender();
+    }
+
+    function _msgData() internal view override(ContextUpgradeable, ERC2771Context) returns (bytes calldata) {
+        return super._msgData();
+    }
+
     function _freeSLDLabel(string calldata label) private pure returns (string memory) {
         return string(abi.encodePacked('udtestdev-', label));
     }
@@ -306,19 +311,39 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         return string(abi.encodePacked(label, '.', _tlds[tld]));
     }
 
-    function _beforeTokenMint(uint256 tokenId) internal {
+    function _beforeTokenMint(uint256 tokenId) private {
         if (!_isBlocklistPaused()) {
             require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
             _block(tokenId);
         }
     }
 
-    function _msgSender() internal view override(ContextUpgradeable, ERC2771Context) returns (address) {
-        return super._msgSender();
+    /**
+     * @dev The function adds TLD and mint token in UNS Registry.
+     * Current MintingManager has '.crypto' TLD registered, but UNS Registry does not have '.crypto' token.
+     * It leads to revert on mint.
+     * The function can be executed in order to mint '.crypto' token in UNS registry, while TLD already registered.
+     * Sideffect: It is possible to add the same TLD multiple times, it will burn gas.
+     * TODO: think about the implementation
+     */
+    function _addTld(string memory tld) private {
+        uint256 namehash = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(tld)))));
+
+        _tlds[namehash] = tld;
+        emit NewTld(namehash, tld);
+
+        if (!unsRegistry.exists(namehash)) {
+            unsRegistry.mint(address(0xdead), namehash, tld);
+        }
     }
 
-    function _msgData() internal view override(ContextUpgradeable, ERC2771Context) returns (bytes calldata) {
-        return super._msgData();
+    /**
+     * @dev namehash('crypto') = 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f
+     */
+    function _useCNS(uint256 tld) private view returns (bool) {
+        return
+            address(cnsMintingController) != address(0) &&
+            tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
     }
 
     // Reserved storage space to allow for layout changes in the future.

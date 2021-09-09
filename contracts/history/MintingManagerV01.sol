@@ -11,7 +11,7 @@ import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.
 import './../cns/IResolver.sol';
 import './../cns/IMintingController.sol';
 import './../cns/IURIPrefixController.sol';
-import './../IMintingManager.sol';
+import './IMintingManagerV01.sol';
 import './../IUNSRegistry.sol';
 import './../metatx/Relayer.sol';
 import './roles/MinterRoleV0.sol';
@@ -26,7 +26,7 @@ contract MintingManagerV01 is
     OwnableUpgradeable,
     MinterRoleV0,
     Relayer,
-    IMintingManager
+    IMintingManagerV01
 {
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.1.0';

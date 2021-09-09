@@ -3,14 +3,7 @@
 
 pragma solidity ^0.8.0;
 
-interface IMintingManager {
-    event NewTld(uint256 indexed namehash, string tld);
-
-    /**
-     * @dev Adds new TLD
-     */
-    function addTld(string calldata tld) external;
-
+interface IMintingManagerV01 {
     /**
      * @dev Mints a Second Level Domain (SLD).
      * @param to address to mint the new SLD to.

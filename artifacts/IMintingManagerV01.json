@@ -1,40 +1,8 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IMintingManager",
-  "sourceName": "contracts/IMintingManager.sol",
+  "contractName": "IMintingManagerV01",
+  "sourceName": "contracts/history/IMintingManagerV01.sol",
   "abi": [
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "namehash",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "tld",
-          "type": "string"
-        }
-      ],
-      "name": "NewTld",
-      "type": "event"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "tld",
-          "type": "string"
-        }
-      ],
-      "name": "addTld",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
     {
       "inputs": [
         {
