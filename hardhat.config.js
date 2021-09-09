@@ -71,10 +71,12 @@ module.exports = {
       },
       {
         version: '0.8.0',
-        metadata: {
-          bytecodeHash: 'none',
+        settings: {
+          ...settings,
+          metadata: {
+            bytecodeHash: 'none',
+          },
         },
-        settings,
       },
     ],
   },
