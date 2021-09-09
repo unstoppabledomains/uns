@@ -59,7 +59,7 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
 
     function balanceOf(address owner) external view override returns (uint256) {
         uint256 _balance = _unsRegistry.balanceOf(owner);
-        if(address(_cnsRegistry) != address(0)) {
+        if (address(_cnsRegistry) != address(0)) {
             _balance += _cnsRegistry.balanceOf(owner);
         }
         return _balance;
