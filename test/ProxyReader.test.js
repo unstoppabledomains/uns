@@ -342,6 +342,23 @@ describe('ProxyReader', () => {
         expect(proxyResult).to.be.equal(resolverResult);
         expect(resolverResult).to.be.equal('value12');
       });
+
+      it('should resolve empty record value for .crypto domain when token not found', async () => {
+        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q1');
+
+        const proxyResult = await proxy.get('get_key_134', _tokenId);
+
+        expect(proxyResult).to.be.equal('');
+      });
+
+      it('should resolve empty record value for .crypto domain when resolver not found', async () => {
+        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q1');
+        await mintingController.mintSLD(coinbase.address, 'test-sgh-q1');
+
+        const proxyResult = await proxy.get('get_key_134', _tokenId);
+
+        expect(proxyResult).to.be.equal('');
+      });
     });
 
     describe('getMany', () => {
@@ -393,6 +410,23 @@ describe('ProxyReader', () => {
         const result = await proxy.getMany(keys, cryptoTokenId);
         expect(result).to.be.eql(values);
       });
+
+      it('should resolve empty records value for .crypto domain when token not found', async () => {
+        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q2');
+
+        const proxyResult = await proxy.getMany(keys, _tokenId);
+
+        expect(proxyResult).to.be.eql(['', '']);
+      });
+
+      it('should resolve empty records value for .crypto domain when resolver not found', async () => {
+        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q2');
+        await mintingController.mintSLD(coinbase.address, 'test-sgh-q2');
+
+        const proxyResult = await proxy.getMany(keys, _tokenId);
+
+        expect(proxyResult).to.be.eql(['', '']);
+      });
     });
 
     describe('getByHash', () => {
@@ -416,6 +450,25 @@ describe('ProxyReader', () => {
 
         expect(proxyResult).to.be.eql(resolverResult);
         expect(resolverResult).to.be.eql(['get_key_0946', 'value4521']);
+      });
+
+      it('should resolve empty record value for .crypto domain when token not found', async () => {
+        const keyHash = utils.id('get_key_0946');
+        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q3');
+
+        const proxyResult = await proxy.getByHash(keyHash, _tokenId);
+
+        expect(proxyResult).to.be.eql(['', '']);
+      });
+
+      it('should resolve empty record value for .crypto domain when resolver not found', async () => {
+        const keyHash = utils.id('get_key_0946');
+        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q3');
+        await mintingController.mintSLD(coinbase.address, 'test-sgh-q3');
+
+        const proxyResult = await proxy.getByHash(keyHash, _tokenId);
+
+        expect(proxyResult).to.be.eql(['', '']);
       });
     });
 
@@ -450,6 +503,25 @@ describe('ProxyReader', () => {
 
         expect(proxyResult).to.be.eql(resolverResult);
         expect(resolverResult).to.be.eql([[key], [value]]);
+      });
+
+      it('should resolve empty records value for .crypto domain when token not found', async () => {
+        const keyHash = utils.id(keys[0]);
+        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q4');
+
+        const proxyResult = await proxy.getManyByHash([keyHash], _tokenId);
+
+        expect(proxyResult).to.be.eql([[''], ['']]);
+      });
+
+      it('should resolve empty records value for .crypto domain when resolver not found', async () => {
+        const keyHash = utils.id(keys[0]);
+        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q5');
+        await mintingController.mintSLD(coinbase.address, 'test-sgh-q5');
+
+        const proxyResult = await proxy.getManyByHash([keyHash], _tokenId);
+
+        expect(proxyResult).to.be.eql([[''], ['']]);
       });
     });
   });
