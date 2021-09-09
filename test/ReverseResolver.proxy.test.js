@@ -1,6 +1,8 @@
 const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
 
+const { TLD } = require('./helpers/constants');
+
 const { BigNumber } = ethers;
 
 describe('ReverseResolver (proxy)', () => {
@@ -9,36 +11,26 @@ describe('ReverseResolver (proxy)', () => {
   let CNSRegistry, CNSMintingController, CNSResolver, cnsRegistry, cnsMintingController, cnsResolver;
   let coinbase, account, cryptoTokenId;
 
-  const walletRoot = BigNumber.from(
-    '0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230',
-  );
-  const xRoot = BigNumber.from(
-    '0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d',
-  );
-  const cryptoRoot = BigNumber.from(
-    '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
-  );
-
   before(async () => {
     [coinbase, account] = await ethers.getSigners();
 
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
+    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
+    CNSMintingController = await ethers.getContractFactory('MintingController');
+    CNSResolver = await ethers.getContractFactory('Resolver');
+    ReverseResolver = await ethers.getContractFactory('ReverseResolver');
 
     unsRegistry = await upgrades.deployProxy(UNSRegistry, [coinbase.address], {
       initializer: 'initialize',
     });
 
-    // Deploy CNS.
-    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
-    CNSMintingController = await ethers.getContractFactory('MintingController');
-    CNSResolver = await ethers.getContractFactory('Resolver');
+    // Deploy CNS
     cnsRegistry = await CNSRegistry.deploy();
     cnsMintingController = await CNSMintingController.deploy(cnsRegistry.address);
     await cnsRegistry.addController(cnsMintingController.address);
     cnsResolver = await CNSResolver.deploy(cnsRegistry.address, cnsMintingController.address);
 
-    // Deploy Reverse Resolver.
-    ReverseResolver = await ethers.getContractFactory('ReverseResolver');
+    // Deploy Reverse Resolver
     reverseResolver = await upgrades.deployProxy(
       ReverseResolver,
       [unsRegistry.address, '0x0000000000000000000000000000000000000000'],
@@ -50,31 +42,32 @@ describe('ReverseResolver (proxy)', () => {
       { initializer: 'initialize' },
     );
 
-    // Mint domains.
-    await unsRegistry.mint(coinbase.address, walletRoot, 'wallet');
+    // Mint domains
+    await unsRegistry.mint(coinbase.address, TLD.WALLET, 'wallet');
     await unsRegistry.setTokenURIPrefix('/');
-    cryptoTokenId = await cnsRegistry.childIdOf(cryptoRoot, cryptoDomainName);
+
+    cryptoTokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, cryptoDomainName);
     await cnsMintingController.mintSLDWithResolver(coinbase.address, cryptoDomainName, cnsResolver.address);
   });
 
   describe('ReverseResolver (UNS only)', () => {
     it('should register reverse record and resolve it', async () => {
-      await reverseResolver.connect(coinbase).register(walletRoot);
+      await reverseResolver.connect(coinbase).register(TLD.WALLET);
       expect(await reverseResolver.reverseOf(coinbase.address)).to.be.eq(
-        walletRoot,
+        TLD.WALLET,
       );
     });
 
     it('`register` should reject when registering a reverse record for a not owned domain', async () => {
       await expect(
-        reverseResolver.connect(account).register(walletRoot),
+        reverseResolver.connect(account).register(TLD.WALLET),
       ).to.be.revertedWith(
         'ReverseResolver: SENDER_IS_NOT_APPROVED_OR_OWNER',
       );
     });
 
     it('`reverseOf` should reject after changing a domain owner', async () => {
-      await unsRegistry.setOwner(account.address, walletRoot);
+      await unsRegistry.setOwner(account.address, TLD.WALLET);
       await expect(
         reverseResolver.reverseOf(coinbase.address),
       ).to.be.revertedWith(
@@ -97,7 +90,7 @@ describe('ReverseResolver (proxy)', () => {
     });
 
     it('`remove` should remove a reverse record', async () => {
-      await reverseResolver.connect(account).register(walletRoot);
+      await reverseResolver.connect(account).register(TLD.WALLET);
       await reverseResolver.connect(account).remove();
       await expect(
         reverseResolver.reverseOf(account.address),
@@ -111,8 +104,8 @@ describe('ReverseResolver (proxy)', () => {
     });
 
     it('`remove` should remove a reverse record for a not owned domain', async () => {
-      await unsRegistry.mint(coinbase.address, xRoot, 'crypto');
-      await unsRegistry.setOwner(account.address, xRoot);
+      await unsRegistry.mint(coinbase.address, TLD.X, 'crypto');
+      await unsRegistry.setOwner(account.address, TLD.X);
       await reverseResolver.connect(coinbase).remove();
       await expect(
         reverseResolver.connect(account).remove(),
@@ -175,7 +168,7 @@ describe('ReverseResolver (proxy)', () => {
 
     it('`remove` should remove a reverse record for a not owned domain', async () => {
       await cnsMintingController.mintSLDWithResolver(coinbase.address, 'another', cnsResolver.address);
-      const crypto2TokenId = await cnsRegistry.childIdOf(cryptoRoot, 'another');
+      const crypto2TokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'another');
       await cnsRegistry.setOwner(account.address, crypto2TokenId);
       await reverseResolverWithCNS.connect(coinbase).remove();
       await expect(

@@ -13,7 +13,7 @@ contract ReverseResolver is Initializable, ContextUpgradeable {
     string public constant NAME = 'UNS: Reverse Resolver';
     string public constant VERSION = '0.1.0';
 
-    mapping(address => uint256) reverses;
+    mapping(address => uint256) private _reverses;
 
     IUNSRegistry private _unsRegistry;
     ICNSRegistry private _cnsRegistry;
@@ -24,23 +24,26 @@ contract ReverseResolver is Initializable, ContextUpgradeable {
     }
 
     function reverseOf(address account) public view returns (uint256) {
-        uint256 tokenId = reverses[account];
+        uint256 tokenId = _reverses[account];
         require(tokenId != 0, 'ReverseResolver: REVERSE_RECORD_IS_EMPTY');
         require(isApprovedOrOwner(account, tokenId), 'ReverseResolver: ACCOUNT_IS_NOT_APPROVED_OR_OWNER');
         return tokenId;
     }
 
+    /**
+     TODO: does it make sense to emit event on register?
+     */
     function register(uint256 tokenId) public {
         address sender = _msgSender();
         require(isApprovedOrOwner(sender, tokenId), 'ReverseResolver: SENDER_IS_NOT_APPROVED_OR_OWNER');
-        reverses[sender] = tokenId;
+        _reverses[sender] = tokenId;
     }
 
     function remove() public {
         address sender = _msgSender();
-        uint256 tokenId = reverses[sender];
+        uint256 tokenId = _reverses[sender];
         require(tokenId != 0, 'ReverseResolver: REVERSE_RECORD_IS_EMPTY');
-        delete reverses[sender];
+        delete _reverses[sender];
     }
 
     function isApprovedOrOwner(address account, uint256 tokenId) private view returns (bool) {
