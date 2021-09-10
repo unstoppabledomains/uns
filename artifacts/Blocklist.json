@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "BlocklistStorage",
-  "sourceName": "contracts/BlocklistStorage.sol",
+  "contractName": "Blocklist",
+  "sourceName": "contracts/utils/Blocklist.sol",
   "abi": [
     {
       "anonymous": false,
@@ -21,12 +21,25 @@
       "inputs": [
         {
           "indexed": false,
-          "internalType": "bool",
-          "name": "state",
-          "type": "bool"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         }
       ],
-      "name": "BlocklistPaused",
+      "name": "BlocklistDisabled",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "BlocklistEnabled",
       "type": "event"
     },
     {
@@ -57,6 +70,19 @@
         }
       ],
       "name": "isBlocked",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isBlocklistDisabled",
       "outputs": [
         {
           "internalType": "bool",

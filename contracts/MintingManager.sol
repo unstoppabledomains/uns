@@ -3,7 +3,6 @@
 
 pragma solidity ^0.8.0;
 
-import './BlocklistStorage.sol';
 import './cns/IResolver.sol';
 import './cns/IMintingController.sol';
 import './cns/IURIPrefixController.sol';
@@ -12,13 +11,14 @@ import './IUNSRegistry.sol';
 import './metatx/ERC2771Context.sol';
 import './metatx/Relayer.sol';
 import './roles/MinterRole.sol';
+import './utils/Blocklist.sol';
 import './utils/Pausable.sol';
 
 /**
  * @title MintingManager
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage, Pausable, IMintingManager {
+contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausable, IMintingManager {
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.2.0';
 
@@ -84,6 +84,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         __Ownable_init_unchained();
         __MinterRole_init_unchained();
         __ERC2771Context_init_unchained(forwarder);
+        __Blocklist_init_unchained();
         __Pausable_init_unchained();
 
         // Relayer is required to be a minter
@@ -192,8 +193,12 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         _setForwarder(forwarder);
     }
 
-    function pauseBlocklist(bool state) external onlyOwner {
-        _pauseBlocklist(state);
+    function disableBlocklist() external onlyOwner {
+        _disableBlocklist();
+    }
+
+    function enableBlocklist() external onlyOwner {
+        _enableBlocklist();
     }
 
     function blocklist(uint256 tokenId) external onlyMinter {
@@ -322,7 +327,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
     }
 
     function _beforeTokenMint(uint256 tokenId) private {
-        if (!_isBlocklistPaused()) {
+        if (!isBlocklistDisabled()) {
             require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
             _block(tokenId);
         }

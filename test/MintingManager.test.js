@@ -789,7 +789,6 @@ describe('MintingManager', () => {
 
       await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.addMinter(coinbase.address);
-      await mintingManager.setTokenURIPrefix('/');
     });
 
     it('should emit Blocked event on blocklist', async () => {
@@ -929,7 +928,7 @@ describe('MintingManager', () => {
     });
   });
 
-  describe('Blocklisting paused', () => {
+  describe('Blocklisting disabled', () => {
     before(async () => {
       [, developer] = signers;
 
@@ -939,8 +938,7 @@ describe('MintingManager', () => {
 
       await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.addMinter(coinbase.address);
-      await mintingManager.setTokenURIPrefix('/');
-      await mintingManager.pauseBlocklist(true);
+      await mintingManager.disableBlocklist();
     });
 
     it('should not block token after mint', async () => {
@@ -955,39 +953,39 @@ describe('MintingManager', () => {
     it('should blocklist depends on pausable', async () => {
       const tokenId = await unsRegistry.childIdOf(TLD.WALLET, 'test-blockp-8vn0');
 
-      await expect(mintingManager.pauseBlocklist(false))
-        .to.emit(mintingManager, 'BlocklistPaused')
-        .withArgs(false);
+      await expect(mintingManager.enableBlocklist())
+        .to.emit(mintingManager, 'BlocklistEnabled')
+        .withArgs(coinbase.address);
 
       await mintingManager.blocklist(tokenId);
       expect(await mintingManager.isBlocked(tokenId)).to.be.equal(true);
 
-      await expect(mintingManager.pauseBlocklist(true))
-        .to.emit(mintingManager, 'BlocklistPaused')
-        .withArgs(true);
+      await expect(mintingManager.disableBlocklist())
+        .to.emit(mintingManager, 'BlocklistDisabled')
+        .withArgs(coinbase.address);
       expect(await mintingManager.isBlocked(tokenId)).to.be.equal(false);
     });
 
-    it('should revert blocklist when paused', async () => {
+    it('should revert blocklist when disabled', async () => {
       const tokenId1 = await unsRegistry.childIdOf(TLD.WALLET, 'test-blockp-48hg-1');
 
       await expect(
         mintingManager.blocklist(tokenId1),
-      ).to.be.revertedWith('BlocklistStorage: PAUSED');
+      ).to.be.revertedWith('Blocklist: DISABLED');
     });
 
-    it('should revert blocklist multiple when paused', async () => {
+    it('should revert blocklist multiple when disabled', async () => {
       const tokenId1 = await unsRegistry.childIdOf(TLD.WALLET, 'test-blockp-57hg-1');
       const tokenId2 = await unsRegistry.childIdOf(TLD.WALLET, 'test-blockp-57hg-2');
 
       await expect(
         mintingManager.blocklistAll([tokenId1, tokenId2]),
-      ).to.be.revertedWith('BlocklistStorage: PAUSED');
+      ).to.be.revertedWith('Blocklist: DISABLED');
     });
 
     it('should revert pauseBlocklist when called by non-owner', async () => {
       await expect(
-        mintingManager.connect(developer).pauseBlocklist(false),
+        mintingManager.connect(developer).disableBlocklist(),
       ).to.be.revertedWith('Ownable: caller is not the owner');
     });
   });
