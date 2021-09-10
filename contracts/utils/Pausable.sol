@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: MIT
+// @author Unstoppable Domains, Inc.
+// @date September 10th, 2021
 
 pragma solidity ^0.8.0;
 
@@ -56,7 +57,7 @@ abstract contract Pausable is Initializable, ContextUpgradeable {
      * - The contract must not be paused.
      */
     modifier whenNotPaused() {
-        require(!paused(), 'Pausable: paused');
+        require(!paused(), 'Pausable: PAUSED');
         _;
     }
 
@@ -68,7 +69,7 @@ abstract contract Pausable is Initializable, ContextUpgradeable {
      * - The contract must be paused.
      */
     modifier whenPaused() {
-        require(paused(), 'Pausable: not paused');
+        require(paused(), 'Pausable: NOT_PAUSED');
         _;
     }
 

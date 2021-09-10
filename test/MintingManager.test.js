@@ -1007,60 +1007,60 @@ describe('MintingManager', () => {
       it('should revert claim when paused', async () => {
         await expect(
           mintingManager['claim(uint256,string)'](TLD.WALLET, 'test-paused-mint'),
-        ).to.be.revertedWith('Pausable: paused');
+        ).to.be.revertedWith('Pausable: PAUSED');
       });
 
       it('should revert claimTo when paused', async () => {
         await expect(
           mintingManager['claimTo(address,uint256,string)'](coinbase.address, TLD.WALLET, 'test-paused-mint'),
-        ).to.be.revertedWith('Pausable: paused');
+        ).to.be.revertedWith('Pausable: PAUSED');
       });
 
       it('should revert claim with resords when paused', async () => {
         const selector = 'claimToWithRecords(address,uint256,string,string[],string[])';
         await expect(
           mintingManager[selector](coinbase.address, TLD.WALLET, 'test-paused-mint', [], []),
-        ).to.be.revertedWith('Pausable: paused');
+        ).to.be.revertedWith('Pausable: PAUSED');
       });
 
       it('should revert mint when paused', async () => {
         await expect(
           mintingManager.mintSLD(coinbase.address, TLD.WALLET, 'test-paused-mint'),
-        ).to.be.revertedWith('Pausable: paused');
+        ).to.be.revertedWith('Pausable: PAUSED');
       });
 
       it('should revert safe mint when paused', async () => {
         await expect(
           mintingManager['safeMintSLD(address,uint256,string)'](coinbase.address, TLD.WALLET, 'test-paused-mint'),
-        ).to.be.revertedWith('Pausable: paused');
+        ).to.be.revertedWith('Pausable: PAUSED');
       });
 
       it('should revert safe mint(data) when paused', async () => {
         const selector = 'safeMintSLD(address,uint256,string,bytes)';
         await expect(
           mintingManager[selector](coinbase.address, TLD.WALLET, 'test-paused-mint', '0x'),
-        ).to.be.revertedWith('Pausable: paused');
+        ).to.be.revertedWith('Pausable: PAUSED');
       });
 
       it('should revert mint with records when paused', async () => {
         const selector = 'mintSLDWithRecords(address,uint256,string,string[],string[])';
         await expect(
           mintingManager[selector](coinbase.address, TLD.WALLET, 'test-paused-mint', [], []),
-        ).to.be.revertedWith('Pausable: paused');
+        ).to.be.revertedWith('Pausable: PAUSED');
       });
 
       it('should revert safe mint with records when paused', async () => {
         const selector = 'safeMintSLDWithRecords(address,uint256,string,string[],string[])';
         await expect(
           mintingManager[selector](coinbase.address, TLD.WALLET, 'test-paused-mint', [], []),
-        ).to.be.revertedWith('Pausable: paused');
+        ).to.be.revertedWith('Pausable: PAUSED');
       });
 
       it('should revert safe mint(data) with records when paused', async () => {
         const selector = 'safeMintSLDWithRecords(address,uint256,string,string[],string[],bytes)';
         await expect(
           mintingManager[selector](coinbase.address, TLD.WALLET, 'test-paused-mint', [], [], '0x'),
-        ).to.be.revertedWith('Pausable: paused');
+        ).to.be.revertedWith('Pausable: PAUSED');
       });
     });
 
@@ -1086,7 +1086,7 @@ describe('MintingManager', () => {
         await mintingManager.pause();
         await expect(
           mintingManager.pause(),
-        ).to.be.revertedWith('Pausable: paused');
+        ).to.be.revertedWith('Pausable: PAUSED');
       });
 
       it('should revert unpausing when called by non-owner', async () => {
@@ -1098,7 +1098,28 @@ describe('MintingManager', () => {
       it('should revert unpausing when not paused', async () => {
         await expect(
           mintingManager.unpause(),
-        ).to.be.revertedWith('Pausable: not paused');
+        ).to.be.revertedWith('Pausable: NOT_PAUSED');
+      });
+
+      it('should pause and unpause', async () => {
+        const tokenId = await unsRegistry.childIdOf(TLD.WALLET, 'test-pausable');
+
+        // Paused
+        await expect(mintingManager.pause())
+          .to.emit(mintingManager, 'Paused')
+          .withArgs(coinbase.address);
+
+        await expect(
+          mintingManager.mintSLD(coinbase.address, TLD.WALLET, 'test-pausable'),
+        ).to.be.revertedWith('Pausable: PAUSED');
+
+        // Unpaused
+        await expect(mintingManager.unpause())
+          .to.emit(mintingManager, 'Unpaused')
+          .withArgs(coinbase.address);
+
+        await mintingManager.mintSLD(coinbase.address, TLD.WALLET, 'test-pausable');
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
       });
     });
   });
