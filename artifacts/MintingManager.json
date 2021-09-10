@@ -98,7 +98,7 @@
         {
           "indexed": true,
           "internalType": "bytes4",
-          "name": "funcSig",
+          "name": "selector",
           "type": "bytes4"
         },
         {

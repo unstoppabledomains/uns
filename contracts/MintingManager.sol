@@ -217,13 +217,13 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
     }
 
-    function _verifyRelayCall(bytes4 funcSig, bytes calldata) internal pure override {
-        bool isSupported = funcSig == _SIG_MINT ||
-            funcSig == _SIG_SAFE_MINT ||
-            funcSig == _SIG_SAFE_MINT_DATA ||
-            funcSig == _SIG_MINT_WITH_RECORDS ||
-            funcSig == _SIG_SAFE_MINT_WITH_RECORDS ||
-            funcSig == _SIG_SAFE_MINT_WITH_RECORDS_DATA;
+    function _verifyRelayCall(bytes4 selector, bytes calldata) internal pure override {
+        bool isSupported = selector == _SIG_MINT ||
+            selector == _SIG_SAFE_MINT ||
+            selector == _SIG_SAFE_MINT_DATA ||
+            selector == _SIG_MINT_WITH_RECORDS ||
+            selector == _SIG_SAFE_MINT_WITH_RECORDS ||
+            selector == _SIG_SAFE_MINT_WITH_RECORDS_DATA;
 
         require(isSupported, 'MintingManager: UNSUPPORTED_RELAY_CALL');
     }

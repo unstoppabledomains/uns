@@ -79,8 +79,8 @@ describe('ERC2771RegistryContext', () => {
       const [success, returnData] = await context.callStatic.execute(encodedData);
 
       expect(success).to.be.eq(true);
-      const [,, funcSig] = utils.defaultAbiCoder.decode(['bytes32', 'bytes32', 'bytes4'], returnData);
-      expect(funcSig).to.be.eql(calldata);
+      const [,, selector] = utils.defaultAbiCoder.decode(['bytes32', 'bytes32', 'bytes4'], returnData);
+      expect(selector).to.be.eql(calldata);
     });
 
     it('should return data when untrusted forwarder', async () => {
