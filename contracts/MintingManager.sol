@@ -3,7 +3,6 @@
 
 pragma solidity ^0.8.0;
 
-import './BlocklistStorage.sol';
 import './cns/IResolver.sol';
 import './cns/IMintingController.sol';
 import './cns/IURIPrefixController.sol';
@@ -12,12 +11,14 @@ import './IUNSRegistry.sol';
 import './metatx/ERC2771Context.sol';
 import './metatx/Relayer.sol';
 import './roles/MinterRole.sol';
+import './utils/Blocklist.sol';
+import './utils/Pausable.sol';
 
 /**
  * @title MintingManager
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage, IMintingManager {
+contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausable, IMintingManager {
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.2.0';
 
@@ -83,6 +84,8 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         __Ownable_init_unchained();
         __MinterRole_init_unchained();
         __ERC2771Context_init_unchained(forwarder);
+        __Blocklist_init_unchained();
+        __Pausable_init_unchained();
 
         // Relayer is required to be a minter
         _addMinter(address(this));
@@ -101,7 +104,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         address to,
         uint256 tld,
         string calldata label
-    ) external override onlyMinter onlyRegisteredTld(tld) {
+    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
         _mintSLD(to, tld, label);
     }
 
@@ -109,7 +112,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         address to,
         uint256 tld,
         string calldata label
-    ) external override onlyMinter onlyRegisteredTld(tld) {
+    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
         _safeMintSLD(to, tld, label, '');
     }
 
@@ -118,7 +121,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         uint256 tld,
         string calldata label,
         bytes calldata data
-    ) external override onlyMinter onlyRegisteredTld(tld) {
+    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
         _safeMintSLD(to, tld, label, data);
     }
 
@@ -128,7 +131,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMinter onlyRegisteredTld(tld) {
+    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
         _mintSLDWithRecords(to, tld, label, keys, values);
     }
 
@@ -138,7 +141,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMinter onlyRegisteredTld(tld) {
+    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
         _safeMintSLDWithRecords(to, tld, label, keys, values, '');
     }
 
@@ -149,11 +152,11 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         string[] calldata keys,
         string[] calldata values,
         bytes calldata data
-    ) external override onlyMinter onlyRegisteredTld(tld) {
+    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
         _safeMintSLDWithRecords(to, tld, label, keys, values, data);
     }
 
-    function claim(uint256 tld, string calldata label) external override onlyRegisteredTld(tld) {
+    function claim(uint256 tld, string calldata label) external override onlyRegisteredTld(tld) whenNotPaused {
         _mintSLD(_msgSender(), tld, _freeSLDLabel(label));
     }
 
@@ -161,7 +164,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         address to,
         uint256 tld,
         string calldata label
-    ) external override onlyRegisteredTld(tld) {
+    ) external override onlyRegisteredTld(tld) whenNotPaused {
         _mintSLD(to, tld, _freeSLDLabel(label));
     }
 
@@ -171,7 +174,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyRegisteredTld(tld) {
+    ) external override onlyRegisteredTld(tld) whenNotPaused {
         _mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
     }
 
@@ -190,16 +193,28 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         _setForwarder(forwarder);
     }
 
-    function pauseBlocklist(bool state) external override onlyOwner {
-        _pauseBlocklist(state);
+    function disableBlocklist() external onlyOwner {
+        _disableBlocklist();
     }
 
-    function blocklist(uint256 tokenId) external override onlyMinter {
+    function enableBlocklist() external onlyOwner {
+        _enableBlocklist();
+    }
+
+    function blocklist(uint256 tokenId) external onlyMinter {
         _block(tokenId);
     }
 
-    function blocklistAll(uint256[] calldata tokenIds) external override onlyMinter {
+    function blocklistAll(uint256[] calldata tokenIds) external onlyMinter {
         _blockAll(tokenIds);
+    }
+
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     function _verifyRelaySigner(address signer) internal view override {
@@ -207,13 +222,13 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
         require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
     }
 
-    function _verifyRelayCall(bytes4 funcSig, bytes calldata) internal pure override {
-        bool isSupported = funcSig == _SIG_MINT ||
-            funcSig == _SIG_SAFE_MINT ||
-            funcSig == _SIG_SAFE_MINT_DATA ||
-            funcSig == _SIG_MINT_WITH_RECORDS ||
-            funcSig == _SIG_SAFE_MINT_WITH_RECORDS ||
-            funcSig == _SIG_SAFE_MINT_WITH_RECORDS_DATA;
+    function _verifyRelayCall(bytes4 selector, bytes calldata) internal pure override {
+        bool isSupported = selector == _SIG_MINT ||
+            selector == _SIG_SAFE_MINT ||
+            selector == _SIG_SAFE_MINT_DATA ||
+            selector == _SIG_MINT_WITH_RECORDS ||
+            selector == _SIG_SAFE_MINT_WITH_RECORDS ||
+            selector == _SIG_SAFE_MINT_WITH_RECORDS_DATA;
 
         require(isSupported, 'MintingManager: UNSUPPORTED_RELAY_CALL');
     }
@@ -312,7 +327,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, BlocklistStorage
     }
 
     function _beforeTokenMint(uint256 tokenId) private {
-        if (!_isBlocklistPaused()) {
+        if (!isBlocklistDisabled()) {
             require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
             _block(tokenId);
         }

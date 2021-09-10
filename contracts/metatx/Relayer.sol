@@ -9,7 +9,7 @@ import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.
 abstract contract Relayer is ContextUpgradeable {
     using ECDSAUpgradeable for bytes32;
 
-    event Relayed(address indexed sender, address indexed signer, bytes4 indexed funcSig, bytes32 digest);
+    event Relayed(address indexed sender, address indexed signer, bytes4 indexed selector, bytes32 digest);
 
     /**
      * Relay allows execute transaction on behalf of whitelisted minter.
@@ -21,15 +21,15 @@ abstract contract Relayer is ContextUpgradeable {
         bytes32 digest = keccak256(data);
         address signer = keccak256(abi.encodePacked(digest, address(this))).toEthSignedMessageHash().recover(signature);
 
-        bytes4 funcSig;
+        bytes4 selector;
         bytes memory _data = data;
         /* solium-disable-next-line security/no-inline-assembly */
         assembly {
-            funcSig := mload(add(_data, add(0x20, 0)))
+            selector := mload(add(_data, add(0x20, 0)))
         }
 
         _verifyRelaySigner(signer);
-        _verifyRelayCall(funcSig, data);
+        _verifyRelayCall(selector, data);
 
         /* solium-disable-next-line security/no-low-level-calls */
         (bool success, bytes memory result) = address(this).call(data);
@@ -43,7 +43,7 @@ abstract contract Relayer is ContextUpgradeable {
             }
         }
 
-        emit Relayed(_msgSender(), signer, funcSig, digest);
+        emit Relayed(_msgSender(), signer, selector, digest);
         return result;
     }
 
@@ -51,5 +51,5 @@ abstract contract Relayer is ContextUpgradeable {
         require(signer != address(0), 'Relayer: SIGNATURE_IS_INVALID');
     }
 
-    function _verifyRelayCall(bytes4 funcSig, bytes calldata data) internal pure virtual {}
+    function _verifyRelayCall(bytes4 selector, bytes calldata data) internal pure virtual {}
 }
