@@ -4,7 +4,7 @@
 pragma solidity ^0.8.0;
 
 interface IMintingManager {
-    event NewTld(uint256 indexed namehash, string tld);
+    event NewTld(uint256 indexed tokenId, string tld);
 
     /**
      * @dev Adds new TLD

@@ -9,7 +9,7 @@
         {
           "indexed": true,
           "internalType": "uint256",
-          "name": "namehash",
+          "name": "tokenId",
           "type": "uint256"
         },
         {
