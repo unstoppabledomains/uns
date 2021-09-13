@@ -271,13 +271,16 @@ Warning: In case of contracts' redeployment, make sure there is no deployment ou
 
 ## Migrations
 
-### Universal forwarder (rinkeby)
+### 1. Universal forwarder (rinkeby)
 1. `yarn hardhat run --network rinkeby scripts/deploy_CNS_Forwarders.js`
 2. `yarn hardhat run --network rinkeby scripts/upgrade_MintingManager.js`
 3. `yarn hardhat run --network rinkeby scripts/deploy_MintingManagerForwarder.js`
 4. `yarn hardhat run --network rinkeby scripts/upgrade_UNSRegistry.js`
-5. ---next---
-6. Upgrade MintingManager
-7. *Add minting support .crypto in UNS `mintingManager.addTld('crypto')`
-8. Deploy ProxyReader
+5. Undate config
 
+### 2. L2 related upgrades
+1. Upgrade MintingManager
+  - explicitly bisable blocklist (Rinkeby, Mainnet)
+2. Deploy ProxyReader
+3. Update config
+4. Add minting support .crypto in UNS `mintingManager.addTld('crypto')` (if needed)

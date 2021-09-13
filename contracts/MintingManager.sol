@@ -342,13 +342,13 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
      * TODO: think about the implementation
      */
     function _addTld(string memory tld) private {
-        uint256 namehash = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(tld)))));
+        uint256 tokenId = _childId(uint256(0x0), tld);
 
-        _tlds[namehash] = tld;
-        emit NewTld(namehash, tld);
+        _tlds[tokenId] = tld;
+        emit NewTld(tokenId, tld);
 
-        if (!unsRegistry.exists(namehash)) {
-            unsRegistry.mint(address(0xdead), namehash, tld);
+        if (!unsRegistry.exists(tokenId)) {
+            unsRegistry.mint(address(0xdead), tokenId, tld);
         }
     }
 
