@@ -105,6 +105,7 @@
                 "ProxyReader": {
                     "address": "0xE6729D224D00b3dd4FC731C4Ee3274E35Da06578",
                     "legacyAddresses": [
+                        "0x299974AeD8911bcbd2C61262605b89F591a53E83",
                         "0x9F19473F6a98a715176291c930558E1954fd3D1e",
                         "0x3A2e74CF832cbA3d77E72708d55370119E4323a6"
                     ],
