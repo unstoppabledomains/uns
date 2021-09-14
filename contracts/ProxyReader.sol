@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol';
 
 import './cns/ICNSRegistry.sol';
 import './cns/IResolver.sol';
@@ -13,11 +14,11 @@ import './IRecordReader.sol';
 import './IUNSRegistry.sol';
 import './IRegistryReader.sol';
 
-contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IDataReader {
+contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader, IRecordReader, IDataReader {
     using SafeMathUpgradeable for uint256;
 
     string public constant NAME = 'UNS: Proxy Reader';
-    string public constant VERSION = '0.1.1';
+    string public constant VERSION = '0.2.0';
 
     IUNSRegistry private immutable _unsRegistry;
     ICNSRegistry private immutable _cnsRegistry;
@@ -25,6 +26,8 @@ contract ProxyReader is ERC165Upgradeable, IRegistryReader, IRecordReader, IData
     constructor(IUNSRegistry unsRegistry, ICNSRegistry cnsRegistry) {
         _unsRegistry = unsRegistry;
         _cnsRegistry = cnsRegistry;
+
+        __Multicall_init_unchained();
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {

@@ -881,4 +881,80 @@ describe('ProxyReader', () => {
       expect(address).to.be.equal(unsRegistry.address);
     });
   });
+
+  describe('Multicall', () => {
+    const abiCoder = new utils.AbiCoder();
+
+    it('should return owners', async () => {
+      const unknownTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'unknown');
+      const owners = await proxy.callStatic.multicall([
+        proxy.interface.encodeFunctionData('ownerOf(uint256)', [unknownTokenId]),
+        proxy.interface.encodeFunctionData('ownerOf(uint256)', [walletTokenId]),
+        proxy.interface.encodeFunctionData('ownerOf(uint256)', [cryptoTokenId]),
+      ]);
+
+      const results = owners.map(owner => abiCoder.decode(['address'], owner)[0]);
+      expect(results).to.be.eql([ZERO_ADDRESS, coinbase.address, coinbase.address]);
+    });
+
+    it('should return existance of tokens', async () => {
+      const unknownTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'unknown');
+      const owners = await proxy.callStatic.multicall([
+        proxy.interface.encodeFunctionData('exists(uint256)', [unknownTokenId]),
+        proxy.interface.encodeFunctionData('exists(uint256)', [walletTokenId]),
+        proxy.interface.encodeFunctionData('exists(uint256)', [cryptoTokenId]),
+      ]);
+
+      const results = owners.map(owner => abiCoder.decode(['bool'], owner)[0]);
+      expect(results).to.be.eql([false, true, true]);
+    });
+
+    it('should return token uri\'s for UNS and CNS', async () => {
+      const owners = await proxy.callStatic.multicall([
+        proxy.interface.encodeFunctionData('tokenURI(uint256)', [cryptoTokenId]),
+        proxy.interface.encodeFunctionData('tokenURI(uint256)', [walletTokenId]),
+      ]);
+
+      const results = owners.map(owner => abiCoder.decode(['string'], owner)[0]);
+      expect(results).to.be.eql([
+        'test_42.crypto',
+        '/40559307672254207728557027035302885851369665055277251407821151545011532191308',
+      ]);
+    });
+
+    it('should return heterogeneous call results', async () => {
+      await resolver.set('het_key_111', 'het_value_1', cryptoTokenId);
+
+      const data = await proxy.callStatic.multicall([
+        proxy.interface.encodeFunctionData('ownerOf(uint256)', [cryptoTokenId]),
+        proxy.interface.encodeFunctionData('get(string,uint256)', ['het_key_111', cryptoTokenId]),
+        proxy.interface.encodeFunctionData('getData(string[],uint256)', [['het_key_111'], cryptoTokenId]),
+        proxy.interface.encodeFunctionData('ownerOfForMany(uint256[])', [[walletTokenId, cryptoTokenId]]),
+        proxy.interface.encodeFunctionData('registryOf(uint256)', [walletTokenId]),
+      ]);
+
+      const results = [];
+      [
+        ['address'],
+        ['string'],
+        ['address', 'address', 'string[]'],
+        ['address[]'],
+        ['address'],
+      ].forEach((output, i) => {
+        results.push(abiCoder.decode(output, data[i]));
+      });
+
+      expect(results).to.be.eql([
+        [coinbase.address],
+        ['het_value_1'],
+        [
+          resolver.address,
+          coinbase.address,
+          ['het_value_1'],
+        ],
+        [[coinbase.address, coinbase.address]],
+        [unsRegistry.address],
+      ]);
+    });
+  });
 });
