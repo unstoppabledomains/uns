@@ -1,22 +1,22 @@
-const { ethers, network } = require('hardhat');
+const { network } = require('hardhat');
 
+const { mergeNetworkConfig } = require('../src/config');
+const Deployer = require('../src/deployer');
 const UNSNetworkConfig = require('./../uns-config.json');
 
 async function main () {
-  const ProxyReader = await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader');
-
-  const unsConfig = UNSNetworkConfig.networks[network.config.chainId];
-  if (!unsConfig) {
-    throw new Error(`UNS config not found for network ${network.config.chainId}`);
-  }
-
-  const { UNSRegistry, CNSRegistry } = unsConfig.contracts;
-
   console.log('Network:', network.name);
 
-  // Deploy ProxyReader
-  const proxyReader = await ProxyReader.deploy(UNSRegistry.address, CNSRegistry.address);
-  console.log('ProxyReader deployed to:', proxyReader.address);
+  const config = UNSNetworkConfig.networks[network.config.chainId];
+  if (!config) {
+    throw new Error(`Config not found for network ${network.config.chainId}`);
+  }
+
+  const deployer = await Deployer.create();
+  const deployConfig = await deployer.execute(['uns_proxy_reader'], config);
+  mergeNetworkConfig(deployConfig);
+
+  console.log('Deployed!');
 }
 
 main()

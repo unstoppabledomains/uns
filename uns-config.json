@@ -97,18 +97,18 @@
                 },
                 "MintingManager": {
                     "address": "0xdAAf99A920D31F4f5720e4667b12b24e54A03070",
-                    "implementation": "0x14B2048d45d0C47052EF1d6a795a8903c36467c7",
+                    "implementation": "0x38Fa95a0AC0E59D6e2845eFADBc17aF0FF9c7089",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x85e629",
                     "forwarder": "0xfB13e29C4D31a48B4Cd61131Cf3b681416e11681"
                 },
                 "ProxyReader": {
-                    "address": "0x299974AeD8911bcbd2C61262605b89F591a53E83",
+                    "address": "0xE6729D224D00b3dd4FC731C4Ee3274E35Da06578",
                     "legacyAddresses": [
                         "0x9F19473F6a98a715176291c930558E1954fd3D1e",
                         "0x3A2e74CF832cbA3d77E72708d55370119E4323a6"
                     ],
-                    "deploymentBlock": "0x8671b4"
+                    "deploymentBlock": "0x8dc79a"
                 },
                 "ProxyAdmin": {
                     "address": "0xaf9815005A208d1460b6fC60B4f90B9f2185E88c",
