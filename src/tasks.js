@@ -18,20 +18,20 @@ const deployCNSTask = {
     // CNS registry
     const cnsRegistry = await CNSRegistry.connect(owner).deploy();
     await ctx.saveContractConfig('CNSRegistry', cnsRegistry);
-    await verify(cnsRegistry.address, []);
+    await verify(ctx, cnsRegistry.address, []);
 
     // CNS Controllers
     const signatureController = await SignatureController.connect(owner).deploy(cnsRegistry.address);
     await ctx.saveContractConfig('SignatureController', signatureController);
-    await verify(signatureController.address, [cnsRegistry.address]);
+    await verify(ctx, signatureController.address, [cnsRegistry.address]);
 
     const mintingController = await MintingController.connect(owner).deploy(cnsRegistry.address);
     await ctx.saveContractConfig('MintingController', mintingController);
-    await verify(mintingController.address, [cnsRegistry.address]);
+    await verify(ctx, mintingController.address, [cnsRegistry.address]);
 
     const uriPrefixController = await URIPrefixController.connect(owner).deploy(cnsRegistry.address);
     await ctx.saveContractConfig('URIPrefixController', uriPrefixController);
-    await verify(uriPrefixController.address, [cnsRegistry.address]);
+    await verify(ctx, uriPrefixController.address, [cnsRegistry.address]);
 
     // Configuration
     await cnsRegistry.connect(owner).addController(signatureController.address);
@@ -43,14 +43,14 @@ const deployCNSTask = {
       .connect(owner)
       .deploy(cnsRegistry.address, mintingController.address);
     await ctx.saveContractConfig('Resolver', resolver);
-    await verify(resolver.address, [cnsRegistry.address, mintingController.address]);
+    await verify(ctx, resolver.address, [cnsRegistry.address, mintingController.address]);
 
     // CNS WhitelistedMinter
     const whitelistedMinter = await WhitelistedMinter
       .connect(owner)
       .deploy(mintingController.address);
     await ctx.saveContractConfig('WhitelistedMinter', whitelistedMinter);
-    await verify(whitelistedMinter.address, [mintingController.address]);
+    await verify(ctx, whitelistedMinter.address, [mintingController.address]);
 
     await mintingController.connect(owner).addMinter(whitelistedMinter.address);
     await whitelistedMinter.connect(owner).setDefaultResolver(resolver.address);
@@ -94,13 +94,13 @@ const deployCNSForwardersTask = {
       .connect(owner)
       .deploy(SignatureController.address);
     await ctx.saveForwarderConfig('CNSRegistry', cnsRegistryForwarder);
-    await verify(cnsRegistryForwarder.address, [SignatureController.address]);
+    await verify(ctx, cnsRegistryForwarder.address, [SignatureController.address]);
 
     const resolverForwarder = await ctx.artifacts.ResolverForwarder
       .connect(owner)
       .deploy(CNSRegistry.address);
     await ctx.saveForwarderConfig('Resolver', resolverForwarder);
-    await verify(resolverForwarder.address, [CNSRegistry.address]);
+    await verify(ctx, resolverForwarder.address, [CNSRegistry.address]);
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -151,19 +151,19 @@ const deployUNSTask = {
 
       unsRegistryImpl = await proxyAdmin.callStatic.getProxyImplementation(unsRegistry.address);
       await ctx.saveContractConfig('UNSRegistry', unsRegistry, unsRegistryImpl, unsRegistry);
-      await verify(unsRegistryImpl, []);
+      await verify(ctx, unsRegistryImpl, []);
 
       mintingManagerImpl = await proxyAdmin.callStatic.getProxyImplementation(mintingManager.address);
       await ctx.saveContractConfig('MintingManager', mintingManager, mintingManagerImpl);
-      await verify(mintingManagerImpl, []);
+      await verify(ctx, mintingManagerImpl, []);
     } else {
       unsRegistry = await ctx.artifacts.UNSRegistry.connect(owner).deploy();
       await ctx.saveContractConfig('UNSRegistry', unsRegistry);
-      await verify(unsRegistry.address, []);
+      await verify(ctx, unsRegistry.address, []);
 
       mintingManager = await ctx.artifacts.MintingManager.connect(owner).deploy();
       await ctx.saveContractConfig('MintingManager', mintingManager);
-      await verify(mintingManager.address, []);
+      await verify(ctx, mintingManager.address, []);
     }
 
     const registryInitTx = await unsRegistry.connect(owner).initialize(mintingManager.address);
@@ -173,7 +173,7 @@ const deployUNSTask = {
       .connect(owner)
       .deploy(mintingManager.address);
     await ctx.saveForwarderConfig('MintingManager', forwarder);
-    await verify(forwarder.address, [mintingManager.address]);
+    await verify(ctx, forwarder.address, [mintingManager.address]);
 
     const mintingManagerInitTx = await mintingManager.connect(owner).initialize(
       unsRegistry.address,
@@ -206,7 +206,7 @@ const deployUNSTask = {
           [owner.address],
         );
       await ctx.saveContractConfig('TwitterValidationOperator', operator);
-      await verify(operator.address, [
+      await verify(ctx, operator.address, [
         unsRegistry.address,
         CNSRegistry.address,
         ctx.linkToken,
@@ -254,7 +254,7 @@ const deployUNSProxyReaderTask = {
       .connect(owner)
       .deploy(UNSRegistry.address, CNSRegistry.address);
     await ctx.saveContractConfig('ProxyReader', proxyReader);
-    await verify(proxyReader.address, [UNSRegistry.address, CNSRegistry.address]);
+    await verify(ctx, proxyReader.address, [UNSRegistry.address, CNSRegistry.address]);
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -337,8 +337,7 @@ const deployMMForwarderTask = {
       .connect(owner);
     await mintingManager.setForwarder(forwarder.address);
     await ctx.saveForwarderConfig('MintingManager', forwarder);
-
-    await verify(forwarder.address, [MintingManager.address]);
+    await verify(ctx, forwarder.address, [MintingManager.address]);
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -368,7 +367,7 @@ const upgradeUNSRegistryTask = {
 
     const unsRegistryImpl = await proxyAdmin.callStatic.getProxyImplementation(unsRegistry.address);
     await ctx.saveContractConfig('UNSRegistry', unsRegistry, unsRegistryImpl, unsRegistry);
-    await verify(unsRegistryImpl, []);
+    await verify(ctx, unsRegistryImpl, []);
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -405,7 +404,7 @@ const upgradeMintingManagerTask = {
 
     const mintingManagerImpl = await proxyAdmin.callStatic.getProxyImplementation(mintingManager.address);
     await ctx.saveContractConfig('MintingManager', mintingManager, mintingManagerImpl);
-    await verify(mintingManagerImpl, []);
+    await verify(ctx, mintingManagerImpl, []);
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -426,15 +425,14 @@ const upgradeMintingManagerTask = {
   },
 };
 
-const verify = async (address, args) => {
+const verify = async (ctx, address, args) => {
   try {
     await run('verify:verify', {
       address,
       constructorArguments: args,
     });
   } catch (err) {
-    console.log('Verification failed:');
-    console.log(`  [chainId: ${network.config.chainId}, address: ${address}, args: [${args}]`);
+    ctx.log('Verification failed', { chainId: network.config.chainId, address, args });
   }
 };
 
