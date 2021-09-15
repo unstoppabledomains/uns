@@ -166,7 +166,8 @@ module.exports = {
         '0x1daf08a27304a78434e22ab79bea508e341f910d',
       ],
       mainnet: [],
-      mumbai: [],
+      mumbai: ['0xc152ba5caa9db5883f2cfefb984610fd3bd7914a'],
+      polygon: ['0xd8263053a6d08ef3acbf2381f144b90841726233'],
     },
     linkToken: {
       hardhat: '',
@@ -174,7 +175,8 @@ module.exports = {
       sandbox: '',
       rinkeby: '0x01BE23585060835E02B77ef475b0Cc51aA1e0709',
       mainnet: '0x514910771af9ca656af840dff83e8264ecf986ca',
-      mumbai: '0x514910771af9ca656af840dff83e8264ecf986ca',
+      mumbai: '',
+      polygon: '',
     },
   },
 };
