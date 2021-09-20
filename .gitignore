@@ -32,6 +32,8 @@ cache
 
 # openzeppelin
 .openzeppelin/unknown-*.json
+# mumbai network
+!.openzeppelin/unknown-80001.json
 
 .sandbox
 .deployer
