@@ -12,11 +12,12 @@
                 "CNSRegistry": {
                     "address": "0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x8a958b"
+                    "deploymentBlock": "0x8a958b",
+                    "forwarder": "0x802E1D2d48dA1d36ff2c8E2e376D39b8D1DCA549"
                 },
                 "MintingManager": {
                     "address": "0x2a7084870bB724175a3C96Da8FaA55128fa3E19D",
-                    "implementation": "0x2f133a06fe4fc845E41261aCFF6831a727ea9062",
+                    "implementation": "0x1c776e8D286a35e8B4bc51388A77dD2044E5Fa7d",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xc2fee0"
                 },
@@ -60,7 +61,8 @@
                         "0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d",
                         "0x878bc2f3f717766ab69c0a5f9a6144931e61aed3"
                     ],
-                    "deploymentBlock": "0x960844"
+                    "deploymentBlock": "0x960844",
+                    "forwarder": "0xa88541075B3E29C602C3334F8CA8C943F6BD35c1"
                 },
                 "ProxyReader": {
                     "address": "0xfEe4D4F0aDFF8D84c12170306507554bC7045878",

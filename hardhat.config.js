@@ -104,7 +104,6 @@ module.exports = {
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.MAINNET_INFURA_KEY}`,
       chainId: 1,
-      gasPrice: 20000000000,
       accounts: process.env.MAINNET_UNS_PRIVATE_KEY
         ? [process.env.MAINNET_UNS_PRIVATE_KEY]
         : undefined,
