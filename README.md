@@ -268,6 +268,10 @@ yarn hardhat run --network <network> scripts/deploy.js
 
 Warning: In case of contracts' redeployment, make sure there is no deployment output file `.deployer/{chain_id}.json`
 
+### Deploying UNS(Mumbai)
+```
+env ETHERSCAN_API_KEY=$POLYGONSCAN_API_KEY yarn hardhat run --network mumbai scripts/deploy_UNS_only.js
+```
 
 ## Migrations
 
