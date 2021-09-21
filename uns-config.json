@@ -67,12 +67,13 @@
                     "forwarder": "0xa88541075B3E29C602C3334F8CA8C943F6BD35c1"
                 },
                 "ProxyReader": {
-                    "address": "0xfEe4D4F0aDFF8D84c12170306507554bC7045878",
+                    "address": "0xc3C2BAB5e3e52DBF311b2aAcEf2e40344f19494E",
                     "legacyAddresses": [
+                        "0xfEe4D4F0aDFF8D84c12170306507554bC7045878",
                         "0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5",
                         "0x7ea9Ee21077F84339eDa9C80048ec6db678642B1"
                     ],
-                    "deploymentBlock": "0xc300b4"
+                    "deploymentBlock": "0xca7ab2"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x2F659766E3D08561CA3408FbAba7C0749ab2c402",
