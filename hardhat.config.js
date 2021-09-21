@@ -118,6 +118,14 @@ module.exports = {
         : undefined,
       loggingEnabled: true,
     },
+    polygon: {
+      url: `https://polygon-mainnet.infura.io/v3/${process.env.POLYGON_INFURA_KEY}`,
+      chainId: 137,
+      accounts: process.env.POLYGON_UNS_PRIVATE_KEY
+        ? [process.env.POLYGON_UNS_PRIVATE_KEY]
+        : undefined,
+      loggingEnabled: true,
+    },
   },
   gasReporter: {
     currency: 'USD',
