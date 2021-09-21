@@ -5,9 +5,10 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x049aba7510f45BA5b64ea9E658E342F904DB358D",
-                    "implementation": "0x6d4FaFcD5B4A8b360c80eAca8D91e3Bc814ecc39",
+                    "implementation": "0x2351f8557Ec733F35a278C922F9DcAac32c687AF",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0xc2fede"
+                    "deploymentBlock": "0xc2fede",
+                    "forwarder": "0x049aba7510f45BA5b64ea9E658E342F904DB358D"
                 },
                 "CNSRegistry": {
                     "address": "0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe",
