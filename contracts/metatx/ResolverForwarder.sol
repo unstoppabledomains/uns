@@ -17,10 +17,10 @@ contract ResolverForwarder is BaseRoutingForwarder {
 
     constructor(ICNSRegistry cnsRegistry) {
         _cnsRegistry = cnsRegistry;
-        _addRule('reset(uint256)', 'resetFor(uint256,bytes)', 2);
-        _addRule('set(string,string,uint256)', 'setFor(string,string,uint256,bytes)', 4);
-        _addRule('setMany(string[],string[],uint256)', 'setManyFor(string[],string[],uint256,bytes)', 4);
-        _addRule('reconfigure(string[],string[],uint256)', 'reconfigureFor(string[],string[],uint256,bytes)', 4);
+        _addRoute('reset(uint256)', 'resetFor(uint256,bytes)');
+        _addRoute('set(string,string,uint256)', 'setFor(string,string,uint256,bytes)');
+        _addRoute('setMany(string[],string[],uint256)', 'setManyFor(string[],string[],uint256,bytes)');
+        _addRoute('reconfigure(string[],string[],uint256)', 'reconfigureFor(string[],string[],uint256,bytes)');
     }
 
     function nonceOf(uint256 tokenId) public view override returns (uint256) {
@@ -37,5 +37,26 @@ contract ResolverForwarder is BaseRoutingForwarder {
         uint256 gas = gasleft();
         address target = _cnsRegistry.resolverOf(req.tokenId);
         return _execute(req.from, target, req.tokenId, gas, req.data, signature);
+    }
+
+    function _buildRouteData(
+        bytes4 selector,
+        bytes memory data,
+        bytes memory signature
+    ) internal pure override returns (bytes memory) {
+        if(selector == bytes4(keccak256('resetFor(uint256,bytes)'))) {
+            (uint256 p1) = abi.decode(data, (uint256));
+            return abi.encodeWithSelector(selector, p1, signature);
+        } else if(selector == bytes4(keccak256('setFor(string,string,uint256,bytes)'))) {
+            (string memory p1, string memory p2, uint256 p3) = abi.decode(data, (string, string, uint256));
+            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+        } else if(selector == bytes4(keccak256('setManyFor(string[],string[],uint256,bytes)'))) {
+            (string[] memory p1, string[] memory p2, uint256 p3) = abi.decode(data, (string[], string[], uint256));
+            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+        } else if(selector == bytes4(keccak256('reconfigureFor(string[],string[],uint256,bytes)'))) {
+            (string[] memory p1, string[] memory p2, uint256 p3) = abi.decode(data, (string[], string[], uint256));
+            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+        }
+        return '';
     }
 }

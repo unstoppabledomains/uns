@@ -16,38 +16,33 @@ contract CNSRegistryForwarder is BaseRoutingForwarder {
 
     constructor(IForwarder target) {
         _target = target;
-        _addRule('transferFrom(address,address,uint256)', 'transferFromFor(address,address,uint256,bytes)', 4);
-        _addRule('safeTransferFrom(address,address,uint256)', 'safeTransferFromFor(address,address,uint256,bytes)', 4);
-        _addRule(
+        _addRoute('transferFrom(address,address,uint256)', 'transferFromFor(address,address,uint256,bytes)');
+        _addRoute('safeTransferFrom(address,address,uint256)', 'safeTransferFromFor(address,address,uint256,bytes)');
+        _addRoute(
             'safeTransferFrom(address,address,uint256,bytes)',
-            'safeTransferFromFor(address,address,uint256,bytes,bytes)',
-            5
+            'safeTransferFromFor(address,address,uint256,bytes,bytes)'
         );
-        _addRule('burn(uint256)', 'burnFor(uint256,bytes)', 2);
-        _addRule('mintChild(address,uint256,string)', 'mintChildFor(address,uint256,string,bytes)', 4);
-        _addRule('safeMintChild(address,uint256,string)', 'safeMintChildFor(address,uint256,string,bytes)', 4);
-        _addRule(
+        _addRoute('burn(uint256)', 'burnFor(uint256,bytes)');
+        _addRoute('mintChild(address,uint256,string)', 'mintChildFor(address,uint256,string,bytes)');
+        _addRoute('safeMintChild(address,uint256,string)', 'safeMintChildFor(address,uint256,string,bytes)');
+        _addRoute(
             'safeMintChild(address,uint256,string,bytes)',
-            'safeMintChildFor(address,uint256,string,bytes,bytes)',
-            5
+            'safeMintChildFor(address,uint256,string,bytes,bytes)'
         );
-        _addRule(
+        _addRoute(
             'transferFromChild(address,address,uint256,string)',
-            'transferFromChildFor(address,address,uint256,string,bytes)',
-            5
+            'transferFromChildFor(address,address,uint256,string,bytes)'
         );
-        _addRule(
+        _addRoute(
             'safeTransferFromChild(address,address,uint256,string)',
-            'safeTransferFromChildFor(address,address,uint256,string,bytes)',
-            5
+            'safeTransferFromChildFor(address,address,uint256,string,bytes)'
         );
-        _addRule(
+        _addRoute(
             'safeTransferFromChild(address,address,uint256,string,bytes)',
-            'safeTransferFromChildFor(address,address,uint256,string,bytes,bytes)',
-            6
+            'safeTransferFromChildFor(address,address,uint256,string,bytes,bytes)'
         );
-        _addRule('burnChild(uint256,string)', 'burnChildFor(uint256,string,bytes)', 3);
-        _addRule('resolveTo(address,uint256)', 'resolveToFor(address,uint256,bytes)', 3);
+        _addRoute('burnChild(uint256,string)', 'burnChildFor(uint256,string,bytes)');
+        _addRoute('resolveTo(address,uint256)', 'resolveToFor(address,uint256,bytes)');
     }
 
     function nonceOf(uint256 tokenId) public view override returns (uint256) {
@@ -61,5 +56,50 @@ contract CNSRegistryForwarder is BaseRoutingForwarder {
     function execute(ForwardRequest calldata req, bytes calldata signature) external override returns (bytes memory) {
         uint256 gas = gasleft();
         return _execute(req.from, address(_target), req.tokenId, gas, req.data, signature);
+    }
+
+    function _buildRouteData(
+        bytes4 selector,
+        bytes memory data,
+        bytes memory signature
+    ) internal pure override returns (bytes memory) {
+        if(selector == bytes4(keccak256('transferFromFor(address,address,uint256,bytes)'))) {
+            (address p1, address p2, uint256 p3) = abi.decode(data, (address, address, uint256));
+            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+        } else if(selector == bytes4(keccak256('safeTransferFromFor(address,address,uint256,bytes)'))) {
+            (address p1, address p2, uint256 p3) = abi.decode(data, (address, address, uint256));
+            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+        } else if(selector == bytes4(keccak256('safeTransferFromFor(address,address,uint256,bytes,bytes)'))) {
+            (address p1, address p2, uint256 p3, bytes memory p4) = abi.decode(data, (address, address, uint256, bytes));
+            return abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
+        } else if(selector == bytes4(keccak256('burnFor(uint256,bytes)'))) {
+            (uint256 p1) = abi.decode(data, (uint256));
+            return abi.encodeWithSelector(selector, p1, signature);
+        } else if(selector == bytes4(keccak256('mintChildFor(address,uint256,string,bytes)'))) {
+            (address p1, uint256 p2, string memory p3) = abi.decode(data, (address, uint256, string));
+            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+        } else if(selector == bytes4(keccak256('safeMintChildFor(address,uint256,string,bytes)'))) {
+            (address p1, uint256 p2, string memory p3) = abi.decode(data, (address, uint256, string));
+            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+        } else if(selector == bytes4(keccak256('safeMintChildFor(address,uint256,string,bytes,bytes)'))) {
+            (address p1, uint256 p2, string memory p3, bytes memory p4) = abi.decode(data, (address, uint256, string, bytes));
+            return abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
+        } else if(selector == bytes4(keccak256('transferFromChildFor(address,address,uint256,string,bytes)'))) {
+            (address p1, address p2, uint256 p3, string memory p4) = abi.decode(data, (address, address, uint256, string));
+            return abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
+        } else if(selector == bytes4(keccak256('safeTransferFromChildFor(address,address,uint256,string,bytes)'))) {
+            (address p1, address p2, uint256 p3, string memory p4) = abi.decode(data, (address, address, uint256, string));
+            return abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
+        } else if(selector == bytes4(keccak256('safeTransferFromChildFor(address,address,uint256,string,bytes,bytes)'))) {
+            (address p1, address p2, uint256 p3, string memory p4, bytes memory p5) = abi.decode(data, (address, address, uint256, string, bytes));
+            return abi.encodeWithSelector(selector, p1, p2, p3, p4, p5, signature);
+        } else if(selector == bytes4(keccak256('burnChildFor(uint256,string,bytes)'))) {
+            (uint256 p1, string memory p2) = abi.decode(data, (uint256, string));
+            return abi.encodeWithSelector(selector, p1, p2, signature);
+        } else if(selector == bytes4(keccak256('resolveToFor(address,uint256,bytes)'))) {
+            (address p1, uint256 p2) = abi.decode(data, (address, uint256));
+            return abi.encodeWithSelector(selector, p1, p2, signature);
+        }
+        return '';
     }
 }

@@ -21,6 +21,13 @@ describe('BaseRoutingForwarder', () => {
     return { req: { from: from.address, nonce, tokenId, data }, signature };
   };
 
+  const buildExecuteRoutingParams = async (selector, params, from, tokenId) => {
+    const data = forwarder.interface.encodeFunctionData(selector, params);
+    const nonce = await forwarder.nonceOf(tokenId);
+    const signature = await sign(data, forwarder.address, nonce, from);
+    return { req: { from: from.address, nonce, tokenId, data }, signature };
+  };
+
   const buildTransfer = async (from, toAddress, tokenId) => {
     return await buildExecuteParams(
       'transferFrom(address,address,uint256)',
@@ -59,7 +66,55 @@ describe('BaseRoutingForwarder', () => {
     );
 
     const calldata = await forwarder.callStatic.buildRouteData(req, signature);
-    expect(`${calldata}00000000000000000000000000000000000000000000000000000000000000`).to.be.equal(expectedData);
+    expect(calldata).to.be.equal(expectedData);
+  });
+
+  it('should build valid `putString(string)` route calldata', async () => {
+    const tokenId = await registry.childIdOf(TLD.CRYPTO, 'test_foob_3');
+    const { req, signature } = await buildExecuteRoutingParams(
+      'putString(string)',
+      ['vv'],
+      owner,
+      tokenId,
+    );
+
+    const expectedData = forwarder.interface.encodeFunctionData('putStringFor(string,bytes)', ['vv', signature]);
+
+    const calldata = await forwarder.callStatic.buildRouteData(req, signature);
+    expect(calldata).to.be.equal(expectedData);
+  });
+
+  it('should build valid `putUint(uint)` route calldata', async () => {
+    const tokenId = await registry.childIdOf(TLD.CRYPTO, 'test_foob_4');
+    const { req, signature } = await buildExecuteRoutingParams(
+      'putUint(uint256)',
+      [1],
+      owner,
+      tokenId,
+    );
+
+    const expectedData = forwarder.interface.encodeFunctionData('putUintFor(uint256,bytes)', [1, signature]);
+
+    const calldata = await forwarder.callStatic.buildRouteData(req, signature);
+    expect(calldata).to.be.equal(expectedData);
+  });
+
+  it('should build valid `putUintArr(uint256[])` route calldata', async () => {
+    const tokenId = await registry.childIdOf(TLD.CRYPTO, 'test_foob_5');
+    const { req, signature } = await buildExecuteRoutingParams(
+      'putUintArr(uint256[])',
+      [[1, 2]],
+      owner,
+      tokenId,
+    );
+
+    const expectedData = forwarder.interface.encodeFunctionData(
+      'putUintArrFor(uint256[],bytes)',
+      [[1, 2], signature],
+    );
+
+    const calldata = await forwarder.callStatic.buildRouteData(req, signature);
+    expect(calldata).to.be.equal(expectedData);
   });
 
   it('should revert when unknown function call', async () => {
