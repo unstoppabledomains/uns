@@ -421,6 +421,16 @@
       "validationRegex": "^NQ[0-9]{2} ([A-Z0-9]{4} ){7}[A-Z0-9]{4}$",
       "deprecated": false
     },
+    "crypto.ELA.version.ELA.address": {
+      "deprecatedKeyName": "ELA_ELA",
+      "validationRegex": "E[a-zA-HJ-NP-Z0-9]{33}",
+      "deprecated": false
+    },
+    "crypto.ELA.version.ESC.address": {
+      "deprecatedKeyName": "ELA_ESC",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
     "crypto.ELA.version.HRC20.address": {
       "deprecatedKeyName": "ELA_HRC20",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
@@ -429,11 +439,6 @@
     "crypto.ELA.version.ERC20.address": {
       "deprecatedKeyName": "ELA_ERC20",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
-      "deprecated": false
-    },
-    "crypto.ELA.version.ELA.address": {
-      "deprecatedKeyName": "ELA_ELA",
-      "validationRegex": "E[a-zA-HJ-NP-Z0-9]{33}",
       "deprecated": false
     },
     "crypto.USDT.version.ERC20.address": {
