@@ -37,16 +37,6 @@ describe('ResolverForwarder', () => {
     buildExecuteParams = buildExecuteFunc(resolver.interface, resolver.address, forwarder);
   });
 
-  it('should verify & execute correctly', async () => {
-    const tokenId = await mintDomain('test_foo', owner.address);
-    const { req, signature } = await buildExecuteParams(
-      'reset(uint256)', [tokenId], owner, tokenId);
-
-    expect(await forwarder.verify(req, signature)).to.be.equal(true);
-
-    await forwarder.execute(req, signature);
-  });
-
   describe('nonceOf', () => {
     it('should match nonces', async () => {
       const tokenId = await mintDomain('test_foon', owner.address);
@@ -99,6 +89,61 @@ describe('ResolverForwarder', () => {
       await forwarder.execute(req, signature);
 
       expect(await forwarder.verify(req, signature)).to.be.equal(false);
+    });
+  });
+
+  describe('execute', () => {
+    it('should execute `reset` records', async () => {
+      const tokenId = await mintDomain('test_foo__1', owner.address);
+      await resolver.set('k', 'v', tokenId);
+      expect(await resolver.get('k', tokenId)).to.be.equal('v');
+
+      const { req, signature } = await buildExecuteParams(
+        'reset(uint256)', [tokenId], owner, tokenId);
+      expect(await forwarder.verify(req, signature)).to.be.equal(true);
+
+      await forwarder.execute(req, signature);
+
+      expect(await resolver.get('k', tokenId)).to.be.equal('');
+    });
+
+    it('should execute `set` records', async () => {
+      const tokenId = await mintDomain('test_foo__2', owner.address);
+
+      const { req, signature } = await buildExecuteParams(
+        'set(string,string,uint256)', ['k', 'v', tokenId], owner, tokenId);
+      expect(await forwarder.verify(req, signature)).to.be.equal(true);
+
+      await forwarder.execute(req, signature);
+
+      expect(await resolver.get('k', tokenId)).to.be.equal('v');
+    });
+
+    it('should execute `setMany` records', async () => {
+      const tokenId = await mintDomain('test_foo__3', owner.address);
+
+      const { req, signature } = await buildExecuteParams(
+        'setMany(string[],string[],uint256)', [['k1', 'k2'], ['v1', 'v2'], tokenId], owner, tokenId);
+      expect(await forwarder.verify(req, signature)).to.be.equal(true);
+
+      await forwarder.execute(req, signature);
+
+      expect(await resolver.get('k1', tokenId)).to.be.equal('v1');
+    });
+
+    it('should execute `reconfigure` records', async () => {
+      const tokenId = await mintDomain('test_foo__4', owner.address);
+      await resolver.set('k1', 'v1', tokenId);
+      expect(await resolver.get('k1', tokenId)).to.be.equal('v1');
+
+      const { req, signature } = await buildExecuteParams(
+        'reconfigure(string[],string[],uint256)', [['k2'], ['v2'], tokenId], owner, tokenId);
+      expect(await forwarder.verify(req, signature)).to.be.equal(true);
+
+      await forwarder.execute(req, signature);
+
+      expect(await resolver.get('k1', tokenId)).to.be.equal('');
+      expect(await resolver.get('k2', tokenId)).to.be.equal('v2');
     });
   });
 });
