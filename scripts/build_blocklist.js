@@ -29,7 +29,7 @@ async function main () {
   const cnsRegistry = await CNSRegistryArtifact.attach(CNSRegistry.address);
   const eventsCNS = await fetchEvents(cnsRegistry, parseInt(CNSRegistry.deploymentBlock, 16));
 
-  const tokens = eventsUNS.concat(eventsCNS).map(t => t.args.tokenId.toString());
+  const tokens = eventsUNS.concat(eventsCNS).map(t => t.args.tokenId.toHexString());
   await save(network.config.chainId, { tokens: [...new Set(tokens)] });
 
   console.log('Blocklist complete!');
