@@ -491,6 +491,11 @@
       "validationRegex": "^[0-9a-zA-Z]+\\$[0-9a-zA-Z]+\\.[0-9a-zA-Z]+$",
       "deprecated": false
     },
+    "social.picture.value": {
+      "deprecatedKeyName": "picture",
+      "validationRegex": null,
+      "deprecated": false
+    },
     "whois.email.value": {
       "deprecatedKeyName": "email",
       "validationRegex": "^[^@]+@[^\\.]+\\..+$",
