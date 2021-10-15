@@ -4,8 +4,6 @@ const fs = require('fs');
 
 const UNSNetworkConfig = require('./../uns-config.json');
 
-const { BigNumber } = ethers;
-
 async function main () {
   console.log('Network:', network.name);
 
@@ -26,30 +24,34 @@ async function main () {
   }
 
   const unsRegistry = await UNSRegistryArtifact.attach(UNSRegistry.address);
-  const eventsUNS = await fetchEvents(unsRegistry, UNSRegistry.deploymentBlock);
+  const eventsUNS = await fetchEvents(unsRegistry, parseInt(UNSRegistry.deploymentBlock, 16));
 
   const cnsRegistry = await CNSRegistryArtifact.attach(CNSRegistry.address);
-  const eventsCNS = await fetchEvents(cnsRegistry, CNSRegistry.deploymentBlock);
+  const eventsCNS = await fetchEvents(cnsRegistry, parseInt(CNSRegistry.deploymentBlock, 16));
 
-  await save(network.config.chainId, eventsUNS.concat(eventsCNS).map(t => t.args.tokenId.toString()));
+  const tokens = eventsUNS.concat(eventsCNS).map(t => {
+    return '0x' + t.args.tokenId.toHexString()
+      .replace(/^(0x)?/, '')
+      .padStart(64, '0');
+  });
+  await save(network.config.chainId, { tokens: [...new Set(tokens)] });
 
   console.log('Blocklist complete!');
 }
 
 async function fetchEvents (contract, fromBlock, toBlock, limit = 10000) {
   if (!toBlock) {
-    toBlock = BigNumber.from(await contract.provider.getBlockNumber());
+    toBlock = await contract.provider.getBlockNumber();
   }
 
-  const maxBlock = BigNumber.from(fromBlock).add(limit);
-  const isTail = BigNumber.from(toBlock).gt(maxBlock);
-  const _toBlock = isTail ? maxBlock : toBlock;
+  const maxBlock = fromBlock + limit;
+  const _toBlock = Math.min(maxBlock, toBlock);
 
-  console.log(`Fetching events blocks[${fromBlock}-${_toBlock}]`);
+  console.log(`Fetching events blocks [${contract.address}: ${fromBlock}-${_toBlock}]`);
   const transferFilter = contract.filters.Transfer('0x0000000000000000000000000000000000000000');
   try {
-    const events = await contract.queryFilter(transferFilter, Number(fromBlock), Number(_toBlock));
-    return isTail ? events.concat(await fetchEvents(contract, _toBlock.add(1))) : events;
+    const events = await contract.queryFilter(transferFilter, fromBlock, _toBlock);
+    return toBlock > maxBlock ? events.concat(await fetchEvents(contract, _toBlock)) : events;
   } catch (err) {
     console.log('FAIL', err);
 
@@ -62,9 +64,9 @@ async function fetchEvents (contract, fromBlock, toBlock, limit = 10000) {
   }
 }
 
-async function save (chainId, list) {
+async function save (chainId, state) {
   const _path = path.resolve('./.deployer', `${chainId}.blocklist.json`);
-  fs.writeFileSync(_path, JSON.stringify(list, null, 2));
+  fs.writeFileSync(_path, JSON.stringify(state, null, 2));
 }
 
 main()
