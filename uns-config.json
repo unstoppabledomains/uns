@@ -14,7 +14,7 @@
                     "address": "0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x8a958b",
-                    "forwarder": "0x802E1D2d48dA1d36ff2c8E2e376D39b8D1DCA549"
+                    "forwarder": "0x97B0E89fC1B7eD4A8B237D9d8Fcce9b234f25A37"
                 },
                 "MintingManager": {
                     "address": "0x2a7084870bB724175a3C96Da8FaA55128fa3E19D",
@@ -64,7 +64,7 @@
                         "0x878bc2f3f717766ab69c0a5f9a6144931e61aed3"
                     ],
                     "deploymentBlock": "0x960844",
-                    "forwarder": "0xa88541075B3E29C602C3334F8CA8C943F6BD35c1"
+                    "forwarder": "0x92660E5F403679aB45e0C6DB7c35B5629d265fDd"
                 },
                 "ProxyReader": {
                     "address": "0xc3C2BAB5e3e52DBF311b2aAcEf2e40344f19494E",
