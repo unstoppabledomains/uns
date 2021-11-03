@@ -1,3 +1,4 @@
+const fs = require('fs');
 const tar = require('tar');
 
 const Sandbox = require('.');
@@ -16,11 +17,12 @@ if (require.main === module) {
       const { db_path: dbPath, snapshotPath } = sandbox.options.network;
       await tar.create(
         {
+          cwd: dbPath,
           gzip: true,
           file: snapshotPath,
           filter: p => p.indexOf('_tmp') === -1,
         },
-        [dbPath],
+        fs.readdirSync(dbPath),
       );
     } catch (error) {
       console.error(error);
