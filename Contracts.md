@@ -1,7 +1,7 @@
 
 # Deployed Contracts
 
-<table class="table table-bordered">
+<table>
 <tr><td colspan="100%"><h2>UNSRegistry</h2></td></tr>
 <tr><th>network</th><th>address</th><th>forwarder</th></tr>
 <tr><td>1</td><td><a href="https://etherscan.io/address/0x049aba7510f45BA5b64ea9E658E342F904DB358D">0x049aba7510f45BA5b64ea9E658E342F904DB358D</a></td><td><a href="https://etherscan.io/address/0x049aba7510f45BA5b64ea9E658E342F904DB358D">0x049aba7510f45BA5b64ea9E658E342F904DB358D</a></td></tr>
