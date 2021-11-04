@@ -421,6 +421,16 @@
       "validationRegex": "^NQ[0-9]{2} ([A-Z0-9]{4} ){7}[A-Z0-9]{4}$",
       "deprecated": false
     },
+    "crypto.ELA.version.ELA.address": {
+      "deprecatedKeyName": "ELA_ELA",
+      "validationRegex": "E[a-zA-HJ-NP-Z0-9]{33}",
+      "deprecated": false
+    },
+    "crypto.ELA.version.ESC.address": {
+      "deprecatedKeyName": "ELA_ESC",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
     "crypto.ELA.version.HRC20.address": {
       "deprecatedKeyName": "ELA_HRC20",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
@@ -429,11 +439,6 @@
     "crypto.ELA.version.ERC20.address": {
       "deprecatedKeyName": "ELA_ERC20",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
-      "deprecated": false
-    },
-    "crypto.ELA.version.ELA.address": {
-      "deprecatedKeyName": "ELA_ELA",
-      "validationRegex": "E[a-zA-HJ-NP-Z0-9]{33}",
       "deprecated": false
     },
     "crypto.USDT.version.ERC20.address": {
@@ -481,9 +486,29 @@
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     },
+    "crypto.MATIC.version.MATIC.address": {
+      "deprecatedKeyName": "MATIC_MATIC",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.MATIC.version.BEP20.address": {
+      "deprecatedKeyName": "MATIC_BEP20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.MATIC.version.ERC20.address": {
+      "deprecatedKeyName": "MATIC_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
     "social.payid.name": {
       "deprecatedKeyName": "payid",
       "validationRegex": "^[0-9a-zA-Z]+\\$[0-9a-zA-Z]+\\.[0-9a-zA-Z]+$",
+      "deprecated": false
+    },
+    "social.picture.value": {
+      "deprecatedKeyName": "picture",
+      "validationRegex": null,
       "deprecated": false
     },
     "whois.email.value": {

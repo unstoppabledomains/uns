@@ -55,8 +55,8 @@ class Sandbox {
     }
 
     if (options.extract) {
-      await tar.extract({ file: snapshotPath });
-      log(`Prepared sandbox database. Source: ${snapshotPath}`);
+      await tar.extract({ cwd: dbPath, file: snapshotPath });
+      log(`Prepared sandbox database. [Source: ${snapshotPath}, TargetDir: ${dbPath}]`);
     }
 
     const service = new GanacheService(networkOptions);
