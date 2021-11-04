@@ -486,6 +486,21 @@
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     },
+    "crypto.MATIC.version.MATIC.address": {
+      "deprecatedKeyName": "MATIC_MATIC",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.MATIC.version.BEP20.address": {
+      "deprecatedKeyName": "MATIC_BEP20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.MATIC.version.ERC20.address": {
+      "deprecatedKeyName": "MATIC_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
     "social.payid.name": {
       "deprecatedKeyName": "payid",
       "validationRegex": "^[0-9a-zA-Z]+\\$[0-9a-zA-Z]+\\.[0-9a-zA-Z]+$",
