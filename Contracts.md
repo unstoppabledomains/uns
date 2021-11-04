@@ -2,10 +2,9 @@
 # Deployed Contracts
 
 <table class="table table-bordered">
-
-      <tr><td colspan="100%"><h2>UNSRegistry</h2></td></tr>
-      <tr><th>network</th><th>address</th><th>forwarder</th></tr>
-      <tr><td>1</td><td><a href="https://etherscan.io/address/0x049aba7510f45BA5b64ea9E658E342F904DB358D">0x049aba7510f45BA5b64ea9E658E342F904DB358D</a></td><td><a href="https://etherscan.io/address/0x049aba7510f45BA5b64ea9E658E342F904DB358D">0x049aba7510f45BA5b64ea9E658E342F904DB358D</a></td></tr>
+<tr><td colspan="100%"><h2>UNSRegistry</h2></td></tr>
+<tr><th>network</th><th>address</th><th>forwarder</th></tr>
+<tr><td>1</td><td><a href="https://etherscan.io/address/0x049aba7510f45BA5b64ea9E658E342F904DB358D">0x049aba7510f45BA5b64ea9E658E342F904DB358D</a></td><td><a href="https://etherscan.io/address/0x049aba7510f45BA5b64ea9E658E342F904DB358D">0x049aba7510f45BA5b64ea9E658E342F904DB358D</a></td></tr>
 
 <tr><td>4</td><td><a href="https://rinkeby.etherscan.io/address/0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086">0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086</a></td><td><a href="https://rinkeby.etherscan.io/address/0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086">0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086</a></td></tr>
 
@@ -15,8 +14,8 @@
 
   
 
-      <tr><td colspan="100%"><h2>CNSRegistry</h2></td></tr>
-      <tr><th>network</th><th>address</th><th>forwarder</th></tr>
+<tr><td colspan="100%"><h2>CNSRegistry</h2></td></tr>
+<tr><th>network</th><th>address</th><th>forwarder</th></tr>
       <tr><td>1</td><td><a href="https://etherscan.io/address/0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe">0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe</a></td><td><a href="https://etherscan.io/address/0x802E1D2d48dA1d36ff2c8E2e376D39b8D1DCA549">0x802E1D2d48dA1d36ff2c8E2e376D39b8D1DCA549</a></td></tr>
 
 <tr><td>4</td><td><a href="https://rinkeby.etherscan.io/address/0xAad76bea7CFEc82927239415BB18D2e93518ecBB">0xAad76bea7CFEc82927239415BB18D2e93518ecBB</a></td><td><a href="https://rinkeby.etherscan.io/address/0x4c46Fb148F2165517E71d6EB5C99c2021e67f068">0x4c46Fb148F2165517E71d6EB5C99c2021e67f068</a></td></tr>
