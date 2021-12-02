@@ -8,7 +8,7 @@ const { utils, BigNumber } = ethers;
 describe('UNSRegistry (proxy)', () => {
   const cryptoRoot = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
 
-  let UNSRegistryV01, UNSRegistryV02, unsRegistry;
+  let UNSRegistry, unsRegistry;
   let signers, owner, receiver, spender;
 
   const mintDomain = async (label, owner) => {
@@ -17,14 +17,20 @@ describe('UNSRegistry (proxy)', () => {
     return tokenId;
   };
 
+  const buildExecuteParams = async (selector, params, from, tokenId) => {
+    const data = unsRegistry.interface.encodeFunctionData(selector, params);
+    const nonce = await unsRegistry.nonceOf(tokenId);
+    const signature = await sign(data, unsRegistry.address, nonce, from);
+    return { req: { from: from.address, nonce, tokenId, data }, signature };
+  };
+
   beforeEach(async () => {
     signers = await ethers.getSigners();
     [owner, receiver, spender] = signers;
 
-    UNSRegistryV01 = await ethers.getContractFactory('UNSRegistryV01');
-    UNSRegistryV02 = await ethers.getContractFactory('UNSRegistry');
+    UNSRegistry = await ethers.getContractFactory('UNSRegistry');
 
-    unsRegistry = await upgrades.deployProxy(UNSRegistryV01, [owner.address], { initializer: 'initialize' });
+    unsRegistry = await upgrades.deployProxy(UNSRegistry, [owner.address], { initializer: 'initialize' });
     await unsRegistry.mint('0xdead000000000000000000000000000000000000', cryptoRoot, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
   });
@@ -195,27 +201,6 @@ describe('UNSRegistry (proxy)', () => {
         unsRegistry.connect(signers[1]).reconfigure(['new-key'], ['new-value'], tok),
       ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     });
-  });
-
-  describe('UNSRegistry V01 -> V02', () => {
-    const buildExecuteParams = async (selector, params, from, tokenId) => {
-      const data = unsRegistry.interface.encodeFunctionData(selector, params);
-      const nonce = await unsRegistry.nonceOf(tokenId);
-      const signature = await sign(data, unsRegistry.address, nonce, from);
-      return { req: { from: from.address, nonce, tokenId, data }, signature };
-    };
-
-    it('should keep main storage layout consistent after upgrade', async () => {
-      const tokenId = await mintDomain('up_state_domain_1', owner.address);
-      await unsRegistry.set('old-key', 'old-value', tokenId);
-      expect(await unsRegistry.get('old-key', tokenId)).to.be.equal('old-value');
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
-
-      unsRegistry = await upgrades.upgradeProxy(unsRegistry.address, UNSRegistryV02);
-
-      expect(await unsRegistry.get('old-key', tokenId)).to.be.equal('old-value');
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
-    });
 
     it('should keep forwarding storage layout consistent after upgrade', async () => {
       const tokenId = await mintDomain('up_state_domain_2', owner.address);
@@ -228,21 +213,18 @@ describe('UNSRegistry (proxy)', () => {
 
       await unsRegistry.connect(spender)
         .transferFromFor(owner.address, receiver.address, tokenId, params1.signature);
-      // Due to double increment in UNSRegistryV01 nonce equals 2
-      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(2);
+      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(1);
 
-      unsRegistry = await upgrades.upgradeProxy(unsRegistry.address, UNSRegistryV02);
+      unsRegistry = await upgrades.upgradeProxy(unsRegistry.address, UNSRegistry);
+      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(1);
 
-      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(2);
-
-      // Token meta-transfer back to owner on UNSRegistryV02
       const params2 = await buildExecuteParams(
         'transferFrom(address,address,uint256)',
         [receiver.address, owner.address, tokenId],
         receiver, tokenId,
       );
       await unsRegistry.execute(params2.req, params2.signature);
-      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(3);
+      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(2);
     });
   });
 });
