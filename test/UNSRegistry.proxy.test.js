@@ -216,10 +216,8 @@ describe('UNSRegistry (proxy)', () => {
       expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(1);
 
       unsRegistry = await upgrades.upgradeProxy(unsRegistry.address, UNSRegistry);
-
       expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(1);
 
-      // Token meta-transfer back to owner on UNSRegistryV02
       const params2 = await buildExecuteParams(
         'transferFrom(address,address,uint256)',
         [receiver.address, owner.address, tokenId],
