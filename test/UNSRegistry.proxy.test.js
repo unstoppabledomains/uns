@@ -1,13 +1,15 @@
 const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
 
+const { sign } = require('./helpers/metatx');
+
 const { utils, BigNumber } = ethers;
 
 describe('UNSRegistry (proxy)', () => {
   const cryptoRoot = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
 
   let UNSRegistry, unsRegistry;
-  let signers, owner, receiver;
+  let signers, owner, receiver, spender;
 
   const mintDomain = async (label, owner) => {
     const tokenId = await unsRegistry.childIdOf(cryptoRoot, label);
@@ -15,9 +17,16 @@ describe('UNSRegistry (proxy)', () => {
     return tokenId;
   };
 
+  const buildExecuteParams = async (selector, params, from, tokenId) => {
+    const data = unsRegistry.interface.encodeFunctionData(selector, params);
+    const nonce = await unsRegistry.nonceOf(tokenId);
+    const signature = await sign(data, unsRegistry.address, nonce, from);
+    return { req: { from: from.address, nonce, tokenId, data }, signature };
+  };
+
   beforeEach(async () => {
     signers = await ethers.getSigners();
-    [owner, receiver] = signers;
+    [owner, receiver, spender] = signers;
 
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
 
@@ -191,6 +200,33 @@ describe('UNSRegistry (proxy)', () => {
       await expect(
         unsRegistry.connect(signers[1]).reconfigure(['new-key'], ['new-value'], tok),
       ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    });
+
+    it('should keep forwarding storage layout consistent after upgrade', async () => {
+      const tokenId = await mintDomain('up_state_domain_2', owner.address);
+      const params1 = await buildExecuteParams(
+        'transferFrom(address,address,uint256)',
+        [owner.address, receiver.address, tokenId],
+        owner, tokenId,
+      );
+      expect(params1.req.nonce).to.be.equal(0);
+
+      await unsRegistry.connect(spender)
+        .transferFromFor(owner.address, receiver.address, tokenId, params1.signature);
+      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(1);
+
+      unsRegistry = await upgrades.upgradeProxy(unsRegistry.address, UNSRegistry);
+
+      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(1);
+
+      // Token meta-transfer back to owner on UNSRegistryV02
+      const params2 = await buildExecuteParams(
+        'transferFrom(address,address,uint256)',
+        [receiver.address, owner.address, tokenId],
+        receiver, tokenId,
+      );
+      await unsRegistry.execute(params2.req, params2.signature);
+      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(2);
     });
   });
 });
