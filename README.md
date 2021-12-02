@@ -49,7 +49,6 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
     ```solidity
     struct ForwardRequest {
         address from;
-        uint256 gas;
         uint256 tokenId;
         uint256 nonce;
         bytes data;
@@ -112,7 +111,7 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
     }
     ```
 
-9. Domin minting
+9. Domain minting
 
     **Unstoppable Domains, Inc.** reserves all rights of domains minting and defines rules of domain minting through MintingManager contract.
 
@@ -129,14 +128,20 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
 
 ## Environment variables
 
-- `RINKEBY_INFURA_KEY` - Infura key for connecting to Ethereum Node
-- `RINKEBY_UNS_PRIVATE_KEY` - Private key of account for contracts deployment
-- `ETHERSCAN_API_KEY` - Etherscan API Key for smart contracts verification
+- `{NETWORK}_INFURA_KEY` - Infura key for connecting to Ethereum Node
+- `{NETWORK}_UNS_PRIVATE_KEY` - Private key of account for contracts deployment
+- `{EXPLORER}_API_KEY` - Etherscan(or any whitelabled compatible explorer) API Key for smart contracts verification
 
 NOTE: All private keys should be in HEX format with `0x` prefix
 
+Network | Variables
+--- | ---
+Mainnet | MAINNET_INFURA_KEY <br /> MAINNET_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
+Rinkeby | RINKEBY_INFURA_KEY <br /> RINKEBY_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
+Polygon | POLYGON_INFURA_KEY <br /> POLYGON_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY*
+Mumbai | MUMBAI_INFURA_KEY <br /> MUMBAI_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY*
 
-Variables [`RINKEBY_INFURA_KEY`, `RINKEBY_UNS_PRIVATE_KEY`] are required for operating with Rinkeby network, including deployment and making smart contract calls.
+NOTE: take a look usage of POLYGONSCAN_API_KEY in section **Deploying UNS on L2(Polygon/Mumbai)**
 
 <div id="backward-incompatibility"></div>
 
@@ -268,23 +273,7 @@ yarn hardhat run --network <network> scripts/deploy.js
 
 Warning: In case of contracts' redeployment, make sure there is no deployment output file `.deployer/{chain_id}.json`
 
-### Deploying UNS(Mumbai)
+### Deploying UNS on L2(Polygon/Mumbai)
 ```
 env ETHERSCAN_API_KEY=$POLYGONSCAN_API_KEY yarn hardhat run --network mumbai scripts/deploy_UNS_only.js
 ```
-
-## Migrations
-
-### 1. Universal forwarder (rinkeby)
-1. `yarn hardhat run --network rinkeby scripts/deploy_CNS_Forwarders.js`
-2. `yarn hardhat run --network rinkeby scripts/upgrade_MintingManager.js`
-3. `yarn hardhat run --network rinkeby scripts/deploy_MintingManagerForwarder.js`
-4. `yarn hardhat run --network rinkeby scripts/upgrade_UNSRegistry.js`
-5. Undate config
-
-### 2. L2 related upgrades
-1. Upgrade MintingManager
-  - explicitly bisable blocklist (Rinkeby, Mainnet)
-2. Deploy ProxyReader
-3. Update config
-4. Add minting support .crypto in UNS `mintingManager.addTld('crypto')` (if needed)
