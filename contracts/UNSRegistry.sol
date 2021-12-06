@@ -4,11 +4,14 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
 import './IUNSRegistry.sol';
 import './RecordStorage.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
+import './@maticnetwork/IRootChainManager.sol';
+import './@maticnetwork/RootChainManagerStorage.sol';
 
 /**
  * @title UNSRegistry v0.2
@@ -261,6 +264,24 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    // TODO: guard the function by owner check
+    // This is the keccak-256 hash of "uns.polygon.root_chain_manager" subtracted by 1
+    bytes32 internal constant _ROOT_CHAIN_MANAGER_SLOT = 0xbe2bb46ac0377341a1ec5c3116d70fd5029d704bd46292e58f6265dd177ebafe;
+    function setRootChainManager(address rootChainManager) public {
+        StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value = rootChainManager;
+    }
+
+    function depositToPolygon(uint256 tokenId) public onlyApprovedOrOwner(tokenId) {
+        address manager = StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value;
+        bytes32 tokenType = RootChainManagerStorage(manager).tokenToType(address(this));
+        address predicate = RootChainManagerStorage(manager).typeToPredicate(tokenType);
+
+        // NOTE: Workaround for predicator
+        _transfer(_msgSender(), address(this), tokenId);
+        _approve(predicate, tokenId);
+        IRootChainManager(manager).depositFor(_msgSender(), address(this), abi.encode(tokenId));
     }
 
     /// Internal

@@ -2,7 +2,7 @@ const { ethers } = require('hardhat');
 const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
 
-const { ZERO_ADDRESS } = require('./helpers/constants');
+const { TLD, ZERO_ADDRESS } = require('./helpers/constants');
 
 const { utils, BigNumber } = ethers;
 
@@ -10,6 +10,12 @@ describe('UNSRegistry', () => {
   let UNSRegistry, ERC721ReceiverMock;
   let unsRegistry, root;
   let signers, coinbase, owner, receiver, accounts;
+
+  const mintDomain = async (label, owner) => {
+    const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, label);
+    await unsRegistry.mint(owner, tokenId, `${label}.crypto`);
+    return tokenId;
+  };
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -33,9 +39,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should resolve properly', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'resolution');
-
-      await unsRegistry.mint(coinbase.address, tok, 'resolution');
+      const tok = await mintDomain('resolution', coinbase.address);
       expect(await unsRegistry.resolverOf(tok)).to.be.equal(unsRegistry.address);
 
       await unsRegistry.burn(tok);
@@ -56,8 +60,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should emit Transfer event on set owner', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'tok_aq_sj');
-      await unsRegistry.mint(coinbase.address, tok, 'tok_aq_sj');
+      const tok = await mintDomain('tok_aq_sj', coinbase.address);
       await unsRegistry.set('key_82', 'value_23', tok);
       expect(await unsRegistry.get('key_82', tok)).to.be.equal('value_23');
 
@@ -80,8 +83,7 @@ describe('UNSRegistry', () => {
 
     describe('exists', () => {
       it('should return true when token exists', async () => {
-        const tok = await unsRegistry.childIdOf(root, 'token_exists_11ew3');
-        await unsRegistry.mint(coinbase.address, tok, 'token_exists_11ew3');
+        const tok = await mintDomain('token_exists_11ew3', coinbase.address);
         expect(await unsRegistry.exists(tok)).to.be.equal(true);
       });
 
@@ -117,9 +119,7 @@ describe('UNSRegistry', () => {
 
   describe('Registry (minting)', () => {
     it('should mint domains', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'label_22');
-      await unsRegistry.mint(coinbase.address, tok, 'label_22');
-
+      const tok = await mintDomain('label_22', coinbase.address);
       expect(await unsRegistry.ownerOf(tok)).to.be.equal(coinbase.address);
 
       // should fail to mint existing token
@@ -235,12 +235,6 @@ describe('UNSRegistry', () => {
   });
 
   describe('UNS Registry (records management)', () => {
-    const initializeDomain = async (name) => {
-      const tok = await unsRegistry.childIdOf(root, name);
-      await unsRegistry.mint(coinbase.address, tok, name);
-      return tok;
-    };
-
     const initializeKey = async (key) => {
       const keyHash = BigNumber.from(utils.id(key));
       await unsRegistry.addKey(key);
@@ -279,7 +273,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should get key by hash', async () => {
-      const tok = await initializeDomain('heyhash');
+      const tok = await mintDomain('heyhash', coinbase.address);
       const expectedKey = 'new-hashed-key';
       await unsRegistry.set(expectedKey, 'value', tok);
 
@@ -288,7 +282,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should get many keys by hashes', async () => {
-      const tok = await initializeDomain('heyhash-many');
+      const tok = await mintDomain('heyhash-many', coinbase.address);
       const expectedKeys = ['keyhash-many-1', 'keyhash-many-2'];
       await unsRegistry.setMany(expectedKeys, ['value', 'value'], tok);
 
@@ -298,7 +292,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should not consume additional gas if key hash was set before', async () => {
-      const tok = await initializeDomain('heyhash-gas');
+      const tok = await mintDomain('heyhash-gas', coinbase.address);
       let newKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tok);
       newKeyHashTx.receipt = await newKeyHashTx.wait();
       let exitsKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tok);
@@ -321,7 +315,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should get value by key hash', async () => {
-      const tok = await initializeDomain('get-key-by-hash');
+      const tok = await mintDomain('get-key-by-hash', coinbase.address);
       const key = 'get-key-by-hash-key';
       const expectedValue = 'get-key-by-hash-value';
       await unsRegistry.set(key, expectedValue, tok);
@@ -332,7 +326,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should get multiple values by hashes', async () => {
-      const tok = await initializeDomain('get-many-keys-by-hash');
+      const tok = await mintDomain('get-many-keys-by-hash', coinbase.address);
       const keys = ['key-to-hash-1', 'key-to-hash-2'];
       const expectedValues = ['value-42', 'value-43'];
       await unsRegistry.setMany(keys, expectedValues, tok);
@@ -343,7 +337,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should emit NewKey event new keys added', async () => {
-      const tok = await initializeDomain('new-key');
+      const tok = await mintDomain('new-key', coinbase.address);
       const key = 'new-key';
       const value = 'value';
 
@@ -356,7 +350,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should emit correct Set event', async () => {
-      const tok = await initializeDomain('check-set-event');
+      const tok = await mintDomain('check-set-event', coinbase.address);
       const key = 'new-key';
       const value = 'value';
 
@@ -372,7 +366,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should reconfigure resolver with new values', async () => {
-      const tok = await initializeDomain('reconfigure');
+      const tok = await mintDomain('reconfigure', coinbase.address);
       await unsRegistry.set('old-key', 'old-value', tok);
       await unsRegistry.reconfigure(['new-key'], ['new-value'], tok);
 
@@ -386,7 +380,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should set record by hash', async () => {
-      const tok = await initializeDomain('sk_2q1');
+      const tok = await mintDomain('sk_2q1', coinbase.address);
       const expectedKey = 'key_23c';
       const keyHash = await initializeKey(expectedKey);
 
@@ -397,7 +391,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should revert setting record by hash when key is not registered', async () => {
-      const tok = await initializeDomain('sk_2p3');
+      const tok = await mintDomain('sk_2p3', coinbase.address);
       const expectedKey = 'key_23f3c';
       const keyHash = BigNumber.from(utils.id(expectedKey));
 
@@ -407,7 +401,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should set records(1) by hash', async () => {
-      const tok = await initializeDomain('sk_q93');
+      const tok = await mintDomain('sk_q93', coinbase.address);
       const expectedKey = 'key_2w12c';
       const keyHash = await initializeKey(expectedKey);
 
@@ -417,7 +411,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should set records(2) by hash', async () => {
-      const tok = await initializeDomain('sk_8s6b1');
+      const tok = await mintDomain('sk_8s6b1', coinbase.address);
       const key1 = 'key_3m3c';
       const key2 = 'key_9v3f';
       const key1Hash = await initializeKey(key1);
@@ -430,7 +424,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should revert setting records by hash when at least one key is not registered', async () => {
-      const tok = await initializeDomain('sk_30q13');
+      const tok = await mintDomain('sk_30q13', coinbase.address);
       const key1 = 'key_2d83c';
       const key2 = 'key_4o83f';
       const key1Hash = await initializeKey(key1);
@@ -442,8 +436,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should reset records on transfer', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'tok_aa_23');
-      await unsRegistry.mint(coinbase.address, tok, 'tok_aa_23');
+      const tok = await mintDomain('tok_aa_23', coinbase.address);
       await unsRegistry.set('key_23', 'value_23', tok);
       expect(await unsRegistry.get('key_23', tok)).to.be.equal('value_23');
 
@@ -453,8 +446,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should reset records on safe transfer', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'tok_aw_23');
-      await unsRegistry.mint(coinbase.address, tok, 'tok_aw_23');
+      const tok = await mintDomain('tok_aw_23', coinbase.address);
       await unsRegistry.set('key_13', 'value_23', tok);
       expect(await unsRegistry.get('key_13', tok)).to.be.equal('value_23');
 
@@ -464,8 +456,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should reset records on safe transfer with data', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'tok_ae_23');
-      await unsRegistry.mint(coinbase.address, tok, 'tok_ae_23');
+      const tok = await mintDomain('tok_ae_23', coinbase.address);
       await unsRegistry.set('key_12', 'value_23', tok);
       expect(await unsRegistry.get('key_12', tok)).to.be.equal('value_23');
 
@@ -476,8 +467,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should reset records on burn', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'tok_hj_23');
-      await unsRegistry.mint(coinbase.address, tok, 'tok_hj_23');
+      const tok = await mintDomain('tok_hj_23', coinbase.address);
       await unsRegistry.set('key_31', 'value_23', tok);
       expect(await unsRegistry.get('key_31', tok)).to.be.equal('value_23');
 
@@ -490,8 +480,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should not reset records on set owner', async () => {
-      const tok = await unsRegistry.childIdOf(root, 'tok_aq_23');
-      await unsRegistry.mint(coinbase.address, tok, 'tok_aq_23');
+      const tok = await mintDomain('tok_aq_23', coinbase.address);
       await unsRegistry.set('key_16', 'value_23', tok);
       expect(await unsRegistry.get('key_16', tok)).to.be.equal('value_23');
 

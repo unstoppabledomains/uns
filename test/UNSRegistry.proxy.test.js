@@ -2,17 +2,16 @@ const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
 
 const { sign } = require('./helpers/metatx');
+const { TLD } = require('./helpers/constants');
 
 const { utils, BigNumber } = ethers;
 
 describe('UNSRegistry (proxy)', () => {
-  const cryptoRoot = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
-
   let UNSRegistry, unsRegistry;
   let signers, owner, receiver, spender;
 
   const mintDomain = async (label, owner) => {
-    const tokenId = await unsRegistry.childIdOf(cryptoRoot, label);
+    const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, label);
     await unsRegistry.mint(owner, tokenId, 'resolution');
     return tokenId;
   };
@@ -31,13 +30,13 @@ describe('UNSRegistry (proxy)', () => {
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
 
     unsRegistry = await upgrades.deployProxy(UNSRegistry, [owner.address], { initializer: 'initialize' });
-    await unsRegistry.mint('0xdead000000000000000000000000000000000000', cryptoRoot, 'crypto');
+    await unsRegistry.mint('0xdead000000000000000000000000000000000000', TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
   });
 
   describe('Registry', () => {
     it('should construct itself correctly', async () => {
-      expect(cryptoRoot).to.be.equal('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
+      expect(TLD.CRYPTO).to.be.equal('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
     });
 
     it('should resolve properly', async () => {
@@ -49,7 +48,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should set URI prefix', async () => {
-      const tok = cryptoRoot;
+      const tok = TLD.CRYPTO;
       expect(await unsRegistry.tokenURI(tok)).to.be.equal(`/${tok}`);
 
       await unsRegistry.setTokenURIPrefix('prefix-');
@@ -62,7 +61,7 @@ describe('UNSRegistry (proxy)', () => {
 
   describe('Resolver', () => {
     it('should resolve tokens', async () => {
-      const tok = await unsRegistry.childIdOf(cryptoRoot, 'label_931');
+      const tok = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_931');
 
       // should fail to set name if not owner
       await expect(

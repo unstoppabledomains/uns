@@ -1,10 +1,9 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "IERC165",
-  "sourceName": "@openzeppelin/contracts/introspection/IERC165.sol",
+  "sourceName": "contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol",
   "abi": [
     {
-      "constant": true,
       "inputs": [
         {
           "internalType": "bytes4",
@@ -20,7 +19,6 @@
           "type": "bool"
         }
       ],
-      "payable": false,
       "stateMutability": "view",
       "type": "function"
     }
