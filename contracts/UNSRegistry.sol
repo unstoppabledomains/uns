@@ -270,6 +270,10 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
     // This is the keccak-256 hash of "uns.polygon.root_chain_manager" subtracted by 1
     bytes32 internal constant _ROOT_CHAIN_MANAGER_SLOT = 0xbe2bb46ac0377341a1ec5c3116d70fd5029d704bd46292e58f6265dd177ebafe;
     function setRootChainManager(address rootChainManager) public {
+        require(
+            StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value == address(0),
+            'Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY'
+        );
         StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value = rootChainManager;
     }
 

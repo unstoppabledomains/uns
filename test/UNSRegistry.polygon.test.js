@@ -56,6 +56,12 @@ describe('UNSRegistry (polygon)', () => {
     await l1UnsRegistry.setRootChainManager(rootChainManager.address);
   });
 
+  it('should revert when set RootChainManager multiple times', async () => {
+    await expect(
+      l1UnsRegistry.setRootChainManager(rootChainManager.address),
+    ).to.be.revertedWith('Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY');
+  });
+
   describe('One-step deposit', () => {
     it('should deposit token through UNS registry', async () => {
       const tokenId = await mintDomainL1('poly-1d-as2', owner.address);
