@@ -19,6 +19,7 @@ const isValidAddress = (address?: string): address is string => {
 const BlockExplorerUrls = {
   1: "https://etherscan.io",
   4: "https://rinkeby.etherscan.io",
+  5: "https://goerli.etherscan.io",
   137: "http://polygonscan.com",
   // 1337: "http://localhost",
   80001: "https://mumbai.polygonscan.com",
