@@ -215,9 +215,9 @@
                     "deprecated": true
                 },
                 "WhitelistedMinter": {
-                    "address": "0x4Ba20362cB0994298AE18697bB196dF963CF595e",
+                    "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x5b57dd",
+                    "deploymentBlock": "0x0",
                     "deprecated": true
                 },
                 "URIPrefixController": {
