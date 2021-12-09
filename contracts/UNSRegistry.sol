@@ -269,7 +269,7 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
     // TODO: guard the function by owner check
     // This is the keccak-256 hash of "uns.polygon.root_chain_manager" subtracted by 1
     bytes32 internal constant _ROOT_CHAIN_MANAGER_SLOT = 0xbe2bb46ac0377341a1ec5c3116d70fd5029d704bd46292e58f6265dd177ebafe;
-    function setRootChainManager(address rootChainManager) public {
+    function setRootChainManager(address rootChainManager) external {
         require(
             StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value == address(0),
             'Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY'
@@ -277,17 +277,21 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
         StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value = rootChainManager;
     }
 
-    function depositToPolygon(uint256 tokenId) public onlyApprovedOrOwner(tokenId) {
-        address manager = StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value;
-        bytes32 tokenType = RootChainManagerStorage(manager).tokenToType(address(this));
-        address predicate = RootChainManagerStorage(manager).typeToPredicate(tokenType);
-
+    function depositToPolygon(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) {
         // A workaround for MintableERC721Predicate
         // that requires a depositor to be equal to token owner:
         // https://github.com/maticnetwork/pos-portal/blob/88dbf0a88fd68fa11f7a3b9d36629930f6b93a05/contracts/root/TokenPredicates/MintableERC721Predicate.sol#L94
         _transfer(_msgSender(), address(this), tokenId);
-        _approve(predicate, tokenId);
-        IRootChainManager(manager).depositFor(_msgSender(), address(this), abi.encode(tokenId));
+        _depositToPolygon(_msgSender(), tokenId);
+    }
+
+    function mintAndDepositToPolygon(
+        address to,
+        uint256 tokenId,
+        string calldata uri
+    ) external override onlyMintingManager {
+        _mint(address(this), tokenId, uri);
+        _depositToPolygon(to, tokenId);
     }
 
     /// Internal
@@ -338,6 +342,15 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
 
     function _msgData() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (bytes calldata) {
         return super._msgData();
+    }
+
+    function _depositToPolygon(address to, uint256 tokenId) internal {
+        address manager = StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value;
+        bytes32 tokenType = RootChainManagerStorage(manager).tokenToType(address(this));
+        address predicate = RootChainManagerStorage(manager).typeToPredicate(tokenType);
+
+        _approve(predicate, tokenId);
+        IRootChainManager(manager).depositFor(to, address(this), abi.encode(tokenId));
     }
 
     // Reserved storage space to allow for layout changes in the future.

@@ -32,4 +32,6 @@ interface IMintingController {
         address resolver,
         bytes calldata data
     ) external;
+
+    function registry() external view returns (address);
 }

@@ -152,4 +152,12 @@ interface IUNSRegistry is IERC721MetadataUpgradeable, IRecordStorage {
         string[] calldata values,
         bytes calldata data
     ) external;
+
+    function depositToPolygon(uint256 tokenId) external;
+
+    function mintAndDepositToPolygon(
+        address to,
+        uint256 tokenId,
+        string calldata uri
+    ) external;
 }

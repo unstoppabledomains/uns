@@ -3,6 +3,7 @@
 
 pragma solidity ^0.8.0;
 
+import './cns/ICNSRegistry.sol';
 import './cns/IResolver.sol';
 import './cns/IMintingController.sol';
 import './cns/IURIPrefixController.sol';
@@ -176,6 +177,15 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         string[] calldata values
     ) external override onlyRegisteredTld(tld) whenNotPaused {
         _mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
+    }
+
+    function upgradeCnsToPolygon(uint256 tld, string calldata label) external onlyRegisteredTld(tld) {
+        require(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f, 'MintingManager: CRYPTO_TLD_ONLY');
+        uint256 tokenId = _childId(tld, label);
+        ICNSRegistry registry = ICNSRegistry(cnsMintingController.registry());
+        address owner = registry.ownerOf(tokenId);
+        registry.burn(tokenId);
+        unsRegistry.mintAndDepositToPolygon(owner, tokenId, _uri(tld, label));
     }
 
     function setResolver(address resolver) external onlyOwner {
