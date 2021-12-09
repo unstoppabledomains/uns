@@ -1,10 +1,9 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "IERC721Receiver",
-  "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
+  "sourceName": "contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol",
   "abi": [
     {
-      "constant": false,
       "inputs": [
         {
           "internalType": "address",
@@ -35,7 +34,6 @@
           "type": "bytes4"
         }
       ],
-      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     }

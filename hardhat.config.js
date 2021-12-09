@@ -70,6 +70,15 @@ module.exports = {
         settings,
       },
       {
+        version: '0.6.6',
+        settings: {
+          ...settings,
+          metadata: {
+            bytecodeHash: 'none',
+          },
+        },
+      },
+      {
         version: '0.8.0',
         settings: {
           ...settings,
