@@ -12,6 +12,8 @@ describe.only('UNSRegistry (polygon)', () => {
     mintingManager, rootChainManager, predicate, stateSender;
   let signers, tokenOwner, rcmOwner, predicateOwner, owner;
 
+  const abiCoder = new utils.AbiCoder();
+
   const mintDomainL1 = async (owner, tld, label) => {
     await mintingManager.mintSLD(owner, tld, label);
     return await l1UnsRegistry.childIdOf(tld, label);
@@ -108,8 +110,8 @@ describe.only('UNSRegistry (polygon)', () => {
       const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'poly-1md-aq1');
       expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
-      await cnsRegistry.connect(owner)['safeTransferFrom(address,address,uint256)'](
-        owner.address, l1UnsRegistry.address, tokenId);
+      await cnsRegistry.connect(owner)['safeTransferFrom(address,address,uint256,bytes)'](
+        owner.address, l1UnsRegistry.address, tokenId, abiCoder.encode(['bool'], [true]));
 
       await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
       expect(await l1UnsRegistry.exists(tokenId)).to.be.equal(true);
@@ -129,6 +131,32 @@ describe.only('UNSRegistry (polygon)', () => {
         .withArgs(owner.address, owner.address, l1UnsRegistry.address, tokenId);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
+    });
+  });
+
+  describe('CNS -> UNS migration', () => {
+    it('should migrate CNS domain to UNS through safeTransferFrom', async () => {
+      const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'cns-uns-aq1');
+      expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+
+      await cnsRegistry.connect(owner)['safeTransferFrom(address,address,uint256)'](
+        owner.address, l1UnsRegistry.address, tokenId);
+
+      await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      expect(await l1UnsRegistry.exists(tokenId)).to.be.equal(true);
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+    });
+
+    it('should migrate CNS domain to UNS through safeTransferFrom(data)', async () => {
+      const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'cns-uns-aq2');
+      expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+
+      await cnsRegistry.connect(owner)['safeTransferFrom(address,address,uint256,bytes)'](
+        owner.address, l1UnsRegistry.address, tokenId, abiCoder.encode(['bool'], [false]));
+
+      await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      expect(await l1UnsRegistry.exists(tokenId)).to.be.equal(true);
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
     });
   });
 });

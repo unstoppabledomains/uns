@@ -200,15 +200,19 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
     }
 
     function onERC721Received(
-        address operator,
+        address,
         address from,
         uint256 tokenId,
         bytes calldata data
     ) external override returns (bytes4) {
         // TODO: sender must be the CNS registry
-        _mint(address(this), tokenId, '');
         ICNSRegistry(_msgSender()).burn(tokenId);
-        _depositToPolygon(from, tokenId);
+        if(data.length > 0 && abi.decode(data, (bool))) {
+            _mint(address(this), tokenId);
+            _depositToPolygon(from, tokenId);
+        } else {
+            _mint(from, tokenId);
+        }
 
         return IERC721ReceiverUpgradeable.onERC721Received.selector;
     }
