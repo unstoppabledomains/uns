@@ -11,4 +11,6 @@ interface ICNSRegistry is IERC721MetadataUpgradeable {
     function resolverOf(uint256 tokenId) external view returns (address);
 
     function childIdOf(uint256 tokenId, string calldata label) external view returns (uint256);
+
+    function burn(uint256 tokenId) external;
 }
