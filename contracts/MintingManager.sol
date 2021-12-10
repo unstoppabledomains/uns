@@ -7,6 +7,7 @@ import './cns/ICNSRegistry.sol';
 import './cns/IResolver.sol';
 import './cns/IMintingController.sol';
 import './cns/IURIPrefixController.sol';
+import './cns/ISignatureController.sol';
 import './IMintingManager.sol';
 import './IUNSRegistry.sol';
 import './metatx/ERC2771Context.sol';
@@ -26,6 +27,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
     IURIPrefixController public cnsURIPrefixController;
+    ISignatureController public cnsSignatureController;
     IResolver public cnsResolver;
 
     /**
@@ -74,12 +76,14 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         IUNSRegistry unsRegistry_,
         IMintingController cnsMintingController_,
         IURIPrefixController cnsURIPrefixController_,
+        ISignatureController cnsSignatureController_,
         IResolver cnsResolver_,
         address forwarder
     ) public initializer {
         unsRegistry = unsRegistry_;
         cnsMintingController = cnsMintingController_;
         cnsURIPrefixController = cnsURIPrefixController_;
+        cnsSignatureController = cnsSignatureController_;
         cnsResolver = cnsResolver_;
 
         __Ownable_init_unchained();
@@ -185,6 +189,15 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         ICNSRegistry registry = ICNSRegistry(cnsMintingController.registry());
         address owner = registry.ownerOf(tokenId);
         registry.burn(tokenId);
+        unsRegistry.mintAndDepositToPolygon(owner, tokenId, _uri(tld, label));
+    }
+
+    function upgradeCnsToPolygonFor(uint256 tld, string calldata label, bytes calldata signature) external onlyRegisteredTld(tld) {
+        require(tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f, 'MintingManager: CRYPTO_TLD_ONLY');
+        uint256 tokenId = _childId(tld, label);
+        ICNSRegistry registry = ICNSRegistry(cnsMintingController.registry());
+        address owner = registry.ownerOf(tokenId);
+        cnsSignatureController.burnFor(tokenId, signature);
         unsRegistry.mintAndDepositToPolygon(owner, tokenId, _uri(tld, label));
     }
 
