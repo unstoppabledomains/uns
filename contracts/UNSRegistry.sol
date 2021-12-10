@@ -199,22 +199,36 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
         _safeTransfer(from, to, tokenId, data);
     }
 
+    // TODO: guard the function by owner check
+    // This is the keccak-256 hash of "uns.cns_registry" subtracted by 1
+    bytes32 internal constant _CNS_REGISTRY_SLOT = 0x8ffb960699dc2ba88f34d0e41c029c3c36c95149679fe1d0153a9582bec92378;
+    function setCNSRegistry(address rootChainManager) external {
+        require(
+            StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value == address(0),
+            'Registry: CNS_REGISTRY_NOT_EMPTY'
+        );
+        StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value = rootChainManager;
+    }
+
     function onERC721Received(
         address,
         address from,
         uint256 tokenId,
         bytes calldata data
     ) external override returns (bytes4) {
-        // TODO: sender must be the CNS registry
-        ICNSRegistry(_msgSender()).burn(tokenId);
-        if(data.length > 0 && abi.decode(data, (bool))) {
-            _mint(address(this), tokenId);
-            _depositToPolygon(from, tokenId);
-        } else {
-            _mint(from, tokenId);
+        if(_msgSender() == StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value) {
+            ICNSRegistry(_msgSender()).burn(tokenId);
+            if(data.length > 0 && abi.decode(data, (bool))) {
+                _mint(address(this), tokenId);
+                _depositToPolygon(from, tokenId);
+            } else {
+                _mint(from, tokenId);
+            }
+
+            return IERC721ReceiverUpgradeable.onERC721Received.selector;
         }
 
-        return IERC721ReceiverUpgradeable.onERC721Received.selector;
+        revert('Registry: ERC721_RECEIVING_NOT_ALLOWED');
     }
 
     /// Burning
@@ -289,7 +303,7 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
     // TODO: guard the function by owner check
     // This is the keccak-256 hash of "uns.polygon.root_chain_manager" subtracted by 1
     bytes32 internal constant _ROOT_CHAIN_MANAGER_SLOT = 0xbe2bb46ac0377341a1ec5c3116d70fd5029d704bd46292e58f6265dd177ebafe;
-    function setRootChainManager(address rootChainManager) public {
+    function setRootChainManager(address rootChainManager) external {
         require(
             StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value == address(0),
             'Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY'
@@ -297,7 +311,7 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
         StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value = rootChainManager;
     }
 
-    function depositToPolygon(uint256 tokenId) public onlyApprovedOrOwner(tokenId) {
+    function depositToPolygon(uint256 tokenId) external onlyApprovedOrOwner(tokenId) {
         // A workaround for MintableERC721Predicate
         // that requires a depositor to be equal to token owner:
         // https://github.com/maticnetwork/pos-portal/blob/88dbf0a88fd68fa11f7a3b9d36629930f6b93a05/contracts/root/TokenPredicates/MintableERC721Predicate.sol#L94

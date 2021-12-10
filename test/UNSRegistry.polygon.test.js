@@ -48,6 +48,7 @@ describe.only('UNSRegistry (polygon)', () => {
 
     mintingManager = await MintingManager.deploy();
     await l1UnsRegistry.initialize(mintingManager.address);
+    await l1UnsRegistry.setCNSRegistry(cnsRegistry.address);
 
     await mintingController.addMinter(mintingManager.address);
     await uriPrefixController.addWhitelisted(mintingManager.address);
@@ -59,9 +60,6 @@ describe.only('UNSRegistry (polygon)', () => {
       resolver.address,
       ZERO_ADDRESS);
     await mintingManager.addMinter(tokenOwner.address);
-
-    l2UnsRegistry = (await UNSRegistry.deploy()).connect(tokenOwner);
-    await l2UnsRegistry.initialize(tokenOwner.address);
 
     l2UnsRegistry = (await UNSRegistry.deploy()).connect(tokenOwner);
     await l2UnsRegistry.initialize(tokenOwner.address);
@@ -157,6 +155,17 @@ describe.only('UNSRegistry (polygon)', () => {
       await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
       expect(await l1UnsRegistry.exists(tokenId)).to.be.equal(true);
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+    });
+
+    it('should revert when UNS registry receives token from random ERC721', async () => {
+      const randomERC721 = await CNSRegistry.deploy();
+      await randomERC721.controlledMintChild(owner.address, TLD.CRYPTO, 'fake-cns-uns-te1');
+      const tokenId = await randomERC721.childIdOf(TLD.CRYPTO, 'fake-cns-uns-te1');
+
+      await expect(
+        randomERC721.connect(owner)['safeTransferFrom(address,address,uint256)'](
+          owner.address, l1UnsRegistry.address, tokenId),
+      ).to.be.revertedWith('Registry: ERC721_RECEIVING_NOT_ALLOWED');
     });
   });
 });
