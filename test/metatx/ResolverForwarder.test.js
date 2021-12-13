@@ -66,17 +66,9 @@ describe('ResolverForwarder', () => {
       let nonceF = await forwarder.nonceOf(tokenId);
       let nonceR = await resolver.nonceOf(tokenId);
 
-      expect(nonceF).to.be.equal(0);
       expect(nonceF).to.be.equal(nonceR);
-
-      const { req, signature } = await buildExecuteParams(
-        'reset(uint256)', [tokenId], owner, tokenId);
-      await forwarder.execute(req, signature);
-
-      nonceF = await forwarder.nonceOf(tokenId);
-      nonceR = await resolver.nonceOf(tokenId);
-      expect(nonceF).to.be.equal(1);
-      expect(nonceF).to.be.equal(nonceR);
+      // should be reverted when domain resolver is not set
+      await expect(registry.resolverOf(tokenId)).to.be.revertedWith('');
     });
   });
 

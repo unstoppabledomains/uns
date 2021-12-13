@@ -26,8 +26,10 @@ contract ResolverForwarder is BaseRoutingForwarder {
     }
 
     function nonceOf(uint256 tokenId) public view override returns (uint256) {
-        address addr = _cnsRegistry.resolverOf(tokenId);
-        if (addr == address(0x0)) {
+        address addr;
+         try _cnsRegistry.resolverOf(tokenId) returns (address _resolver) {
+            addr = _resolver;
+        } catch {
             addr = _defaultCnsResolverAddress;
         }
         IForwarder target = IForwarder(addr);
