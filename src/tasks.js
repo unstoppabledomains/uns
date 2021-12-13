@@ -94,7 +94,7 @@ const deployCNSForwardersTask = {
   priority: 5,
   run: async (ctx, dependencies) => {
     const { owner } = ctx.accounts;
-    const { CNSRegistry, SignatureController } = dependencies;
+    const { CNSRegistry, SignatureController, Resolver } = dependencies;
 
     const cnsRegistryForwarder = await ctx.artifacts.CNSRegistryForwarder
       .connect(owner)
@@ -105,7 +105,7 @@ const deployCNSForwardersTask = {
 
     const resolverForwarder = await ctx.artifacts.ResolverForwarder
       .connect(owner)
-      .deploy(CNSRegistry.address);
+      .deploy(CNSRegistry.address, Resolver.address);
     await ctx.saveForwarderConfig('Resolver', resolverForwarder);
     await resolverForwarder.deployTransaction.wait();
     await verify(ctx, resolverForwarder.address, [CNSRegistry.address]);

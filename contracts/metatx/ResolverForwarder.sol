@@ -14,9 +14,11 @@ import './BaseRoutingForwarder.sol';
  */
 contract ResolverForwarder is BaseRoutingForwarder {
     ICNSRegistry private _cnsRegistry;
+    address private _defaultCnsResolver;
 
-    constructor(ICNSRegistry cnsRegistry) {
+    constructor(ICNSRegistry cnsRegistry, address defaultCnsResolver) {
         _cnsRegistry = cnsRegistry;
+        _defaultCnsResolver = defaultCnsResolver;
         _addRoute('reset(uint256)', 'resetFor(uint256,bytes)');
         _addRoute('set(string,string,uint256)', 'setFor(string,string,uint256,bytes)');
         _addRoute('setMany(string[],string[],uint256)', 'setManyFor(string[],string[],uint256,bytes)');
@@ -24,7 +26,11 @@ contract ResolverForwarder is BaseRoutingForwarder {
     }
 
     function nonceOf(uint256 tokenId) public view override returns (uint256) {
-        IForwarder target = IForwarder(_cnsRegistry.resolverOf(tokenId));
+        address resolver = _defaultCnsResolver;
+        try _cnsRegistry.resolverOf(tokenId) returns (address _resolver) {
+            resolver = _resolver;
+        } catch { }
+        IForwarder target = IForwarder(resolver);
         return target.nonceOf(tokenId);
     }
 
@@ -49,20 +55,19 @@ contract ResolverForwarder is BaseRoutingForwarder {
         bytes4 selector,
         bytes memory data,
         bytes memory signature
-    ) internal pure override returns (bytes memory) {
+    ) internal pure override returns (bytes memory routeData) {
         if(selector == 0xb87abc11) {
             (uint256 p1) = abi.decode(data, (uint256));
-            return abi.encodeWithSelector(selector, p1, signature);
+            routeData = abi.encodeWithSelector(selector, p1, signature);
         } else if(selector == 0xc5974073) {
             (string memory p1, string memory p2, uint256 p3) = abi.decode(data, (string, string, uint256));
-            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
         } else if(selector == 0x8f69c188) {
             (string[] memory p1, string[] memory p2, uint256 p3) = abi.decode(data, (string[], string[], uint256));
-            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
         } else if(selector == 0xa3557e6c) {
             (string[] memory p1, string[] memory p2, uint256 p3) = abi.decode(data, (string[], string[], uint256));
-            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
         }
-        return '';
     }
 }
