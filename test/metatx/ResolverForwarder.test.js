@@ -14,6 +14,11 @@ describe('ResolverForwarder', () => {
     return await registry.childIdOf(TLD.CRYPTO, label);
   };
 
+  const mintDomainWithoutResolver = async (label, owner) => {
+    await mintingController.mintSLD(owner, label);
+    return await registry.childIdOf(TLD.CRYPTO, label);
+  };
+
   before(async () => {
     signers = await ethers.getSigners();
     [owner] = signers;
@@ -32,7 +37,7 @@ describe('ResolverForwarder', () => {
     await registry.addController(mintingController.address);
     await registry.addController(signatureController.address);
 
-    forwarder = await ResolverForwarder.deploy(registry.address);
+    forwarder = await ResolverForwarder.deploy(registry.address, resolver.address);
 
     buildExecuteParams = buildExecuteFunc(resolver.interface, resolver.address, forwarder);
   });
@@ -40,6 +45,24 @@ describe('ResolverForwarder', () => {
   describe('nonceOf', () => {
     it('should match nonces', async () => {
       const tokenId = await mintDomain('test_foon', owner.address);
+      let nonceF = await forwarder.nonceOf(tokenId);
+      let nonceR = await resolver.nonceOf(tokenId);
+
+      expect(nonceF).to.be.equal(0);
+      expect(nonceF).to.be.equal(nonceR);
+
+      const { req, signature } = await buildExecuteParams(
+        'reset(uint256)', [tokenId], owner, tokenId);
+      await forwarder.execute(req, signature);
+
+      nonceF = await forwarder.nonceOf(tokenId);
+      nonceR = await resolver.nonceOf(tokenId);
+      expect(nonceF).to.be.equal(1);
+      expect(nonceF).to.be.equal(nonceR);
+    });
+
+    it(`should return nonce of default resolver when domain doesn't have own`, async () => {
+      const tokenId = await mintDomainWithoutResolver('test_foo_no_res', owner.address);
       let nonceF = await forwarder.nonceOf(tokenId);
       let nonceR = await resolver.nonceOf(tokenId);
 
