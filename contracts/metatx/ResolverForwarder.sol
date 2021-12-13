@@ -14,11 +14,11 @@ import './BaseRoutingForwarder.sol';
  */
 contract ResolverForwarder is BaseRoutingForwarder {
     ICNSRegistry private _cnsRegistry;
-    address private _defaultCnsResolverAddress;
+    address private _defaultCnsResolver;
 
-    constructor(ICNSRegistry cnsRegistry, address defaultCnsResolverAddress) {
+    constructor(ICNSRegistry cnsRegistry, address defaultCnsResolver) {
         _cnsRegistry = cnsRegistry;
-        _defaultCnsResolverAddress = defaultCnsResolverAddress;
+        _defaultCnsResolver = defaultCnsResolver;
         _addRoute('reset(uint256)', 'resetFor(uint256,bytes)');
         _addRoute('set(string,string,uint256)', 'setFor(string,string,uint256,bytes)');
         _addRoute('setMany(string[],string[],uint256)', 'setManyFor(string[],string[],uint256,bytes)');
@@ -26,13 +26,11 @@ contract ResolverForwarder is BaseRoutingForwarder {
     }
 
     function nonceOf(uint256 tokenId) public view override returns (uint256) {
-        address addr;
+        address resolver = _defaultCnsResolver;
          try _cnsRegistry.resolverOf(tokenId) returns (address _resolver) {
-            addr = _resolver;
-        } catch {
-            addr = _defaultCnsResolverAddress;
-        }
-        IForwarder target = IForwarder(addr);
+            resolver = _resolver;
+        } catch { }
+        IForwarder target = IForwarder(resolver);
         return target.nonceOf(tokenId);
     }
 

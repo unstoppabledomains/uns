@@ -61,7 +61,7 @@ describe('ResolverForwarder', () => {
       expect(nonceF).to.be.equal(nonceR);
     });
 
-    it(`should return nonce of default resolver when domain doesn't have own`, async () => {
+    it(`should return nonce from default resolver when domain doesn't have own`, async () => {
       const tokenId = await mintDomainWithoutResolver('test_foo_no_res', owner.address);
       let nonceF = await forwarder.nonceOf(tokenId);
       let nonceR = await resolver.nonceOf(tokenId);
