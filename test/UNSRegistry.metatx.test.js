@@ -225,7 +225,8 @@ describe('UNSRegistry (metatx)', () => {
         'setFor',
         'setManyFor',
         'reconfigureFor',
-        'depositToPolygon', // TODO: the function requires rootChainManager contract
+        'depositToPolygon', // requires rootChainManager contract
+        'onERC721Received',
       ];
 
       const getFuncs = () => {
@@ -330,6 +331,7 @@ describe('UNSRegistry (metatx)', () => {
         'transferOwnership', // might influence tests
         'renounceOwnership', // might influence tests
         'setRootChainManager',
+        'setCNSRegistry',
       ];
 
       before(async () => {

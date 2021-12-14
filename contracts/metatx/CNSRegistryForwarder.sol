@@ -76,44 +76,43 @@ contract CNSRegistryForwarder is BaseRoutingForwarder {
         bytes4 selector,
         bytes memory data,
         bytes memory signature
-    ) internal pure override returns (bytes memory) {
+    ) internal pure override returns (bytes memory routeData) {
         if(selector == 0xef2c3088) {
             (address p1, address p2, uint256 p3) = abi.decode(data, (address, address, uint256));
-            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
         } else if(selector == 0x6debcb8d) {
             (address p1, address p2, uint256 p3) = abi.decode(data, (address, address, uint256));
-            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
         } else if(selector == 0x280d9b05) {
             (address p1, address p2, uint256 p3, bytes memory p4) = abi.decode(data, (address, address, uint256, bytes));
-            return abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
         } else if(selector == 0x61603dd9) {
             (uint256 p1) = abi.decode(data, (uint256));
-            return abi.encodeWithSelector(selector, p1, signature);
+            routeData = abi.encodeWithSelector(selector, p1, signature);
         } else if(selector == 0xb34f33c5) {
             (address p1, uint256 p2, string memory p3) = abi.decode(data, (address, uint256, string));
-            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
         } else if(selector == 0x30135293) {
             (address p1, uint256 p2, string memory p3) = abi.decode(data, (address, uint256, string));
-            return abi.encodeWithSelector(selector, p1, p2, p3, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
         } else if(selector == 0x07eca395) {
             (address p1, uint256 p2, string memory p3, bytes memory p4) = abi.decode(data, (address, uint256, string, bytes));
-            return abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
         } else if(selector == 0x68b6154f) {
             (address p1, address p2, uint256 p3, string memory p4) = abi.decode(data, (address, address, uint256, string));
-            return abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
         } else if(selector == 0xd0778d6c) {
             (address p1, address p2, uint256 p3, string memory p4) = abi.decode(data, (address, address, uint256, string));
-            return abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
         } else if(selector == 0xf5090c1e) {
             (address p1, address p2, uint256 p3, string memory p4, bytes memory p5) = abi.decode(data, (address, address, uint256, string, bytes));
-            return abi.encodeWithSelector(selector, p1, p2, p3, p4, p5, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, p3, p4, p5, signature);
         } else if(selector == 0x6fab95b3) {
             (uint256 p1, string memory p2) = abi.decode(data, (uint256, string));
-            return abi.encodeWithSelector(selector, p1, p2, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, signature);
         } else if(selector == 0x511f1112) {
             (address p1, uint256 p2) = abi.decode(data, (address, uint256));
-            return abi.encodeWithSelector(selector, p1, p2, signature);
+            routeData = abi.encodeWithSelector(selector, p1, p2, signature);
         }
-        return '';
     }
 }
