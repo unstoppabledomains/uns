@@ -369,7 +369,6 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
         return super._msgData();
     }
 
-    // TODO: emit deposit event
     function _depositToPolygon(address to, uint256 tokenId) internal {
         address manager = StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value;
         bytes32 tokenType = RootChainManagerStorage(manager).tokenToType(address(this));
