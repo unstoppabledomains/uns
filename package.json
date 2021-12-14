@@ -29,7 +29,7 @@
     "upgrade:rinkeby": "hardhat run --network rinkeby scripts/upgrade.js",
     "upgrade:mainnet": "hardhat run --network mainnet scripts/upgrade.js",
     "start:node": "hardhat node",
-    "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
+    "gas-report": "env ENABLE_GAS_REPORT=true yarn test:sol",
     "make:uml": "npx sol2uml ./contracts -b UNSRegistry,MintingManager,ProxyReader -o ./assets/uns.svg -i ./contracts/mocks"
   },
   "devDependencies": {

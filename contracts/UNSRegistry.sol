@@ -6,6 +6,7 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
+import './cns/ICNSRegistry.sol';
 import './IUNSRegistry.sol';
 import './RecordStorage.sol';
 import './metatx/ERC2771RegistryContext.sol';
@@ -14,7 +15,7 @@ import './@maticnetwork/IRootChainManager.sol';
 import './@maticnetwork/RootChainManagerStorage.sol';
 
 /**
- * @title UNSRegistry v0.2
+ * @title UNSRegistry v0.3
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
@@ -30,7 +31,7 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
     event AdminChanged(address previousAdmin, address newAdmin);
 
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.2.0';
+    string public constant VERSION = '0.3.0';
 
     string internal _prefix;
 
@@ -197,6 +198,37 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
         _safeTransfer(from, to, tokenId, data);
     }
 
+    // This is the keccak-256 hash of "uns.cns_registry" subtracted by 1
+    bytes32 internal constant _CNS_REGISTRY_SLOT = 0x8ffb960699dc2ba88f34d0e41c029c3c36c95149679fe1d0153a9582bec92378;
+    function setCNSRegistry(address registry) external override {
+        require(
+            StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value == address(0),
+            'Registry: CNS_REGISTRY_NOT_EMPTY'
+        );
+        StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value = registry;
+    }
+
+    function onERC721Received(
+        address,
+        address from,
+        uint256 tokenId,
+        bytes calldata data
+    ) external override returns (bytes4) {
+        if(_msgSender() == StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value) {
+            ICNSRegistry(_msgSender()).burn(tokenId);
+            if(data.length > 0 && abi.decode(data, (bool))) {
+                _mint(address(this), tokenId);
+                _depositToPolygon(from, tokenId);
+            } else {
+                _mint(from, tokenId);
+            }
+
+            return UNSRegistry.onERC721Received.selector;
+        }
+
+        revert('Registry: ERC721_RECEIVING_NOT_ALLOWED');
+    }
+
     /// Burning
 
     function burn(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
@@ -254,6 +286,26 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
         _reset(tokenId);
     }
 
+    // Polygon
+
+    // This is the keccak-256 hash of "uns.polygon.root_chain_manager" subtracted by 1
+    bytes32 internal constant _ROOT_CHAIN_MANAGER_SLOT = 0xbe2bb46ac0377341a1ec5c3116d70fd5029d704bd46292e58f6265dd177ebafe;
+    function setRootChainManager(address rootChainManager) external override {
+        require(
+            StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value == address(0),
+            'Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY'
+        );
+        StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value = rootChainManager;
+    }
+
+    function depositToPolygon(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) {
+        // A workaround for MintableERC721Predicate
+        // that requires a depositor to be equal to token owner:
+        // https://github.com/maticnetwork/pos-portal/blob/88dbf0a88fd68fa11f7a3b9d36629930f6b93a05/contracts/root/TokenPredicates/MintableERC721Predicate.sol#L94
+        _transfer(_msgSender(), address(this), tokenId);
+        _depositToPolygon(_msgSender(), tokenId);
+    }
+
     /**
      * @dev See {IERC165-supportsInterface}.
      */
@@ -264,30 +316,6 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
-    }
-
-    // TODO: guard the function by owner check
-    // This is the keccak-256 hash of "uns.polygon.root_chain_manager" subtracted by 1
-    bytes32 internal constant _ROOT_CHAIN_MANAGER_SLOT = 0xbe2bb46ac0377341a1ec5c3116d70fd5029d704bd46292e58f6265dd177ebafe;
-    function setRootChainManager(address rootChainManager) public {
-        require(
-            StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value == address(0),
-            'Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY'
-        );
-        StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value = rootChainManager;
-    }
-
-    function depositToPolygon(uint256 tokenId) public onlyApprovedOrOwner(tokenId) {
-        address manager = StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value;
-        bytes32 tokenType = RootChainManagerStorage(manager).tokenToType(address(this));
-        address predicate = RootChainManagerStorage(manager).typeToPredicate(tokenType);
-
-        // A workaround for MintableERC721Predicate
-        // that requires a depositor to be equal to token owner:
-        // https://github.com/maticnetwork/pos-portal/blob/88dbf0a88fd68fa11f7a3b9d36629930f6b93a05/contracts/root/TokenPredicates/MintableERC721Predicate.sol#L94
-        _transfer(_msgSender(), address(this), tokenId);
-        _approve(predicate, tokenId);
-        IRootChainManager(manager).depositFor(_msgSender(), address(this), abi.encode(tokenId));
     }
 
     /// Internal
@@ -338,6 +366,15 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
 
     function _msgData() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (bytes calldata) {
         return super._msgData();
+    }
+
+    function _depositToPolygon(address to, uint256 tokenId) internal {
+        address manager = StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value;
+        bytes32 tokenType = RootChainManagerStorage(manager).tokenToType(address(this));
+        address predicate = RootChainManagerStorage(manager).typeToPredicate(tokenType);
+
+        _approve(predicate, tokenId);
+        IRootChainManager(manager).depositFor(to, address(this), abi.encode(tokenId));
     }
 
     // Reserved storage space to allow for layout changes in the future.

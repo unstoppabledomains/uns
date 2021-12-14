@@ -4,10 +4,11 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol';
 
 import './IRecordStorage.sol';
 
-interface IUNSRegistry is IERC721MetadataUpgradeable, IRecordStorage {
+interface IUNSRegistry is IERC721MetadataUpgradeable, IERC721ReceiverUpgradeable, IRecordStorage {
     event NewURI(uint256 indexed tokenId, string uri);
 
     event NewURIPrefix(string prefix);
@@ -152,4 +153,28 @@ interface IUNSRegistry is IERC721MetadataUpgradeable, IRecordStorage {
         string[] calldata values,
         bytes calldata data
     ) external;
+
+    /**
+     * @dev Stores CNS registry address.
+     * It's one-time operation required to set CNS registry address.
+     * UNS registry allows to receive ERC721 tokens only from CNS registry,
+     * by supporting ERC721Receiver interface.
+     * @param registry address of CNS registry contract
+     */
+    function setCNSRegistry(address registry) external;
+
+    /**
+     * @dev Stores RootChainManager address.
+     * It's one-time operation required to set RootChainManager address.
+     * RootChainManager is a contract responsible for bridging Ethereum
+     * and Polygon networks.
+     * @param rootChainManager address of RootChainManager contract
+     */
+    function setRootChainManager(address rootChainManager) external;
+
+    /**
+     * @dev Deposits token to Polygon through RootChainManager contract
+     * @param tokenId id of token
+     */
+    function depositToPolygon(uint256 tokenId) external;
 }

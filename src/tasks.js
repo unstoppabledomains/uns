@@ -116,10 +116,12 @@ const deployCNSForwardersTask = {
     const {
       CNSRegistry,
       SignatureController,
+      Resolver,
     } = config.contracts || {};
     const dependencies = {
       CNSRegistry,
       SignatureController,
+      Resolver,
     };
 
     for (const [key, value] of Object.entries(dependencies)) {
@@ -294,7 +296,13 @@ const deployUNSProxyReaderTask = {
 const configureCNSTask = {
   tags: ['uns_config_cns', 'full'],
   priority: 20,
-  run: async (ctx, { MintingController, URIPrefixController, MintingManager }) => {
+  run: async (ctx, {
+    CNSRegistry,
+    MintingController,
+    URIPrefixController,
+    UNSRegistry,
+    MintingManager,
+  }) => {
     const { owner } = ctx.accounts;
 
     const mintingController = await ctx.artifacts.MintingController
@@ -310,18 +318,27 @@ const configureCNSTask = {
     if (!(await uriPrefixController.isWhitelisted(MintingManager.address))) {
       await uriPrefixController.addWhitelisted(MintingManager.address);
     }
+
+    const unsRegistry = await ctx.artifacts.UNSRegistry
+      .attach(UNSRegistry.address)
+      .connect(owner);
+    await unsRegistry.setCNSRegistry(CNSRegistry.address);
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const {
+      CNSRegistry,
       MintingController,
       URIPrefixController,
+      UNSRegistry,
       MintingManager,
     } = config.contracts || {};
     const dependencies = {
+      CNSRegistry,
       MintingController,
       URIPrefixController,
+      UNSRegistry,
       MintingManager,
     };
 

@@ -74,6 +74,7 @@ class Sandbox {
     this.options = options || {};
     this.provider = service.provider;
     this.snapshotId = undefined;
+    this.version = 'v0.2';
 
     const accounts = this._getAccounts(this.options.network);
     this.accounts = {

@@ -7,8 +7,8 @@ const { TLD, ZERO_ADDRESS } = require('./helpers/constants');
 const { utils, BigNumber } = ethers;
 
 describe('UNSRegistry', () => {
-  let UNSRegistry, ERC721ReceiverMock;
-  let unsRegistry, root;
+  let UNSRegistry, CNSRegistry, ERC721ReceiverMock;
+  let unsRegistry, cnsRegistry, root;
   let signers, coinbase, owner, receiver, accounts;
 
   const mintDomain = async (label, owner) => {
@@ -23,6 +23,7 @@ describe('UNSRegistry', () => {
     [, ...accounts] = signers.map(s => s.address);
 
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
+    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
     ERC721ReceiverMock = await ethers.getContractFactory('ERC721ReceiverMock');
 
     root = BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
@@ -31,6 +32,8 @@ describe('UNSRegistry', () => {
     await unsRegistry.initialize(coinbase.address);
     await unsRegistry.mint('0xdead000000000000000000000000000000000000', root, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
+
+    cnsRegistry = await CNSRegistry.deploy();
   });
 
   describe('General', () => {
@@ -151,7 +154,7 @@ describe('UNSRegistry', () => {
 
       // should fail to safely mint token to non reciever contract
       await expect(
-        unsRegistry.callStatic['safeMint(address,uint256,string)'](unsRegistry.address, tok, 'label_93'),
+        unsRegistry.callStatic['safeMint(address,uint256,string)'](cnsRegistry.address, tok, 'label_93'),
       ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
 
       const tokenReceiver = await ERC721ReceiverMock.deploy();
@@ -175,7 +178,7 @@ describe('UNSRegistry', () => {
 
       // should fail to safely mint token to non reciever contract
       await expect(
-        unsRegistry.callStatic['safeMint(address,uint256,string)'](unsRegistry.address, tok, 'label_s23'),
+        unsRegistry.callStatic['safeMint(address,uint256,string)'](cnsRegistry.address, tok, 'label_s23'),
       ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
 
       const tokenReceiver = await ERC721ReceiverMock.deploy();
