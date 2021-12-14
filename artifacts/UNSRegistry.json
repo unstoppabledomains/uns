@@ -1226,7 +1226,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "rootChainManager",
+          "name": "registry",
           "type": "address"
         }
       ],
