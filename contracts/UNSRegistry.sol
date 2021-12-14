@@ -4,7 +4,6 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
 import './cns/ICNSRegistry.sol';
@@ -16,7 +15,7 @@ import './@maticnetwork/IRootChainManager.sol';
 import './@maticnetwork/RootChainManagerStorage.sol';
 
 /**
- * @title UNSRegistry v0.2
+ * @title UNSRegistry v0.3
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
@@ -32,7 +31,7 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
     event AdminChanged(address previousAdmin, address newAdmin);
 
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.2.0';
+    string public constant VERSION = '0.3.0';
 
     string internal _prefix;
 
@@ -224,7 +223,7 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
                 _mint(from, tokenId);
             }
 
-            return IERC721ReceiverUpgradeable.onERC721Received.selector;
+            return UNSRegistry.onERC721Received.selector;
         }
 
         revert('Registry: ERC721_RECEIVING_NOT_ALLOWED');
