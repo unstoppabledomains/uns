@@ -331,7 +331,9 @@ describe('UNSRegistry (metatx)', () => {
         'transferOwnership', // might influence tests
         'renounceOwnership', // might influence tests
         'setRootChainManager',
+        'setChildChainManager',
         'setCNSRegistry',
+        'deposit', // requires childChainManager contract
       ];
 
       before(async () => {
