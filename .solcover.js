@@ -8,7 +8,7 @@ module.exports = {
     '@maticnetwork/pos-portal/MintableERC721Predicate.sol',
     '@maticnetwork/pos-portal/RootChainManager.sol',
     '@maticnetwork/pos-portal/DummyStateSender.sol',
-    '@maticnetwork/CustomMintableERC721Predicate.sol',
+    '@maticnetwork/IChildToken.sol',
     '@maticnetwork/IRootChainManager.sol',
     '@maticnetwork/RootChainManagerStorage.sol',
   ],

@@ -11,6 +11,7 @@ import './IUNSRegistry.sol';
 import './RecordStorage.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
+import './@maticnetwork/IChildToken.sol';
 import './@maticnetwork/IRootChainManager.sol';
 import './@maticnetwork/RootChainManagerStorage.sol';
 
@@ -19,7 +20,14 @@ import './@maticnetwork/RootChainManagerStorage.sol';
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage, UNSRegistryForwarder, IUNSRegistry {
+contract UNSRegistry is
+    ERC721Upgradeable,
+    ERC2771RegistryContext,
+    RecordStorage,
+    UNSRegistryForwarder,
+    IUNSRegistry,
+    IChildToken
+{
     /**
      * @dev ERC-1967: Emitted when the implementation is upgraded. Required for ABI decoding only.
      */
@@ -198,6 +206,8 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
         _safeTransfer(from, to, tokenId, data);
     }
 
+    // Token's migration from CNS
+
     // This is the keccak-256 hash of "uns.cns_registry" subtracted by 1
     bytes32 internal constant _CNS_REGISTRY_SLOT = 0x8ffb960699dc2ba88f34d0e41c029c3c36c95149679fe1d0153a9582bec92378;
     function setCNSRegistry(address registry) external override {
@@ -286,7 +296,7 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
         _reset(tokenId);
     }
 
-    // Polygon
+    // L1 Polygon support
 
     // This is the keccak-256 hash of "uns.polygon.root_chain_manager" subtracted by 1
     bytes32 internal constant _ROOT_CHAIN_MANAGER_SLOT = 0xbe2bb46ac0377341a1ec5c3116d70fd5029d704bd46292e58f6265dd177ebafe;
@@ -304,6 +314,39 @@ contract UNSRegistry is ERC721Upgradeable, ERC2771RegistryContext, RecordStorage
         // https://github.com/maticnetwork/pos-portal/blob/88dbf0a88fd68fa11f7a3b9d36629930f6b93a05/contracts/root/TokenPredicates/MintableERC721Predicate.sol#L94
         _transfer(_msgSender(), address(this), tokenId);
         _depositToPolygon(_msgSender(), tokenId);
+    }
+
+    // L2 Polygon support
+
+    // This is the keccak-256 hash of "uns.polygon.child_chain_manager" subtracted by 1
+    bytes32 internal constant _CHILD_CHAIN_MANAGER_SLOT = 0x8bea9a6f8afd34f4e29c585f854e0cc5161431bf5fc299d468454d33dce53b87;
+    function setChildChainManager(address clientChainManager) external {
+        require(
+            StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value == address(0),
+            'Registry: CHILD_CHAIN_MANEGER_NOT_EMPTY'
+        );
+        StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value = clientChainManager;
+    }
+
+    function deposit(address user, bytes calldata depositData) external override {
+        require(
+            _msgSender() == StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value,
+            'Registry: INSUFFICIENT_PERMISSIONS'
+        );
+
+        // deposit single
+        if (depositData.length == 32) {
+            uint256 tokenId = abi.decode(depositData, (uint256));
+            _mint(user, tokenId);
+
+        // deposit batch
+        } else {
+            uint256[] memory tokenIds = abi.decode(depositData, (uint256[]));
+            uint256 length = tokenIds.length;
+            for (uint256 i; i < length; i++) {
+                _mint(user, tokenIds[i]);
+            }
+        }
     }
 
     /**
