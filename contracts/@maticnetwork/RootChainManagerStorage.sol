@@ -1,6 +1,3 @@
-// @author Unstoppable Domains, Inc.
-// @date December 6th, 2021
-
 pragma solidity ^0.8.0;
 
 abstract contract RootChainManagerStorage {

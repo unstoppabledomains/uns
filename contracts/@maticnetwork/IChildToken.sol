@@ -1,6 +1,3 @@
-// @author Unstoppable Domains, Inc.
-// @date December 15th, 2021
-
 pragma solidity ^0.8.0;
 
 interface IChildToken {
