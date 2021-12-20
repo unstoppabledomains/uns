@@ -49,7 +49,7 @@ describe('TwitterValidationOperator', () => {
 
   const mintUNSToken = async (root, label) => {
     const tokenId = await unsRegistry.childIdOf(root, label);
-    await unsRegistry.mint(coinbase.address, tokenId, '');
+    await unsRegistry['mint(address,uint256,string)'](coinbase.address, tokenId, '');
     await unsRegistry.approve(operator.address, tokenId);
     return tokenId;
   };
@@ -201,7 +201,7 @@ describe('TwitterValidationOperator', () => {
     it('should initiate validation via LINK token transfer', async () => {
       const guestManageDomainName = 'guest-manage-verification';
       const tokenId = await unsRegistry.childIdOf(walletRoot, guestManageDomainName);
-      await unsRegistry.mint(validationRequester.address, tokenId, guestManageDomainName);
+      await unsRegistry['mint(address,uint256,string)'](validationRequester.address, tokenId, guestManageDomainName);
       await unsRegistry.connect(validationRequester).approve(operator.address, tokenId);
 
       const operatorInitialBalance = await linkToken.balanceOf(operator.address);

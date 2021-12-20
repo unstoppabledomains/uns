@@ -958,19 +958,6 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "rootChainManager",
-          "type": "address"
-        }
-      ],
-      "name": "setRootChainManager",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "string",
           "name": "prefix",
           "type": "string"

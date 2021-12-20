@@ -43,7 +43,7 @@ describe('ReverseResolver (proxy)', () => {
     );
 
     // Mint domains
-    await unsRegistry.mint(coinbase.address, TLD.WALLET, 'wallet');
+    await unsRegistry['mint(address,uint256,string)'](coinbase.address, TLD.WALLET, 'wallet');
     await unsRegistry.setTokenURIPrefix('/');
 
     cryptoTokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, cryptoDomainName);
@@ -104,7 +104,7 @@ describe('ReverseResolver (proxy)', () => {
     });
 
     it('`remove` should remove a reverse record for a not owned domain', async () => {
-      await unsRegistry.mint(coinbase.address, TLD.X, 'crypto');
+      await unsRegistry['mint(address,uint256,string)'](coinbase.address, TLD.X, 'crypto');
       await unsRegistry.setOwner(account.address, TLD.X);
       await reverseResolver.connect(coinbase).remove();
       await expect(
