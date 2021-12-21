@@ -13,8 +13,6 @@ import './RecordStorage.sol';
 import './RootRegistry.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
-import './@maticnetwork/IRootChainManager.sol';
-import './@maticnetwork/RootChainManagerStorage.sol';
 
 /**
  * @title UNSRegistry v0.3
@@ -298,8 +296,9 @@ contract UNSRegistry is
         _reset(tokenId);
     }
 
-    // L1 Polygon support
-
+    /**
+     * @dev See {RootRegistry-depositToPolygon}.
+     */
     function depositToPolygon(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) {
         // A workaround for MintableERC721Predicate
         // that requires a depositor to be equal to token owner:
@@ -309,10 +308,16 @@ contract UNSRegistry is
         _deposit(_msgSender(), tokenId);
     }
 
+    /**
+     * @dev See {IMintableERC721-mint(address,uint256)}.
+     */
     function mint(address user, uint256 tokenId) external override onlyPredicate {
         _mint(user, tokenId);
     }
 
+    /**
+     * @dev See {IMintableERC721-mint(address,uint256,bytes)}.
+     */
     function mint(address user, uint256 tokenId, bytes calldata) external override onlyPredicate {
         _mint(user, tokenId);
     }
