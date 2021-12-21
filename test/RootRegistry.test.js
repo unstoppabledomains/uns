@@ -429,5 +429,17 @@ describe('RootRegistry', () => {
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
     });
+
+    it('should revert mint(onlyPredicate) by non-predicate', async () => {
+      const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1w-revert');
+      await expect(l1UnsRegistry['mint(address,uint256)'](owner.address, tokenId))
+        .to.be.revertedWith('Registry: INSUFFICIENT_PERMISSIONS');
+    });
+
+    it('should revert mint(onlyPredicate) with metadata by non-predicate', async () => {
+      const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1w-revert');
+      await expect(l1UnsRegistry['mint(address,uint256,bytes)'](owner.address, tokenId, '0x'))
+        .to.be.revertedWith('Registry: INSUFFICIENT_PERMISSIONS');
+    });
   });
 });
