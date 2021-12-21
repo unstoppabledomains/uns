@@ -11,7 +11,7 @@ describe('RootRegistry', () => {
     CNSRegistryForwarder, MintingManager, RootChainManager, MintableERC721Predicate, DummyStateSender;
   let l1UnsRegistry, l2UnsRegistry, cnsRegistry, resolver, mintingController, uriPrefixController,
     signatureController, cnsForwarder, mintingManager, rootChainManager, predicate, stateSender;
-  let tokenOwner, rcmOwner, predicateOwner, owner, spender;
+  let registryOwner, rcmOwner, predicateOwner, owner, spender;
   let buildExecuteCnsParams, buildExecuteUnsParams;
 
   const abiCoder = new utils.AbiCoder();
@@ -22,7 +22,7 @@ describe('RootRegistry', () => {
   };
 
   before(async () => {
-    [tokenOwner, rcmOwner, predicateOwner, owner, spender] = await ethers.getSigners();
+    [registryOwner, rcmOwner, predicateOwner, owner, spender] = await ethers.getSigners();
 
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
     CNSRegistry = await ethers.getContractFactory('CNSRegistry');
@@ -37,7 +37,7 @@ describe('RootRegistry', () => {
       .getContractFactory('contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol:MintableERC721Predicate');
     DummyStateSender = await ethers.getContractFactory('DummyStateSender');
 
-    l1UnsRegistry = (await UNSRegistry.deploy()).connect(tokenOwner);
+    l1UnsRegistry = (await UNSRegistry.deploy()).connect(registryOwner);
 
     cnsRegistry = await CNSRegistry.deploy();
     mintingController = await MintingController.deploy(cnsRegistry.address);
@@ -65,11 +65,11 @@ describe('RootRegistry', () => {
       uriPrefixController.address,
       resolver.address,
       ZERO_ADDRESS);
-    await mintingManager.addMinter(tokenOwner.address);
+    await mintingManager.addMinter(registryOwner.address);
 
-    l2UnsRegistry = (await UNSRegistry.deploy()).connect(tokenOwner);
-    await l2UnsRegistry.initialize(tokenOwner.address);
-    await l2UnsRegistry.setChildChainManager(tokenOwner.address);
+    l2UnsRegistry = (await UNSRegistry.deploy()).connect(registryOwner);
+    await l2UnsRegistry.initialize(registryOwner.address);
+    await l2UnsRegistry.setChildChainManager(registryOwner.address);
 
     // deploy state sender
     stateSender = await DummyStateSender.deploy();

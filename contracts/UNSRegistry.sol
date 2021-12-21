@@ -309,14 +309,14 @@ contract UNSRegistry is
     }
 
     /**
-     * @dev See {IMintableERC721-mint(address,uint256)}.
+     * @dev See {RootRegistry-mint(address,uint256)}.
      */
     function mint(address user, uint256 tokenId) external override onlyPredicate {
         _mint(user, tokenId);
     }
 
     /**
-     * @dev See {IMintableERC721-mint(address,uint256,bytes)}.
+     * @dev See {RootRegistry-mint(address,uint256,bytes)}.
      */
     function mint(address user, uint256 tokenId, bytes calldata) external override onlyPredicate {
         _mint(user, tokenId);

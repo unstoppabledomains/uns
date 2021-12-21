@@ -11,7 +11,6 @@ interface IChildRegistry is IChildToken {
     /**
      * @notice called when user wants to withdraw token back to root chain
      * @dev Should handle withraw by burning user's token.
-     * Should set `withdrawnTokens` mapping to `true` for the tokenId being withdrawn
      * This transaction will be verified when exiting on root chain
      * @param tokenId tokenId to withdraw
      */
@@ -27,9 +26,7 @@ interface IChildRegistry is IChildToken {
     /**
      * @notice called when user wants to withdraw token back to root chain with token URI
      * @dev Should handle withraw by burning user's token.
-     * Should set `withdrawnTokens` mapping to `true` for the tokenId being withdrawn
      * This transaction will be verified when exiting on root chain
-     *
      * @param tokenId tokenId to withdraw
      */
     function withdrawWithMetadata(uint256 tokenId) external;

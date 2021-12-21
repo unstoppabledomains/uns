@@ -57,7 +57,10 @@ abstract contract ChildRegistry is ERC721Upgradeable, IChildRegistry {
         for (uint256 i; i < length; i++) {
             uint256 tokenId = tokenIds[i];
 
-            require(_msgSender() == ownerOf(tokenId), string(abi.encodePacked("Registry: INVALID_TOKEN_OWNER ", tokenId)));
+            require(
+                _msgSender() == ownerOf(tokenId),
+                string(abi.encodePacked("Registry: INVALID_TOKEN_OWNER ", tokenId))
+            );
             _burn(tokenId);
         }
 
