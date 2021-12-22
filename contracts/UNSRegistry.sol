@@ -6,14 +6,13 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
+import './ChildRegistry.sol';
 import './cns/ICNSRegistry.sol';
 import './IUNSRegistry.sol';
 import './RecordStorage.sol';
+import './RootRegistry.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
-import './@maticnetwork/IChildToken.sol';
-import './@maticnetwork/IRootChainManager.sol';
-import './@maticnetwork/RootChainManagerStorage.sol';
 
 /**
  * @title UNSRegistry v0.3
@@ -25,8 +24,9 @@ contract UNSRegistry is
     ERC2771RegistryContext,
     RecordStorage,
     UNSRegistryForwarder,
-    IUNSRegistry,
-    IChildToken
+    RootRegistry,
+    ChildRegistry,
+    IUNSRegistry
 {
     /**
      * @dev ERC-1967: Emitted when the implementation is upgraded. Required for ABI decoding only.
@@ -103,7 +103,7 @@ contract UNSRegistry is
         return _childId(tokenId, label);
     }
 
-    function exists(uint256 tokenId) external view override returns (bool) {
+    function exists(uint256 tokenId) external view override(IUNSRegistry, IMintableERC721) returns (bool) {
         return _exists(tokenId);
     }
 
@@ -228,7 +228,7 @@ contract UNSRegistry is
             ICNSRegistry(_msgSender()).burn(tokenId);
             if(data.length > 0 && abi.decode(data, (bool))) {
                 _mint(address(this), tokenId);
-                _depositToPolygon(from, tokenId);
+                _deposit(from, tokenId);
             } else {
                 _mint(from, tokenId);
             }
@@ -296,57 +296,30 @@ contract UNSRegistry is
         _reset(tokenId);
     }
 
-    // L1 Polygon support
-
-    // This is the keccak-256 hash of "uns.polygon.root_chain_manager" subtracted by 1
-    bytes32 internal constant _ROOT_CHAIN_MANAGER_SLOT = 0xbe2bb46ac0377341a1ec5c3116d70fd5029d704bd46292e58f6265dd177ebafe;
-    function setRootChainManager(address rootChainManager) external override {
-        require(
-            StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value == address(0),
-            'Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY'
-        );
-        StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value = rootChainManager;
-    }
-
+    /**
+     * @dev See {RootRegistry-depositToPolygon}.
+     */
     function depositToPolygon(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) {
         // A workaround for MintableERC721Predicate
         // that requires a depositor to be equal to token owner:
         // https://github.com/maticnetwork/pos-portal/blob/88dbf0a88fd68fa11f7a3b9d36629930f6b93a05/contracts/root/TokenPredicates/MintableERC721Predicate.sol#L94
         _transfer(_msgSender(), address(this), tokenId);
-        _depositToPolygon(_msgSender(), tokenId);
+
+        _deposit(_msgSender(), tokenId);
     }
 
-    // L2 Polygon support
-
-    // This is the keccak-256 hash of "uns.polygon.child_chain_manager" subtracted by 1
-    bytes32 internal constant _CHILD_CHAIN_MANAGER_SLOT = 0x8bea9a6f8afd34f4e29c585f854e0cc5161431bf5fc299d468454d33dce53b87;
-    function setChildChainManager(address clientChainManager) external {
-        require(
-            StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value == address(0),
-            'Registry: CHILD_CHAIN_MANEGER_NOT_EMPTY'
-        );
-        StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value = clientChainManager;
+    /**
+     * @dev See {RootRegistry-mint(address,uint256)}.
+     */
+    function mint(address user, uint256 tokenId) external override onlyPredicate {
+        _mint(user, tokenId);
     }
 
-    function deposit(address user, bytes calldata depositData) external override {
-        require(
-            _msgSender() == StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value,
-            'Registry: INSUFFICIENT_PERMISSIONS'
-        );
-
-        // deposit single
-        if (depositData.length == 32) {
-            uint256 tokenId = abi.decode(depositData, (uint256));
-            _mint(user, tokenId);
-
-        // deposit batch
-        } else {
-            uint256[] memory tokenIds = abi.decode(depositData, (uint256[]));
-            uint256 length = tokenIds.length;
-            for (uint256 i; i < length; i++) {
-                _mint(user, tokenIds[i]);
-            }
-        }
+    /**
+     * @dev See {RootRegistry-mint(address,uint256,bytes)}.
+     */
+    function mint(address user, uint256 tokenId, bytes calldata) external override onlyPredicate {
+        _mint(user, tokenId);
     }
 
     /**
@@ -409,15 +382,6 @@ contract UNSRegistry is
 
     function _msgData() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (bytes calldata) {
         return super._msgData();
-    }
-
-    function _depositToPolygon(address to, uint256 tokenId) internal {
-        address manager = StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value;
-        bytes32 tokenType = RootChainManagerStorage(manager).tokenToType(address(this));
-        address predicate = RootChainManagerStorage(manager).typeToPredicate(tokenType);
-
-        _approve(predicate, tokenId);
-        IRootChainManager(manager).depositFor(to, address(this), abi.encode(tokenId));
     }
 
     // Reserved storage space to allow for layout changes in the future.

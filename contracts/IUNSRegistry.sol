@@ -7,8 +7,16 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721Metad
 import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol';
 
 import './IRecordStorage.sol';
+import './IRootRegistry.sol';
+import './IChildRegistry.sol';
 
-interface IUNSRegistry is IERC721MetadataUpgradeable, IERC721ReceiverUpgradeable, IRecordStorage {
+interface IUNSRegistry is
+    IERC721MetadataUpgradeable,
+    IERC721ReceiverUpgradeable,
+    IRecordStorage,
+    IRootRegistry,
+    IChildRegistry
+{
     event NewURI(uint256 indexed tokenId, string uri);
 
     event NewURIPrefix(string prefix);
@@ -46,7 +54,7 @@ interface IUNSRegistry is IERC721MetadataUpgradeable, IERC721ReceiverUpgradeable
      * @dev Existence of token.
      * @param tokenId uint256 ID of the token
      */
-    function exists(uint256 tokenId) external view returns (bool);
+    function exists(uint256 tokenId) external override view returns (bool);
 
     /**
      * @dev Transfer domain ownership without resetting domain records.
@@ -162,19 +170,4 @@ interface IUNSRegistry is IERC721MetadataUpgradeable, IERC721ReceiverUpgradeable
      * @param registry address of CNS registry contract
      */
     function setCNSRegistry(address registry) external;
-
-    /**
-     * @dev Stores RootChainManager address.
-     * It's one-time operation required to set RootChainManager address.
-     * RootChainManager is a contract responsible for bridging Ethereum
-     * and Polygon networks.
-     * @param rootChainManager address of RootChainManager contract
-     */
-    function setRootChainManager(address rootChainManager) external;
-
-    /**
-     * @dev Deposits token to Polygon through RootChainManager contract
-     * @param tokenId id of token
-     */
-    function depositToPolygon(uint256 tokenId) external;
 }

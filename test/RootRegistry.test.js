@@ -6,12 +6,12 @@ const { sign, buildExecuteFunc } = require('./helpers/metatx');
 
 const { utils } = ethers;
 
-describe('UNSRegistry (polygon)', () => {
+describe('RootRegistry', () => {
   let UNSRegistry, CNSRegistry, Resolver, MintingController, URIPrefixController, SignatureController,
     CNSRegistryForwarder, MintingManager, RootChainManager, MintableERC721Predicate, DummyStateSender;
   let l1UnsRegistry, l2UnsRegistry, cnsRegistry, resolver, mintingController, uriPrefixController,
     signatureController, cnsForwarder, mintingManager, rootChainManager, predicate, stateSender;
-  let signers, tokenOwner, rcmOwner, predicateOwner, owner, spender;
+  let registryOwner, rcmOwner, predicateOwner, owner, spender;
   let buildExecuteCnsParams, buildExecuteUnsParams;
 
   const abiCoder = new utils.AbiCoder();
@@ -22,8 +22,7 @@ describe('UNSRegistry (polygon)', () => {
   };
 
   before(async () => {
-    signers = await ethers.getSigners();
-    [tokenOwner, rcmOwner, predicateOwner, owner, spender] = signers;
+    [registryOwner, rcmOwner, predicateOwner, owner, spender] = await ethers.getSigners();
 
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
     CNSRegistry = await ethers.getContractFactory('CNSRegistry');
@@ -38,7 +37,7 @@ describe('UNSRegistry (polygon)', () => {
       .getContractFactory('contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol:MintableERC721Predicate');
     DummyStateSender = await ethers.getContractFactory('DummyStateSender');
 
-    l1UnsRegistry = (await UNSRegistry.deploy()).connect(tokenOwner);
+    l1UnsRegistry = (await UNSRegistry.deploy()).connect(registryOwner);
 
     cnsRegistry = await CNSRegistry.deploy();
     mintingController = await MintingController.deploy(cnsRegistry.address);
@@ -66,11 +65,11 @@ describe('UNSRegistry (polygon)', () => {
       uriPrefixController.address,
       resolver.address,
       ZERO_ADDRESS);
-    await mintingManager.addMinter(tokenOwner.address);
+    await mintingManager.addMinter(registryOwner.address);
 
-    l2UnsRegistry = (await UNSRegistry.deploy()).connect(tokenOwner);
-    await l2UnsRegistry.initialize(tokenOwner.address);
-    await l2UnsRegistry.setChildChainManager(tokenOwner.address);
+    l2UnsRegistry = (await UNSRegistry.deploy()).connect(registryOwner);
+    await l2UnsRegistry.initialize(registryOwner.address);
+    await l2UnsRegistry.setChildChainManager(registryOwner.address);
 
     // deploy state sender
     stateSender = await DummyStateSender.deploy();
@@ -98,13 +97,13 @@ describe('UNSRegistry (polygon)', () => {
     buildExecuteUnsParams = buildExecuteFunc(l1UnsRegistry.interface, l1UnsRegistry.address, l1UnsRegistry);
   });
 
-  describe('L1-side', () => {
-    it('should revert when set RootChainManager multiple times', async () => {
-      await expect(
-        l1UnsRegistry.setRootChainManager(rootChainManager.address),
-      ).to.be.revertedWith('Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY');
-    });
+  it('should revert when set RootChainManager multiple times', async () => {
+    await expect(
+      l1UnsRegistry.setRootChainManager(rootChainManager.address),
+    ).to.be.revertedWith('Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY');
+  });
 
+  describe('Deposit', () => {
     describe('One-step deposit', () => {
       it('should deposit token through UNS registry', async () => {
         const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-1d-as2');
@@ -288,61 +287,159 @@ describe('UNSRegistry (polygon)', () => {
     });
   });
 
-  describe('L2-side', () => {
-    describe('Management of childChainManager', async () => {
-      let tempL2UnsRegistry;
+  describe('Withdraw', () => {
+    it('should withdraw a domain', async () => {
+      const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-1w-as1');
+      await l1UnsRegistry.connect(owner).depositToPolygon(tokenId);
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
 
-      beforeEach(async () => {
-        tempL2UnsRegistry = (await UNSRegistry.deploy()).connect(tokenOwner);
-        await tempL2UnsRegistry.initialize(tokenOwner.address);
-      });
+      const data = utils.RLP.encode([
+        '0x', // skip first elem
+        [
+          // keccak256("Transfer(address,address,uint256)")
+          '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+          // withdrawer
+          owner.address,
+          // receiver(zero address, b/c of token's burn)
+          ZERO_ADDRESS,
+          // tokenId
+          tokenId.toHexString(),
+        ],
+      ]);
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
 
-      it('should revert when childChainManager is empty', async () => {
-        const tokenId = await tempL2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-te1');
-
-        await expect(
-          tempL2UnsRegistry.deposit(owner.address, abiCoder.encode(['uint256'], [tokenId])),
-        ).to.be.revertedWith('Registry: INSUFFICIENT_PERMISSIONS');
-      });
-
-      it('should revert when insufficient permissions', async () => {
-        const tokenId = await tempL2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-te2');
-        await tempL2UnsRegistry.setChildChainManager(tokenOwner.address);
-
-        await expect(
-          tempL2UnsRegistry.connect(owner).deposit(owner.address, abiCoder.encode(['uint256'], [tokenId])),
-        ).to.be.revertedWith('Registry: INSUFFICIENT_PERMISSIONS');
-      });
-
-      it('should revert setChildChainManager when childChainManager defined', async () => {
-        await tempL2UnsRegistry.setChildChainManager(tokenOwner.address);
-
-        await expect(
-          tempL2UnsRegistry.setChildChainManager(tokenOwner.address),
-        ).to.be.revertedWith('Registry: CHILD_CHAIN_MANEGER_NOT_EMPTY');
-      });
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
     });
 
-    describe('L2 deposit', () => {
-      it('should deposit one token', async () => {
-        const tokenId = await l2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-aq1');
+    it('should mint a domain on withdraw while it was minted on L2', async () => {
+      const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1wm-as1');
+      await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
-        await expect(l2UnsRegistry.deposit(owner.address, abiCoder.encode(['uint256'], [tokenId])))
-          .to.emit(l2UnsRegistry, 'Transfer')
-          .withArgs(ZERO_ADDRESS, owner.address, tokenId);
-        expect(await l2UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
-      });
+      const data = utils.RLP.encode([
+        '0x', // skip first elem
+        [
+          // keccak256("Transfer(address,address,uint256)")
+          '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+          // withdrawer
+          owner.address,
+          // receiver(zero address, b/c of token's burn)
+          ZERO_ADDRESS,
+          // tokenId
+          tokenId.toHexString(),
+        ],
+      ]);
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
 
-      it('should deposit multiple tokens', async () => {
-        const tokenId1 = await l2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-eq1');
-        const tokenId2 = await l2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-eq2');
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+    });
 
-        await expect(l2UnsRegistry.deposit(owner.address, abiCoder.encode(['uint256[]'], [[tokenId1, tokenId2]])))
-          .to.emit(l2UnsRegistry, 'Transfer')
-          .withArgs(ZERO_ADDRESS, owner.address, tokenId1);
-        expect(await l2UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
-        expect(await l2UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
-      });
+    it('should withdraw multiple domains', async () => {
+      const tokenId1 = await mintDomainL1(owner.address, TLD.WALLET, 'poly-2w-as1');
+      await l1UnsRegistry.connect(owner).depositToPolygon(tokenId1);
+      expect(await l1UnsRegistry.ownerOf(tokenId1)).to.be.equal(predicate.address);
+
+      const tokenId2 = await mintDomainL1(owner.address, TLD.WALLET, 'poly-2w-aq1');
+      await l1UnsRegistry.connect(owner).depositToPolygon(tokenId2);
+      expect(await l1UnsRegistry.ownerOf(tokenId2)).to.be.equal(predicate.address);
+
+      const data = utils.RLP.encode([
+        '0x', // skip first elem
+        [
+          // keccak256("WithdrawnBatch(address,uint256[])")
+          '0xf871896b17e9cb7a64941c62c188a4f5c621b86800e3d15452ece01ce56073df',
+          // withdrawer
+          owner.address,
+        ],
+        // tokenIds
+        abiCoder.encode(['uint256[]'], [[tokenId1, tokenId2]]),
+      ]);
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
+
+      expect(await l1UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
+      expect(await l1UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
+    });
+
+    it('should mint multiple domains on withdraw while they were minted on L2', async () => {
+      const tokenId1 = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-2wm-as1');
+      await expect(l1UnsRegistry.ownerOf(tokenId1)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+
+      const tokenId2 = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-2wm-aq1');
+      await expect(l1UnsRegistry.ownerOf(tokenId2)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+
+      const data = utils.RLP.encode([
+        '0x', // skip first elem
+        [
+          // keccak256("WithdrawnBatch(address,uint256[])")
+          '0xf871896b17e9cb7a64941c62c188a4f5c621b86800e3d15452ece01ce56073df',
+          // withdrawer
+          owner.address,
+        ],
+        // tokenIds
+        abiCoder.encode(['uint256[]'], [[tokenId1, tokenId2]]),
+      ]);
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
+
+      expect(await l1UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
+      expect(await l1UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
+    });
+
+    it('should withdraw a domain with metadata', async () => {
+      const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-1wmm-as1');
+      await l1UnsRegistry.connect(owner).depositToPolygon(tokenId);
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
+
+      const data = utils.RLP.encode([
+        '0x', // skip first elem
+        [
+          // keccak256("TransferWithMetadata(address,address,uint256,bytes)")
+          '0xf94915c6d1fd521cee85359239227480c7e8776d7caf1fc3bacad5c269b66a14',
+          // withdrawer
+          owner.address,
+          // receiver(zero address, b/c of token's burn)
+          ZERO_ADDRESS,
+          // tokenId
+          tokenId.toHexString(),
+        ],
+      ]);
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
+
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+    });
+
+    it('should mint a domain with metadata on withdraw while it was minted on L2', async () => {
+      const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1wmm-as2');
+      await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+
+      const data = utils.RLP.encode([
+        '0x', // skip first elem
+        [
+          // keccak256("TransferWithMetadata(address,address,uint256,bytes)")
+          '0xf94915c6d1fd521cee85359239227480c7e8776d7caf1fc3bacad5c269b66a14',
+          // withdrawer
+          owner.address,
+          // receiver(zero address, b/c of token's burn)
+          ZERO_ADDRESS,
+          // tokenId
+          tokenId.toHexString(),
+        ],
+        // metadata
+        abiCoder.encode(['bytes'], ['0x']),
+      ]);
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
+
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+    });
+
+    it('should revert mint(onlyPredicate) by non-predicate', async () => {
+      const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1w-revert');
+      await expect(l1UnsRegistry['mint(address,uint256)'](owner.address, tokenId))
+        .to.be.revertedWith('Registry: INSUFFICIENT_PERMISSIONS');
+    });
+
+    it('should revert mint(onlyPredicate) with metadata by non-predicate', async () => {
+      const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1w-revert');
+      await expect(l1UnsRegistry['mint(address,uint256,bytes)'](owner.address, tokenId, '0x'))
+        .to.be.revertedWith('Registry: INSUFFICIENT_PERMISSIONS');
     });
   });
 });
