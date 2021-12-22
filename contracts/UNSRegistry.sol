@@ -381,7 +381,10 @@ contract UNSRegistry is
     }
 
     function _isUpgradableURI(string memory uri) internal pure returns(bool) {
-        return !uri.toSlice().contains('udtestdev-'.toSlice());
+        Strings.slice memory uriSlice = uri.toSlice();
+        uint256 start = uriSlice.find('/'.toSlice())._len;
+        return start + 10 > uriSlice._len &&
+            uriSlice.sub(start, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8;
     }
 
     // Reserved storage space to allow for layout changes in the future.

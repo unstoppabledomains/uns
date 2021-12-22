@@ -22,13 +22,33 @@ library Strings {
     }
 
     /**
-     * @dev Returns True if `self` contains `value`.
-     * @param self The slice to search.
-     * @param value The text to search for in `self`.
-     * @return True if `value` is found in `self`, false otherwise.
+     * @dev Returns the keccak-256 hash of the slice.
+     * @param self The slice to hash.
+     * @return ret The hash of the slice.
      */
-    function contains(slice memory self, slice memory value) internal pure returns (bool) {
-        return findPtr(self._len, self._ptr, value._len, value._ptr) != self._ptr;
+    function keccak(slice memory self) internal pure returns (bytes32 ret) {
+        /* solium-disable-next-line security/no-inline-assembly */
+        assembly {
+            ret := keccak256(mload(add(self, 32)), mload(self))
+        }
+    }
+
+    function sub(slice memory self, uint index, uint len) internal pure returns (slice memory) {
+        return slice(len, self._ptr + index);
+    }
+
+    /**
+     * @dev Modifies `self` to contain the part of the string from the start of
+     *      `self` to the end of the first occurrence of `value`. If `value`
+     *      is not found, `self` is set to the empty slice.
+     * @param self The slice to search and modify.
+     * @param value The text to search for.
+     * @return `self`.
+     */
+    function find(slice memory self, slice memory value) internal pure returns (slice memory) {
+        uint ptr = findPtr(self._len, self._ptr, value._len, value._ptr);
+        self._len = ptr - self._ptr;
+        return self;
     }
 
     // Returns the memory address of the first byte after the last occurrence of
