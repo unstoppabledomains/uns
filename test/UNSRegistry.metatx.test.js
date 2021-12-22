@@ -230,7 +230,7 @@ describe('UNSRegistry (metatx)', () => {
         'onERC721Received',
         'withdraw',
         'withdrawBatch',
-        'withdrawWithMetadata'
+        'withdrawWithMetadata',
       ];
 
       const getFuncs = () => {
