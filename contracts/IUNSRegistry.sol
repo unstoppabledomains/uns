@@ -6,11 +6,13 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol';
 
+import './IERC1967.sol';
 import './IRecordStorage.sol';
 import './IRootRegistry.sol';
 import './IChildRegistry.sol';
 
 interface IUNSRegistry is
+    IERC1967,
     IERC721MetadataUpgradeable,
     IERC721ReceiverUpgradeable,
     IRecordStorage,
@@ -20,16 +22,6 @@ interface IUNSRegistry is
     event NewURI(uint256 indexed tokenId, string uri);
 
     event NewURIPrefix(string prefix);
-
-    /**
-     * @dev ERC-1967: Emitted when the implementation is upgraded. Required for ABI decoding only.
-     */
-    event Upgraded(address indexed implementation);
-
-    /**
-     * @dev ERC-1967: Emitted when the admin account has changed. Required for ABI decoding only.
-     */
-    event AdminChanged(address previousAdmin, address newAdmin);
 
     /**
      * @dev Function to set the token URI Prefix for all tokens.

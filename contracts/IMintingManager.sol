@@ -3,7 +3,9 @@
 
 pragma solidity ^0.8.0;
 
-interface IMintingManager {
+import './IERC1967.sol';
+
+interface IMintingManager is IERC1967 {
     event NewTld(uint256 indexed tokenId, string tld);
 
     /**
