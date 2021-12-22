@@ -143,16 +143,6 @@ describe('RootRegistry', () => {
         expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
       });
 
-      it('should revert depositing CNS free domains through MintingManager', async () => {
-        const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'udtestdev-t1');
-        expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
-
-        await expect(
-          cnsRegistry.connect(owner)['safeTransferFrom(address,address,uint256,bytes)'](
-            owner.address, l1UnsRegistry.address, tokenId, abiCoder.encode(['bool'], [true])),
-        ).to.be.revertedWith('Registry: TOKEN_UPGRADE_PROHIBITED');
-      });
-
       it('should mate-deposit CNS domains through MintingManager', async () => {
         const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'poly-1md-bl1');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);

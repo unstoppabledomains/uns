@@ -128,13 +128,19 @@ describe('MintingManager', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(developer.address);
       });
 
-      it('should not allow to mint the same domain twice', async () => {
+      it('should revert minting same domain twice', async () => {
         const minter = mintingManager.connect(developer);
         await minter.functions['claim(uint256,string)'](TLD.WALLET, domainSuffix);
 
         await expect(
           minter.functions['claim(uint256,string)'](TLD.WALLET, domainSuffix),
         ).to.be.revertedWith('MintingManager: TOKEN_BLOCKED');
+      });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager.connect(developer).functions['claim(uint256,string)'](TLD.WALLET, 'udtestdev-t1'),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
       });
     });
 
@@ -145,6 +151,13 @@ describe('MintingManager', () => {
         const tokenId = await unsRegistry.childIdOf(TLD.WALLET, `${DomainNamePrefix}${domainSuffix}`);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+      });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager.connect(developer)
+            .functions['claimTo(address,uint256,string)'](receiver.address, TLD.CRYPTO, 'udtestdev-t2'),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
       });
     });
 
@@ -167,6 +180,13 @@ describe('MintingManager', () => {
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
         expect(await unsRegistry.getMany(['key1', 'key2'], tokenId)).to.be.eql(['', '']);
+      });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager.connect(developer)
+            .functions[selector](receiver.address, TLD.CRYPTO, 'udtestdev-t3', [], []),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
       });
     });
   });
@@ -210,6 +230,12 @@ describe('MintingManager', () => {
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
       });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager.mintSLD(coinbase.address, TLD.CRYPTO, 'udtestdev-t4'),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+      });
     });
 
     describe('safe mint second level domain', () => {
@@ -235,10 +261,16 @@ describe('MintingManager', () => {
       });
 
       it('should safe mint .crypto damain in UNS registry when CNS registry undefined', async () => {
-        await mintingManager.mintSLD(coinbase.address, TLD.CRYPTO, 'test-uc-992f');
+        await mintingManager[selector](coinbase.address, TLD.CRYPTO, 'test-uc-992f');
         const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-uc-992f');
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+      });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t5'),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
       });
     });
 
@@ -265,10 +297,16 @@ describe('MintingManager', () => {
       });
 
       it('should safe mint .crypto damain in UNS registry when CNS registry undefined', async () => {
-        await mintingManager.mintSLD(coinbase.address, TLD.CRYPTO, 'test-uc-77ei');
+        await mintingManager[selector](coinbase.address, TLD.CRYPTO, 'test-uc-77ei', '0x');
         const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-uc-77ei');
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+      });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t6', '0x'),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
       });
     });
   });
@@ -459,18 +497,7 @@ describe('MintingManager', () => {
     });
 
     it('should have registered all tlds', async () => {
-      const tlds = {
-        wallet: '0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230',
-        coin: '0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2',
-        x: '0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d',
-        nft: '0xb75cf4f3d8bc3deb317ed5216d898899d5cc6a783f65f6768eb9bcb89428670d',
-        blockchain: '0x4118ebbd893ecbb9f5d7a817c7d8039c1bd991b56ea243e2ae84d0a1b2c950a7',
-        bitcoin: '0x042fb01c1e43fb4a32f85b41c821e17d2faeac58cfc5fb23f80bc00c940f85e3',
-        888: '0x5c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e',
-        dao: '0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553',
-      };
-
-      Object.values(tlds).forEach(async (tld) => {
+      Object.values(TLD).forEach(async (tld) => {
         expect(await unsRegistry.exists(tld)).to.be.equal(true);
       });
     });
@@ -631,6 +658,12 @@ describe('MintingManager', () => {
 
         expect(await unsRegistry.get('key1', tokenId)).to.be.eql('value1');
       });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t7', ['key1'], ['value1']),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+      });
     });
 
     describe('mintSLDWithRecords(address,uint256,string,string[],string[]) no records', () => {
@@ -652,6 +685,12 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.WALLET, 'test-mdmc3w');
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t7-1', [], []),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
       });
     });
 
@@ -678,6 +717,12 @@ describe('MintingManager', () => {
 
         expect(await unsRegistry.get('key1', tokenId)).to.be.eql('value1');
       });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t8', ['key1'], ['value1']),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+      });
     });
 
     describe('safeMintSLDWithRecords(address,uint256,string,string[],string[]) no records', () => {
@@ -699,6 +744,12 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.WALLET, 'test-msg220');
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t8-1', [], []),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
       });
     });
 
@@ -725,6 +776,12 @@ describe('MintingManager', () => {
 
         expect(await unsRegistry.get('key1', tokenId)).to.be.eql('value1');
       });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t9', ['key1'], ['value1'], '0x'),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+      });
     });
 
     describe('safeMintSLDWithRecords(address,uint256,string,string[],string[],bytes) no records', () => {
@@ -746,6 +803,12 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.WALLET, 'test-msdb3');
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t9-1', [], [], '0x'),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
       });
     });
   });

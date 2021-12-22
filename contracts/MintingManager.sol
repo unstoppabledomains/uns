@@ -13,12 +13,15 @@ import './metatx/Relayer.sol';
 import './roles/MinterRole.sol';
 import './utils/Blocklist.sol';
 import './utils/Pausable.sol';
+import './utils/Strings.sol';
 
 /**
  * @title MintingManager
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
 contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausable, IMintingManager {
+    using Strings for *;
+
     string public constant NAME = 'UNS: Minting Manager';
     string public constant VERSION = '0.2.0';
 
@@ -64,8 +67,22 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
      */
     bytes4 private constant _SIG_SAFE_MINT_WITH_RECORDS_DATA = 0x6a2d2256;
 
-    modifier onlyRegisteredTld(uint256 tld) {
+    /**
+     * @dev The modifier checks domain's tld and label on mint.
+     * @param tld should be registered.
+     * @param label should not have legacy CNS free domain prefix.
+     *      Legacy CNS free domain prefix is 'udtestdev-'.
+     *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
+     */
+    modifier onlyAllowed(uint256 tld, string memory label) {
         require(bytes(_tlds[tld]).length > 0, 'MintingManager: TLD_NOT_REGISTERED');
+        Strings.slice memory labelSlice = label.toSlice();
+        if(labelSlice._len > 10) {
+            require(
+                labelSlice.sub(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
+                'MintingManager: TOKEN_LABLE_PROHIBITED'
+            );
+        }
         _;
     }
 
@@ -104,7 +121,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         address to,
         uint256 tld,
         string calldata label
-    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
+    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
         _mintSLD(to, tld, label);
     }
 
@@ -112,7 +129,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         address to,
         uint256 tld,
         string calldata label
-    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
+    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
         _safeMintSLD(to, tld, label, '');
     }
 
@@ -121,7 +138,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         uint256 tld,
         string calldata label,
         bytes calldata data
-    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
+    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
         _safeMintSLD(to, tld, label, data);
     }
 
@@ -131,7 +148,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
+    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
         _mintSLDWithRecords(to, tld, label, keys, values);
     }
 
@@ -141,7 +158,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
+    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
         _safeMintSLDWithRecords(to, tld, label, keys, values, '');
     }
 
@@ -152,11 +169,11 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         string[] calldata keys,
         string[] calldata values,
         bytes calldata data
-    ) external override onlyMinter onlyRegisteredTld(tld) whenNotPaused {
+    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
         _safeMintSLDWithRecords(to, tld, label, keys, values, data);
     }
 
-    function claim(uint256 tld, string calldata label) external override onlyRegisteredTld(tld) whenNotPaused {
+    function claim(uint256 tld, string calldata label) external override onlyAllowed(tld, label) whenNotPaused {
         _mintSLD(_msgSender(), tld, _freeSLDLabel(label));
     }
 
@@ -164,7 +181,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         address to,
         uint256 tld,
         string calldata label
-    ) external override onlyRegisteredTld(tld) whenNotPaused {
+    ) external override onlyAllowed(tld, label) whenNotPaused {
         _mintSLD(to, tld, _freeSLDLabel(label));
     }
 
@@ -174,7 +191,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyRegisteredTld(tld) whenNotPaused {
+    ) external override onlyAllowed(tld, label) whenNotPaused {
         _mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
     }
 

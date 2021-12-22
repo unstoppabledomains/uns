@@ -13,7 +13,6 @@ import './RecordStorage.sol';
 import './RootRegistry.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
-import './utils/Strings.sol';
 
 /**
  * @title UNSRegistry v0.3
@@ -29,8 +28,6 @@ contract UNSRegistry is
     ChildRegistry,
     IUNSRegistry
 {
-    using Strings for *;
-
     string public constant NAME = 'UNS: Registry';
     string public constant VERSION = '0.3.0';
 
@@ -218,10 +215,7 @@ contract UNSRegistry is
         bytes calldata data
     ) external override returns (bytes4) {
         if(_msgSender() == StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value) {
-            ICNSRegistry cnsRegistry = ICNSRegistry(_msgSender());
-            require(_isUpgradableURI(cnsRegistry.tokenURI(tokenId)), 'Registry: TOKEN_UPGRADE_PROHIBITED');
-
-            cnsRegistry.burn(tokenId);
+            ICNSRegistry(_msgSender()).burn(tokenId);
             if(data.length > 0 && abi.decode(data, (bool))) {
                 _mint(address(this), tokenId);
                 _deposit(from, tokenId);
@@ -378,13 +372,6 @@ contract UNSRegistry is
 
     function _msgData() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (bytes calldata) {
         return super._msgData();
-    }
-
-    function _isUpgradableURI(string memory uri) internal pure returns(bool) {
-        Strings.slice memory uriSlice = uri.toSlice();
-        uint256 start = uriSlice.find('/'.toSlice())._len;
-        return start + 10 > uriSlice._len &&
-            uriSlice.sub(start, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8;
     }
 
     // Reserved storage space to allow for layout changes in the future.
