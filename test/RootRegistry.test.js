@@ -66,6 +66,7 @@ describe('RootRegistry', () => {
       resolver.address,
       ZERO_ADDRESS);
     await mintingManager.addMinter(registryOwner.address);
+    await mintingManager.setTokenURIPrefix('https://metadata.unstoppabledomains.ooo/metadata/');
 
     l2UnsRegistry = (await UNSRegistry.deploy()).connect(registryOwner);
     await l2UnsRegistry.initialize(registryOwner.address);
@@ -140,6 +141,16 @@ describe('RootRegistry', () => {
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
         expect(await l1UnsRegistry.exists(tokenId)).to.be.equal(true);
         expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
+      });
+
+      it('should revert depositing CNS free domains through MintingManager', async () => {
+        const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'udtestdev-t1');
+        expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+
+        await expect(
+          cnsRegistry.connect(owner)['safeTransferFrom(address,address,uint256,bytes)'](
+            owner.address, l1UnsRegistry.address, tokenId, abiCoder.encode(['bool'], [true])),
+        ).to.be.revertedWith('Registry: TOKEN_UPGRADE_PROHIBITED');
       });
 
       it('should mate-deposit CNS domains through MintingManager', async () => {
@@ -282,7 +293,7 @@ describe('RootRegistry', () => {
         await expect(
           randomERC721.connect(owner)['safeTransferFrom(address,address,uint256)'](
             owner.address, l1UnsRegistry.address, tokenId),
-        ).to.be.revertedWith('Registry: ERC721_RECEIVING_NOT_ALLOWED');
+        ).to.be.revertedWith('Registry: ERC721_RECEIVING_PROHIBITED');
       });
     });
   });

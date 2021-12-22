@@ -7,7 +7,7 @@ const { ZERO_ADDRESS, TLD } = require('./helpers/constants');
 const { utils } = ethers;
 
 describe('MintingManager', () => {
-  const DomainNamePrefix = 'udtestdev-';
+  const DomainNamePrefix = 'uns-devtest-';
 
   let UNSRegistry, CNSRegistry, Resolver, MintingController, URIPrefixController, MintingManager;
   let unsRegistry, cnsRegistry, resolver, mintingController, uriPrefixController, mintingManager;
@@ -483,7 +483,7 @@ describe('MintingManager', () => {
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
-        expect(await cnsRegistry.tokenURI(tokenId)).to.be.eql('/udtestdev-test-c221.crypto');
+        expect(await cnsRegistry.tokenURI(tokenId)).to.be.eql('/uns-devtest-test-c221.crypto');
         expect(await cnsRegistry.resolverOf(tokenId)).to.be.eql(resolver.address);
       });
 

@@ -319,7 +319,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
     }
 
     function _freeSLDLabel(string calldata label) private pure returns (string memory) {
-        return string(abi.encodePacked('udtestdev-', label));
+        return string(abi.encodePacked('uns-devtest-', label));
     }
 
     function _uri(uint256 tld, string memory label) private view returns (string memory) {

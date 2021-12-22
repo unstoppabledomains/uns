@@ -13,6 +13,7 @@ import './RecordStorage.sol';
 import './RootRegistry.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
+import './utils/Strings.sol';
 
 /**
  * @title UNSRegistry v0.3
@@ -28,15 +29,7 @@ contract UNSRegistry is
     ChildRegistry,
     IUNSRegistry
 {
-    /**
-     * @dev ERC-1967: Emitted when the implementation is upgraded. Required for ABI decoding only.
-     */
-    event Upgraded(address indexed implementation);
-
-    /**
-     * @dev ERC-1967: Emitted when the admin account has changed. Required for ABI decoding only.
-     */
-    event AdminChanged(address previousAdmin, address newAdmin);
+    using Strings for *;
 
     string public constant NAME = 'UNS: Registry';
     string public constant VERSION = '0.3.0';
@@ -225,7 +218,10 @@ contract UNSRegistry is
         bytes calldata data
     ) external override returns (bytes4) {
         if(_msgSender() == StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value) {
-            ICNSRegistry(_msgSender()).burn(tokenId);
+            ICNSRegistry cnsRegistry = ICNSRegistry(_msgSender());
+            require(_isUpgradableURI(cnsRegistry.tokenURI(tokenId)), 'Registry: TOKEN_UPGRADE_PROHIBITED');
+
+            cnsRegistry.burn(tokenId);
             if(data.length > 0 && abi.decode(data, (bool))) {
                 _mint(address(this), tokenId);
                 _deposit(from, tokenId);
@@ -236,7 +232,7 @@ contract UNSRegistry is
             return UNSRegistry.onERC721Received.selector;
         }
 
-        revert('Registry: ERC721_RECEIVING_NOT_ALLOWED');
+        revert('Registry: ERC721_RECEIVING_PROHIBITED');
     }
 
     /// Burning
@@ -382,6 +378,10 @@ contract UNSRegistry is
 
     function _msgData() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (bytes calldata) {
         return super._msgData();
+    }
+
+    function _isUpgradableURI(string memory uri) internal pure returns(bool) {
+        return !uri.toSlice().contains('udtestdev-'.toSlice());
     }
 
     // Reserved storage space to allow for layout changes in the future.

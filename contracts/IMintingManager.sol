@@ -104,14 +104,14 @@ interface IMintingManager {
     ) external;
 
     /**
-     * @dev Claims free domain. The fuction adds prefix `udtestdev-` to label.
+     * @dev Claims free domain. The fuction adds prefix to label.
      * @param tld id of parent token
      * @param label SLD label to mint
      */
     function claim(uint256 tld, string calldata label) external;
 
     /**
-     * @dev Claims free domain. The fuction adds prefix `udtestdev-` to label.
+     * @dev Claims free domain. The fuction adds prefix to label.
      * @param to address to mint the new SLD to
      * @param tld id of parent token
      * @param label SLD label to mint
@@ -123,7 +123,7 @@ interface IMintingManager {
     ) external;
 
     /**
-     * @dev Claims free domain. The fuction adds prefix `udtestdev-` to label.
+     * @dev Claims free domain. The fuction adds prefix to label.
      * @param to address to mint the new SLD to
      * @param tld id of parent token
      * @param label SLD label to mint

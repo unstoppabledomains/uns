@@ -22,6 +22,16 @@ interface IUNSRegistry is
     event NewURIPrefix(string prefix);
 
     /**
+     * @dev ERC-1967: Emitted when the implementation is upgraded. Required for ABI decoding only.
+     */
+    event Upgraded(address indexed implementation);
+
+    /**
+     * @dev ERC-1967: Emitted when the admin account has changed. Required for ABI decoding only.
+     */
+    event AdminChanged(address previousAdmin, address newAdmin);
+
+    /**
      * @dev Function to set the token URI Prefix for all tokens.
      * @param prefix string URI to assign
      */
