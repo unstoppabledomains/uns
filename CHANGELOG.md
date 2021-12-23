@@ -1,3 +1,6 @@
+## v0.2.0-alpha.1
+- Disable minting legacy free domains (`udtestdev-` legacy free domain prefix). New free domain prefix `uns-devtest-`
+
 ## v0.2.0-alpha.0
 - UNSRegistry@0.3.0 receives L2 Polygon support
     - RootRigistry - abstract contract implements L1-side Polygon support
