@@ -140,7 +140,7 @@ describe('MintingManager', () => {
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
           mintingManager.connect(developer).functions['claim(uint256,string)'](TLD.WALLET, 'udtestdev-t1'),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
 
@@ -157,7 +157,7 @@ describe('MintingManager', () => {
         await expect(
           mintingManager.connect(developer)
             .functions['claimTo(address,uint256,string)'](receiver.address, TLD.CRYPTO, 'udtestdev-t2'),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
 
@@ -186,7 +186,7 @@ describe('MintingManager', () => {
         await expect(
           mintingManager.connect(developer)
             .functions[selector](receiver.address, TLD.CRYPTO, 'udtestdev-t3', [], []),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
   });
@@ -234,7 +234,7 @@ describe('MintingManager', () => {
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
           mintingManager.mintSLD(coinbase.address, TLD.CRYPTO, 'udtestdev-t4'),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
 
@@ -270,7 +270,7 @@ describe('MintingManager', () => {
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
           mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t5'),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
 
@@ -306,7 +306,7 @@ describe('MintingManager', () => {
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
           mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t6', '0x'),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
   });
@@ -662,7 +662,7 @@ describe('MintingManager', () => {
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
           mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t7', ['key1'], ['value1']),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
 
@@ -690,7 +690,7 @@ describe('MintingManager', () => {
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
           mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t7-1', [], []),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
 
@@ -721,7 +721,7 @@ describe('MintingManager', () => {
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
           mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t8', ['key1'], ['value1']),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
 
@@ -749,7 +749,7 @@ describe('MintingManager', () => {
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
           mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t8-1', [], []),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
 
@@ -780,7 +780,7 @@ describe('MintingManager', () => {
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
           mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t9', ['key1'], ['value1'], '0x'),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
 
@@ -808,7 +808,7 @@ describe('MintingManager', () => {
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
           mintingManager[selector](coinbase.address, TLD.CRYPTO, 'udtestdev-t9-1', [], [], '0x'),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABLE_PROHIBITED');
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
   });

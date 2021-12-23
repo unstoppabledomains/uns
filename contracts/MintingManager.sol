@@ -80,7 +80,7 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         if(labelSlice._len > 10) {
             require(
                 labelSlice.sub(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
-                'MintingManager: TOKEN_LABLE_PROHIBITED'
+                'MintingManager: TOKEN_LABEL_PROHIBITED'
             );
         }
         _;
