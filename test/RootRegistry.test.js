@@ -66,6 +66,7 @@ describe('RootRegistry', () => {
       resolver.address,
       ZERO_ADDRESS);
     await mintingManager.addMinter(registryOwner.address);
+    await mintingManager.setTokenURIPrefix('https://metadata.unstoppabledomains.ooo/metadata/');
 
     l2UnsRegistry = (await UNSRegistry.deploy()).connect(registryOwner);
     await l2UnsRegistry.initialize(registryOwner.address);
@@ -282,7 +283,7 @@ describe('RootRegistry', () => {
         await expect(
           randomERC721.connect(owner)['safeTransferFrom(address,address,uint256)'](
             owner.address, l1UnsRegistry.address, tokenId),
-        ).to.be.revertedWith('Registry: ERC721_RECEIVING_NOT_ALLOWED');
+        ).to.be.revertedWith('Registry: ERC721_RECEIVING_PROHIBITED');
       });
     });
   });

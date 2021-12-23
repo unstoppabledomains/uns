@@ -28,16 +28,6 @@ contract UNSRegistry is
     ChildRegistry,
     IUNSRegistry
 {
-    /**
-     * @dev ERC-1967: Emitted when the implementation is upgraded. Required for ABI decoding only.
-     */
-    event Upgraded(address indexed implementation);
-
-    /**
-     * @dev ERC-1967: Emitted when the admin account has changed. Required for ABI decoding only.
-     */
-    event AdminChanged(address previousAdmin, address newAdmin);
-
     string public constant NAME = 'UNS: Registry';
     string public constant VERSION = '0.3.0';
 
@@ -236,7 +226,7 @@ contract UNSRegistry is
             return UNSRegistry.onERC721Received.selector;
         }
 
-        revert('Registry: ERC721_RECEIVING_NOT_ALLOWED');
+        revert('Registry: ERC721_RECEIVING_PROHIBITED');
     }
 
     /// Burning
