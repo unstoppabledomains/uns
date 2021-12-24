@@ -76,10 +76,10 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
      */
     modifier onlyAllowed(uint256 tld, string memory label) {
         require(bytes(_tlds[tld]).length > 0, 'MintingManager: TLD_NOT_REGISTERED');
-        Strings.slice memory labelSlice = label.toSlice();
-        if(labelSlice._len > 10) {
+        Strings.Slice memory _label = label.toSlice();
+        if(_label._len > 10) {
             require(
-                labelSlice.sub(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
+                _label.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
                 'MintingManager: TOKEN_LABEL_PROHIBITED'
             );
         }

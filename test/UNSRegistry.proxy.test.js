@@ -199,15 +199,14 @@ describe('UNSRegistry (proxy)', () => {
 
     it('should keep forwarding storage layout consistent after upgrade', async () => {
       const tokenId = await mintDomain(unsRegistry, owner.address, TLD.CRYPTO, 'up_state_domain_2');
+      expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(0);
+
       const params1 = await buildExecuteParams(
         'transferFrom(address,address,uint256)',
         [owner.address, receiver.address, tokenId],
         owner, tokenId,
       );
-      expect(params1.req.nonce).to.be.equal(0);
-
-      await unsRegistry.connect(spender)
-        .transferFromFor(owner.address, receiver.address, tokenId, params1.signature);
+      await unsRegistry.execute(params1.req, params1.signature);
       expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(1);
 
       unsRegistry = await upgrades.upgradeProxy(unsRegistry.address, UNSRegistry);
