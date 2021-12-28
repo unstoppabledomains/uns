@@ -9,7 +9,6 @@ import './cns/IURIPrefixController.sol';
 import './IMintingManager.sol';
 import './IUNSRegistry.sol';
 import './metatx/ERC2771Context.sol';
-import './metatx/Relayer.sol';
 import './roles/MinterRole.sol';
 import './utils/Blocklist.sol';
 import './utils/Pausable.sol';
@@ -19,11 +18,11 @@ import './utils/Strings.sol';
  * @title MintingManager
  * @dev Defines the functions for distribution of Second Level Domains (SLD)s.
  */
-contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausable, IMintingManager {
+contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMintingManager {
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.2.0';
+    string public constant VERSION = '0.3.0';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -36,36 +35,6 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
      * `namehash` = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(label)))))
      */
     mapping(uint256 => string) internal _tlds;
-
-    /**
-     * @dev bytes4(keccak256('mintSLD(address,uint256,string)')) == 0xae2ad903
-     */
-    bytes4 private constant _SIG_MINT = 0xae2ad903;
-
-    /**
-     * @dev bytes4(keccak256('safeMintSLD(address,uint256,string)')) == 0x4c1819e0
-     */
-    bytes4 private constant _SIG_SAFE_MINT = 0x4c1819e0;
-
-    /**
-     * @dev bytes4(keccak256('safeMintSLD(address,uint256,string,bytes)')) == 0x58839d6b
-     */
-    bytes4 private constant _SIG_SAFE_MINT_DATA = 0x58839d6b;
-
-    /**
-     * @dev bytes4(keccak256('mintSLDWithRecords(address,uint256,string,string[],string[])')) == 0x39ccf4d0
-     */
-    bytes4 private constant _SIG_MINT_WITH_RECORDS = 0x39ccf4d0;
-
-    /**
-     * @dev bytes4(keccak256('safeMintSLDWithRecords(address,uint256,string,string[],string[])')) == 0x27bbd225
-     */
-    bytes4 private constant _SIG_SAFE_MINT_WITH_RECORDS = 0x27bbd225;
-
-    /**
-     * @dev bytes4(keccak256('safeMintSLDWithRecords(address,uint256,string,string[],string[],bytes)')) == 0x6a2d2256
-     */
-    bytes4 private constant _SIG_SAFE_MINT_WITH_RECORDS_DATA = 0x6a2d2256;
 
     /**
      * @dev The modifier checks domain's tld and label on mint.
@@ -103,9 +72,6 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
         __ERC2771Context_init_unchained(forwarder);
         __Blocklist_init_unchained();
         __Pausable_init_unchained();
-
-        // Relayer is required to be a minter
-        _addMinter(address(this));
 
         string[9] memory tlds = ['crypto', 'wallet', 'coin', 'x', 'nft', 'blockchain', 'bitcoin', '888', 'dao'];
         for (uint256 i = 0; i < tlds.length; i++) {
@@ -232,22 +198,6 @@ contract MintingManager is ERC2771Context, MinterRole, Relayer, Blocklist, Pausa
 
     function unpause() external onlyOwner {
         _unpause();
-    }
-
-    function _verifyRelaySigner(address signer) internal view override {
-        super._verifyRelaySigner(signer);
-        require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
-    }
-
-    function _verifyRelayCall(bytes4 selector, bytes calldata) internal pure override {
-        bool isSupported = selector == _SIG_MINT ||
-            selector == _SIG_SAFE_MINT ||
-            selector == _SIG_SAFE_MINT_DATA ||
-            selector == _SIG_MINT_WITH_RECORDS ||
-            selector == _SIG_SAFE_MINT_WITH_RECORDS ||
-            selector == _SIG_SAFE_MINT_WITH_RECORDS_DATA;
-
-        require(isSupported, 'MintingManager: UNSUPPORTED_RELAY_CALL');
     }
 
     function _mintSLD(
