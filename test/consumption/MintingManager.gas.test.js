@@ -1,24 +1,12 @@
 const { ethers } = require('hardhat');
 
 const { ZERO_ADDRESS, TLD } = require('../helpers/constants');
-
-const { utils } = ethers;
+const { buildExecuteFunc } = require('../helpers/metatx');
 
 describe('MintingManager (consumption)', () => {
-  let UNSRegistry, MintingManager;
-  let unsRegistry, mintingManager;
+  let UNSRegistry, MintingManager, MintingManagerForwarder;
+  let unsRegistry, mintingManager, forwarder, buildExecuteParams;
   let signers, coinbase, receiver, spender;
-
-  const sign = async (data, address, signer) => {
-    return signer.signMessage(
-      utils.arrayify(
-        utils.solidityKeccak256(
-          [ 'bytes32', 'address' ],
-          [ utils.keccak256(data), address ],
-        ),
-      ),
-    );
-  };
 
   function percDiff (a, b) {
     return -((a - b) / a) * 100;
@@ -30,6 +18,7 @@ describe('MintingManager (consumption)', () => {
 
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
     MintingManager = await ethers.getContractFactory('MintingManager');
+    MintingManagerForwarder = await ethers.getContractFactory('MintingManagerForwarder');
 
     [, , receiver, spender] = signers;
 
@@ -37,12 +26,17 @@ describe('MintingManager (consumption)', () => {
     mintingManager = await MintingManager.deploy();
     await unsRegistry.initialize(mintingManager.address);
 
+    forwarder = await MintingManagerForwarder.deploy(mintingManager.address);
+
     await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await mintingManager.addMinter(coinbase.address);
     await mintingManager.setTokenURIPrefix('/');
+    await mintingManager.setForwarder(forwarder.address);
+
+    buildExecuteParams = buildExecuteFunc(mintingManager.interface, mintingManager.address, forwarder);
   });
 
-  describe('Relay', () => {
+  describe('Mint consumprion', () => {
     const getCases = () => {
       return [
         {
@@ -70,12 +64,12 @@ describe('MintingManager (consumption)', () => {
       for (let i = 0; i < cases.length; i++) {
         const { selector, params } = cases[i];
         const [acc, root, token, ...rest] = params;
-        const relayParams = [acc, root, token + 'r', ...rest];
+        const executeParams = [acc, root, token + 'r', ...rest];
 
-        const callData = mintingManager.interface.encodeFunctionData(selector, relayParams);
-        const signature = sign(callData, mintingManager.address, coinbase);
-        const relayTx = await mintingManager.connect(spender).relay(callData, signature);
-        relayTx.receipt = await relayTx.wait();
+        const tokenId = await unsRegistry.childIdOf(root, executeParams[2]);
+        const { req, signature } = await buildExecuteParams(selector, executeParams, coinbase, tokenId);
+        const executeTx = await forwarder.connect(spender).execute(req, signature);
+        executeTx.receipt = await executeTx.wait();
 
         const tx = await mintingManager[selector](...params);
         tx.receipt = await tx.wait();
@@ -84,9 +78,9 @@ describe('MintingManager (consumption)', () => {
           selector,
           records: Array.isArray(params[2]) ? params[2].length : '-',
           send: tx.receipt.gasUsed.toString(),
-          relay: relayTx.receipt.gasUsed.toString(),
+          execute: executeTx.receipt.gasUsed.toString(),
           increase:
-            percDiff(tx.receipt.gasUsed, relayTx.receipt.gasUsed).toFixed(2) +
+            percDiff(tx.receipt.gasUsed, executeTx.receipt.gasUsed).toFixed(2) +
             ' %',
         });
       }
