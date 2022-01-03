@@ -35,6 +35,11 @@ abstract contract RootRegistry is ERC721Upgradeable, IRootRegistry {
         IRootChainManager(manager).depositFor(to, address(this), abi.encode(tokenId));
     }
 
+    function _withdraw(bytes calldata inputData) internal {
+        address manager = StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value;
+        IRootChainManager(manager).exit(inputData);
+    }
+
     function _getPredicate() internal view returns(address predicate) {
         address manager = StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value;
         bytes32 tokenType = RootChainManagerStorage(manager).tokenToType(address(this));
