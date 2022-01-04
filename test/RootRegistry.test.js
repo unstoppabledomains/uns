@@ -3,6 +3,11 @@ const { expect } = require('chai');
 
 const { TLD, ZERO_ADDRESS } = require('./helpers/constants');
 const { sign, buildExecuteFunc } = require('./helpers/metatx');
+const {
+  buildPredicateExitInput,
+  buildPredicateMetadataExitInput,
+  buildPredicateBatchExitInput,
+} = require('./helpers/polygon');
 
 const { utils } = ethers;
 
@@ -294,20 +299,8 @@ describe('RootRegistry', () => {
       await l1UnsRegistry.connect(owner).depositToPolygon(tokenId);
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
 
-      const data = utils.RLP.encode([
-        '0x', // skip first elem
-        [
-          // keccak256("Transfer(address,address,uint256)")
-          '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-          // withdrawer
-          owner.address,
-          // receiver(zero address, b/c of token's burn)
-          ZERO_ADDRESS,
-          // tokenId
-          tokenId.toHexString(),
-        ],
-      ]);
-      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
+      const inputData = buildPredicateExitInput(owner.address, ZERO_ADDRESS, tokenId);
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, inputData);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
     });
@@ -316,20 +309,8 @@ describe('RootRegistry', () => {
       const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1wm-as1');
       await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
-      const data = utils.RLP.encode([
-        '0x', // skip first elem
-        [
-          // keccak256("Transfer(address,address,uint256)")
-          '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-          // withdrawer
-          owner.address,
-          // receiver(zero address, b/c of token's burn)
-          ZERO_ADDRESS,
-          // tokenId
-          tokenId.toHexString(),
-        ],
-      ]);
-      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
+      const inputData = buildPredicateExitInput(owner.address, ZERO_ADDRESS, tokenId);
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, inputData);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
     });
@@ -343,18 +324,8 @@ describe('RootRegistry', () => {
       await l1UnsRegistry.connect(owner).depositToPolygon(tokenId2);
       expect(await l1UnsRegistry.ownerOf(tokenId2)).to.be.equal(predicate.address);
 
-      const data = utils.RLP.encode([
-        '0x', // skip first elem
-        [
-          // keccak256("WithdrawnBatch(address,uint256[])")
-          '0xf871896b17e9cb7a64941c62c188a4f5c621b86800e3d15452ece01ce56073df',
-          // withdrawer
-          owner.address,
-        ],
-        // tokenIds
-        abiCoder.encode(['uint256[]'], [[tokenId1, tokenId2]]),
-      ]);
-      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
+      const inputData = buildPredicateBatchExitInput(owner.address, [tokenId1, tokenId2]);
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, inputData);
 
       expect(await l1UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
       expect(await l1UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
@@ -367,18 +338,8 @@ describe('RootRegistry', () => {
       const tokenId2 = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-2wm-aq1');
       await expect(l1UnsRegistry.ownerOf(tokenId2)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
-      const data = utils.RLP.encode([
-        '0x', // skip first elem
-        [
-          // keccak256("WithdrawnBatch(address,uint256[])")
-          '0xf871896b17e9cb7a64941c62c188a4f5c621b86800e3d15452ece01ce56073df',
-          // withdrawer
-          owner.address,
-        ],
-        // tokenIds
-        abiCoder.encode(['uint256[]'], [[tokenId1, tokenId2]]),
-      ]);
-      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
+      const inputData = buildPredicateBatchExitInput(owner.address, [tokenId1, tokenId2]);
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, inputData);
 
       expect(await l1UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
       expect(await l1UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
@@ -389,20 +350,8 @@ describe('RootRegistry', () => {
       await l1UnsRegistry.connect(owner).depositToPolygon(tokenId);
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
 
-      const data = utils.RLP.encode([
-        '0x', // skip first elem
-        [
-          // keccak256("TransferWithMetadata(address,address,uint256,bytes)")
-          '0xf94915c6d1fd521cee85359239227480c7e8776d7caf1fc3bacad5c269b66a14',
-          // withdrawer
-          owner.address,
-          // receiver(zero address, b/c of token's burn)
-          ZERO_ADDRESS,
-          // tokenId
-          tokenId.toHexString(),
-        ],
-      ]);
-      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
+      const inputData = buildPredicateMetadataExitInput(owner.address, ZERO_ADDRESS, tokenId);
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, inputData);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
     });
@@ -411,22 +360,8 @@ describe('RootRegistry', () => {
       const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1wmm-as2');
       await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
-      const data = utils.RLP.encode([
-        '0x', // skip first elem
-        [
-          // keccak256("TransferWithMetadata(address,address,uint256,bytes)")
-          '0xf94915c6d1fd521cee85359239227480c7e8776d7caf1fc3bacad5c269b66a14',
-          // withdrawer
-          owner.address,
-          // receiver(zero address, b/c of token's burn)
-          ZERO_ADDRESS,
-          // tokenId
-          tokenId.toHexString(),
-        ],
-        // metadata
-        abiCoder.encode(['bytes'], ['0x']),
-      ]);
-      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, data);
+      const inputData = buildPredicateMetadataExitInput(owner.address, ZERO_ADDRESS, tokenId, '0x');
+      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, inputData);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
     });
