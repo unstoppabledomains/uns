@@ -394,8 +394,8 @@ describe('RootRegistry', () => {
     });
   });
 
-  describe('Withdraw through rootChainManager', () => {
-    it('should be able to exit', async () => {
+  describe('Withdraw', () => {
+    it('should be able to exit through rootChainManager', async () => {
       const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-1');
       const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId);
       const receipt = await txn.wait();
@@ -405,6 +405,31 @@ describe('RootRegistry', () => {
       await rootChainManager.exit(data);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+    });
+
+    it('should be able to exit through UNS registry', async () => {
+      const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-2');
+      const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId);
+      const receipt = await txn.wait();
+
+      const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
+      const data = await buildExitInput(checkpointManager, receipt, checkpoint);
+      await l1UnsRegistry.connect(owner).withdrawFromPolygon(data, tokenId, [], []);
+
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+    });
+
+    it('should be able to exit through UNS registry with records update', async () => {
+      const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-2up');
+      const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId);
+      const receipt = await txn.wait();
+
+      const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
+      const data = await buildExitInput(checkpointManager, receipt, checkpoint);
+      await l1UnsRegistry.connect(owner).withdrawFromPolygon(data, tokenId, ['k1'], ['v1']);
+
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+      expect(await l1UnsRegistry.get('k1', tokenId)).to.be.eql('v1');
     });
   });
 });
