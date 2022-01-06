@@ -1,6 +1,5 @@
-const { ethers, artifacts } = require('hardhat');
+const { ethers } = require('hardhat');
 const { expect } = require('chai');
-const { bufferToHex, rlp } = require('ethereumjs-util');
 
 const { TLD, ZERO_ADDRESS } = require('./helpers/constants');
 const { sign, buildExecuteFunc } = require('./helpers/metatx');
@@ -8,16 +7,16 @@ const {
   buildPredicateExitInput,
   buildPredicateMetadataExitInput,
   buildPredicateBatchExitInput,
+  writeCheckpoint,
+  buildExitInput,
 } = require('./helpers/polygon');
-const { submitCheckpoint } = require('./helpers/@maticnetwork/checkpoint');
-const { childWeb3 } = require('./helpers/@maticnetwork/contracts');
 
 const { utils } = ethers;
 
 describe('RootRegistry', () => {
   let UNSRegistry, CNSRegistry, Resolver, MintingController, URIPrefixController, SignatureController,
     CNSRegistryForwarder, MintingManager, RootChainManager, MintableERC721Predicate, DummyStateSender,
-    CheckpointManager, CheckpointManagerABI;
+    CheckpointManager;
   let l1UnsRegistry, l2UnsRegistry, cnsRegistry, resolver, mintingController, uriPrefixController,
     signatureController, cnsForwarder, mintingManager, rootChainManager, predicate, stateSender,
     checkpointManager;
@@ -53,7 +52,6 @@ describe('RootRegistry', () => {
       .getContractFactory('contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol:MintableERC721Predicate');
     DummyStateSender = await ethers.getContractFactory('DummyStateSender');
     CheckpointManager = await ethers.getContractFactory('MockCheckpointManager');
-    CheckpointManagerABI = (await artifacts.readArtifact('MockCheckpointManager')).abi;
 
     l1UnsRegistry = (await UNSRegistry.deploy()).connect(registryOwner);
 
@@ -397,39 +395,13 @@ describe('RootRegistry', () => {
   });
 
   describe('Withdraw through rootChainManager', () => {
-    const ERC721_TRANSFER_EVENT_SIG = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-
     it('should be able to exit', async () => {
       const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-1');
       const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId);
       const receipt = await txn.wait();
 
-      const web3CheckpointManager = new childWeb3.eth.Contract(
-        CheckpointManagerABI,
-        checkpointManager.address,
-        { from: rcmOwner.address },
-      );
-
-      // submit checkpoint including burn (withdraw) tx
-      const checkpointData = await submitCheckpoint(web3CheckpointManager, txn.hash);
-
-      const headerNumber = (await checkpointManager.currentCheckpointNumber()).toNumber();
-      const logIndex = receipt.logs
-        .findIndex(log => log.topics[0].toLowerCase() === ERC721_TRANSFER_EVENT_SIG.toLowerCase());
-      const data = bufferToHex(
-        rlp.encode([
-          headerNumber,
-          bufferToHex(Buffer.concat(checkpointData.proof)),
-          checkpointData.number,
-          checkpointData.timestamp,
-          bufferToHex(checkpointData.transactionsRoot),
-          bufferToHex(checkpointData.receiptsRoot),
-          bufferToHex(checkpointData.receipt),
-          bufferToHex(rlp.encode(checkpointData.receiptParentNodes)),
-          bufferToHex(checkpointData.path), // branch mask,
-          logIndex,
-        ]),
-      );
+      const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
+      const data = await buildExitInput(checkpointManager, receipt, checkpoint);
       await rootChainManager.exit(data);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
