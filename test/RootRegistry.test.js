@@ -431,5 +431,23 @@ describe('RootRegistry', () => {
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       expect(await l1UnsRegistry.get('k1', tokenId)).to.be.eql('v1');
     });
+
+    it('should be able to meta-exit through UNS registry with records update', async () => {
+      const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-meta2up');
+      const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId);
+      const receipt = await txn.wait();
+
+      const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
+      const data = await buildExitInput(checkpointManager, receipt, checkpoint);
+      const { req, signature } = await buildExecuteUnsParams(
+        'withdrawFromPolygon(bytes,uint256,string[],string[])',
+        [data, tokenId, ['k2'], ['v2']],
+        owner, tokenId,
+      );
+      await l1UnsRegistry.execute(req, signature);
+
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+      expect(await l1UnsRegistry.get('k2', tokenId)).to.be.eql('v2');
+    });
   });
 });
