@@ -20,7 +20,6 @@ async function _getArtifacts () {
     SignatureController: await ethers.getContractFactory('SignatureController'),
     MintingController: await ethers.getContractFactory('MintingController'),
     URIPrefixController: await ethers.getContractFactory('URIPrefixController'),
-    WhitelistedMinter: await ethers.getContractFactory('WhitelistedMinter'),
     Resolver: await ethers.getContractFactory('Resolver'),
     ResolverForwarder: await ethers.getContractFactory('ResolverForwarder'),
     UNSRegistry: await ethers.getContractFactory('UNSRegistry'),
