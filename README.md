@@ -204,7 +204,7 @@ None
 
 ### Minting API change
 
-Changes: 
+Changes:
 
 * `MintingController`
   * Removed - minting permissions are now controlled by single upgradable `MintingManager` contract
