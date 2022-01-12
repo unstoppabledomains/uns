@@ -11,7 +11,6 @@ const deployCNSTask = {
       SignatureController,
       MintingController,
       URIPrefixController,
-      WhitelistedMinter,
       Resolver,
     } = ctx.artifacts;
 
@@ -50,30 +49,10 @@ const deployCNSTask = {
     await resolver.deployTransaction.wait();
     await verify(ctx, resolver.address, [cnsRegistry.address, mintingController.address]);
 
-    // CNS WhitelistedMinter
-    const whitelistedMinter = await WhitelistedMinter
-      .connect(owner)
-      .deploy(mintingController.address);
-    await ctx.saveContractConfig('WhitelistedMinter', whitelistedMinter);
-    await whitelistedMinter.deployTransaction.wait();
-    await verify(ctx, whitelistedMinter.address, [mintingController.address]);
-
-    await mintingController.connect(owner).addMinter(whitelistedMinter.address);
-    await whitelistedMinter.connect(owner).setDefaultResolver(resolver.address);
-    if (ctx.minters.length) {
-      const chunkSize = 100;
-      for (let i = 0, j = ctx.minters.length; i < j; i += chunkSize) {
-        const array = ctx.minters.slice(i, i + chunkSize);
-
-        ctx.log('Whitelisting...', array);
-        const bulkAddWhitelistedTx = await whitelistedMinter.connect(owner)
-          .bulkAddWhitelisted(array);
-        await bulkAddWhitelistedTx.wait();
-        ctx.log(`Whitelisted ${array.length} minters`);
-      }
-    }
-
     // Stub unsupported contracts
+    await ctx.saveContractConfig('WhitelistedMinter', {
+      address: '0x0000000000000000000000000000000000000000',
+    });
     await ctx.saveContractConfig('DomainZoneController', {
       address: '0x0000000000000000000000000000000000000000',
     });
