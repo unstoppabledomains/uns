@@ -1,3 +1,8 @@
+## 0.2.0-alpha.3
+- UNSRegistry@0.3.0 receives the ability to withdraw tokens from L2
+- SafeMath is redundant for solidity v0.8 (ProxyReader and TwitterValidationOperator affected)
+- Remove WhitelistedMinter from deployment of CNS
+
 ## 0.2.0-alpha.2
 - Remove legacy meta-transactions from UNSRegistryForwarder
 - Remove Relayer contract, release MintingManager@0.3.0

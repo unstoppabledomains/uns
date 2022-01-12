@@ -9,7 +9,7 @@ const { utils, BigNumber } = ethers;
 
 describe('UNSRegistry (proxy)', () => {
   let UNSRegistry, unsRegistry;
-  let signers, owner, receiver, spender;
+  let signers, owner, receiver;
 
   const buildExecuteParams = async (selector, params, from, tokenId) => {
     const data = unsRegistry.interface.encodeFunctionData(selector, params);
@@ -20,7 +20,7 @@ describe('UNSRegistry (proxy)', () => {
 
   beforeEach(async () => {
     signers = await ethers.getSigners();
-    [owner, receiver, spender] = signers;
+    [owner, receiver] = signers;
 
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
 

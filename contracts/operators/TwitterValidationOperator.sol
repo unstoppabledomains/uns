@@ -3,7 +3,6 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol';
 import '@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol';
 
 import '../cns/IResolver.sol';
@@ -13,10 +12,8 @@ import '../roles/CapperRole.sol';
 import '../IUNSRegistry.sol';
 
 contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receiver {
-    using SafeMathUpgradeable for uint256;
-
     string public constant NAME = 'UNS: Chainlink Twitter Validation Operator';
-    string public constant VERSION = '0.1.0';
+    string public constant VERSION = '0.1.1';
 
     event Validation(uint256 indexed tokenId, uint256 requestId, uint256 paymentAmount);
     event ValidationRequest(uint256 indexed tokenId, address indexed owner, uint256 requestId, string code);
@@ -76,7 +73,7 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
      */
     modifier hasAvailableBalance() {
         require(
-            availableBalance() >= withdrawableTokens.add(operatorPaymentPerValidation),
+            availableBalance() >= withdrawableTokens + operatorPaymentPerValidation,
             'TwitterValidationOperator: NOT_ENOUGH_TOKENS_ON_CONTRACT_BALANCE'
         );
         _;
@@ -113,7 +110,7 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
         uint256 requestId
     ) external onlyWhitelisted hasAvailableBalance {
         uint256 payment = _calculatePaymentForValidation(requestId);
-        withdrawableTokens = withdrawableTokens.add(payment);
+        withdrawableTokens = withdrawableTokens + payment;
 
         IUNSRegistry registry = _getRegistry(tokenId);
         IResolver resolver = IResolver(registry.resolverOf(tokenId));
@@ -155,7 +152,7 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
      * @param amount The amount to send (specified in wei)
      */
     function withdraw(address recipient, uint256 amount) external onlyWhitelistAdmin hasAvailableFunds(amount) {
-        withdrawableTokens = withdrawableTokens.sub(amount);
+        withdrawableTokens = withdrawableTokens - amount;
         assert(_linkToken.transfer(recipient, amount));
     }
 
@@ -182,11 +179,11 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
             registry.isApprovedOrOwner(address(this), tokenId),
             'TwitterValidationOperator: OPERATOR_SHOULD_BE_APPROVED'
         );
-        _frozenTokens = _frozenTokens.add(value);
+        _frozenTokens = _frozenTokens + value;
         _userRequests[_lastRequestId] = value;
 
         emit ValidationRequest(tokenId, registry.ownerOf(tokenId), _lastRequestId, code);
-        _lastRequestId = _lastRequestId.add(1);
+        _lastRequestId = _lastRequestId + 1;
     }
 
     /**
@@ -194,14 +191,14 @@ contract TwitterValidationOperator is WhitelistedRole, CapperRole, ERC677Receive
      * @dev Returns tokens amount
      */
     function availableBalance() public view returns (uint256) {
-        return _linkToken.balanceOf(address(this)).sub(_frozenTokens);
+        return _linkToken.balanceOf(address(this)) - _frozenTokens;
     }
 
     function _calculatePaymentForValidation(uint256 requestId) private returns (uint256 paymentPerValidation) {
         if (requestId > 0) {
             // Validation was requested from Smart Contract. We need to search for price in mapping
             paymentPerValidation = _userRequests[requestId];
-            _frozenTokens = _frozenTokens.sub(paymentPerValidation);
+            _frozenTokens = _frozenTokens - paymentPerValidation;
             delete _userRequests[requestId];
         } else {
             paymentPerValidation = operatorPaymentPerValidation;

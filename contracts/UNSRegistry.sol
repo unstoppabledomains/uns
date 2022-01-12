@@ -287,7 +287,7 @@ contract UNSRegistry is
     }
 
     /**
-     * @dev See {RootRegistry-depositToPolygon}.
+     * @dev See {IRootRegistry-depositToPolygon}.
      */
     function depositToPolygon(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) {
         // A workaround for MintableERC721Predicate
@@ -296,6 +296,21 @@ contract UNSRegistry is
         _transfer(_msgSender(), address(this), tokenId);
 
         _deposit(_msgSender(), tokenId);
+    }
+
+    /**
+     * @dev See {IRootRegistry-withdrawFromPolygon}.
+     */
+    function withdrawFromPolygon(
+        bytes calldata inputData,
+        uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values
+    ) external override {
+        _withdraw(inputData);
+
+        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
+        _setMany(keys, values, tokenId);
     }
 
     /**

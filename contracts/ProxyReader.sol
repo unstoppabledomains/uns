@@ -4,7 +4,6 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol';
 
 import './cns/ICNSRegistry.sol';
@@ -15,10 +14,8 @@ import './IUNSRegistry.sol';
 import './IRegistryReader.sol';
 
 contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader, IRecordReader, IDataReader {
-    using SafeMathUpgradeable for uint256;
-
     string public constant NAME = 'UNS: Proxy Reader';
-    string public constant VERSION = '0.2.0';
+    string public constant VERSION = '0.2.1';
 
     IUNSRegistry private immutable _unsRegistry;
     ICNSRegistry private immutable _cnsRegistry;

@@ -227,6 +227,7 @@ describe('UNSRegistry (metatx)', () => {
         'setManyFor',
         'reconfigureFor',
         'depositToPolygon', // requires rootChainManager contract
+        'withdrawFromPolygon', // requires rootChainManager contract
         'onERC721Received',
         'withdraw',
         'withdrawBatch',

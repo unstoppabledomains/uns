@@ -16,8 +16,22 @@ interface IRootRegistry is IMintableERC721 {
     function setRootChainManager(address rootChainManager) external;
 
     /**
-     * @dev Deposits token to Polygon through RootChainManager contract
+     * @dev Deposits token to Polygon through RootChainManager contract.
      * @param tokenId id of token
      */
     function depositToPolygon(uint256 tokenId) external;
+
+    /**
+     * @dev Exit from Polygon through RootChainManager contract.
+     *      It withdraws token with records update.
+     * @param tokenId id of token
+     * @param keys New record keys
+     * @param values New record values
+     */
+    function withdrawFromPolygon(
+        bytes calldata inputData,
+        uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values
+    ) external;
 }
