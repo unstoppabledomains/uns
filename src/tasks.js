@@ -1,5 +1,8 @@
-const { network, upgrades, run } = require('hardhat');
+const { network, upgrades, run, ethers } = require('hardhat');
 const merge = require('lodash.merge');
+const { ZERO_ADDRESS } = require('../test/helpers/constants');
+
+const { utils } = ethers;
 
 const deployCNSTask = {
   tags: ['cns', 'full'],
@@ -435,6 +438,97 @@ const upgradeMintingManagerTask = {
   },
 };
 
+/**
+ * The task deploys Polygon POS Bridge contracts.
+ * It is required for emulation of Bridge for test environments.
+ */
+const deployPolygonPosBridgeTask = {
+  tags: ['deploy_polygon_pos_bridge'],
+  priority: 120,
+  run: async (ctx, { UNSRegistry }) => {
+    const { owner } = ctx.accounts;
+
+    const stateSender = await ctx.artifacts.DummyStateSender.connect(owner).deploy();
+    const checkpointManager = await ctx.artifacts.CheckpointManager.connect(owner).deploy();
+
+    // deploy Predicate
+    const predicate = await ctx.artifacts.MintableERC721Predicate.connect(owner).deploy();
+    await predicate.initialize(owner.address);
+    await ctx.saveContractConfig('Predicate', predicate);
+
+    // deploy RootChainManager
+    const rootChainManager = await ctx.artifacts.RootChainManager.connect(owner).deploy();
+    await rootChainManager.initialize(owner.address);
+    await rootChainManager.setCheckpointManager(checkpointManager.address);
+    await rootChainManager.setStateSender(stateSender.address);
+
+    const tokenType = utils.keccak256(UNSRegistry.address);
+    await rootChainManager.registerPredicate(tokenType, predicate.address);
+    await rootChainManager.mapToken(
+      UNSRegistry.address,
+      ZERO_ADDRESS,
+      tokenType,
+    );
+    await predicate.grantRole(await predicate.MANAGER_ROLE(), rootChainManager.address);
+    await ctx.saveContractConfig('RootChainManager', rootChainManager);
+  },
+  ensureDependencies: (ctx, config) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { UNSRegistry } = config.contracts || {};
+    const dependencies = { UNSRegistry };
+
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    };
+
+    return dependencies;
+  },
+};
+
+const configurePolygonPosBridgeTask = {
+  tags: ['uns_config_polygon_pos_bridge'],
+  priority: 140,
+  run: async (ctx, {
+    CNSRegistry,
+    UNSRegistry,
+    RootChainManager,
+  }) => {
+    const { owner } = ctx.accounts;
+
+    const unsRegistry = await ctx.artifacts.UNSRegistry
+      .attach(UNSRegistry.address)
+      .connect(owner);
+
+    await unsRegistry.setCNSRegistry(CNSRegistry.address);
+    await unsRegistry.setRootChainManager(RootChainManager.address);
+  },
+  ensureDependencies: (ctx, config) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const {
+      CNSRegistry,
+      UNSRegistry,
+      RootChainManager,
+    } = config.contracts || {};
+    const dependencies = {
+      CNSRegistry,
+      UNSRegistry,
+      RootChainManager,
+    };
+
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    };
+
+    return dependencies;
+  },
+};
+
 const verify = async (ctx, address, args) => {
   try {
     await run('verify:verify', {
@@ -455,4 +549,6 @@ module.exports = [
   deployMMForwarderTask,
   upgradeUNSRegistryTask,
   upgradeMintingManagerTask,
+  deployPolygonPosBridgeTask,
+  configurePolygonPosBridgeTask,
 ];

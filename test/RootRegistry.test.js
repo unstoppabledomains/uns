@@ -53,7 +53,7 @@ describe('RootRegistry', () => {
     DummyStateSender = await ethers.getContractFactory('DummyStateSender');
     CheckpointManager = await ethers.getContractFactory('MockCheckpointManager');
 
-    l1UnsRegistry = (await UNSRegistry.deploy()).connect(registryOwner);
+    l1UnsRegistry = await UNSRegistry.connect(registryOwner).deploy();
 
     cnsRegistry = await CNSRegistry.deploy();
     mintingController = await MintingController.deploy(cnsRegistry.address);
@@ -84,7 +84,7 @@ describe('RootRegistry', () => {
     await mintingManager.addMinter(registryOwner.address);
     await mintingManager.setTokenURIPrefix('https://metadata.unstoppabledomains.ooo/metadata/');
 
-    l2UnsRegistry = (await UNSRegistry.deploy()).connect(registryOwner);
+    l2UnsRegistry = await UNSRegistry.connect(registryOwner).deploy();
     await l2UnsRegistry.initialize(registryOwner.address);
     await l2UnsRegistry.setChildChainManager(registryOwner.address);
 
@@ -92,14 +92,14 @@ describe('RootRegistry', () => {
     stateSender = await DummyStateSender.deploy();
 
     // deploy checkpoint manager
-    checkpointManager = (await CheckpointManager.deploy()).connect(rcmOwner);
+    checkpointManager = await CheckpointManager.connect(rcmOwner).deploy();
 
     // deploy and init predicate
-    predicate = (await MintableERC721Predicate.deploy()).connect(predicateOwner);
+    predicate = await MintableERC721Predicate.connect(predicateOwner).deploy();
     await predicate.initialize(predicateOwner.address);
 
     // deploy and setup root chain manager
-    rootChainManager = (await RootChainManager.deploy()).connect(rcmOwner);
+    rootChainManager = await RootChainManager.connect(rcmOwner).deploy();
     await rootChainManager.initialize(rcmOwner.address);
     await rootChainManager.setCheckpointManager(checkpointManager.address);
     await rootChainManager.setStateSender(stateSender.address);
