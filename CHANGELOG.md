@@ -1,3 +1,5 @@
+- ProxyReader@0.2.2 receives unbreakable resolve's data reading
+
 ## 0.2.0-alpha.3
 - UNSRegistry@0.3.0 receives the ability to withdraw tokens from L2
 - SafeMath is redundant for solidity v0.8 (ProxyReader and TwitterValidationOperator affected)

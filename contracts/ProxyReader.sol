@@ -15,7 +15,7 @@ import './IRegistryReader.sol';
 
 contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader, IRecordReader, IDataReader {
     string public constant NAME = 'UNS: Proxy Reader';
-    string public constant VERSION = '0.2.1';
+    string public constant VERSION = '0.2.2';
 
     IUNSRegistry private immutable _unsRegistry;
     ICNSRegistry private immutable _cnsRegistry;
