@@ -11,7 +11,7 @@ if (require.main === module) {
       const sandbox = await Sandbox.create({ extract: false });
       await sandbox.start({ noSnapshot: true });
       const deployer = await Deployer.create();
-      await deployer.execute(['full']);
+      await deployer.execute(['full', 'deploy_polygon_pos_bridge', 'uns_config_polygon_pos_bridge']);
       await sandbox.stop();
 
       const { db_path: dbPath, snapshotPath } = sandbox.options.network;

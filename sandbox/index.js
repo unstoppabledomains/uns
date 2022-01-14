@@ -19,7 +19,7 @@ class Sandbox {
       gasLimit: 6721975,
       defaultBalanceEther: 1000,
       totalAccounts: 10,
-      hardfork: 'petersburg',
+      hardfork: 'istanbul',
       allowUnlimitedContractSize: false,
       locked: false,
       hdPath: 'm/44\'/60\'/0\'/0/',
