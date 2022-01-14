@@ -14,6 +14,8 @@ import './IUNSRegistry.sol';
 import './IRegistryReader.sol';
 
 contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader, IRecordReader, IDataReader {
+    using AddressUpgradeable for address;
+
     string public constant NAME = 'UNS: Proxy Reader';
     string public constant VERSION = '0.2.1';
 
@@ -86,7 +88,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
             return _unsRegistry.get(key, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
-            if (resolver != address(0x0)) {
+            if (resolver.isContract()) {
                 try IResolver(resolver).get(key, tokenId) returns (string memory _value) {
                     value = _value;
                 } catch {}
@@ -100,7 +102,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
             return _unsRegistry.getMany(keys, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
-            if (resolver != address(0x0) && keys.length > 0) {
+            if (resolver.isContract() && keys.length > 0) {
                 try IResolver(resolver).getMany(keys, tokenId) returns (string[] memory _values) {
                     values = _values;
                 } catch {}
@@ -118,7 +120,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
             return _unsRegistry.getByHash(keyHash, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
-            if (resolver != address(0x0)) {
+            if (resolver.isContract()) {
                 try IResolver(resolver).getByHash(keyHash, tokenId) returns (string memory _key, string memory _value) {
                     (key, value) = (_key, _value);
                 } catch {}
@@ -138,7 +140,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
             return _unsRegistry.getManyByHash(keyHashes, tokenId);
         } else {
             address resolver = _cnsResolverOf(tokenId);
-            if (resolver != address(0x0) && keyHashes.length > 0) {
+            if (resolver.isContract() && keyHashes.length > 0) {
                 try IResolver(resolver).getManyByHash(keyHashes, tokenId) returns (string[] memory _keys, string[] memory _values) {
                     (keys, values) = (_keys, _values);
                 } catch {}
@@ -249,7 +251,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
         } else {
             resolver = _cnsResolverOf(tokenId);
             owner = _cnsOwnerOf(tokenId);
-            if (resolver != address(0x0) && keys.length > 0) {
+            if (resolver.isContract() && keys.length > 0) {
                 try IResolver(resolver).getMany(keys, tokenId) returns (string[] memory _values) {
                     values = _values;
                 } catch {}
@@ -276,7 +278,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
         } else {
             resolver = _cnsResolverOf(tokenId);
             owner = _cnsOwnerOf(tokenId);
-            if (resolver != address(0x0) && keys.length > 0) {
+            if (resolver.isContract() && keys.length > 0) {
                 try IResolver(resolver).getManyByHash(keyHashes, tokenId) returns (string[] memory _keys, string[] memory _values) {
                     (keys, values) = (_keys, _values);
                 } catch {}
