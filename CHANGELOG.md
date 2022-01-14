@@ -1,3 +1,4 @@
+## 0.2.0-alpha.4
 - ProxyReader@0.2.2 receives unbreakable resolve's data reading
 
 ## 0.2.0-alpha.3
