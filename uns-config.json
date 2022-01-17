@@ -180,7 +180,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x070e83FCed225184E67c86302493ffFCDB953f71",
-                    "implementation": "0x24b91e7Cd07cb5ae581034e545Db2Fe36F9e9Ada",
+                    "implementation": "0x514E677B1EC3bE8B5A2b2D0D1097721925EC34da",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ea",
                     "forwarder": "0x070e83FCed225184E67c86302493ffFCDB953f71"
@@ -193,7 +193,7 @@
                 },
                 "MintingManager": {
                     "address": "0x9ee42D3EB042e06F8Cd241890C4fA0d51e4DA345",
-                    "implementation": "0x487DE785da9A671E23976F08abF991072Af9dB21",
+                    "implementation": "0xFB11410f3067BB6Db61bC335f0de23bE87A1767e",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ec",
                     "forwarder": "0x7F9F48cF94C69ce91D4b442DA186F31118ac0185"
