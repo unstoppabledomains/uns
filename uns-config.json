@@ -256,7 +256,7 @@
                     "deploymentBlock": "0x0",
                     "deprecated": true
                 },
-                "Predicate": {
+                "MintableERC721Predicate": {
                     "address": "0x56E14C4C1748a818a5564D33cF774c59EB3eDF59",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x2fc240"
@@ -426,7 +426,7 @@
                     "deploymentBlock": "0x0",
                     "deprecated": true
                 },
-                "Predicate": {
+                "MintableERC721Predicate": {
                     "address": "0xBCfb5C1b1393B922Ec6939a83090B7Ea9F9AFb05",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x1a"
