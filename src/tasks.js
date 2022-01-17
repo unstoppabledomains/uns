@@ -1,6 +1,8 @@
-const { network, upgrades, run, ethers } = require('hardhat');
+const { network, upgrades, ethers } = require('hardhat');
 const merge = require('lodash.merge');
+
 const { ZERO_ADDRESS } = require('../test/helpers/constants');
+const verify = require('./verify');
 
 const { utils } = ethers;
 
@@ -90,7 +92,7 @@ const deployCNSForwardersTask = {
       .deploy(CNSRegistry.address, Resolver.address);
     await ctx.saveForwarderConfig('Resolver', resolverForwarder);
     await resolverForwarder.deployTransaction.wait();
-    await verify(ctx, resolverForwarder.address, [CNSRegistry.address]);
+    await verify(ctx, resolverForwarder.address, [CNSRegistry.address, Resolver.address]);
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -495,7 +497,7 @@ const deployPolygonPosBridgeTask = {
     // deploy Predicate
     const predicate = await ctx.artifacts.MintableERC721Predicate.connect(owner).deploy();
     await predicate.initialize(owner.address);
-    await ctx.saveContractConfig('Predicate', predicate);
+    await ctx.saveContractConfig('MintableERC721Predicate', predicate);
 
     // deploy RootChainManager
     const rootChainManager = await ctx.artifacts.RootChainManager.connect(owner).deploy();
@@ -564,17 +566,6 @@ const configurePolygonPosBridgeTask = {
 
     return dependencies;
   },
-};
-
-const verify = async (ctx, address, args) => {
-  try {
-    await run('verify:verify', {
-      address,
-      constructorArguments: args,
-    });
-  } catch (err) {
-    ctx.log('Verification failed', { chainId: network.config.chainId, address, args });
-  }
 };
 
 module.exports = [
