@@ -497,7 +497,7 @@ const deployPolygonPosBridgeTask = {
     // deploy Predicate
     const predicate = await ctx.artifacts.MintableERC721Predicate.connect(owner).deploy();
     await predicate.initialize(owner.address);
-    await ctx.saveContractConfig('Predicate', predicate);
+    await ctx.saveContractConfig('MintableERC721Predicate', predicate);
 
     // deploy RootChainManager
     const rootChainManager = await ctx.artifacts.RootChainManager.connect(owner).deploy();
