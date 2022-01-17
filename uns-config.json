@@ -236,12 +236,14 @@
                     "address": "0x0555344A5F440Bd1d8cb6B42db46c5e5D4070437",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57dc",
-                    "forwarder": "0xdD076eBC73f3AE9F4F946B3707eb8d26Fb53ede7"
+                    "forwarder": "0xfFe10676BC87D27e18A909e939DDac4577b3eBb5"
                 },
                 "ProxyReader": {
-                    "address": "0xFc5f608149f4D9e2Ed0733efFe9DD57ee24BCF68",
-                    "legacyAddresses": [],
-                    "deploymentBlock": "0x5b57f3"
+                    "address": "0x9A70ff906D422C2FD0F7B94244D6b36DB62Ee982",
+                    "legacyAddresses": [
+                        "0xFc5f608149f4D9e2Ed0733efFe9DD57ee24BCF68"
+                    ],
+                    "deploymentBlock": "0x5ede68"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",
