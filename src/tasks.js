@@ -1,6 +1,8 @@
-const { network, upgrades, run, ethers } = require('hardhat');
+const { network, upgrades, ethers } = require('hardhat');
 const merge = require('lodash.merge');
+
 const { ZERO_ADDRESS } = require('../test/helpers/constants');
+const verify = require('./verify');
 
 const { utils } = ethers;
 
@@ -564,17 +566,6 @@ const configurePolygonPosBridgeTask = {
 
     return dependencies;
   },
-};
-
-const verify = async (ctx, address, args) => {
-  try {
-    await run('verify:verify', {
-      address,
-      constructorArguments: args,
-    });
-  } catch (err) {
-    ctx.log('Verification failed', { chainId: network.config.chainId, address, args });
-  }
 };
 
 module.exports = [
