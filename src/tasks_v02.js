@@ -63,7 +63,7 @@ const postUpgradeL1RegistryTaskV02 = {
       .attach(UNSRegistry.address)
       .connect(owner);
 
-    console.log('### setCNSRegistry');
+    console.log('### setCNSRegistry', CNSRegistry.address);
     await unsRegistry.setCNSRegistry(CNSRegistry.address);
 
     let manager = '0xBbD7cBFA79faee899Eaf900F13C9065bF03B1A74'; // Goerli RootChainManagerProxy

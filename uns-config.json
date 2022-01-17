@@ -255,6 +255,16 @@
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0",
                     "deprecated": true
+                },
+                "Predicate": {
+                    "address": "0x56E14C4C1748a818a5564D33cF774c59EB3eDF59",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x2fc240"
+                },
+                "RootChainManager": {
+                    "address": "0xBbD7cBFA79faee899Eaf900F13C9065bF03B1A74",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x2dc9b9"
                 }
             }
         },
