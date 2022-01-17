@@ -439,6 +439,47 @@ const upgradeMintingManagerTask = {
 };
 
 /**
+ * The task configure CNS domain migration to UNS.
+ * It is required for post-upgrade configuration.
+ */
+const configureCnsMigrationTask = {
+  tags: ['uns_config_cns_migration'],
+  priority: 100,
+  run: async (ctx, {
+    CNSRegistry,
+    UNSRegistry,
+  }) => {
+    const { owner } = ctx.accounts;
+
+    const unsRegistry = await ctx.artifacts.UNSRegistry
+      .attach(UNSRegistry.address)
+      .connect(owner);
+
+    await unsRegistry.setCNSRegistry(CNSRegistry.address);
+  },
+  ensureDependencies: (ctx, config) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const {
+      CNSRegistry,
+      UNSRegistry,
+    } = config.contracts || {};
+    const dependencies = {
+      CNSRegistry,
+      UNSRegistry,
+    };
+
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    };
+
+    return dependencies;
+  },
+};
+
+/**
  * The task deploys Polygon POS Bridge contracts.
  * It is required for emulation of Bridge for test environments.
  */
@@ -492,7 +533,6 @@ const configurePolygonPosBridgeTask = {
   tags: ['uns_config_polygon_pos_bridge'],
   priority: 140,
   run: async (ctx, {
-    CNSRegistry,
     UNSRegistry,
     RootChainManager,
   }) => {
@@ -502,19 +542,16 @@ const configurePolygonPosBridgeTask = {
       .attach(UNSRegistry.address)
       .connect(owner);
 
-    await unsRegistry.setCNSRegistry(CNSRegistry.address);
     await unsRegistry.setRootChainManager(RootChainManager.address);
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const {
-      CNSRegistry,
       UNSRegistry,
       RootChainManager,
     } = config.contracts || {};
     const dependencies = {
-      CNSRegistry,
       UNSRegistry,
       RootChainManager,
     };
@@ -549,6 +586,7 @@ module.exports = [
   deployMMForwarderTask,
   upgradeUNSRegistryTask,
   upgradeMintingManagerTask,
+  configureCnsMigrationTask,
   deployPolygonPosBridgeTask,
   configurePolygonPosBridgeTask,
 ];
