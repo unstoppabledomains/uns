@@ -16,7 +16,7 @@ const upgradeUtilitiesTaskV02 = {
       .deploy(CNSRegistry.address, Resolver.address);
     await ctx.saveForwarderConfig('Resolver', resolverForwarder);
     await resolverForwarder.deployTransaction.wait();
-    await verify(ctx, resolverForwarder.address, [CNSRegistry.address]);
+    await verify(ctx, resolverForwarder.address, [CNSRegistry.address, Resolver.address]);
 
     console.log('## Deploying ProxyReader');
     const proxyReader = await ctx.artifacts.ProxyReader

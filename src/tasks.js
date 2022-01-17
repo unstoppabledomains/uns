@@ -92,7 +92,7 @@ const deployCNSForwardersTask = {
       .deploy(CNSRegistry.address, Resolver.address);
     await ctx.saveForwarderConfig('Resolver', resolverForwarder);
     await resolverForwarder.deployTransaction.wait();
-    await verify(ctx, resolverForwarder.address, [CNSRegistry.address]);
+    await verify(ctx, resolverForwarder.address, [CNSRegistry.address, Resolver.address]);
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
