@@ -3,12 +3,12 @@ const merge = require('lodash.merge');
 
 const verify = require('./verify');
 
-const upgradeUtilitiesTaskV02 = {
-  tags: ['upgrade_v02_l1', 'upgrade_v02_l2'],
+const deployResolverForwarderTaskV02 = {
+  tags: ['upgrade_v02_l1'],
   priority: 90,
   run: async (ctx, dependencies) => {
     const { owner } = ctx.accounts;
-    const { CNSRegistry, Resolver, UNSRegistry } = dependencies;
+    const { CNSRegistry, Resolver } = dependencies;
 
     console.log('## Deploying ResolverForwarder');
     const resolverForwarder = await ctx.artifacts.ResolverForwarder
@@ -17,6 +17,29 @@ const upgradeUtilitiesTaskV02 = {
     await ctx.saveForwarderConfig('Resolver', resolverForwarder);
     await resolverForwarder.deployTransaction.wait();
     await verify(ctx, resolverForwarder.address, [CNSRegistry.address, Resolver.address]);
+  },
+  ensureDependencies: (ctx, config) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { CNSRegistry, Resolver } = config.contracts || {};
+    const dependencies = { CNSRegistry, Resolver };
+
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    };
+
+    return dependencies;
+  },
+};
+
+const deployProxyReaderTaskV02 = {
+  tags: ['upgrade_v02_l1', 'upgrade_v02_l2'],
+  priority: 90,
+  run: async (ctx, dependencies) => {
+    const { owner } = ctx.accounts;
+    const { CNSRegistry, UNSRegistry } = dependencies;
 
     console.log('## Deploying ProxyReader');
     const proxyReader = await ctx.artifacts.ProxyReader
@@ -29,16 +52,8 @@ const upgradeUtilitiesTaskV02 = {
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const {
-      UNSRegistry,
-      CNSRegistry,
-      Resolver,
-    } = config.contracts || {};
-    const dependencies = {
-      UNSRegistry,
-      CNSRegistry,
-      Resolver,
-    };
+    const { UNSRegistry, CNSRegistry } = config.contracts || {};
+    const dependencies = { UNSRegistry, CNSRegistry };
 
     for (const [key, value] of Object.entries(dependencies)) {
       if (!value || !value.address) {
@@ -126,7 +141,8 @@ const postUpgradeL2RegistryTaskV02 = {
 };
 
 module.exports = [
-  upgradeUtilitiesTaskV02,
-  // postUpgradeL1RegistryTaskV02,
+  deployResolverForwarderTaskV02,
+  deployProxyReaderTaskV02,
+  // postUpgradeL1RegistryTaskV02,s
   // postUpgradeL2RegistryTaskV02,
 ];

@@ -5,7 +5,7 @@ const merge = require('lodash.merge');
 const debug = require('debug');
 
 const tasks = require('./tasks');
-const tasks_v02 = require('./tasks_v02');
+const tasksV02 = require('./tasks_v02');
 
 const log = debug('UNS:deployer');
 
@@ -79,7 +79,7 @@ class Deployer {
 
   async execute (tags, config) {
     tags = tags || [];
-    const _tasks = tasks.concat(tasks_v02);
+    const _tasks = tasks.concat(tasksV02);
 
     this.log('Execution started');
     for (const task of _tasks.sort((a, b) => a.priority - b.priority)) {
