@@ -143,6 +143,6 @@ const postUpgradeL2RegistryTaskV02 = {
 module.exports = [
   deployResolverForwarderTaskV02,
   deployProxyReaderTaskV02,
-  // postUpgradeL1RegistryTaskV02,s
+  // postUpgradeL1RegistryTaskV02,
   // postUpgradeL2RegistryTaskV02,
 ];

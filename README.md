@@ -139,10 +139,8 @@ Network | Variables
 Mainnet | MAINNET_INFURA_KEY <br /> MAINNET_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
 Rinkeby | RINKEBY_INFURA_KEY <br /> RINKEBY_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
 Goerli | GOERLI_INFURA_KEY <br /> GOERLI_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
-Polygon | POLYGON_INFURA_KEY <br /> POLYGON_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY*
-Mumbai | MUMBAI_INFURA_KEY <br /> MUMBAI_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY*
-
-NOTE: take a look usage of POLYGONSCAN_API_KEY in section **Deploying UNS on L2(Polygon/Mumbai)**
+Polygon | POLYGON_INFURA_KEY <br /> POLYGON_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY
+Mumbai | MUMBAI_INFURA_KEY <br /> MUMBAI_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY
 
 <div id="backward-incompatibility"></div>
 
@@ -278,3 +276,6 @@ Warning: In case of contracts' redeployment, make sure there is no deployment ou
 ```
 yarn hardhat run --network mumbai scripts/deploy_UNS_only.js
 ```
+
+## L2 Polygon
+There are configs networks [Mainnet](https://static.matic.network/network/mainnet/v1/index.json), [Testnet](https://static.matic.network/network/testnet/mumbai/index.json)

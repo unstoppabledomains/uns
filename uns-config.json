@@ -274,7 +274,7 @@
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272eb5",
-                    "implementation": "0x0a7b33E986f2c8BF2a16bdda6004d3FaFFC27695",
+                    "implementation": "0xDA2fa7bf8e60e8BD3A9ADb7105C67B184F26209D",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
                 },
                 "CNSRegistry": {
@@ -287,7 +287,7 @@
                     "address": "0x7be83293BeeDc9Eba1bd76c66A65F10F3efaeC26",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272f41",
-                    "implementation": "0x10e91753eC98cd259A62085002C25E92C9dc8Aed",
+                    "implementation": "0xBb45a6E10224Aa36EAcd812205F3763D353e9783",
                     "forwarder": "0xC37d3c4326ab0E1D2b9D8b916bBdf5715f780fcF"
                 },
                 "ProxyAdmin": {
@@ -331,9 +331,11 @@
                     "forwarder": "0x0000000000000000000000000000000000000000"
                 },
                 "ProxyReader": {
-                    "address": "0xA3f32c8cd786dc089Bd1fC175F2707223aeE5d00",
-                    "legacyAddresses": [],
-                    "deploymentBlock": "0x01273234"
+                    "address": "0x423F2531bd5d3C3D4EF7C318c2D1d9BEDE67c680",
+                    "legacyAddresses": [
+                        "0xA3f32c8cd786dc089Bd1fC175F2707223aeE5d00"
+                    ],
+                    "deploymentBlock": "0x016ca441"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",
