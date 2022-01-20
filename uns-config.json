@@ -184,6 +184,16 @@
                     "legacyAddresses": [],
                     "deploymentBlock": "0x740d93",
                     "deprecated": true
+                },
+                "MintableERC721Predicate": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "RootChainManager": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -358,6 +368,16 @@
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0",
                     "deprecated": true
+                },
+                "MintableERC721Predicate": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "RootChainManager": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -530,6 +550,16 @@
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0",
                     "deprecated": true
+                },
+                "MintableERC721Predicate": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "RootChainManager": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         }
