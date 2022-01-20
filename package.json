@@ -53,7 +53,7 @@
     "ethereum-waffle": "3.4.0",
     "ethers": "^5.1.4",
     "ganache-core": "^2.13.2",
-    "hardhat": "^2.4.1",
+    "hardhat": "^2.6.0",
     "hardhat-abi-exporter": "^2.2.1",
     "hardhat-contract-sizer": "^2.0.3",
     "hardhat-gas-reporter": "^1.0.4",

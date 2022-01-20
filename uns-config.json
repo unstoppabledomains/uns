@@ -5,7 +5,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x049aba7510f45BA5b64ea9E658E342F904DB358D",
-                    "implementation": "0x2351f8557Ec733F35a278C922F9DcAac32c687AF",
+                    "implementation": "0xa715562307AA8AEDCba976b3793b3337F371c14a",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xc2fede",
                     "forwarder": "0x049aba7510f45BA5b64ea9E658E342F904DB358D"
@@ -18,7 +18,7 @@
                 },
                 "MintingManager": {
                     "address": "0x2a7084870bB724175a3C96Da8FaA55128fa3E19D",
-                    "implementation": "0x1c776e8D286a35e8B4bc51388A77dD2044E5Fa7d",
+                    "implementation": "0x8caAeaD19aab5f54C94BB9F4be32e200E54AC8D7",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xc2fee0",
                     "forwarder": "0xb970fbCF52cd8111c76c379D4f2FE12E7f8AE7fb"
@@ -64,16 +64,17 @@
                         "0x878bc2f3f717766ab69c0a5f9a6144931e61aed3"
                     ],
                     "deploymentBlock": "0x960844",
-                    "forwarder": "0x92660E5F403679aB45e0C6DB7c35B5629d265fDd"
+                    "forwarder": "0xc33aBEe943be2A2DA50708bAb61F47d581ee450d"
                 },
                 "ProxyReader": {
-                    "address": "0xc3C2BAB5e3e52DBF311b2aAcEf2e40344f19494E",
+                    "address": "0x58034A288D2E56B661c9056A0C27273E5460B63c",
                     "legacyAddresses": [
+                        "0xc3C2BAB5e3e52DBF311b2aAcEf2e40344f19494E",
                         "0xfEe4D4F0aDFF8D84c12170306507554bC7045878",
                         "0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5",
                         "0x7ea9Ee21077F84339eDa9C80048ec6db678642B1"
                     ],
-                    "deploymentBlock": "0xca7ab2"
+                    "deploymentBlock": "0xd62e80"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x2F659766E3D08561CA3408FbAba7C0749ab2c402",
@@ -87,6 +88,16 @@
                     "legacyAddresses": [],
                     "deploymentBlock": "0xacc390",
                     "deprecated": true
+                },
+                "MintableERC721Predicate": {
+                    "address": "0x932532aA4c0174b8453839A6E44eE09Cc615F2b7",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0xa3cf69"
+                },
+                "RootChainManager": {
+                    "address": "0xA0c68C638235ee32657e8f720a23ceC1bFc77C77",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0xa3cf4d"
                 }
             }
         },

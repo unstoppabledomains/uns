@@ -397,7 +397,8 @@ describe('RootRegistry', () => {
   describe('Withdraw', () => {
     it('should be able to exit through rootChainManager', async () => {
       const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-1');
-      const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId);
+      // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
+      const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
       const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
@@ -409,7 +410,8 @@ describe('RootRegistry', () => {
 
     it('should be able to exit through UNS registry', async () => {
       const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-2');
-      const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId);
+      // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
+      const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
       const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
@@ -421,7 +423,8 @@ describe('RootRegistry', () => {
 
     it('should be able to exit through UNS registry with records update', async () => {
       const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-2up');
-      const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId);
+      // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
+      const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
       const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
@@ -434,7 +437,8 @@ describe('RootRegistry', () => {
 
     it('should be able to meta-exit through UNS registry with records update', async () => {
       const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-meta2up');
-      const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId);
+      // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
+      const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
       const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
