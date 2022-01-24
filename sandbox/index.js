@@ -29,6 +29,7 @@ class Sandbox {
       dbPath: './.sandbox',
       snapshotPath: path.join(__dirname, 'db.tgz'),
       vmErrorsOnRpcResponse: true,
+      logger: { log: () => {} },
     };
   }
 
