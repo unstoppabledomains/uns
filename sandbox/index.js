@@ -28,6 +28,7 @@ class Sandbox {
       chainId: 1337,
       dbPath: './.sandbox',
       snapshotPath: path.join(__dirname, 'db.tgz'),
+      vmErrorsOnRpcResponse: true,
     };
   }
 
