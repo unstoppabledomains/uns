@@ -28,6 +28,8 @@ class Sandbox {
       chainId: 1337,
       dbPath: './.sandbox',
       snapshotPath: path.join(__dirname, 'db.tgz'),
+      vmErrorsOnRpcResponse: true,
+      logger: { log: () => {} },
     };
   }
 
@@ -49,7 +51,9 @@ class Sandbox {
 
     const { dbPath, snapshotPath } = networkOptions;
     if (options.clean) {
-      fs.rmdirSync(dbPath, { recursive: true });
+      if (fs.existsSync(dbPath)) {
+        fs.rmdirSync(dbPath, { recursive: true });
+      }
       fs.mkdirSync(dbPath, { recursive: true });
       log(`Cleaned sandbox database. Path: ${dbPath}`);
     }
@@ -74,7 +78,7 @@ class Sandbox {
     this.options = options || {};
     this.provider = service.provider;
     this.snapshotId = undefined;
-    this.version = 'v0.3';
+    this.version = 'v0.4';
 
     const accounts = this._getAccounts(this.options.network);
     this.accounts = {

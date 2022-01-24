@@ -1,4 +1,4 @@
-const ganache = require('ganache-core');
+const ganache = require('ganache');
 
 const DEFAULT_PORT = 7545;
 
@@ -9,37 +9,13 @@ class GanacheService {
     this.provider = this.server.provider;
   }
 
-  async startServer () {
-    const port = this._options.port;
-    const hostname = this._options.hostname;
-
-    await new Promise((resolve, reject) => {
-      const onListening = () => {
-        this.server.removeListener('error', onError);
-        resolve();
-      };
-
-      const onError = (err) => {
-        this.server.removeListener('listening', onListening);
-        reject(err);
-      };
-
-      this.server.once('listening', onListening);
-      this.server.once('error', onError);
-      this.server.listen(port, hostname);
-    });
+  startServer () {
+    const { port, hostname } = this._options;
+    return this.server.listen(port, hostname);
   }
 
-  async stopServer () {
-    await new Promise((resolve, reject) => {
-      this.server.close((err) => {
-        if (err !== undefined && err !== null) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
+  stopServer () {
+    return this.server.close();
   }
 
   _validateAndTransformOptions (options) {

@@ -1,3 +1,7 @@
+## v0.2.1
+- Upgrade Ganache to v7.0.0
+- Upgrade Sandbox to v0.4
+
 ## v0.2.0
 - ProxyReader@0.2.2 receives unbreakable resolve's data reading
 - UNSRegistry@0.3.0 receives the ability to withdraw tokens from L2
