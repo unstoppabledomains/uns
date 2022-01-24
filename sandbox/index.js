@@ -51,7 +51,9 @@ class Sandbox {
 
     const { dbPath, snapshotPath } = networkOptions;
     if (options.clean) {
-      fs.rmdirSync(dbPath, { recursive: true });
+      if (fs.existsSync(dbPath)) {
+        fs.rmdirSync(dbPath, { recursive: true });
+      }
       fs.mkdirSync(dbPath, { recursive: true });
       log(`Cleaned sandbox database. Path: ${dbPath}`);
     }
