@@ -1,5 +1,8 @@
+## v0.4
+- Upgrade to ganache@v7.0.0
+
 ## v0.3
-- Upgraded up to UNS@0.2.0-alpha.4
+- Upgrade up to UNS@0.2.0-alpha.4
 
 ## v0.2
 - Adds possibility to migrate CNS domain to UNS registry through functions:
