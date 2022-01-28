@@ -166,68 +166,12 @@ Note: List of changes which makes UNS and CNS backward incompatibile
   * Moved from Resolver to Registry
   * Registry now fires this event when records are reset on transfer.
 
-#### Affected components
-
-* Website Backend
-  * UNS Mirror
-* Resolution Service
-  * UNS Mirror
-* Resolution Libs
-  * allRecords
-
-### Read API
-
-* `Registry.isController`
-  * Removed
-
-#### Affected Components
-
-None
-
 ### Resolvers Removal
 
 * `function resolveTo(address to, uint256 tokenId) external {}` 
   * Removed - UNS uses a single Resolver which is Registry itself.
 * `function resolverOf(uint256 tokenId)`
   * Now always returns Regsitry address itself
-
-#### Affected Components
-
-* Website Backend
-  * Records Management
-* Website Frontend
-  * Records Management
-* Mobile App
-  * Records Management
-
-### Minting API change
-
-Changes:
-
-* `MintingController`
-  * Removed - minting permissions are now controlled by single upgradable `MintingManager` contract
-* `WhitelistedMinter`
-  * Removed - `MintingManager` now has methods to do that.
-* `MintingManager`
-  * Added - it's minting methods are similar to old `WhitelistedMinter` but they all have additional parameter - `tld`
-
-#### Affected Components
-
-* Website Backend
-  * Claim a domain
-    * Including Delegate Claiming fee
-
-### Internal package API changed
-
-
-* `function controlledResolveTo(address to, uint256 tokenId) external {}` 
-  * Removed
-* `function sync(uint256 tokenId, uint256 updateId) external {}`
-  * Removed
-* `function preconfigure(string[] memory keys, string[] memory values, uint256 tokenId) external {}` 
-  * Removed due to removing controllers
-
-#### Affected Components: None
 
 ---
 ## Sandbox
