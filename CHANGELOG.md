@@ -1,3 +1,6 @@
+## v0.2.2
+- Update BTC regex to support BECH32 (P2WSH) address format
+
 ## v0.2.1
 - Upgrade Ganache to v7.0.0
 - Upgrade Sandbox to v0.4
