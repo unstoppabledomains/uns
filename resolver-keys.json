@@ -101,6 +101,11 @@
       "deprecated": false,
       "validationRegex": "^z([a-zA-Z0-9]){94}$|^zs1([a-zA-Z0-9]){75}$|^t([a-zA-Z0-9]){34}$"
     },
+    "crypto.YEC.address": {
+      "deprecatedKeyName": "YEC",
+      "deprecated": false,
+      "validationRegex": "^y([a-zA-Z0-9]){94}$|^ys1([a-zA-Z0-9]){75}$|^s([a-zA-Z0-9]){34}$"
+    },
     "crypto.ADA.address": {
       "deprecatedKeyName": "ADA",
       "deprecated": false,
