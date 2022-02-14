@@ -99,7 +99,7 @@
     "crypto.ZEC.address": {
       "deprecatedKeyName": "ZEC",
       "deprecated": false,
-      "validationRegex": "^z([a-zA-Z0-9]){94}$|^zs([a-zA-Z0-9]){75}$|^t([a-zA-Z0-9]){34}$"
+      "validationRegex": "^z([a-zA-Z0-9]){94}$|^zs1([a-zA-Z0-9]){75}$|^t([a-zA-Z0-9]){34}$"
     },
     "crypto.ADA.address": {
       "deprecatedKeyName": "ADA",
