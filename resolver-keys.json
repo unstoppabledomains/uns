@@ -1,5 +1,10 @@
 {
   "version": "2.1.0",
+  "information": {
+    "description": "This file desribes all resolver keys which a defined meaning and related metadata used by Unstopppable Domains UNS Registry"
+    "documentation": "https://docs.unstoppabledomains.com/domain-registry-essentials/records-reference",
+    "contribution": "https://github.com/unstoppabledomains/uns/blob/main/resolver-keys.json",
+  },
   "keys": {
     "crypto.BTC.address": {
       "deprecatedKeyName": "BTC",
@@ -100,6 +105,11 @@
       "deprecatedKeyName": "ZEC",
       "deprecated": false,
       "validationRegex": "^z([a-zA-Z0-9]){94}$|^zs1([a-zA-Z0-9]){75}$|^t([a-zA-Z0-9]){34}$"
+    },
+    "crypto.YEC.address": {
+      "deprecatedKeyName": "YEC",
+      "deprecated": false,
+      "validationRegex": "^y([a-zA-Z0-9]){94}$|^ys1([a-zA-Z0-9]){75}$|^s([a-zA-Z0-9]){34}$"
     },
     "crypto.ADA.address": {
       "deprecatedKeyName": "ADA",
