@@ -1,3 +1,8 @@
+## v0.5
+- Configures tokenURI prefix (prefix = `uns://`):
+  - `UNS.tokenURI(0x{tokenId})` -> `uns://0x{tokenId}`
+  - `CNS.tokenURI(0x{tokenId})` -> `uns://{domain_label}.crypto`
+
 ## v0.4
 - Upgrade Ganache to v7.0.0
 
