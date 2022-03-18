@@ -1,3 +1,8 @@
+## v0.5
+- Configures tokenURI prefix (prefix = `https://example.com/`):
+  - `UNS.tokenURI(0x{tokenId})` -> `https://example.com/0x{tokenId}`
+  - `CNS.tokenURI(0x{tokenId})` -> `https://example.com/{domain_label}.crypto`
+
 ## v0.4
 - Upgrade Ganache to v7.0.0
 

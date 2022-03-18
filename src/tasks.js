@@ -307,6 +307,14 @@ const configureCNSTask = {
       .attach(UNSRegistry.address)
       .connect(owner);
     await unsRegistry.setCNSRegistry(CNSRegistry.address);
+
+    // Set tokenURI prefix only for Sandbox
+    if (network.config.chainId === 1337) {
+      const mintingManager = await ctx.artifacts.MintingManager
+        .attach(MintingManager.address)
+        .connect(owner);
+      await mintingManager.setTokenURIPrefix('https://example.com/');
+    }
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
