@@ -313,7 +313,7 @@ const configureCNSTask = {
       const mintingManager = await ctx.artifacts.MintingManager
         .attach(MintingManager.address)
         .connect(owner);
-      await mintingManager.setTokenURIPrefix('uns://');
+      await mintingManager.setTokenURIPrefix('https://example.com/');
     }
   },
   ensureDependencies: (ctx, config) => {
