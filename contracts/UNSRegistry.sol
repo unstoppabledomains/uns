@@ -35,6 +35,8 @@ contract UNSRegistry is
 
     address internal _mintingManager;
 
+    mapping(address => uint256) private _reverseStorage;
+
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
         _;
@@ -51,6 +53,11 @@ contract UNSRegistry is
         } else {
             _invalidateNonce(tokenId);
         }
+        _;
+    }
+
+    modifier onlyOwner(uint256 tokenId) {
+        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
         _;
     }
 
@@ -309,6 +316,7 @@ contract UNSRegistry is
     ) external override {
         _withdraw(inputData);
 
+        // TODO: use onlyOwner modifier
         require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
         _setMany(keys, values, tokenId);
     }
@@ -337,6 +345,34 @@ contract UNSRegistry is
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    /**
+     * @dev See {IReverseRegistry-setReverse}.
+     */
+    function setReverse(uint256 tokenId) external override onlyOwner(tokenId) {
+        address sender = _msgSender();
+        _reverseStorage[sender] = tokenId;
+        emit SetReverse(sender, tokenId);
+    }
+
+    /**
+     * @dev See {IReverseRegistry-removeReverse}.
+     */
+    function removeReverse() external override {
+        address sender = _msgSender();
+        delete _reverseStorage[sender];
+        emit RemoveReverse(sender);
+    }
+
+    /**
+     * @dev See {IReverseRegistry-reverseOf}.
+     */
+    function reverseOf(address addr) external view override returns (uint256) {
+        uint256 tokenId = _reverseStorage[addr];
+        require(tokenId != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
+        require(ownerOf(tokenId) == _msgSender(), 'Registry: ACCOUNT_IS_NOT_OWNER');
+        return tokenId;
     }
 
     /// Internal
@@ -387,6 +423,13 @@ contract UNSRegistry is
 
     function _msgData() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (bytes calldata) {
         return super._msgData();
+    }
+
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
+        super._beforeTokenTransfer(from, to, amount);
+
+        /// @dev remove reverse record
+        delete _reverseStorage[_msgSender()];
     }
 
     // Reserved storage space to allow for layout changes in the future.

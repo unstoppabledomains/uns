@@ -17,6 +17,7 @@ interface IUNSRegistry is
     IERC721MetadataUpgradeable,
     IERC721ReceiverUpgradeable,
     IRecordStorage,
+    IReverseRegistry,
     IRootRegistry,
     IChildRegistry
 {
