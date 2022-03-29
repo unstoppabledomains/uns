@@ -316,7 +316,7 @@ contract UNSRegistry is
     ) external override {
         _withdraw(inputData);
 
-        // TODO: use onlyOwner modifier
+        /// @dev order is matter, the token should be minted on withdraw
         require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
         _setMany(keys, values, tokenId);
     }
@@ -361,8 +361,8 @@ contract UNSRegistry is
      */
     function removeReverse() external override {
         address sender = _msgSender();
-        delete _reverseStorage[sender];
-        emit RemoveReverse(sender);
+        require(_reverseStorage[sender] != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
+        _removeReverse(sender);
     }
 
     /**
@@ -371,7 +371,7 @@ contract UNSRegistry is
     function reverseOf(address addr) external view override returns (uint256) {
         uint256 tokenId = _reverseStorage[addr];
         require(tokenId != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
-        require(ownerOf(tokenId) == _msgSender(), 'Registry: ACCOUNT_IS_NOT_OWNER');
+        require(ownerOf(tokenId) == addr, 'Registry: ACCOUNT_IS_NOT_OWNER');
         return tokenId;
     }
 
@@ -428,8 +428,14 @@ contract UNSRegistry is
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
         super._beforeTokenTransfer(from, to, amount);
 
-        /// @dev remove reverse record
-        delete _reverseStorage[_msgSender()];
+        if(_reverseStorage[from] != 0) {
+            _removeReverse(from);
+        }
+    }
+
+    function _removeReverse(address addr) internal {
+        delete _reverseStorage[addr];
+        emit RemoveReverse(addr);
     }
 
     // Reserved storage space to allow for layout changes in the future.
