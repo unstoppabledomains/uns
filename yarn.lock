@@ -887,22 +887,24 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-2.3.0.tgz#043961a6e37b87e0eb80647c7528a7c62c41361f"
   integrity sha512-lf8C3oULQAnsu3OTRP4tP5/ddfil6l65Lg3JQCwAIgc99vZ1jz5qeBoETGGGmczxt+bIyMI06WPP2apC74EZag==
 
-"@openzeppelin/hardhat-upgrades@^1.10.0":
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/hardhat-upgrades/-/hardhat-upgrades-1.10.0.tgz#e7751e3b9a005ccc9cef4e0de190628b181b59b6"
-  integrity sha512-iGe058iV7Ba/g11RxlbqBG47nbqbZn1FRdg1FCQq7xPmvjRhXmFsoI/5gGw5el0aZlLDRtpFOBZbzMZvI/S7iw==
+"@openzeppelin/hardhat-upgrades@^1.16.1":
+  version "1.16.1"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/hardhat-upgrades/-/hardhat-upgrades-1.16.1.tgz#f2c1cdeadb3461712e593945e0fce52f362c91fe"
+  integrity sha512-vSlOCi3n9MGex3F+Qs+0WZJx2d2sg1rhWQ6FbHAybfQH7wngQn4INv1m3JZZpmerkOAoHi1Cdv4GOGLmxFnWYQ==
   dependencies:
-    "@openzeppelin/upgrades-core" "^1.9.0"
+    "@openzeppelin/upgrades-core" "^1.13.1"
+    chalk "^4.1.0"
+    proper-lockfile "^4.1.1"
 
-"@openzeppelin/upgrades-core@^1.9.0":
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/upgrades-core/-/upgrades-core-1.9.0.tgz#cc5c4fd71d6510559f02e94032ddd788eb651c10"
-  integrity sha512-dd2VhRItfMSUOJwhXh1OUR/74LqbVhmkCSShfqf9OjFJAJbMuWdbEi2Fy2SxLvMGwdzrpbjtlB74KI5y+YT2RA==
+"@openzeppelin/upgrades-core@^1.13.1":
+  version "1.14.1"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/upgrades-core/-/upgrades-core-1.14.1.tgz#a0e1c83f9811186ac49d286e6b43ae129097422b"
+  integrity sha512-iKlh1mbUxyfdjdEiUFyhMkqirfas+DMUu7ED53nZbHEyhcYsm+5Fl/g0Bv6bZA+a7k8kO8+22DNEKsqaDUBc2Q==
   dependencies:
     bn.js "^5.1.2"
     cbor "^8.0.0"
     chalk "^4.1.0"
-    compare-versions "^3.6.0"
+    compare-versions "^4.0.0"
     debug "^4.1.1"
     ethereumjs-util "^7.0.3"
     proper-lockfile "^4.1.1"
@@ -3109,10 +3111,10 @@ commander@3.0.2:
   resolved "https://registry.yarnpkg.com/commander/-/commander-3.0.2.tgz#6837c3fb677ad9933d1cfba42dd14d5117d6b39e"
   integrity sha512-Gar0ASD4BDyKC4hl4DwHqDrmvjoxWKZigVnAbn5H1owvm4CxCPdb0HQDehwNYMJpla5+M2tPmPARzhtYuwpHow==
 
-compare-versions@^3.6.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-3.6.0.tgz#1a5689913685e5a87637b8d3ffca75514ec41d62"
-  integrity sha512-W6Af2Iw1z4CB7q4uU4hv646dW9GQuBM+YpC0UvUCWSD8w90SJjp+ujJuXaEMtAXBtSqGfMPuFOVn4/+FlaqfBA==
+compare-versions@^4.0.0:
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-4.1.3.tgz#8f7b8966aef7dc4282b45dfa6be98434fc18a1a4"
+  integrity sha512-WQfnbDcrYnGr55UwbxKiQKASnTtNnaAWVi8jZyy8NTpVAXWACSne8lMD1iaIo9AiU6mnuLvSVshCzewVuWxHUg==
 
 component-emitter@^1.2.1:
   version "1.3.0"

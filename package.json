@@ -40,7 +40,7 @@
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "2.3.0",
     "@openzeppelin/contracts-upgradeable": "^4.1.0",
-    "@openzeppelin/hardhat-upgrades": "^1.10.0",
+    "@openzeppelin/hardhat-upgrades": "^1.16.1",
     "chai": "^4.3.4",
     "debug": "^4.3.1",
     "dot-crypto": "https://github.com/unstoppabledomains/dot-crypto.git#2.0.0",
