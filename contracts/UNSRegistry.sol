@@ -369,10 +369,11 @@ contract UNSRegistry is
      * @dev See {IReverseRegistry-reverseOf}.
      */
     function reverseOf(address addr) external view override returns (uint256) {
-        uint256 tokenId = _reverseStorage[addr];
-        require(tokenId != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
-        require(ownerOf(tokenId) == addr, 'Registry: ACCOUNT_IS_NOT_OWNER');
-        return tokenId;
+        // uint256 tokenId = _reverseStorage[addr];
+        // require(tokenId != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
+        // require(ownerOf(tokenId) == addr, 'Registry: ACCOUNT_IS_NOT_OWNER');
+        // return tokenId;
+        return _reverseStorage[addr];
     }
 
     /// Internal
