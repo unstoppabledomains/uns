@@ -1,7 +1,7 @@
 {
   "version": "2.1.0",
   "information": {
-    "description": "This file desribes all resolver keys which a defined meaning and related metadata used by Unstopppable Domains UNS Registry"
+    "description": "This file desribes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry"
     "documentation": "https://docs.unstoppabledomains.com/domain-registry-essentials/records-reference",
     "contribution": "https://github.com/unstoppabledomains/uns/blob/main/resolver-keys.json",
   },
