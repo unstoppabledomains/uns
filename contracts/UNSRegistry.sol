@@ -316,7 +316,6 @@ contract UNSRegistry is
     ) external override {
         _withdraw(inputData);
 
-        /// @dev order is matter, the token should be minted on withdraw
         require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
         _setMany(keys, values, tokenId);
     }
