@@ -35,7 +35,7 @@ contract UNSRegistry is
 
     address internal _mintingManager;
 
-    mapping(address => uint256) private _reverseStorage;
+    mapping(address => uint256) private _reverses;
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
@@ -352,7 +352,7 @@ contract UNSRegistry is
      */
     function setReverse(uint256 tokenId) external override onlyOwner(tokenId) {
         address sender = _msgSender();
-        _reverseStorage[sender] = tokenId;
+        _reverses[sender] = tokenId;
         emit SetReverse(sender, tokenId);
     }
 
@@ -361,7 +361,7 @@ contract UNSRegistry is
      */
     function removeReverse() external override {
         address sender = _msgSender();
-        require(_reverseStorage[sender] != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
+        require(_reverses[sender] != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
         _removeReverse(sender);
     }
 
@@ -369,11 +369,7 @@ contract UNSRegistry is
      * @dev See {IReverseRegistry-reverseOf}.
      */
     function reverseOf(address addr) external view override returns (uint256) {
-        // uint256 tokenId = _reverseStorage[addr];
-        // require(tokenId != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
-        // require(ownerOf(tokenId) == addr, 'Registry: ACCOUNT_IS_NOT_OWNER');
-        // return tokenId;
-        return _reverseStorage[addr];
+        return _reverses[addr];
     }
 
     /// Internal
@@ -429,16 +425,16 @@ contract UNSRegistry is
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
         super._beforeTokenTransfer(from, to, amount);
 
-        if(_reverseStorage[from] != 0) {
+        if(_reverses[from] != 0) {
             _removeReverse(from);
         }
     }
 
     function _removeReverse(address addr) internal {
-        delete _reverseStorage[addr];
+        delete _reverses[addr];
         emit RemoveReverse(addr);
     }
 
     // Reserved storage space to allow for layout changes in the future.
-    uint256[50] private __gap;
+    uint256[49] private __gap;
 }
