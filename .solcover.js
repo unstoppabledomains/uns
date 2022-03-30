@@ -13,5 +13,6 @@ module.exports = {
     '@maticnetwork/IMintableERC721.sol',
     '@maticnetwork/IRootChainManager.sol',
     '@maticnetwork/RootChainManagerStorage.sol',
+    'utils/MultiSend.sol'
   ],
 }
