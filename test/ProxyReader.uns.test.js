@@ -61,12 +61,13 @@ describe('ProxyReader (UNS only)', () => {
       * bytes4(keccak256(abi.encodePacked('getApproved(uint256)'))) == 0x081812fc
       * bytes4(keccak256(abi.encodePacked('isApprovedForAll(address,address)'))) == 0xe985e9c5
       * bytes4(keccak256(abi.encodePacked('exists(uint256)'))) == 0x4f558e79
+      * bytes4(keccak256(abi.encodePacked('reverseOf(address)'))) == 0x7e37479e
       *
       * => 0xc87b56dd ^ 0x430c2081 ^ 0xb3f9e4cb ^ 0x68b62d32 ^
       *    0x70a08231 ^ 0x6352211e ^ 0x081812fc ^ 0xe985e9c5 ^
-      *    0x4f558e79 == 0xed0269ca
+      *    0x4f558e79 ^ 0x7e37479e == 0x93352e54
       */
-      expect(await proxy.supportsInterface('0xed0269ca')).to.be.equal(true);
+      expect(await proxy.supportsInterface('0x93352e54')).to.be.equal(true);
     });
 
     it('should revert isApprovedForAll call', async () => {
@@ -279,6 +280,20 @@ describe('ProxyReader (UNS only)', () => {
 
       it('should return true for .wallet TLD', async () => {
         expect(await proxy.exists(TLD.WALLET)).to.be.equal(true);
+      });
+    });
+
+    describe('reverseOf', () => {
+      it('should return empty reverse record when it is not set', async () => {
+        expect(await proxy.reverseOf(coinbase.address)).to.be.equal(0);
+      });
+
+      it('should return reverse record', async () => {
+        const owner = signers[3];
+        const tokenId = await mintDomain(unsRegistry, owner.address, TLD.X, 'hey_hoy_11sfg');
+        await unsRegistry.connect(owner).setReverse(tokenId);
+
+        expect(await proxy.reverseOf(owner.address)).to.be.equal(tokenId);
       });
     });
   });

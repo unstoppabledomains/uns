@@ -15,7 +15,7 @@ import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
 
 /**
- * @title UNSRegistry v0.3
+ * @title UNSRegistry v0.4
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
@@ -29,7 +29,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.3.0';
+    string public constant VERSION = '0.4.0';
 
     string internal _prefix;
 

@@ -1,3 +1,13 @@
+## next release (v0.3.0)
+- UNSRegistry@0.4.0 receives the Reverse Registry support
+- ProxyReader@0.2.3 receives reverse records reading
+- Remove ReverseResolver contract
+- Upgrade Hardhat to v2.9.2
+
+## v0.2.3
+- Upgrade Sandbox to v0.5
+- Remove Rinkeby from config
+
 ## v0.2.2
 - Update BTC regex to support BECH32 (P2WSH) address format
 - Fix ZEC sapling regexp

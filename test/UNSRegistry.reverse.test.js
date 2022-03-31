@@ -131,7 +131,7 @@ describe('UNSRegistry (reverse)', () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'rem_mtx_3');
       await unsRegistry.connect(owner).setReverse(tokenId);
 
-      const { req, signature } = await buildExecuteParams('removeReverse()', [], owner, tokenId);
+      const { req, signature } = await buildExecuteParams('removeReverse()', [], owner, owner.address);
       await unsRegistry.execute(req, signature);
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
