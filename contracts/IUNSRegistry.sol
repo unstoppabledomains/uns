@@ -8,6 +8,7 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradea
 
 import './IERC1967.sol';
 import './IRecordStorage.sol';
+import './IReverseRegistry.sol';
 import './IRootRegistry.sol';
 import './IChildRegistry.sol';
 
@@ -16,6 +17,7 @@ interface IUNSRegistry is
     IERC721MetadataUpgradeable,
     IERC721ReceiverUpgradeable,
     IRecordStorage,
+    IReverseRegistry,
     IRootRegistry,
     IChildRegistry
 {

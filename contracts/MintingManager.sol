@@ -306,7 +306,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      * It leads to revert on mint.
      * The function can be executed in order to mint '.crypto' token in UNS registry, while TLD already registered.
      * Sideffect: It is possible to add the same TLD multiple times, it will burn gas.
-     * TODO: think about the implementation
      */
     function _addTld(string memory tld) private {
         uint256 tokenId = _childId(uint256(0x0), tld);
