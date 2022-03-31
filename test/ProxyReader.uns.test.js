@@ -282,6 +282,20 @@ describe('ProxyReader (UNS only)', () => {
         expect(await proxy.exists(TLD.WALLET)).to.be.equal(true);
       });
     });
+
+    describe('reverseOf', () => {
+      it('should return empty reverse record when it is not set', async () => {
+        expect(await proxy.reverseOf(coinbase.address)).to.be.equal(0);
+      });
+
+      it('should return reverse record', async () => {
+        const owner = signers[3];
+        const tokenId = await mintDomain(unsRegistry, owner.address, TLD.X, 'hey_hoy_11sfg');
+        await unsRegistry.connect(owner).setReverse(tokenId);
+
+        expect(await proxy.reverseOf(owner.address)).to.be.equal(tokenId);
+      });
+    });
   });
 
   describe('IRecordReader', () => {
