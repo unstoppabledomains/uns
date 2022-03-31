@@ -53,4 +53,11 @@ interface IRegistryReader {
      * @dev Returns whether token exists or not.
      */
     function exists(uint256 tokenId) external view returns (bool);
+
+    /**
+     * @dev Returns the reverse record for a given account's reverse record.
+     * @param addr The address of the reverse record.
+     * @return tokenId The token associated with the address.
+     */
+    function reverseOf(address addr) external view returns (uint256);
 }
