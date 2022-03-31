@@ -1,31 +1,31 @@
 # UNS (Unstoppable Naming Service)
 
-UNS Registry smart contracts.  
-Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
+UNS Registry smart contracts.
+Author: Unstoppable Domains, Inc., 2021. All rights reserved.
 
 ## Specifications
 
-1.  Implements ERC721
+1. Implements ERC721
 
     [ERC-721](https://eips.ethereum.org/EIPS/eip-721) Non-Fungible Token Standard
 
-2.  Implements ERC165
+2. Implements ERC165
 
     [ERC-165](https://eips.ethereum.org/EIPS/eip-165) Standard Interface Detection
 
-3.  Implements IERC721Metadata
+3. Implements IERC721Metadata
 
     > IERC721Metadata is an extension of ERC-721. IERC721Metadata allows smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
 
     Ref: https://eips.ethereum.org/EIPS/eip-721
 
-4.  Implements [IUNSRegistry](./contracts/IUNSRegistry.sol)
+4. Implements [IUNSRegistry](./contracts/IUNSRegistry.sol)
 
-5.  Record Storage (aka Resolver)
+5. Record Storage (aka Resolver)
 
     Record Storage implements [IRecordStorage](./contracts/IRecordStorage.sol)
 
-6.  Support meta-transactions
+6. Support meta-transactions
 
     [EIP-2771](https://eips.ethereum.org/EIPS/eip-2771): Secure Protocol for Native Meta Transactions
 
@@ -74,7 +74,7 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
 
     Implementation [UNSRegistryForwarder.sol](./contracts/metatx/UNSRegistryForwarder.sol)
 
-7.  Upgradability
+7. Upgradability
 
     > By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits significantly from the technology’s immutability, still a certain degree of mutability is needed for bug fixing and potential product improvements.
 
@@ -123,7 +123,7 @@ Author: Unstoppable Domains, Inc., 2021.  All rights reserved.
 
 - Solidity `^0.8.0`
 - OpenZeppelin contracts-upgradeable `^4.1.0`
-- Hardhat `^2.4.1`
+- Hardhat `^2.9.2`
 - ethers.js `^5.1.4`
 
 ## Environment variables
