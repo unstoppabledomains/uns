@@ -3,6 +3,8 @@
 
 pragma solidity ^0.8.0;
 
+import '@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol';
+
 import './../cns/ICNSRegistry.sol';
 import './IForwarder.sol';
 import './BaseRoutingForwarder.sol';
@@ -13,6 +15,8 @@ import './BaseRoutingForwarder.sol';
  * It works on top of existing Resolver contracts.
  */
 contract ResolverForwarder is BaseRoutingForwarder {
+    using AddressUpgradeable for address;
+
     ICNSRegistry private _cnsRegistry;
     address private _defaultCnsResolver;
 
@@ -27,11 +31,23 @@ contract ResolverForwarder is BaseRoutingForwarder {
 
     function nonceOf(uint256 tokenId) public view override returns (uint256) {
         address resolver = _defaultCnsResolver;
+
+        // use default resolver when domain has empty resolver
         try _cnsRegistry.resolverOf(tokenId) returns (address _resolver) {
             resolver = _resolver;
         } catch { }
-        IForwarder target = IForwarder(resolver);
-        return target.nonceOf(tokenId);
+
+        // check that resolver is contract
+        if(resolver.isContract()) {
+            IForwarder target = IForwarder(resolver);
+
+            // catch error when resolver does not implement IForwarder interface
+            try target.nonceOf(tokenId) returns (uint256 nonce) {
+                return nonce;
+            } catch { }
+        }
+
+        return 0;
     }
 
     function verify(ForwardRequest calldata req, bytes calldata signature) external view override returns (bool) {
