@@ -9,8 +9,8 @@ describe('ResolverForwarder', () => {
   let forwarder, registry, mintingController, signatureController, resolver;
   let signers, owner, buildExecuteParams;
 
-  const mintDomain = async (label, owner) => {
-    await mintingController.mintSLDWithResolver(owner, label, resolver.address);
+  const mintDomain = async (label, owner, resolverAddress = resolver.address) => {
+    await mintingController.mintSLDWithResolver(owner, label, resolverAddress);
     return await registry.childIdOf(TLD.CRYPTO, label);
   };
 
@@ -61,14 +61,36 @@ describe('ResolverForwarder', () => {
       expect(nonceF).to.be.equal(nonceR);
     });
 
-    it(`should return nonce from default resolver when domain doesn't have own`, async () => {
+    it('should return nonce from default resolver when domain doesn\'t have own', async () => {
       const tokenId = await mintDomainWithoutResolver('test_foo_no_res', owner.address);
-      let nonceF = await forwarder.nonceOf(tokenId);
-      let nonceR = await resolver.nonceOf(tokenId);
+      const nonceF = await forwarder.nonceOf(tokenId);
+      const nonceR = await resolver.nonceOf(tokenId);
 
       expect(nonceF).to.be.equal(nonceR);
+
       // should be reverted when domain resolver is not set
       await expect(registry.resolverOf(tokenId)).to.be.revertedWith('');
+    });
+
+    it('should return nonce from default resolver when resolver is non-contract', async () => {
+      const tokenId = await mintDomain('test_foo_noc', owner.address, owner.address);
+      expect(await forwarder.nonceOf(tokenId)).to.be.equal(0);
+    });
+
+    it('should return nonce from default resolver when resolver is wrong', async () => {
+      const tokenId = await mintDomain('test_foo_nof', owner.address, forwarder.address);
+      expect(await forwarder.nonceOf(tokenId)).to.be.equal(0);
+    });
+
+    it('should return nonce from default resolver when resolver is wrong 2', async () => {
+      const tokenId = await mintDomain('test_foo_nof2', owner.address);
+      const { req, signature } = await buildExecuteParams(
+        'reset(uint256)', [tokenId], owner, tokenId,
+      );
+      await forwarder.execute(req, signature);
+      await registry.resolveTo(forwarder.address, tokenId);
+
+      expect(await forwarder.nonceOf(tokenId)).to.be.equal(1);
     });
   });
 

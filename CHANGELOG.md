@@ -4,6 +4,11 @@
 - Remove ReverseResolver contract
 - Upgrade Hardhat to v2.9.2
 
+### Migration notes
+- Upgrade UNSRegistry without storage layout check (`unsafeSkipStorageCheck`)
+- Deploy ProxyReader (current move to legacy)
+- Deploy ResolverForwarder (current move to legacy)
+
 ## v0.2.3
 - Upgrade Sandbox to v0.5
 - Remove Rinkeby from config
