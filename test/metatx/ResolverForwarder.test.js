@@ -72,14 +72,25 @@ describe('ResolverForwarder', () => {
       await expect(registry.resolverOf(tokenId)).to.be.revertedWith('');
     });
 
-    it('should return 0 nonce when resolver is non-contract', async () => {
+    it('should return nonce from default resolver when resolver is non-contract', async () => {
       const tokenId = await mintDomain('test_foo_noc', owner.address, owner.address);
       expect(await forwarder.nonceOf(tokenId)).to.be.equal(0);
     });
 
-    it('should return 0 nonce when resolver is wrong', async () => {
+    it('should return nonce from default resolver when resolver is wrong', async () => {
       const tokenId = await mintDomain('test_foo_nof', owner.address, forwarder.address);
       expect(await forwarder.nonceOf(tokenId)).to.be.equal(0);
+    });
+
+    it('should return nonce from default resolver when resolver is wrong 2', async () => {
+      const tokenId = await mintDomain('test_foo_nof2', owner.address);
+      const { req, signature } = await buildExecuteParams(
+        'reset(uint256)', [tokenId], owner, tokenId,
+      );
+      await forwarder.execute(req, signature);
+      await registry.resolveTo(forwarder.address, tokenId);
+
+      expect(await forwarder.nonceOf(tokenId)).to.be.equal(1);
     });
   });
 

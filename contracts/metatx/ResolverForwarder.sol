@@ -47,7 +47,8 @@ contract ResolverForwarder is BaseRoutingForwarder {
             } catch { }
         }
 
-        return 0;
+        // return nonce from default resolver as a fallback
+        return IForwarder(_defaultCnsResolver).nonceOf(tokenId);
     }
 
     function verify(ForwardRequest calldata req, bytes calldata signature) external view override returns (bool) {
