@@ -112,6 +112,11 @@ describe('ProxyReader (UNS only)', () => {
         expect(proxyResult).to.be.equal(resolverResult);
         expect(resolverResult).to.be.equal(accounts[0]);
       });
+
+      it('should return zero address when token does not exist', async () => {
+        const proxyResult = await proxy.getApproved(1);
+        expect(proxyResult).to.be.equal(ZERO_ADDRESS);
+      });
     });
 
     describe('isApprovedOrOwner', () => {
@@ -149,6 +154,11 @@ describe('ProxyReader (UNS only)', () => {
 
         expect(proxyResult).to.be.equal(resolverResult);
         expect(resolverResult).to.be.equal(true);
+      });
+
+      it('should return false value when token does not exist', async () => {
+        const proxyResult = await proxy.isApprovedOrOwner(accounts[0], 1);
+        expect(proxyResult).to.be.equal(false);
       });
     });
 
@@ -192,6 +202,11 @@ describe('ProxyReader (UNS only)', () => {
         expect(proxyResult).to.be.equal(resolverResult);
         expect(resolverResult).to.be.equal(unsRegistry.address);
       });
+
+      it('should return false value when token does not exist', async () => {
+        const proxyResult = await proxy.resolverOf(1);
+        expect(proxyResult).to.be.equal(ZERO_ADDRESS);
+      });
     });
 
     describe('tokenURI', () => {
@@ -211,6 +226,11 @@ describe('ProxyReader (UNS only)', () => {
         expect(proxyResult).to.be.equal(resolverResult);
         expect(resolverResult).to.be
           .equal('/107771857897517834290909154724501010203356272148473478760301214125032721342346');
+      });
+
+      it('should return empty tokenURI when token does not exist', async () => {
+        const proxyResult = await proxy.tokenURI(1);
+        expect(proxyResult).to.be.equal('');
       });
     });
 
