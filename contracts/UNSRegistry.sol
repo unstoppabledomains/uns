@@ -349,12 +349,7 @@ contract UNSRegistry is
     /**
      * @dev See {IReverseRegistry-setReverse}.
      */
-    function setReverse(uint256 tokenId)
-        external
-        override
-        onlyOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
+    function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
         address sender = _msgSender();
         _reverses[sender] = tokenId;
         emit SetReverse(sender, tokenId);
