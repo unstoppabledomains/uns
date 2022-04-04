@@ -127,8 +127,22 @@ describe('UNSRegistry (reverse)', () => {
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
     });
 
+    it('revert setting reverse record when non-token based nonce', async () => {
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_mtx_3');
+
+      const { req, signature } = await buildExecuteParams(
+        'setReverse(uint256)',
+        [tokenId], owner, 1,
+      );
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
+        'Registry: TOKEN_INVALID',
+      );
+
+      expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
+    });
+
     it('should remove reverse record', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'rem_mtx_3');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'rem_mtx_4');
       await unsRegistry.connect(owner).setReverse(tokenId);
 
       const { req, signature } = await buildExecuteParams('removeReverse()', [], owner, owner.address);
