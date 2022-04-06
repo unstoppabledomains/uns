@@ -6,7 +6,7 @@ const NetworkConfig = require('../uns-config.json');
 
 async function main () {
   console.log('Network:', network.name);
-  if (![1, 5, 137, 31337].includes(network.config.chainId)) {
+  if (![1, 5, 31337].includes(network.config.chainId)) {
     throw new Error(`The upgrade is not supported for newtwork with cainId: ${network.config.chainId}`);
   }
 
@@ -18,7 +18,7 @@ async function main () {
   const deployer = await Deployer.create();
   const deployConfig = await deployer.execute([
     'upgrade_registry',
-    'upgrade_v03',
+    'upgrade_v03_l1',
   ], config);
   mergeNetworkConfig(deployConfig);
 }

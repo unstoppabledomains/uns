@@ -4,7 +4,7 @@ const merge = require('lodash.merge');
 const verify = require('./verify');
 
 const deployResolverForwarderTaskV03 = {
-  tags: ['upgrade_v03'],
+  tags: ['upgrade_v03_l1'],
   priority: 110,
   run: async (ctx, dependencies) => {
     const { owner } = ctx.accounts;
@@ -35,7 +35,7 @@ const deployResolverForwarderTaskV03 = {
 };
 
 const deployProxyReaderTaskV03 = {
-  tags: ['upgrade_v03'],
+  tags: ['upgrade_v03_l1', 'upgrade_v03_l2'],
   priority: 110,
   run: async (ctx, dependencies) => {
     const { owner } = ctx.accounts;
