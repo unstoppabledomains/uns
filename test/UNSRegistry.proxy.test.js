@@ -55,6 +55,37 @@ describe('UNSRegistry (proxy)', () => {
     });
   });
 
+  describe('Registry V03 -> V04 upgrade', () => {
+    let UNSRegistryV03;
+
+    beforeEach(async () => {
+      signers = await ethers.getSigners();
+      [owner, receiver] = signers;
+
+      UNSRegistryV03 = await ethers.getContractFactory('UNSRegistryV03');
+
+      unsRegistry = await upgrades.deployProxy(UNSRegistryV03, [owner.address], { initializer: 'initialize' });
+      await unsRegistry['mint(address,uint256,string)'](
+        '0xdead000000000000000000000000000000000000', TLD.CRYPTO, 'crypto');
+      await unsRegistry.setTokenURIPrefix('/');
+    });
+
+    it('should upgrade from V03 to V04', async () => {
+      expect(await unsRegistry.VERSION()).to.be.eql('0.3.0');
+
+      const tokenId = await mintDomain(unsRegistry, owner.address, TLD.CRYPTO, 'up_state_domain_34');
+
+      await upgrades.upgradeProxy(unsRegistry.address, UNSRegistry, { unsafeSkipStorageCheck: true });
+      expect(await unsRegistry.VERSION()).to.be.eql('0.4.0');
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.eql(owner.address);
+
+      const _unsRegistry = UNSRegistry.attach(unsRegistry.address).connect(owner);
+      await _unsRegistry.setReverse(tokenId);
+      expect(await _unsRegistry.reverseOf(owner.address)).to.be.eql(tokenId);
+    });
+  });
+
   describe('Resolver', () => {
     it('should resolve tokens', async () => {
       const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_931');
