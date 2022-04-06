@@ -6,36 +6,34 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
-import './ChildRegistry.sol';
-import './cns/ICNSRegistry.sol';
-import './IUNSRegistry.sol';
-import './RecordStorage.sol';
-import './RootRegistry.sol';
-import './metatx/ERC2771RegistryContext.sol';
-import './metatx/UNSRegistryForwarder.sol';
+import './../ChildRegistry.sol';
+import './../cns/ICNSRegistry.sol';
+import './IUNSRegistryV03.sol';
+import './../RecordStorage.sol';
+import './../RootRegistry.sol';
+import './../metatx/ERC2771RegistryContext.sol';
+import './../metatx/UNSRegistryForwarder.sol';
 
 /**
- * @title UNSRegistry v0.4
+ * @title UNSRegistry v0.3
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract UNSRegistry is
+contract UNSRegistryV03 is
     ERC721Upgradeable,
     ERC2771RegistryContext,
     RecordStorage,
     UNSRegistryForwarder,
     RootRegistry,
     ChildRegistry,
-    IUNSRegistry
+    IUNSRegistryV03
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.4.0';
+    string public constant VERSION = '0.3.0';
 
     string internal _prefix;
 
     address internal _mintingManager;
-
-    mapping(address => uint256) internal _reverses;
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
@@ -53,11 +51,6 @@ contract UNSRegistry is
         } else {
             _invalidateNonce(tokenId);
         }
-        _;
-    }
-
-    modifier onlyOwner(uint256 tokenId) {
-        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
         _;
     }
 
@@ -100,7 +93,7 @@ contract UNSRegistry is
         return _childId(tokenId, label);
     }
 
-    function exists(uint256 tokenId) external view override(IUNSRegistry, IMintableERC721) returns (bool) {
+    function exists(uint256 tokenId) external view override(IUNSRegistryV03, IMintableERC721) returns (bool) {
         return _exists(tokenId);
     }
 
@@ -230,7 +223,7 @@ contract UNSRegistry is
                 _mint(from, tokenId);
             }
 
-            return UNSRegistry.onERC721Received.selector;
+            return UNSRegistryV03.onERC721Received.selector;
         }
 
         revert('Registry: ERC721_RECEIVING_PROHIBITED');
@@ -346,31 +339,6 @@ contract UNSRegistry is
         return super.supportsInterface(interfaceId);
     }
 
-    /**
-     * @dev See {IReverseRegistry-setReverse}.
-     */
-    function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
-        address sender = _msgSender();
-        _reverses[sender] = tokenId;
-        emit SetReverse(sender, tokenId);
-    }
-
-    /**
-     * @dev See {IReverseRegistry-removeReverse}.
-     */
-    function removeReverse() external override {
-        address sender = _msgSender();
-        require(_reverses[sender] != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
-        _removeReverse(sender);
-    }
-
-    /**
-     * @dev See {IReverseRegistry-reverseOf}.
-     */
-    function reverseOf(address addr) external view override returns (uint256) {
-        return _reverses[addr];
-    }
-
     /// Internal
 
     function _childId(uint256 tokenId, string memory label) internal pure returns (uint256) {
@@ -421,19 +389,6 @@ contract UNSRegistry is
         return super._msgData();
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
-        super._beforeTokenTransfer(from, to, amount);
-
-        if(_reverses[from] != 0) {
-            _removeReverse(from);
-        }
-    }
-
-    function _removeReverse(address addr) internal {
-        delete _reverses[addr];
-        emit RemoveReverse(addr);
-    }
-
     // Reserved storage space to allow for layout changes in the future.
-    uint256[49] private __gap;
+    uint256[50] private __gap;
 }
