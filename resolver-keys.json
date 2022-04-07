@@ -3,7 +3,7 @@
   "information": {
     "description": "This file desribes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/domain-registry-essentials/records-reference",
-    "contribution": "https://github.com/unstoppabledomains/uns/blob/main/resolver-keys.json",
+    "contribution": "https://github.com/unstoppabledomains/uns/blob/main/resolver-keys.json"
   },
   "keys": {
     "crypto.BTC.address": {
