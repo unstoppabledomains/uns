@@ -3,6 +3,12 @@
 UNS Registry smart contracts.
 Author: Unstoppable Domains, Inc., 2021. All rights reserved.
 
+## Official deployments
+
+UNS Contracts are officially deployed to several different Ethereum and Polygon networks
+The contract addresses are distributed via a [UNS Config File](https://github.com/unstoppabledomains/uns/blob/main/uns-config.json) and always kept up to date.
+
+
 ## Specifications
 
 1. Implements ERC721
