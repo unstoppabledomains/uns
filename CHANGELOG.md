@@ -3,6 +3,7 @@
 - ProxyReader@0.2.3 receives reverse records reading
 - Remove ReverseResolver contract
 - Upgrade Hardhat to v2.9.2
+- Upgrade Sandbox to v0.6
 
 ### Migration notes
 - Upgrade UNSRegistry without storage layout check (`unsafeSkipStorageCheck`)
