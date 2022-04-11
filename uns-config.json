@@ -105,7 +105,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x070e83FCed225184E67c86302493ffFCDB953f71",
-                    "implementation": "0x514E677B1EC3bE8B5A2b2D0D1097721925EC34da",
+                    "implementation": "0x4473e84898E3F58feEFb7529dfF9E83Ff26CCae9",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ea",
                     "forwarder": "0x070e83FCed225184E67c86302493ffFCDB953f71"
@@ -161,14 +161,15 @@
                     "address": "0x0555344A5F440Bd1d8cb6B42db46c5e5D4070437",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57dc",
-                    "forwarder": "0xfFe10676BC87D27e18A909e939DDac4577b3eBb5"
+                    "forwarder": "0xFCc1A95B7287Ae7a8B7cA813F12991dF5714d4C7"
                 },
                 "ProxyReader": {
-                    "address": "0x9A70ff906D422C2FD0F7B94244D6b36DB62Ee982",
+                    "address": "0xE3b961856C417d081a02cBa0161a051268F52677",
                     "legacyAddresses": [
+                        "0x9A70ff906D422C2FD0F7B94244D6b36DB62Ee982",
                         "0xFc5f608149f4D9e2Ed0733efFe9DD57ee24BCF68"
                     ],
-                    "deploymentBlock": "0x5ede68"
+                    "deploymentBlock": "0x65bdfe"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",
@@ -380,8 +381,8 @@
                 "UNSRegistry": {
                     "address": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x01213f43",
-                    "implementation": "0x920C8C343b7aade800cA70316C18eF90e96A31A4",
+                    "deploymentBlock": "0x0189f713",
+                    "implementation": "0xAc1a1F2136BfDe3a353a95C0676Cd0d55f311ee3",
                     "forwarder": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93"
                 },
                 "CNSRegistry": {
@@ -438,11 +439,12 @@
                     "forwarder": "0x0000000000000000000000000000000000000000"
                 },
                 "ProxyReader": {
-                    "address": "0xbd9e01F6513E7C05f71Bf21d419a3bDF1EA9104b",
+                    "address": "0x6fe7c857C1B0E54492C8762f27e0a45CA7ff264B",
                     "legacyAddresses": [
+                        "0xbd9e01F6513E7C05f71Bf21d419a3bDF1EA9104b",
                         "0x332A8191905fA8E6eeA7350B5799F225B8ed30a9"
                     ],
-                    "deploymentBlock": "0x016e0c70"
+                    "deploymentBlock": "0x0189f72d"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",

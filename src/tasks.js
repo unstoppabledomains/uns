@@ -382,7 +382,11 @@ const upgradeUNSRegistryTask = {
   tags: ['upgrade_registry'],
   priority: 100,
   run: async (ctx, { UNSRegistry }) => {
-    const unsRegistry = await upgrades.upgradeProxy(UNSRegistry.address, ctx.artifacts.UNSRegistry);
+    const unsRegistry = await upgrades.upgradeProxy(
+      UNSRegistry.address,
+      ctx.artifacts.UNSRegistry,
+      { unsafeSkipStorageCheck: true },
+    );
     await unsRegistry.deployTransaction.wait();
 
     const proxyAdmin = await upgrades.admin.getInstance();

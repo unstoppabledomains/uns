@@ -6,18 +6,16 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol';
 
-import './IERC1967.sol';
-import './IRecordStorage.sol';
-import './IReverseRegistry.sol';
-import './IRootRegistry.sol';
-import './IChildRegistry.sol';
+import './../IERC1967.sol';
+import './../IRecordStorage.sol';
+import './../IRootRegistry.sol';
+import './../IChildRegistry.sol';
 
-interface IUNSRegistry is
+interface IUNSRegistryV03 is
     IERC1967,
     IERC721MetadataUpgradeable,
     IERC721ReceiverUpgradeable,
     IRecordStorage,
-    IReverseRegistry,
     IRootRegistry,
     IChildRegistry
 {
