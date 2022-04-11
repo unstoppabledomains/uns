@@ -58,17 +58,17 @@
 
 <tr><td>80001</td><td>&mdash;</td><td>&mdash;</td></tr><tr><td colspan="100%"><h2>Resolver</h2></td></tr><tr><th>network</th><th>address</th><th>forwarder</th></tr><tr><td>1</td><td><a href="https://etherscan.io/address/0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842">0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842</a></td><td><a href="https://etherscan.io/address/0xc33aBEe943be2A2DA50708bAb61F47d581ee450d">0xc33aBEe943be2A2DA50708bAb61F47d581ee450d</a></td></tr>
 
-<tr><td>5</td><td><a href="https://goerli.etherscan.io/address/0x0555344A5F440Bd1d8cb6B42db46c5e5D4070437">0x0555344A5F440Bd1d8cb6B42db46c5e5D4070437</a></td><td><a href="https://goerli.etherscan.io/address/0xfFe10676BC87D27e18A909e939DDac4577b3eBb5">0xfFe10676BC87D27e18A909e939DDac4577b3eBb5</a></td></tr>
+<tr><td>5</td><td><a href="https://goerli.etherscan.io/address/0x0555344A5F440Bd1d8cb6B42db46c5e5D4070437">0x0555344A5F440Bd1d8cb6B42db46c5e5D4070437</a></td><td><a href="https://goerli.etherscan.io/address/0xFCc1A95B7287Ae7a8B7cA813F12991dF5714d4C7">0xFCc1A95B7287Ae7a8B7cA813F12991dF5714d4C7</a></td></tr>
 
 <tr><td>137</td><td>&mdash;</td><td>&mdash;</td></tr>
 
 <tr><td>80001</td><td>&mdash;</td><td>&mdash;</td></tr><tr><td colspan="100%"><h2>ProxyReader</h2></td></tr><tr><th>network</th><th>address</th><th>forwarder</th></tr><tr><td>1</td><td><a href="https://etherscan.io/address/0x58034A288D2E56B661c9056A0C27273E5460B63c">0x58034A288D2E56B661c9056A0C27273E5460B63c</a></td><td>&mdash;</td></tr>
 
-<tr><td>5</td><td><a href="https://goerli.etherscan.io/address/0x9A70ff906D422C2FD0F7B94244D6b36DB62Ee982">0x9A70ff906D422C2FD0F7B94244D6b36DB62Ee982</a></td><td>&mdash;</td></tr>
+<tr><td>5</td><td><a href="https://goerli.etherscan.io/address/0xE3b961856C417d081a02cBa0161a051268F52677">0xE3b961856C417d081a02cBa0161a051268F52677</a></td><td>&mdash;</td></tr>
 
 <tr><td>137</td><td><a href="http://polygonscan.com/address/0x423F2531bd5d3C3D4EF7C318c2D1d9BEDE67c680">0x423F2531bd5d3C3D4EF7C318c2D1d9BEDE67c680</a></td><td>&mdash;</td></tr>
 
-<tr><td>80001</td><td><a href="https://mumbai.polygonscan.com/address/0xbd9e01F6513E7C05f71Bf21d419a3bDF1EA9104b">0xbd9e01F6513E7C05f71Bf21d419a3bDF1EA9104b</a></td><td>&mdash;</td></tr><tr><td colspan="100%"><h2>TwitterValidationOperator</h2></td></tr><tr><th>network</th><th>address</th><th>forwarder</th></tr><tr><td>1</td><td><a href="https://etherscan.io/address/0x2F659766E3D08561CA3408FbAba7C0749ab2c402">0x2F659766E3D08561CA3408FbAba7C0749ab2c402</a></td><td>&mdash;</td></tr>
+<tr><td>80001</td><td><a href="https://mumbai.polygonscan.com/address/0x6fe7c857C1B0E54492C8762f27e0a45CA7ff264B">0x6fe7c857C1B0E54492C8762f27e0a45CA7ff264B</a></td><td>&mdash;</td></tr><tr><td colspan="100%"><h2>TwitterValidationOperator</h2></td></tr><tr><th>network</th><th>address</th><th>forwarder</th></tr><tr><td>1</td><td><a href="https://etherscan.io/address/0x2F659766E3D08561CA3408FbAba7C0749ab2c402">0x2F659766E3D08561CA3408FbAba7C0749ab2c402</a></td><td>&mdash;</td></tr>
 
 <tr><td>5</td><td>&mdash;</td><td>&mdash;</td></tr>
 
