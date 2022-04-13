@@ -7,7 +7,7 @@
                     "address": "0x049aba7510f45BA5b64ea9E658E342F904DB358D",
                     "implementation": "0xa715562307AA8AEDCba976b3793b3337F371c14a",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0xc2fede",
+                    "deploymentBlock": "0xd62e9d",
                     "forwarder": "0x049aba7510f45BA5b64ea9E658E342F904DB358D"
                 },
                 "CNSRegistry": {
@@ -64,17 +64,18 @@
                         "0x878bc2f3f717766ab69c0a5f9a6144931e61aed3"
                     ],
                     "deploymentBlock": "0x960844",
-                    "forwarder": "0xc33aBEe943be2A2DA50708bAb61F47d581ee450d"
+                    "forwarder": "0x486eb10E4F48C038513ECAf11585Ca2779768CF2"
                 },
                 "ProxyReader": {
-                    "address": "0x58034A288D2E56B661c9056A0C27273E5460B63c",
+                    "address": "0x1BDc0fD4fbABeed3E611fd6195fCd5d41dcEF393",
                     "legacyAddresses": [
+                        "0x58034A288D2E56B661c9056A0C27273E5460B63c",
                         "0xc3C2BAB5e3e52DBF311b2aAcEf2e40344f19494E",
                         "0xfEe4D4F0aDFF8D84c12170306507554bC7045878",
                         "0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5",
                         "0x7ea9Ee21077F84339eDa9C80048ec6db678642B1"
                     ],
-                    "deploymentBlock": "0xd62e80"
+                    "deploymentBlock": "0xde71cd"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x2F659766E3D08561CA3408FbAba7C0749ab2c402",
