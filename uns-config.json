@@ -199,8 +199,8 @@
                 "UNSRegistry": {
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x01272eb5",
-                    "implementation": "0xDA2fa7bf8e60e8BD3A9ADb7105C67B184F26209D",
+                    "deploymentBlock": "0x019d6188",
+                    "implementation": "0x5442953b0BFFf69FC945f5f1387cbFD2e2673447",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
                 },
                 "CNSRegistry": {
@@ -257,11 +257,12 @@
                     "forwarder": "0x0000000000000000000000000000000000000000"
                 },
                 "ProxyReader": {
-                    "address": "0x423F2531bd5d3C3D4EF7C318c2D1d9BEDE67c680",
+                    "address": "0x3E67b8c702a1292d1CEb025494C84367fcb12b45",
                     "legacyAddresses": [
+                        "0x423F2531bd5d3C3D4EF7C318c2D1d9BEDE67c680",
                         "0xA3f32c8cd786dc089Bd1fC175F2707223aeE5d00"
                     ],
-                    "deploymentBlock": "0x016ca441"
+                    "deploymentBlock": "0x019d61a9"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",
