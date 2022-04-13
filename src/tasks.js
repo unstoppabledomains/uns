@@ -385,7 +385,6 @@ const upgradeUNSRegistryTask = {
     const unsRegistry = await upgrades.upgradeProxy(
       UNSRegistry.address,
       ctx.artifacts.UNSRegistry,
-      { unsafeSkipStorageCheck: true },
     );
     await unsRegistry.deployTransaction.wait();
 
