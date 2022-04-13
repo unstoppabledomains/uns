@@ -1,4 +1,4 @@
-## next release (v0.3.0)
+## v0.4.0
 - UNSRegistry@0.4.0 receives the Reverse Registry support
 - ProxyReader@0.2.3 receives reverse records reading
 - Remove ReverseResolver contract
