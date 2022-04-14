@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
+  "version": "2.1.1",
   "information": {
     "description": "This file desribes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/domain-registry-essentials/records-reference",
@@ -443,16 +443,6 @@
     },
     "crypto.ELA.version.ESC.address": {
       "deprecatedKeyName": "ELA_ESC",
-      "validationRegex": "^0x[a-fA-F0-9]{40}$",
-      "deprecated": false
-    },
-    "crypto.ELA.version.HRC20.address": {
-      "deprecatedKeyName": "ELA_HRC20",
-      "validationRegex": "^0x[a-fA-F0-9]{40}$",
-      "deprecated": false
-    },
-    "crypto.ELA.version.ERC20.address": {
-      "deprecatedKeyName": "ELA_ERC20",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     },
