@@ -1,0 +1,1 @@
+[{"inputs":[],"name":"greet","outputs":[{"internalType":"string","name":"name","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"}],"name":"rememberName","outputs":[],"stateMutability":"nonpayable","type":"function"}]
