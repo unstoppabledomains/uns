@@ -1,15 +1,16 @@
 ## v0.4
 - Rebuild sandbox (UNS v0.4.0)
+- Add `.zil` and `.polygon` TLDs
 
 ## v0.3
 - Rebuild sandbox (UNS v0.2.0)
 - Upgrade Ganache to v7.0.0
-- Configures tokenURI prefix (prefix = `https://example.com/`):
+- Configure tokenURI prefix (prefix = `https://example.com/`):
   - `UNS.tokenURI(0x{tokenId})` -> `https://example.com/0x{tokenId}`
   - `CNS.tokenURI(0x{tokenId})` -> `https://example.com/{domain_label}.crypto`
 
 ## v0.2
-- Adds possibility to migrate CNS domain to UNS registry through functions:
+- Add possibility to migrate CNS domain to UNS registry through functions:
   - `safeTransferFrom(address,address,uint256)`
   - `safeTransferFrom(address,address,uint256,bytes)` (where last `bytes` parameter receives
   `abi.encode(['bool'], [false])`))

@@ -1,3 +1,6 @@
+## v0.4.2
+- Add `.zil` and `.polygon` TLDs
+
 ## v0.4.1
 - Remove invalid ELA versions
 

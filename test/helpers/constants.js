@@ -18,5 +18,7 @@ module.exports = {
     BITCOIN: BigNumber.from('0x042fb01c1e43fb4a32f85b41c821e17d2faeac58cfc5fb23f80bc00c940f85e3'),
     888: BigNumber.from('0x5c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e'),
     DAO: BigNumber.from('0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553'),
+    ZIL: BigNumber.from('0xd81bbfcee722494b885e891546eeac23d0eedcd44038d7a2f6ef9ec2f9e0d239'),
+    POLYGON: BigNumber.from('0xed9ce6b49a0e2c56c57c86795b131bd6df792312183994c3cf3de1516cfe92d6'),
   },
 };
