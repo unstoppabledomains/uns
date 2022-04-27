@@ -4,7 +4,7 @@ const namehash = require('eth-ens-namehash');
 
 const { ZERO_ADDRESS, TLD } = require('./helpers/constants');
 
-describe.only('MintingManager', () => {
+describe('MintingManager', () => {
   const DomainNamePrefix = 'uns-devtest-';
 
   let UNSRegistry,
