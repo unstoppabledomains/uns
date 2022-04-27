@@ -73,7 +73,19 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         __Blocklist_init_unchained();
         __Pausable_init_unchained();
 
-        string[9] memory tlds = ['crypto', 'wallet', 'coin', 'x', 'nft', 'blockchain', 'bitcoin', '888', 'dao'];
+        string[11] memory tlds = [
+            'crypto',
+            'wallet',
+            'coin',
+            'x',
+            'nft',
+            'blockchain',
+            'bitcoin',
+            '888',
+            'dao',
+            'zil',
+            'polygon'
+        ];
         for (uint256 i = 0; i < tlds.length; i++) {
             _addTld(tlds[i]);
         }
