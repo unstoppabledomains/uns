@@ -20,5 +20,6 @@ module.exports = {
     DAO: BigNumber.from('0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553'),
     ZIL: BigNumber.from('0xd81bbfcee722494b885e891546eeac23d0eedcd44038d7a2f6ef9ec2f9e0d239'),
     POLYGON: BigNumber.from('0xed9ce6b49a0e2c56c57c86795b131bd6df792312183994c3cf3de1516cfe92d6'),
+    UNSTOPPABLE: BigNumber.from('0x92bba949890cd44a226a8ce54135cf86538cd6c5ca0ccf41877102fd718cc8aa'),
   },
 };

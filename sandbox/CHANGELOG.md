@@ -1,6 +1,9 @@
 ## v0.4
 - Rebuild sandbox (UNS v0.4.0)
-- Add `.zil` and `.polygon` TLDs
+- Add TLDs:
+  - `.zil`
+  - `.polygon`
+  - `.unstoppable`
 
 ## v0.3
 - Rebuild sandbox (UNS v0.2.0)
