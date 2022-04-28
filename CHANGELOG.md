@@ -1,3 +1,6 @@
+## v0.4.3
+- Add `.unstoppable` TLD
+
 ## v0.4.2
 - Add `.zil` and `.polygon` TLDs
 
