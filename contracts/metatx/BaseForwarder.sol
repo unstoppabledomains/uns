@@ -4,11 +4,13 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol';
 
 import './IForwarder.sol';
 
 abstract contract BaseForwarder is IForwarder {
     using ECDSAUpgradeable for bytes32;
+    using SignatureCheckerUpgradeable for address;
 
     function _verify(
         ForwardRequest memory req,
@@ -16,17 +18,9 @@ abstract contract BaseForwarder is IForwarder {
         bytes memory signature
     ) internal view virtual returns (bool) {
         uint256 nonce = this.nonceOf(req.tokenId);
-        address signer = _recover(keccak256(req.data), target, nonce, signature);
-        return nonce == req.nonce && signer == req.from;
-    }
+        bytes32 hash = keccak256(abi.encodePacked(keccak256(req.data), target, req.nonce)).toEthSignedMessageHash();
 
-    function _recover(
-        bytes32 digest,
-        address target,
-        uint256 nonce,
-        bytes memory signature
-    ) internal pure virtual returns (address signer) {
-        return keccak256(abi.encodePacked(digest, target, nonce)).toEthSignedMessageHash().recover(signature);
+        return req.nonce == nonce && req.from.isValidSignatureNow(hash, signature);
     }
 
     function _execute(
