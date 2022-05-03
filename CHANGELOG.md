@@ -1,3 +1,6 @@
+## v0.4.1
+- UNSRegistry@0.4.1 - receives support for smart contract wallet meta-transactions
+
 ## v0.4.0
 - UNSRegistry@0.4.0 receives the Reverse Registry support
 - ProxyReader@0.2.3 receives reverse records reading

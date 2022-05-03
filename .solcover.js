@@ -5,6 +5,7 @@ module.exports = {
     'mocks/BaseForwarderMock.sol',
     'mocks/BaseRoutingForwarderMock.sol',
     'mocks/MinterRoleMock.sol',
+    'mocks/ERC1271SmartWalletMock.sol',
     '@maticnetwork/pos-portal/DummyStateSender.sol',
     '@maticnetwork/pos-portal/MintableERC721Predicate.sol',
     '@maticnetwork/pos-portal/MockCheckpointManager.sol',
