@@ -1,3 +1,6 @@
+## v0.4.4
+- UNSRegistry@0.4.1 - receives support for smart contract wallet meta-transactions
+
 ## v0.4.3
 - Add `.unstoppable` TLD
 
