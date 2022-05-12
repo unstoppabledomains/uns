@@ -12,7 +12,6 @@ const {
 } = require('./helpers/polygon');
 
 const { utils } = ethers;
-const { bufferToHex } = require('ethereumjs-util');
 
 describe('RootRegistry', () => {
   let UNSRegistry, CNSRegistry, Resolver, MintingController, URIPrefixController, SignatureController,
@@ -404,7 +403,7 @@ describe('RootRegistry', () => {
           0,
           checkpointData.number,
           checkpointData.number,
-          bufferToHex(checkpointData.header.root),
+          utils.hexlify(checkpointData.header.root),
         );
     }
 

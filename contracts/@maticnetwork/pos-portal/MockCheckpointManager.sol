@@ -2,7 +2,7 @@
 
 pragma solidity ^0.6.0;
 
-contract ICheckpointManager {
+interface IRootChain {
     event NewHeaderBlock(
         address indexed proposer,
         uint256 indexed headerBlockId,
@@ -11,7 +11,9 @@ contract ICheckpointManager {
         uint256 end,
         bytes32 root
     );
+}
 
+contract ICheckpointManager {
     struct HeaderBlock {
         bytes32 root;
         uint256 start;
@@ -30,7 +32,7 @@ contract ICheckpointManager {
 /**
  * @notice Mock Checkpoint Manager contract to simulate plasma checkpoints while testing
  */
-contract MockCheckpointManager is ICheckpointManager {
+contract MockCheckpointManager is ICheckpointManager, IRootChain {
     uint256 public currentCheckpointNumber = 0;
 
     function setCheckpoint(bytes32 rootHash, uint256 start, uint256 end) public {
