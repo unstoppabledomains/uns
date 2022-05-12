@@ -63,10 +63,11 @@ async function submitCheckpoint (checkpointManager, txnHash) {
   const root = bufferToHex(checkpointData.header.root);
 
   // submit checkpoint including burn (withdraw) tx
-  await checkpointManager.methods.setCheckpoint(root, block.number, block.number).send();
+  const setCheckPointTxReceipt = await checkpointManager.methods.setCheckpoint(root, block.number, block.number).send();
+  const setCheckPointTx = await childWeb3.eth.getTransaction(setCheckPointTxReceipt.transactionHash);
 
   // return checkpoint data
-  return checkpointData;
+  return { checkpointData, setCheckPointTx };
 }
 
 module.exports = {

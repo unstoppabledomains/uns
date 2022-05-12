@@ -3,6 +3,15 @@
 pragma solidity ^0.6.0;
 
 contract ICheckpointManager {
+    event NewHeaderBlock(
+        address indexed proposer,
+        uint256 indexed headerBlockId,
+        uint256 indexed reward,
+        uint256 start,
+        uint256 end,
+        bytes32 root
+    );
+
     struct HeaderBlock {
         bytes32 root;
         uint256 start;
@@ -35,5 +44,7 @@ contract MockCheckpointManager is ICheckpointManager {
 
         currentCheckpointNumber = currentCheckpointNumber + 1;
         headerBlocks[currentCheckpointNumber] = headerBlock;
+
+        emit NewHeaderBlock(msg.sender, currentCheckpointNumber, 0, start, end, rootHash);
     }
 }
