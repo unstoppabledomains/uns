@@ -1,3 +1,7 @@
+## v0.4.5
+- Added `NewHeaderBlock` event to `MockCheckpointManager`
+- Improved `sandbox:rebuild` so that it now updates `uns-config.json`
+
 ## v0.4.4
 - UNSRegistry@0.4.1 - receives support for smart contract wallet meta-transactions
 
