@@ -1,5 +1,4 @@
 const { ethers, artifacts } = require('hardhat');
-const { bufferToHex, rlp } = require('ethereumjs-util');
 
 const { childWeb3 } = require('./@maticnetwork/contracts');
 const { submitCheckpoint } = require('./@maticnetwork/checkpoint');
@@ -80,19 +79,20 @@ const buildExitInput = async (checkpointManager, receipt, checkpointData) => {
   const headerNumber = (await checkpointManager.currentCheckpointNumber()).toNumber();
   const logIndex = receipt.logs
     .findIndex(log => log.topics[0].toLowerCase() === ERC721_TRANSFER_EVENT_SIG.toLowerCase());
-  return bufferToHex(
-    rlp.encode([
+
+  return utils.hexlify(
+    utils.RLP.encode([
       headerNumber,
-      bufferToHex(Buffer.concat(checkpointData.proof)),
+      Buffer.concat(checkpointData.proof),
       checkpointData.number,
       checkpointData.timestamp,
-      bufferToHex(checkpointData.transactionsRoot),
-      bufferToHex(checkpointData.receiptsRoot),
-      bufferToHex(checkpointData.receipt),
-      bufferToHex(rlp.encode(checkpointData.receiptParentNodes)),
-      bufferToHex(checkpointData.path), // branch mask,
+      checkpointData.transactionsRoot,
+      checkpointData.receiptsRoot,
+      checkpointData.receipt,
+      utils.RLP.encode(checkpointData.receiptParentNodes),
+      checkpointData.path, // branch mask,
       logIndex,
-    ]),
+    ].map(utils.hexlify)),
   );
 };
 

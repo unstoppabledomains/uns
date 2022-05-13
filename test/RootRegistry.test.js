@@ -395,14 +395,28 @@ describe('RootRegistry', () => {
   });
 
   describe('Withdraw', () => {
+    const expectNewHeaderBlockEventEmitted = async (setCheckPointTx, checkpointData) => {
+      await expect(setCheckPointTx).to.emit(checkpointManager, 'NewHeaderBlock')
+        .withArgs(
+          rcmOwner.address,
+          checkpointData.header.number,
+          0,
+          checkpointData.number,
+          checkpointData.number,
+          utils.hexlify(checkpointData.header.root),
+        );
+    }
+
     it('should be able to exit through rootChainManager', async () => {
       const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-1');
       // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
       const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
-      const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
-      const data = await buildExitInput(checkpointManager, receipt, checkpoint);
+      const { setCheckPointTx, checkpointData } = await writeCheckpoint(checkpointManager, rcmOwner, txn);
+      await expectNewHeaderBlockEventEmitted(setCheckPointTx, checkpointData);
+
+      const data = await buildExitInput(checkpointManager, receipt, checkpointData);
       await rootChainManager.exit(data);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
@@ -414,8 +428,10 @@ describe('RootRegistry', () => {
       const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
-      const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
-      const data = await buildExitInput(checkpointManager, receipt, checkpoint);
+      const { setCheckPointTx, checkpointData } = await writeCheckpoint(checkpointManager, rcmOwner, txn);
+      await expectNewHeaderBlockEventEmitted(setCheckPointTx, checkpointData);
+
+      const data = await buildExitInput(checkpointManager, receipt, checkpointData);
       await l1UnsRegistry.connect(owner).withdrawFromPolygon(data, tokenId, [], []);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
@@ -427,8 +443,10 @@ describe('RootRegistry', () => {
       const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
-      const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
-      const data = await buildExitInput(checkpointManager, receipt, checkpoint);
+      const { setCheckPointTx, checkpointData } = await writeCheckpoint(checkpointManager, rcmOwner, txn);
+      await expectNewHeaderBlockEventEmitted(setCheckPointTx, checkpointData);
+
+      const data = await buildExitInput(checkpointManager, receipt, checkpointData);
       await l1UnsRegistry.connect(owner).withdrawFromPolygon(data, tokenId, ['k1'], ['v1']);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
@@ -441,8 +459,10 @@ describe('RootRegistry', () => {
       const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
-      const checkpoint = await writeCheckpoint(checkpointManager, rcmOwner, txn);
-      const data = await buildExitInput(checkpointManager, receipt, checkpoint);
+      const { setCheckPointTx, checkpointData } = await writeCheckpoint(checkpointManager, rcmOwner, txn);
+      await expectNewHeaderBlockEventEmitted(setCheckPointTx, checkpointData);
+
+      const data = await buildExitInput(checkpointManager, receipt, checkpointData);
       const { req, signature } = await buildExecuteUnsParams(
         'withdrawFromPolygon(bytes,uint256,string[],string[])',
         [data, tokenId, ['k2'], ['v2']],
