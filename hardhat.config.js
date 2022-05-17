@@ -42,7 +42,7 @@ task(TASK_COMPILE, 'hook compile task to perform post-compile task', async (_, h
   for (const artifactPath of await hre.artifacts.getArtifactPaths()) {
     const artifact = fs.readFileSync(artifactPath);
     const { abi, contractName } = JSON.parse(artifact);
-    if (!abi.length || contractName.includes('Mock')) continue;
+    if (!abi.length) continue;
 
     const target = path.join(outputDir, `${contractName}.json`);
     fs.copyFileSync(artifactPath, target);
@@ -174,7 +174,6 @@ module.exports = {
     path: './artifacts/abi',
     clear: true,
     flat: true,
-    except: ['Mock'],
     spacing: 0,
   },
   uns: {
