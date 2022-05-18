@@ -30,9 +30,9 @@ contract ICheckpointManager {
 }
 
 /**
- * @notice Mock Checkpoint Manager contract to simulate plasma checkpoints while testing
+ * @notice Simple Checkpoint Manager contract to simulate plasma checkpoints while testing
  */
-contract MockCheckpointManager is ICheckpointManager, IRootChain {
+contract SimpleCheckpointManager is ICheckpointManager, IRootChain {
     uint256 public currentCheckpointNumber = 0;
 
     function setCheckpoint(bytes32 rootHash, uint256 start, uint256 end) public {

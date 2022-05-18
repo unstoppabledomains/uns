@@ -51,7 +51,7 @@ describe('RootRegistry', () => {
     MintableERC721Predicate = await ethers
       .getContractFactory('contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol:MintableERC721Predicate');
     DummyStateSender = await ethers.getContractFactory('DummyStateSender');
-    CheckpointManager = await ethers.getContractFactory('MockCheckpointManager');
+    CheckpointManager = await ethers.getContractFactory('SimpleCheckpointManager');
 
     l1UnsRegistry = await UNSRegistry.connect(registryOwner).deploy();
 

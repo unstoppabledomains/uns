@@ -68,7 +68,7 @@ const buildPredicateBatchExitInput = async (withdrawer, tokenIds) => {
 };
 
 const writeCheckpoint = async (contract, admin, txn) => {
-  const abi = (await artifacts.readArtifact('MockCheckpointManager')).abi;
+  const abi = (await artifacts.readArtifact('SimpleCheckpointManager')).abi;
   const checkpointManager = new childWeb3.eth.Contract(abi, contract.address, {
     from: admin.address,
   });

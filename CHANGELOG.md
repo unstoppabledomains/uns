@@ -1,3 +1,6 @@
+## v0.4.6
+- Renamed 'MockCheckpointManager' to 'SimpleCheckpointManager'
+
 ## v0.4.5
 - Added `NewHeaderBlock` event to `MockCheckpointManager`
 - Improved `sandbox:rebuild` so that it now updates `uns-config.json`
