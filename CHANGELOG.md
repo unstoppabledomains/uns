@@ -1,7 +1,3 @@
-## v0.4.6
-- Included Mock contracts in 'hardhat.config.js'
-- Added Mock contracts artifacts and ABIs
-
 ## v0.4.5
 - Added `NewHeaderBlock` event to `MockCheckpointManager`
 - Improved `sandbox:rebuild` so that it now updates `uns-config.json`
