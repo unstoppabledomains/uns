@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "MockCheckpointManager",
-  "sourceName": "contracts/@maticnetwork/pos-portal/MockCheckpointManager.sol",
+  "contractName": "SimpleCheckpointManager",
+  "sourceName": "contracts/@maticnetwork/pos-portal/SimpleCheckpointManager.sol",
   "abi": [
     {
       "anonymous": false,

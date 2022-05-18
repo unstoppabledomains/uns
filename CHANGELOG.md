@@ -1,6 +1,5 @@
 ## v0.4.6
-- Included Mock contracts in 'hardhat.config.js'
-- Added Mock contracts artifacts and ABIs
+- Renamed 'MockCheckpointManager' to 'SimpleCheckpointManager'
 
 ## v0.4.5
 - Added `NewHeaderBlock` event to `MockCheckpointManager`

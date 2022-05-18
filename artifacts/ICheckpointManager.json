@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "ICheckpointManager",
-  "sourceName": "contracts/@maticnetwork/pos-portal/RootChainManager.sol",
+  "sourceName": "contracts/@maticnetwork/pos-portal/SimpleCheckpointManager.sol",
   "abi": [
     {
       "inputs": [
