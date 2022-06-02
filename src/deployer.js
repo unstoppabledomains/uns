@@ -26,7 +26,6 @@ async function _getArtifacts () {
     MintingManager: await ethers.getContractFactory('MintingManager'),
     MintingManagerForwarder: await ethers.getContractFactory('MintingManagerForwarder'),
     ProxyReader: await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader'),
-    TwitterValidationOperator: await ethers.getContractFactory('TwitterValidationOperator'),
     DummyStateSender: await ethers.getContractFactory('DummyStateSender'),
     CheckpointManager: await ethers.getContractFactory('SimpleCheckpointManager'),
     MintableERC721Predicate: await ethers.getContractFactory('MintableERC721Predicate'),

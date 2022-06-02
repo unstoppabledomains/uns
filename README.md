@@ -143,7 +143,6 @@ NOTE: All private keys should be in HEX format with `0x` prefix
 Network | Variables
 --- | ---
 Mainnet | MAINNET_INFURA_KEY <br /> MAINNET_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
-Rinkeby | RINKEBY_INFURA_KEY <br /> RINKEBY_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
 Goerli | GOERLI_INFURA_KEY <br /> GOERLI_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
 Polygon | POLYGON_INFURA_KEY <br /> POLYGON_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY
 Mumbai | MUMBAI_INFURA_KEY <br /> MUMBAI_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY
@@ -195,11 +194,11 @@ yarn hardhat run --network <network> scripts/filename.js
 
 As scripts make JSON-RPC calls to Infura and sign transactions, you'll need to specify 2 environment variables.
 Those variables' names depend on the network you want deploy the contracts to. Assuming you want to deploy new contracts
-to Rinkeby, you'll need the following variables:
+to Goerli, you'll need the following variables:
 
 ```
-export RINKEBY_UNS_PRIVATE_KEY=<HEX_PRIVATE_KEY>
-export RINKEBY_INFURA_KEY=<INFURA_PROJECT_ID>
+export GOERLI_UNS_PRIVATE_KEY=<HEX_PRIVATE_KEY>
+export GOERLI_INFURA_KEY=<INFURA_PROJECT_ID>
 ```
 
 The scripts located in `./scripts` directory are wrappers around Deployer tasks. You can see their definitions inside
