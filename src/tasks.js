@@ -192,25 +192,6 @@ const deployUNSTask = {
         ctx.log(`Added ${array.length} minters`);
       }
     }
-
-    if (ctx.linkToken.length) {
-      const operator = await ctx.artifacts.TwitterValidationOperator
-        .connect(owner)
-        .deploy(
-          unsRegistry.address,
-          CNSRegistry.address,
-          ctx.linkToken,
-          [owner.address],
-        );
-      await ctx.saveContractConfig('TwitterValidationOperator', operator);
-      await operator.deployTransaction.wait();
-      await verify(ctx, operator.address, [
-        unsRegistry.address,
-        CNSRegistry.address,
-        ctx.linkToken,
-        [owner.address],
-      ]);
-    }
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);

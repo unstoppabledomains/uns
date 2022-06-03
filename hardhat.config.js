@@ -193,14 +193,5 @@ module.exports = {
       mumbai: ['0xc152ba5caa9db5883f2cfefb984610fd3bd7914a'],
       polygon: ['0xd8263053a6d08ef3acbf2381f144b90841726233'],
     },
-    linkToken: {
-      hardhat: '',
-      localhost: '',
-      sandbox: '',
-      goerli: '',
-      mainnet: '0x514910771af9ca656af840dff83e8264ecf986ca',
-      mumbai: '',
-      polygon: '',
-    },
   },
 };
