@@ -11,3 +11,4 @@ import 'dot-crypto/contracts/controllers/MintingController.sol';
 import 'dot-crypto/contracts/controllers/SignatureController.sol';
 import 'dot-crypto/contracts/controllers/URIPrefixController.sol';
 import 'dot-crypto/contracts/util/FreeMinter.sol';
+import 'dot-crypto/contracts/operators/TwitterValidationOperator.sol';
