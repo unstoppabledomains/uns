@@ -26,7 +26,6 @@ async function _getArtifacts () {
     MintingManager: await ethers.getContractFactory('MintingManager'),
     MintingManagerForwarder: await ethers.getContractFactory('MintingManagerForwarder'),
     ProxyReader: await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader'),
-    TwitterValidationOperator: await ethers.getContractFactory('TwitterValidationOperator'),
     DummyStateSender: await ethers.getContractFactory('DummyStateSender'),
     CheckpointManager: await ethers.getContractFactory('SimpleCheckpointManager'),
     MintableERC721Predicate: await ethers.getContractFactory('MintableERC721Predicate'),
@@ -44,11 +43,10 @@ class Deployer {
       await _getArtifacts(),
       { owner },
       _unsConfig.minters[network.name],
-      _unsConfig.linkToken[network.name],
     );
   }
 
-  constructor (options, artifacts, accounts, minters, linkToken) {
+  constructor (options, artifacts, accounts, minters) {
     this.options = {
       ...defaultOptions,
       ...options,
@@ -56,7 +54,6 @@ class Deployer {
     this.artifacts = artifacts;
     this.accounts = accounts;
     this.minters = minters;
-    this.linkToken = linkToken;
     this.network = network.config;
 
     this.log = log;
@@ -72,7 +69,6 @@ class Deployer {
       artifacts: Object.keys(artifacts),
       accounts: Object.values(accounts).filter(a => !!a).map(a => a.address),
       minters,
-      linkToken,
     });
   }
 

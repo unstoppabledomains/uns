@@ -1,3 +1,6 @@
+## v0.4.7
+- Remove TwitterValidationOperator and related contracts
+
 ## v0.4.6
 - Renamed 'MockCheckpointManager' to 'SimpleCheckpointManager'
 
