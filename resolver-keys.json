@@ -1,5 +1,5 @@
 {
-  "version": "2.1.1",
+  "version": "2.1.2",
   "information": {
     "description": "This file desribes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/domain-registry-essentials/records-reference",
@@ -1178,6 +1178,11 @@
     },
     "crypto.AAVE.version.HRC20.address": {
       "deprecatedKeyName": "AAVE_HRC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.BLOCKS.address": {
+      "deprecatedKeyName": "BLOCKS",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     },
