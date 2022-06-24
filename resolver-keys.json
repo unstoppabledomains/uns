@@ -1,5 +1,5 @@
 {
-  "version": "2.1.2",
+  "version": "2.1.3",
   "information": {
     "description": "This file desribes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/domain-registry-essentials/records-reference",
@@ -435,6 +435,11 @@
       "deprecatedKeyName": "GUAP",
       "validationRegex": "^(G|P)[a-zA-HJ-NP-Z0-9]{25,39}$",
       "deprecated": false
+    },
+    "crypto.YLD.address": {
+      "deprecatedKeyName": "YLD",
+      "deprecated": false,
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
     },
     "crypto.ELA.version.ELA.address": {
       "deprecatedKeyName": "ELA_ELA",
