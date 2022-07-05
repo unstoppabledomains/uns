@@ -34,10 +34,10 @@ describe('ProxyReader (UNS only)', () => {
     await unsRegistry['mint(address,uint256,string)'](coinbase.address, TLD.CRYPTO, 'crypto');
 
     // mint .wallet
-    walletTokenId = await mintDomain(unsRegistry, coinbase.address, TLD.WALLET, domainName);
+    walletTokenId = await mintDomain(unsRegistry, coinbase, TLD.WALLET, domainName, true);
 
     // mint .crypto
-    cryptoTokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO, domainName);
+    cryptoTokenId = await mintDomain(unsRegistry, coinbase, TLD.CRYPTO, domainName, true);
 
     proxy = await ProxyReader.deploy(unsRegistry.address, ZERO_ADDRESS);
   });
