@@ -1,0 +1,42 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "GringottsEscrowSignature",
+  "sourceName": "contracts/GringottsEscrowExploit.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "secretHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "expiration",
+          "type": "uint256"
+        }
+      ],
+      "name": "deposit",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "secret",
+          "type": "string"
+        }
+      ],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b5060ec8061001f6000396000f3fe60806040526004361060265760003560e01c80631de26e1614602b57806331fb67c214603c575b600080fd5b603a60363660046057565b6053565b005b348015604757600080fd5b50603a60363660046077565b5050565b600080604083850312156068578182fd5b50508035926020909101359150565b600080602083850312156088578182fd5b823567ffffffffffffffff80821115609e578384fd5b818501915085601f83011260b0578384fd5b81358181111560bd578485fd5b86602082850101111560cd578485fd5b6020929092019691955090935050505056fea164736f6c6343000800000a",
+  "deployedBytecode": "0x60806040526004361060265760003560e01c80631de26e1614602b57806331fb67c214603c575b600080fd5b603a60363660046057565b6053565b005b348015604757600080fd5b50603a60363660046077565b5050565b600080604083850312156068578182fd5b50508035926020909101359150565b600080602083850312156088578182fd5b823567ffffffffffffffff80821115609e578384fd5b818501915085601f83011260b0578384fd5b81358181111560bd578485fd5b86602082850101111560cd578485fd5b6020929092019691955090935050505056fea164736f6c6343000800000a",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

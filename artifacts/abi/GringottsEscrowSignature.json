@@ -1,0 +1,1 @@
+[{"inputs":[{"internalType":"bytes32","name":"secretHash","type":"bytes32"},{"internalType":"uint256","name":"expiration","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"string","name":"secret","type":"string"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}]
