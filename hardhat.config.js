@@ -100,7 +100,7 @@ module.exports = {
     hardhat: {
       blockGasLimit: 10000000,
       initialBaseFeePerGas: 0,
-      gasPrice: 1000000000,
+      gasPrice: 1,
     },
     localhost: {
       url: 'http://localhost:8545',

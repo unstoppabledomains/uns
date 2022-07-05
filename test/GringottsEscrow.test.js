@@ -107,9 +107,7 @@ describe('GringottsEscrow', function () {
       tx.receipt = await tx.wait();
 
       expect((await addr2.getBalance()).sub(startBalance)).to.be.equal(
-        BigNumber.from('500000000000000000').sub(
-          tx.receipt.gasUsed.mul(BigNumber.from('1000000000')),
-        ),
+        BigNumber.from('500000000000000000').sub(tx.receipt.gasUsed),
       );
     });
 
@@ -127,9 +125,7 @@ describe('GringottsEscrow', function () {
       tx.receipt = await tx.wait();
 
       expect((await addr1.getBalance()).sub(startBalance)).to.be.equal(
-        BigNumber.from('500000000000000000').sub(
-          tx.receipt.gasUsed.mul(BigNumber.from('1000000000')),
-        ),
+        BigNumber.from('500000000000000000').sub(tx.receipt.gasUsed),
       );
     });
 
