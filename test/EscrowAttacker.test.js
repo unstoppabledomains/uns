@@ -40,16 +40,9 @@ describe('EscrowAttacker', function () {
       ),
     ).to.equal('51.0');
 
-    // Attack
-    await attackerContract.connect(attacker).withdrawAll(
+    // Attack (not works anymore)
+    await expect(attackerContract.connect(attacker).withdrawAll(
       'other-password',
-    );
-
-    // Stolen :)
-    expect(
-      ethers.utils.formatEther(
-        await waffle.provider.getBalance(escrowContract.address),
-      ),
-    ).to.equal('0.0');
+    )).to.be.revertedWith('ReentrancyGuard: reentrant call');
   });
 });
