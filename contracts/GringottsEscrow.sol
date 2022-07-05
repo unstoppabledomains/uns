@@ -1,6 +1,8 @@
 pragma solidity ^0.8.0;
 
-contract GringottsEscrow {
+import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
+
+contract GringottsEscrow is ReentrancyGuardUpgradeable {
     struct EscrowDetails {
         address owner;
         uint256 expiration;
@@ -17,7 +19,7 @@ contract GringottsEscrow {
         _ecrows[secretHash] = EscrowDetails(msg.sender, expiration, msg.value);
     }
 
-    function withdraw(string calldata secret) public {
+    function withdraw(string calldata secret) public nonReentrant {
         bytes32 secretHash = generateSecretHash(secret, address(this));
         EscrowDetails memory escrow = _ecrows[secretHash];
 
