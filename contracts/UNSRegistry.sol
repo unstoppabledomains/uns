@@ -350,8 +350,7 @@ contract UNSRegistry is
      * @dev See {IReverseRegistry-setReverse}.
      */
     function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
-        address sender = _msgSender();
-        _setReverse(sender, tokenId);
+        _setReverse(_msgSender(), tokenId);
     }
 
     /**
@@ -384,6 +383,7 @@ contract UNSRegistry is
     ) internal {
         _mint(to, tokenId);
         emit NewURI(tokenId, uri);
+        /// set reverse must be after emission of New URL event in order to keep events' order
         _safeSetReverse(to, tokenId);
     }
 
@@ -395,6 +395,7 @@ contract UNSRegistry is
     ) internal {
         _safeMint(to, tokenId, data);
         emit NewURI(tokenId, uri);
+        /// set reverse must be after emission of New URL event in order to keep events' order
         _safeSetReverse(to, tokenId);
     }
 
