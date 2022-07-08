@@ -29,7 +29,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.4.1';
+    string public constant VERSION = '0.4.2';
 
     string internal _prefix;
 
@@ -350,9 +350,7 @@ contract UNSRegistry is
      * @dev See {IReverseRegistry-setReverse}.
      */
     function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
-        address sender = _msgSender();
-        _reverses[sender] = tokenId;
-        emit SetReverse(sender, tokenId);
+        _setReverse(_msgSender(), tokenId);
     }
 
     /**
@@ -385,6 +383,8 @@ contract UNSRegistry is
     ) internal {
         _mint(to, tokenId);
         emit NewURI(tokenId, uri);
+        /// set reverse must be after emission of New URL event in order to keep events' order
+        _safeSetReverse(to, tokenId);
     }
 
     function _safeMint(
@@ -395,6 +395,8 @@ contract UNSRegistry is
     ) internal {
         _safeMint(to, tokenId, data);
         emit NewURI(tokenId, uri);
+        /// set reverse must be after emission of New URL event in order to keep events' order
+        _safeSetReverse(to, tokenId);
     }
 
     function _safeMintWithRecords(
@@ -426,6 +428,17 @@ contract UNSRegistry is
 
         if(_reverses[from] != 0) {
             _removeReverse(from);
+        }
+    }
+
+    function _setReverse(address addr, uint256 tokenId) internal {
+        _reverses[addr] = tokenId;
+        emit SetReverse(addr, tokenId);
+    }
+
+    function _safeSetReverse(address addr, uint256 tokenId) internal {
+        if(address(0xdead) != addr && _reverses[addr] == 0) {
+            _setReverse(addr, tokenId);
         }
     }
 

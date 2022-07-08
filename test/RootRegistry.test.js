@@ -405,7 +405,7 @@ describe('RootRegistry', () => {
           checkpointData.number,
           utils.hexlify(checkpointData.header.root),
         );
-    }
+    };
 
     it('should be able to exit through rootChainManager', async () => {
       const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-1');

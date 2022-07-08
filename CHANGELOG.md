@@ -1,3 +1,9 @@
+## v0.4.9
+- Added configuring reverse resolution on minting automatically
+
+## v0.4.8
+- Added YLD token to resovler list
+
 ## v0.4.7
 - Remove TwitterValidationOperator and related contracts
 

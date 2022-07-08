@@ -12,6 +12,11 @@ describe('MintingManager (consumption)', () => {
     return -((a - b) / a) * 100;
   }
 
+  async function removeReverse() {
+    const removeReverseTx = await unsRegistry.connect(receiver).removeReverse();
+    await removeReverseTx.wait();
+  }
+
   before(async () => {
     signers = await ethers.getSigners();
     [coinbase] = signers;
@@ -71,8 +76,12 @@ describe('MintingManager (consumption)', () => {
         const executeTx = await forwarder.connect(spender).execute(req, signature);
         executeTx.receipt = await executeTx.wait();
 
+        await removeReverse();
+
         const tx = await mintingManager[selector](...params);
         tx.receipt = await tx.wait();
+
+        await removeReverse();
 
         result.push({
           selector,
