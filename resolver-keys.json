@@ -481,6 +481,11 @@
       "validationRegex": "^0x[a-fA-F0-9]{40}$|^ex[a-zA-HJ-NP-Z0-9]{39}$",
       "deprecated": false
     },
+    "crypto.BNB.version.BEP20.address": {
+      "deprecatedKeyName": "BNB_BEP20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
     "crypto.FTM.version.ERC20.address": {
       "deprecatedKeyName": "FTM_ERC20",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
