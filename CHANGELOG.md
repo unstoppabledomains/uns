@@ -1,6 +1,5 @@
 ## v0.4.10
 - Add `OKC` token to resolver list
-- Add support BEP20 chain for `BNB` token
 
 ## v0.4.9
 - Added configuring reverse resolution on minting automatically
