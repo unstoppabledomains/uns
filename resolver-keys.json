@@ -1,5 +1,5 @@
 {
-  "version": "2.1.3",
+  "version": "2.1.4",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/domain-registry-essentials/records-reference",
@@ -441,6 +441,11 @@
       "deprecated": false,
       "validationRegex": "^0x[a-fA-F0-9]{40}$"
     },
+    "crypto.OKT.address": {
+      "deprecatedKeyName": "OKT",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$|^ex[a-zA-HJ-NP-Z0-9]{6,90}$",
+      "deprecated": false
+    },
     "crypto.ELA.version.ELA.address": {
       "deprecatedKeyName": "ELA_ELA",
       "validationRegex": "E[a-zA-HJ-NP-Z0-9]{33}",
@@ -469,6 +474,11 @@
     "crypto.USDT.version.OMNI.address": {
       "deprecatedKeyName": "USDT_OMNI",
       "validationRegex": "^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$",
+      "deprecated": false
+    },
+    "crypto.USDT.version.OKC.address": {
+      "deprecatedKeyName": "USDT_OKC",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$|^ex[a-zA-HJ-NP-Z0-9]{6,90}$",
       "deprecated": false
     },
     "crypto.FTM.version.ERC20.address": {
