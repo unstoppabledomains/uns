@@ -443,7 +443,7 @@
     },
     "crypto.OKT.address": {
       "deprecatedKeyName": "OKT",
-      "validationRegex": "^0x[a-fA-F0-9]{40}$|^ex[a-zA-HJ-NP-Z0-9]{39}$",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$|^ex[a-zA-HJ-NP-Z0-9]{6,90}$",
       "deprecated": false
     },
     "crypto.ELA.version.ELA.address": {
@@ -478,7 +478,7 @@
     },
     "crypto.USDT.version.OKC.address": {
       "deprecatedKeyName": "USDT_OKC",
-      "validationRegex": "^0x[a-fA-F0-9]{40}$|^ex[a-zA-HJ-NP-Z0-9]{39}$",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$|^ex[a-zA-HJ-NP-Z0-9]{6,90}$",
       "deprecated": false
     },
     "crypto.FTM.version.ERC20.address": {
