@@ -5,7 +5,7 @@ describe('Splitter', () => {
   async function countTxFee (tx) {
     const gasPrice = tx.gasPrice;
     const gasUsed = (await tx.wait()).gasUsed;
-    return gasPrice * gasUsed;
+    return gasPrice.mul(gasUsed);
   }
   let Splitter;
   let splitter;
@@ -57,12 +57,9 @@ describe('Splitter', () => {
     const txFee = await countTxFee(tx);
 
     const afterWithdrawal = await splitter.provider.getBalance(receiverOne.address);
-    const expectedAfterWithdrawal = beforeWithdrawal - txFee + 15;
+    const expectedAfterWithdrawal = beforeWithdrawal.sub(txFee).add(15);
 
-    // There are difficulties with comparing big numbers in chai, so, counting delta.
-    const actualVsExpectedDelta = expectedAfterWithdrawal - afterWithdrawal;
-    expect(actualVsExpectedDelta).to.be.equal(0);
-
+    expect(afterWithdrawal).to.be.equal(expectedAfterWithdrawal);
     expect(await splitter.provider.getBalance(splitter.address)).to.be.equal(16);
     expect((await splitter.balanceMap(receiverOne.address))).to.be.equal(0);
   });

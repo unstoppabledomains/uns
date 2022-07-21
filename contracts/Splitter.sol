@@ -22,8 +22,8 @@ contract Splitter {
         uint256 currentBalance = balanceMap[msg.sender];
         require(currentBalance > 0, 'Zero balance, nothing to withdraw');
 
+        balanceMap[msg.sender] = 0;
         (bool sent,) = msg.sender.call{value: currentBalance}("");
         require(sent, 'Failed to send Ether');
-        balanceMap[msg.sender] = 0;
     }
 }
