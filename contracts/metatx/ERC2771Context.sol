@@ -23,13 +23,13 @@ abstract contract ERC2771Context is Initializable, ContextUpgradeable {
     bytes32 internal constant _FORWARDER_SLOT = 0x893ef2ea16c023f61d4f55d3e6ee3fc3f2fbfd478461323dbc2fbf919047086e;
 
     // solhint-disable-next-line func-name-mixedcase
-    function __ERC2771Context_init(address forwarder) internal initializer {
+    function __ERC2771Context_init(address forwarder) internal onlyInitializing {
         __Context_init_unchained();
         __ERC2771Context_init_unchained(forwarder);
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __ERC2771Context_init_unchained(address forwarder) internal initializer {
+    function __ERC2771Context_init_unchained(address forwarder) internal onlyInitializing {
         _setForwarder(forwarder);
     }
 

@@ -511,7 +511,7 @@ describe('MintingManager', () => {
         );
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await cnsRegistry.tokenURI(tokenId)).to.be.eql(
@@ -554,7 +554,7 @@ describe('MintingManager', () => {
         );
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await cnsRegistry.resolverOf(tokenId)).to.be.eql(
@@ -601,7 +601,7 @@ describe('MintingManager', () => {
         );
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await resolver.get('key1', tokenId)).to.be.eql('value3');
@@ -645,7 +645,7 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test-m12');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await cnsRegistry.tokenURI(tokenId)).to.be.eql(
@@ -686,7 +686,7 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test-m986');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await cnsRegistry.resolverOf(tokenId)).to.be.eql(
@@ -725,7 +725,7 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test-m636');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await cnsRegistry.resolverOf(tokenId)).to.be.eql(
@@ -767,7 +767,7 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test-m110');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await resolver.get('key1', tokenId)).to.be.eql('value1');
@@ -825,7 +825,7 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test-mf43m');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await cnsRegistry.resolverOf(tokenId)).to.be.eql(
@@ -880,7 +880,7 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test-mcm4d1');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await resolver.get('key1', tokenId)).to.be.eql('value1');
@@ -938,7 +938,7 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test-m23fdf');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await cnsRegistry.resolverOf(tokenId)).to.be.eql(
@@ -994,7 +994,7 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test-mv2n');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await resolver.get('key1', tokenId)).to.be.eql('value1');
@@ -1055,7 +1055,7 @@ describe('MintingManager', () => {
         const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test-mdg423');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-          'ERC721: owner query for nonexistent token',
+          'ERC721: invalid token ID',
         );
 
         expect(await cnsRegistry.resolverOf(tokenId)).to.be.eql(

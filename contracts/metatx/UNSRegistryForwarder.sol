@@ -24,12 +24,12 @@ abstract contract UNSRegistryForwarder is Initializable, EIP712UpgradeableGap, B
     mapping(uint256 => uint256) private _nonces;
 
     // solhint-disable-next-line func-name-mixedcase
-    function __UNSRegistryForwarder_init() internal initializer {
+    function __UNSRegistryForwarder_init() internal onlyInitializing {
         __UNSRegistryForwarder_init_unchained();
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __UNSRegistryForwarder_init_unchained() internal initializer {}
+    function __UNSRegistryForwarder_init_unchained() internal onlyInitializing {}
 
     function nonceOf(uint256 tokenId) public view override returns (uint256) {
         return _nonces[tokenId];
