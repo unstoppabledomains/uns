@@ -1,3 +1,7 @@
+## v0.5.1
+- Rename ERC1271SmartWalletMock to ERC1271SimpleWallet
+- Add ERC1271SimpleWallet ABI
+
 ## v0.5.0
 - Update `solc` to 0.8.4
 - Update `@openzeppelin/contracts-upgradeable` to 4.7.1 (https://github.com/advisories/GHSA-4g63-c64m-25w9)

@@ -15,7 +15,7 @@ import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
 
 /**
- * @title UNSRegistry v0.4
+ * @title UNSRegistry
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */

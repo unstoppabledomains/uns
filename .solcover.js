@@ -4,7 +4,7 @@ module.exports = {
     'mocks/BaseForwarderMock.sol',
     'mocks/BaseRoutingForwarderMock.sol',
     'mocks/MinterRoleMock.sol',
-    'mocks/ERC1271SmartWalletMock.sol',
+    'mocks/ERC1271Mock.sol',
     '@maticnetwork/pos-portal/DummyStateSender.sol',
     '@maticnetwork/pos-portal/MintableERC721Predicate.sol',
     '@maticnetwork/pos-portal/MockCheckpointManager.sol',
@@ -13,6 +13,7 @@ module.exports = {
     '@maticnetwork/IMintableERC721.sol',
     '@maticnetwork/IRootChainManager.sol',
     '@maticnetwork/RootChainManagerStorage.sol',
-    'utils/MultiSend.sol'
+    'utils/MultiSend.sol',
+    'utils/ERC1271SimpleWallet.sol',
   ],
-}
+};
