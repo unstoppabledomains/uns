@@ -38,7 +38,9 @@ task(
 
     await runSuper();
 
-    fs.rmdirSync(outputDir, { recursive: true });
+    if (fs.existsSync(outputDir)) {
+      fs.rmdirSync(outputDir, { recursive: true });
+    }
     fs.mkdirSync(outputDir, { recursive: true });
 
     for (const artifactPath of await hre.artifacts.getArtifactPaths()) {
