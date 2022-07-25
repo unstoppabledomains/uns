@@ -130,7 +130,7 @@ describe('ChildRegistry', () => {
 
       await expect(
         l2UnsRegistry.withdraw(tokenId),
-      ).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      ).to.be.revertedWith('ERC721: invalid token ID');
     });
 
     it('should revert withdraw when called by non-owner', async () => {
@@ -151,7 +151,7 @@ describe('ChildRegistry', () => {
         .withArgs(owner.address, ZERO_ADDRESS, tokenId);
 
       await expect(l2UnsRegistry.ownerOf(tokenId))
-        .to.be.revertedWith('ERC721: owner query for nonexistent token');
+        .to.be.revertedWith('ERC721: invalid token ID');
     });
 
     it('should revert batch withdraw when token is not exists', async () => {
@@ -160,7 +160,7 @@ describe('ChildRegistry', () => {
 
       await expect(
         l2UnsRegistry.withdrawBatch([tokenId1, tokenId2]),
-      ).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      ).to.be.revertedWith('ERC721: invalid token ID');
     });
 
     it('should revert batch withdraw when exceeds batch limit', async () => {
@@ -196,9 +196,9 @@ describe('ChildRegistry', () => {
         .withArgs(owner.address, ZERO_ADDRESS, tokenId1);
 
       await expect(l2UnsRegistry.ownerOf(tokenId1))
-        .to.be.revertedWith('ERC721: owner query for nonexistent token');
+        .to.be.revertedWith('ERC721: invalid token ID');
       await expect(l2UnsRegistry.ownerOf(tokenId2))
-        .to.be.revertedWith('ERC721: owner query for nonexistent token');
+        .to.be.revertedWith('ERC721: invalid token ID');
     });
 
     it('should revert withdraw with matadata when token is not exists', async () => {
@@ -206,7 +206,7 @@ describe('ChildRegistry', () => {
 
       await expect(
         l2UnsRegistry.withdrawWithMetadata(tokenId),
-      ).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      ).to.be.revertedWith('ERC721: invalid token ID');
     });
 
     it('should revert withdraw when called by non-owner', async () => {
@@ -227,7 +227,7 @@ describe('ChildRegistry', () => {
         .withArgs(owner.address, ZERO_ADDRESS, tokenId);
 
       await expect(l2UnsRegistry.ownerOf(tokenId))
-        .to.be.revertedWith('ERC721: owner query for nonexistent token');
+        .to.be.revertedWith('ERC721: invalid token ID');
     });
   });
 });

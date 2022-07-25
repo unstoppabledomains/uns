@@ -19,13 +19,13 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
  */
 abstract contract ERC2771RegistryContext is Initializable, ContextUpgradeable {
     // solhint-disable-next-line func-name-mixedcase
-    function __ERC2771RegistryContext_init() internal initializer {
+    function __ERC2771RegistryContext_init() internal onlyInitializing {
         __Context_init_unchained();
         __ERC2771RegistryContext_init_unchained();
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __ERC2771RegistryContext_init_unchained() internal initializer {}
+    function __ERC2771RegistryContext_init_unchained() internal onlyInitializing {}
 
     /**
      * @dev Return bool whether provided address is the trusted forwarder.

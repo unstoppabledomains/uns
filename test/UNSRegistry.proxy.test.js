@@ -62,7 +62,7 @@ describe('UNSRegistry (proxy)', () => {
       // should fail to set name if not owner
       await expect(
         unsRegistry.set('key', 'value', tokenId),
-      ).to.be.revertedWith('ERC721: operator query for nonexistent token');
+      ).to.be.revertedWith('ERC721: invalid token ID');
 
       await unsRegistry['mint(address,uint256,string)'](owner.address, tokenId, 'label_931');
       await unsRegistry.set('key', 'value', tokenId);

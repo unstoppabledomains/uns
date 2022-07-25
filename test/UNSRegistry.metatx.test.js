@@ -130,7 +130,7 @@ describe('UNSRegistry (metatx)', () => {
       await unsRegistry.execute(req, signature);
 
       await expect(unsRegistry.ownerOf(tokenId)).to.be
-        .revertedWith('ERC721: owner query for nonexistent token');
+        .revertedWith('ERC721: invalid token ID');
     });
 
     it('should revert meta-burn for non-onwer', async () => {
