@@ -24,7 +24,7 @@ describe('BaseForwarder', () => {
     [owner, account] = signers;
 
     BaseForwarder = await ethers.getContractFactory('BaseForwarderMock');
-    ERC1271SmartWalletFactory = await ethers.getContractFactory('ERC1271SmartWalletMock');
+    ERC1271SmartWalletFactory = await ethers.getContractFactory('ERC1271SimpleSmartWallet');
     ERC1271EmptyMockFactory = await ethers.getContractFactory('ERC1271EmptyMock');
 
     forwarder = await BaseForwarder.deploy();

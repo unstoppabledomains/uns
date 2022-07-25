@@ -8,7 +8,7 @@ import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.
    * https://github.com/dapperlabs/dapper-contracts/blob/0321efcc80c413dc1d3a3cd30ae02929b3ddadfe/contracts/Wallet/CoreWallet.sol#L360
    * https://github.com/polymorpher/one-wallet/blob/db7d27442c7400b1b0181aff0f1757a15baaa699/code/contracts/SignatureManager.sol#L161
 */
-contract ERC1271SmartWalletMock is IERC1271Upgradeable {
+contract ERC1271SimpleSmartWallet is IERC1271Upgradeable {
     using ECDSAUpgradeable for bytes32;
 
     bytes4 constant internal _ERC1271_MAGIC_VALUE = bytes4(keccak256("isValidSignature(bytes32,bytes)"));

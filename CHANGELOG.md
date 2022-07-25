@@ -1,3 +1,6 @@
+## v0.4.8
+- Renamed ERC1271SmartWalletMock to ERC1271SimpleSmartWallet. Added ABI
+
 ## v0.4.7
 - Remove TwitterValidationOperator and related contracts
 
