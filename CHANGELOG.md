@@ -1,3 +1,6 @@
+## v0.5.2
+- Upgrade UNSRegistry@0.5.0 on Goerli and Mumbai
+
 ## v0.5.1
 - Rename ERC1271SmartWalletMock to ERC1271SimpleWallet
 - Add ERC1271SimpleWallet ABI
