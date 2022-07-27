@@ -1,3 +1,6 @@
+## v0.5.3
+- Fix ganache initializations for versions 7.1.0 and higher
+
 ## v0.5.2
 - Upgrade UNSRegistry@0.5.0 on Goerli and Mumbai
 
