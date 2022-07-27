@@ -10,8 +10,8 @@ class GanacheService {
   }
 
   startServer () {
-    const { port, hostname } = this._options;
-    return this.server.listen(port, hostname);
+    const { port } = this._options;
+    return this.server.listen(port);
   }
 
   stopServer () {
