@@ -1,3 +1,6 @@
+## v0.5.4
+- Add `DOG` token to resolver list
+
 ## v0.5.3
 - Fix ganache initializations for versions 7.1.0 and higher
 
