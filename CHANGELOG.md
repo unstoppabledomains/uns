@@ -1,3 +1,6 @@
+## v0.5.5
+- Add `B2M` token to resolver list
+
 ## v0.5.4
 - Add `DOG` token to resolver list
 
