@@ -1,3 +1,6 @@
+## v0.5.6
+- Add regexes to coins with `validationRegex` property set to `null` value in the resolver list
+
 ## v0.5.5
 - Add `B2M` token to resolver list
 
