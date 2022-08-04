@@ -1,8 +1,8 @@
 {
-  "version": "2.1.4",
+  "version": "2.1.6",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
-    "documentation": "https://docs.unstoppabledomains.com/domain-registry-essentials/records-reference",
+    "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
     "contribution": "https://github.com/unstoppabledomains/uns/blob/main/resolver-keys.json"
   },
   "keys": {
@@ -10,6 +10,21 @@
       "deprecatedKeyName": "BTC",
       "deprecated": false,
       "validationRegex": "^bc1[ac-hj-np-z02-9]{6,87}$|^[13][a-km-zA-HJ-NP-Z1-9]{25,39}$"
+    },
+    "crypto.B2M.version.MATIC.address": {
+      "deprecatedKeyName": "B2M_MATIC",
+      "validationRegex": "^0x[a-zA-Z0-9]*$",
+      "deprecated": false
+    },
+    "crypto.B2M.version.BEP20.address": {
+      "deprecatedKeyName": "B2M_BEP20",
+      "validationRegex": "^0x[a-zA-Z0-9]*$",
+      "deprecated": false
+    },
+    "crypto.B2M.version.ERC20.address": {
+      "deprecatedKeyName": "B2M_ERC20",
+      "validationRegex": "^0x[a-zA-Z0-9]*$",
+      "deprecated": false
     },
     "crypto.ETH.address": {
       "deprecatedKeyName": "ETH",
@@ -2429,6 +2444,31 @@
     "crypto.DPI.version.MATIC.address": {
       "deprecatedKeyName": "DPI_MATIC",
       "validationRegex": "^[a-zA-Z0-9]*$",
+      "deprecated": false
+    },
+    "crypto.DOG.version.MATIC.address": {
+      "deprecatedKeyName": "DOG_MATIC",
+      "validationRegex": null,
+      "deprecated": false
+    },
+    "crypto.DOG.version.BEP20.address": {
+      "deprecatedKeyName": "DOG_BEP20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.DOG.version.ERC20.address": {
+      "deprecatedKeyName": "DOG_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.DOG.version.AETH.address": {
+      "deprecatedKeyName": "DOG_AETH",
+      "validationRegex": null,
+      "deprecated": false
+    },
+    "crypto.DOG.version.OP.address": {
+      "deprecatedKeyName": "DOG_OP",
+      "validationRegex": null,
       "deprecated": false
     }
   }

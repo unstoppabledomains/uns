@@ -1,3 +1,25 @@
+## v0.5.5
+- Add `B2M` token to resolver list
+
+## v0.5.4
+- Add `DOG` token to resolver list
+
+## v0.5.3
+- Fix ganache initializations for versions 7.1.0 and higher
+
+## v0.5.2
+- Upgrade UNSRegistry@0.5.0 on Goerli and Mumbai
+
+## v0.5.1
+- Rename ERC1271SmartWalletMock to ERC1271SimpleWallet
+- Add ERC1271SimpleWallet ABI
+
+## v0.5.0
+- Update `solc` to 0.8.4
+- Update `@openzeppelin/contracts-upgradeable` to 4.7.1 (https://github.com/advisories/GHSA-4g63-c64m-25w9)
+- UNSRegistry@0.5.0 increase version due to `ERC721` contract update with segnificant changes (eg. `ERC721: owner query for nonexistent token` error replaced by `ERC721: invalid token ID`, it might be important for clients)
+- MintingManager@0.3.3 increase version due to `Initializable` contract update
+
 ## v0.4.10
 - Add `OKC` token to resolver list
 

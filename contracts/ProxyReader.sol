@@ -25,8 +25,6 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
     constructor(IUNSRegistry unsRegistry, ICNSRegistry cnsRegistry) {
         _unsRegistry = unsRegistry;
         _cnsRegistry = cnsRegistry;
-
-        __Multicall_init_unchained();
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {

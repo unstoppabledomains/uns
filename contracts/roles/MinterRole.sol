@@ -15,14 +15,14 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __MinterRole_init() internal initializer {
+    function __MinterRole_init() internal onlyInitializing {
         __Ownable_init_unchained();
         __AccessControl_init_unchained();
         __MinterRole_init_unchained();
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __MinterRole_init_unchained() internal initializer {
+    function __MinterRole_init_unchained() internal onlyInitializing {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 

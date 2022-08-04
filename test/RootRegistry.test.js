@@ -322,7 +322,7 @@ describe('RootRegistry', () => {
 
     it('should mint a domain on withdraw while it was minted on L2', async () => {
       const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1wm-as1');
-      await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: invalid token ID');
 
       const inputData = buildPredicateExitInput(owner.address, ZERO_ADDRESS, tokenId);
       await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, inputData);
@@ -348,10 +348,10 @@ describe('RootRegistry', () => {
 
     it('should mint multiple domains on withdraw while they were minted on L2', async () => {
       const tokenId1 = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-2wm-as1');
-      await expect(l1UnsRegistry.ownerOf(tokenId1)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      await expect(l1UnsRegistry.ownerOf(tokenId1)).to.be.revertedWith('ERC721: invalid token ID');
 
       const tokenId2 = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-2wm-aq1');
-      await expect(l1UnsRegistry.ownerOf(tokenId2)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      await expect(l1UnsRegistry.ownerOf(tokenId2)).to.be.revertedWith('ERC721: invalid token ID');
 
       const inputData = buildPredicateBatchExitInput(owner.address, [tokenId1, tokenId2]);
       await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, inputData);
@@ -373,7 +373,7 @@ describe('RootRegistry', () => {
 
     it('should mint a domain with metadata on withdraw while it was minted on L2', async () => {
       const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1wmm-as2');
-      await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: invalid token ID');
 
       const inputData = buildPredicateMetadataExitInput(owner.address, ZERO_ADDRESS, tokenId, '0x');
       await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, inputData);

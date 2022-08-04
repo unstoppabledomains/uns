@@ -37,12 +37,12 @@ abstract contract Blocklist is Initializable, ContextUpgradeable {
     /**
      * @dev Initializes the blocklist in enabled state.
      */
-    function __Blocklist_init() internal initializer {
+    function __Blocklist_init() internal onlyInitializing {
         __Context_init_unchained();
         __Blocklist_init_unchained();
     }
 
-    function __Blocklist_init_unchained() internal initializer {
+    function __Blocklist_init_unchained() internal onlyInitializing {
         StorageSlotUpgradeable.getBooleanSlot(_BLOCKLIST_DISABLED_SLOT).value = false;
     }
 

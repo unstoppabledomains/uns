@@ -125,13 +125,6 @@ The contract addresses are distributed via a [UNS Config File](https://github.co
 
     TBD
 
-## Main stack
-
-- Solidity `^0.8.0`
-- OpenZeppelin contracts-upgradeable `^4.1.0`
-- Hardhat `^2.9.2`
-- ethers.js `^5.1.4`
-
 ## Environment variables
 
 - `{NETWORK}_INFURA_KEY` - Infura key for connecting to Ethereum Node

@@ -38,7 +38,9 @@ task(
 
     await runSuper();
 
-    fs.rmdirSync(outputDir, { recursive: true });
+    if (fs.existsSync(outputDir)) {
+      fs.rmdirSync(outputDir, { recursive: true });
+    }
     fs.mkdirSync(outputDir, { recursive: true });
 
     for (const artifactPath of await hre.artifacts.getArtifactPaths()) {
@@ -82,7 +84,7 @@ module.exports = {
         },
       },
       {
-        version: '0.8.0',
+        version: '0.8.4',
         settings: {
           ...settings,
           metadata: {
