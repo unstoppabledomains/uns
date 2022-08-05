@@ -1,3 +1,6 @@
+## v0.5.7
+- Add `GALA` token to resolver list
+
 ## v0.5.6
 - Add regexes to coins with `validationRegex` property set to `null` value in the resolver list
 
