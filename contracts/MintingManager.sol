@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.3.3';
+    string public constant VERSION = '0.3.4';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
