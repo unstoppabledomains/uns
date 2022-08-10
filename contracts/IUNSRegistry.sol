@@ -177,7 +177,7 @@ interface IUNSRegistry is
 
     /**
      * @dev Deprecates tokens
-     * @param tokenIds[]
+     * @param tokenIds[] list of tokenIds to mark deprecated
      */
     function deprecateTokens(uint256[] calldata tokenIds) external;
 }

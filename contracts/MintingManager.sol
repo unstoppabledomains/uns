@@ -348,6 +348,9 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         delete _tlds[tld];
     }
 
+    /**
+     * @dev This function checks whether TLD is registered
+     */
     function _isRegistredTld(uint256 tld) private view returns (bool) {
         return bytes(_tlds[tld]).length > 0;
     }
