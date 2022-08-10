@@ -44,7 +44,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
     modifier onlyAllowed(uint256 tld, string memory label) {
-        require(bytes(_tlds[tld]).length > 0, 'MintingManager: TLD_NOT_REGISTERED');
+        require(_isRegistredTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
         Strings.Slice memory _label = label.toSlice();
         if(_label._len > 10) {
             require(
@@ -73,10 +73,9 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         __Blocklist_init_unchained();
         __Pausable_init_unchained();
 
-        string[12] memory tlds = [
+        string[11] memory tlds = [
             'crypto',
             'wallet',
-            'coin',
             'x',
             'nft',
             'blockchain',
@@ -94,6 +93,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function addTld(string calldata tld) external override onlyOwner {
         _addTld(tld);
+    }
+
+    function removeTld(uint256 tld) external override onlyOwner {
+        _removeTld(tld);
     }
 
     function mintSLD(
@@ -213,6 +216,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _unpause();
     }
 
+    function deprecateTokens(uint256[] calldata tokenIds) external onlyOwner {
+        unsRegistry.deprecateTokens(tokenIds);
+    }
+
     function _mintSLD(
         address to,
         uint256 tld,
@@ -329,6 +336,20 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         if (!unsRegistry.exists(tokenId)) {
             unsRegistry.mint(address(0xdead), tokenId, tld);
         }
+    }
+
+    /**
+     * @dev This function removes TLD which was already minted
+     */
+    function _removeTld(uint256 tld) private {
+        require(_isRegistredTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
+
+        emit RemoveTld(tld, _tlds[tld]);
+        delete _tlds[tld];
+    }
+
+    function _isRegistredTld(uint256 tld) private view returns (bool) {
+        return bytes(_tlds[tld]).length > 0;
     }
 
     /**

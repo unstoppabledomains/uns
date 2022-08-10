@@ -174,4 +174,10 @@ interface IUNSRegistry is
      * @param registry address of CNS registry contract
      */
     function setCNSRegistry(address registry) external;
+
+    /**
+     * @dev Deprecates tokens
+     * @param tokenIds[]
+     */
+    function deprecateTokens(uint256[] calldata tokenIds) external;
 }

@@ -234,6 +234,7 @@ describe('UNSRegistry (metatx)', () => {
         'withdrawWithMetadata',
         'setReverse',
         'removeReverse',
+        'deprecateTokens',
       ];
 
       const getFuncs = () => {
@@ -345,6 +346,7 @@ describe('UNSRegistry (metatx)', () => {
         'withdrawBatch',
         'withdrawWithMetadata',
         'removeReverse',
+        'deprecateTokens',
       ];
 
       before(async () => {

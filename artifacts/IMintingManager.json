@@ -46,6 +46,25 @@
       "inputs": [
         {
           "indexed": true,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "tld",
+          "type": "string"
+        }
+      ],
+      "name": "RemoveTld",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
           "internalType": "address",
           "name": "implementation",
           "type": "address"
@@ -193,6 +212,19 @@
         }
       ],
       "name": "mintSLDWithRecords",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "removeTld",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

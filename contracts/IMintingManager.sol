@@ -7,11 +7,17 @@ import './IERC1967.sol';
 
 interface IMintingManager is IERC1967 {
     event NewTld(uint256 indexed tokenId, string tld);
+    event RemoveTld(uint256 indexed tokenId, string tld);
 
     /**
      * @dev Adds new TLD
      */
     function addTld(string calldata tld) external;
+
+    /**
+     * @dev Removes TLD
+     */
+    function removeTld(uint256 tokenId) external;
 
     /**
      * @dev Mints a Second Level Domain (SLD).

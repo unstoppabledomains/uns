@@ -13,6 +13,7 @@ import './RecordStorage.sol';
 import './RootRegistry.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
+import './IChildRegistry.sol';
 
 /**
  * @title UNSRegistry
@@ -37,6 +38,8 @@ contract UNSRegistry is
 
     mapping(address => uint256) internal _reverses;
 
+    mapping(uint256 => bool) internal _deprecatedTokens;
+
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
         _;
@@ -58,6 +61,16 @@ contract UNSRegistry is
 
     modifier onlyOwner(uint256 tokenId) {
         require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
+        _;
+    }
+
+    modifier onlyNonDeprecatedToken(uint256 tokenId) {
+        require(!_deprecatedTokens[tokenId], 'Registry: TOKEN_DEPRECATED');
+        _;
+    }
+
+    modifier onlyDeadAddressIfDeprecated(uint256 tokenId, address addr) {
+        require(!_deprecatedTokens[tokenId] || addr == address(0xdead), 'Registry: DEPRECATED_TOKEN_TRANSFER_ADDRESS_INVALID');
         _;
     }
 
@@ -253,7 +266,7 @@ contract UNSRegistry is
         string calldata key,
         string calldata value,
         uint256 tokenId
-    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
         _set(key, value, tokenId);
     }
 
@@ -261,7 +274,7 @@ contract UNSRegistry is
         string[] calldata keys,
         string[] calldata values,
         uint256 tokenId
-    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
         _setMany(keys, values, tokenId);
     }
 
@@ -269,7 +282,7 @@ contract UNSRegistry is
         uint256 keyHash,
         string calldata value,
         uint256 tokenId
-    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
         _setByHash(keyHash, value, tokenId);
     }
 
@@ -277,7 +290,7 @@ contract UNSRegistry is
         uint256[] calldata keyHashes,
         string[] calldata values,
         uint256 tokenId
-    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
         _setManyByHash(keyHashes, values, tokenId);
     }
 
@@ -285,7 +298,7 @@ contract UNSRegistry is
         string[] calldata keys,
         string[] calldata values,
         uint256 tokenId
-    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
         _reconfigure(keys, values, tokenId);
     }
 
@@ -296,7 +309,7 @@ contract UNSRegistry is
     /**
      * @dev See {IRootRegistry-depositToPolygon}.
      */
-    function depositToPolygon(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) {
+    function depositToPolygon(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) onlyNonDeprecatedToken(tokenId) {
         // A workaround for MintableERC721Predicate
         // that requires a depositor to be equal to token owner:
         // https://github.com/maticnetwork/pos-portal/blob/88dbf0a88fd68fa11f7a3b9d36629930f6b93a05/contracts/root/TokenPredicates/MintableERC721Predicate.sol#L94
@@ -349,7 +362,7 @@ contract UNSRegistry is
     /**
      * @dev See {IReverseRegistry-setReverse}.
      */
-    function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
+    function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
         _setReverse(_msgSender(), tokenId);
     }
 
@@ -367,6 +380,23 @@ contract UNSRegistry is
      */
     function reverseOf(address addr) external view override returns (uint256) {
         return _reverses[addr];
+    }
+
+    /**
+     * @dev See {IUNSRegistry-deprecateTokens(uint256[])}.
+     */
+    function deprecateTokens(uint256[] calldata tokenIds) external override onlyMintingManager {
+        for(uint i = 0; i < tokenIds.length; i++) {
+            uint256 tokenId = tokenIds[i];
+            address owner = ownerOf(tokenId);
+
+            _reset(tokenId);
+            _deprecatedTokens[tokenId] = true;
+
+            if(_reverses[owner] == tokenId) {
+                _removeReverse(owner);
+            }
+        }
     }
 
     /// Internal
@@ -429,6 +459,27 @@ contract UNSRegistry is
         if(_reverses[from] != 0) {
             _removeReverse(from);
         }
+    }
+
+    function _burn(uint256 tokenId) internal override onlyNonDeprecatedToken(tokenId) {
+        super._burn(tokenId);
+    }
+
+    function _transfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override onlyDeadAddressIfDeprecated(tokenId, to) {
+        super._transfer(from, to, tokenId);
+    }
+
+    function _safeTransfer(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) internal override onlyDeadAddressIfDeprecated(tokenId, to) {
+        super._safeTransfer(from, to, tokenId, data);
     }
 
     function _setReverse(address addr, uint256 tokenId) internal {

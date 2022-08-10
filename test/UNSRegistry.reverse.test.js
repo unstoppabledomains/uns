@@ -2,7 +2,7 @@ const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
 const { buildExecuteFunc } = require('./helpers/metatx');
-const { TLD } = require('./helpers/constants');
+const { TLD, DEAD_ADDRESS } = require('./helpers/constants');
 const { mintDomain } = require('./helpers/registry');
 
 describe('UNSRegistry (reverse)', () => {
@@ -84,7 +84,7 @@ describe('UNSRegistry (reverse)', () => {
       });
 
       it('should not set reverse resolution when minting to 0xdead address', async () => {
-        const address = '0x000000000000000000000000000000000000dEaD';
+        const address = DEAD_ADDRESS;
         await unsRegistry.functions[selector](address, TLD.WALLET, 'wallet');
 
         expect(await unsRegistry.reverseOf(address)).to.be.equal(0);
@@ -344,6 +344,19 @@ describe('UNSRegistry (reverse)', () => {
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
     });
 
+    it('should revert setting reverse record if tokenId is deprecated', async () => {
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_1', true);
+
+      await unsRegistry.deprecateTokens([tokenId]);
+
+      const _unsRegistry = unsRegistry.connect(owner);
+
+      await expect(_unsRegistry.setReverse(tokenId))
+        .to.be.revertedWith('Registry: TOKEN_DEPRECATED')
+
+      expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
+    });
+
     it('should remove reverse record on tranfer', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'rem_2');
       const _unsRegistry = unsRegistry.connect(owner);
@@ -405,8 +418,22 @@ describe('UNSRegistry (reverse)', () => {
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
     });
 
+    it('should revert setting reverse record if tokenId is deprecated', async () => {
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_metatx_3', true);
+
+      await unsRegistry.deprecateTokens([tokenId]);
+
+      const { req, signature } = await buildExecuteParams(
+        'setReverse(uint256)',
+        [tokenId], owner, tokenId,
+      );
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
+        'Registry: TOKEN_DEPRECATED',
+      );
+    });
+
     it('revert setting reverse record when non-token based nonce', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_mtx_3', true);
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_mtx_4', true);
 
       const { req, signature } = await buildExecuteParams(
         'setReverse(uint256)',
