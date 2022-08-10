@@ -1,5 +1,5 @@
 {
-  "version": "2.1.7",
+  "version": "2.1.8",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2469,6 +2469,16 @@
     "crypto.DOG.version.OP.address": {
       "deprecatedKeyName": "DOG_OP",
       "validationRegex": null,
+      "deprecated": false
+    },
+    "crypto.GALA.version.ERC20.address": {
+      "deprecatedKeyName": "GALA_ERC20",
+      "validationRegex": "^0x[a-zA-Z0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.GALA.version.BEP20.address": {
+      "deprecatedKeyName": "GALA_BEP20",
+      "validationRegex": "^0x[a-zA-Z0-9]{40}$",
       "deprecated": false
     }
   }

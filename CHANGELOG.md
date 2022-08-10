@@ -1,3 +1,6 @@
+## v0.5.8
+- Add `GALA` token to resolver list
+
 ## v0.5.7
 - Upgrade UNSRegistry@0.5.0 on Mainnet and Polygon
 
