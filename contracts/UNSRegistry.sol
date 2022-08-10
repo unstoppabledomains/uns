@@ -69,11 +69,6 @@ contract UNSRegistry is
         _;
     }
 
-    modifier onlyDeadAddressIfDeprecated(uint256 tokenId, address addr) {
-        require(!_deprecatedTokens[tokenId] || addr == address(0xdead), 'Registry: DEPRECATED_TOKEN_TRANSFER_ADDRESS_INVALID');
-        _;
-    }
-
     function initialize(address mintingManager) public initializer {
         _mintingManager = mintingManager;
 
@@ -453,33 +448,19 @@ contract UNSRegistry is
         return super._msgData();
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
-        super._beforeTokenTransfer(from, to, amount);
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
+        super._beforeTokenTransfer(from, to, tokenId);
+
+        if(_deprecatedTokens[tokenId]) {
+            // This happens when burning a domain, so we don't allow this action for deprecated tokens
+            require(to != address(0), 'Registry: TOKEN_DEPRECATED');
+            // General setOwner / transferFrom / safeTransferFrom case
+            require(to == address(0xdead), 'Registry: DEPRECATED_TOKEN_TRANSFER_ADDRESS_INVALID');
+        }
 
         if(_reverses[from] != 0) {
             _removeReverse(from);
         }
-    }
-
-    function _burn(uint256 tokenId) internal override onlyNonDeprecatedToken(tokenId) {
-        super._burn(tokenId);
-    }
-
-    function _transfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override onlyDeadAddressIfDeprecated(tokenId, to) {
-        super._transfer(from, to, tokenId);
-    }
-
-    function _safeTransfer(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) internal override onlyDeadAddressIfDeprecated(tokenId, to) {
-        super._safeTransfer(from, to, tokenId, data);
     }
 
     function _setReverse(address addr, uint256 tokenId) internal {
@@ -499,5 +480,5 @@ contract UNSRegistry is
     }
 
     // Reserved storage space to allow for layout changes in the future.
-    uint256[49] private __gap;
+    uint256[48] private __gap;
 }
