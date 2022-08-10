@@ -1,11 +1,11 @@
 {
-    "version": "0.5.1",
+    "version": "0.5.2",
     "networks": {
         "1": {
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x049aba7510f45BA5b64ea9E658E342F904DB358D",
-                    "implementation": "0xa715562307AA8AEDCba976b3793b3337F371c14a",
+                    "implementation": "0xe09dC3724CD5B566D64Db4186FA8B4321071C28F",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xd62e9d",
                     "forwarder": "0x049aba7510f45BA5b64ea9E658E342F904DB358D"
@@ -201,7 +201,7 @@
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x019d6188",
-                    "implementation": "0x5442953b0BFFf69FC945f5f1387cbFD2e2673447",
+                    "implementation": "0x24BaB5874f934e90c782b97e2Fe724B8762d0812",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
                 },
                 "CNSRegistry": {

@@ -1,5 +1,8 @@
-## v0.5.7
+## v0.5.8
 - Add `GALA` token to resolver list
+
+## v0.5.7
+- Upgrade UNSRegistry@0.5.0 on Mainnet and Polygon
 
 ## v0.5.6
 - Add regexes to coins with `validationRegex` property set to `null` value in the resolver list
