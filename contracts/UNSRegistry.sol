@@ -260,7 +260,7 @@ contract UNSRegistry is
         string calldata key,
         string calldata value,
         uint256 tokenId
-    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _set(key, value, tokenId);
     }
 
@@ -268,7 +268,7 @@ contract UNSRegistry is
         string[] calldata keys,
         string[] calldata values,
         uint256 tokenId
-    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _setMany(keys, values, tokenId);
     }
 
@@ -276,7 +276,7 @@ contract UNSRegistry is
         uint256 keyHash,
         string calldata value,
         uint256 tokenId
-    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _setByHash(keyHash, value, tokenId);
     }
 
@@ -284,7 +284,7 @@ contract UNSRegistry is
         uint256[] calldata keyHashes,
         string[] calldata values,
         uint256 tokenId
-    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _setManyByHash(keyHashes, values, tokenId);
     }
 
@@ -292,7 +292,7 @@ contract UNSRegistry is
         string[] calldata keys,
         string[] calldata values,
         uint256 tokenId
-    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
+    ) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _reconfigure(keys, values, tokenId);
     }
 
@@ -455,6 +455,15 @@ contract UNSRegistry is
         if(_reverses[from] != 0) {
             _removeReverse(from);
         }
+    }
+
+    function _beforeRecordSet(
+        uint256 keyHash,
+        string memory key,
+        string memory value,
+        uint256 tokenId
+    ) internal override onlyNonDeprecatedToken(tokenId) {
+        super._beforeRecordSet(keyHash, key, value, tokenId);
     }
 
     function _setReverse(address addr, uint256 tokenId) internal {

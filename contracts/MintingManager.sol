@@ -219,7 +219,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _unpause();
     }
 
-    function deprecateAll(uint256[] calldata tokenIds) external onlyOwner {
+    function deprecateAll(uint256[] calldata tokenIds) external onlyMinter {
         unsRegistry.deprecateAll(tokenIds);
     }
 

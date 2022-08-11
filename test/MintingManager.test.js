@@ -96,13 +96,13 @@ describe('MintingManager', () => {
       );
     });
 
-    it('should revert if not owner', async () => {
+    it('should revert if not minter', async () => {
       await mintingManager.mintSLD(receiver.address, TLD.CRYPTO, 'deprecate-tokens-test-2');
       const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'deprecate-tokens-test-2');
 
       await expect(
         mintingManager.connect(signers[1]).deprecateAll([tokenId]),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
     });
   });
 
