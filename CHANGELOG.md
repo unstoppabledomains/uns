@@ -1,5 +1,5 @@
 ## v0.5.9
-- Added ability to deprecate tokens via MintingManager#deprecateTokens
+- Added ability to deprecate tokens via MintingManager#deprecateAll
 
 ## v0.5.8
 - Add `GALA` token to resolver list

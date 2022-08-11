@@ -13,7 +13,6 @@ import './RecordStorage.sol';
 import './RootRegistry.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
-import './IChildRegistry.sol';
 
 /**
  * @title UNSRegistry
@@ -378,9 +377,9 @@ contract UNSRegistry is
     }
 
     /**
-     * @dev See {IUNSRegistry-deprecateTokens(uint256[])}.
+     * @dev See {IUNSRegistry-deprecateAll(uint256[])}.
      */
-    function deprecateTokens(uint256[] calldata tokenIds) external override onlyMintingManager {
+    function deprecateAll(uint256[] calldata tokenIds) external override onlyMintingManager {
         for(uint i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
             address owner = ownerOf(tokenId);
@@ -451,12 +450,7 @@ contract UNSRegistry is
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
         super._beforeTokenTransfer(from, to, tokenId);
 
-        if(_deprecatedTokens[tokenId]) {
-            // This happens when burning a domain, so we don't allow this action for deprecated tokens
-            require(to != address(0), 'Registry: TOKEN_DEPRECATED');
-            // General setOwner / transferFrom / safeTransferFrom case
-            require(to == address(0xdead), 'Registry: DEPRECATED_TOKEN_TRANSFER_ADDRESS_INVALID');
-        }
+        require(!_deprecatedTokens[tokenId] || to == address(0xdead), 'Registry: TOKEN_DEPRECATED');
 
         if(_reverses[from] != 0) {
             _removeReverse(from);

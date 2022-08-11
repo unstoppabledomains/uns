@@ -179,5 +179,5 @@ interface IUNSRegistry is
      * @dev Deprecates tokens
      * @param tokenIds[] list of tokenIds to mark deprecated
      */
-    function deprecateTokens(uint256[] calldata tokenIds) external;
+    function deprecateAll(uint256[] calldata tokenIds) external;
 }

@@ -67,7 +67,7 @@ describe('MintingManager', () => {
     });
   });
 
-  describe('deprecateTokens', () => {
+  describe('deprecateAll', () => {
     before(async () => {
       [, , receiver, resolver] = signers;
 
@@ -89,7 +89,7 @@ describe('MintingManager', () => {
       await mintingManager.mintSLD(receiver.address, TLD.CRYPTO, 'deprecate-tokens-test');
       const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'deprecate-tokens-test');
 
-      await mintingManager.deprecateTokens([tokenId]);
+      await mintingManager.deprecateAll([tokenId]);
 
       expect(unsRegistry.connect(receiver).burn(tokenId)).to.be.revertedWith(
         'Registry: TOKEN_DEPRECATED',
@@ -101,7 +101,7 @@ describe('MintingManager', () => {
       const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'deprecate-tokens-test-2');
 
       await expect(
-        mintingManager.connect(signers[1]).deprecateTokens([tokenId]),
+        mintingManager.connect(signers[1]).deprecateAll([tokenId]),
       ).to.be.revertedWith('Ownable: caller is not the owner');
     });
   });

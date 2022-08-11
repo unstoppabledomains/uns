@@ -347,7 +347,7 @@ describe('UNSRegistry (reverse)', () => {
     it('should revert setting reverse record if tokenId is deprecated', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_1', true);
 
-      await unsRegistry.deprecateTokens([tokenId]);
+      await unsRegistry.deprecateAll([tokenId]);
 
       const _unsRegistry = unsRegistry.connect(owner);
 
@@ -421,7 +421,7 @@ describe('UNSRegistry (reverse)', () => {
     it('should revert setting reverse record if tokenId is deprecated', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_metatx_3', true);
 
-      await unsRegistry.deprecateTokens([tokenId]);
+      await unsRegistry.deprecateAll([tokenId]);
 
       const { req, signature } = await buildExecuteParams(
         'setReverse(uint256)',

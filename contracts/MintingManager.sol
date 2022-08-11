@@ -96,7 +96,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     function removeTld(uint256 tld) external override onlyOwner {
-        _removeTld(tld);
+        require(_isRegistredTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
+
+        emit RemoveTld(tld, _tlds[tld]);
+        delete _tlds[tld];
     }
 
     function mintSLD(
@@ -216,8 +219,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _unpause();
     }
 
-    function deprecateTokens(uint256[] calldata tokenIds) external onlyOwner {
-        unsRegistry.deprecateTokens(tokenIds);
+    function deprecateAll(uint256[] calldata tokenIds) external onlyOwner {
+        unsRegistry.deprecateAll(tokenIds);
     }
 
     function _mintSLD(
@@ -336,16 +339,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         if (!unsRegistry.exists(tokenId)) {
             unsRegistry.mint(address(0xdead), tokenId, tld);
         }
-    }
-
-    /**
-     * @dev This function removes TLD which was already minted
-     */
-    function _removeTld(uint256 tld) private {
-        require(_isRegistredTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
-
-        emit RemoveTld(tld, _tlds[tld]);
-        delete _tlds[tld];
     }
 
     /**

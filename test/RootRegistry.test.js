@@ -139,7 +139,7 @@ describe('RootRegistry', () => {
       it('should revert deposit if token is deprecated', async () => {
         const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-deprecated-1');
 
-        await mintingManager.deprecateTokens([tokenId]);
+        await mintingManager.deprecateAll([tokenId]);
 
         await expect(l1UnsRegistry.connect(owner).depositToPolygon(tokenId))
           .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
@@ -168,7 +168,7 @@ describe('RootRegistry', () => {
           [tokenId],
           owner, tokenId,
         );
-        await mintingManager.deprecateTokens([tokenId]);
+        await mintingManager.deprecateAll([tokenId]);
 
         await expect(l1UnsRegistry.execute(req, signature))
           .to.be.revertedWith('Registry: TOKEN_DEPRECATED');

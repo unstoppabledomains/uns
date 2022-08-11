@@ -157,7 +157,7 @@ describe('ChildRegistry', () => {
       const tokenId = await mintDomainL2(owner.address, TLD.CRYPTO, 'deprecation-test');
       expect(await l2UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
-      await mintingManager.deprecateTokens([tokenId]);
+      await mintingManager.deprecateAll([tokenId]);
 
       await expect(
         l2UnsRegistry.connect(owner).withdraw(tokenId),
@@ -201,7 +201,7 @@ describe('ChildRegistry', () => {
       expect(await l2UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
       expect(await l2UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
 
-      await mintingManager.deprecateTokens([tokenId2]);
+      await mintingManager.deprecateAll([tokenId2]);
 
       await expect(
         l2UnsRegistry.connect(owner).withdrawBatch([tokenId1, tokenId2]),
@@ -245,7 +245,7 @@ describe('ChildRegistry', () => {
       const tokenId = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-depreacted-wm-revert');
       expect(await l2UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
-      await mintingManager.deprecateTokens([tokenId]);
+      await mintingManager.deprecateAll([tokenId]);
 
       await expect(
         l2UnsRegistry.connect(owner).withdrawWithMetadata(tokenId),
