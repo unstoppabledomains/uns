@@ -303,7 +303,7 @@ contract UNSRegistry is
     /**
      * @dev See {IRootRegistry-depositToPolygon}.
      */
-    function depositToPolygon(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) onlyNonDeprecatedToken(tokenId) {
+    function depositToPolygon(uint256 tokenId) external override onlyApprovedOrOwner(tokenId) {
         // A workaround for MintableERC721Predicate
         // that requires a depositor to be equal to token owner:
         // https://github.com/maticnetwork/pos-portal/blob/88dbf0a88fd68fa11f7a3b9d36629930f6b93a05/contracts/root/TokenPredicates/MintableERC721Predicate.sol#L94
