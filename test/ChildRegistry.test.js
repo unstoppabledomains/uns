@@ -153,15 +153,15 @@ describe('ChildRegistry', () => {
         .to.be.revertedWith('ERC721: invalid token ID');
     });
 
-    it('should revert if tokenId is deprecated', async () => {
-      const tokenId = await mintDomainL2(owner.address, TLD.CRYPTO, 'deprecation-test');
+    it('should revert if tokenId is upgraded', async () => {
+      const tokenId = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-upgraded-bw-revert-test');
       expect(await l2UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
-      await mintingManager.deprecateAll([tokenId]);
+      await mintingManager.upgradeAll([tokenId]);
 
       await expect(
         l2UnsRegistry.connect(owner).withdraw(tokenId),
-      ).to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+      ).to.be.revertedWith('Registry: TOKEN_UPGRADED');
     });
 
     it('should revert batch withdraw when token is not exists', async () => {
@@ -195,17 +195,17 @@ describe('ChildRegistry', () => {
       ).to.be.revertedWith('Registry: INVALID_TOKEN_OWNER');
     });
 
-    it('should revert batch withdraw if tokenId is deprecated', async () => {
-      const tokenId1 = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-depreacted-bw-revert');
-      const tokenId2 = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-deprecated-bw-revert');
+    it('should revert batch withdraw if tokenId is upgraded', async () => {
+      const tokenId1 = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-upgraded-bw-revert');
+      const tokenId2 = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-upgraded-bw-revert-2');
       expect(await l2UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
       expect(await l2UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
 
-      await mintingManager.deprecateAll([tokenId2]);
+      await mintingManager.upgradeAll([tokenId2]);
 
       await expect(
         l2UnsRegistry.connect(owner).withdrawBatch([tokenId1, tokenId2]),
-      ).to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+      ).to.be.revertedWith('Registry: TOKEN_UPGRADED');
     });
 
     it('should batch withdraw multiple tokens', async () => {
@@ -241,15 +241,15 @@ describe('ChildRegistry', () => {
       ).to.be.revertedWith('Registry: INVALID_TOKEN_OWNER');
     });
 
-    it('should revert withdraw with metadata if tokenId is deprecated', async () => {
+    it('should revert withdraw with metadata if tokenId is upgraded', async () => {
       const tokenId = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-depreacted-wm-revert');
       expect(await l2UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
-      await mintingManager.deprecateAll([tokenId]);
+      await mintingManager.upgradeAll([tokenId]);
 
       await expect(
         l2UnsRegistry.connect(owner).withdrawWithMetadata(tokenId),
-      ).to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+      ).to.be.revertedWith('Registry: TOKEN_UPGRADED');
     });
 
     it('should withdraw a token', async () => {

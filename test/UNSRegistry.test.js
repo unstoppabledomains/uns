@@ -192,15 +192,15 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.get('key_31', tokenId)).to.be.equal('');
       });
 
-      it('should revert if tokenId is deprecated', async () => {
-        await unsRegistry.deprecateAll([tokenId]);
+      it('should revert if tokenId is upgraded', async () => {
+        await unsRegistry.upgradeAll([tokenId]);
 
         await expect(unsRegistry.burn(tokenId))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
     });
 
-    describe('deprecateAll', async () => {
+    describe('upgradeAll', async () => {
       it('should reset records and reverse resolution properly', async () => {
         const tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
         const tokenId2 = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
@@ -214,7 +214,7 @@ describe('UNSRegistry', () => {
         await unsRegistry.connect(owner).setMany(['token3-key', 'token3-key2'], [42, 44], tokenId3);
         await unsRegistry.connect(owner).setReverse(tokenId3);
 
-        await unsRegistry.connect(coinbase).deprecateAll([
+        await unsRegistry.connect(coinbase).upgradeAll([
           tokenId,
           tokenId2,
           tokenId3,
@@ -227,12 +227,38 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
       });
 
+      it('should produce ResetRecords event', async () => {
+        const tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
+
+        await unsRegistry.set('token1-key', 42, tokenId);
+
+        await expect(
+          unsRegistry.connect(coinbase).upgradeAll([
+            tokenId,
+          ]),
+        ).to.emit(unsRegistry, 'ResetRecords')
+          .withArgs(tokenId);
+      });
+
+      it('should produce RemoveReverse event', async () => {
+        const tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
+
+        await unsRegistry.setReverse(tokenId);
+
+        await expect(
+          unsRegistry.connect(coinbase).upgradeAll([
+            tokenId,
+          ]),
+        ).to.emit(unsRegistry, 'RemoveReverse')
+          .withArgs(coinbase.address);
+      });
+
       it('should revert if one of the tokens does not exist', async () => {
         const tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
         const tokenId2 = utils.id('burned-domain');
 
         await expect(
-          unsRegistry.connect(coinbase).deprecateAll([
+          unsRegistry.connect(coinbase).upgradeAll([
             tokenId,
             tokenId2,
           ]),
@@ -243,7 +269,7 @@ describe('UNSRegistry', () => {
         const tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
 
         await expect(
-          unsRegistry.connect(signers[1]).deprecateAll([tokenId]),
+          unsRegistry.connect(signers[1]).upgradeAll([tokenId]),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_MINTING_MANAGER');
       });
     });
@@ -638,15 +664,15 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
       });
 
-      it('reverts transaction if tokenId is deprecated', async () => {
-        await unsRegistry.deprecateAll([tokenId]);
+      it('reverts transaction if tokenId is upgraded', async () => {
+        await unsRegistry.upgradeAll([tokenId]);
 
         await expect(unsRegistry.setOwner(owner.address, tokenId))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
 
-      it('can set owner to 0xdead when tokenId is deprecated', async () => {
-        await unsRegistry.deprecateAll([tokenId]);
+      it('can set owner to 0xdead when tokenId is upgraded', async () => {
+        await unsRegistry.upgradeAll([tokenId]);
 
         await unsRegistry.setOwner(DEAD_ADDRESS, tokenId);
 
@@ -677,21 +703,21 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
       });
 
-      it('reverts transaction if tokenId is deprecated', async () => {
+      it('reverts transaction if tokenId is upgraded', async () => {
         const tokenId = await mintDomain(
           unsRegistry,
           coinbase.address,
           TLD.CRYPTO,
         );
 
-        await unsRegistry.deprecateAll([tokenId]);
+        await unsRegistry.upgradeAll([tokenId]);
 
         await expect(unsRegistry.transferFrom(coinbase.address, owner.address, tokenId))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
 
-      it('can transfer ownership to 0xdead when tokenId is deprecated', async () => {
-        await unsRegistry.deprecateAll([tokenId]);
+      it('can transfer ownership to 0xdead when tokenId is upgraded', async () => {
+        await unsRegistry.upgradeAll([tokenId]);
 
         await unsRegistry.transferFrom(coinbase.address, DEAD_ADDRESS, tokenId);
 
@@ -728,16 +754,16 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
       });
 
-      it('reverts transaction if tokenId is deprecated', async () => {
-        await unsRegistry.deprecateAll([tokenId]);
+      it('reverts transaction if tokenId is upgraded', async () => {
+        await unsRegistry.upgradeAll([tokenId]);
         const safeTransferFrom = unsRegistry['safeTransferFrom(address,address,uint256)'];
 
         await expect(safeTransferFrom(coinbase.address, owner.address, tokenId))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
 
-      it('can transfer ownership to 0xdead when tokenId is deprecated', async () => {
-        await unsRegistry.deprecateAll([tokenId]);
+      it('can transfer ownership to 0xdead when tokenId is upgraded', async () => {
+        await unsRegistry.upgradeAll([tokenId]);
 
         await unsRegistry['safeTransferFrom(address,address,uint256)'](
           coinbase.address, DEAD_ADDRESS, tokenId,
@@ -780,16 +806,16 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
       });
 
-      it('reverts transaction if tokenId is deprecated', async () => {
-        await unsRegistry.deprecateAll([tokenId]);
+      it('reverts transaction if tokenId is upgraded', async () => {
+        await unsRegistry.upgradeAll([tokenId]);
         const safeTransferFrom = unsRegistry['safeTransferFrom(address,address,uint256,bytes)'];
 
         await expect(safeTransferFrom(coinbase.address, owner.address, tokenId, '0x'))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
 
-      it('can transfer ownership to 0xdead when tokenId is deprecated', async () => {
-        await unsRegistry.deprecateAll([tokenId]);
+      it('can transfer ownership to 0xdead when tokenId is upgraded', async () => {
+        await unsRegistry.upgradeAll([tokenId]);
 
         await unsRegistry['safeTransferFrom(address,address,uint256,bytes)'](
           coinbase.address, DEAD_ADDRESS, tokenId, '0x',
@@ -877,11 +903,11 @@ describe('UNSRegistry', () => {
           .withArgs(tokenId, utils.id(key), utils.id(value), key, value);
       });
 
-      it('should revert transaction if on set tokenId is deprecated', async () => {
-        await unsRegistry.deprecateAll([tokenId]);
+      it('should revert transaction if on set tokenId is upgraded', async () => {
+        await unsRegistry.upgradeAll([tokenId]);
 
         await expect(unsRegistry.set('key', 'value', tokenId))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
 
         expect(await unsRegistry.get('key', tokenId))
           .to.be.equal('');
@@ -922,11 +948,11 @@ describe('UNSRegistry', () => {
         ).to.be.deep.equal(['']);
       });
 
-      it('should revert transaction on set if tokenId is deprecated', async () => {
-        await unsRegistry.deprecateAll([tokenId]);
+      it('should revert transaction on set if tokenId is upgraded', async () => {
+        await unsRegistry.upgradeAll([tokenId]);
 
         await expect(unsRegistry.setMany(['key'], ['value'], tokenId))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
 
         expect(await unsRegistry.getMany(['key'], tokenId))
           .to.be.deep.equal(['']);
@@ -1013,11 +1039,11 @@ describe('UNSRegistry', () => {
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
       });
 
-      it('should revert transaction if tokenId is deprecated', async () => {
-        await unsRegistry.deprecateAll([tokenId]);
+      it('should revert transaction if tokenId is upgraded', async () => {
+        await unsRegistry.upgradeAll([tokenId]);
 
         await expect(unsRegistry.reconfigure(['new-key'], ['new-value'], tokenId))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
     });
 
@@ -1061,14 +1087,14 @@ describe('UNSRegistry', () => {
         ).to.be.revertedWith('RecordStorage: KEY_NOT_FOUND');
       });
 
-      it('should revert setting record by hash if tokenId is deprecated', async () => {
+      it('should revert setting record by hash if tokenId is upgraded', async () => {
         const key = 'key_23c';
         const keyHash = await initializeKey(key);
 
-        await unsRegistry.deprecateAll([tokenId]);
+        await unsRegistry.upgradeAll([tokenId]);
 
         await expect(unsRegistry.setByHash(keyHash, 'value', tokenId))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
 
         expect(await unsRegistry.get(key, tokenId)).to.be.equal('');
       });
@@ -1085,14 +1111,14 @@ describe('UNSRegistry', () => {
         ]);
       });
 
-      it('should revert setting multiple records by hash if tokenId is deprecated', async () => {
+      it('should revert setting multiple records by hash if tokenId is upgraded', async () => {
         const key = 'key_26c';
         const keyHash = await initializeKey(key);
 
-        await unsRegistry.deprecateAll([tokenId]);
+        await unsRegistry.upgradeAll([tokenId]);
 
         await expect(unsRegistry.setManyByHash([keyHash], ['value'], tokenId))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
 
         expect(await unsRegistry.get(key, tokenId)).to.be.eql('');
       });

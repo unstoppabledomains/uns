@@ -176,8 +176,8 @@ interface IUNSRegistry is
     function setCNSRegistry(address registry) external;
 
     /**
-     * @dev Deprecates tokens
-     * @param tokenIds[] list of tokenIds to mark deprecated
+     * @dev Marks tokens as upgraded.
+     * @param tokenIds[] list of tokenIds to mark upgraded
      */
-    function deprecateAll(uint256[] calldata tokenIds) external;
+    function upgradeAll(uint256[] calldata tokenIds) external;
 }

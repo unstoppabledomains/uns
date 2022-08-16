@@ -344,15 +344,15 @@ describe('UNSRegistry (reverse)', () => {
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
     });
 
-    it('should revert setting reverse record if tokenId is deprecated', async () => {
+    it('should revert setting reverse record if tokenId is upgraded', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_1', true);
 
-      await unsRegistry.deprecateAll([tokenId]);
+      await unsRegistry.upgradeAll([tokenId]);
 
       const _unsRegistry = unsRegistry.connect(owner);
 
       await expect(_unsRegistry.setReverse(tokenId))
-        .to.be.revertedWith('Registry: TOKEN_DEPRECATED')
+        .to.be.revertedWith('Registry: TOKEN_UPGRADED')
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
     });
@@ -418,17 +418,17 @@ describe('UNSRegistry (reverse)', () => {
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
     });
 
-    it('should revert setting reverse record if tokenId is deprecated', async () => {
+    it('should revert setting reverse record if tokenId is upgraded', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_metatx_3', true);
 
-      await unsRegistry.deprecateAll([tokenId]);
+      await unsRegistry.upgradeAll([tokenId]);
 
       const { req, signature } = await buildExecuteParams(
         'setReverse(uint256)',
         [tokenId], owner, tokenId,
       );
       await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
-        'Registry: TOKEN_DEPRECATED',
+        'Registry: TOKEN_UPGRADED',
       );
     });
 

@@ -44,7 +44,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
     modifier onlyAllowed(uint256 tld, string memory label) {
-        require(_isRegistredTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
+        require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
         Strings.Slice memory _label = label.toSlice();
         if(_label._len > 10) {
             require(
@@ -96,7 +96,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     function removeTld(uint256 tld) external override onlyOwner {
-        require(_isRegistredTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
+        require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
 
         emit RemoveTld(tld, _tlds[tld]);
         delete _tlds[tld];
@@ -219,8 +219,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _unpause();
     }
 
-    function deprecateAll(uint256[] calldata tokenIds) external onlyMinter {
-        unsRegistry.deprecateAll(tokenIds);
+    function upgradeAll(uint256[] calldata tokenIds) external onlyMinter {
+        unsRegistry.upgradeAll(tokenIds);
     }
 
     function _mintSLD(
@@ -342,9 +342,9 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     /**
-     * @dev This function checks whether TLD is registered
+     * @dev This function checks whether TLD exists
      */
-    function _isRegistredTld(uint256 tld) private view returns (bool) {
+    function _isTld(uint256 tld) private view returns (bool) {
         return bytes(_tlds[tld]).length > 0;
     }
 

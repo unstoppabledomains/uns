@@ -37,7 +37,7 @@ contract UNSRegistry is
 
     mapping(address => uint256) internal _reverses;
 
-    mapping(uint256 => bool) internal _deprecatedTokens;
+    mapping(uint256 => bool) internal _upgradedTokens;
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
@@ -63,8 +63,8 @@ contract UNSRegistry is
         _;
     }
 
-    modifier onlyNonDeprecatedToken(uint256 tokenId) {
-        require(!_deprecatedTokens[tokenId], 'Registry: TOKEN_DEPRECATED');
+    modifier onlyNonUpgradedToken(uint256 tokenId) {
+        require(!_upgradedTokens[tokenId], 'Registry: TOKEN_UPGRADED');
         _;
     }
 
@@ -356,7 +356,7 @@ contract UNSRegistry is
     /**
      * @dev See {IReverseRegistry-setReverse}.
      */
-    function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) onlyNonDeprecatedToken(tokenId) {
+    function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) onlyNonUpgradedToken(tokenId) {
         _setReverse(_msgSender(), tokenId);
     }
 
@@ -377,15 +377,15 @@ contract UNSRegistry is
     }
 
     /**
-     * @dev See {IUNSRegistry-deprecateAll(uint256[])}.
+     * @dev See {IUNSRegistry-upgradeAll(uint256[])}.
      */
-    function deprecateAll(uint256[] calldata tokenIds) external override onlyMintingManager {
+    function upgradeAll(uint256[] calldata tokenIds) external override onlyMintingManager {
         for(uint i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
             address owner = ownerOf(tokenId);
 
             _reset(tokenId);
-            _deprecatedTokens[tokenId] = true;
+            _upgradedTokens[tokenId] = true;
 
             if(_reverses[owner] == tokenId) {
                 _removeReverse(owner);
@@ -450,7 +450,7 @@ contract UNSRegistry is
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
         super._beforeTokenTransfer(from, to, tokenId);
 
-        require(!_deprecatedTokens[tokenId] || to == address(0xdead), 'Registry: TOKEN_DEPRECATED');
+        require(!_upgradedTokens[tokenId] || to == address(0xdead), 'Registry: TOKEN_UPGRADED');
 
         if(_reverses[from] != 0) {
             _removeReverse(from);
@@ -462,7 +462,7 @@ contract UNSRegistry is
         string memory key,
         string memory value,
         uint256 tokenId
-    ) internal override onlyNonDeprecatedToken(tokenId) {
+    ) internal override onlyNonUpgradedToken(tokenId) {
         super._beforeRecordSet(keyHash, key, value, tokenId);
     }
 

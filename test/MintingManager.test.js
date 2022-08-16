@@ -1,9 +1,7 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
-
 const { ZERO_ADDRESS, DEAD_ADDRESS, TLD } = require('./helpers/constants');
-const { mintDomain } = require('./helpers/registry');
 
 describe('MintingManager', () => {
   const DomainNamePrefix = 'uns-devtest-';
@@ -67,7 +65,7 @@ describe('MintingManager', () => {
     });
   });
 
-  describe('deprecateAll', () => {
+  describe('upgradeAll', () => {
     before(async () => {
       [, , receiver, resolver] = signers;
 
@@ -85,23 +83,51 @@ describe('MintingManager', () => {
       await mintingManager.addMinter(coinbase.address);
     });
 
-    it('should successfully deprecate tokens', async () => {
-      await mintingManager.mintSLD(receiver.address, TLD.CRYPTO, 'deprecate-tokens-test');
-      const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'deprecate-tokens-test');
+    it('should successfully mark tokens as upgraded', async () => {
+      await mintingManager.mintSLD(receiver.address, TLD.CRYPTO, 'upgrade-tokens-test');
+      const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'upgrade-tokens-test');
 
-      await mintingManager.deprecateAll([tokenId]);
+      await mintingManager.upgradeAll([tokenId]);
 
       expect(unsRegistry.connect(receiver).burn(tokenId)).to.be.revertedWith(
-        'Registry: TOKEN_DEPRECATED',
+        'Registry: TOKEN_UPGRADED',
       );
     });
 
-    it('should revert if not minter', async () => {
-      await mintingManager.mintSLD(receiver.address, TLD.CRYPTO, 'deprecate-tokens-test-2');
-      const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'deprecate-tokens-test-2');
+    it('should produce ResetRecords event', async () => {
+      await mintingManager.mintSLD(receiver.address, TLD.CRYPTO, 'upgrade-tokens-event-test');
+      const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'upgrade-tokens-event-test');
+
+      await unsRegistry.connect(receiver).set('token1-key', 42, tokenId);
 
       await expect(
-        mintingManager.connect(signers[1]).deprecateAll([tokenId]),
+        mintingManager.upgradeAll([
+          tokenId,
+        ]),
+      ).to.emit(unsRegistry, 'ResetRecords')
+        .withArgs(tokenId);
+    });
+
+    it('should produce RemoveReverse event', async () => {
+      await mintingManager.mintSLD(receiver.address, TLD.CRYPTO, 'upgrade-tokens-event-2-test');
+      const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'upgrade-tokens-event-2-test');
+
+      await unsRegistry.connect(receiver).setReverse(tokenId);
+
+      await expect(
+        mintingManager.upgradeAll([
+          tokenId,
+        ]),
+      ).to.emit(unsRegistry, 'RemoveReverse')
+        .withArgs(receiver.address);
+    });
+
+    it('should revert if not minter', async () => {
+      await mintingManager.mintSLD(receiver.address, TLD.CRYPTO, 'upgrade-tokens-test-2');
+      const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'upgrade-tokens-test-2');
+
+      await expect(
+        mintingManager.connect(signers[1]).upgradeAll([tokenId]),
       ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
     });
   });
@@ -156,7 +182,7 @@ describe('MintingManager', () => {
     });
 
     describe('removeTld', async () => {
-      it('should be able to delete existing TLD', async () => {
+      it('should be able to remove existing TLD', async () => {
         const tld = 'test-removing-tld';
         const hashname = namehash.hash(tld);
 

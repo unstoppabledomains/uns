@@ -136,13 +136,13 @@ describe('RootRegistry', () => {
         expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
       });
 
-      it('should revert deposit if token is deprecated', async () => {
-        const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-deprecated-1');
+      it('should revert deposit if token is upgraded', async () => {
+        const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-upgraded-1');
 
-        await mintingManager.deprecateAll([tokenId]);
+        await mintingManager.upgradeAll([tokenId]);
 
         await expect(l1UnsRegistry.connect(owner).depositToPolygon(tokenId))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
 
       it('should meta-deposit token through UNS registry', async () => {
@@ -160,18 +160,18 @@ describe('RootRegistry', () => {
         expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
       });
 
-      it('should revert meta-deposit if token is deprecated', async () => {
-        const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-deprecated-1-meta');
+      it('should revert meta-deposit if token is upgraded', async () => {
+        const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-upgraded-1-meta');
 
         const { req, signature } = await buildExecuteUnsParams(
           'depositToPolygon(uint256)',
           [tokenId],
           owner, tokenId,
         );
-        await mintingManager.deprecateAll([tokenId]);
+        await mintingManager.upgradeAll([tokenId]);
 
         await expect(l1UnsRegistry.execute(req, signature))
-          .to.be.revertedWith('Registry: TOKEN_DEPRECATED');
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
 
       it('should deposit CNS domains through MintingManager', async () => {
