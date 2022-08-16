@@ -190,7 +190,7 @@ describe('MintingManager', () => {
 
         await expect(mintingManager.removeTld(hashname))
           .to.emit(mintingManager, 'RemoveTld')
-          .withArgs(hashname, tld);
+          .withArgs(hashname);
 
         await expect(mintingManager.mintSLD(coinbase.address, hashname, 'sld-domain-qq'))
           .to.be.revertedWith('MintingManager: TLD_NOT_REGISTERED');

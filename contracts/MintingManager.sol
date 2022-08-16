@@ -98,8 +98,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     function removeTld(uint256 tld) external override onlyOwner {
         require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
 
-        emit RemoveTld(tld, _tlds[tld]);
         delete _tlds[tld];
+        emit RemoveTld(tld);
     }
 
     function mintSLD(

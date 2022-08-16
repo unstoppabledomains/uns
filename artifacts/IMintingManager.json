@@ -49,12 +49,6 @@
           "internalType": "uint256",
           "name": "tokenId",
           "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "tld",
-          "type": "string"
         }
       ],
       "name": "RemoveTld",

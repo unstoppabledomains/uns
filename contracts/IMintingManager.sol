@@ -7,7 +7,7 @@ import './IERC1967.sol';
 
 interface IMintingManager is IERC1967 {
     event NewTld(uint256 indexed tokenId, string tld);
-    event RemoveTld(uint256 indexed tokenId, string tld);
+    event RemoveTld(uint256 indexed tokenId);
 
     /**
      * @dev Adds new TLD
