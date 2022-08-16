@@ -7,7 +7,7 @@
                     "address": "0x049aba7510f45BA5b64ea9E658E342F904DB358D",
                     "implementation": "0xe09dC3724CD5B566D64Db4186FA8B4321071C28F",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0xd62e9d",
+                    "deploymentBlock": "0xc2fede",
                     "forwarder": "0x049aba7510f45BA5b64ea9E658E342F904DB358D"
                 },
                 "CNSRegistry": {
@@ -200,7 +200,7 @@
                 "UNSRegistry": {
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x019d6188",
+                    "deploymentBlock": "0x01272eb5",
                     "implementation": "0x24BaB5874f934e90c782b97e2Fe724B8762d0812",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
                 },
@@ -383,7 +383,7 @@
                 "UNSRegistry": {
                     "address": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x0189f713",
+                    "deploymentBlock": "0x01213f43",
                     "implementation": "0x267f251B85B2003B98645195D085021C5B6e928c",
                     "forwarder": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93"
                 },
