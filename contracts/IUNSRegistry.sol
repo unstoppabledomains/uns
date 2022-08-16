@@ -174,4 +174,10 @@ interface IUNSRegistry is
      * @param registry address of CNS registry contract
      */
     function setCNSRegistry(address registry) external;
+
+    /**
+     * @dev Marks tokens as upgraded.
+     * @param tokenIds[] list of tokenIds to mark upgraded
+     */
+    function upgradeAll(uint256[] calldata tokenIds) external;
 }

@@ -1,3 +1,6 @@
+## v0.5.9
+- Added ability to mark tokens as upgraded via MintingManager#upgradeAll
+
 ## v0.5.8
 - Add `GALA` token to resolver list
 
