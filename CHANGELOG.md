@@ -1,8 +1,6 @@
-## v0.5.10
-- Update `@openzeppelin/contracts-upgradeable` to 4.7.3 (https://github.com/OpenZeppelin/openzeppelin-contracts/security/advisories/GHSA-4h98-2769-gh6h)
-
 ## v0.5.9
 - Added ability to mark tokens as upgraded via MintingManager#upgradeAll
+- Update `@openzeppelin/contracts-upgradeable` to 4.7.3 (https://github.com/OpenZeppelin/openzeppelin-contracts/security/advisories/GHSA-4h98-2769-gh6h)
 
 ## v0.5.8
 - Add `GALA` token to resolver list
