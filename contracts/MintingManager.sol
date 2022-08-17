@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.3.4';
+    string public constant VERSION = '0.3.3';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -44,7 +44,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
     modifier onlyAllowed(uint256 tld, string memory label) {
-        require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
+        require(bytes(_tlds[tld]).length > 0, 'MintingManager: TLD_NOT_REGISTERED');
         Strings.Slice memory _label = label.toSlice();
         if(_label._len > 10) {
             require(
@@ -73,9 +73,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         __Blocklist_init_unchained();
         __Pausable_init_unchained();
 
-        string[11] memory tlds = [
+        string[12] memory tlds = [
             'crypto',
             'wallet',
+            'coin',
             'x',
             'nft',
             'blockchain',
@@ -93,13 +94,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function addTld(string calldata tld) external override onlyOwner {
         _addTld(tld);
-    }
-
-    function removeTld(uint256 tld) external override onlyOwner {
-        require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
-
-        delete _tlds[tld];
-        emit RemoveTld(tld);
     }
 
     function mintSLD(
@@ -219,10 +213,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _unpause();
     }
 
-    function upgradeAll(uint256[] calldata tokenIds) external onlyMinter {
-        unsRegistry.upgradeAll(tokenIds);
-    }
-
     function _mintSLD(
         address to,
         uint256 tld,
@@ -339,13 +329,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         if (!unsRegistry.exists(tokenId)) {
             unsRegistry.mint(address(0xdead), tokenId, tld);
         }
-    }
-
-    /**
-     * @dev This function checks whether TLD exists
-     */
-    function _isTld(uint256 tld) private view returns (bool) {
-        return bytes(_tlds[tld]).length > 0;
     }
 
     /**

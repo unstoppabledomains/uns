@@ -126,21 +126,11 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         string memory value,
         uint256 tokenId
     ) private {
-        _beforeRecordSet(keyHash, key, value, tokenId);
-
         if (bytes(_records[_presetOf(tokenId)][keyHash]).length == 0) {
             emit NewKey(tokenId, key, key);
         }
 
         _records[_presetOf(tokenId)][keyHash] = value;
-
         emit Set(tokenId, key, value, key, value);
     }
-
-    function _beforeRecordSet(
-        uint256 keyHash,
-        string memory key,
-        string memory,
-        uint256 tokenId
-    ) internal virtual {}
 }
