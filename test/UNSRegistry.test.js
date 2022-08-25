@@ -658,25 +658,20 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
-      it('can set owner to 0xdead correctly', async () => {
-        await unsRegistry.setOwner(DEAD_ADDRESS, tokenId);
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
-      });
-
-      it('reverts transaction if tokenId is upgraded', async () => {
+      it('sets owner correctly even if token is upgraded', async () => {
         await unsRegistry.upgradeAll([tokenId]);
 
-        await expect(unsRegistry.setOwner(owner.address, tokenId))
-          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
+        await unsRegistry.setOwner(owner.address, tokenId);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
-      it('can set owner to 0xdead when tokenId is upgraded', async () => {
+      it('produces ERC721 error when transfering upgraded token to zero address', async () => {
         await unsRegistry.upgradeAll([tokenId]);
 
-        await unsRegistry.setOwner(DEAD_ADDRESS, tokenId);
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
+        await expect(
+          unsRegistry.setOwner(ZERO_ADDRESS, tokenId),
+        ).to.be.revertedWith('ERC721: transfer to the zero address');
       });
 
       it('should not reset records on set owner', async () => {
@@ -697,31 +692,12 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
-      it('can transferFrom to 0xdead correctly', async () => {
-        await unsRegistry.transferFrom(coinbase.address, DEAD_ADDRESS, tokenId);
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
-      });
-
-      it('reverts transaction if tokenId is upgraded', async () => {
-        const tokenId = await mintDomain(
-          unsRegistry,
-          coinbase.address,
-          TLD.CRYPTO,
-        );
-
+      it('transfers domain correctly even if token is upgraded', async () => {
         await unsRegistry.upgradeAll([tokenId]);
 
-        await expect(unsRegistry.transferFrom(coinbase.address, owner.address, tokenId))
-          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
-      });
+        await unsRegistry.transferFrom(coinbase.address, owner.address, tokenId);
 
-      it('can transfer ownership to 0xdead when tokenId is upgraded', async () => {
-        await unsRegistry.upgradeAll([tokenId]);
-
-        await unsRegistry.transferFrom(coinbase.address, DEAD_ADDRESS, tokenId);
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
       it('should reset records on transfer', async () => {
@@ -746,30 +722,14 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
-      it('can transferFrom to 0xdead correctly', async () => {
-        await unsRegistry['safeTransferFrom(address,address,uint256)'](
-          coinbase.address, DEAD_ADDRESS, tokenId,
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
-      });
-
-      it('reverts transaction if tokenId is upgraded', async () => {
-        await unsRegistry.upgradeAll([tokenId]);
-        const safeTransferFrom = unsRegistry['safeTransferFrom(address,address,uint256)'];
-
-        await expect(safeTransferFrom(coinbase.address, owner.address, tokenId))
-          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
-      });
-
-      it('can transfer ownership to 0xdead when tokenId is upgraded', async () => {
+      it('transfers domain correctly even if token is upgraded', async () => {
         await unsRegistry.upgradeAll([tokenId]);
 
         await unsRegistry['safeTransferFrom(address,address,uint256)'](
-          coinbase.address, DEAD_ADDRESS, tokenId,
+          coinbase.address, owner.address, tokenId,
         );
 
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
       it('should reset records on safe transfer', async () => {
@@ -798,30 +758,14 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
-      it('can transferFrom to 0xdead correctly', async () => {
-        await unsRegistry['safeTransferFrom(address,address,uint256,bytes)'](
-          coinbase.address, DEAD_ADDRESS, tokenId, '0x',
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
-      });
-
-      it('reverts transaction if tokenId is upgraded', async () => {
-        await unsRegistry.upgradeAll([tokenId]);
-        const safeTransferFrom = unsRegistry['safeTransferFrom(address,address,uint256,bytes)'];
-
-        await expect(safeTransferFrom(coinbase.address, owner.address, tokenId, '0x'))
-          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
-      });
-
-      it('can transfer ownership to 0xdead when tokenId is upgraded', async () => {
+      it('transfers domain correctly even if token is upgraded', async () => {
         await unsRegistry.upgradeAll([tokenId]);
 
         await unsRegistry['safeTransferFrom(address,address,uint256,bytes)'](
-          coinbase.address, DEAD_ADDRESS, tokenId, '0x',
+          coinbase.address, owner.address, tokenId, '0x',
         );
 
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(DEAD_ADDRESS);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
       it('should reset records on safe transfer with data', async () => {
