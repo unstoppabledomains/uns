@@ -29,13 +29,15 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.5.0';
+    string public constant VERSION = '0.5.1';
 
     string internal _prefix;
 
     address internal _mintingManager;
 
     mapping(address => uint256) internal _reverses;
+
+    mapping(uint256 => bool) internal _upgradedTokens;
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
@@ -58,6 +60,11 @@ contract UNSRegistry is
 
     modifier onlyOwner(uint256 tokenId) {
         require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
+        _;
+    }
+
+    modifier onlyNonUpgradedToken(uint256 tokenId) {
+        require(!_upgradedTokens[tokenId], 'Registry: TOKEN_UPGRADED');
         _;
     }
 
@@ -349,7 +356,7 @@ contract UNSRegistry is
     /**
      * @dev See {IReverseRegistry-setReverse}.
      */
-    function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
+    function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) onlyNonUpgradedToken(tokenId) {
         _setReverse(_msgSender(), tokenId);
     }
 
@@ -367,6 +374,23 @@ contract UNSRegistry is
      */
     function reverseOf(address addr) external view override returns (uint256) {
         return _reverses[addr];
+    }
+
+    /**
+     * @dev See {IUNSRegistry-upgradeAll(uint256[])}.
+     */
+    function upgradeAll(uint256[] calldata tokenIds) external override onlyMintingManager {
+        for(uint i = 0; i < tokenIds.length; i++) {
+            uint256 tokenId = tokenIds[i];
+            address owner = ownerOf(tokenId);
+
+            _reset(tokenId);
+            _upgradedTokens[tokenId] = true;
+
+            if(_reverses[owner] == tokenId) {
+                _removeReverse(owner);
+            }
+        }
     }
 
     /// Internal
@@ -423,12 +447,23 @@ contract UNSRegistry is
         return super._msgData();
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
-        super._beforeTokenTransfer(from, to, amount);
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
+        super._beforeTokenTransfer(from, to, tokenId);
+
+        require(!_upgradedTokens[tokenId] || to == address(0xdead), 'Registry: TOKEN_UPGRADED');
 
         if(_reverses[from] != 0) {
             _removeReverse(from);
         }
+    }
+
+    function _beforeRecordSet(
+        uint256 keyHash,
+        string memory key,
+        string memory value,
+        uint256 tokenId
+    ) internal override onlyNonUpgradedToken(tokenId) {
+        super._beforeRecordSet(keyHash, key, value, tokenId);
     }
 
     function _setReverse(address addr, uint256 tokenId) internal {
@@ -448,5 +483,5 @@ contract UNSRegistry is
     }
 
     // Reserved storage space to allow for layout changes in the future.
-    uint256[49] private __gap;
+    uint256[48] private __gap;
 }

@@ -136,6 +136,15 @@ describe('RootRegistry', () => {
         expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
       });
 
+      it('should revert deposit if token is upgraded', async () => {
+        const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-upgraded-1');
+
+        await mintingManager.upgradeAll([tokenId]);
+
+        await expect(l1UnsRegistry.connect(owner).depositToPolygon(tokenId))
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
+      });
+
       it('should meta-deposit token through UNS registry', async () => {
         const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-1d-bp2');
 
@@ -149,6 +158,20 @@ describe('RootRegistry', () => {
           .withArgs(l1UnsRegistry.address, owner.address, l1UnsRegistry.address, tokenId);
 
         expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
+      });
+
+      it('should revert meta-deposit if token is upgraded', async () => {
+        const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-upgraded-1-meta');
+
+        const { req, signature } = await buildExecuteUnsParams(
+          'depositToPolygon(uint256)',
+          [tokenId],
+          owner, tokenId,
+        );
+        await mintingManager.upgradeAll([tokenId]);
+
+        await expect(l1UnsRegistry.execute(req, signature))
+          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
 
       it('should deposit CNS domains through MintingManager', async () => {
