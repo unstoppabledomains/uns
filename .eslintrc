@@ -1,11 +1,16 @@
 {
   "extends" : [
     "standard",
-    "plugin:promise/recommended"
+    "plugin:promise/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parsers": [
+    "@typescript-eslint/parser"
   ],
   "plugins": [
     "mocha-no-only",
-    "promise"
+    "promise",
+    "@typescript-eslint"
   ],
   "env": {
     "browser" : true,

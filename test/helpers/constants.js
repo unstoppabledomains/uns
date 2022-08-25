@@ -1,3 +1,4 @@
+// TODO: REMOVE THIS JS FILE
 const { ethers } = require('hardhat');
 
 const { BigNumber } = ethers;

@@ -1,9 +1,45 @@
-const { task } = require('hardhat/config');
-const { TASK_COMPILE } = require('hardhat/builtin-tasks/task-names');
-const path = require('path');
-const fs = require('fs');
+import { HardhatUserConfig } from 'hardhat/types/config';
+import { TASK_COMPILE } from 'hardhat/builtin-tasks/task-names';
+import path from 'path';
+import fs from 'fs';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { task } from 'hardhat/config';
 
-const Sandbox = require('./sandbox');
+// We need to extend HardhatUserConfig in order to support custom uns settings.
+declare module "hardhat/types/config" {
+  interface HardhatUserConfig {
+    uns?: {
+      minters: {
+        [networkName: string]: string[]
+      }
+    }
+  }
+
+  interface ProjectPathsUserConfig {
+    flatArtifacts?: string;
+  }
+
+  interface ProjectPathsConfig {
+    flatArtifacts?: string;
+  }
+}
+
+import '@typechain/hardhat';
+import '@nomiclabs/hardhat-ethers';
+import '@nomiclabs/hardhat-waffle';
+import '@nomiclabs/hardhat-solhint';
+import '@nomiclabs/hardhat-etherscan'
+
+import '@openzeppelin/hardhat-upgrades';
+
+// There are no type declarations for 
+require('solidity-coverage');
+
+import 'hardhat-gas-reporter';
+
+import 'hardhat-contract-sizer';
+
+import { Sandbox } from './sandbox';
 
 /// ENVVAR
 // - ENABLE_GAS_REPORT
@@ -15,26 +51,12 @@ const argv = require('yargs/yargs')()
   .boolean('enableContractSizer')
   .boolean('ci').argv;
 
-require('@openzeppelin/hardhat-upgrades');
-require('@nomiclabs/hardhat-waffle');
-require('@nomiclabs/hardhat-solhint');
-require('@nomiclabs/hardhat-etherscan');
-require('solidity-coverage');
-
-if (argv.enableGasReport) {
-  require('hardhat-gas-reporter');
-}
-
-if (argv.enableContractSizer) {
-  require('hardhat-contract-sizer');
-}
-
 task(
   TASK_COMPILE,
   'hook compile task to perform post-compile task',
-  async (_, hre, runSuper) => {
-    const { root, flatArtifacts } = hre.config.paths;
-    const outputDir = path.resolve(root, flatArtifacts);
+  async (_, hardhatRuntimeEnv: HardhatRuntimeEnvironment, runSuper) => {
+    const { root, flatArtifacts } = hardhatRuntimeEnv.config.paths;
+    const outputDir = path.resolve(root, flatArtifacts!);
 
     await runSuper();
 
@@ -43,9 +65,9 @@ task(
     }
     fs.mkdirSync(outputDir, { recursive: true });
 
-    for (const artifactPath of await hre.artifacts.getArtifactPaths()) {
+    for (const artifactPath of await hardhatRuntimeEnv.artifacts.getArtifactPaths()) {
       const artifact = fs.readFileSync(artifactPath);
-      const { abi, contractName } = JSON.parse(artifact);
+      const { abi, contractName } = JSON.parse(artifact.toString());
       if (!abi.length || contractName.includes('Mock')) continue;
 
       const target = path.join(outputDir, `${contractName}.json`);
@@ -55,7 +77,7 @@ task(
 );
 
 // NOTE: Order matters
-require('hardhat-abi-exporter');
+import 'hardhat-abi-exporter';
 
 const settings = {
   optimizer: {
@@ -64,10 +86,8 @@ const settings = {
   },
 };
 
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
-module.exports = {
+// Specifing ANY as we have a lot of types here
+const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
@@ -143,6 +163,7 @@ module.exports = {
     },
   },
   gasReporter: {
+    enabled: argv.enableGasReport,
     currency: 'USD',
     outputFile: argv.ci ? 'gas-report.txt' : undefined,
     excludeContracts: [
@@ -153,7 +174,7 @@ module.exports = {
   },
   contractSizer: {
     alphaSort: true,
-    runOnCompile: true,
+    runOnCompile: argv.enableContractSizer,
     disambiguatePaths: false,
     only: ['UNSRegistry.sol', 'ProxyReader.sol', 'MintingManager.sol'],
   },
@@ -198,4 +219,6 @@ module.exports = {
       polygon: ['0xd8263053a6d08ef3acbf2381f144b90841726233'],
     },
   },
-};
+}
+
+export default config;

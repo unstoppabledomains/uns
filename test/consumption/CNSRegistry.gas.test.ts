@@ -1,19 +1,21 @@
-const { ethers } = require('hardhat');
-
-const { TLD } = require('../helpers/constants');
-const { sign, buildExecuteFunc } = require('../helpers/metatx');
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { Contract } from 'ethers';
+import { ethers } from 'hardhat';
+import { TLD } from '../helpers/constants';
+import { sign, buildExecuteFunc } from '../helpers/metatx';
 
 describe('CNSRegistry (consumption)', () => {
-  let CNSRegistryForwarder, CNSRegistry, MintingController, SignatureController;
-  let forwarder, registry, mintingController, signatureController;
-  let signers, owner, receiver, spender, buildExecuteParams;
+  let forwarder: Contract, registry: Contract, mintingController: Contract, signatureController: Contract;
+  let signers: SignerWithAddress[], owner: SignerWithAddress, receiver: SignerWithAddress, spender: SignerWithAddress;
 
-  const mintDomain = async (label, owner) => {
+  let buildExecuteParams;
+
+  const mintDomain = async (label: string, owner: string) => {
     await mintingController.mintSLD(owner, label);
     return await registry.childIdOf(TLD.CRYPTO, label);
   };
 
-  function percDiff (a, b) {
+  function percDiff (a: number, b: number) {
     return -((a - b) / a) * 100;
   }
 
@@ -21,10 +23,10 @@ describe('CNSRegistry (consumption)', () => {
     signers = await ethers.getSigners();
     [owner, receiver, spender] = signers;
 
-    CNSRegistryForwarder = await ethers.getContractFactory('CNSRegistryForwarder');
-    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
-    MintingController = await ethers.getContractFactory('MintingController');
-    SignatureController = await ethers.getContractFactory('SignatureController');
+    const CNSRegistryForwarder = await ethers.getContractFactory('CNSRegistryForwarder');
+    const CNSRegistry = await ethers.getContractFactory('CNSRegistry');
+    const MintingController = await ethers.getContractFactory('MintingController');
+    const SignatureController = await ethers.getContractFactory('SignatureController');
 
     registry = await CNSRegistry.deploy();
     mintingController = await MintingController.deploy(registry.address);
@@ -39,7 +41,7 @@ describe('CNSRegistry (consumption)', () => {
   });
 
   it('`transferFrom` consumption', async () => {
-    const result = [];
+    const result: any[] = [];
     const label = 'cons-d1-';
 
     // Direct transfer

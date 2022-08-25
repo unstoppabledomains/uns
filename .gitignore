@@ -41,3 +41,4 @@ cache
 .deployer
 
 slither.sarif
+typechain-types
