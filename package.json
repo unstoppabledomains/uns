@@ -28,7 +28,8 @@
     "upgrade:mainnet": "hardhat run --network mainnet scripts/upgrade.js",
     "start:node": "hardhat node",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test:sol",
-    "make:uml": "npx sol2uml ./contracts -b UNSRegistry,MintingManager,ProxyReader -o ./assets/uns.svg -i ./contracts/mocks"
+    "make:uml": "npx sol2uml ./contracts -b UNSRegistry,MintingManager,ProxyReader -o ./assets/uns.svg -i ./contracts/mocks",
+    "analyze": "slither . --hardhat-artifacts-directory ./.artifacts --sarif slither.sarif --config-file .slither.json"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

@@ -125,6 +125,12 @@ The contract addresses are distributed via a [UNS Config File](https://github.co
 
     TBD
 
+## Dependencies
+
+- [Slither](https://github.com/crytic/slither) - solidity source analyzer [optional]
+
+  Installation command: `pip3 install slither-analyzer`
+
 ## Environment variables
 
 - `{NETWORK}_INFURA_KEY` - Infura key for connecting to Ethereum Node
