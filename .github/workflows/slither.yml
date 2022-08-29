@@ -2,9 +2,10 @@ name: Slither Analysis
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches:
+      - master
+  pull_request: {}
+  workflow_dispatch: {}
 
 jobs:
   analyze:
