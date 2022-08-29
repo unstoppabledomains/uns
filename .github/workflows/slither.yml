@@ -23,7 +23,7 @@ jobs:
       id: slither
       with:
         node-version: 16
-        hardhat-artifacts-directory: ./.artifacts
+        slither-args: "--hardhat-artifacts-directory ./.artifacts"
         sarif: results.sarif
 
     - name: Upload SARIF file
