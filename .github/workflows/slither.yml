@@ -30,7 +30,7 @@ jobs:
     - run: yarn compile
 
     - name: Run Slither
-      uses: crytic/slither-action@master
+      uses: crytic/slither-action@main
       continue-on-error: true
       id: slither
       with:
