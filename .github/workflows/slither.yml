@@ -35,7 +35,7 @@ jobs:
       id: slither
       with:
         node-version: 16
-        slither-args: "--ignore-compile --hardhat-artifacts-directory ./.artifacts"
+        slither-args: "--ignore-compile --hardhat-artifacts-directory ./.artifacts --config-file .slither.json"
         sarif: results.sarif
 
     - name: Upload SARIF file
