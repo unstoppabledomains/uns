@@ -80,9 +80,11 @@ contract ResolverForwarder is BaseRoutingForwarder {
             (string memory p1, string memory p2, uint256 p3) = abi.decode(data, (string, string, uint256));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
         } else if(selector == 0x8f69c188) {
+            // slither-disable-next-line uninitialized-storage
             (string[] memory p1, string[] memory p2, uint256 p3) = abi.decode(data, (string[], string[], uint256));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
         } else if(selector == 0xa3557e6c) {
+            // slither-disable-next-line uninitialized-storage
             (string[] memory p1, string[] memory p2, uint256 p3) = abi.decode(data, (string[], string[], uint256));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
         }

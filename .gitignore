@@ -39,3 +39,5 @@ cache
 
 .sandbox
 .deployer
+
+slither.sarif
