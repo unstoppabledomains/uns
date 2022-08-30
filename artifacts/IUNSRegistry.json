@@ -272,6 +272,19 @@
       "inputs": [
         {
           "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
+      ],
+      "name": "addProxyReader",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "to",
           "type": "address"
         },
@@ -1232,6 +1245,19 @@
         }
       ],
       "name": "transferFrom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "tokenIds",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "upgradeAll",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
