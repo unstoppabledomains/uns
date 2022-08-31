@@ -1,5 +1,5 @@
 {
-  "version": "2.1.8",
+  "version": "2.1.9",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2479,6 +2479,11 @@
     "crypto.GALA.version.BEP20.address": {
       "deprecatedKeyName": "GALA_BEP20",
       "validationRegex": "^0x[a-zA-Z0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.MOBX.address": {
+      "deprecatedKeyName": "MOBX",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     }
   }
