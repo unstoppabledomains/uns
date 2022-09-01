@@ -2483,7 +2483,7 @@
     },
     "crypto.MOBX.address": {
       "deprecatedKeyName": "MOBX",
-      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "validationRegex": "^fetch[a-zA-Z0-9]{39}$",
       "deprecated": false
     }
   }
