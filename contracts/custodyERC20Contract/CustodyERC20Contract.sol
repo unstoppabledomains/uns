@@ -15,7 +15,7 @@ contract CustodyERC20Contract is ReentrancyGuardUpgradeable {
     event Deposit(address indexed owner, uint256 numberOfTokens, uint256 depositReleaseTimestamp);
 
     IERC20Upgradeable _token;
-    mapping(bytes32 => DepositStruct) _deposits;
+    mapping(bytes32 => DepositStruct) public _deposits;
 
     function initialize(IERC20Upgradeable token) public initializer {
         _token = token;
@@ -25,12 +25,12 @@ contract CustodyERC20Contract is ReentrancyGuardUpgradeable {
         bytes32 secretHash = keccak256(abi.encode(secret));
         DepositStruct memory deposit = _deposits[secretHash]; 
 
-        require(deposit.owner != address(0) , 'deposit by this secret is not available');
+        require(deposit.owner != address(0) , 'Deposit by this secret is not available');
 
         //should be not an owner, or deposit should be released for owner
         require(
             msg.sender != deposit.owner || block.timestamp >= deposit.depositOwnerReleaseTimestamp,
-            'deposit is not released for owner yet'
+            'Deposit is not released for owner yet'
         );
         require(_token.transfer(msg.sender, deposit.numberOfTokens),  "Token transfer wasn't successful.");
 
@@ -49,7 +49,7 @@ contract CustodyERC20Contract is ReentrancyGuardUpgradeable {
         uint256 allowance = _token.allowance(msg.sender, _contractAddress());
 
         require(allowance >= numberOfTokens, 'Allowance is less then required');
-        require(_deposits[secretHash].owner == address(0x0), 'deposit with such secretHash already exists');
+        require(_deposits[secretHash].owner == address(0x0), 'Deposit with such secretHash already exist');
 
         require(_token.transferFrom(msg.sender, _contractAddress(), numberOfTokens), "Token transfer wasn't successful.");
         emit Deposit(msg.sender, numberOfTokens, depositOwnerReleaseTimestamp);

@@ -2,6 +2,7 @@ node_modules/
 build/
 .chaindata/
 .idea
+bin
 
 logs
 *.log
