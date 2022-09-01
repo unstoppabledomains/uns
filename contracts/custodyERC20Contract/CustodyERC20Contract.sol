@@ -32,7 +32,7 @@ contract CustodyERC20Contract is ReentrancyGuardUpgradeable {
             msg.sender != deposit.owner || block.timestamp >= deposit.depositOwnerReleaseTimestamp,
             'deposit is not released for owner yet'
         );
-        _token.transfer(msg.sender, deposit.numberOfTokens);
+        require(_token.transfer(msg.sender, deposit.numberOfTokens),  "Token transfer wasn't successful.");
 
         emit Withdrawal(secret, msg.sender, deposit.numberOfTokens);
         delete _deposits[secretHash];
@@ -45,13 +45,13 @@ contract CustodyERC20Contract is ReentrancyGuardUpgradeable {
         uint256 numberOfTokens,
         uint256 depositOwnerReleaseTimestamp,
         bytes32 secretHash
-    ) public {
+    ) public nonReentrant{
         uint256 allowance = _token.allowance(msg.sender, _contractAddress());
 
         require(allowance >= numberOfTokens, 'Allowance is less then required');
         require(_deposits[secretHash].owner == address(0x0), 'deposit with such secretHash already exists');
 
-        _token.transferFrom(msg.sender, _contractAddress(), numberOfTokens);
+        require(_token.transferFrom(msg.sender, _contractAddress(), numberOfTokens), "Token transfer wasn't successful.");
         emit Deposit(msg.sender, numberOfTokens, depositOwnerReleaseTimestamp);
 
         _deposits[secretHash].owner = msg.sender;
