@@ -1,6 +1,5 @@
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
 import '@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 
@@ -29,7 +28,6 @@ contract CustodyERC20Contract is ReentrancyGuardUpgradeable {
         require(deposit.owner != address(0) , 'deposit by this secret is not available');
 
         //should be not an owner, or deposit should be released for owner
-
         require(
             msg.sender != deposit.owner || block.timestamp >= deposit.depositOwnerReleaseTimestamp,
             'deposit is not released for owner yet'
