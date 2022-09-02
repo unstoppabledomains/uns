@@ -117,7 +117,7 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
     }
 
     function _get(uint256 keyHash, uint256 tokenId) private view returns (string memory) {
-        if(!_recordsReadAvailable(tokenId)) {
+        if(_isReadRestricted(tokenId)) {
             return '';
         }
 
@@ -139,5 +139,5 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         emit Set(tokenId, key, value, key, value);
     }
 
-    function _recordsReadAvailable(uint256 tokenId) internal virtual view returns (bool) {}
+    function _isReadRestricted(uint256 tokenId) internal virtual view returns (bool) {}
 }

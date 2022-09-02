@@ -372,7 +372,7 @@ contract UNSRegistry is
     function reverseOf(address addr) external view override returns (uint256 reverse) {
         uint256 tokenId = _reverses[addr];
 
-        if(_recordsReadAvailable(tokenId)) {
+        if(!_isReadRestricted(tokenId)) {
             reverse = tokenId;
         }
     }
@@ -450,6 +450,7 @@ contract UNSRegistry is
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
         super._beforeTokenTransfer(from, to, tokenId);
 
+        // This prevents the token from being burned, or withdrawed from L2
         require(!_upgradedTokens[tokenId] || to != address(0), 'Registry: TOKEN_UPGRADED');
 
         if(_reverses[from] == tokenId) {
@@ -473,8 +474,8 @@ contract UNSRegistry is
         emit RemoveReverse(addr);
     }
 
-    function _recordsReadAvailable(uint256 tokenId) internal override view returns (bool) {
-        return !_upgradedTokens[tokenId] || !_proxyReaders[_msgSender()];
+    function _isReadRestricted(uint256 tokenId) internal override view returns (bool) {
+        return _upgradedTokens[tokenId] &&_proxyReaders[_msgSender()];
     }
 
     // Reserved storage space to allow for layout changes in the future.
