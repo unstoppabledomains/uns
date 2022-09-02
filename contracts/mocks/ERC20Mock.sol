@@ -9,4 +9,5 @@ contract ERC20Mock is ERC20Upgradeable {
         __ERC20_init("Test", "TTT");
         _mint(msg.sender, initMintAmount);
     }
+
 }
