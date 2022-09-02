@@ -32,11 +32,10 @@ contract CustodyERC20Contract is ReentrancyGuardUpgradeable {
         require(deposit.owner != address(0), 'Deposit by this secret is not available');
         require(deposit.amount > 0, 'Deposit is already withdrawn');
 
-        //should be not an owner, or deposit should be released for owner
-        require(
-            msg.sender != deposit.owner || block.timestamp >= deposit.expiration,
-            'Deposit is not released for owner yet'
-        );
+        require(!(msg.sender == deposit.owner && block.timestamp < deposit.expiration),
+            'Deposit is not released for owner yet');
+        require(!(msg.sender != deposit.owner && block.timestamp >= deposit.expiration),
+            'Deposit is expired, now only owner can withdraw it');
 
         _token.safeTransfer(msg.sender, deposit.amount);
 

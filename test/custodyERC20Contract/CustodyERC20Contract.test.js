@@ -187,6 +187,13 @@ describe('CustodyERC20Contract', () => {
         .to.revertedWith('Deposit is not released for owner yet');
     });
 
+    it('not an owner should not be able to withdraw after expiration', async () => {
+      await hre.network.provider.send("evm_setNextBlockTimestamp", [_getTimestampInTenSeconds()]);//increments bext block time by 10seconds
+
+      await expect(custodyContract.connect(recipient).withdrawTokens(SECRET_1))
+        .to.be.revertedWith('Deposit is expired, now only owner can withdraw it');
+    });
+
     it('owner should be able to withdraw after the release', async () => {
       await hre.network.provider.send("evm_setNextBlockTimestamp", [_getTimestampInTenSeconds()]);//increments bext block time by 10seconds
 
