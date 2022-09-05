@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
-import "hardhat/console.sol";
 
 contract CustodyERC20Contract is ReentrancyGuardUpgradeable {
 
@@ -25,6 +24,10 @@ contract CustodyERC20Contract is ReentrancyGuardUpgradeable {
         _token = token;
     }
 
+    function getSecretHash(bytes32 secret)public view returns(bytes32){
+        return keccak256(abi.encode(secret, block.chainid, address(this)));
+    }
+
     function withdrawTokens(bytes32 secret) public nonReentrant {
         bytes32 secretHash = keccak256(abi.encode(secret, block.chainid, address(this)));
         DepositStruct memory deposit = _deposits[secretHash];
@@ -32,10 +35,9 @@ contract CustodyERC20Contract is ReentrancyGuardUpgradeable {
         require(deposit.owner != address(0), 'Deposit by this secret is not available');
         require(deposit.amount > 0, 'Deposit is already withdrawn');
 
-        require(!(msg.sender == deposit.owner && block.timestamp < deposit.expiration),
-            'Deposit is not released for owner yet');
-        require(!(msg.sender != deposit.owner && block.timestamp >= deposit.expiration),
-            'Deposit is expired, now only owner can withdraw it');
+        require(((msg.sender == deposit.owner && block.timestamp >= deposit.expiration) ||
+                (msg.sender != deposit.owner && block.timestamp < deposit.expiration)), 
+                "The user can not withdraw the deposit due to expiration");
 
         _token.safeTransfer(msg.sender, deposit.amount);
 
@@ -43,18 +45,14 @@ contract CustodyERC20Contract is ReentrancyGuardUpgradeable {
         _deposits[secretHash].amount = 0; // to avoid additional flag for withdrawn deposits.
     }
 
-    //prerequest: user should have tokens and preaprove them.
-    //expiration is a timestamp is seconds after which deposit owner is allowed to make a withdraw
-    //secret hash - secret, hashed using keccak256
+    // expiration is a timestamp in seconds after which deposit owner is allowed to make a withdraw
+    // secret hash - secret, hashed using keccak256
     function depositTokens(
         uint256 amount,
         uint256 expiration,
         bytes32 secretHash
     ) public nonReentrant {
-        uint256 allowance = _token.allowance(msg.sender, address(this));
-
-        require(allowance >= amount, 'Allowance is less then required');
-        require(amount > 0, 'Deposit amount should be > 0');
+        require( 0 < amount && amount <= _token.allowance(msg.sender, address(this)), 'Amount is out of bounds.');
         require(secretHash != '', 'SecretHash can not be empty');
         require(block.timestamp < expiration, 'Expiration can not be less then current time');
         require(_deposits[secretHash].owner == address(0x0), 'Deposit with such secretHash already exist');

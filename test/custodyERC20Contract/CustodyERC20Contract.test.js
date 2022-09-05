@@ -72,7 +72,7 @@ describe('CustodyERC20Contract', () => {
         NUMBER_OF_TOKENS_TO_TRANSFER,
         _getTimestampInTenSeconds(),
         _getSecretHash(SECRET_1)
-      )).to.be.revertedWith('Allowance is less then required');
+      )).to.be.revertedWith('Amount is out of bounds.');
     })
 
     it('should revert when sender does not have enough tokens', async () => {
@@ -99,7 +99,7 @@ describe('CustodyERC20Contract', () => {
         0,
         _getTimestampInTenSeconds(),
         _getSecretHash(SECRET_1)
-      )).to.be.revertedWith('Deposit amount should be > 0');
+      )).to.be.revertedWith('Amount is out of bounds.');
     });
 
     it('should revert if secret hash is empty', async () => {
@@ -184,14 +184,14 @@ describe('CustodyERC20Contract', () => {
 
     it('owner can not withdraw before deposit release', async () => {
       await expect(custodyContract.withdrawTokens(SECRET_1))
-        .to.revertedWith('Deposit is not released for owner yet');
+        .to.revertedWith('The user can not withdraw the deposit due to expiration');
     });
 
     it('not an owner should not be able to withdraw after expiration', async () => {
       await hre.network.provider.send("evm_setNextBlockTimestamp", [_getTimestampInTenSeconds()]);//increments bext block time by 10seconds
 
       await expect(custodyContract.connect(recipient).withdrawTokens(SECRET_1))
-        .to.be.revertedWith('Deposit is expired, now only owner can withdraw it');
+        .to.be.revertedWith('The user can not withdraw the deposit due to expiration');
     });
 
     it('owner should be able to withdraw after the release', async () => {
@@ -226,6 +226,14 @@ describe('CustodyERC20Contract', () => {
 
       await expect(await erc20Token.balanceOf(custodyContract.address))
         .to.be.equal(NUMBER_OF_INIT_TOKENS_CONTRACT);
+    })
+
+    describe('Secret encryption', async () => {
+
+      it('encrypts the secret', async () => {
+        await expect(await custodyContract.getSecretHash(SECRET_1))
+          .to.be.equals(_getSecretHash(SECRET_1));
+      })
     })
 
   });
