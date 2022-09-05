@@ -139,5 +139,5 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         emit Set(tokenId, key, value, key, value);
     }
 
-    function _isReadRestricted(uint256 tokenId) internal virtual view returns (bool) {}
+    function _isReadRestricted(uint256 tokenId) internal virtual view returns (bool);
 }
