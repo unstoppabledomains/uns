@@ -35,16 +35,16 @@ contract ResolverForwarder is BaseRoutingForwarder {
         // use default resolver when domain has empty resolver
         try _cnsRegistry.resolverOf(tokenId) returns (address _resolver) {
             resolver = _resolver;
-        } catch { }
+        } catch {}
 
         // check that resolver is contract
-        if(resolver.isContract()) {
+        if (resolver.isContract()) {
             IForwarder target = IForwarder(resolver);
 
             // catch error when resolver does not implement IForwarder interface
             try target.nonceOf(tokenId) returns (uint256 nonce) {
                 return nonce;
-            } catch { }
+            } catch {}
         }
 
         // return nonce from default resolver as a fallback
@@ -73,17 +73,17 @@ contract ResolverForwarder is BaseRoutingForwarder {
         bytes memory data,
         bytes memory signature
     ) internal pure override returns (bytes memory routeData) {
-        if(selector == 0xb87abc11) {
-            (uint256 p1) = abi.decode(data, (uint256));
+        if (selector == 0xb87abc11) {
+            uint256 p1 = abi.decode(data, (uint256));
             routeData = abi.encodeWithSelector(selector, p1, signature);
-        } else if(selector == 0xc5974073) {
+        } else if (selector == 0xc5974073) {
             (string memory p1, string memory p2, uint256 p3) = abi.decode(data, (string, string, uint256));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
-        } else if(selector == 0x8f69c188) {
+        } else if (selector == 0x8f69c188) {
             // slither-disable-next-line uninitialized-storage
             (string[] memory p1, string[] memory p2, uint256 p3) = abi.decode(data, (string[], string[], uint256));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
-        } else if(selector == 0xa3557e6c) {
+        } else if (selector == 0xa3557e6c) {
             // slither-disable-next-line uninitialized-storage
             (string[] memory p1, string[] memory p2, uint256 p3) = abi.decode(data, (string[], string[], uint256));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);

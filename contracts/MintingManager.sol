@@ -46,7 +46,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     modifier onlyAllowed(uint256 tld, string memory label) {
         require(bytes(_tlds[tld]).length > 0, 'MintingManager: TLD_NOT_REGISTERED');
         Strings.Slice memory _label = label.toSlice();
-        if(_label._len > 10) {
+        if (_label._len > 10) {
             require(
                 _label.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
                 'MintingManager: TOKEN_LABEL_PROHIBITED'
@@ -335,9 +335,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      * @dev namehash('crypto') = 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f
      */
     function _useCNS(uint256 tld) private view returns (bool) {
-        return
-            address(cnsMintingController) != address(0) &&
-            tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
+        return address(cnsMintingController) != address(0) && tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
     }
 
     // Reserved storage space to allow for layout changes in the future.

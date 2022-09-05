@@ -46,10 +46,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
         if (!_exists(tokenId)) {
             return false;
         }
-        return
-            _useUns(tokenId)
-                ? _unsRegistry.isApprovedOrOwner(spender, tokenId)
-                : _cnsRegistry.isApprovedOrOwner(spender, tokenId);
+        return _useUns(tokenId) ? _unsRegistry.isApprovedOrOwner(spender, tokenId) : _cnsRegistry.isApprovedOrOwner(spender, tokenId);
     }
 
     function resolverOf(uint256 tokenId) external view override returns (address) {
@@ -124,12 +121,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
         }
     }
 
-    function getByHash(uint256 keyHash, uint256 tokenId)
-        external
-        view
-        override
-        returns (string memory key, string memory value)
-    {
+    function getByHash(uint256 keyHash, uint256 tokenId) external view override returns (string memory key, string memory value) {
         if (_useUns(tokenId)) {
             return _unsRegistry.getByHash(keyHash, tokenId);
         } else {

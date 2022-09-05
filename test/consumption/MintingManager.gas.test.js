@@ -12,7 +12,7 @@ describe('MintingManager (consumption)', () => {
     return -((a - b) / a) * 100;
   }
 
-  async function removeReverse() {
+  async function removeReverse () {
     const removeReverseTx = await unsRegistry.connect(receiver).removeReverse();
     await removeReverseTx.wait();
   }
@@ -23,7 +23,9 @@ describe('MintingManager (consumption)', () => {
 
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
     MintingManager = await ethers.getContractFactory('MintingManager');
-    MintingManagerForwarder = await ethers.getContractFactory('MintingManagerForwarder');
+    MintingManagerForwarder = await ethers.getContractFactory(
+      'MintingManagerForwarder',
+    );
 
     [, , receiver, spender] = signers;
 
@@ -33,12 +35,22 @@ describe('MintingManager (consumption)', () => {
 
     forwarder = await MintingManagerForwarder.deploy(mintingManager.address);
 
-    await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+    await mintingManager.initialize(
+      unsRegistry.address,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+    );
     await mintingManager.addMinter(coinbase.address);
     await mintingManager.setTokenURIPrefix('/');
     await mintingManager.setForwarder(forwarder.address);
 
-    buildExecuteParams = buildExecuteFunc(mintingManager.interface, mintingManager.address, forwarder);
+    buildExecuteParams = buildExecuteFunc(
+      mintingManager.interface,
+      mintingManager.address,
+      forwarder,
+    );
   });
 
   describe('Mint consumprion', () => {
@@ -72,8 +84,15 @@ describe('MintingManager (consumption)', () => {
         const executeParams = [acc, root, token + 'r', ...rest];
 
         const tokenId = await unsRegistry.childIdOf(root, executeParams[2]);
-        const { req, signature } = await buildExecuteParams(selector, executeParams, coinbase, tokenId);
-        const executeTx = await forwarder.connect(spender).execute(req, signature);
+        const { req, signature } = await buildExecuteParams(
+          selector,
+          executeParams,
+          coinbase,
+          tokenId,
+        );
+        const executeTx = await forwarder
+          .connect(spender)
+          .execute(req, signature);
         executeTx.receipt = await executeTx.wait();
 
         await removeReverse();

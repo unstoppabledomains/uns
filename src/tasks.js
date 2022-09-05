@@ -124,7 +124,6 @@ const deployUNSTask = {
   run: async (ctx, dependencies) => {
     const { owner } = ctx.accounts;
     const {
-      CNSRegistry,
       MintingController,
       URIPrefixController,
       Resolver,

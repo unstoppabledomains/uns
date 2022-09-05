@@ -18,21 +18,12 @@ contract CNSRegistryForwarder is BaseRoutingForwarder {
         _target = target;
         _addRoute('transferFrom(address,address,uint256)', 'transferFromFor(address,address,uint256,bytes)');
         _addRoute('safeTransferFrom(address,address,uint256)', 'safeTransferFromFor(address,address,uint256,bytes)');
-        _addRoute(
-            'safeTransferFrom(address,address,uint256,bytes)',
-            'safeTransferFromFor(address,address,uint256,bytes,bytes)'
-        );
+        _addRoute('safeTransferFrom(address,address,uint256,bytes)', 'safeTransferFromFor(address,address,uint256,bytes,bytes)');
         _addRoute('burn(uint256)', 'burnFor(uint256,bytes)');
         _addRoute('mintChild(address,uint256,string)', 'mintChildFor(address,uint256,string,bytes)');
         _addRoute('safeMintChild(address,uint256,string)', 'safeMintChildFor(address,uint256,string,bytes)');
-        _addRoute(
-            'safeMintChild(address,uint256,string,bytes)',
-            'safeMintChildFor(address,uint256,string,bytes,bytes)'
-        );
-        _addRoute(
-            'transferFromChild(address,address,uint256,string)',
-            'transferFromChildFor(address,address,uint256,string,bytes)'
-        );
+        _addRoute('safeMintChild(address,uint256,string,bytes)', 'safeMintChildFor(address,uint256,string,bytes,bytes)');
+        _addRoute('transferFromChild(address,address,uint256,string)', 'transferFromChildFor(address,address,uint256,string,bytes)');
         _addRoute(
             'safeTransferFromChild(address,address,uint256,string)',
             'safeTransferFromChildFor(address,address,uint256,string,bytes)'
@@ -77,40 +68,43 @@ contract CNSRegistryForwarder is BaseRoutingForwarder {
         bytes memory data,
         bytes memory signature
     ) internal pure override returns (bytes memory routeData) {
-        if(selector == 0xef2c3088) {
+        if (selector == 0xef2c3088) {
             (address p1, address p2, uint256 p3) = abi.decode(data, (address, address, uint256));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
-        } else if(selector == 0x6debcb8d) {
+        } else if (selector == 0x6debcb8d) {
             (address p1, address p2, uint256 p3) = abi.decode(data, (address, address, uint256));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
-        } else if(selector == 0x280d9b05) {
+        } else if (selector == 0x280d9b05) {
             (address p1, address p2, uint256 p3, bytes memory p4) = abi.decode(data, (address, address, uint256, bytes));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
-        } else if(selector == 0x61603dd9) {
-            (uint256 p1) = abi.decode(data, (uint256));
+        } else if (selector == 0x61603dd9) {
+            uint256 p1 = abi.decode(data, (uint256));
             routeData = abi.encodeWithSelector(selector, p1, signature);
-        } else if(selector == 0xb34f33c5) {
+        } else if (selector == 0xb34f33c5) {
             (address p1, uint256 p2, string memory p3) = abi.decode(data, (address, uint256, string));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
-        } else if(selector == 0x30135293) {
+        } else if (selector == 0x30135293) {
             (address p1, uint256 p2, string memory p3) = abi.decode(data, (address, uint256, string));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, signature);
-        } else if(selector == 0x07eca395) {
+        } else if (selector == 0x07eca395) {
             (address p1, uint256 p2, string memory p3, bytes memory p4) = abi.decode(data, (address, uint256, string, bytes));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
-        } else if(selector == 0x68b6154f) {
+        } else if (selector == 0x68b6154f) {
             (address p1, address p2, uint256 p3, string memory p4) = abi.decode(data, (address, address, uint256, string));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
-        } else if(selector == 0xd0778d6c) {
+        } else if (selector == 0xd0778d6c) {
             (address p1, address p2, uint256 p3, string memory p4) = abi.decode(data, (address, address, uint256, string));
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, p4, signature);
-        } else if(selector == 0xf5090c1e) {
-            (address p1, address p2, uint256 p3, string memory p4, bytes memory p5) = abi.decode(data, (address, address, uint256, string, bytes));
+        } else if (selector == 0xf5090c1e) {
+            (address p1, address p2, uint256 p3, string memory p4, bytes memory p5) = abi.decode(
+                data,
+                (address, address, uint256, string, bytes)
+            );
             routeData = abi.encodeWithSelector(selector, p1, p2, p3, p4, p5, signature);
-        } else if(selector == 0x6fab95b3) {
+        } else if (selector == 0x6fab95b3) {
             (uint256 p1, string memory p2) = abi.decode(data, (uint256, string));
             routeData = abi.encodeWithSelector(selector, p1, p2, signature);
-        } else if(selector == 0x511f1112) {
+        } else if (selector == 0x511f1112) {
             (address p1, uint256 p2) = abi.decode(data, (address, uint256));
             routeData = abi.encodeWithSelector(selector, p1, p2, signature);
         }
