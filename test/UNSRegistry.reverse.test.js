@@ -1,17 +1,16 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
-
 const { buildExecuteFunc } = require('./helpers/metatx');
-const { TLD } = require('./helpers/constants');
+const { TLD, DEAD_ADDRESS } = require('./helpers/constants');
 const { mintDomain } = require('./helpers/registry');
 
 describe('UNSRegistry (reverse)', () => {
   let UNSRegistry, unsRegistry, buildExecuteParams;
-  let signers, coinbase, owner, receiver;
+  let signers, coinbase, owner, receiver, reader;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [coinbase, owner, receiver] = signers;
+    [coinbase, owner, receiver, reader] = signers;
 
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
   });
@@ -27,6 +26,8 @@ describe('UNSRegistry (reverse)', () => {
     await unsRegistry.setTokenURIPrefix('/');
 
     buildExecuteParams = buildExecuteFunc(unsRegistry.interface, unsRegistry.address, unsRegistry);
+
+    await unsRegistry.addProxyReader(reader.address);
   });
 
   describe('Minting', () => {
@@ -84,7 +85,7 @@ describe('UNSRegistry (reverse)', () => {
       });
 
       it('should not set reverse resolution when minting to 0xdead address', async () => {
-        const address = '0x000000000000000000000000000000000000dEaD';
+        const address = DEAD_ADDRESS;
         await unsRegistry.functions[selector](address, TLD.WALLET, 'wallet');
 
         expect(await unsRegistry.reverseOf(address)).to.be.equal(0);
@@ -321,6 +322,15 @@ describe('UNSRegistry (reverse)', () => {
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
     });
 
+    it('should not resolve reverse record if reader is ProxyReader and token is upgraded', async () => {
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X);
+
+      await unsRegistry.upgradeAll([tokenId]);
+
+      expect(await unsRegistry.connect(reader).reverseOf(owner.address)).to.be.equal(0);
+      expect(await unsRegistry.connect(coinbase).reverseOf(owner.address)).to.be.equal(tokenId);
+    });
+
     it('should set reverse record (case-insensitive address)', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_1', true);
       const _unsRegistry = unsRegistry.connect(owner);
@@ -345,7 +355,7 @@ describe('UNSRegistry (reverse)', () => {
     });
 
     it('should remove reverse record on tranfer', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'rem_2');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X);
       const _unsRegistry = unsRegistry.connect(owner);
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
@@ -353,6 +363,18 @@ describe('UNSRegistry (reverse)', () => {
       await _unsRegistry.transferFrom(owner.address, receiver.address, tokenId);
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
+      expect(await unsRegistry.reverseOf(receiver.address)).to.be.equal(0);
+    });
+
+    it('should remove reverse record on transfer only for current domain', async () => {
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X);
+      const tokenId2 = await mintDomain(unsRegistry, owner, TLD.X);
+
+      expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
+
+      await unsRegistry.connect(owner).transferFrom(owner.address, receiver.address, tokenId2);
+
+      expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
       expect(await unsRegistry.reverseOf(receiver.address)).to.be.equal(0);
     });
 
@@ -406,7 +428,7 @@ describe('UNSRegistry (reverse)', () => {
     });
 
     it('revert setting reverse record when non-token based nonce', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_mtx_3', true);
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X, 'res_mtx_4', true);
 
       const { req, signature } = await buildExecuteParams(
         'setReverse(uint256)',

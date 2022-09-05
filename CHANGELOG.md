@@ -1,7 +1,9 @@
+## vNext
+- Added ability to mark tokens as upgraded via MintingManager#upgradeAll
+- Fixed the case when domain transfer caused removing of reverse resolution for domain, which wasn't transfered
+
 ## v0.5.10
 - Add `MOBX` token to resolver list
-
-## v0.5.9
 - Update `@openzeppelin/contracts-upgradeable` to 4.7.3 (https://github.com/OpenZeppelin/openzeppelin-contracts/security/advisories/GHSA-4h98-2769-gh6h)
 
 ## v0.5.8

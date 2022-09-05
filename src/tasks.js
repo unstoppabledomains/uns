@@ -227,6 +227,7 @@ const deployUNSProxyReaderTask = {
     const {
       CNSRegistry,
       UNSRegistry,
+      MintingManager,
     } = dependencies;
 
     const proxyReader = await ctx.artifacts.ProxyReader
@@ -235,6 +236,10 @@ const deployUNSProxyReaderTask = {
     await ctx.saveContractConfig('ProxyReader', proxyReader);
     await proxyReader.deployTransaction.wait();
     await verify(ctx, proxyReader.address, [UNSRegistry.address, CNSRegistry.address]);
+
+    const mintingManager = ctx.artifacts.MintingManager.attach(MintingManager.address);
+
+    await mintingManager.connect(owner).addProxyReaders([proxyReader.address]);
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -242,10 +247,12 @@ const deployUNSProxyReaderTask = {
     const {
       CNSRegistry,
       UNSRegistry,
+      MintingManager,
     } = config.contracts || {};
     const dependencies = {
       CNSRegistry,
       UNSRegistry,
+      MintingManager,
     };
 
     for (const [key, value] of Object.entries(dependencies)) {
