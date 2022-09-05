@@ -1,3 +1,6 @@
+## vNext
+- Upgrade Hardhat to v2.11.0 post-Merge test
+
 ## v0.5.10
 - Add `MOBX` token to resolver list
 
