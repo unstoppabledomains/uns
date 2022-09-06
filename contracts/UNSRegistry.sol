@@ -29,13 +29,17 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.5.0';
+    string public constant VERSION = '0.5.1';
 
     string internal _prefix;
 
     address internal _mintingManager;
 
     mapping(address => uint256) internal _reverses;
+
+    mapping(address => bool) internal _proxyReaders;
+
+    mapping(uint256 => bool) internal _upgradedTokens;
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
@@ -343,8 +347,28 @@ contract UNSRegistry is
     /**
      * @dev See {IReverseRegistry-reverseOf}.
      */
-    function reverseOf(address addr) external view override returns (uint256) {
-        return _reverses[addr];
+    function reverseOf(address addr) external view override returns (uint256 reverse) {
+        uint256 tokenId = _reverses[addr];
+
+        if(!_isReadRestricted(tokenId)) {
+            reverse = tokenId;
+        }
+    }
+
+    /**
+     * @dev See {IUNSRegistry-addProxyReader(address)}.
+     */
+    function addProxyReader(address addr) external override onlyMintingManager {
+        _proxyReaders[addr] = true;
+    }
+
+    /**
+     * @dev See {IUNSRegistry-upgradeAll(uint256[])}.
+     */
+    function upgradeAll(uint256[] calldata tokenIds) external override onlyMintingManager {
+        for(uint i = 0; i < tokenIds.length; i++) {
+            _upgradedTokens[tokenIds[i]] = true;
+        }
     }
 
     /// Internal
@@ -401,14 +425,13 @@ contract UNSRegistry is
         return super._msgData();
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override {
-        super._beforeTokenTransfer(from, to, amount);
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
+        super._beforeTokenTransfer(from, to, tokenId);
 
-        if (_reverses[from] != 0) {
+        // This prevents the upgraded token from being burned or withdrawn from L2
+        require(!_upgradedTokens[tokenId] || to != address(0), 'Registry: TOKEN_UPGRADED');
+
+        if(_reverses[from] == tokenId) {
             _removeReverse(from);
         }
     }
@@ -429,6 +452,10 @@ contract UNSRegistry is
         emit RemoveReverse(addr);
     }
 
+    function _isReadRestricted(uint256 tokenId) internal override view returns (bool) {
+        return _upgradedTokens[tokenId] && _proxyReaders[_msgSender()];
+    }
+
     // Reserved storage space to allow for layout changes in the future.
-    uint256[49] private __gap;
+    uint256[47] private __gap;
 }

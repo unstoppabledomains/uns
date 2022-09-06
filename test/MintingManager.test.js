@@ -1,8 +1,7 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
-
-const { ZERO_ADDRESS, TLD } = require('./helpers/constants');
+const { ZERO_ADDRESS, DEAD_ADDRESS, TLD } = require('./helpers/constants');
 
 describe('MintingManager', () => {
   const DomainNamePrefix = 'uns-devtest-';
@@ -12,13 +11,16 @@ describe('MintingManager', () => {
     Resolver,
     MintingController,
     URIPrefixController,
-    MintingManager;
+    MintingManager,
+    ProxyReader;
+
   let unsRegistry,
     cnsRegistry,
     resolver,
     mintingController,
     uriPrefixController,
-    mintingManager;
+    mintingManager,
+    proxyReader;
   let signers, domainSuffix;
   let coinbase, receiver, developer, spender;
 
@@ -34,6 +36,7 @@ describe('MintingManager', () => {
       'URIPrefixController',
     );
     MintingManager = await ethers.getContractFactory('MintingManager');
+    ProxyReader = await ethers.getContractFactory('ProxyReader');
   });
 
   describe('Ownership', () => {
@@ -66,6 +69,97 @@ describe('MintingManager', () => {
     });
   });
 
+  describe('addProxyReaders', async () => {
+    let proxyReader2;
+
+    before(async () => {
+      [, , receiver, resolver] = signers;
+
+      unsRegistry = await UNSRegistry.deploy();
+      mintingManager = await MintingManager.deploy();
+      cnsRegistry = await CNSRegistry.deploy();
+
+      await unsRegistry.initialize(mintingManager.address);
+
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
+      await mintingManager.addMinter(coinbase.address);
+
+      proxyReader = await ProxyReader.deploy(unsRegistry.address, cnsRegistry.address);
+      proxyReader2 = await ProxyReader.deploy(unsRegistry.address, cnsRegistry.address);
+    });
+
+    it('adds ProxyReader addresses', async () => {
+      await mintingManager.mintSLD(receiver.address, TLD.CRYPTO, 'add-proxy-readers-test');
+      const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'add-proxy-readers-test');
+
+      await mintingManager.addProxyReaders([
+        proxyReader.address,
+        proxyReader2.address,
+      ]);
+
+      await mintingManager.upgradeAll([tokenId]);
+
+      await unsRegistry.connect(receiver).set('key', 'value', tokenId);
+
+      const [,, result] = await proxyReader.connect(receiver).callStatic.getData(['key'], tokenId);
+      const [,, result2] = await proxyReader2.callStatic.getData(['key'], tokenId);
+
+      expect(result).to.deep.equal(['']);
+      expect(result2).to.deep.equal(['']);
+    });
+
+    it('should revert if not owner', async () => {
+      await expect(
+        mintingManager.connect(signers[1]).addProxyReaders([proxyReader.address])
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
+  describe('upgradeAll', () => {
+    before(async () => {
+      [, , receiver, resolver] = signers;
+
+      unsRegistry = await UNSRegistry.deploy();
+      mintingManager = await MintingManager.deploy();
+      await unsRegistry.initialize(mintingManager.address);
+
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
+      await mintingManager.addMinter(coinbase.address);
+    });
+
+    it('should successfully mark tokens as upgraded', async () => {
+      await mintingManager.mintSLD(receiver.address, TLD.CRYPTO, 'upgrade-tokens-test');
+      const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'upgrade-tokens-test');
+
+      await mintingManager.upgradeAll([tokenId]);
+
+      expect(unsRegistry.connect(receiver).burn(tokenId)).to.be.revertedWith(
+        'Registry: TOKEN_UPGRADED',
+      );
+    });
+
+    it('should revert if not minter', async () => {
+      await mintingManager.mintSLD(receiver.address, TLD.CRYPTO, 'upgrade-tokens-test-2');
+      const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'upgrade-tokens-test-2');
+
+      await expect(
+        mintingManager.connect(signers[1]).upgradeAll([tokenId]),
+      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+    });
+  });
+
   describe('TLD management', () => {
     before(async () => {
       [, spender] = signers;
@@ -84,35 +178,69 @@ describe('MintingManager', () => {
       await mintingManager.addMinter(coinbase.address);
     });
 
-    it('should add new TLD', async () => {
-      const _tld = 'test';
-      const _hashname = namehash.hash(_tld);
+    describe('addTld', async () => {
+      it('should add new TLD', async () => {
+        const _tld = 'test';
+        const _hashname = namehash.hash(_tld);
 
-      await expect(mintingManager.addTld(_tld))
-        .to.emit(mintingManager, 'NewTld')
-        .withArgs(_hashname, _tld);
+        await expect(mintingManager.addTld(_tld))
+          .to.emit(mintingManager, 'NewTld')
+          .withArgs(_hashname, _tld);
 
-      await mintingManager.mintSLD(coinbase.address, _hashname, 'test-1');
+        await mintingManager.mintSLD(coinbase.address, _hashname, 'test-1');
 
-      const tokenId = await unsRegistry.childIdOf(_hashname, 'test-1');
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
-      expect(await unsRegistry.exists(_hashname)).to.be.equal(true);
+        const tokenId = await unsRegistry.childIdOf(_hashname, 'test-1');
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+        expect(await unsRegistry.exists(_hashname)).to.be.equal(true);
+      });
+
+      it('should revert adding TLD when non-owner', async () => {
+        const _tld = 'test1';
+
+        await expect(
+          mintingManager.connect(spender).addTld(_tld),
+        ).to.be.revertedWith('Ownable: caller is not the owner');
+      });
+
+      it('should have all supported tlds minted', async () => {
+        for (const key of Object.keys(TLD)) {
+          expect(await unsRegistry.ownerOf(TLD[key])).to.be.equal(DEAD_ADDRESS);
+        }
+      });
     });
 
-    it('should revert adding TLD when non-owner', async () => {
-      const _tld = 'test1';
+    describe('removeTld', async () => {
+      it('should be able to remove existing TLD', async () => {
+        const tld = 'test-removing-tld';
+        const hashname = namehash.hash(tld);
 
-      await expect(
-        mintingManager.connect(spender).addTld(_tld),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
-    });
+        await mintingManager.addTld(tld);
 
-    it('should have all supported tlds minted', async () => {
-      for (const key of Object.keys(TLD)) {
-        expect(await unsRegistry.ownerOf(TLD[key])).to.be.equal(
-          '0x000000000000000000000000000000000000dEaD',
-        );
-      }
+        await expect(mintingManager.removeTld(hashname))
+          .to.emit(mintingManager, 'RemoveTld')
+          .withArgs(hashname);
+
+        await expect(mintingManager.mintSLD(coinbase.address, hashname, 'sld-domain-qq'))
+          .to.be.revertedWith('MintingManager: TLD_NOT_REGISTERED');
+      });
+
+      it('should revert removing TLD when not registred', async () => {
+        const hashname = namehash.hash('test-removing-tld-not-existing');
+
+        await expect(mintingManager.removeTld(hashname))
+          .to.be.revertedWith('MintingManager: TLD_NOT_REGISTERED');
+      });
+
+      it('should revert removing TLD when non-owner', async () => {
+        const tld = 'test-removing-tld-when-not-owner';
+        const hashname = namehash.hash(tld);
+
+        await mintingManager.addTld(tld);
+
+        await expect(
+          mintingManager.connect(spender).removeTld(hashname),
+        ).to.be.revertedWith('Ownable: caller is not the owner');
+      });
     });
   });
 
