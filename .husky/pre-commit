@@ -6,5 +6,3 @@ yarn lint
 npx hardhat clean
 yarn compile
 git add artifacts/*
-
-yarn test
