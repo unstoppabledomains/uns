@@ -350,7 +350,7 @@ contract UNSRegistry is
     function reverseOf(address addr) external view override returns (uint256 reverse) {
         uint256 tokenId = _reverses[addr];
 
-        if(!_isReadRestricted(tokenId)) {
+        if (!_isReadRestricted(tokenId)) {
             reverse = tokenId;
         }
     }
@@ -366,7 +366,7 @@ contract UNSRegistry is
      * @dev See {IUNSRegistry-upgradeAll(uint256[])}.
      */
     function upgradeAll(uint256[] calldata tokenIds) external override onlyMintingManager {
-        for(uint i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             _upgradedTokens[tokenIds[i]] = true;
         }
     }
@@ -425,13 +425,17 @@ contract UNSRegistry is
         return super._msgData();
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override {
         super._beforeTokenTransfer(from, to, tokenId);
 
         // This prevents the upgraded token from being burned or withdrawn from L2
         require(!_upgradedTokens[tokenId] || to != address(0), 'Registry: TOKEN_UPGRADED');
 
-        if(_reverses[from] == tokenId) {
+        if (_reverses[from] == tokenId) {
             _removeReverse(from);
         }
     }
@@ -452,7 +456,7 @@ contract UNSRegistry is
         emit RemoveReverse(addr);
     }
 
-    function _isReadRestricted(uint256 tokenId) internal override view returns (bool) {
+    function _isReadRestricted(uint256 tokenId) internal view override returns (bool) {
         return _upgradedTokens[tokenId] && _proxyReaders[_msgSender()];
     }
 

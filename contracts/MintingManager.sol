@@ -73,19 +73,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         __Blocklist_init_unchained();
         __Pausable_init_unchained();
 
-        string[11] memory tlds = [
-            'crypto',
-            'wallet',
-            'x',
-            'nft',
-            'blockchain',
-            'bitcoin',
-            '888',
-            'dao',
-            'zil',
-            'polygon',
-            'unstoppable'
-        ];
+        string[11] memory tlds = ['crypto', 'wallet', 'x', 'nft', 'blockchain', 'bitcoin', '888', 'dao', 'zil', 'polygon', 'unstoppable'];
         for (uint256 i = 0; i < tlds.length; i++) {
             _addTld(tlds[i]);
         }
@@ -220,7 +208,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     function addProxyReaders(address[] calldata addrs) external onlyOwner {
-        for(uint256 i = 0; i < addrs.length; i++) {
+        for (uint256 i = 0; i < addrs.length; i++) {
             unsRegistry.addProxyReader(addrs[i]);
         }
     }

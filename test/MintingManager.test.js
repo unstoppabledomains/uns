@@ -116,7 +116,7 @@ describe('MintingManager', () => {
 
     it('should revert if not owner', async () => {
       await expect(
-        mintingManager.connect(signers[1]).addProxyReaders([proxyReader.address])
+        mintingManager.connect(signers[1]).addProxyReaders([proxyReader.address]),
       ).to.be.revertedWith('Ownable: caller is not the owner');
     });
   });
