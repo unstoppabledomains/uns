@@ -37,7 +37,7 @@ abstract contract ChildRegistry is ERC721Upgradeable, IChildRegistry {
             // deposit batch
             uint256[] memory tokenIds = abi.decode(depositData, (uint256[]));
             uint256 length = tokenIds.length;
-            for (uint256 i; i < length; i++) {
+            for (uint256 i = 0; i < length; i++) {
                 _mint(user, tokenIds[i]);
             }
         }
