@@ -54,7 +54,7 @@ abstract contract ChildRegistry is ERC721Upgradeable, IChildRegistry {
 
         // Iteratively burn ERC721 tokens, for performing
         // batch withdraw
-        for (uint256 i; i < length; i++) {
+        for (uint256 i = 0; i < length; i++) {
             uint256 tokenId = tokenIds[i];
 
             require(_msgSender() == ownerOf(tokenId), string(abi.encodePacked('Registry: INVALID_TOKEN_OWNER ', tokenId)));
