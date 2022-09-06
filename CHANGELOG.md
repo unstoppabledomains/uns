@@ -1,6 +1,7 @@
-## vNext
+## v0.5.11
 - Added ability to mark tokens as upgraded via MintingManager#upgradeAll
 - Fixed the case when domain transfer caused removing of reverse resolution for domain, which wasn't transfered
+- Added script to fetch on-chain token list
 
 ## v0.5.10
 - Add `MOBX` token to resolver list
