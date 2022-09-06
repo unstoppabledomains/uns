@@ -6,7 +6,7 @@
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "private": true,
   "scripts": {
-    "compile": "hardhat compile",
+    "compile": "hardhat compile --force",
     "compile:size": "env ENABLE_CONTRACT_SIZER=true yarn compile",
     "coverage": "hardhat coverage",
     "test": "yarn test:sol && yarn test:sandbox",
