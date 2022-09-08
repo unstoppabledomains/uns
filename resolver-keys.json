@@ -223,6 +223,11 @@
     },
     "crypto.XZC.address": {
       "deprecatedKeyName": "XZC",
+      "deprecated": true,
+      "validationRegex": "^[a-km-zA-HJ-NP-Z1-9]{34}$"
+    },
+    "crypto.FIRO.address": {
+      "deprecatedKeyName": "FIRO",
       "deprecated": false,
       "validationRegex": "^[a-km-zA-HJ-NP-Z1-9]{34}$"
     },
