@@ -1,3 +1,7 @@
+## v0.5.12
+- Upgrade UNSRegistry@0.5.1 on Goerli and Mumbai
+- Upgrade MintingManager@0.3.4 on Goerli and Mumbai
+
 ## v0.5.11
 - Added ability to mark tokens as upgraded via MintingManager#upgradeAll
 - Fixed the case when domain transfer caused removing of reverse resolution for domain, which wasn't transfered

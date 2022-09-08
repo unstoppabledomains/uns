@@ -1,5 +1,5 @@
 {
-    "version": "0.5.2",
+    "version": "0.5.3",
     "networks": {
         "1": {
             "contracts": {
@@ -106,7 +106,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x070e83FCed225184E67c86302493ffFCDB953f71",
-                    "implementation": "0xe42Cae86552020ABb3C4D9d212B43f0e33C381D7",
+                    "implementation": "0xF5e6e88d12fE21fbD53AA7579E0d722DDa749804",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ea",
                     "forwarder": "0x070e83FCed225184E67c86302493ffFCDB953f71"
@@ -119,7 +119,7 @@
                 },
                 "MintingManager": {
                     "address": "0x9ee42D3EB042e06F8Cd241890C4fA0d51e4DA345",
-                    "implementation": "0xFB11410f3067BB6Db61bC335f0de23bE87A1767e",
+                    "implementation": "0x926C1D3947947c2796D6dC6A1c6012280e6a29F4",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ec",
                     "forwarder": "0x7F9F48cF94C69ce91D4b442DA186F31118ac0185"
@@ -384,7 +384,7 @@
                     "address": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f43",
-                    "implementation": "0x267f251B85B2003B98645195D085021C5B6e928c",
+                    "implementation": "0xc7C84B247661ab766115E27a20BD39E324c81dBD",
                     "forwarder": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93"
                 },
                 "CNSRegistry": {
@@ -397,7 +397,7 @@
                     "address": "0x428189346bb3CC52f031A1092fd47C919AC30A9f",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f4a",
-                    "implementation": "0xCC17E698bA21bae4277579F22cA51135AaF00777",
+                    "implementation": "0x41F3B5e1dDCb7fF4578a71C8431dadE9be9B2CE4",
                     "forwarder": "0xEf3a491A8750BEC2Dff5339CF6Df94436d432C4d"
                 },
                 "ProxyAdmin": {
