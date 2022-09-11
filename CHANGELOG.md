@@ -1,3 +1,7 @@
+## v0.5.14
+
+- Add `FAB` token to resolver list
+
 ## v0.5.13
 
 - Add `FIRO` token to resolver list
