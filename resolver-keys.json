@@ -1,5 +1,5 @@
 {
-  "version": "2.1.9",
+  "version": "2.1.10",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2490,6 +2490,11 @@
       "deprecatedKeyName": "MOBX",
       "validationRegex": "^fetch[a-zA-Z0-9]{39}$",
       "deprecated": false
+    },
+    "crypto.FAB.address": {
+      "deprecatedKeyName": "FAB",
+      "deprecated": false,
+      "validationRegex": "^[a-zA-Z0-9]{34}$"
     }
   }
 }
