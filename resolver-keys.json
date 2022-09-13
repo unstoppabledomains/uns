@@ -1,5 +1,5 @@
 {
-  "version": "2.1.10",
+  "version": "2.1.11",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2169,6 +2169,16 @@
     "crypto.FET.address": {
       "deprecatedKeyName": "FET",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": true
+    },
+    "crypto.FET.version.ERC20.address": {
+      "deprecatedKeyName": "FET_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.FET.version.FETCHAI.address": {
+      "deprecatedKeyName": "FET_FETCHAI",
+      "validationRegex": "^fetch[a-zA-Z0-9]{39}$",
       "deprecated": false
     },
     "crypto.OXT.address": {

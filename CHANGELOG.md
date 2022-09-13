@@ -1,3 +1,7 @@
+## v0.5.15
+
+- Add `FET` as a multi-chain token to resolver list
+
 ## v0.5.14
 
 - Add `FAB` token to resolver list
