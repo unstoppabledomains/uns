@@ -1,4 +1,4 @@
-## v0.5.14
+## v0.5.15
 
 - Add `FET` as a multi-chain token to resolver list
 
