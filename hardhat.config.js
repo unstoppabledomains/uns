@@ -29,6 +29,7 @@ if (argv.enableContractSizer) {
   require('hardhat-contract-sizer');
 }
 
+
 task(
   TASK_COMPILE,
   'hook compile task to perform post-compile task',
@@ -154,6 +155,7 @@ module.exports = {
     alphaSort: true,
     runOnCompile: true,
     disambiguatePaths: false,
+    only: ['UNSRegistry.sol', 'ProxyReader.sol', 'MintingManager.sol'],
   },
   mocha: {
     timeout: 100000,

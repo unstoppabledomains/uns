@@ -1,4 +1,4 @@
-name: CI
+name: Contracts size
 
 on:
   push:
@@ -8,10 +8,13 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  test:
+  target-contracts-size:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 2
       - uses: actions/setup-node@v2
         with:
           node-version: 16.x
@@ -23,15 +26,15 @@ jobs:
           restore-keys: yarn-v2-
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true'
-      - run: yarn test
-        env:
-          FORCE_COLOR: 1
-          ENABLE_GAS_REPORT: true
-      - name: Print gas report
-        run: cat gas-report.txt
+      - run: yarn compile:size
+      - uses: actions/upload-artifact@v3
+        with:
+          name: hardhat-contract-sizer-output
+          path: cache/.hardhat_contract_sizer_output.json
 
-  coverage:
+  pr-contracts-size:
     runs-on: ubuntu-latest
+    needs: target-contracts-size
     steps:
       - uses: actions/checkout@v2
         with:
@@ -47,7 +50,11 @@ jobs:
           restore-keys: yarn-v2-
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true'
-      - run: yarn coverage
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
-      - uses: codecov/codecov-action@v1
+      - uses: actions/download-artifact@v3
+        with:
+          name: hardhat-contract-sizer-output
+          path: cache/
+      - uses: unstoppabledomains/solidity-sizer@aslobodian/REG-641
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          sizeCommand: yarn compile:size
