@@ -154,6 +154,7 @@ module.exports = {
     alphaSort: true,
     runOnCompile: true,
     disambiguatePaths: false,
+    only: ['UNSRegistry.sol', 'ProxyReader.sol', 'MintingManager.sol'],
   },
   mocha: {
     timeout: 100000,
