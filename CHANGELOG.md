@@ -1,3 +1,8 @@
+## v0.5.16
+
+- Upgrade UNSRegistry@0.5.1 on Mainnet and Polygon
+- Upgrade MintingManager@0.3.4 on Mainnet and Polygon
+
 ## v0.5.15
 
 - Add `FET` as a multi-chain token to resolver list

@@ -1,11 +1,11 @@
 {
-    "version": "0.5.3",
+    "version": "0.5.4",
     "networks": {
         "1": {
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x049aba7510f45BA5b64ea9E658E342F904DB358D",
-                    "implementation": "0xe09dC3724CD5B566D64Db4186FA8B4321071C28F",
+                    "implementation": "0x4ed485a33175b8329a6786D17C5aDf1583B14FFB",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xc2fede",
                     "forwarder": "0x049aba7510f45BA5b64ea9E658E342F904DB358D"
@@ -18,7 +18,7 @@
                 },
                 "MintingManager": {
                     "address": "0x2a7084870bB724175a3C96Da8FaA55128fa3E19D",
-                    "implementation": "0x8caAeaD19aab5f54C94BB9F4be32e200E54AC8D7",
+                    "implementation": "0x22655AdDDD2Ac3E3490aD40113F8dc653A9cfe4d",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xc2fee0",
                     "forwarder": "0xb970fbCF52cd8111c76c379D4f2FE12E7f8AE7fb"
@@ -201,7 +201,7 @@
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272eb5",
-                    "implementation": "0x24BaB5874f934e90c782b97e2Fe724B8762d0812",
+                    "implementation": "0xE96cE2F6546AF59b1ecC91d80fE887e0AAbc91B7",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
                 },
                 "CNSRegistry": {
@@ -214,7 +214,7 @@
                     "address": "0x7be83293BeeDc9Eba1bd76c66A65F10F3efaeC26",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272f41",
-                    "implementation": "0xBb45a6E10224Aa36EAcd812205F3763D353e9783",
+                    "implementation": "0x4726E4a6858eFff6A89A3A7Fc21048b4333825D6",
                     "forwarder": "0xC37d3c4326ab0E1D2b9D8b916bBdf5715f780fcF"
                 },
                 "ProxyAdmin": {
