@@ -4,7 +4,7 @@ const merge = require('lodash.merge');
 const { ZERO_ADDRESS } = require('../test/helpers/constants');
 const verify = require('./verify');
 
-const { utils } = ethers;
+const { utils, BigNumber } = ethers;
 
 const deployCNSTask = {
   tags: ['cns', 'full'],
@@ -566,6 +566,44 @@ const configurePolygonPosBridgeTask = {
   },
 };
 
+const configureDotCoinTask = {
+  tags: ['temp_configure_dotcoin'],
+  priority: 110,
+  run: async (ctx, { MintingManager, ProxyReader }) => {
+    const { owner } = ctx.accounts;
+
+    const mintingManager = await ctx.artifacts.MintingManager.attach(
+      MintingManager.address,
+    ).connect(owner);
+
+    // remove .coin tld
+    const coinTld = BigNumber.from(
+      '0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2',
+    );
+    await mintingManager.removeTld(coinTld);
+
+    // add all proxy readers
+    const proxyReaders = [ProxyReader.address, ...ProxyReader.legacyAddresses];
+    console.log('ProxyReaders', proxyReaders);
+    await mintingManager.addProxyReaders(proxyReaders);
+  },
+  ensureDependencies: (ctx, config) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { MintingManager, ProxyReader } = config.contracts || {};
+    const dependencies = { MintingManager, ProxyReader };
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(
+          `${key} contract not found for network ${network.config.chainId}`,
+        );
+      }
+    }
+
+    return dependencies;
+  },
+};
+
 module.exports = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -578,4 +616,5 @@ module.exports = [
   configureCnsMigrationTask,
   deployPolygonPosBridgeTask,
   configurePolygonPosBridgeTask,
+  configureDotCoinTask,
 ];
