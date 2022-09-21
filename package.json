@@ -54,7 +54,7 @@
     "ganache": "^7.0.0",
     "hardhat": "^2.9.2",
     "hardhat-abi-exporter": "^2.2.1",
-    "hardhat-contract-sizer": "^2.0.3",
+    "hardhat-contract-sizer": "^2.6.1",
     "hardhat-gas-reporter": "^1.0.4",
     "hdkey": "^2.0.1",
     "lodash.merge": "^4.6.2",
