@@ -80,6 +80,11 @@ contract UNSRegistry is
         emit NewURIPrefix(prefix);
     }
 
+    function dummySetTokenURIPrefix(string calldata prefix) external {
+        _prefix = prefix;
+        emit NewURIPrefix(prefix);
+    }
+
     /// Ownership
 
     function isApprovedOrOwner(address spender, uint256 tokenId) external view override returns (bool) {
