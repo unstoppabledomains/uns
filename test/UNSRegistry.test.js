@@ -153,25 +153,21 @@ describe('UNSRegistry', () => {
       let tokenId;
 
       beforeEach(async () => {
-        tokenId = await mintDomain(
-          unsRegistry,
-          coinbase.address,
-          TLD.CRYPTO,
-        );
+        tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
       });
 
       it('should burn the domain', async () => {
-        expect(await unsRegistry.exists(tokenId)).to.be.true;
+        expect(await unsRegistry.exists(tokenId)).to.be.equal(true);
 
         await unsRegistry.burn(tokenId);
 
-        expect(await unsRegistry.exists(tokenId)).to.be.false;
+        expect(await unsRegistry.exists(tokenId)).to.be.equal(false);
       });
 
       it('should revert if not owner', async () => {
-        await expect(unsRegistry.connect(signers[1]).burn(tokenId)).to.be.revertedWith(
-          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
-        );
+        await expect(
+          unsRegistry.connect(signers[1]).burn(tokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
       });
 
       it('should reset records on burn', async () => {
@@ -182,52 +178,79 @@ describe('UNSRegistry', () => {
           'token-to-burn',
         );
         await unsRegistry.set('key_31', 'value_23', tokenId);
-        expect(await unsRegistry.get('key_31', tokenId)).to.be.equal('value_23');
+        expect(await unsRegistry.get('key_31', tokenId)).to.be.equal(
+          'value_23',
+        );
 
         await expect(unsRegistry.burn(tokenId))
           .to.emit(unsRegistry, 'ResetRecords')
           .withArgs(tokenId);
         expect(await unsRegistry.get('key_31', tokenId)).to.be.equal('');
 
-        await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO, 'token-to-burn');
+        await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+          'token-to-burn',
+        );
         expect(await unsRegistry.get('key_31', tokenId)).to.be.equal('');
       });
 
       it('should revert if tokenId is upgraded', async () => {
         await unsRegistry.upgradeAll([tokenId]);
 
-        await expect(unsRegistry.burn(tokenId))
-          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
+        await expect(unsRegistry.burn(tokenId)).to.be.revertedWith(
+          'Registry: TOKEN_UPGRADED',
+        );
       });
     });
 
     describe('upgradeAll', async () => {
       it('should mark tokens as upgraded', async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
-        const tokenId2 = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
-        const tokenId3 = await mintDomain(unsRegistry, owner.address, TLD.CRYPTO);
+        const tokenId = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+        );
+        const tokenId2 = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+        );
+        const tokenId3 = await mintDomain(
+          unsRegistry,
+          owner.address,
+          TLD.CRYPTO,
+        );
 
-        const notMintedTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'not-existing-domain-upgrade-test');
+        const notMintedTokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'not-existing-domain-upgrade-test',
+        );
 
-        await unsRegistry.connect(coinbase).upgradeAll([
-          tokenId,
-          tokenId2,
-          tokenId3,
-          notMintedTokenId,
-        ]);
+        await unsRegistry
+          .connect(coinbase)
+          .upgradeAll([tokenId, tokenId2, tokenId3, notMintedTokenId]);
 
-        await expect(unsRegistry.burn(tokenId))
-          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
+        await expect(unsRegistry.burn(tokenId)).to.be.revertedWith(
+          'Registry: TOKEN_UPGRADED',
+        );
 
-        await expect(unsRegistry.burn(tokenId2))
-          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
+        await expect(unsRegistry.burn(tokenId2)).to.be.revertedWith(
+          'Registry: TOKEN_UPGRADED',
+        );
 
-        await expect(unsRegistry.connect(owner).burn(tokenId3))
-          .to.be.revertedWith('Registry: TOKEN_UPGRADED');
+        await expect(
+          unsRegistry.connect(owner).burn(tokenId3),
+        ).to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
 
       it('should not allow upgrading tokens if not minting manager', async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
+        const tokenId = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+        );
 
         await expect(
           unsRegistry.connect(signers[1]).upgradeAll([tokenId]),
@@ -605,11 +628,7 @@ describe('UNSRegistry', () => {
     let tokenId;
 
     beforeEach(async () => {
-      tokenId = await mintDomain(
-        unsRegistry,
-        coinbase.address,
-        TLD.CRYPTO,
-      );
+      tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
     });
 
     describe('setOwner', () => {
@@ -637,18 +656,26 @@ describe('UNSRegistry', () => {
 
       it('should not reset records on set owner', async () => {
         await unsRegistry.set('key_16', 'value_23', tokenId);
-        expect(await unsRegistry.get('key_16', tokenId)).to.be.equal('value_23');
+        expect(await unsRegistry.get('key_16', tokenId)).to.be.equal(
+          'value_23',
+        );
 
         await expect(unsRegistry.setOwner(owner.address, tokenId))
           .to.not.emit(unsRegistry, 'ResetRecords')
           .withArgs(tokenId);
-        expect(await unsRegistry.get('key_16', tokenId)).to.be.equal('value_23');
+        expect(await unsRegistry.get('key_16', tokenId)).to.be.equal(
+          'value_23',
+        );
       });
     });
 
     describe('transferFrom', () => {
       it('transfers domain correctly', async () => {
-        await unsRegistry.transferFrom(coinbase.address, owner.address, tokenId);
+        await unsRegistry.transferFrom(
+          coinbase.address,
+          owner.address,
+          tokenId,
+        );
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
@@ -656,18 +683,25 @@ describe('UNSRegistry', () => {
       it('transfers domain correctly even if token is upgraded', async () => {
         await unsRegistry.upgradeAll([tokenId]);
 
-        await unsRegistry.transferFrom(coinbase.address, owner.address, tokenId);
+        await unsRegistry.transferFrom(
+          coinbase.address,
+          owner.address,
+          tokenId,
+        );
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
       it('should reset records on transfer', async () => {
         await unsRegistry.set('key_23', 'value_23', tokenId);
-        expect(await unsRegistry.get('key_23', tokenId)).to.be.equal('value_23');
+        expect(await unsRegistry.get('key_23', tokenId)).to.be.equal(
+          'value_23',
+        );
 
         await expect(
           unsRegistry.transferFrom(coinbase.address, accounts[0], tokenId),
-        ).to.emit(unsRegistry, 'ResetRecords')
+        )
+          .to.emit(unsRegistry, 'ResetRecords')
           .withArgs(tokenId);
 
         expect(await unsRegistry.get('key_23', tokenId)).to.be.equal('');
@@ -677,7 +711,9 @@ describe('UNSRegistry', () => {
     describe('safeTransferFrom(address,address,uint256)', () => {
       it('transfers domain correctly', async () => {
         await unsRegistry['safeTransferFrom(address,address,uint256)'](
-          coinbase.address, owner.address, tokenId,
+          coinbase.address,
+          owner.address,
+          tokenId,
         );
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
@@ -687,7 +723,9 @@ describe('UNSRegistry', () => {
         await unsRegistry.upgradeAll([tokenId]);
 
         await unsRegistry['safeTransferFrom(address,address,uint256)'](
-          coinbase.address, owner.address, tokenId,
+          coinbase.address,
+          owner.address,
+          tokenId,
         );
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
@@ -695,7 +733,9 @@ describe('UNSRegistry', () => {
 
       it('should reset records on safe transfer', async () => {
         await unsRegistry.set('key_12', 'value_23', tokenId);
-        expect(await unsRegistry.get('key_12', tokenId)).to.be.equal('value_23');
+        expect(await unsRegistry.get('key_12', tokenId)).to.be.equal(
+          'value_23',
+        );
 
         await expect(
           unsRegistry['safeTransferFrom(address,address,uint256)'](
@@ -703,7 +743,8 @@ describe('UNSRegistry', () => {
             accounts[0],
             tokenId,
           ),
-        ).to.emit(unsRegistry, 'ResetRecords')
+        )
+          .to.emit(unsRegistry, 'ResetRecords')
           .withArgs(tokenId);
 
         expect(await unsRegistry.get('key_12', tokenId)).to.be.equal('');
@@ -713,7 +754,10 @@ describe('UNSRegistry', () => {
     describe('safeTransferFrom(address,address,uint256,bytes)', () => {
       it('transfers domain correctly', async () => {
         await unsRegistry['safeTransferFrom(address,address,uint256,bytes)'](
-          coinbase.address, owner.address, tokenId, '0x',
+          coinbase.address,
+          owner.address,
+          tokenId,
+          '0x',
         );
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
@@ -723,7 +767,10 @@ describe('UNSRegistry', () => {
         await unsRegistry.upgradeAll([tokenId]);
 
         await unsRegistry['safeTransferFrom(address,address,uint256,bytes)'](
-          coinbase.address, owner.address, tokenId, '0x',
+          coinbase.address,
+          owner.address,
+          tokenId,
+          '0x',
         );
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
@@ -731,7 +778,9 @@ describe('UNSRegistry', () => {
 
       it('should reset records on safe transfer with data', async () => {
         await unsRegistry.set('key_12', 'value_23', tokenId);
-        expect(await unsRegistry.get('key_12', tokenId)).to.be.equal('value_23');
+        expect(await unsRegistry.get('key_12', tokenId)).to.be.equal(
+          'value_23',
+        );
 
         await expect(
           unsRegistry['safeTransferFrom(address,address,uint256,bytes)'](
@@ -757,11 +806,7 @@ describe('UNSRegistry', () => {
     let tokenId;
 
     beforeEach(async () => {
-      tokenId = await mintDomain(
-        unsRegistry,
-        coinbase.address,
-        TLD.CRYPTO,
-      );
+      tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
     });
 
     describe('set & get', () => {
@@ -776,22 +821,26 @@ describe('UNSRegistry', () => {
 
         await unsRegistry.set('key', 'value', tokenId);
 
-        expect(await unsRegistry.connect(reader).get('key', tokenId)).to.equal('');
-        expect(await unsRegistry.connect(coinbase).get('key', tokenId)).to.equal('value');
+        expect(await unsRegistry.connect(reader).get('key', tokenId)).to.equal(
+          '',
+        );
+        expect(
+          await unsRegistry.connect(coinbase).get('key', tokenId),
+        ).to.equal('value');
       });
 
       it('should fail if not owner', async () => {
-        await expect(unsRegistry.connect(signers[1]).set('key', 'value', tokenId)).to.be.revertedWith(
-          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
-        );
+        await expect(
+          unsRegistry.connect(signers[1]).set('key', 'value', tokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
       });
 
       it('should fail if token is not minted', async () => {
         const tokenId = await unsRegistry.childIdOf(root, 'some_invalid_label');
 
-        await expect(unsRegistry.set('key', 'value', tokenId)).to.be.revertedWith(
-          'ERC721: invalid token ID',
-        );
+        await expect(
+          unsRegistry.set('key', 'value', tokenId),
+        ).to.be.revertedWith('ERC721: invalid token ID');
       });
 
       it('should emit NewKey event new keys added', async () => {
@@ -836,7 +885,14 @@ describe('UNSRegistry', () => {
             ['key1', 'key2', 'key3', 'key4', 'key5', 'key6'],
             tokenId,
           ),
-        ).to.be.eql(['value1', 'value2', 'value3', 'value4', 'value5', 'value6']);
+        ).to.be.eql([
+          'value1',
+          'value2',
+          'value3',
+          'value4',
+          'value5',
+          'value6',
+        ]);
       });
 
       it('should return empty values if token is upgraded and is being read from proxy reader', async () => {
@@ -853,20 +909,19 @@ describe('UNSRegistry', () => {
         ).to.deep.equal(['', '']);
 
         expect(
-          await unsRegistry.connect(coinbase).getMany(['key1', 'key2'], tokenId),
+          await unsRegistry
+            .connect(coinbase)
+            .getMany(['key1', 'key2'], tokenId),
         ).to.deep.equal(['value1', 'value2']);
       });
 
       it('should fail on setMany if not owner', async () => {
-        await expect(unsRegistry.connect(signers[1]).setMany(['key'], ['value'], tokenId)).to.be.revertedWith(
-          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
-        );
+        await expect(
+          unsRegistry.connect(signers[1]).setMany(['key'], ['value'], tokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
 
         expect(
-          await unsRegistry.connect(signers[1]).getMany(
-            ['key'],
-            tokenId,
-          ),
+          await unsRegistry.connect(signers[1]).getMany(['key'], tokenId),
         ).to.be.deep.equal(['']);
       });
     });
@@ -884,10 +939,7 @@ describe('UNSRegistry', () => {
           .withArgs(tokenId.toString());
 
         expect(
-          await unsRegistry.getMany(
-            ['key1', 'key2'],
-            tokenId,
-          ),
+          await unsRegistry.getMany(['key1', 'key2'], tokenId),
         ).to.be.deep.eql(['', '']);
       });
 
@@ -898,15 +950,12 @@ describe('UNSRegistry', () => {
           tokenId,
         );
 
-        await expect(unsRegistry.connect(signers[1]).reset(tokenId)).to.be.revertedWith(
-          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
-        );
+        await expect(
+          unsRegistry.connect(signers[1]).reset(tokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
 
         expect(
-          await unsRegistry.getMany(
-            ['key1', 'key2'],
-            tokenId,
-          ),
+          await unsRegistry.getMany(['key1', 'key2'], tokenId),
         ).to.be.deep.eql(['value1', 'value2']);
       });
     });
@@ -940,7 +989,9 @@ describe('UNSRegistry', () => {
         await unsRegistry.reconfigure(['new-key'], ['new-value'], tokenId);
 
         expect(await unsRegistry.get('old-key', tokenId)).to.be.equal('');
-        expect(await unsRegistry.get('new-key', tokenId)).to.be.eql('new-value');
+        expect(await unsRegistry.get('new-key', tokenId)).to.be.eql(
+          'new-value',
+        );
       });
 
       it('should fail when trying to reconfigure non-owned domain', async () => {
@@ -971,11 +1022,16 @@ describe('UNSRegistry', () => {
         await unsRegistry.upgradeAll([tokenId]);
 
         expect(
-          (await unsRegistry.connect(reader).getByHash(utils.id(key), tokenId)).value,
+          (await unsRegistry.connect(reader).getByHash(utils.id(key), tokenId))
+            .value,
         ).to.be.equal('');
 
         expect(
-          (await unsRegistry.connect(coinbase).getByHash(utils.id(key), tokenId)).value,
+          (
+            await unsRegistry
+              .connect(coinbase)
+              .getByHash(utils.id(key), tokenId)
+          ).value,
         ).to.be.equal(value);
       });
 
@@ -998,12 +1054,16 @@ describe('UNSRegistry', () => {
 
         const hashedKeys = keys.map((key) => BigNumber.from(utils.id(key)));
 
-        const [, resultingValues] = await unsRegistry.connect(reader).getManyByHash(hashedKeys, tokenId);
+        const [, resultingValues] = await unsRegistry
+          .connect(reader)
+          .getManyByHash(hashedKeys, tokenId);
 
         expect(resultingValues).to.be.deep.equal(['', '']);
 
         expect(
-          await unsRegistry.connect(coinbase).getManyByHash(hashedKeys, tokenId),
+          await unsRegistry
+            .connect(coinbase)
+            .getManyByHash(hashedKeys, tokenId),
         ).to.be.deep.equal([keys, values]);
       });
 
@@ -1074,7 +1134,11 @@ describe('UNSRegistry', () => {
       });
 
       it('should not consume additional gas if key hash was set before', async () => {
-        let newKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tokenId);
+        let newKeyHashTx = await unsRegistry.set(
+          'keyhash-gas',
+          'value',
+          tokenId,
+        );
         newKeyHashTx.receipt = await newKeyHashTx.wait();
         let exitsKeyHashTx = await unsRegistry.set(
           'keyhash-gas',

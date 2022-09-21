@@ -86,11 +86,7 @@ contract UNSRegistry is
         return _isApprovedOrOwner(spender, tokenId);
     }
 
-    function approve(address to, uint256 tokenId)
-        public
-        override(IERC721Upgradeable, ERC721Upgradeable)
-        protectTokenOperation(tokenId)
-    {
+    function approve(address to, uint256 tokenId) public override(IERC721Upgradeable, ERC721Upgradeable) protectTokenOperation(tokenId) {
         super.approve(to, tokenId);
     }
 
@@ -169,12 +165,7 @@ contract UNSRegistry is
 
     /// Transfering
 
-    function setOwner(address to, uint256 tokenId)
-        external
-        override
-        onlyApprovedOrOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
+    function setOwner(address to, uint256 tokenId) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _transfer(ownerOf(tokenId), to, tokenId);
     }
 
@@ -182,12 +173,7 @@ contract UNSRegistry is
         address from,
         address to,
         uint256 tokenId
-    )
-        public
-        override(IERC721Upgradeable, ERC721Upgradeable)
-        onlyApprovedOrOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
+    ) public override(IERC721Upgradeable, ERC721Upgradeable) onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _reset(tokenId);
         _transfer(from, to, tokenId);
     }
@@ -197,12 +183,7 @@ contract UNSRegistry is
         address to,
         uint256 tokenId,
         bytes memory data
-    )
-        public
-        override(IERC721Upgradeable, ERC721Upgradeable)
-        onlyApprovedOrOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
+    ) public override(IERC721Upgradeable, ERC721Upgradeable) onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
         _reset(tokenId);
         _safeTransfer(from, to, tokenId, data);
     }
@@ -211,11 +192,9 @@ contract UNSRegistry is
 
     // This is the keccak-256 hash of "uns.cns_registry" subtracted by 1
     bytes32 internal constant _CNS_REGISTRY_SLOT = 0x8ffb960699dc2ba88f34d0e41c029c3c36c95149679fe1d0153a9582bec92378;
+
     function setCNSRegistry(address registry) external override {
-        require(
-            StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value == address(0),
-            'Registry: CNS_REGISTRY_NOT_EMPTY'
-        );
+        require(StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value == address(0), 'Registry: CNS_REGISTRY_NOT_EMPTY');
         StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value = registry;
     }
 
@@ -225,9 +204,9 @@ contract UNSRegistry is
         uint256 tokenId,
         bytes calldata data
     ) external override returns (bytes4) {
-        if(_msgSender() == StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value) {
+        if (_msgSender() == StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value) {
             ICNSRegistry(_msgSender()).burn(tokenId);
-            if(data.length > 0 && abi.decode(data, (bool))) {
+            if (data.length > 0 && abi.decode(data, (bool))) {
                 _mint(address(this), tokenId);
                 _deposit(from, tokenId);
             } else {
@@ -334,19 +313,18 @@ contract UNSRegistry is
     /**
      * @dev See {RootRegistry-mint(address,uint256,bytes)}.
      */
-    function mint(address user, uint256 tokenId, bytes calldata) external override onlyPredicate {
+    function mint(
+        address user,
+        uint256 tokenId,
+        bytes calldata
+    ) external override onlyPredicate {
         _mint(user, tokenId);
     }
 
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721Upgradeable, IERC165Upgradeable)
-        returns (bool)
-    {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721Upgradeable, IERC165Upgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -372,7 +350,7 @@ contract UNSRegistry is
     function reverseOf(address addr) external view override returns (uint256 reverse) {
         uint256 tokenId = _reverses[addr];
 
-        if(!_isReadRestricted(tokenId)) {
+        if (!_isReadRestricted(tokenId)) {
             reverse = tokenId;
         }
     }
@@ -388,7 +366,7 @@ contract UNSRegistry is
      * @dev See {IUNSRegistry-upgradeAll(uint256[])}.
      */
     function upgradeAll(uint256[] calldata tokenIds) external override onlyMintingManager {
-        for(uint i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             _upgradedTokens[tokenIds[i]] = true;
         }
     }
@@ -447,13 +425,17 @@ contract UNSRegistry is
         return super._msgData();
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override {
         super._beforeTokenTransfer(from, to, tokenId);
 
         // This prevents the upgraded token from being burned or withdrawn from L2
         require(!_upgradedTokens[tokenId] || to != address(0), 'Registry: TOKEN_UPGRADED');
 
-        if(_reverses[from] == tokenId) {
+        if (_reverses[from] == tokenId) {
             _removeReverse(from);
         }
     }
@@ -464,7 +446,7 @@ contract UNSRegistry is
     }
 
     function _safeSetReverse(address addr, uint256 tokenId) internal {
-        if(address(0xdead) != addr && _reverses[addr] == 0) {
+        if (address(0xdead) != addr && _reverses[addr] == 0) {
             _setReverse(addr, tokenId);
         }
     }
@@ -474,7 +456,7 @@ contract UNSRegistry is
         emit RemoveReverse(addr);
     }
 
-    function _isReadRestricted(uint256 tokenId) internal override view returns (bool) {
+    function _isReadRestricted(uint256 tokenId) internal view override returns (bool) {
         return _upgradedTokens[tokenId] && _proxyReaders[_msgSender()];
     }
 

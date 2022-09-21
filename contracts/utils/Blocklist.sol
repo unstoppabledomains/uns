@@ -27,21 +27,21 @@ abstract contract Blocklist is Initializable, ContextUpgradeable {
     event BlocklistEnabled(address account);
 
     // This is the keccak-256 hash of "uns.blocklist." subtracted by 1
-    bytes32 internal constant _BLOCKLIST_PREFIX_SLOT =
-        0x1ec047073e2c8b15660901dbfdb6e3ff6365bd699dd9f95dcc6eab5448bebd69;
+    bytes32 internal constant _BLOCKLIST_PREFIX_SLOT = 0x1ec047073e2c8b15660901dbfdb6e3ff6365bd699dd9f95dcc6eab5448bebd69;
 
     // This is the keccak-256 hash of "uns.blocklist.disabled" subtracted by 1
-    bytes32 internal constant _BLOCKLIST_DISABLED_SLOT =
-        0xa85b8425a460dd344a297bd4a82e287385f0fc558cb3e78867b0489f43df2470;
+    bytes32 internal constant _BLOCKLIST_DISABLED_SLOT = 0xa85b8425a460dd344a297bd4a82e287385f0fc558cb3e78867b0489f43df2470;
 
     /**
      * @dev Initializes the blocklist in enabled state.
      */
+    // solhint-disable-next-line func-name-mixedcase
     function __Blocklist_init() internal onlyInitializing {
         __Context_init_unchained();
         __Blocklist_init_unchained();
     }
 
+    // solhint-disable-next-line func-name-mixedcase
     function __Blocklist_init_unchained() internal onlyInitializing {
         StorageSlotUpgradeable.getBooleanSlot(_BLOCKLIST_DISABLED_SLOT).value = false;
     }
@@ -88,9 +88,7 @@ abstract contract Blocklist is Initializable, ContextUpgradeable {
     }
 
     function _block(uint256 tokenId) internal whenEnabled {
-        StorageSlotUpgradeable
-            .getBooleanSlot(keccak256(abi.encodePacked(_BLOCKLIST_PREFIX_SLOT, tokenId)))
-            .value = true;
+        StorageSlotUpgradeable.getBooleanSlot(keccak256(abi.encodePacked(_BLOCKLIST_PREFIX_SLOT, tokenId))).value = true;
         emit Blocked(tokenId);
     }
 

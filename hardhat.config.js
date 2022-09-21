@@ -102,6 +102,7 @@ module.exports = {
     hardhat: {
       blockGasLimit: 10000000,
       initialBaseFeePerGas: 0,
+      hardfork: 'merge',
     },
     localhost: {
       url: 'http://localhost:8545',

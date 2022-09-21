@@ -18,7 +18,7 @@ import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.
 contract ERC1271SimpleWallet is IERC1271Upgradeable {
     using ECDSAUpgradeable for bytes32;
 
-    bytes4 constant internal _ERC1271_MAGIC_VALUE = bytes4(keccak256("isValidSignature(bytes32,bytes)"));
+    bytes4 internal constant _ERC1271_MAGIC_VALUE = bytes4(keccak256('isValidSignature(bytes32,bytes)'));
 
     address private _owner;
 
@@ -27,7 +27,7 @@ contract ERC1271SimpleWallet is IERC1271Upgradeable {
     }
 
     function isValidSignature(bytes32 _hash, bytes memory _signature) public view override returns (bytes4) {
-        if(_hash.recover(_signature) == _owner) {
+        if (_hash.recover(_signature) == _owner) {
             return _ERC1271_MAGIC_VALUE;
         } else {
             return 0;

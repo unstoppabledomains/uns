@@ -38,19 +38,19 @@ contract BaseRoutingForwarderMock is BaseRoutingForwarder {
         revert('mockFor');
     }
 
-    function putUint(uint) public pure {
+    function putUint(uint256) public pure {
         revert('mock');
     }
 
-    function putUintFor(uint, bytes calldata) public pure {
+    function putUintFor(uint256, bytes calldata) public pure {
         revert('mockFor');
     }
 
-    function putUintArr(uint[] calldata) public pure {
+    function putUintArr(uint256[] calldata) public pure {
         revert('mock');
     }
 
-    function putUintArrFor(uint[] calldata, bytes calldata) public pure {
+    function putUintArrFor(uint256[] calldata, bytes calldata) public pure {
         revert('mockFor');
     }
 
@@ -59,17 +59,17 @@ contract BaseRoutingForwarderMock is BaseRoutingForwarder {
         bytes memory data,
         bytes memory signature
     ) internal pure override returns (bytes memory) {
-        if(selector == bytes4(keccak256('transferFromFor(address,address,uint256,bytes)'))) {
+        if (selector == bytes4(keccak256('transferFromFor(address,address,uint256,bytes)'))) {
             (address p1, address p2, uint256 p3) = abi.decode(data, (address, address, uint256));
             return abi.encodeWithSelector(selector, p1, p2, p3, signature);
-        } else if(selector == bytes4(keccak256('putStringFor(string,bytes)'))) {
-            (string memory p1) = abi.decode(data, (string));
+        } else if (selector == bytes4(keccak256('putStringFor(string,bytes)'))) {
+            string memory p1 = abi.decode(data, (string));
             return abi.encodeWithSelector(selector, p1, signature);
-        } else if(selector == bytes4(keccak256('putUintFor(uint256,bytes)'))) {
-            (uint256 p1) = abi.decode(data, (uint256));
+        } else if (selector == bytes4(keccak256('putUintFor(uint256,bytes)'))) {
+            uint256 p1 = abi.decode(data, (uint256));
             return abi.encodeWithSelector(selector, p1, signature);
-        } else if(selector == bytes4(keccak256('putUintArrFor(uint256[],bytes)'))) {
-            (uint256[] memory p1) = abi.decode(data, (uint256[]));
+        } else if (selector == bytes4(keccak256('putUintArrFor(uint256[],bytes)'))) {
+            uint256[] memory p1 = abi.decode(data, (uint256[]));
             return abi.encodeWithSelector(selector, p1, signature);
         }
         return '';

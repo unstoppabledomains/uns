@@ -58,7 +58,7 @@ interface IUNSRegistry is
      * @dev Existence of token.
      * @param tokenId uint256 ID of the token
      */
-    function exists(uint256 tokenId) external override view returns (bool);
+    function exists(uint256 tokenId) external view override returns (bool);
 
     /**
      * @dev Transfer domain ownership without resetting domain records.

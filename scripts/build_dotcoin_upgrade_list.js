@@ -7,17 +7,14 @@ const fs = require('fs');
 const NEW_URI_EVENT_TOPIC = utils.id('NewURI(uint256,string)');
 
 const normalizeTokenId = (bigNumber) => {
-  return utils.hexZeroPad(
-    bigNumber.toHexString(),
-    32
-  ).toLowerCase()
-}
+  return utils.hexZeroPad(bigNumber.toHexString(), 32).toLowerCase();
+};
 
 const INITIAL_DB = {
   tokens: {},
   latestSyncedL1Block: 1,
   latestSyncedL2Block: 1,
-}
+};
 
 const SCOPED_NETWORK_CONFIG = {
   1: {
@@ -39,31 +36,37 @@ const SCOPED_NETWORK_CONFIG = {
     fetchLimit: 3499,
     isL2: true,
     stateFile: '5-80001-dotcoin-upgrade-uris.json',
-  }
-}
+  },
+};
 
-function getContractsConfig(chainId) {
+function getContractsConfig (chainId) {
   return {
-    ...UnsConfig.networks[chainId]?.contracts,
-    additionalConfiguration: SCOPED_NETWORK_CONFIG[chainId]
-  }
+    ...UnsConfig.networks[chainId].contracts,
+    additionalConfiguration: SCOPED_NETWORK_CONFIG[chainId],
+  };
 }
 
-async function fetchLogs(contract, topics, fromBlock, toBlock, limit) {
+async function fetchLogs (contract, topics, fromBlock, toBlock, limit) {
   const maxBlock = fromBlock + limit;
   const _toBlock = Math.min(maxBlock, toBlock);
 
-  console.log(`Fetching events blocks [${contract.address}: ${fromBlock}-${_toBlock}]`);
+  console.log(
+    `Fetching events blocks [${contract.address}: ${fromBlock}-${_toBlock}]`,
+  );
 
   try {
     const events = await contract.provider.getLogs({
       address: contract.address,
       topics,
       fromBlock,
-      toBlock: _toBlock
+      toBlock: _toBlock,
     });
 
-    return toBlock > maxBlock ? events.concat(await fetchLogs(contract, topics, _toBlock, toBlock, limit)) : events;
+    return toBlock > maxBlock
+      ? events.concat(
+        await fetchLogs(contract, topics, _toBlock, toBlock, limit),
+      )
+      : events;
   } catch (err) {
     console.log('FAIL', err);
 
@@ -76,31 +79,26 @@ async function fetchLogs(contract, topics, fromBlock, toBlock, limit) {
   }
 }
 
-function resolveStatePath(chainId) {
+function resolveStatePath (chainId) {
   return path.resolve('./.deployer/', SCOPED_NETWORK_CONFIG[chainId].stateFile);
 }
 
-function readState(chainId) {
+function readState (chainId) {
   try {
-    return JSON.parse(
-      fs.readFileSync(
-        resolveStatePath(chainId)
-      )
-    );
+    return JSON.parse(fs.readFileSync(resolveStatePath(chainId)));
   } catch (err) {
-    console.log(`Could not load current state for chainId: ${chainId}. Using initial`);
+    console.log(
+      `Could not load current state for chainId: ${chainId}. Using initial`,
+    );
     return INITIAL_DB;
   }
 }
 
-function saveState(chainId, state) {
-  fs.writeFileSync(
-    resolveStatePath(chainId),
-    JSON.stringify(state, null, 2)
-  );
+function saveState (chainId, state) {
+  fs.writeFileSync(resolveStatePath(chainId), JSON.stringify(state, null, 2));
 }
 
-async function main() {
+async function main () {
   const chainId = network.config.chainId;
 
   console.log('Network:', network.name + ' ChainID: ' + chainId);
@@ -116,14 +114,21 @@ async function main() {
   }
 
   const unsRegistryFactory = await ethers.getContractFactory('UNSRegistry');
-  const unsRegistryContract = unsRegistryFactory.attach(contractsConfig.UNSRegistry.address);
+  const unsRegistryContract = unsRegistryFactory.attach(
+    contractsConfig.UNSRegistry.address,
+  );
 
   const currentState = readState(network.config.chainId);
-  let newState = JSON.parse(JSON.stringify(currentState));
+  const newState = JSON.parse(JSON.stringify(currentState));
 
-  const latestSyncedBlock = contractsConfig.additionalConfiguration.isL1 ? currentState.latestSyncedL1Block : currentState.latestSyncedL2Block;
+  const latestSyncedBlock = contractsConfig.additionalConfiguration.isL1
+    ? currentState.latestSyncedL1Block
+    : currentState.latestSyncedL2Block;
 
-  const fromBlock = Math.max(latestSyncedBlock, parseInt(contractsConfig.UNSRegistry.deploymentBlock));
+  const fromBlock = Math.max(
+    latestSyncedBlock,
+    parseInt(contractsConfig.UNSRegistry.deploymentBlock),
+  );
   const toBlock = await unsRegistryContract.provider.getBlockNumber();
 
   console.log('Fetching events from ' + fromBlock + ' to ' + toBlock);
@@ -133,45 +138,47 @@ async function main() {
     [NEW_URI_EVENT_TOPIC],
     fromBlock,
     toBlock,
-    contractsConfig.additionalConfiguration.fetchLimit
+    contractsConfig.additionalConfiguration.fetchLimit,
   );
 
   console.log(`Logs fetched. Found ${result.length} logs. Processing...`);
-  
-  const parsedLogs = result.map(log => unsRegistryContract.interface.parseLog(log));
 
-  parsedLogs.forEach(({name, args}) => {
-    if(name !== 'NewURI') {
+  const parsedLogs = result.map((log) =>
+    unsRegistryContract.interface.parseLog(log),
+  );
+
+  parsedLogs.forEach(({ name, args }) => {
+    if (name !== 'NewURI') {
       return;
     }
 
-    const {uri, tokenId} = args;
+    const { uri, tokenId } = args;
 
-    if(!uri.endsWith('.coin')) {
+    if (!uri.endsWith('.coin')) {
       return;
     }
 
     newState.tokens[normalizeTokenId(tokenId)] = {
-      uri: uri
-    }
+      uri: uri,
+    };
   });
 
-  if(contractsConfig.additionalConfiguration.isL1) {
+  if (contractsConfig.additionalConfiguration.isL1) {
     newState.latestSyncedL1Block = toBlock;
-  } else if(contractsConfig.additionalConfiguration.isL2) {
+  } else if (contractsConfig.additionalConfiguration.isL2) {
     newState.latestSyncedL2Block = toBlock;
   }
 
   console.log('Logs processed. Writing... \n');
 
   saveState(network.config.chainId, newState);
-  
+
   console.log('Completed');
 }
 
 main()
   .then(() => process.exit(0))
-  .catch(err => {
+  .catch((err) => {
     console.log('ERR', err);
     process.exit(1);
   });

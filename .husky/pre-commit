@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+yarn lint
+
+npx hardhat clean
+yarn compile
+git add artifacts/*

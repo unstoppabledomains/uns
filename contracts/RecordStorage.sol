@@ -24,12 +24,7 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         }
     }
 
-    function getByHash(uint256 keyHash, uint256 tokenId)
-        external
-        view
-        override
-        returns (string memory key, string memory value)
-    {
+    function getByHash(uint256 keyHash, uint256 tokenId) external view override returns (string memory key, string memory value) {
         (key, value) = _getByHash(keyHash, tokenId);
     }
 
@@ -107,17 +102,13 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         return _get(uint256(keccak256(abi.encodePacked(key))), tokenId);
     }
 
-    function _getByHash(uint256 keyHash, uint256 tokenId)
-        private
-        view
-        returns (string memory key, string memory value)
-    {
+    function _getByHash(uint256 keyHash, uint256 tokenId) private view returns (string memory key, string memory value) {
         key = getKey(keyHash);
         value = _get(keyHash, tokenId);
     }
 
     function _get(uint256 keyHash, uint256 tokenId) private view returns (string memory) {
-        if(_isReadRestricted(tokenId)) {
+        if (_isReadRestricted(tokenId)) {
             return '';
         }
 
@@ -139,5 +130,5 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         emit Set(tokenId, key, value, key, value);
     }
 
-    function _isReadRestricted(uint256 tokenId) internal virtual view returns (bool);
+    function _isReadRestricted(uint256 tokenId) internal view virtual returns (bool);
 }

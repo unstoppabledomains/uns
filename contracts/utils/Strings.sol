@@ -5,8 +5,8 @@ pragma solidity ^0.8.0;
 
 library Strings {
     struct Slice {
-        uint _len;
-        uint _ptr;
+        uint256 _len;
+        uint256 _ptr;
     }
 
     /**
@@ -15,9 +15,11 @@ library Strings {
      * @return A newly allocated slice containing the entire string.
      */
     function toSlice(string memory self) internal pure returns (Slice memory) {
-        uint ptr;
+        uint256 ptr;
         /* solium-disable-next-line security/no-inline-assembly */
-        assembly { ptr := add(self, 0x20) }
+        assembly {
+            ptr := add(self, 0x20)
+        }
         return Slice(bytes(self).length, ptr);
     }
 
@@ -40,7 +42,11 @@ library Strings {
      * @param len The sub slice length.
      * @return The slice of the original slice.
      */
-    function slice(Slice memory self, uint index, uint len) internal pure returns (Slice memory) {
+    function slice(
+        Slice memory self,
+        uint256 index,
+        uint256 len
+    ) internal pure returns (Slice memory) {
         return Slice(len, self._ptr + index);
     }
 }
