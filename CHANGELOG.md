@@ -2,6 +2,10 @@
 
 - Upgrade Hardhat to v2.11.0 post-Merge test
 
+## v0.5.17
+
+- Add `BEAM` token to resolver list
+
 ## v0.5.16
 
 - Upgrade UNSRegistry@0.5.1 on Mainnet and Polygon
