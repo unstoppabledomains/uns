@@ -1,5 +1,5 @@
 {
-  "version": "2.1.11",
+  "version": "2.1.12",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2505,6 +2505,11 @@
       "deprecatedKeyName": "FAB",
       "deprecated": false,
       "validationRegex": "^[a-zA-Z0-9]{34}$"
+    },
+    "crypto.BEAM.address": {
+      "deprecatedKeyName": "BEAM",
+      "deprecated": false,
+      "validationRegex": null
     }
   }
 }
