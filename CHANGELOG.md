@@ -1,10 +1,7 @@
-## vNext
-
-- Upgrade Hardhat to v2.11.0 post-Merge test
-
 ## v0.5.17
 
 - Add `BEAM` token to resolver list
+- Upgrade Hardhat to v2.11.0 post-Merge test
 
 ## v0.5.16
 
