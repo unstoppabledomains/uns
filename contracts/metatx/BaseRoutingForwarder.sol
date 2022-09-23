@@ -36,7 +36,7 @@ abstract contract BaseRoutingForwarder is BaseForwarder {
         bytes memory signature
     ) internal view override returns (bytes memory) {
         bytes4 route = _getRoute(data);
-        require(route != 0, 'BaseRoutingForwarder: ROUTE_UNKNOWN');
+        require(route != 0, '30');
 
         bytes memory _data;
         assembly {

@@ -38,7 +38,7 @@ abstract contract BaseForwarder is IForwarder {
         // See https://ronan.eth.link/blog/ethereum-gas-dangers/
         assert(gasleft() > gas / 63);
 
-        return _verifyCallResult(success, returndata, 'BaseForwarder: CALL_FAILED');
+        return _verifyCallResult(success, returndata, '28');
     }
 
     function _invalidateNonce(

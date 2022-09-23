@@ -8,118 +8,127 @@ Author: Unstoppable Domains, Inc., 2021. All rights reserved.
 UNS Contracts are officially deployed to several different Ethereum and Polygon networks
 The contract addresses are distributed via a [UNS Config File](https://github.com/unstoppabledomains/uns/blob/main/uns-config.json) and always kept up to date.
 
-
 ## Specifications
 
 1. Implements ERC721
 
-    [ERC-721](https://eips.ethereum.org/EIPS/eip-721) Non-Fungible Token Standard
+   [ERC-721](https://eips.ethereum.org/EIPS/eip-721) Non-Fungible Token Standard
 
 2. Implements ERC165
 
-    [ERC-165](https://eips.ethereum.org/EIPS/eip-165) Standard Interface Detection
+   [ERC-165](https://eips.ethereum.org/EIPS/eip-165) Standard Interface Detection
 
 3. Implements IERC721Metadata
 
-    > IERC721Metadata is an extension of ERC-721. IERC721Metadata allows smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
+   > IERC721Metadata is an extension of ERC-721. IERC721Metadata allows smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
 
-    Ref: https://eips.ethereum.org/EIPS/eip-721
+   Ref: https://eips.ethereum.org/EIPS/eip-721
 
 4. Implements [IUNSRegistry](./contracts/IUNSRegistry.sol)
 
 5. Record Storage (aka Resolver)
 
-    Record Storage implements [IRecordStorage](./contracts/IRecordStorage.sol)
+   Record Storage implements [IRecordStorage](./contracts/IRecordStorage.sol)
 
 6. Support meta-transactions
 
-    [EIP-2771](https://eips.ethereum.org/EIPS/eip-2771): Secure Protocol for Native Meta Transactions
+   [EIP-2771](https://eips.ethereum.org/EIPS/eip-2771): Secure Protocol for Native Meta Transactions
 
-    ### Recipient:
+   ### Recipient:
 
-    In order to support `EIP-2771` recepient should implement `Context`.
+   In order to support `EIP-2771` recepient should implement `Context`.
 
-    ```solidity
-    interface Context {
-        function _msgSender() internal view returns (address);
-        function _msgData() internal view returns (bytes calldata);
-    }
-    ```
+   ```solidity
+   interface Context {
+     function _msgSender() internal view returns (address);
 
-    The implementation should allow replacement of `_msgSender` and `_msgData` in case of forwarding.
+     function _msgData() internal view returns (bytes calldata);
+   }
 
-    Implementation [ERC2771RegistryContext.sol](./contracts/metatx/ERC2771RegistryContext.sol)
+   ```
 
-    ### Forwarder:
+   The implementation should allow replacement of `_msgSender` and `_msgData` in case of forwarding.
 
-    ```solidity
-    struct ForwardRequest {
-        address from;
-        uint256 tokenId;
-        uint256 nonce;
-        bytes data;
-    }
+   Implementation [ERC2771RegistryContext.sol](./contracts/metatx/ERC2771RegistryContext.sol)
 
-    interface Forwarder {
-        /**
-         * @dev Return current token nonce
-         */
-        function nonceOf(uint256 tokenId) public view returns (uint256);
+   ### Forwarder:
 
-        /**
-         * @dev Verify signature against provided request
-         */
-        function verify(ForwardRequest calldata req, bytes calldata signature) public view returns (bool);
+   ```solidity
+   struct ForwardRequest {
+     address from;
+     uint256 tokenId;
+     uint256 nonce;
+     bytes data;
+   }
 
-        /**
-         * @dev Execute bytecode if signature is correct
-         */
-        function execute(ForwardRequest calldata req, bytes calldata signature) public returns (bool, bytes memory);
-    }
-    ```
+   interface Forwarder {
+     /**
+      * @dev Return current token nonce
+      */
+     function nonceOf(uint256 tokenId) public view returns (uint256);
 
-    Implementation [UNSRegistryForwarder.sol](./contracts/metatx/UNSRegistryForwarder.sol)
+     /**
+      * @dev Verify signature against provided request
+      */
+     function verify(ForwardRequest calldata req, bytes calldata signature)
+       public
+       view
+       returns (bool);
+
+     /**
+      * @dev Execute bytecode if signature is correct
+      */
+     function execute(ForwardRequest calldata req, bytes calldata signature)
+       public
+       returns (bool, bytes memory);
+   }
+
+   ```
+
+   Implementation [UNSRegistryForwarder.sol](./contracts/metatx/UNSRegistryForwarder.sol)
 
 7. Upgradability
 
-    > By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits significantly from the technology’s immutability, still a certain degree of mutability is needed for bug fixing and potential product improvements.
+   > By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits significantly from the technology’s immutability, still a certain degree of mutability is needed for bug fixing and potential product improvements.
 
-    Upgradability comes from two patterns:
-    1. Initializable
-        > Since a proxied contract can't have a constructor, it's common to move constructor logic to an
-        external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer
-        function so it can only be called once.
-    2. Context
-        > Provides information about the current execution context, including the
-        sender of the transaction and its data.
+   Upgradability comes from two patterns:
 
-    UNS uses [Transparent Proxy](https://blog.openzeppelin.com/the-transparent-proxy-pattern/) for upgradability.
+   1. Initializable
+      > Since a proxied contract can't have a constructor, it's common to move constructor logic to an
+      > external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer
+      > function so it can only be called once.
+   2. Context
+      > Provides information about the current execution context, including the
+      > sender of the transaction and its data.
 
-    Refs:
+   UNS uses [Transparent Proxy](https://blog.openzeppelin.com/the-transparent-proxy-pattern/) for upgradability.
 
-    - [IMPORTANT: Storage layout](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#modifying-your-contracts)
-    - [Writing Upgradeable Contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable)
-    - [UUPS Proxies: Tutorial (Solidity + JavaScript)](https://forum.openzeppelin.com/t/uups-proxies-tutorial-solidity-javascript/7786)
-    - [Transparent vs UUPS Proxies](https://docs.openzeppelin.com/contracts/4.x/api/proxy#transparent-vs-uups)
+   Refs:
+
+   - [IMPORTANT: Storage layout](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#modifying-your-contracts)
+   - [Writing Upgradeable Contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable)
+   - [UUPS Proxies: Tutorial (Solidity + JavaScript)](https://forum.openzeppelin.com/t/uups-proxies-tutorial-solidity-javascript/7786)
+   - [Transparent vs UUPS Proxies](https://docs.openzeppelin.com/contracts/4.x/api/proxy#transparent-vs-uups)
 
 8. TLD management
 
-    UNS TLD management is delegated to MintingManager contract.
+   UNS TLD management is delegated to MintingManager contract.
 
-    ```solidity
-    contract IMintingManager {
-        /**
-         * @dev Mapping TLD `hashname` to TLD label
-         *
-         * `hashname` = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(label)))))
-         */
-        mapping(uint256 => string) internal _tlds;
-    }
-    ```
+   ```solidity
+   contract IMintingManager {
+     /**
+      * @dev Mapping TLD `hashname` to TLD label
+      *
+      * `hashname` = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(label)))))
+      */
+     mapping(uint256 => string) internal _tlds;
+   }
+
+   ```
 
 9. Domain minting
 
-    **Unstoppable Domains, Inc.** reserves all rights of domains minting and defines rules of domain minting through MintingManager contract.
+   **Unstoppable Domains, Inc.** reserves all rights of domains minting and defines rules of domain minting through MintingManager contract.
 
 10. Roles model
 
@@ -139,12 +148,12 @@ The contract addresses are distributed via a [UNS Config File](https://github.co
 
 NOTE: All private keys should be in HEX format with `0x` prefix
 
-Network | Variables
---- | ---
-Mainnet | MAINNET_INFURA_KEY <br /> MAINNET_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
-Goerli | GOERLI_INFURA_KEY <br /> GOERLI_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
-Polygon | POLYGON_INFURA_KEY <br /> POLYGON_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY
-Mumbai | MUMBAI_INFURA_KEY <br /> MUMBAI_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY
+| Network | Variables                                                                    |
+| ------- | ---------------------------------------------------------------------------- |
+| Mainnet | MAINNET_INFURA_KEY <br /> MAINNET_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY   |
+| Goerli  | GOERLI_INFURA_KEY <br /> GOERLI_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY     |
+| Polygon | POLYGON_INFURA_KEY <br /> POLYGON_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY |
+| Mumbai  | MUMBAI_INFURA_KEY <br /> MUMBAI_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY   |
 
 <div id="backward-incompatibility"></div>
 
@@ -154,30 +163,31 @@ Note: List of changes which makes UNS and CNS backward incompatibile
 
 ### Events
 
-* `event Approved ApprovedForAll Transfer NewURI`
-  * Unchanged
-* `event Resolve(uint256 indexed tokenId, address indexed to)` 
-  * Removed
-  * UNS has a single resolver which is Registry, so one can assume that resolver is always set to registry address
-* `event Sync(address indexed resolver, uint256 indexed updateId, uint256 indexed tokenId)` 
-  * Removed
-  * There is no need for this event because there is only one resolver and changes can be tracked by `Set` event instead
-* `event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value)` 
-  * Moved from Resolver to Registry
-* `event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key)` 
-  * Moved from Resolver to Regisry
-* `event ResetRecords(uint256 indexed tokenId)` 
-  * Moved from Resolver to Registry
-  * Registry now fires this event when records are reset on transfer.
+- `event Approved ApprovedForAll Transfer NewURI`
+  - Unchanged
+- `event Resolve(uint256 indexed tokenId, address indexed to)`
+  - Removed
+  - UNS has a single resolver which is Registry, so one can assume that resolver is always set to registry address
+- `event Sync(address indexed resolver, uint256 indexed updateId, uint256 indexed tokenId)`
+  - Removed
+  - There is no need for this event because there is only one resolver and changes can be tracked by `Set` event instead
+- `event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value)`
+  - Moved from Resolver to Registry
+- `event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key)`
+  - Moved from Resolver to Regisry
+- `event ResetRecords(uint256 indexed tokenId)`
+  - Moved from Resolver to Registry
+  - Registry now fires this event when records are reset on transfer.
 
 ### Resolvers Removal
 
-* `function resolveTo(address to, uint256 tokenId) external {}` 
-  * Removed - UNS uses a single Resolver which is Registry itself.
-* `function resolverOf(uint256 tokenId)`
-  * Now always returns Regsitry address itself
+- `function resolveTo(address to, uint256 tokenId) external {}`
+  - Removed - UNS uses a single Resolver which is Registry itself.
+- `function resolverOf(uint256 tokenId)`
+  - Now always returns Regsitry address itself
 
 ---
+
 ## Sandbox
 
 [>> README](./sandbox/README.md)
@@ -221,9 +231,48 @@ yarn hardhat run --network <network> scripts/deploy.js
 Warning: In case of contracts' redeployment, make sure there is no deployment output file `.deployer/{chain_id}.json`
 
 ### Deploying UNS on L2(Polygon/Mumbai)
+
 ```
 yarn hardhat run --network mumbai scripts/deploy_UNS_only.js
 ```
 
 ## L2 Polygon
+
 There are configs networks [Mainnet](https://static.matic.network/network/mainnet/v1/index.json), [Testnet](https://static.matic.network/network/testnet/mumbai/index.json)
+
+## Errors
+
+1. Registry: SENDER_IS_NOT_APPROVED_OR_OWNER
+2. Registry: SENDER_IS_NOT_MINTING_MANAGER
+3. Registry: TOKEN_INVALID
+4. Registry: SENDER_IS_NOT_OWNER
+5. Registry: CNS_REGISTRY_NOT_EMPTY
+6. Registry: REVERSE_RECORD_IS_EMPTY
+7. Registry: LABEL_EMPTY
+8. Registry: TOKEN_UPGRADED
+9. Registry: INSUFFICIENT_PERMISSIONS
+10. Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY
+11. Registry: CHILD_CHAIN_MANEGER_NOT_EMPTY
+12. Registry: INVALID_TOKEN_OWNER
+13. Registry: EXCEEDS_BATCH_LIMIT
+
+18. RecordStorage: KEY_NOT_FOUND
+
+28. BaseForwarder: CALL_FAILED
+29. UNSRegistryForwarder: SIGNATURE_INVALID
+30. BaseRoutingForwarder: ROUTE_UNKNOWN
+31. MintingManagerForwarder: SIGNATURE_INVALID
+
+41. MintingManager: TLD_NOT_REGISTERED
+42. MintingManager: TOKEN_LABEL_PROHIBITED
+43. MintingManager: LABEL_EMPTY
+44. MintingManager: TOKEN_BLOCKED
+
+54. MinterRole: CALLER_IS_NOT_MINTER
+55. MinterRole: RECEIVER_IS_EMPTY
+
+65. Blocklist: DISABLED
+66. Blocklist: ENABLED
+
+76. Pausable: PAUSED
+77. Pausable: NOT_PAUSED

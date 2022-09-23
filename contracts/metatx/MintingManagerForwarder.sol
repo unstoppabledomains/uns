@@ -24,7 +24,7 @@ contract MintingManagerForwarder is BaseForwarder {
 
     function execute(ForwardRequest calldata req, bytes calldata signature) external override returns (bytes memory) {
         uint256 gas = gasleft();
-        require(verify(req, signature), 'MintingManagerForwarder: SIGNATURE_INVALID');
+        require(verify(req, signature), '31');
         return _execute(req.from, _mintingManager, req.tokenId, gas, req.data, signature);
     }
 

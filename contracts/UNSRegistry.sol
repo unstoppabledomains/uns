@@ -42,26 +42,21 @@ contract UNSRegistry is
     mapping(uint256 => bool) internal _upgradedTokens;
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
-        require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+        require(_isApprovedOrOwner(_msgSender(), tokenId), '1');
         _;
     }
 
     modifier onlyMintingManager() {
-        require(_msgSender() == _mintingManager, 'Registry: SENDER_IS_NOT_MINTING_MANAGER');
+        require(_msgSender() == _mintingManager, '2');
         _;
     }
 
     modifier protectTokenOperation(uint256 tokenId) {
         if (isTrustedForwarder(msg.sender)) {
-            require(tokenId == _msgToken(), 'Registry: TOKEN_INVALID');
+            require(tokenId == _msgToken(), '3');
         } else {
             _invalidateNonce(tokenId);
         }
-        _;
-    }
-
-    modifier onlyOwner(uint256 tokenId) {
-        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
         _;
     }
 
@@ -194,7 +189,7 @@ contract UNSRegistry is
     bytes32 internal constant _CNS_REGISTRY_SLOT = 0x8ffb960699dc2ba88f34d0e41c029c3c36c95149679fe1d0153a9582bec92378;
 
     function setCNSRegistry(address registry) external override {
-        require(StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value == address(0), 'Registry: CNS_REGISTRY_NOT_EMPTY');
+        require(StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value == address(0), '5');
         StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value = registry;
     }
 
@@ -299,7 +294,7 @@ contract UNSRegistry is
     ) external override {
         _withdraw(inputData);
 
-        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
+        require(ownerOf(tokenId) == _msgSender(), '4');
         _setMany(keys, values, tokenId);
     }
 
@@ -331,7 +326,8 @@ contract UNSRegistry is
     /**
      * @dev See {IReverseRegistry-setReverse}.
      */
-    function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
+    function setReverse(uint256 tokenId) external override protectTokenOperation(tokenId) {
+        require(ownerOf(tokenId) == _msgSender(), '4');
         _setReverse(_msgSender(), tokenId);
     }
 
@@ -340,7 +336,7 @@ contract UNSRegistry is
      */
     function removeReverse() external override {
         address sender = _msgSender();
-        require(_reverses[sender] != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
+        require(_reverses[sender] != 0, '6');
         _removeReverse(sender);
     }
 
@@ -374,7 +370,7 @@ contract UNSRegistry is
     /// Internal
 
     function _childId(uint256 tokenId, string memory label) internal pure returns (uint256) {
-        require(bytes(label).length != 0, 'Registry: LABEL_EMPTY');
+        require(bytes(label).length != 0, '7');
         return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
     }
 
@@ -433,7 +429,7 @@ contract UNSRegistry is
         super._beforeTokenTransfer(from, to, tokenId);
 
         // This prevents the upgraded token from being burned or withdrawn from L2
-        require(!_upgradedTokens[tokenId] || to != address(0), 'Registry: TOKEN_UPGRADED');
+        require(!_upgradedTokens[tokenId] || to != address(0), '8');
 
         if (_reverses[from] == tokenId) {
             _removeReverse(from);

@@ -44,13 +44,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
     modifier onlyAllowed(uint256 tld, string memory label) {
-        require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
+        require(_isTld(tld), '41');
         Strings.Slice memory _label = label.toSlice();
         if (_label._len > 10) {
-            require(
-                _label.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
-                'MintingManager: TOKEN_LABEL_PROHIBITED'
-            );
+            require(_label.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8, '42');
         }
         _;
     }
@@ -84,7 +81,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     function removeTld(uint256 tld) external override onlyOwner {
-        require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
+        require(_isTld(tld), '41');
 
         delete _tlds[tld];
         emit RemoveTld(tld);
@@ -290,7 +287,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     function _childId(uint256 tokenId, string memory label) internal pure returns (uint256) {
-        require(bytes(label).length != 0, 'MintingManager: LABEL_EMPTY');
+        require(bytes(label).length != 0, '43');
         return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
     }
 
@@ -312,7 +309,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function _beforeTokenMint(uint256 tokenId) private {
         if (!isBlocklistDisabled()) {
-            require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
+            require(isBlocked(tokenId) == false, '44');
             _block(tokenId);
         }
     }

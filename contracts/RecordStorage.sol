@@ -70,7 +70,7 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         string calldata value,
         uint256 tokenId
     ) internal {
-        require(_existsKey(keyHash), 'RecordStorage: KEY_NOT_FOUND');
+        require(_existsKey(keyHash), '18');
         _set(keyHash, getKey(keyHash), value, tokenId);
     }
 

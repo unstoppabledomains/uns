@@ -71,7 +71,7 @@ abstract contract Blocklist is Initializable, ContextUpgradeable {
      * - The blocklist must be enabled.
      */
     modifier whenEnabled() {
-        require(!isBlocklistDisabled(), 'Blocklist: DISABLED');
+        require(!isBlocklistDisabled(), '65');
         _;
     }
 
@@ -83,7 +83,7 @@ abstract contract Blocklist is Initializable, ContextUpgradeable {
      * - The blocklist must be disabled.
      */
     modifier whenDisabled() {
-        require(isBlocklistDisabled(), 'Blocklist: ENABLED');
+        require(isBlocklistDisabled(), '66');
         _;
     }
 

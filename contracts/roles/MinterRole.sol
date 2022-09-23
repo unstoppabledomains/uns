@@ -10,7 +10,7 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
     bytes32 public constant MINTER_ROLE = keccak256('MINTER_ROLE');
 
     modifier onlyMinter() {
-        require(isMinter(_msgSender()), 'MinterRole: CALLER_IS_NOT_MINTER');
+        require(isMinter(_msgSender()), '54');
         _;
     }
 
@@ -63,7 +63,7 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
      * Renounce minter account with funds' forwarding
      */
     function closeMinter(address payable receiver) external payable onlyMinter {
-        require(receiver != address(0x0), 'MinterRole: RECEIVER_IS_EMPTY');
+        require(receiver != address(0x0), '55');
 
         renounceMinter();
         receiver.transfer(msg.value);
@@ -73,7 +73,7 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
      * Replace minter account by new account with funds' forwarding
      */
     function rotateMinter(address payable receiver) external payable onlyMinter {
-        require(receiver != address(0x0), 'MinterRole: RECEIVER_IS_EMPTY');
+        require(receiver != address(0x0), '55');
 
         _addMinter(receiver);
         renounceMinter();

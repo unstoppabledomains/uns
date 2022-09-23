@@ -15,15 +15,12 @@ abstract contract RootRegistry is ERC721Upgradeable, IRootRegistry {
     bytes32 internal constant _ROOT_CHAIN_MANAGER_SLOT = 0xbe2bb46ac0377341a1ec5c3116d70fd5029d704bd46292e58f6265dd177ebafe;
 
     modifier onlyPredicate() {
-        require(_msgSender() == _getPredicate(), 'Registry: INSUFFICIENT_PERMISSIONS');
+        require(_msgSender() == _getPredicate(), '9');
         _;
     }
 
     function setRootChainManager(address rootChainManager) external override {
-        require(
-            StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value == address(0),
-            'Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY'
-        );
+        require(StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value == address(0), '10');
         StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value = rootChainManager;
     }
 

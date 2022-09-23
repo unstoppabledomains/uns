@@ -59,7 +59,7 @@ abstract contract Pausable is Initializable, ContextUpgradeable {
      * - The contract must not be paused.
      */
     modifier whenNotPaused() {
-        require(!paused(), 'Pausable: PAUSED');
+        require(!paused(), '76');
         _;
     }
 
@@ -71,7 +71,7 @@ abstract contract Pausable is Initializable, ContextUpgradeable {
      * - The contract must be paused.
      */
     modifier whenPaused() {
-        require(paused(), 'Pausable: NOT_PAUSED');
+        require(paused(), '77');
         _;
     }
 
