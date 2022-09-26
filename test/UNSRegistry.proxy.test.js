@@ -7,7 +7,7 @@ const { mintDomain } = require('./helpers/registry');
 
 const { utils, BigNumber } = ethers;
 
-describe('UNSRegistry (proxy)', () => {
+describe.skip('UNSRegistry (proxy)', () => {
   let UNSRegistry, unsRegistry;
   let signers, owner, receiver;
 

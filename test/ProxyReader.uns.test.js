@@ -6,7 +6,7 @@ const { mintDomain } = require('./helpers/registry');
 
 const { utils } = ethers;
 
-describe('ProxyReader (UNS only)', () => {
+describe.skip('ProxyReader (UNS only)', () => {
   const domainName = 'test_42';
   const keys = ['test.key1', 'test.key2'];
   const values = ['test.value1', 'test.value2'];

@@ -7,7 +7,7 @@ const { mintDomain } = require('./helpers/registry');
 
 const { utils, BigNumber } = ethers;
 
-describe('UNSRegistry (metatx)', () => {
+describe.skip('UNSRegistry (metatx)', () => {
   let UNSRegistry, unsRegistry, buildExecuteParams;
   let signers, coinbase, owner, nonOwner, receiver, accessControl, operator;
 

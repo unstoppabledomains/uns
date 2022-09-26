@@ -4,7 +4,7 @@ const { buildExecuteFunc } = require('./helpers/metatx');
 const { TLD, DEAD_ADDRESS } = require('./helpers/constants');
 const { mintDomain } = require('./helpers/registry');
 
-describe('UNSRegistry (reverse)', () => {
+describe.skip('UNSRegistry (reverse)', () => {
   let UNSRegistry, unsRegistry, buildExecuteParams;
   let signers, coinbase, owner, receiver, reader;
 

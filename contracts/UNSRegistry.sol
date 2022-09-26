@@ -41,6 +41,10 @@ contract UNSRegistry is
 
     mapping(uint256 => bool) internal _upgradedTokens;
 
+    uint256 public constant REVERSE_DELEGATE_ID = 1;
+    uint256 public constant FALLBACK_DELEGATE_ID = 100;
+    mapping(uint256 => address) internal _delegates;
+
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
         _;
@@ -332,6 +336,10 @@ contract UNSRegistry is
      * @dev See {IReverseRegistry-setReverse}.
      */
     function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
+        _functionDelegateCall(_delegates[REVERSE_DELEGATE_ID], _msgData());
+    }
+
+    function setReverseDirect(uint256 tokenId) external onlyOwner(tokenId) protectTokenOperation(tokenId) {
         _setReverse(_msgSender(), tokenId);
     }
 
@@ -339,6 +347,10 @@ contract UNSRegistry is
      * @dev See {IReverseRegistry-removeReverse}.
      */
     function removeReverse() external override {
+        _functionDelegateCall(_delegates[REVERSE_DELEGATE_ID], _msgData());
+    }
+
+    function removeReverseDirect() external {
         address sender = _msgSender();
         require(_reverses[sender] != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
         _removeReverse(sender);
@@ -369,6 +381,18 @@ contract UNSRegistry is
         for (uint256 i = 0; i < tokenIds.length; i++) {
             _upgradedTokens[tokenIds[i]] = true;
         }
+    }
+
+    function addReverseDelegate(address addr) external onlyMintingManager {
+        _delegates[REVERSE_DELEGATE_ID] = addr;
+    }
+
+    function addFallbackDelegate(address addr) external onlyMintingManager {
+        _delegates[FALLBACK_DELEGATE_ID] = addr;
+    }
+
+    fallback() external {
+        _functionDelegateCall(_delegates[FALLBACK_DELEGATE_ID], _msgData());
     }
 
     /// Internal
@@ -460,6 +484,12 @@ contract UNSRegistry is
         return _upgradedTokens[tokenId] && _proxyReaders[_msgSender()];
     }
 
+    function _functionDelegateCall(address target, bytes memory data) private returns (bytes memory) {
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, bytes memory returndata) = target.delegatecall(data);
+        return AddressUpgradeable.verifyCallResult(success, returndata, '111');
+    }
+
     // Reserved storage space to allow for layout changes in the future.
-    uint256[47] private __gap;
+    uint256[46] private __gap;
 }
