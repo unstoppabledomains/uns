@@ -1,4 +1,5 @@
 const { ethers } = require('hardhat');
+const { ZERO_ADDRESS, DEAD_ADDRESS } = require('./constants');
 
 const generateRandomLabel = () => 'domain-' + ethers.utils.hexlify(
   ethers.utils.randomBytes(16),
@@ -16,4 +17,15 @@ const mintDomain = async (registry, owner, tld, label = generateRandomLabel(), w
   return tokenId;
 };
 
-module.exports = { mintDomain };
+
+const mintTLD = async (registry, tld) => {
+  const tokenId = await registry.childIdOf(ZERO_ADDRESS, tld);
+  await registry['mint(address,uint256,string)'](
+    DEAD_ADDRESS,
+    tokenId,
+    tld,
+  );
+return tokenId;
+}
+
+module.exports = { mintTLD, mintDomain };

@@ -2,6 +2,7 @@ const { ethers } = require('hardhat');
 const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
 const { ZERO_ADDRESS, DEAD_ADDRESS, TLD } = require('./helpers/constants');
+const { mintTLD } = require('./helpers/registry');
 
 describe('MintingManager', () => {
   const DomainNamePrefix = 'uns-devtest-';
@@ -157,6 +158,99 @@ describe('MintingManager', () => {
       await expect(
         mintingManager.connect(signers[1]).upgradeAll([tokenId]),
       ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+    });
+  });
+
+  describe('burnTLDL1', async () => {
+    before(async () => {
+      [, spender] = signers;
+
+      unsRegistry = await UNSRegistry.deploy();
+      mintingManager = await MintingManager.deploy();
+      await unsRegistry.initialize(mintingManager.address);
+
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
+      await mintingManager.addMinter(coinbase.address);
+    });
+
+    it('should burn TLD tokens', async () => {
+      const burnl1Tld = 'burnl1';
+      await mintingManager.addTld(burnl1Tld)
+      const burnl1TldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, burnl1Tld);
+
+      const coinTld = 'coin';
+      await mintingManager.addTld(coinTld)
+      const coinTldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, coinTld);
+      await mintingManager.removeTld(coinTldTokenId)
+
+      expect(await unsRegistry.ownerOf(burnl1TldTokenId)).to.be.equal(DEAD_ADDRESS);
+      expect(await unsRegistry.ownerOf(coinTldTokenId)).to.be.equal(DEAD_ADDRESS);
+
+      await mintingManager.burnTLDL1([burnl1TldTokenId, coinTldTokenId]);
+
+      await expect(unsRegistry.ownerOf(burnl1TldTokenId)).to.be.revertedWith(
+        'ERC721: invalid token ID',
+      );
+      await expect(unsRegistry.ownerOf(coinTldTokenId)).to.be.revertedWith(
+        'ERC721: invalid token ID',
+      );
+    });
+
+    it('should not allow burn TLD tokens if not minter', async () => {
+      await expect(mintingManager.connect(signers[1]).burnTLDL1([TLD.CRYPTO])).to.be.revertedWith(
+        'MinterRole: CALLER_IS_NOT_MINTER',
+      );
+    });
+  });
+
+  describe('moveTLDOwnershipL2', async () => {
+    before(async () => {
+      [, spender] = signers;
+
+      unsRegistry = await UNSRegistry.deploy();
+      mintingManager = await MintingManager.deploy();
+      await unsRegistry.initialize(mintingManager.address);
+
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
+      await mintingManager.addMinter(coinbase.address);
+    });
+
+    it('should change TLD tokens ownership to minting manager', async () => {
+      const movel2Tld = 'movel2';
+      await mintingManager.addTld(movel2Tld)
+      const movel2TldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, movel2Tld);
+
+      const coinTld = 'coin';
+      await mintingManager.addTld(coinTld)
+      const coinTldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, coinTld);
+      await mintingManager.removeTld(coinTldTokenId)
+
+      expect(await unsRegistry.ownerOf(movel2TldTokenId)).to.be.equal(DEAD_ADDRESS);
+      expect(await unsRegistry.ownerOf(coinTldTokenId)).to.be.equal(DEAD_ADDRESS);
+
+      await mintingManager.moveTLDOwnershipL2([movel2TldTokenId, coinTldTokenId]);
+
+      expect(await unsRegistry.ownerOf(movel2TldTokenId)).to.be.equal(mintingManager.address);
+      expect(await unsRegistry.ownerOf(coinTldTokenId)).to.be.equal(mintingManager.address);
+    });
+    
+
+    it('should not allow change TLD tokens ownership if not minter', async () => {
+      await expect(mintingManager.connect(signers[1]).moveTLDOwnershipL2([TLD.CRYPTO])).to.be.revertedWith(
+        'MinterRole: CALLER_IS_NOT_MINTER',
+      );
     });
   });
 

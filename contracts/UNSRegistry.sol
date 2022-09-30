@@ -371,6 +371,22 @@ contract UNSRegistry is
         }
     }
 
+    /**
+     * @dev See {IUNSRegistry-burnTLDL1(uint256)}.
+     */
+    function burnTLDL1(uint256 tokenId) external override onlyMintingManager {
+        require(ownerOf(tokenId) == address(0xdead), 'Registry: OWNER_NOT_0xDEAD');
+        _burn(tokenId);
+    }
+
+    /**
+     * @dev See {IUNSRegistry-moveTLDOwnershipL2(uint256)}.
+     */
+    function moveTLDOwnershipL2(uint256 tokenId) external override onlyMintingManager {
+        require(ownerOf(tokenId) == address(0xdead), 'Registry: OWNER_NOT_0xDEAD');
+        _transfer(address(0xdead), _mintingManager, tokenId);
+    }
+
     /// Internal
 
     function _childId(uint256 tokenId, string memory label) internal pure returns (uint256) {
