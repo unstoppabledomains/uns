@@ -2527,7 +2527,7 @@
       "deprecated": false
     },
     "crypto.0ZK.version.0ZK.address": {
-      "deprecatedKeyName": "0ZK_MATIC",
+      "deprecatedKeyName": "0ZK_0ZK",
       "validationRegex": "(^0zk1)([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{52})([pr98ftd03n4hemal])(rv7j6fe3z53l)([ce6mua7l])([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{57})",
       "deprecated": false
     }
