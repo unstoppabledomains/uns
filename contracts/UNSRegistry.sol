@@ -13,6 +13,7 @@ import './RecordStorage.sol';
 import './RootRegistry.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
+import './libraries/ReverseLogic.sol';
 
 /**
  * @title UNSRegistry
@@ -332,6 +333,10 @@ contract UNSRegistry is
      * @dev See {IReverseRegistry-setReverse}.
      */
     function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
+        ReverseLogic.set(_reverses, _msgSender(), tokenId);
+    }
+
+    function setReverseDirect(uint256 tokenId) external onlyOwner(tokenId) protectTokenOperation(tokenId) {
         _setReverse(_msgSender(), tokenId);
     }
 
@@ -339,6 +344,10 @@ contract UNSRegistry is
      * @dev See {IReverseRegistry-removeReverse}.
      */
     function removeReverse() external override {
+        ReverseLogic.remove(_reverses, _msgSender());
+    }
+
+    function removeReverseDirect() external {
         address sender = _msgSender();
         require(_reverses[sender] != 0, 'Registry: REVERSE_RECORD_IS_EMPTY');
         _removeReverse(sender);
@@ -386,7 +395,7 @@ contract UNSRegistry is
         _mint(to, tokenId);
         emit NewURI(tokenId, uri);
         /// set reverse must be after emission of New URL event in order to keep events' order
-        _safeSetReverse(to, tokenId);
+        ReverseLogic.safeSet(_reverses, to, tokenId);
     }
 
     function _safeMint(
@@ -398,7 +407,7 @@ contract UNSRegistry is
         _safeMint(to, tokenId, data);
         emit NewURI(tokenId, uri);
         /// set reverse must be after emission of New URL event in order to keep events' order
-        _safeSetReverse(to, tokenId);
+        ReverseLogic.safeSet(_reverses, to, tokenId);
     }
 
     function _safeMintWithRecords(
@@ -436,19 +445,13 @@ contract UNSRegistry is
         require(!_upgradedTokens[tokenId] || to != address(0), 'Registry: TOKEN_UPGRADED');
 
         if (_reverses[from] == tokenId) {
-            _removeReverse(from);
+            ReverseLogic.remove(_reverses, from);
         }
     }
 
     function _setReverse(address addr, uint256 tokenId) internal {
         _reverses[addr] = tokenId;
         emit SetReverse(addr, tokenId);
-    }
-
-    function _safeSetReverse(address addr, uint256 tokenId) internal {
-        if (address(0xdead) != addr && _reverses[addr] == 0) {
-            _setReverse(addr, tokenId);
-        }
     }
 
     function _removeReverse(address addr) internal {
