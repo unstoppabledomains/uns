@@ -25,7 +25,7 @@ const mintTLD = async (registry, tld) => {
     tokenId,
     tld,
   );
-return tokenId;
+  return tokenId;
 }
 
 module.exports = { mintTLD, mintDomain };

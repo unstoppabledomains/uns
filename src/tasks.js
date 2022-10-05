@@ -635,7 +635,7 @@ const configureTldBurnTask = {
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    if (network.config.chainId !== 1) {
+    if (network.config.chainId !== 1 && network.config.chainId !== 5) {
       throw new Error('Current network configuration does not support burning TLD');
     }
 
@@ -680,7 +680,7 @@ const configureTldOwnershipTransferTask = {
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    if (network.config.chainId !== 137) {
+    if (network.config.chainId !== 137 && network.config.chainId !== 80001) {
       throw new Error('Current network configuration does not support moving TLD ownership');
     }
 
