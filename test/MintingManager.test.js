@@ -163,7 +163,7 @@ describe('MintingManager', () => {
 
   describe('burnTLDL1', async () => {
     before(async () => {
-      [, spender] = signers;
+      [owner, spender] = signers;
 
       unsRegistry = await UNSRegistry.deploy();
       mintingManager = await MintingManager.deploy();
@@ -202,9 +202,9 @@ describe('MintingManager', () => {
       );
     });
 
-    it('should not allow burn TLD tokens if not minter', async () => {
+    it('should not allow burn TLD tokens if not owner', async () => {
       await expect(mintingManager.connect(signers[1]).burnTLDL1([TLD.CRYPTO])).to.be.revertedWith(
-        'MinterRole: CALLER_IS_NOT_MINTER',
+        'Ownable: caller is not the owner',
       );
     });
   });
@@ -247,9 +247,9 @@ describe('MintingManager', () => {
     });
     
 
-    it('should not allow change TLD tokens ownership if not minter', async () => {
+    it('should not allow change TLD tokens ownership if not owner', async () => {
       await expect(mintingManager.connect(signers[1]).moveTLDOwnershipL2([TLD.CRYPTO])).to.be.revertedWith(
-        'MinterRole: CALLER_IS_NOT_MINTER',
+        'Ownable: caller is not the owner',
       );
     });
   });
