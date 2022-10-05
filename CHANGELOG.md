@@ -1,3 +1,7 @@
+## v0.5.18
+
+- Add `0ZK` token to resolver list
+
 ## v0.5.17
 
 - Add `BEAM` token to resolver list
