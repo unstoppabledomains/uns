@@ -1,3 +1,7 @@
+## v0.5.19
+- Added ability to burn TLD tokens via MintingManager#burnTLDL1
+- Added ability to move TLD tokens ownership to MintingManager via MintingManager#moveTLDOwnershipL2
+
 ## v0.5.18
 
 - Add `0ZK` token to resolver list
