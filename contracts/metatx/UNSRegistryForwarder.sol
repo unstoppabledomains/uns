@@ -6,6 +6,7 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 
 import './BaseForwarder.sol';
+import './../libraries/Errors.sol';
 
 abstract contract EIP712UpgradeableGap {
     /* solhint-disable var-name-mixedcase */
@@ -41,7 +42,7 @@ abstract contract UNSRegistryForwarder is Initializable, EIP712UpgradeableGap, B
 
     function execute(ForwardRequest calldata req, bytes calldata signature) public override returns (bytes memory) {
         uint256 gas = gasleft();
-        require(verify(req, signature), 'UNSRegistryForwarder: SIGNATURE_INVALID');
+        require(verify(req, signature), Errors.REFW_SIGNATURE_INVALID);
         return _execute(req.from, address(this), req.tokenId, gas, req.data, signature);
     }
 

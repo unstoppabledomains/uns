@@ -7,6 +7,8 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
+import './../libraries/Errors.sol';
+
 /**
  * @dev Contract module which allows children to implement an emergency stop
  * mechanism that can be triggered by an authorized account.
@@ -59,7 +61,7 @@ abstract contract Pausable is Initializable, ContextUpgradeable {
      * - The contract must not be paused.
      */
     modifier whenNotPaused() {
-        require(!paused(), 'Pausable: PAUSED');
+        require(!paused(), Errors.P_PAUSED);
         _;
     }
 
@@ -71,7 +73,7 @@ abstract contract Pausable is Initializable, ContextUpgradeable {
      * - The contract must be paused.
      */
     modifier whenPaused() {
-        require(paused(), 'Pausable: NOT_PAUSED');
+        require(paused(), Errors.P_NOT_PAUSED);
         _;
     }
 

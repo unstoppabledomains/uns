@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 
 import './IForwarder.sol';
 import './BaseForwarder.sol';
+import './../libraries/Errors.sol';
 
 contract MintingManagerForwarder is BaseForwarder {
     address private _mintingManager;
@@ -24,7 +25,7 @@ contract MintingManagerForwarder is BaseForwarder {
 
     function execute(ForwardRequest calldata req, bytes calldata signature) external override returns (bytes memory) {
         uint256 gas = gasleft();
-        require(verify(req, signature), 'MintingManagerForwarder: SIGNATURE_INVALID');
+        require(verify(req, signature), Errors.MMFW_SIGNATURE_INVALID);
         return _execute(req.from, _mintingManager, req.tokenId, gas, req.data, signature);
     }
 

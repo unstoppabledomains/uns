@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 
 import './IRecordStorage.sol';
 import './KeyStorage.sol';
+import './libraries/Errors.sol';
 
 abstract contract RecordStorage is KeyStorage, IRecordStorage {
     /// @dev mapping of presetIds to keyIds to values
@@ -70,7 +71,7 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         string calldata value,
         uint256 tokenId
     ) internal {
-        require(_existsKey(keyHash), 'RecordStorage: KEY_NOT_FOUND');
+        require(_existsKey(keyHash), Errors.RS_KEY_NOT_FOUND);
         _set(keyHash, getKey(keyHash), value, tokenId);
     }
 

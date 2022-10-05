@@ -9,20 +9,21 @@ import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 import './IRootRegistry.sol';
 import './@maticnetwork/IRootChainManager.sol';
 import './@maticnetwork/RootChainManagerStorage.sol';
+import './libraries/Errors.sol';
 
 abstract contract RootRegistry is ERC721Upgradeable, IRootRegistry {
     // This is the keccak-256 hash of "uns.polygon.root_chain_manager" subtracted by 1
     bytes32 internal constant _ROOT_CHAIN_MANAGER_SLOT = 0xbe2bb46ac0377341a1ec5c3116d70fd5029d704bd46292e58f6265dd177ebafe;
 
     modifier onlyPredicate() {
-        require(_msgSender() == _getPredicate(), 'Registry: INSUFFICIENT_PERMISSIONS');
+        require(_msgSender() == _getPredicate(), Errors.RE_INSUFFICIENT_PERMISSIONS);
         _;
     }
 
     function setRootChainManager(address rootChainManager) external override {
         require(
             StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value == address(0),
-            'Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY'
+            Errors.RE_ROOT_CHAIN_MANEGER_NOT_EMPTY
         );
         StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value = rootChainManager;
     }

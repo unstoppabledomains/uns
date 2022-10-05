@@ -1,0 +1,375 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Errors",
+  "sourceName": "contracts/libraries/Errors.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "BFW_CALL_FAILED",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "BL_DISABLED",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "BL_ENABLED",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MMFW_SIGNATURE_INVALID",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MM_LABEL_EMPTY",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MM_TLD_NOT_REGISTERED",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MM_TOKEN_BLOCKED",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MM_TOKEN_LABEL_PROHIBITED",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MR_CALLER_IS_NOT_MINTER",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MR_RECEIVER_IS_EMPTY",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "P_NOT_PAUSED",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "P_PAUSED",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "REFW_SIGNATURE_INVALID",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_CHILD_CHAIN_MANEGER_NOT_EMPTY",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_CNS_REGISTRY_NOT_EMPTY",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_EXCEEDS_BATCH_LIMIT",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_INSUFFICIENT_PERMISSIONS",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_INVALID_TOKEN_OWNER",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_LABEL_EMPTY",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_REVERSE_RECORD_IS_EMPTY",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_ROOT_CHAIN_MANEGER_NOT_EMPTY",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_SENDER_IS_NOT_APPROVED_OR_OWNER",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_SENDER_IS_NOT_MINTING_MANAGER",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_SENDER_IS_NOT_OWNER",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_TOKEN_INVALID",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RE_TOKEN_UPGRADED",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RFW_ROUTE_UNKNOWN",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RS_KEY_NOT_FOUND",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6105dc61003a600b82828239805160001a60731461002d57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600436106101ce5760003560e01c80635aa4e2ed11610103578063c497363f116100a1578063e7a7bbb71161007b578063e7a7bbb7146104fa578063eb060ddf1461051a578063eebcbf501461053a578063f70f96dd1461055b57600080fd5b8063c497363f14610498578063cc16eeec146104b8578063e3862711146104d957600080fd5b8063b7008cd9116100dd578063b7008cd914610414578063ba7a64ab14610435578063bc4464aa14610456578063c16072cc1461047757600080fd5b80635aa4e2ed146103b25780637e7efbea146103d2578063a741ea1c146103f357600080fd5b80632bf8b29c11610170578063428d50091161014a578063428d5009146103305780634887924e146103515780634bf07ac2146103715780635048a62e1461039257600080fd5b80632bf8b29c146102ce5780632d43bf44146102ee5780633b412fc01461030f57600080fd5b806307018e30116101ac57806307018e301461024b5780630fe432c91461026c5780631198621b1461028c5780631f03f59e146102ad57600080fd5b806303a1cb86146101d357806303b4be421461020a578063057b0d4f1461022b575b600080fd5b6101f460405180604001604052806002815260200161199b60f11b81525081565b604051610201919061057c565b60405180910390f35b6101f4604051806040016040528060028152602001610ccd60f21b81525081565b6101f4604051806040016040528060018152602001600760fb1b81525081565b6101f460405180604001604052806002815260200161343760f01b81525081565b6101f4604051806040016040528060018152602001600d60fa1b81525081565b6101f4604051806040016040528060028152602001611a1b60f11b81525081565b6101f460405180604001604052806002815260200161383160f01b81525081565b6101f4604051806040016040528060018152602001603160f81b81525081565b6101f460405180604001604052806002815260200161037360f41b81525081565b6101f460405180604001604052806002815260200161353960f01b81525081565b6101f460405180604001604052806002815260200161313360f01b81525081565b6101f4604051806040016040528060018152602001603760f81b81525081565b6101f460405180604001604052806002815260200161333360f01b81525081565b6101f4604051806040016040528060018152602001603560f81b81525081565b6101f4604051806040016040528060018152602001601960f91b81525081565b6101f460405180604001604052806002815260200161373160f01b81525081565b6101f460405180604001604052806002815260200161068760f31b81525081565b6101f460405180604001604052806002815260200161333560f01b81525081565b6101f460405180604001604052806002815260200161036360f41b81525081565b6101f460405180604001604052806002815260200161031360f41b81525081565b6101f460405180604001604052806002815260200161393160f01b81525081565b6101f4604051806040016040528060018152602001601b60f91b81525081565b6101f460405180604001604052806002815260200161343960f01b81525081565b6101f460405180604001604052806002815260200161323360f01b81525081565b6101f4604051806040016040528060018152602001603360f81b81525081565b6101f4604051806040016040528060018152602001603960f81b81525081565b6101f460405180604001604052806002815260200161189960f11b81525081565b6101f460405180604001604052806002815260200161313160f01b81525081565b6000602080835283518082850152825b818110156105a85785810183015185820160400152820161058c565b818111156105b95783604083870101525b50601f01601f191692909201604001939250505056fea164736f6c6343000804000a",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600436106101ce5760003560e01c80635aa4e2ed11610103578063c497363f116100a1578063e7a7bbb71161007b578063e7a7bbb7146104fa578063eb060ddf1461051a578063eebcbf501461053a578063f70f96dd1461055b57600080fd5b8063c497363f14610498578063cc16eeec146104b8578063e3862711146104d957600080fd5b8063b7008cd9116100dd578063b7008cd914610414578063ba7a64ab14610435578063bc4464aa14610456578063c16072cc1461047757600080fd5b80635aa4e2ed146103b25780637e7efbea146103d2578063a741ea1c146103f357600080fd5b80632bf8b29c11610170578063428d50091161014a578063428d5009146103305780634887924e146103515780634bf07ac2146103715780635048a62e1461039257600080fd5b80632bf8b29c146102ce5780632d43bf44146102ee5780633b412fc01461030f57600080fd5b806307018e30116101ac57806307018e301461024b5780630fe432c91461026c5780631198621b1461028c5780631f03f59e146102ad57600080fd5b806303a1cb86146101d357806303b4be421461020a578063057b0d4f1461022b575b600080fd5b6101f460405180604001604052806002815260200161199b60f11b81525081565b604051610201919061057c565b60405180910390f35b6101f4604051806040016040528060028152602001610ccd60f21b81525081565b6101f4604051806040016040528060018152602001600760fb1b81525081565b6101f460405180604001604052806002815260200161343760f01b81525081565b6101f4604051806040016040528060018152602001600d60fa1b81525081565b6101f4604051806040016040528060028152602001611a1b60f11b81525081565b6101f460405180604001604052806002815260200161383160f01b81525081565b6101f4604051806040016040528060018152602001603160f81b81525081565b6101f460405180604001604052806002815260200161037360f41b81525081565b6101f460405180604001604052806002815260200161353960f01b81525081565b6101f460405180604001604052806002815260200161313360f01b81525081565b6101f4604051806040016040528060018152602001603760f81b81525081565b6101f460405180604001604052806002815260200161333360f01b81525081565b6101f4604051806040016040528060018152602001603560f81b81525081565b6101f4604051806040016040528060018152602001601960f91b81525081565b6101f460405180604001604052806002815260200161373160f01b81525081565b6101f460405180604001604052806002815260200161068760f31b81525081565b6101f460405180604001604052806002815260200161333560f01b81525081565b6101f460405180604001604052806002815260200161036360f41b81525081565b6101f460405180604001604052806002815260200161031360f41b81525081565b6101f460405180604001604052806002815260200161393160f01b81525081565b6101f4604051806040016040528060018152602001601b60f91b81525081565b6101f460405180604001604052806002815260200161343960f01b81525081565b6101f460405180604001604052806002815260200161323360f01b81525081565b6101f4604051806040016040528060018152602001603360f81b81525081565b6101f4604051806040016040528060018152602001603960f81b81525081565b6101f460405180604001604052806002815260200161189960f11b81525081565b6101f460405180604001604052806002815260200161313160f01b81525081565b6000602080835283518082850152825b818110156105a85785810183015185820160400152820161058c565b818111156105b95783604083870101525b50601f01601f191692909201604001939250505056fea164736f6c6343000804000a",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

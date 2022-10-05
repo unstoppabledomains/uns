@@ -7,6 +7,7 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 
 import './IForwarder.sol';
 import './BaseForwarder.sol';
+import './../libraries/Errors.sol';
 
 /**
  * @title BaseRoutingForwarder
@@ -36,7 +37,7 @@ abstract contract BaseRoutingForwarder is BaseForwarder {
         bytes memory signature
     ) internal view override returns (bytes memory) {
         bytes4 route = _getRoute(data);
-        require(route != 0, 'BaseRoutingForwarder: ROUTE_UNKNOWN');
+        require(route != 0, Errors.RFW_ROUTE_UNKNOWN);
 
         bytes memory _data;
         assembly {

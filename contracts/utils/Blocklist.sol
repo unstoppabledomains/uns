@@ -7,6 +7,8 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
+import './../libraries/Errors.sol';
+
 /**
  * @dev Mechanism blocks tokens' minting
  */
@@ -71,7 +73,7 @@ abstract contract Blocklist is Initializable, ContextUpgradeable {
      * - The blocklist must be enabled.
      */
     modifier whenEnabled() {
-        require(!isBlocklistDisabled(), 'Blocklist: DISABLED');
+        require(!isBlocklistDisabled(), Errors.BL_DISABLED);
         _;
     }
 
@@ -83,7 +85,7 @@ abstract contract Blocklist is Initializable, ContextUpgradeable {
      * - The blocklist must be disabled.
      */
     modifier whenDisabled() {
-        require(isBlocklistDisabled(), 'Blocklist: ENABLED');
+        require(isBlocklistDisabled(), Errors.BL_ENABLED);
         _;
     }
 

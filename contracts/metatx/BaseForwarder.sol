@@ -7,6 +7,7 @@ import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol';
 
 import './IForwarder.sol';
+import './../libraries/Errors.sol';
 
 abstract contract BaseForwarder is IForwarder {
     using ECDSAUpgradeable for bytes32;
@@ -38,7 +39,7 @@ abstract contract BaseForwarder is IForwarder {
         // See https://ronan.eth.link/blog/ethereum-gas-dangers/
         assert(gasleft() > gas / 63);
 
-        return _verifyCallResult(success, returndata, 'BaseForwarder: CALL_FAILED');
+        return _verifyCallResult(success, returndata, Errors.BFW_CALL_FAILED);
     }
 
     function _invalidateNonce(

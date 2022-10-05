@@ -7,6 +7,7 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
 import './IChildRegistry.sol';
+import './libraries/Errors.sol';
 
 abstract contract ChildRegistry is ERC721Upgradeable, IChildRegistry {
     // limit batching of tokens due to gas limit restrictions
@@ -18,16 +19,13 @@ abstract contract ChildRegistry is ERC721Upgradeable, IChildRegistry {
     function setChildChainManager(address clientChainManager) external {
         require(
             StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value == address(0),
-            'Registry: CHILD_CHAIN_MANEGER_NOT_EMPTY'
+            Errors.RE_CHILD_CHAIN_MANEGER_NOT_EMPTY
         );
         StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value = clientChainManager;
     }
 
     function deposit(address user, bytes calldata depositData) external override {
-        require(
-            _msgSender() == StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value,
-            'Registry: INSUFFICIENT_PERMISSIONS'
-        );
+        require(_msgSender() == StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value, Errors.RE_INSUFFICIENT_PERMISSIONS);
 
         if (depositData.length == 32) {
             // deposit single
@@ -44,20 +42,20 @@ abstract contract ChildRegistry is ERC721Upgradeable, IChildRegistry {
     }
 
     function withdraw(uint256 tokenId) external override {
-        require(_msgSender() == ownerOf(tokenId), 'Registry: INVALID_TOKEN_OWNER');
+        require(_msgSender() == ownerOf(tokenId), Errors.RE_INVALID_TOKEN_OWNER);
         _burn(tokenId);
     }
 
     function withdrawBatch(uint256[] calldata tokenIds) external override {
         uint256 length = tokenIds.length;
-        require(length <= BATCH_LIMIT, 'Registry: EXCEEDS_BATCH_LIMIT');
+        require(length <= BATCH_LIMIT, Errors.RE_EXCEEDS_BATCH_LIMIT);
 
         // Iteratively burn ERC721 tokens, for performing
         // batch withdraw
         for (uint256 i = 0; i < length; i++) {
             uint256 tokenId = tokenIds[i];
 
-            require(_msgSender() == ownerOf(tokenId), string(abi.encodePacked('Registry: INVALID_TOKEN_OWNER ', tokenId)));
+            require(_msgSender() == ownerOf(tokenId), string(abi.encodePacked(Errors.RE_INVALID_TOKEN_OWNER, ' ', tokenId)));
             _burn(tokenId);
         }
 
@@ -68,7 +66,7 @@ abstract contract ChildRegistry is ERC721Upgradeable, IChildRegistry {
     }
 
     function withdrawWithMetadata(uint256 tokenId) external override {
-        require(_msgSender() == ownerOf(tokenId), 'Registry: INVALID_TOKEN_OWNER');
+        require(_msgSender() == ownerOf(tokenId), Errors.RE_INVALID_TOKEN_OWNER);
         _burn(tokenId);
     }
 }

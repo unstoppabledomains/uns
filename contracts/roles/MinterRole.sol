@@ -6,11 +6,13 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 
+import './../libraries/Errors.sol';
+
 abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
     bytes32 public constant MINTER_ROLE = keccak256('MINTER_ROLE');
 
     modifier onlyMinter() {
-        require(isMinter(_msgSender()), 'MinterRole: CALLER_IS_NOT_MINTER');
+        require(isMinter(_msgSender()), Errors.MR_CALLER_IS_NOT_MINTER);
         _;
     }
 
@@ -63,7 +65,7 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
      * Renounce minter account with funds' forwarding
      */
     function closeMinter(address payable receiver) external payable onlyMinter {
-        require(receiver != address(0x0), 'MinterRole: RECEIVER_IS_EMPTY');
+        require(receiver != address(0x0), Errors.MR_RECEIVER_IS_EMPTY);
 
         renounceMinter();
         receiver.transfer(msg.value);
@@ -73,7 +75,7 @@ abstract contract MinterRole is OwnableUpgradeable, AccessControlUpgradeable {
      * Replace minter account by new account with funds' forwarding
      */
     function rotateMinter(address payable receiver) external payable onlyMinter {
-        require(receiver != address(0x0), 'MinterRole: RECEIVER_IS_EMPTY');
+        require(receiver != address(0x0), Errors.MR_RECEIVER_IS_EMPTY);
 
         _addMinter(receiver);
         renounceMinter();
