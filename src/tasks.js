@@ -604,8 +604,8 @@ const configureDotCoinTask = {
   },
 };
 
-const configureTldBurnTask = {
-  tags: ['temp_configure_tld_burn'],
+const configureReconfigureTldL1Task = {
+  tags: ['temp_reconfigure_tld_l1'],
   priority: 115,
   run: async (ctx, { MintingManager }) => {
     const { owner } = ctx.accounts;
@@ -650,8 +650,8 @@ const configureTldBurnTask = {
   },
 }
 
-const configureTldOwnershipTransferTask = {
-  tags: ['temp_configure_tld_ownership_transfer'],
+const configureReconfigureTldL2Task = {
+  tags: ['temp_reconfigure_tld_l2'],
   priority: 120,
   run: async (ctx, { MintingManager }) => {
     const { owner } = ctx.accounts;
@@ -710,6 +710,6 @@ module.exports = [
   deployPolygonPosBridgeTask,
   configurePolygonPosBridgeTask,
   configureDotCoinTask,
-  configureTldBurnTask,
-  configureTldOwnershipTransferTask,
+  configureReconfigureTldL1Task,
+  configureReconfigureTldL2Task,
 ];
