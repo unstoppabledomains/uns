@@ -1,6 +1,6 @@
 const { ethers } = require('hardhat');
 
-const { ZERO_ADDRESS, TLD } = require('../helpers/constants');
+const { ZERO_ADDRESS } = require('../helpers/constants');
 const { buildExecuteFunc } = require('../helpers/metatx');
 
 describe('MintingManager (consumption)', () => {
@@ -53,23 +53,13 @@ describe('MintingManager (consumption)', () => {
     );
   });
 
-  describe('Mint consumprion', () => {
+  describe('Mint consumption', () => {
     const getCases = () => {
       return [
         {
-          func: 'mintSLD',
-          selector: 'mintSLD(address,uint256,string)',
-          params: [receiver.address, TLD.WALLET, 't1-w1-'],
-        },
-        {
-          func: 'safeMintSLD',
-          selector: 'safeMintSLD(address,uint256,string)',
-          params: [receiver.address, TLD.WALLET, 't1-m1-'],
-        },
-        {
-          func: 'safeMintSLD',
-          selector: 'safeMintSLD(address,uint256,string,bytes)',
-          params: [receiver.address, TLD.WALLET, 't1-y1-', '0x'],
+          func: 'issueWithRecords',
+          selector: 'issueWithRecords(address,string[],string[],string[])',
+          params: [receiver.address, ['t1-w1-', 'wallet'], [], []],
         },
       ];
     };
@@ -80,10 +70,10 @@ describe('MintingManager (consumption)', () => {
       const cases = getCases();
       for (let i = 0; i < cases.length; i++) {
         const { selector, params } = cases[i];
-        const [acc, root, token, ...rest] = params;
-        const executeParams = [acc, root, token + 'r', ...rest];
+        const [acc, labels, ...rest] = params;
+        const executeParams = [acc, [labels[0] + 'r', labels[1]], ...rest];
 
-        const tokenId = await unsRegistry.childIdOf(root, executeParams[2]);
+        const tokenId = await unsRegistry.namehash(labels);
         const { req, signature } = await buildExecuteParams(
           selector,
           executeParams,

@@ -6,11 +6,8 @@ const { expect } = require('chai');
 const UNSNetworkConfig = require('../uns-config.json');
 const Sandbox = require('.');
 
-const { BigNumber } = ethers;
-
 describe('Sandbox', async () => {
   const domainPrefix = 'sandbox';
-  const walletRoot = BigNumber.from('0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230');
 
   let UNSRegistry, MintingManager;
   let unsRegistry, mintingManager;
@@ -40,24 +37,22 @@ describe('Sandbox', async () => {
   });
 
   it('should mint a token', async () => {
-    const _domainName = `${domainPrefix}_wallet_0`;
+    const labels = [`${domainPrefix}_wallet_0`, 'wallet'];
 
-    const tx = await mintingManager.connect(minter)
-      .mintSLD(owner.address, walletRoot, _domainName);
+    const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], []);
     await tx.wait();
 
-    const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
+    const _walletTokenId = await unsRegistry.namehash(labels);
     expect(await unsRegistry.ownerOf(_walletTokenId)).to.be.eq(owner.address);
   });
 
   it('should mint same token as prev test', async () => {
-    const _domainName = `${domainPrefix}_wallet_0`;
+    const labels = [`${domainPrefix}_wallet_0`, 'wallet'];
 
-    const tx = await mintingManager.connect(minter)
-      .mintSLD(owner.address, walletRoot, _domainName);
+    const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], []);
     await tx.wait();
 
-    const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
+    const _walletTokenId = await unsRegistry.namehash(labels);
     expect(await unsRegistry.ownerOf(_walletTokenId)).to.be.eq(owner.address);
   });
 });

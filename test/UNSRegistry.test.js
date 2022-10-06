@@ -3,13 +3,13 @@ const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
 
 const { TLD, ZERO_ADDRESS, DEAD_ADDRESS } = require('./helpers/constants');
-const { mintTLD, mintDomain } = require('./helpers/registry');
+const { mintTLD, mintDomain, mintRandomDomain } = require('./helpers/registry');
 
 const { utils, BigNumber } = ethers;
 
 describe('UNSRegistry', () => {
-  let UNSRegistry, CNSRegistry, ERC721ReceiverMock;
-  let unsRegistry, cnsRegistry;
+  let UNSRegistry;
+  let unsRegistry;
   let signers, coinbase, owner, reader, receiver, accounts;
 
   const root = TLD.CRYPTO;
@@ -20,16 +20,12 @@ describe('UNSRegistry', () => {
     [, ...accounts] = signers.map((s) => s.address);
 
     UNSRegistry = await ethers.getContractFactory('UNSRegistry');
-    CNSRegistry = await ethers.getContractFactory('CNSRegistry');
-    ERC721ReceiverMock = await ethers.getContractFactory('ERC721ReceiverMock');
 
     unsRegistry = await UNSRegistry.deploy();
     await unsRegistry.initialize(coinbase.address);
     await mintTLD(unsRegistry, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
     await unsRegistry.addProxyReader(reader.address);
-
-    cnsRegistry = await CNSRegistry.deploy();
   });
 
   describe('General', () => {
@@ -38,12 +34,7 @@ describe('UNSRegistry', () => {
     });
 
     it('should resolve properly', async () => {
-      const tokenId = await mintDomain(
-        unsRegistry,
-        coinbase.address,
-        TLD.CRYPTO,
-        'resolution',
-      );
+      const tokenId = await mintDomain(unsRegistry, coinbase.address, ['resolution', 'crypto']);
       expect(await unsRegistry.resolverOf(tokenId)).to.be.equal(
         unsRegistry.address,
       );
@@ -51,7 +42,7 @@ describe('UNSRegistry', () => {
       await unsRegistry.burn(tokenId);
       expect(await unsRegistry.resolverOf(tokenId)).to.be.equal(ZERO_ADDRESS);
 
-      await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO, 'resolution');
+      await mintDomain(unsRegistry, coinbase.address, ['resolution', 'crypto']);
       expect(await unsRegistry.resolverOf(tokenId)).to.be.equal(
         unsRegistry.address,
       );
@@ -68,10 +59,10 @@ describe('UNSRegistry', () => {
     });
 
     it('should emit Transfer event on set owner', async () => {
-      const tokenId = await mintDomain(
+      const tokenId = await mintRandomDomain(
         unsRegistry,
         coinbase.address,
-        TLD.CRYPTO,
+        'crypto',
       );
       await unsRegistry.set('key_82', 'value_23', tokenId);
       expect(await unsRegistry.get('key_82', tokenId)).to.be.equal('value_23');
@@ -82,14 +73,14 @@ describe('UNSRegistry', () => {
       expect(await unsRegistry.get('key_82', tokenId)).to.be.equal('value_23');
     });
 
-    describe('childIdOf', () => {
-      it('should return valid childId', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, '12ew3');
+    describe('namehash', () => {
+      it('should return valid namehash', async () => {
+        const tokenId = await unsRegistry.namehash(['12ew3', 'crypto']);
         expect(tokenId).to.be.equal(namehash.hash('12ew3.crypto'));
       });
 
       it('should revert when childId lable is empty', async () => {
-        await expect(unsRegistry.childIdOf(root, '')).to.be.revertedWith(
+        await expect(unsRegistry.namehash(['', 'crypto'])).to.be.revertedWith(
           'Registry: LABEL_EMPTY',
         );
       });
@@ -97,19 +88,16 @@ describe('UNSRegistry', () => {
 
     describe('exists', () => {
       it('should return true when token exists', async () => {
-        const tokenId = await mintDomain(
+        const tokenId = await mintRandomDomain(
           unsRegistry,
           coinbase.address,
-          TLD.CRYPTO,
+          'crypto',
         );
         expect(await unsRegistry.exists(tokenId)).to.be.equal(true);
       });
 
       it('should return false when token exists', async () => {
-        const tok = await unsRegistry.childIdOf(
-          root,
-          'token_doesnt_exists_1094u',
-        );
+        const tok = await unsRegistry.namehash(['token_doesnt_exists_1094u', 'crypto']);
         expect(await unsRegistry.exists(tok)).to.be.equal(false);
       });
     });
@@ -149,7 +137,7 @@ describe('UNSRegistry', () => {
       let tokenId;
 
       beforeEach(async () => {
-        tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
+        tokenId = await mintRandomDomain(unsRegistry, coinbase.address, 'crypto');
       });
 
       it('should burn the domain', async () => {
@@ -167,12 +155,7 @@ describe('UNSRegistry', () => {
       });
 
       it('should reset records on burn', async () => {
-        const tokenId = await mintDomain(
-          unsRegistry,
-          coinbase.address,
-          TLD.CRYPTO,
-          'token-to-burn',
-        );
+        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['token-to-burn', 'crypto']);
         await unsRegistry.set('key_31', 'value_23', tokenId);
         expect(await unsRegistry.get('key_31', tokenId)).to.be.equal(
           'value_23',
@@ -183,12 +166,7 @@ describe('UNSRegistry', () => {
           .withArgs(tokenId);
         expect(await unsRegistry.get('key_31', tokenId)).to.be.equal('');
 
-        await mintDomain(
-          unsRegistry,
-          coinbase.address,
-          TLD.CRYPTO,
-          'token-to-burn',
-        );
+        await mintDomain(unsRegistry, coinbase.address, ['token-to-burn', 'crypto']);
         expect(await unsRegistry.get('key_31', tokenId)).to.be.equal('');
       });
 
@@ -203,26 +181,23 @@ describe('UNSRegistry', () => {
 
     describe('upgradeAll', async () => {
       it('should mark tokens as upgraded', async () => {
-        const tokenId = await mintDomain(
+        const tokenId = await mintRandomDomain(
           unsRegistry,
           coinbase.address,
-          TLD.CRYPTO,
+          'crypto',
         );
-        const tokenId2 = await mintDomain(
+        const tokenId2 = await mintRandomDomain(
           unsRegistry,
           coinbase.address,
-          TLD.CRYPTO,
+          'crypto',
         );
-        const tokenId3 = await mintDomain(
+        const tokenId3 = await mintRandomDomain(
           unsRegistry,
           owner.address,
-          TLD.CRYPTO,
+          'crypto',
         );
 
-        const notMintedTokenId = await unsRegistry.childIdOf(
-          TLD.CRYPTO,
-          'not-existing-domain-upgrade-test',
-        );
+        const notMintedTokenId = await unsRegistry.namehash(['not-existing-domain-upgrade-test', 'crypto']);
 
         await unsRegistry
           .connect(coinbase)
@@ -242,10 +217,10 @@ describe('UNSRegistry', () => {
       });
 
       it('should not allow upgrading tokens if not minting manager', async () => {
-        const tokenId = await mintDomain(
+        const tokenId = await mintRandomDomain(
           unsRegistry,
           coinbase.address,
-          TLD.CRYPTO,
+          'crypto',
         );
 
         await expect(
@@ -315,223 +290,18 @@ describe('UNSRegistry', () => {
   });
 
   describe('Registry (minting)', () => {
-    describe('mint(address,uint256,string)', async () => {
-      const selector = 'mint(address,uint256,string)';
-
-      it('should mint domains', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_22');
-
-        await unsRegistry.functions[selector](
-          coinbase.address,
-          tokenId,
-          'label_22.crypto',
-        );
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-
-        // should fail to mint existing token
-        await expect(
-          unsRegistry.callStatic[selector](
-            coinbase.address,
-            tokenId,
-            'label_22',
-          ),
-        ).to.be.revertedWith('ERC721: token already minted');
-        await expect(
-          unsRegistry.callStatic[selector](accounts[0], tokenId, 'label_22'),
-        ).to.be.revertedWith('ERC721: token already minted');
-
-        // should be able to mint burned domain
-        await unsRegistry.burn(tokenId);
-        await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO, 'label_22');
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-      });
-
-      it('should produce NewURI event', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_23');
-
-        await expect(
-          unsRegistry.functions[selector](
-            coinbase.address,
-            tokenId,
-            'label_23.crypto',
-          ),
-        )
-          .to.emit(unsRegistry, 'NewURI')
-          .withArgs(tokenId, 'label_23.crypto');
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-      });
-    });
-
-    describe('safeMint(address,uint256,string)', async () => {
-      const selector = 'safeMint(address,uint256,string)';
-
-      it('should safely mint domains', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, 'label_93');
-        await unsRegistry.functions[selector](
-          coinbase.address,
-          tokenId,
-          'label_93',
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-
-        // should fail to safely mint existing token contract
-        await expect(
-          unsRegistry.callStatic[selector](
-            coinbase.address,
-            tokenId,
-            'label_93',
-          ),
-        ).to.be.revertedWith('ERC721: token already minted');
-
-        await unsRegistry.burn(tokenId);
-
-        // should fail to safely mint token to non reciever contract
-        await expect(
-          unsRegistry.callStatic[selector](
-            cnsRegistry.address,
-            tokenId,
-            'label_93',
-          ),
-        ).to.be.revertedWith(
-          'ERC721: transfer to non ERC721Receiver implementer',
-        );
-
-        const tokenReceiver = await ERC721ReceiverMock.deploy();
-        await unsRegistry.functions[selector](
-          tokenReceiver.address,
-          tokenId,
-          'label_93',
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          tokenReceiver.address,
-        );
-      });
-
-      it('should produce NewURI event', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_94');
-
-        await expect(
-          unsRegistry.functions[selector](
-            coinbase.address,
-            tokenId,
-            'label_94.crypto',
-          ),
-        )
-          .to.emit(unsRegistry, 'NewURI')
-          .withArgs(tokenId, 'label_94.crypto');
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-      });
-    });
-
-    describe('safeMint(address,uint256,string,bytes)', async () => {
-      const selector = 'safeMint(address,uint256,string,bytes)';
-
-      it('should safely mint(data) domains', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, 'label_s23');
-        await unsRegistry.functions[selector](
-          coinbase.address,
-          tokenId,
-          'label_93',
-          '0x',
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-
-        // should fail to safely mint existing token contract
-        await expect(
-          unsRegistry.callStatic[selector](
-            coinbase.address,
-            tokenId,
-            'label_s23',
-            '0x',
-          ),
-        ).to.be.revertedWith('ERC721: token already minted');
-
-        await unsRegistry.burn(tokenId);
-
-        // should fail to safely mint token to non reciever contract
-        await expect(
-          unsRegistry.callStatic[selector](
-            cnsRegistry.address,
-            tokenId,
-            'label_s23',
-            '0x',
-          ),
-        ).to.be.revertedWith(
-          'ERC721: transfer to non ERC721Receiver implementer',
-        );
-
-        const tokenReceiver = await ERC721ReceiverMock.deploy();
-        await unsRegistry.functions[selector](
-          tokenReceiver.address,
-          tokenId,
-          'label_s23',
-          '0x',
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          tokenReceiver.address,
-        );
-      });
-
-      it('should produce NewURI event', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_s24');
-
-        await expect(
-          unsRegistry.functions[selector](
-            coinbase.address,
-            tokenId,
-            'label_s24.crypto',
-            '0x',
-          ),
-        )
-          .to.emit(unsRegistry, 'NewURI')
-          .withArgs(tokenId, 'label_s24.crypto');
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-      });
-    });
-
     describe('mintWithRecords(address,uint256,string,string[],string[])', async () => {
       it('should mint domain with no records', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, 'label_12324');
-        await unsRegistry.mintWithRecords(
-          coinbase.address,
-          tokenId,
-          'label_12324',
-          [],
-          [],
-        );
-
+        const tokenId = await mintDomain(unsRegistry, coinbase, ['label_12324', 'crypto']);
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
           coinbase.address,
         );
       });
 
       it('should mint domain with record', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, 'label_38f6');
-        await unsRegistry.mintWithRecords(
-          coinbase.address,
-          tokenId,
-          'label_38f6',
+        const tokenId = await mintDomain(unsRegistry, coinbase.address,
+          ['label_38f6', 'crypto'],
+          false,
           ['key_1'],
           ['value_1'],
         );
@@ -542,14 +312,30 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.get('key_1', tokenId)).to.be.eql('value_1');
       });
 
+      it('should mint subdomain', async () => {
+        const labels = ['label_38g', 'crypto'];
+        await mintDomain(unsRegistry, coinbase.address,
+          labels,
+        );
+
+        labels.unshift('sub');
+        const tokenId = await mintDomain(unsRegistry, coinbase.address,
+          labels,
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
+          coinbase.address,
+        );
+      });
+
       it('should produce NewURI event', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'label_38f7');
+        const labels = ['label_38f7', 'crypto'];
+        const tokenId = await unsRegistry.namehash(labels);
 
         await expect(
           unsRegistry.mintWithRecords(
             coinbase.address,
-            tokenId,
-            'label_38f7.crypto',
+            labels,
             ['key1'],
             [42],
           ),
@@ -562,128 +348,13 @@ describe('UNSRegistry', () => {
         );
       });
     });
-
-    describe('safeMintWithRecords(address,uint256,string,string[],string[])', async () => {
-      const selector =
-        'safeMintWithRecords(address,uint256,string,string[],string[])';
-
-      it('should safely mint domain with no records', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, 'label_312er');
-        await unsRegistry[selector](
-          coinbase.address,
-          tokenId,
-          'label_312er',
-          [],
-          [],
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-      });
-
-      it('should safely mint domain with record', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, 'label_dvf321');
-        await unsRegistry[selector](
-          coinbase.address,
-          tokenId,
-          'label_dvf321',
-          ['key_1'],
-          ['value_1'],
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-        expect(await unsRegistry.get('key_1', tokenId)).to.be.eql('value_1');
-      });
-
-      it('should produce NewURI event', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, 'label_dvf322');
-
-        await expect(
-          unsRegistry[selector](
-            coinbase.address,
-            tokenId,
-            'label_dvf322.crypto',
-            ['key_1'],
-            ['value_1'],
-          ),
-        )
-          .to.emit(unsRegistry, 'NewURI')
-          .withArgs(tokenId, 'label_dvf322.crypto');
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-      });
-    });
-
-    describe('safeMintWithRecords(address,uint256,string,string[],string[],bytes)', async () => {
-      const selector =
-        'safeMintWithRecords(address,uint256,string,string[],string[],bytes)';
-
-      it('should safely mint(data) domain with no records', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, 'label_134qwf');
-        await unsRegistry[selector](
-          coinbase.address,
-          tokenId,
-          'label_134qwf',
-          [],
-          [],
-          '0x',
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-      });
-
-      it('should safely mint(data) domain with record', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, 'label_dsf311');
-        await unsRegistry[selector](
-          coinbase.address,
-          tokenId,
-          'label_dsf311',
-          ['key_1'],
-          ['value_1'],
-          '0x',
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-        expect(await unsRegistry.get('key_1', tokenId)).to.be.eql('value_1');
-      });
-
-      it('should produce NewURI event', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, 'label_dvf333');
-
-        await expect(
-          unsRegistry[selector](
-            coinbase.address,
-            tokenId,
-            'label_dvf333.crypto',
-            ['key_1'],
-            ['value_1'],
-            '0x',
-          ),
-        )
-          .to.emit(unsRegistry, 'NewURI')
-          .withArgs(tokenId, 'label_dvf333.crypto');
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
-        );
-      });
-    });
   });
 
   describe('Registry (ownership management)', () => {
     let tokenId;
 
     beforeEach(async () => {
-      tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
+      tokenId = await mintRandomDomain(unsRegistry, coinbase.address, 'crypto');
     });
 
     describe('setOwner', () => {
@@ -861,7 +532,7 @@ describe('UNSRegistry', () => {
     let tokenId;
 
     beforeEach(async () => {
-      tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.CRYPTO);
+      tokenId = await mintRandomDomain(unsRegistry, coinbase.address, 'crypto');
     });
 
     describe('set & get', () => {
@@ -891,7 +562,7 @@ describe('UNSRegistry', () => {
       });
 
       it('should fail if token is not minted', async () => {
-        const tokenId = await unsRegistry.childIdOf(root, 'some_invalid_label');
+        const tokenId = await unsRegistry.namehash(['some_invalid_label', 'crypto']);
 
         await expect(
           unsRegistry.set('key', 'value', tokenId),

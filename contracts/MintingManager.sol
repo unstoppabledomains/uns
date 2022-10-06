@@ -43,9 +43,28 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      *      Legacy CNS free domain prefix is 'udtestdev-'.
      *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
-    modifier onlyAllowed(uint256 tld, string memory label) {
+    modifier onlyAllowedSLD(uint256 tld, string memory label) {
         require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
         Strings.Slice memory _label = label.toSlice();
+        if (_label._len > 10) {
+            require(
+                _label.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
+                'MintingManager: TOKEN_LABEL_PROHIBITED'
+            );
+        }
+        _;
+    }
+
+    /**
+     * @dev The modifier checks subdomain's labels on issue.
+     * @param labels should not have legacy CNS free domain prefix.
+     *      Legacy CNS free domain prefix is 'udtestdev-'.
+     *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
+     */
+    modifier onlyAllowed(string[] memory labels) {
+        require(labels.length >= 2, 'MintingManager: LABELS_LENGTH_BELOW_2');
+        require(_isTld(labels[labels.length - 1]), 'MintingManager: TLD_NOT_REGISTERED');
+        Strings.Slice memory _label = labels[labels.length - 2].toSlice();
         if (_label._len > 10) {
             require(
                 _label.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
@@ -94,25 +113,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         address to,
         uint256 tld,
         string calldata label
-    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
-        _mintSLD(to, tld, label);
-    }
-
-    function safeMintSLD(
-        address to,
-        uint256 tld,
-        string calldata label
-    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
-        _safeMintSLD(to, tld, label, '');
-    }
-
-    function safeMintSLD(
-        address to,
-        uint256 tld,
-        string calldata label,
-        bytes calldata data
-    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
-        _safeMintSLD(to, tld, label, data);
+    ) external override onlyMinter onlyAllowedSLD(tld, label) whenNotPaused {
+        _issue(to, _buildLabels(tld, label));
     }
 
     function mintSLDWithRecords(
@@ -121,41 +123,29 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
-        _mintSLDWithRecords(to, tld, label, keys, values);
+    ) external override onlyMinter onlyAllowedSLD(tld, label) whenNotPaused {
+        _issueWithRecords(to, _buildLabels(tld, label), keys, values);
     }
 
-    function safeMintSLDWithRecords(
+    function issueWithRecords(
         address to,
-        uint256 tld,
-        string calldata label,
+        string[] calldata labels,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
-        _safeMintSLDWithRecords(to, tld, label, keys, values, '');
+    ) external override onlyMinter onlyAllowed(labels) whenNotPaused {
+        _issueWithRecords(to, labels, keys, values);
     }
 
-    function safeMintSLDWithRecords(
-        address to,
-        uint256 tld,
-        string calldata label,
-        string[] calldata keys,
-        string[] calldata values,
-        bytes calldata data
-    ) external override onlyMinter onlyAllowed(tld, label) whenNotPaused {
-        _safeMintSLDWithRecords(to, tld, label, keys, values, data);
-    }
-
-    function claim(uint256 tld, string calldata label) external override onlyAllowed(tld, label) whenNotPaused {
-        _mintSLD(_msgSender(), tld, _freeSLDLabel(label));
+    function claim(uint256 tld, string calldata label) external override onlyAllowedSLD(tld, label) whenNotPaused {
+        _issue(_msgSender(), _buildLabels(tld, _freeSLDLabel(label)));
     }
 
     function claimTo(
         address to,
         uint256 tld,
         string calldata label
-    ) external override onlyAllowed(tld, label) whenNotPaused {
-        _mintSLD(to, tld, _freeSLDLabel(label));
+    ) external override onlyAllowedSLD(tld, label) whenNotPaused {
+        _issue(to, _buildLabels(tld, _freeSLDLabel(label)));
     }
 
     function claimToWithRecords(
@@ -164,8 +154,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string calldata label,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyAllowed(tld, label) whenNotPaused {
-        _mintSLDWithRecords(to, tld, _freeSLDLabel(label), keys, values);
+    ) external override onlyAllowedSLD(tld, label) whenNotPaused {
+        _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), keys, values);
     }
 
     function setResolver(address resolver) external onlyOwner {
@@ -236,81 +226,53 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
        }
     }
 
-    function _mintSLD(
-        address to,
-        uint256 tld,
-        string memory label
-    ) private {
-        uint256 tokenId = _childId(tld, label);
-        _beforeTokenMint(tokenId);
-
-        if (_useCNS(tld)) {
-            cnsMintingController.mintSLDWithResolver(to, label, address(cnsResolver));
-        } else {
-            unsRegistry.mint(to, tokenId, _uri(tld, label));
-        }
+    function _buildLabels(uint256 tld, string memory label) private view returns (string[] memory) {
+        string[] memory labels = new string[](2);
+        labels[0] = label;
+        labels[1] = _tlds[tld];
+        return labels;
     }
 
-    function _safeMintSLD(
-        address to,
-        uint256 tld,
-        string calldata label,
-        bytes memory data
-    ) private {
-        uint256 tokenId = _childId(tld, label);
-        _beforeTokenMint(tokenId);
-
-        if (_useCNS(tld)) {
-            cnsMintingController.safeMintSLDWithResolver(to, label, address(cnsResolver), data);
-        } else {
-            unsRegistry.safeMint(to, tokenId, _uri(tld, label), data);
-        }
+    function _issue(address to, string[] memory labels) private {
+        string[] memory empty;
+        _issueWithRecords(to, labels, empty, empty);
     }
 
-    function _mintSLDWithRecords(
+    function _issueWithRecords(
         address to,
-        uint256 tld,
-        string memory label,
-        string[] calldata keys,
-        string[] calldata values
+        string[] memory labels,
+        string[] memory keys,
+        string[] memory values
     ) private {
-        uint256 tokenId = _childId(tld, label);
-        _beforeTokenMint(tokenId);
+        uint256 tokenId = _namehash(labels);
 
-        if (_useCNS(tld)) {
-            cnsMintingController.mintSLDWithResolver(to, label, address(cnsResolver));
-            if (keys.length > 0) {
-                cnsResolver.preconfigure(keys, values, tokenId);
+        if (unsRegistry.exists(tokenId)) {
+            require(unsRegistry.ownerOf(tokenId) == address(this), 'MintingManager: ISSUING_UNOWNED_TOKEN');
+            unsRegistry.reconfigure(keys, values, tokenId);
+            unsRegistry.setOwner(to, tokenId);
+        } else {
+            _beforeTokenMint(tokenId);
+
+            if (_useCNS(labels) && labels.length == 2) {
+                cnsMintingController.mintSLDWithResolver(to, labels[0], address(cnsResolver));
+                if (keys.length > 0) {
+                    cnsResolver.preconfigure(keys, values, tokenId);
+                }
+            } else {
+                unsRegistry.mintWithRecords(to, labels, keys, values);
             }
-        } else {
-            unsRegistry.mintWithRecords(to, tokenId, _uri(tld, label), keys, values);
         }
     }
 
-    function _safeMintSLDWithRecords(
-        address to,
-        uint256 tld,
-        string memory label,
-        string[] calldata keys,
-        string[] calldata values,
-        bytes memory data
-    ) private {
-        uint256 tokenId = _childId(tld, label);
-        _beforeTokenMint(tokenId);
-
-        if (_useCNS(tld)) {
-            cnsMintingController.safeMintSLDWithResolver(to, label, address(cnsResolver), data);
-            if (keys.length > 0) {
-                cnsResolver.preconfigure(keys, values, tokenId);
-            }
-        } else {
-            unsRegistry.safeMintWithRecords(to, tokenId, _uri(tld, label), keys, values, data);
-        }
-    }
-
-    function _childId(uint256 tokenId, string memory label) internal pure returns (uint256) {
+    function _namehash(uint256 tokenId, string memory label) internal pure returns (uint256) {
         require(bytes(label).length != 0, 'MintingManager: LABEL_EMPTY');
         return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
+    }
+
+    function _namehash(string[] memory labels) internal pure returns (uint256) {
+        uint256 node = 0x0;
+        for (uint256 i = labels.length; i > 0; i--) node = _namehash(node, labels[i - 1]);
+        return node;
     }
 
     function _msgSender() internal view override(ContextUpgradeable, ERC2771Context) returns (address) {
@@ -329,6 +291,14 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         return string(abi.encodePacked(label, '.', _tlds[tld]));
     }
 
+    function _uri(string[] memory labels) private pure returns (string memory) {
+        bytes memory uri = bytes(labels[0]);
+        for (uint256 i = 1; i < labels.length; i++) {
+            uri = abi.encodePacked(uri, '.', labels[i]);
+        }
+        return string(uri);
+    }
+
     function _beforeTokenMint(uint256 tokenId) private {
         if (!isBlocklistDisabled()) {
             require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
@@ -344,13 +314,13 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      * Sideffect: It is possible to add the same TLD multiple times, it will burn gas.
      */
     function _addTld(string memory tld) private {
-        uint256 tokenId = _childId(uint256(0x0), tld);
+        uint256 tokenId = _namehash(uint256(0x0), tld);
 
         _tlds[tokenId] = tld;
         emit NewTld(tokenId, tld);
 
         if (!unsRegistry.exists(tokenId)) {
-            unsRegistry.mint(address(0xdead), tokenId, tld);
+            unsRegistry.mintTLD(tokenId, tld);
         }
     }
 
@@ -362,10 +332,23 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     /**
+     * @dev This function checks whether TLD exists
+     */
+    function _isTld(string memory tld) private view returns (bool) {
+        uint256 tldId = _namehash(uint256(0x0), tld);
+        return _isTld(tldId);
+    }
+
+    /**
      * @dev namehash('crypto') = 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f
      */
     function _useCNS(uint256 tld) private view returns (bool) {
         return address(cnsMintingController) != address(0) && tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
+    }
+
+    function _useCNS(string[] memory labels) private view returns (bool) {
+        uint256 tld = _namehash(uint256(0x0), labels[labels.length - 1]);
+        return _useCNS(tld);
     }
 
     // Reserved storage space to allow for layout changes in the future.

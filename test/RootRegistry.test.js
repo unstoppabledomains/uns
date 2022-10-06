@@ -25,15 +25,14 @@ describe('RootRegistry', () => {
 
   const abiCoder = new utils.AbiCoder();
 
-  const mintDomainL1 = async (owner, tld, label) => {
-    await mintingManager.mintSLD(owner, tld, label);
-    return await l1UnsRegistry.childIdOf(tld, label);
+  const mintDomainL1 = async (owner, labels) => {
+    await mintingManager.issueWithRecords(owner, labels, [], []);
+    return await l1UnsRegistry.namehash(labels);
   };
 
-  const mintDomainL2 = async (owner, tld, label) => {
-    const tokenId = await l2UnsRegistry.childIdOf(tld, label);
-    await l2UnsRegistry['mint(address,uint256,string)'](owner, tokenId, label);
-    return tokenId;
+  const mintDomainL2 = async (owner, labels) => {
+    await l2UnsRegistry['mintWithRecords(address,string[],string[],string[])'](owner, labels, [], []);
+    return await l2UnsRegistry.namehash(labels);
   };
 
   before(async () => {
@@ -87,6 +86,10 @@ describe('RootRegistry', () => {
     l2UnsRegistry = await UNSRegistry.connect(registryOwner).deploy();
     await l2UnsRegistry.initialize(registryOwner.address);
     await l2UnsRegistry.setChildChainManager(registryOwner.address);
+    await l2UnsRegistry['mintTLD(uint256,string)'](
+      TLD.WALLET,
+      'wallet',
+    );
 
     // deploy state sender
     stateSender = await DummyStateSender.deploy();
@@ -127,7 +130,7 @@ describe('RootRegistry', () => {
   describe('Deposit', () => {
     describe('One-step deposit', () => {
       it('should deposit token through UNS registry', async () => {
-        const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-1d-as2');
+        const tokenId = await mintDomainL1(owner.address, ['poly-1d-as2', 'wallet']);
 
         await expect(l1UnsRegistry.connect(owner).depositToPolygon(tokenId))
           .to.emit(predicate, 'LockedMintableERC721')
@@ -137,7 +140,7 @@ describe('RootRegistry', () => {
       });
 
       it('should meta-deposit token through UNS registry', async () => {
-        const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-1d-bp2');
+        const tokenId = await mintDomainL1(owner.address, ['poly-1d-bp2', 'wallet']);
 
         const { req, signature } = await buildExecuteUnsParams(
           'depositToPolygon(uint256)',
@@ -152,7 +155,7 @@ describe('RootRegistry', () => {
       });
 
       it('should deposit CNS domains through MintingManager', async () => {
-        const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'poly-1md-aq1');
+        const tokenId = await mintDomainL1(owner.address, ['poly-1md-aq1', 'crypto']);
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
         await cnsRegistry.connect(owner)['safeTransferFrom(address,address,uint256,bytes)'](
@@ -164,7 +167,7 @@ describe('RootRegistry', () => {
       });
 
       it('should mate-deposit CNS domains through MintingManager', async () => {
-        const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'poly-1md-bl1');
+        const tokenId = await mintDomainL1(owner.address, ['poly-1md-bl1', 'crypto']);
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
         const { req, signature } = await buildExecuteCnsParams(
@@ -182,7 +185,7 @@ describe('RootRegistry', () => {
 
       it('should mate-deposit(legacy) CNS domains through MintingManager', async () => {
         const funcSig = 'safeTransferFromFor(address,address,uint256,bytes,bytes)';
-        const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'poly-1md-al1');
+        const tokenId = await mintDomainL1(owner.address, ['poly-1md-al1', 'crypto']);
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
         const data = cnsRegistry.interface.encodeFunctionData(
@@ -208,7 +211,7 @@ describe('RootRegistry', () => {
 
     describe('Two-steps deposit', () => {
       it('should deposit token', async () => {
-        const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-2d-aq1');
+        const tokenId = await mintDomainL1(owner.address, ['poly-2d-aq1', 'wallet']);
 
         await l1UnsRegistry.connect(owner).approve(predicate.address, tokenId);
 
@@ -223,7 +226,7 @@ describe('RootRegistry', () => {
 
     describe('CNS -> UNS migration', () => {
       it('should migrate CNS domain to UNS through safeTransferFrom', async () => {
-        const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'cns-uns-aq1');
+        const tokenId = await mintDomainL1(owner.address, ['cns-uns-aq1', 'crypto']);
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
         await cnsRegistry.connect(owner)['safeTransferFrom(address,address,uint256)'](
@@ -236,7 +239,7 @@ describe('RootRegistry', () => {
 
       it('should meta-migrate CNS domain to UNS through safeTransferFrom', async () => {
         const funcSig = 'safeTransferFromFor(address,address,uint256,bytes)';
-        const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'cns-uns-maq1');
+        const tokenId = await mintDomainL1(owner.address, ['cns-uns-maq1', 'crypto']);
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
         const data = cnsRegistry.interface.encodeFunctionData(
@@ -259,7 +262,7 @@ describe('RootRegistry', () => {
       });
 
       it('should migrate CNS domain to UNS through safeTransferFrom(data)', async () => {
-        const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'cns-uns-aq2');
+        const tokenId = await mintDomainL1(owner.address, ['cns-uns-aq2', 'crypto']);
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
         await cnsRegistry.connect(owner)['safeTransferFrom(address,address,uint256,bytes)'](
@@ -272,7 +275,7 @@ describe('RootRegistry', () => {
 
       it('should meta-migrate CNS domain to UNS through safeTransferFrom(data)', async () => {
         const funcSig = 'safeTransferFromFor(address,address,uint256,bytes,bytes)';
-        const tokenId = await mintDomainL1(owner.address, TLD.CRYPTO, 'cns-uns-maq2');
+        const tokenId = await mintDomainL1(owner.address, ['cns-uns-maq2', 'crypto']);
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
         const data = cnsRegistry.interface.encodeFunctionData(
@@ -310,7 +313,7 @@ describe('RootRegistry', () => {
 
   describe('Withdraw through predicate', () => {
     it('should withdraw a domain', async () => {
-      const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-1w-as1');
+      const tokenId = await mintDomainL1(owner.address, ['poly-1w-as1', 'wallet']);
       await l1UnsRegistry.connect(owner).depositToPolygon(tokenId);
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
 
@@ -321,7 +324,7 @@ describe('RootRegistry', () => {
     });
 
     it('should mint a domain on withdraw while it was minted on L2', async () => {
-      const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1wm-as1');
+      const tokenId = await l1UnsRegistry.namehash(['poly-1wm-as1', 'wallet']);
       await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: invalid token ID');
 
       const inputData = buildPredicateExitInput(owner.address, ZERO_ADDRESS, tokenId);
@@ -331,11 +334,11 @@ describe('RootRegistry', () => {
     });
 
     it('should withdraw multiple domains', async () => {
-      const tokenId1 = await mintDomainL1(owner.address, TLD.WALLET, 'poly-2w-as1');
+      const tokenId1 = await mintDomainL1(owner.address, ['poly-2w-as1', 'wallet']);
       await l1UnsRegistry.connect(owner).depositToPolygon(tokenId1);
       expect(await l1UnsRegistry.ownerOf(tokenId1)).to.be.equal(predicate.address);
 
-      const tokenId2 = await mintDomainL1(owner.address, TLD.WALLET, 'poly-2w-aq1');
+      const tokenId2 = await mintDomainL1(owner.address, ['poly-2w-aq1', 'wallet']);
       await l1UnsRegistry.connect(owner).depositToPolygon(tokenId2);
       expect(await l1UnsRegistry.ownerOf(tokenId2)).to.be.equal(predicate.address);
 
@@ -347,10 +350,10 @@ describe('RootRegistry', () => {
     });
 
     it('should mint multiple domains on withdraw while they were minted on L2', async () => {
-      const tokenId1 = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-2wm-as1');
+      const tokenId1 = await l1UnsRegistry.namehash(['poly-2wm-as1', 'wallet']);
       await expect(l1UnsRegistry.ownerOf(tokenId1)).to.be.revertedWith('ERC721: invalid token ID');
 
-      const tokenId2 = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-2wm-aq1');
+      const tokenId2 = await l1UnsRegistry.namehash(['poly-2wm-aq1', 'wallet']);
       await expect(l1UnsRegistry.ownerOf(tokenId2)).to.be.revertedWith('ERC721: invalid token ID');
 
       const inputData = buildPredicateBatchExitInput(owner.address, [tokenId1, tokenId2]);
@@ -361,7 +364,7 @@ describe('RootRegistry', () => {
     });
 
     it('should withdraw a domain with metadata', async () => {
-      const tokenId = await mintDomainL1(owner.address, TLD.WALLET, 'poly-1wmm-as1');
+      const tokenId = await mintDomainL1(owner.address, ['poly-1wmm-as1', 'wallet']);
       await l1UnsRegistry.connect(owner).depositToPolygon(tokenId);
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
 
@@ -372,7 +375,7 @@ describe('RootRegistry', () => {
     });
 
     it('should mint a domain with metadata on withdraw while it was minted on L2', async () => {
-      const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1wmm-as2');
+      const tokenId = await l1UnsRegistry.namehash(['poly-1wmm-as2', 'wallet']);
       await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: invalid token ID');
 
       const inputData = buildPredicateMetadataExitInput(owner.address, ZERO_ADDRESS, tokenId, '0x');
@@ -382,13 +385,13 @@ describe('RootRegistry', () => {
     });
 
     it('should revert mint(onlyPredicate) by non-predicate', async () => {
-      const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1w-revert');
+      const tokenId = await l1UnsRegistry.namehash(['poly-1w-revert', 'wallet']);
       await expect(l1UnsRegistry['mint(address,uint256)'](owner.address, tokenId))
         .to.be.revertedWith('Registry: INSUFFICIENT_PERMISSIONS');
     });
 
     it('should revert mint(onlyPredicate) with metadata by non-predicate', async () => {
-      const tokenId = await l1UnsRegistry.childIdOf(TLD.WALLET, 'poly-1w-revert');
+      const tokenId = await l1UnsRegistry.namehash(['poly-1w-revert', 'wallet']);
       await expect(l1UnsRegistry['mint(address,uint256,bytes)'](owner.address, tokenId, '0x'))
         .to.be.revertedWith('Registry: INSUFFICIENT_PERMISSIONS');
     });
@@ -408,7 +411,7 @@ describe('RootRegistry', () => {
     };
 
     it('should be able to exit through rootChainManager', async () => {
-      const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-1');
+      const tokenId = await mintDomainL2(owner.address, ['poly-ex-1', 'wallet']);
       // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
       const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
@@ -423,7 +426,7 @@ describe('RootRegistry', () => {
     });
 
     it('should be able to exit through UNS registry', async () => {
-      const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-2');
+      const tokenId = await mintDomainL2(owner.address, ['poly-ex-2', 'wallet']);
       // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
       const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
@@ -438,7 +441,7 @@ describe('RootRegistry', () => {
     });
 
     it('should be able to exit through UNS registry with records update', async () => {
-      const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-2up');
+      const tokenId = await mintDomainL2(owner.address, ['poly-ex-2up', 'wallet']);
       // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
       const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
@@ -454,7 +457,7 @@ describe('RootRegistry', () => {
     });
 
     it('should be able to meta-exit through UNS registry with records update', async () => {
-      const tokenId = await mintDomainL2(owner.address, TLD.WALLET, 'poly-ex-meta2up');
+      const tokenId = await mintDomainL2(owner.address, ['poly-ex-meta2up', 'wallet']);
       // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
       const txn = await l2UnsRegistry.connect(owner).withdraw(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
