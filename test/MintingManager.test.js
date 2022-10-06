@@ -2,7 +2,6 @@ const { ethers } = require('hardhat');
 const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
 const { ZERO_ADDRESS, DEAD_ADDRESS, TLD } = require('./helpers/constants');
-const { mintTLD } = require('./helpers/registry');
 
 describe('MintingManager', () => {
   const DomainNamePrefix = 'uns-devtest-';
@@ -202,6 +201,19 @@ describe('MintingManager', () => {
       );
     });
 
+    it('should allow SLD minting after TLD burn', async () => {
+      const tld = 'newtld';
+      await mintingManager.addTld(tld)
+      const tldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, tld);
+
+      await mintingManager.burnTLDL1([tldTokenId]);
+
+      await mintingManager.mintSLD(coinbase.address, tldTokenId, 'test-1');
+      const tokenId = await unsRegistry.childIdOf(tldTokenId, 'test-1');
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+    });
+
     it('should not allow burn TLD tokens if not owner', async () => {
       await expect(mintingManager.connect(signers[1]).burnTLDL1([TLD.CRYPTO])).to.be.revertedWith(
         'Ownable: caller is not the owner',
@@ -245,7 +257,19 @@ describe('MintingManager', () => {
       expect(await unsRegistry.ownerOf(movel2TldTokenId)).to.be.equal(mintingManager.address);
       expect(await unsRegistry.ownerOf(coinTldTokenId)).to.be.equal(mintingManager.address);
     });
-    
+
+    it('should allow SLD minting after TLD ownership change', async () => {
+      const tld = 'newtld';
+      await mintingManager.addTld(tld)
+      const tldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, tld);
+
+      await mintingManager.moveTLDOwnershipL2([tldTokenId]);
+
+      await mintingManager.mintSLD(coinbase.address, tldTokenId, 'test-1');
+      const tokenId = await unsRegistry.childIdOf(tldTokenId, 'test-1');
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+    });
 
     it('should not allow change TLD tokens ownership if not owner', async () => {
       await expect(mintingManager.connect(signers[1]).moveTLDOwnershipL2([TLD.CRYPTO])).to.be.revertedWith(
