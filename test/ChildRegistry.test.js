@@ -1,7 +1,7 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
-const { TLD, ZERO_ADDRESS } = require('./helpers/constants');
+const { ZERO_ADDRESS } = require('./helpers/constants');
 
 const { utils } = ethers;
 
@@ -12,10 +12,9 @@ describe('ChildRegistry', () => {
 
   const abiCoder = new utils.AbiCoder();
 
-  const mintDomainL2 = async (owner, tld, label) => {
-    const tokenId = await l2UnsRegistry.childIdOf(tld, label);
-    await mintingManager['mintSLD(address,uint256,string)'](owner, tld, label);
-    return tokenId;
+  const mintDomainL2 = async (owner, labels) => {
+    await mintingManager['issueWithRecords(address,string[],string[],string[])'](owner, labels, [], []);
+    return await l2UnsRegistry.namehash(labels);
   };
 
   before(async () => {
@@ -76,7 +75,7 @@ describe('ChildRegistry', () => {
     });
 
     it('should revert when childChainManager is empty', async () => {
-      const tokenId = await tempL2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-te1');
+      const tokenId = await tempL2UnsRegistry.namehash(['l2-te1', 'crypto']);
 
       await expect(
         tempL2UnsRegistry.deposit(owner.address, abiCoder.encode(['uint256'], [tokenId])),
@@ -84,7 +83,7 @@ describe('ChildRegistry', () => {
     });
 
     it('should revert when insufficient permissions', async () => {
-      const tokenId = await tempL2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-te2');
+      const tokenId = await tempL2UnsRegistry.namehash(['l2-te2', 'crypto']);
       await tempL2UnsRegistry.setChildChainManager(registryOwner.address);
 
       await expect(
@@ -103,7 +102,7 @@ describe('ChildRegistry', () => {
 
   describe('Deposit', () => {
     it('should deposit one token', async () => {
-      const tokenId = await l2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-aq1');
+      const tokenId = await l2UnsRegistry.namehash(['l2-aq1', 'crypto']);
 
       await expect(l2UnsRegistry.deposit(owner.address, abiCoder.encode(['uint256'], [tokenId])))
         .to.emit(l2UnsRegistry, 'Transfer')
@@ -112,8 +111,8 @@ describe('ChildRegistry', () => {
     });
 
     it('should deposit multiple tokens', async () => {
-      const tokenId1 = await l2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-eq1');
-      const tokenId2 = await l2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-eq2');
+      const tokenId1 = await l2UnsRegistry.namehash(['l2-eq1', 'crypto']);
+      const tokenId2 = await l2UnsRegistry.namehash(['l2-eq2', 'crypto']);
 
       await expect(l2UnsRegistry.deposit(owner.address, abiCoder.encode(['uint256[]'], [[tokenId1, tokenId2]])))
         .to.emit(l2UnsRegistry, 'Transfer')
@@ -125,7 +124,7 @@ describe('ChildRegistry', () => {
 
   describe('Withdraw', () => {
     it('should revert withdraw when token is not exists', async () => {
-      const tokenId = await l2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-aq1-revert');
+      const tokenId = await l2UnsRegistry.namehash(['l2-aq1-revert', 'crypto']);
 
       await expect(
         l2UnsRegistry.withdraw(tokenId),
@@ -133,7 +132,7 @@ describe('ChildRegistry', () => {
     });
 
     it('should revert withdraw when called by non-owner', async () => {
-      const tokenId = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-bq1-revert');
+      const tokenId = await mintDomainL2(owner.address, ['l2-bq1-revert', 'crypto']);
       expect(await l2UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
       await expect(
@@ -142,7 +141,7 @@ describe('ChildRegistry', () => {
     });
 
     it('should withdraw a token', async () => {
-      const tokenId = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-bq1');
+      const tokenId = await mintDomainL2(owner.address, ['l2-bq1', 'crypto']);
       expect(await l2UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
       await expect(l2UnsRegistry.connect(owner).withdraw(tokenId))
@@ -154,7 +153,7 @@ describe('ChildRegistry', () => {
     });
 
     it('should revert if tokenId is upgraded', async () => {
-      const tokenId = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-upgraded-bw-revert-test');
+      const tokenId = await mintDomainL2(owner.address, ['l2-upgraded-bw-revert-test', 'crypto']);
       expect(await l2UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
       await mintingManager.upgradeAll([tokenId]);
@@ -165,8 +164,8 @@ describe('ChildRegistry', () => {
     });
 
     it('should revert batch withdraw when token is not exists', async () => {
-      const tokenId1 = await l2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-aq2-revert');
-      const tokenId2 = await l2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-ad2-revert');
+      const tokenId1 = await l2UnsRegistry.namehash(['l2-aq2-revert', 'crypto']);
+      const tokenId2 = await l2UnsRegistry.namehash(['l2-ad2-revert', 'crypto']);
 
       await expect(
         l2UnsRegistry.withdrawBatch([tokenId1, tokenId2]),
@@ -176,7 +175,7 @@ describe('ChildRegistry', () => {
     it('should revert batch withdraw when exceeds batch limit', async () => {
       const tokens = [];
       for (let i = 0; i < 21; i++) {
-        tokens.push(await l2UnsRegistry.childIdOf(TLD.CRYPTO, `l2-${i}-revert`));
+        tokens.push(await l2UnsRegistry.namehash([`l2-${i}-revert`, 'crypto']));
       }
 
       await expect(
@@ -185,8 +184,8 @@ describe('ChildRegistry', () => {
     });
 
     it('should revert batch withdraw when called by non-owner', async () => {
-      const tokenId1 = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-bq2-revert');
-      const tokenId2 = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-bb2-revert');
+      const tokenId1 = await mintDomainL2(owner.address, ['l2-bq2-revert', 'crypto']);
+      const tokenId2 = await mintDomainL2(owner.address, ['l2-bb2-revert', 'crypto']);
       expect(await l2UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
       expect(await l2UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
 
@@ -196,8 +195,8 @@ describe('ChildRegistry', () => {
     });
 
     it('should revert batch withdraw if tokenId is upgraded', async () => {
-      const tokenId1 = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-upgraded-bw-revert');
-      const tokenId2 = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-upgraded-bw-revert-2');
+      const tokenId1 = await mintDomainL2(owner.address, ['l2-upgraded-bw-revert', 'crypto']);
+      const tokenId2 = await mintDomainL2(owner.address, ['l2-upgraded-bw-revert-2', 'crypto']);
       expect(await l2UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
       expect(await l2UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
 
@@ -209,8 +208,8 @@ describe('ChildRegistry', () => {
     });
 
     it('should batch withdraw multiple tokens', async () => {
-      const tokenId1 = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-bq2');
-      const tokenId2 = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-bb2');
+      const tokenId1 = await mintDomainL2(owner.address, ['l2-bq2', 'crypto']);
+      const tokenId2 = await mintDomainL2(owner.address, ['l2-bb2', 'crypto']);
       expect(await l2UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
       expect(await l2UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
 
@@ -225,7 +224,7 @@ describe('ChildRegistry', () => {
     });
 
     it('should revert withdraw with matadata when token is not exists', async () => {
-      const tokenId = await l2UnsRegistry.childIdOf(TLD.CRYPTO, 'l2-am1-revert');
+      const tokenId = await l2UnsRegistry.namehash(['l2-am1-revert', 'crypto']);
 
       await expect(
         l2UnsRegistry.withdrawWithMetadata(tokenId),
@@ -233,7 +232,7 @@ describe('ChildRegistry', () => {
     });
 
     it('should revert withdraw when called by non-owner', async () => {
-      const tokenId = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-bm1-revert');
+      const tokenId = await mintDomainL2(owner.address, ['l2-bm1-revert', 'crypto']);
       expect(await l2UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
       await expect(
@@ -242,7 +241,7 @@ describe('ChildRegistry', () => {
     });
 
     it('should revert withdraw with metadata if tokenId is upgraded', async () => {
-      const tokenId = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-depreacted-wm-revert');
+      const tokenId = await mintDomainL2(owner.address, ['l2-depreacted-wm-revert', 'crypto']);
       expect(await l2UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
       await mintingManager.upgradeAll([tokenId]);
@@ -253,7 +252,7 @@ describe('ChildRegistry', () => {
     });
 
     it('should withdraw a token', async () => {
-      const tokenId = await mintDomainL2(owner.address, TLD.CRYPTO, 'l2-bm1');
+      const tokenId = await mintDomainL2(owner.address, ['l2-bm1', 'crypto']);
       expect(await l2UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 
       await expect(l2UnsRegistry.connect(owner).withdrawWithMetadata(tokenId))

@@ -29,7 +29,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.5.2';
+    string public constant VERSION = '0.6.0';
 
     string internal _prefix;
 
@@ -96,8 +96,10 @@ contract UNSRegistry is
         return 0;
     }
 
-    function childIdOf(uint256 tokenId, string calldata label) external pure override returns (uint256) {
-        return _childId(tokenId, label);
+    function namehash(string[] calldata labels) external pure override returns (uint256) {
+        require(labels.length >= 1, 'Registry: LABELS_LENGTH_BELOW_1');
+        (uint256 tokenId, ) = _namehash(labels);
+        return tokenId;
     }
 
     function exists(uint256 tokenId) external view override(IUNSRegistry, IMintableERC721) returns (bool) {
@@ -106,61 +108,35 @@ contract UNSRegistry is
 
     /// Minting
 
-    function mint(
-        address to,
-        uint256 tokenId,
-        string calldata uri
-    ) external override onlyMintingManager {
-        _mint(to, tokenId, uri);
+    function mintTLD(uint256 tokenId, string calldata uri) external override onlyMintingManager {
+        _mint(_mintingManager, tokenId);
+        emit NewURI(tokenId, uri);
     }
 
-    function safeMint(
+    function unlockWithRecords(
         address to,
         uint256 tokenId,
-        string calldata uri
+        string[] calldata keys,
+        string[] calldata values
     ) external override onlyMintingManager {
-        _safeMint(to, tokenId, uri, '');
-    }
-
-    function safeMint(
-        address to,
-        uint256 tokenId,
-        string calldata uri,
-        bytes calldata data
-    ) external override onlyMintingManager {
-        _safeMint(to, tokenId, uri, data);
+        _reset(tokenId);
+        _transfer(ownerOf(tokenId), to, tokenId);
+        _setMany(keys, values, tokenId);
+        _safeSetReverse(to, tokenId);
     }
 
     function mintWithRecords(
         address to,
-        uint256 tokenId,
-        string calldata uri,
+        string[] calldata labels,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMintingManager {
-        _mint(to, tokenId, uri);
+    ) external override {
+        require(labels.length >= 2, 'Registry: LABELS_LENGTH_BELOW_2');
+        (uint256 tokenId, uint256 parentId) = _namehash(labels);
+        require(_isApprovedOrOwner(_msgSender(), parentId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+        _mint(to, tokenId, _uri(labels));
         _setMany(keys, values, tokenId);
-    }
-
-    function safeMintWithRecords(
-        address to,
-        uint256 tokenId,
-        string calldata uri,
-        string[] calldata keys,
-        string[] calldata values
-    ) external override onlyMintingManager {
-        _safeMintWithRecords(to, tokenId, uri, keys, values, '');
-    }
-
-    function safeMintWithRecords(
-        address to,
-        uint256 tokenId,
-        string calldata uri,
-        string[] calldata keys,
-        string[] calldata values,
-        bytes calldata data
-    ) external override onlyMintingManager {
-        _safeMintWithRecords(to, tokenId, uri, keys, values, data);
     }
 
     /// Transfering
@@ -389,7 +365,20 @@ contract UNSRegistry is
 
     /// Internal
 
-    function _childId(uint256 tokenId, string memory label) internal pure returns (uint256) {
+    function _uri(string[] memory labels) private pure returns (string memory) {
+        bytes memory uri = bytes(labels[0]);
+        for (uint256 i = 1; i < labels.length; i++) uri = abi.encodePacked(uri, '.', labels[i]);
+        return string(uri);
+    }
+
+    function _namehash(string[] calldata labels) internal pure returns (uint256 tokenId, uint256 parentId) {
+        for (uint256 i = labels.length; i > 0; i--) {
+            parentId = tokenId;
+            tokenId = _namehash(parentId, labels[i - 1]);
+        }
+    }
+
+    function _namehash(uint256 tokenId, string memory label) internal pure returns (uint256) {
         require(bytes(label).length != 0, 'Registry: LABEL_EMPTY');
         return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
     }
@@ -403,30 +392,6 @@ contract UNSRegistry is
         emit NewURI(tokenId, uri);
         /// set reverse must be after emission of New URL event in order to keep events' order
         _safeSetReverse(to, tokenId);
-    }
-
-    function _safeMint(
-        address to,
-        uint256 tokenId,
-        string memory uri,
-        bytes memory data
-    ) internal {
-        _safeMint(to, tokenId, data);
-        emit NewURI(tokenId, uri);
-        /// set reverse must be after emission of New URL event in order to keep events' order
-        _safeSetReverse(to, tokenId);
-    }
-
-    function _safeMintWithRecords(
-        address to,
-        uint256 tokenId,
-        string calldata uri,
-        string[] calldata keys,
-        string[] calldata values,
-        bytes memory data
-    ) internal {
-        _safeMint(to, tokenId, uri, data);
-        _setMany(keys, values, tokenId);
     }
 
     function _baseURI() internal view override(ERC721Upgradeable) returns (string memory) {

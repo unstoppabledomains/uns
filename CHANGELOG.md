@@ -1,3 +1,9 @@
+## v0.6.0
+
+- UNSRegistry@0.6.0 receives support for subdomains
+- MintingManager@0.4.0 receives support for subdomains
+- ProxyReader@0.2.4 receives support for subdomains
+
 ## v0.5.21
 
 - Add `.klever` TLD

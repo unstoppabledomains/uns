@@ -3,6 +3,7 @@ const { expect } = require('chai');
 
 const { DEAD_ADDRESS, ZERO_ADDRESS, TLD } = require('./helpers/constants');
 const { mintDomain } = require('./helpers/registry');
+const { getInterfaceId } = require('./helpers/proxy');
 
 const { utils } = ethers;
 
@@ -39,13 +40,13 @@ describe('ProxyReader', () => {
     resolver = await Resolver.deploy(cnsRegistry.address, mintingController.address);
 
     // mint .wallet TLD
-    await unsRegistry['mint(address,uint256,string)'](coinbase.address, TLD.WALLET, 'wallet');
+    await unsRegistry['mintTLD(uint256,string)'](TLD.WALLET, 'wallet');
 
     // mint .wallet
-    walletTokenId = await mintDomain(unsRegistry, coinbase.address, TLD.WALLET, domainName);
+    walletTokenId = await mintDomain(unsRegistry, coinbase.address, [domainName, 'wallet']);
 
     // mint .crypto
-    cryptoTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, domainName);
+    cryptoTokenId = await unsRegistry.namehash([domainName, 'crypto']);
     await mintingController.mintSLDWithResolver(coinbase.address, domainName, resolver.address);
 
     proxy = await ProxyReader.deploy(unsRegistry.address, cnsRegistry.address);
@@ -60,23 +61,13 @@ describe('ProxyReader', () => {
 
   describe('IRegistryReader', () => {
     it('should support IRegistryReader interface', async () => {
-      /*
-      * bytes4(keccak256(abi.encodePacked('tokenURI(uint256)'))) == 0xc87b56dd
-      * bytes4(keccak256(abi.encodePacked('isApprovedOrOwner(address,uint256)'))) == 0x430c2081
-      * bytes4(keccak256(abi.encodePacked('resolverOf(uint256)'))) == 0xb3f9e4cb
-      * bytes4(keccak256(abi.encodePacked('childIdOf(uint256,string)'))) == 0x68b62d32
-      * bytes4(keccak256(abi.encodePacked('balanceOf(address)'))) == 0x70a08231
-      * bytes4(keccak256(abi.encodePacked('ownerOf(uint256)'))) == 0x6352211e
-      * bytes4(keccak256(abi.encodePacked('getApproved(uint256)'))) == 0x081812fc
-      * bytes4(keccak256(abi.encodePacked('isApprovedForAll(address,address)'))) == 0xe985e9c5
-      * bytes4(keccak256(abi.encodePacked('exists(uint256)'))) == 0x4f558e79
-      * bytes4(keccak256(abi.encodePacked('reverseOf(address)'))) == 0x7e37479e
-      *
-      * => 0xc87b56dd ^ 0x430c2081 ^ 0xb3f9e4cb ^ 0x68b62d32 ^
-      *    0x70a08231 ^ 0x6352211e ^ 0x081812fc ^ 0xe985e9c5 ^
-      *    0x4f558e79 ^ 0x7e37479e == 0x93352e54
-      */
-      expect(await proxy.supportsInterface('0x93352e54')).to.be.equal(true);
+      const functions = [
+        'tokenURI', 'isApprovedOrOwner', 'resolverOf', 'namehash', 'balanceOf',
+        'ownerOf', 'getApproved', 'isApprovedForAll', 'exists', 'reverseOf',
+      ];
+
+      const interfaceId = getInterfaceId(ProxyReader, functions);
+      expect(await proxy.supportsInterface(interfaceId)).to.be.equal(true);
     });
 
     it('should revert isApprovedForAll call', async () => {
@@ -163,7 +154,7 @@ describe('ProxyReader', () => {
 
     describe('ownerOf', () => {
       it('should return empty owner for unknown domain', async () => {
-        const unknownTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'unknown');
+        const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
         const owners = await proxy.callStatic.ownerOf(unknownTokenId);
         expect(owners).to.be.equal(ZERO_ADDRESS);
       });
@@ -222,18 +213,18 @@ describe('ProxyReader', () => {
       });
     });
 
-    describe('childIdOf', () => {
-      it('should return childIdOf of .wallet domain', async () => {
-        const proxyResult = await proxy.childIdOf(TLD.WALLET, 'test');
-        const resolverResult = await unsRegistry.childIdOf(TLD.WALLET, 'test');
+    describe('namehash', () => {
+      it('should return namehash of .wallet domain', async () => {
+        const proxyResult = await proxy.namehash(['test', 'wallet']);
+        const resolverResult = await unsRegistry.namehash(['test', 'wallet']);
 
         expect(proxyResult).to.be.equal(resolverResult);
         expect(resolverResult).to.be
           .equal('50586162622368517199428676025463367639931450566950616867100918499864570754504');
       });
 
-      it('should return childIdOf of .crypto domain', async () => {
-        const proxyResult = await proxy.childIdOf(TLD.CRYPTO, 'test');
+      it('should return namehash of .crypto domain', async () => {
+        const proxyResult = await proxy.namehash(['test', 'crypto']);
         const resolverResult = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test');
 
         expect(proxyResult).to.be.equal(resolverResult);
@@ -247,7 +238,7 @@ describe('ProxyReader', () => {
         const _domainName = 'hey_hoy_23bkkcbv';
         const account = accounts[7];
         await mintingController.mintSLD(account, _domainName);
-        await mintDomain(unsRegistry, account, TLD.WALLET, _domainName);
+        await mintDomain(unsRegistry, account, [_domainName, 'wallet']);
 
         const proxyResult = await proxy.balanceOf(account);
         const resolverResult1 = await unsRegistry.balanceOf(account);
@@ -262,7 +253,7 @@ describe('ProxyReader', () => {
       });
 
       it('should return false for unknown .wallet domain', async () => {
-        const unknownTokenId = await unsRegistry.childIdOf(TLD.WALLET, 'unknown');
+        const unknownTokenId = await unsRegistry.namehash(['unknown', 'wallet']);
 
         expect(await proxy.exists(unknownTokenId)).to.be.equal(false);
       });
@@ -274,7 +265,7 @@ describe('ProxyReader', () => {
       });
 
       it('should return true for .wallet domain', async () => {
-        const tokenId = await mintDomain(unsRegistry, accounts[3], TLD.WALLET, 'hey_hoy_97hds');
+        const tokenId = await mintDomain(unsRegistry, accounts[3], ['hey_hoy_97hds', 'wallet']);
         expect(await proxy.exists(tokenId)).to.be.equal(true);
       });
 
@@ -284,15 +275,6 @@ describe('ProxyReader', () => {
         await mintingController.mintSLD(accounts[3], _domainName);
 
         expect(await proxy.exists(cryptoTokenId)).to.be.equal(true);
-      });
-
-      // the scenario is not possible in real setup
-      it('should return true when both registries known domain', async () => {
-        const _domainName = 'hey_hoy_74tbcvl';
-        const tokenId = await mintDomain(unsRegistry, accounts[3], TLD.CRYPTO, 'hey_hoy_74tbcvl');
-        await mintingController.mintSLD(accounts[3], _domainName);
-
-        expect(await proxy.exists(tokenId)).to.be.equal(true);
       });
 
       it('should return true for .crypto TLD', async () => {
@@ -307,15 +289,10 @@ describe('ProxyReader', () => {
 
   describe('IRecordReader', () => {
     it('should support IRecordReader interface', async () => {
-      /*
-       * bytes4(keccak256(abi.encodePacked('get(string,uint256)'))) == 0x1be5e7ed
-       * bytes4(keccak256(abi.encodePacked('getByHash(uint256,uint256)'))) == 0x672b9f81
-       * bytes4(keccak256(abi.encodePacked('getMany(string[],uint256)'))) == 0x1bd8cc1a
-       * bytes4(keccak256(abi.encodePacked('getManyByHash(uint256[],uint256)'))) == 0xb85afd28
-       *
-       * => 0x1be5e7ed ^ 0x672b9f81 ^ 0x1bd8cc1a ^ 0xb85afd28 == 0xdf4c495e
-       */
-      expect(await proxy.supportsInterface('0xdf4c495e')).to.be.equal(true);
+      const functions = ['get', 'getByHash', 'getMany', 'getManyByHash'];
+
+      const interfaceId = getInterfaceId(ProxyReader, functions);
+      expect(await proxy.supportsInterface(interfaceId)).to.be.equal(true);
     });
 
     describe('get', () => {
@@ -340,7 +317,7 @@ describe('ProxyReader', () => {
       });
 
       it('should resolve empty record value for .crypto domain when token not found', async () => {
-        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q1');
+        const _tokenId = await unsRegistry.namehash(['test-sgh-q1', 'crypto']);
 
         const proxyResult = await proxy.get('get_key_134', _tokenId);
 
@@ -348,7 +325,7 @@ describe('ProxyReader', () => {
       });
 
       it('should resolve empty record value for .crypto domain when resolver not found', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q1');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q1', 'crypto']);
         await mintingController.mintSLD(coinbase.address, 'test-sgh-q1');
 
         const proxyResult = await proxy.get('get_key_134', tokenId);
@@ -357,7 +334,7 @@ describe('ProxyReader', () => {
       });
 
       it('should resolve empty record value for .crypto domain when resolver is 0xdead', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q1-2');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q1-2', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q1-2', DEAD_ADDRESS);
 
         const proxyResult = await proxy.get('get_key_134', tokenId);
@@ -366,7 +343,7 @@ describe('ProxyReader', () => {
       });
 
       it('should resolve empty record value for .crypto domain when resolver is EOA', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q1-3');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q1-3', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q1-3', coinbase.address);
 
         const proxyResult = await proxy.get('get_key_134', tokenId);
@@ -375,7 +352,7 @@ describe('ProxyReader', () => {
       });
 
       it('should resolve empty record value for .crypto domain when resolver is not valid', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q1-4');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q1-4', 'crypto']);
         const nonResolverAddress = proxy.address;
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q1-4', nonResolverAddress);
 
@@ -436,7 +413,7 @@ describe('ProxyReader', () => {
       });
 
       it('should resolve empty records value for .crypto domain when token not found', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q2');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q2', 'crypto']);
 
         const proxyResult = await proxy.getMany(keys, tokenId);
 
@@ -444,7 +421,7 @@ describe('ProxyReader', () => {
       });
 
       it('should resolve empty records value for .crypto domain when resolver not found', async () => {
-        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q2');
+        const _tokenId = await unsRegistry.namehash(['test-sgh-q2', 'crypto']);
         await mintingController.mintSLD(coinbase.address, 'test-sgh-q2');
 
         const proxyResult = await proxy.getMany(keys, _tokenId);
@@ -453,7 +430,7 @@ describe('ProxyReader', () => {
       });
 
       it('should resolve empty records value for .crypto domain when resolver is 0xdead', async () => {
-        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q2-2');
+        const _tokenId = await unsRegistry.namehash(['test-sgh-q2-2', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q2-2', DEAD_ADDRESS);
 
         const proxyResult = await proxy.getMany(keys, _tokenId);
@@ -462,7 +439,7 @@ describe('ProxyReader', () => {
       });
 
       it('should resolve empty records value for .crypto domain when resolver is EOA', async () => {
-        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q2-3');
+        const _tokenId = await unsRegistry.namehash(['test-sgh-q2-3', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q2-3', coinbase.address);
 
         const proxyResult = await proxy.getMany(keys, _tokenId);
@@ -471,7 +448,7 @@ describe('ProxyReader', () => {
       });
 
       it('should resolve empty records value for .crypto domain when resolver is not valid', async () => {
-        const _tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q2-4');
+        const _tokenId = await unsRegistry.namehash(['test-sgh-q2-4', 'crypto']);
         const nonResolverAddress = proxy.address;
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q2-4', nonResolverAddress);
 
@@ -506,7 +483,7 @@ describe('ProxyReader', () => {
 
       it('should resolve empty record value for .crypto domain when token not found', async () => {
         const keyHash = utils.id('get_key_0946');
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q3');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q3', 'crypto']);
 
         const proxyResult = await proxy.getByHash(keyHash, tokenId);
 
@@ -515,7 +492,7 @@ describe('ProxyReader', () => {
 
       it('should resolve empty record value for .crypto domain when resolver not found', async () => {
         const keyHash = utils.id('get_key_0946');
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q3');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q3', 'crypto']);
         await mintingController.mintSLD(coinbase.address, 'test-sgh-q3');
 
         const proxyResult = await proxy.getByHash(keyHash, tokenId);
@@ -525,7 +502,7 @@ describe('ProxyReader', () => {
 
       it('should resolve empty record value for .crypto domain when resolver is 0xdead', async () => {
         const keyHash = utils.id('get_key_0946');
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q3-2');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q3-2', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q3-2', DEAD_ADDRESS);
 
         const proxyResult = await proxy.getByHash(keyHash, tokenId);
@@ -535,7 +512,7 @@ describe('ProxyReader', () => {
 
       it('should resolve empty record value for .crypto domain when resolver is EOA', async () => {
         const keyHash = utils.id('get_key_0946');
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q3-3');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q3-3', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q3-3', coinbase.address);
 
         const proxyResult = await proxy.getByHash(keyHash, tokenId);
@@ -545,7 +522,7 @@ describe('ProxyReader', () => {
 
       it('should resolve empty record value for .crypto domain when resolver is not valid', async () => {
         const keyHash = utils.id('get_key_0946');
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q3-4');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q3-4', 'crypto']);
         const nonResolverAddress = proxy.address;
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q3-4', nonResolverAddress);
 
@@ -590,7 +567,7 @@ describe('ProxyReader', () => {
 
       it('should resolve empty records value for .crypto domain when token not found', async () => {
         const keyHash = utils.id(keys[0]);
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q4');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q4', 'crypto']);
 
         const proxyResult = await proxy.getManyByHash([keyHash], tokenId);
 
@@ -599,7 +576,7 @@ describe('ProxyReader', () => {
 
       it('should resolve empty records value for .crypto domain when resolver not found', async () => {
         const keyHash = utils.id(keys[0]);
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q5');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q5', 'crypto']);
         await mintingController.mintSLD(coinbase.address, 'test-sgh-q5');
 
         const proxyResult = await proxy.getManyByHash([keyHash], tokenId);
@@ -609,7 +586,7 @@ describe('ProxyReader', () => {
 
       it('should resolve empty records value for .crypto domain when resolver is 0xdead', async () => {
         const keyHash = utils.id(keys[0]);
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q5-2');
+        const tokenId = await unsRegistry.namehash([ 'test-sgh-q5-2', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q5-2', DEAD_ADDRESS);
 
         const proxyResult = await proxy.getManyByHash([keyHash], tokenId);
@@ -619,7 +596,7 @@ describe('ProxyReader', () => {
 
       it('should resolve empty records value for .crypto domain when resolver is EOA', async () => {
         const keyHash = utils.id(keys[0]);
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q5-3');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q5-3', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q5-3', coinbase.address);
 
         const proxyResult = await proxy.getManyByHash([keyHash], tokenId);
@@ -629,7 +606,7 @@ describe('ProxyReader', () => {
 
       it('should resolve empty records value for .crypto domain when resolver is not valid', async () => {
         const keyHash = utils.id(keys[0]);
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'test-sgh-q5-4');
+        const tokenId = await unsRegistry.namehash(['test-sgh-q5-4', 'crypto']);
         const nonResolverAddress = proxy.address;
         await mintingController.mintSLDWithResolver(coinbase.address, 'test-sgh-q5-4', nonResolverAddress);
 
@@ -642,23 +619,16 @@ describe('ProxyReader', () => {
 
   describe('IDataReader', () => {
     it('should support IDataReader interface', async () => {
-      /*
-       * bytes4(keccak256(abi.encodePacked('getData(string[],uint256)'))) == 0x91015f6b
-       * bytes4(keccak256(abi.encodePacked('getDataForMany(string[],uint256[])'))) == 0x933c051d
-       * bytes4(keccak256(abi.encodePacked('getDataByHash(uint256[],uint256)'))) == 0x03280755
-       * bytes4(keccak256(abi.encodePacked('getDataByHashForMany(uint256[],uint256[])'))) == 0x869b8884
-       * bytes4(keccak256(abi.encodePacked('ownerOfForMany(uint256[])'))) == 0xc15ae7cf
-       *
-       * => 0x91015f6b ^ 0x933c051d ^ 0x03280755 ^
-       *    0x869b8884 ^ 0xc15ae7cf == 0x46d43268
-       */
-      expect(await proxy.supportsInterface('0x46d43268')).to.be.equal(true);
+      const functions = ['getData', 'getDataForMany', 'getDataByHash', 'getDataByHashForMany', 'ownerOfForMany'];
+
+      const interfaceId = getInterfaceId(ProxyReader, functions);
+      expect(await proxy.supportsInterface(interfaceId)).to.be.equal(true);
     });
 
     describe('getData', () => {
       it('should return empty data for non-existing .wallet domain', async () => {
         // arrange
-        const tokenId = await unsRegistry.childIdOf(TLD.WALLET, 'hey_hoy_1037');
+        const tokenId = await unsRegistry.namehash(['hey_hoy_1037', 'wallet']);
 
         // act
         const data = await proxy.callStatic.getData(keys, tokenId);
@@ -693,7 +663,7 @@ describe('ProxyReader', () => {
 
       it('should return data for .wallet domain', async () => {
         // arrange
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.WALLET, 'hey_hoy_121');
+        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['hey_hoy_121', 'wallet']);
 
         // act
         const data = await proxy.callStatic.getData(keys, tokenId);
@@ -703,7 +673,7 @@ describe('ProxyReader', () => {
       });
 
       it('should return data for .crypto domain when resolver is 0xdead', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'hey-hoy-re-2723');
+        const tokenId = await unsRegistry.namehash(['hey-hoy-re-2723', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'hey-hoy-re-2723', DEAD_ADDRESS);
 
         const data = await proxy.getData(keys, tokenId);
@@ -712,7 +682,7 @@ describe('ProxyReader', () => {
       });
 
       it('should return data for .crypto domain when resolver is EOA', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'hey-hoy-re-3723');
+        const tokenId = await unsRegistry.namehash(['hey-hoy-re-3723', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'hey-hoy-re-3723', coinbase.address);
 
         const data = await proxy.getData(keys, tokenId);
@@ -721,7 +691,7 @@ describe('ProxyReader', () => {
       });
 
       it('should return data for .crypto domain when resolver is not valid', async () => {
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'hey-hoy-re-4723');
+        const tokenId = await unsRegistry.namehash(['hey-hoy-re-4723', 'crypto']);
         const nonResolverAddress = proxy.address;
         await mintingController.mintSLDWithResolver(coinbase.address, 'hey-hoy-re-4723', nonResolverAddress);
 
@@ -741,8 +711,8 @@ describe('ProxyReader', () => {
       it('should return empty data for non-existing .crypto|.wallet domains', async () => {
         // arrange
         const _domainName = 'hey_hoy_1037';
-        const _walletTokenId = await unsRegistry.childIdOf(TLD.WALLET, _domainName);
-        const _cryptoTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, _domainName);
+        const _walletTokenId = await unsRegistry.namehash([_domainName, 'wallet']);
+        const _cryptoTokenId = await unsRegistry.namehash([_domainName, 'crypto']);
 
         // act
         const data = await proxy.callStatic.getDataForMany(keys, [_walletTokenId, _cryptoTokenId]);
@@ -754,8 +724,8 @@ describe('ProxyReader', () => {
       it('should return data for multiple .crypto|.wallet domains', async () => {
         // arrange
         const _domainName = 'test_1291';
-        const _cryptoTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, _domainName);
-        const _walletTokenId = await mintDomain(unsRegistry, coinbase.address, TLD.WALLET, _domainName);
+        const _cryptoTokenId = await unsRegistry.namehash([_domainName, 'crypto']);
+        const _walletTokenId = await mintDomain(unsRegistry, coinbase.address, [_domainName, 'wallet']);
         await mintingController.mintSLDWithResolver(coinbase.address, _domainName, resolver.address);
         for (let i = 0; i < keys.length; i++) {
           await resolver.set(keys[i], values[i], _cryptoTokenId);
@@ -775,7 +745,7 @@ describe('ProxyReader', () => {
 
       it('should return owners for multiple tokens (including unknown)', async () => {
         // arrange
-        const unknownTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'unknown');
+        const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
 
         // act
         const data = await proxy.callStatic.getDataForMany([], [walletTokenId, unknownTokenId]);
@@ -794,7 +764,7 @@ describe('ProxyReader', () => {
         // arrange
         const hashes = keys.map(utils.id);
         const _domainName = 'hey_hoy_29224';
-        const _tokenId = await unsRegistry.childIdOf(TLD.WALLET, _domainName);
+        const _tokenId = await unsRegistry.namehash([_domainName, 'wallet']);
 
         // act
         const data = await proxy.callStatic.getDataByHash(hashes, _tokenId);
@@ -840,7 +810,7 @@ describe('ProxyReader', () => {
       it('should return data by hashes for .wallet domain', async () => {
         // arrange
         const hashes = keys.map(utils.id);
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, TLD.WALLET, 'hey_hoy_292');
+        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['hey_hoy_292', 'wallet']);
         for (let i = 0; i < keys.length; i++) {
           await unsRegistry.set(keys[i], values[i], tokenId);
         }
@@ -859,7 +829,7 @@ describe('ProxyReader', () => {
 
       it('should return data for .crypto domain when resolver is 0xdead', async () => {
         const hashes = keys.map(utils.id);
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'hey-hoy-reh-2723');
+        const tokenId = await unsRegistry.namehash(['hey-hoy-reh-2723', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'hey-hoy-reh-2723', DEAD_ADDRESS);
 
         const data = await proxy.getDataByHash(hashes, tokenId);
@@ -869,7 +839,7 @@ describe('ProxyReader', () => {
 
       it('should return data for .crypto domain when resolver is EOA', async () => {
         const hashes = keys.map(utils.id);
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'hey-hoy-reh-3723');
+        const tokenId = await unsRegistry.namehash(['hey-hoy-reh-3723', 'crypto']);
         await mintingController.mintSLDWithResolver(coinbase.address, 'hey-hoy-reh-3723', coinbase.address);
 
         const data = await proxy.getDataByHash(hashes, tokenId);
@@ -879,7 +849,7 @@ describe('ProxyReader', () => {
 
       it('should return data for .crypto domain when resolver is not valid', async () => {
         const hashes = keys.map(utils.id);
-        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'hey-hoy-reh-4723');
+        const tokenId = await unsRegistry.namehash(['hey-hoy-reh-4723', 'crypto']);
         const nonResolverAddress = proxy.address;
         await mintingController.mintSLDWithResolver(coinbase.address, 'hey-hoy-reh-4723', nonResolverAddress);
 
@@ -900,8 +870,8 @@ describe('ProxyReader', () => {
         // arrange
         const hashes = keys.map(utils.id);
         const _domainName = 'hey_hoy_1037';
-        const _walletTokenId = await unsRegistry.childIdOf(TLD.WALLET, _domainName);
-        const _cryptoTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, _domainName);
+        const _walletTokenId = await unsRegistry.namehash([_domainName, 'wallet']);
+        const _cryptoTokenId = await unsRegistry.namehash([_domainName, 'crypto']);
 
         // act
         const data = await proxy.callStatic.getDataByHashForMany(hashes, [_walletTokenId, _cryptoTokenId]);
@@ -919,8 +889,8 @@ describe('ProxyReader', () => {
         // arrange
         const hashes = keys.map(utils.id);
         const _domainName = 'test_1082q';
-        const _cryptoTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, _domainName);
-        const _walletTokenId = await mintDomain(unsRegistry, coinbase.address, TLD.WALLET, 'test_1082q');
+        const _cryptoTokenId = await unsRegistry.namehash([_domainName, 'crypto']);
+        const _walletTokenId = await mintDomain(unsRegistry, coinbase.address, ['test_1082q', 'wallet']);
         await mintingController.mintSLDWithResolver(coinbase.address, _domainName, resolver.address);
 
         for (let i = 0; i < keys.length; i++) {
@@ -942,7 +912,7 @@ describe('ProxyReader', () => {
 
       it('should return owners for multiple domains (including unknown)', async () => {
         // arrange
-        const unknownTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'unknown');
+        const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
 
         // act
         const data = await proxy.callStatic.getDataByHashForMany([], [walletTokenId, unknownTokenId]);
@@ -959,7 +929,7 @@ describe('ProxyReader', () => {
 
     describe('ownerOfForMany', () => {
       it('should return empty owner for unknown domain', async () => {
-        const unknownTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'unknown');
+        const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
         const owners = await proxy.callStatic.ownerOfForMany([unknownTokenId]);
         expect(owners).to.be.eql([ZERO_ADDRESS]);
       });
@@ -972,8 +942,8 @@ describe('ProxyReader', () => {
       it('should return owners for multiple .crypto|.wallet domains', async () => {
         // arrange
         const _domainName = 'test_125t';
-        const _cryptoTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, _domainName);
-        const _walletTokenId = await mintDomain(unsRegistry, accounts[0], TLD.WALLET, 'test_125t');
+        const _cryptoTokenId = await unsRegistry.namehash([_domainName, 'crypto']);
+        const _walletTokenId = await mintDomain(unsRegistry, accounts[0], ['test_125t', 'wallet']);
         await mintingController.mintSLDWithResolver(coinbase.address, _domainName, resolver.address);
 
         // act
@@ -985,7 +955,7 @@ describe('ProxyReader', () => {
 
       it('should return owners for multiple domains (including unknown)', async () => {
         // arrange
-        const unknownTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'unknown');
+        const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
 
         // act
         const owners = await proxy.callStatic.ownerOfForMany([walletTokenId, unknownTokenId]);
@@ -1003,7 +973,7 @@ describe('ProxyReader', () => {
     });
 
     it('should return error for unknown .wallet domain', async () => {
-      const unknownTokenId = await unsRegistry.childIdOf(TLD.WALLET, 'unknown');
+      const unknownTokenId = await unsRegistry.namehash(['unknown', 'wallet']);
 
       const address = await proxy.registryOf(unknownTokenId);
       expect(address).to.be.equal(ZERO_ADDRESS);
@@ -1017,7 +987,7 @@ describe('ProxyReader', () => {
     });
 
     it('should return value for .wallet domain', async () => {
-      const tokenId = await mintDomain(unsRegistry, accounts[3], TLD.WALLET, 'hey_hoy_98hds');
+      const tokenId = await mintDomain(unsRegistry, accounts[3], ['hey_hoy_98hds', 'wallet']);
       const address = await proxy.registryOf(tokenId);
       expect(address).to.be.equal(unsRegistry.address);
     });
@@ -1046,7 +1016,7 @@ describe('ProxyReader', () => {
     const abiCoder = new utils.AbiCoder();
 
     it('should return owners', async () => {
-      const unknownTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'unknown');
+      const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
       const owners = await proxy.callStatic.multicall([
         proxy.interface.encodeFunctionData('ownerOf(uint256)', [unknownTokenId]),
         proxy.interface.encodeFunctionData('ownerOf(uint256)', [walletTokenId]),
@@ -1058,7 +1028,7 @@ describe('ProxyReader', () => {
     });
 
     it('should return existance of tokens', async () => {
-      const unknownTokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'unknown');
+      const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
       const owners = await proxy.callStatic.multicall([
         proxy.interface.encodeFunctionData('exists(uint256)', [unknownTokenId]),
         proxy.interface.encodeFunctionData('exists(uint256)', [walletTokenId]),
