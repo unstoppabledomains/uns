@@ -1343,7 +1343,7 @@
     },
     "crypto.HBAR.address": {
       "deprecatedKeyName": "HBAR",
-      "validationRegex": "^[a-zA-Z0-9]*$",
+      "validationRegex": "^(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))(?:-([a-z]{5}))?$",
       "deprecated": false
     },
     "crypto.TEL.version.ERC20.address": {
