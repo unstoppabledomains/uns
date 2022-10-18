@@ -21,7 +21,7 @@ export class GanacheService {
 
   constructor (options: ServerOptions, serverConfigOptions: ServerConfigOptions) {
     this._serverConfigOptions = this._validateAndTransformOptions(serverConfigOptions);
-    this.server = server(options);
+    this.server = server({ ...options });
     this.provider = this.server.provider;
   }
 

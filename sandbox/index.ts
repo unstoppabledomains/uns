@@ -15,7 +15,7 @@ import { HttpNetworkUserConfig, NetworkUserConfig } from 'hardhat/types';
 
 const log = debug('UNS:sandbox');
 
-const GANACHE_SERVER_CONFIG: ServerOptions<'ethereum'> = {
+export const GANACHE_SERVER_CONFIG: ServerOptions<'ethereum'> = {
   chain: {
     chainId: 1337,
     hardfork: 'istanbul',
@@ -28,12 +28,12 @@ const GANACHE_SERVER_CONFIG: ServerOptions<'ethereum'> = {
   },
   wallet: {
     totalAccounts: 10,
-    defaultBalance: 1000,
     mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
-    hdPath: 'm/44\'/60\'/0\'/0/',
+    defaultBalance: 1000,
+    hdPath: 'm/44\'/60\'/0\'/0',
   },
   database: {
-    dbPath: './.sandbox'
+    dbPath: './.sandbox',
   },
   logging: {
     verbose: false,
@@ -75,6 +75,10 @@ export class Sandbox {
     return sandbox;
   }
 
+  static snapshotPath(): string {
+    return path.join(__dirname, 'db.tgz');
+  }
+
   static async create (options: SandboxOptions) {
     options = {
       clean: true,
@@ -88,7 +92,7 @@ export class Sandbox {
     }
 
     const { dbPath } = GANACHE_SERVER_CONFIG['database'];
-    const snapshotPath = path.join(__dirname, 'db.tgz');
+    const snapshotPath = this.snapshotPath();
 
     if (options.clean) {
       if (fs.existsSync(dbPath)) {

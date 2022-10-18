@@ -1,15 +1,23 @@
-const { network, upgrades, ethers } = require('hardhat');
-const merge = require('lodash.merge');
+import { ethers, network, config, upgrades } from 'hardhat';
+import { Contract } from 'ethers';
+import { merge } from 'lodash';
+import { ZERO_ADDRESS } from '../test/helpers/constants';
+import { Deployer, ArtifactNames } from './deployer';
+import verify from './verify';
+import {BigNumber, utils } from 'ethers';
 
-const { ZERO_ADDRESS } = require('../test/helpers/constants');
-const verify = require('./verify');
+export type Task = {
+  tags: string[];
+  priority: number;
+  run: (ctx: Deployer, dependencies?: any) => Promise<void>
+  // TODO: add typings for uns-config
+  ensureDependencies: (ctx: Deployer, config: any) => any | void;
+}
 
-const { utils, BigNumber } = ethers;
-
-const deployCNSTask = {
+export const deployCNSTask: Task = {
   tags: ['cns', 'full'],
   priority: 0,
-  run: async (ctx) => {
+  run: async (ctx: Deployer) => {
     const { owner } = ctx.accounts;
     const {
       CNSRegistry,
@@ -19,7 +27,6 @@ const deployCNSTask = {
       Resolver,
     } = ctx.artifacts;
 
-    // CNS registry
     const cnsRegistry = await CNSRegistry.connect(owner).deploy();
     await ctx.saveContractConfig('CNSRegistry', cnsRegistry);
     await cnsRegistry.deployTransaction.wait();
@@ -57,26 +64,25 @@ const deployCNSTask = {
     // Stub unsupported contracts
     await ctx.saveContractConfig('WhitelistedMinter', {
       address: '0x0000000000000000000000000000000000000000',
-    });
+    } as Contract);
     await ctx.saveContractConfig('DomainZoneController', {
       address: '0x0000000000000000000000000000000000000000',
-    });
+    } as Contract);
     await ctx.saveContractConfig('TwitterValidationOperator', {
       address: '0x0000000000000000000000000000000000000000',
-    });
+    } as Contract);
     await ctx.saveContractConfig('FreeMinter', {
       address: '0x0000000000000000000000000000000000000000',
-    });
+    } as Contract);
   },
   ensureDependencies: () => {
-
   },
-};
+}
 
-const deployCNSForwardersTask = {
+export const deployCNSForwardersTask: Task = {
   tags: ['cns_forwarders', 'full'],
   priority: 5,
-  run: async (ctx, dependencies) => {
+  run: async (ctx: Deployer, dependencies: any) => {
     const { owner } = ctx.accounts;
     const { CNSRegistry, SignatureController, Resolver } = dependencies;
 
@@ -94,14 +100,14 @@ const deployCNSForwardersTask = {
     await resolverForwarder.deployTransaction.wait();
     await verify(ctx, resolverForwarder.address, [CNSRegistry.address, Resolver.address]);
   },
-  ensureDependencies: (ctx, config) => {
+  ensureDependencies: (ctx: Deployer, config: any) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const {
       CNSRegistry,
       SignatureController,
       Resolver,
-    } = config.contracts || {};
+    } = config.contracts;
     const dependencies = {
       CNSRegistry,
       SignatureController,
@@ -121,7 +127,8 @@ const deployCNSForwardersTask = {
 const deployUNSTask = {
   tags: ['uns', 'full'],
   priority: 10,
-  run: async (ctx, dependencies) => {
+  // TODO: fix dependencies typings
+  run: async (ctx: Deployer, dependencies: any) => {
     const { owner } = ctx.accounts;
     const {
       MintingController,
@@ -192,7 +199,7 @@ const deployUNSTask = {
       }
     }
   },
-  ensureDependencies: (ctx, config) => {
+  ensureDependencies: (ctx: Deployer, config: any) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const {
@@ -218,10 +225,10 @@ const deployUNSTask = {
   },
 };
 
-const deployUNSProxyReaderTask = {
+const deployUNSProxyReaderTask: Task = {
   tags: ['uns', 'uns_proxy_reader', 'full'],
   priority: 15,
-  run: async (ctx, dependencies) => {
+  run: async (ctx: Deployer, dependencies: any) => {
     const { owner } = ctx.accounts;
     const {
       CNSRegistry,
@@ -229,7 +236,7 @@ const deployUNSProxyReaderTask = {
       MintingManager,
     } = dependencies;
 
-    const proxyReader = await ctx.artifacts.ProxyReader
+    const proxyReader = await ctx.artifacts[ArtifactNames.ProxyReader]
       .connect(owner)
       .deploy(UNSRegistry.address, CNSRegistry.address);
     await ctx.saveContractConfig('ProxyReader', proxyReader);
@@ -240,7 +247,7 @@ const deployUNSProxyReaderTask = {
 
     await mintingManager.connect(owner).addProxyReaders([proxyReader.address]);
   },
-  ensureDependencies: (ctx, config) => {
+  ensureDependencies: (ctx: Deployer, config: any) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const {
@@ -267,7 +274,7 @@ const deployUNSProxyReaderTask = {
 const configureCNSTask = {
   tags: ['uns_config_cns', 'full'],
   priority: 20,
-  run: async (ctx, {
+  run: async (ctx: Deployer, {
     CNSRegistry,
     MintingController,
     URIPrefixController,
@@ -276,34 +283,36 @@ const configureCNSTask = {
   }) => {
     const { owner } = ctx.accounts;
 
-    const mintingController = await ctx.artifacts.MintingController
+    const mintingController = ctx.artifacts.MintingController
       .attach(MintingController.address)
       .connect(owner);
+
     if (!(await mintingController.isMinter(MintingManager.address))) {
       await mintingController.addMinter(MintingManager.address);
     }
 
-    const uriPrefixController = await ctx.artifacts.URIPrefixController
+    const uriPrefixController = ctx.artifacts.URIPrefixController
       .attach(URIPrefixController.address)
       .connect(owner);
     if (!(await uriPrefixController.isWhitelisted(MintingManager.address))) {
       await uriPrefixController.addWhitelisted(MintingManager.address);
     }
 
-    const unsRegistry = await ctx.artifacts.UNSRegistry
+    const unsRegistry = ctx.artifacts.UNSRegistry
       .attach(UNSRegistry.address)
       .connect(owner);
+
     await unsRegistry.setCNSRegistry(CNSRegistry.address);
 
     // Set tokenURI prefix only for Sandbox
     if (network.config.chainId === 1337) {
-      const mintingManager = await ctx.artifacts.MintingManager
+      const mintingManager = ctx.artifacts.MintingManager
         .attach(MintingManager.address)
         .connect(owner);
       await mintingManager.setTokenURIPrefix('https://example.com/');
     }
   },
-  ensureDependencies: (ctx, config) => {
+  ensureDependencies: (ctx: Deployer, config: any) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const {
@@ -334,22 +343,23 @@ const configureCNSTask = {
 const deployMMForwarderTask = {
   tags: ['uns_mm_forwarder'],
   priority: 100,
-  run: async (ctx, { MintingManager }) => {
+  run: async (ctx: Deployer, { MintingManager }) => {
     const { owner } = ctx.accounts;
 
     const forwarder = await ctx.artifacts.MintingManagerForwarder
       .connect(owner)
       .deploy(MintingManager.address);
 
-    const mintingManager = await ctx.artifacts.MintingManager
+    const mintingManager = ctx.artifacts.MintingManager
       .attach(MintingManager.address)
       .connect(owner);
+
     await mintingManager.setForwarder(forwarder.address);
     await ctx.saveForwarderConfig('MintingManager', forwarder);
     await forwarder.deployTransaction.wait();
     await verify(ctx, forwarder.address, [MintingManager.address]);
   },
-  ensureDependencies: (ctx, config) => {
+  ensureDependencies: (ctx: Deployer, config: any) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { MintingManager } = config.contracts || {};
@@ -365,10 +375,10 @@ const deployMMForwarderTask = {
   },
 };
 
-const upgradeUNSRegistryTask = {
+const upgradeUNSRegistryTask: Task = {
   tags: ['upgrade_registry'],
   priority: 100,
-  run: async (ctx, { UNSRegistry }) => {
+  run: async (ctx: Deployer, { UNSRegistry }) => {
     const unsRegistry = await upgrades.upgradeProxy(
       UNSRegistry.address,
       ctx.artifacts.UNSRegistry,
@@ -382,7 +392,7 @@ const upgradeUNSRegistryTask = {
     await ctx.saveContractConfig('UNSRegistry', unsRegistry, unsRegistryImpl, unsRegistry);
     await verify(ctx, unsRegistryImpl, []);
   },
-  ensureDependencies: (ctx, config) => {
+  ensureDependencies: (ctx: Deployer, config: any) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { UNSRegistry, ProxyAdmin } = config.contracts || {};
@@ -401,10 +411,10 @@ const upgradeUNSRegistryTask = {
   },
 };
 
-const upgradeMintingManagerTask = {
+const upgradeMintingManagerTask: Task = {
   tags: ['upgrade_minting_manager'],
   priority: 100,
-  run: async (ctx, { MintingManager }) => {
+  run: async (ctx: Deployer, { MintingManager }) => {
     const mintingManager = await upgrades.upgradeProxy(
       MintingManager.address,
       ctx.artifacts.MintingManager,
@@ -419,7 +429,7 @@ const upgradeMintingManagerTask = {
     await ctx.saveContractConfig('MintingManager', mintingManager, mintingManagerImpl);
     await verify(ctx, mintingManagerImpl, []);
   },
-  ensureDependencies: (ctx, config) => {
+  ensureDependencies: (ctx: Deployer, config: any) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { MintingManager, ProxyAdmin } = config.contracts || {};
@@ -438,20 +448,21 @@ const upgradeMintingManagerTask = {
   },
 };
 
+
 /**
  * The task configure CNS domain migration to UNS.
  * It is required for post-upgrade configuration.
  */
-const configureCnsMigrationTask = {
+const configureCnsMigrationTask: Task = {
   tags: ['uns_config_cns_migration'],
   priority: 100,
-  run: async (ctx, {
+  run: async (ctx: Deployer, {
     CNSRegistry,
     UNSRegistry,
   }) => {
     const { owner } = ctx.accounts;
 
-    const unsRegistry = await ctx.artifacts.UNSRegistry
+    const unsRegistry = ctx.artifacts.UNSRegistry
       .attach(UNSRegistry.address)
       .connect(owner);
 
@@ -483,14 +494,14 @@ const configureCnsMigrationTask = {
  * The task deploys Polygon POS Bridge contracts.
  * It is required for emulation of Bridge for test environments.
  */
-const deployPolygonPosBridgeTask = {
+const deployPolygonPosBridgeTask: Task = {
   tags: ['deploy_polygon_pos_bridge'],
   priority: 120,
-  run: async (ctx, { UNSRegistry }) => {
+  run: async (ctx: Deployer, { UNSRegistry }) => {
     const { owner } = ctx.accounts;
 
     const stateSender = await ctx.artifacts.DummyStateSender.connect(owner).deploy();
-    const checkpointManager = await ctx.artifacts.CheckpointManager.connect(owner).deploy();
+    const checkpointManager = await ctx.artifacts[ArtifactNames.CheckpointManager].connect(owner).deploy();
 
     // deploy Predicate
     const predicate = await ctx.artifacts.MintableERC721Predicate.connect(owner).deploy();
@@ -513,7 +524,7 @@ const deployPolygonPosBridgeTask = {
     await predicate.grantRole(await predicate.MANAGER_ROLE(), rootChainManager.address);
     await ctx.saveContractConfig('RootChainManager', rootChainManager);
   },
-  ensureDependencies: (ctx, config) => {
+  ensureDependencies: (ctx: Deployer, config: any) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { UNSRegistry } = config.contracts || {};
@@ -529,16 +540,16 @@ const deployPolygonPosBridgeTask = {
   },
 };
 
-const configurePolygonPosBridgeTask = {
+const configurePolygonPosBridgeTask: Task = {
   tags: ['uns_config_polygon_pos_bridge'],
   priority: 140,
-  run: async (ctx, {
+  run: async (ctx: Deployer, {
     UNSRegistry,
     RootChainManager,
   }) => {
     const { owner } = ctx.accounts;
 
-    const unsRegistry = await ctx.artifacts.UNSRegistry
+    const unsRegistry = ctx.artifacts.UNSRegistry
       .attach(UNSRegistry.address)
       .connect(owner);
 
@@ -566,13 +577,13 @@ const configurePolygonPosBridgeTask = {
   },
 };
 
-const configureDotCoinTask = {
+const configureDotCoinTask: Task = {
   tags: ['temp_configure_dotcoin'],
   priority: 110,
   run: async (ctx, { MintingManager, ProxyReader }) => {
     const { owner } = ctx.accounts;
 
-    const mintingManager = await ctx.artifacts.MintingManager.attach(
+    const mintingManager = ctx.artifacts.MintingManager.attach(
       MintingManager.address,
     ).connect(owner);
 
@@ -604,7 +615,8 @@ const configureDotCoinTask = {
   },
 };
 
-module.exports = [
+
+export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
   deployUNSTask,
@@ -616,5 +628,5 @@ module.exports = [
   configureCnsMigrationTask,
   deployPolygonPosBridgeTask,
   configurePolygonPosBridgeTask,
-  configureDotCoinTask,
-];
+  configureDotCoinTask
+]

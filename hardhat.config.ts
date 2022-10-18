@@ -15,6 +15,14 @@ declare module "hardhat/types/config" {
     }
   }
 
+  interface HardhatConfig {
+    uns?: {
+      minters: {
+        [networkName: string]: string[]
+      }
+    }
+  }
+
   interface ProjectPathsUserConfig {
     flatArtifacts?: string;
   }

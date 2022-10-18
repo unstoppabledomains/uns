@@ -1,19 +1,61 @@
-const { ethers, network, config: hhConfig } = require('hardhat');
-const path = require('path');
-const fs = require('fs');
-const merge = require('lodash.merge');
-const debug = require('debug');
-
-const tasks = require('./tasks');
+import { ethers, network, config } from 'hardhat';
+import path from 'path';
+import fs from 'fs';
+import {merge} from 'lodash';
+import debug from 'debug';
+import { Contract, ContractFactory, Transaction, Signer} from 'ethers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { TransactionResponse } from "@ethersproject/abstract-provider";
+import {Task, tasks} from './tasks';
 
 const log = debug('UNS:deployer');
 
-const defaultOptions = {
+type DeployerOptions = {
+  basePath: string;
+  proxy: boolean;
+}
+
+type DeployerConfig = {
+  contracts: {
+    [k in ArtifactNames]: {
+      address: string,
+      legacyAddresses: string[],
+      deploymentBlock: string,
+      implementation: string,
+      forwarder: string,
+      transaction: TransactionResponse
+    }
+  }
+}
+
+export enum ArtifactNames {
+  CNSRegistry = 'CNSRegistry',
+  CNSRegistryForwarder = 'CNSRegistryForwarder',
+  SignatureController = 'SignatureController',
+  MintingController = 'MintingController',
+  URIPrefixController = 'URIPrefixController',
+  Resolver = 'Resolver',
+  ResolverForwarder = 'ResolverForwarder',
+  UNSRegistry = 'UNSRegistry',
+  MintingManager = 'MintingManager',
+  MintingManagerForwarder = 'MintingManagerForwarder',
+  ProxyReader = 'contracts/ProxyReader.sol:ProxyReader',
+  DummyStateSender = 'DummyStateSender',
+  CheckpointManager = 'SimpleCheckpointManager',
+  MintableERC721Predicate = 'MintableERC721Predicate',
+  RootChainManager = 'RootChainManager',
+}
+
+type ArtifactsMap = {
+  [k in ArtifactNames]: ContractFactory
+}
+
+const DEFAULT_OPTIONS: DeployerOptions = {
   basePath: './.deployer',
   proxy: true,
 };
 
-async function _getArtifacts () {
+async function getArtifacts(): Promise<ArtifactsMap> {
   return {
     CNSRegistry: await ethers.getContractFactory('CNSRegistry'),
     CNSRegistryForwarder: await ethers.getContractFactory('CNSRegistryForwarder'),
@@ -25,30 +67,41 @@ async function _getArtifacts () {
     UNSRegistry: await ethers.getContractFactory('UNSRegistry'),
     MintingManager: await ethers.getContractFactory('MintingManager'),
     MintingManagerForwarder: await ethers.getContractFactory('MintingManagerForwarder'),
-    ProxyReader: await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader'),
+    [ArtifactNames.ProxyReader]: await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader'),
     DummyStateSender: await ethers.getContractFactory('DummyStateSender'),
-    CheckpointManager: await ethers.getContractFactory('SimpleCheckpointManager'),
+    [ArtifactNames.CheckpointManager]: await ethers.getContractFactory('SimpleCheckpointManager'),
     MintableERC721Predicate: await ethers.getContractFactory('MintableERC721Predicate'),
     RootChainManager: await ethers.getContractFactory('RootChainManager'),
   };
 }
 
-class Deployer {
-  static async create (options) {
+export class Deployer {
+  public options: DeployerOptions;    
+  public artifacts: ArtifactsMap;
+  public accounts: {owner: SignerWithAddress};
+  public log: debug.Debugger;
+
+  // TODO: add typings here
+  public minters: any;
+  private network: any;
+
+  static async create (options?: DeployerOptions) {
     const [owner] = await ethers.getSigners();
-    const _unsConfig = hhConfig.uns;
+
+    // Should re-use another type then
+    const _unsConfig = config.uns;
 
     return new Deployer(
       options,
-      await _getArtifacts(),
+      await getArtifacts(),
       { owner },
       _unsConfig.minters[network.name],
     );
   }
 
-  constructor (options, artifacts, accounts, minters) {
+  constructor (options: DeployerOptions, artifacts: ArtifactsMap, accounts: {owner: SignerWithAddress}, minters) {
     this.options = {
-      ...defaultOptions,
+      ...DEFAULT_OPTIONS,
       ...options,
     };
     this.artifacts = artifacts;
@@ -72,14 +125,18 @@ class Deployer {
     });
   }
 
-  async execute (tags, config) {
+  // TODO: add proper typings for uns-config
+  async execute (tags: string[], config?: any) {
     tags = tags || [];
 
     this.log('Execution started');
-    for (const task of tasks.sort((a, b) => a.priority - b.priority)) {
+    // this.log(deployCNSTask);
+
+    for (const task of tasks.sort((a: Task, b: Task) => a.priority - b.priority)) {
       if (!tags.some(t => task.tags.includes(t.toLowerCase()))) continue;
 
       this.log('Executing task', { tags: task.tags });
+
       const dependencies = task.ensureDependencies(this, config);
       await task.run(this, dependencies);
     }
@@ -119,13 +176,13 @@ class Deployer {
     };
   }
 
-  getDeployConfig () {
+  getDeployConfig(): DeployerConfig {
     const configPath = path.resolve(this.options.basePath, `${this.network.chainId}.json`);
-    const file = fs.existsSync(configPath) ? fs.readFileSync(configPath) : '{}';
+    const file = fs.existsSync(configPath) ? fs.readFileSync(configPath).toString() : '{}';
     return JSON.parse(file.length ? file : '{}');
   }
 
-  async saveContractConfig (name, contract, implAddress, forwarder) {
+  async saveContractConfig (name: string, contract: Contract, implAddress?: string, forwarder?: Contract) {
     const config = this.getDeployConfig();
 
     const _config = merge(config, {
@@ -142,7 +199,7 @@ class Deployer {
     this._saveConfig(_config);
   }
 
-  async saveForwarderConfig (name, contract) {
+  async saveForwarderConfig (name: string, contract: Contract) {
     const config = this.getDeployConfig();
 
     const _config = merge(config, {
@@ -157,10 +214,8 @@ class Deployer {
     this._saveConfig(_config);
   }
 
-  async _saveConfig (config) {
+  async _saveConfig (config: any) {
     const configPath = path.resolve(this.options.basePath, `${this.network.chainId}.json`);
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
   }
 }
-
-module.exports = Deployer;

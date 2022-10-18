@@ -1,6 +1,7 @@
-const { network, run } = require('hardhat');
+import { network, run } from 'hardhat';
+import {Deployer} from './deployer';
 
-const verify = async (ctx, address, args) => {
+export default async (ctx: Deployer, address: string, args: any[]) => {
   try {
     await run('verify:verify', {
       address,
@@ -10,5 +11,3 @@ const verify = async (ctx, address, args) => {
     ctx.log('Verification failed', { chainId: network.config.chainId, address, args });
   }
 };
-
-module.exports = verify;
