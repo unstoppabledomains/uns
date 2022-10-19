@@ -1,4 +1,4 @@
-## v0.5.19
+## v0.5.20
 - Added ability to burn TLD tokens via MintingManager#burnTLDL1
 - Added ability to move TLD tokens ownership to MintingManager via MintingManager#moveTLDOwnershipL2
 
