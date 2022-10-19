@@ -883,6 +883,9 @@ describe('MintingManager', () => {
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.eql(signers[1].address);
         expect(await unsRegistry.get('key1', tokenId)).to.be.eql('value2');
+        expect(await unsRegistry.reverseOf(signers[1].address)).to.be.equal(
+          tokenId,
+        );
       });
 
       it('should revert minting legacy CNS free domains', async () => {

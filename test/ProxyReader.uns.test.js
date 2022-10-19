@@ -302,7 +302,7 @@ describe('ProxyReader (UNS only)', () => {
       it('should return reverse record', async () => {
         const owner = signers[3];
         const tokenId = await mintDomain(unsRegistry, owner.address, ['hey_hoy_11sfg', 'wallet']);
-        await unsRegistry.connect(owner).setReverse(tokenId);
+        await unsRegistry.connect(owner)['setReverse(uint256)'](tokenId);
 
         expect(await proxy.reverseOf(owner.address)).to.be.equal(tokenId);
       });

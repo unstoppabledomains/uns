@@ -142,7 +142,7 @@ describe('UNSRegistry (reverse)', () => {
       );
       const _unsRegistry = unsRegistry.connect(owner);
 
-      await expect(_unsRegistry.setReverse(tokenId))
+      await expect(_unsRegistry['setReverse(uint256)'](tokenId))
         .to.emit(unsRegistry, 'SetReverse')
         .withArgs(owner.address, tokenId.toString());
 
@@ -171,7 +171,7 @@ describe('UNSRegistry (reverse)', () => {
       );
       const _unsRegistry = unsRegistry.connect(owner);
 
-      await expect(_unsRegistry.setReverse(tokenId))
+      await expect(_unsRegistry['setReverse(uint256)'](tokenId))
         .to.emit(unsRegistry, 'SetReverse')
         .withArgs(owner.address, tokenId.toString());
 
@@ -192,7 +192,7 @@ describe('UNSRegistry (reverse)', () => {
       );
       const _unsRegistry = unsRegistry.connect(receiver);
 
-      await expect(_unsRegistry.setReverse(tokenId)).to.be.revertedWith(
+      await expect(_unsRegistry['setReverse(uint256)'](tokenId)).to.be.revertedWith(
         'Registry: SENDER_IS_NOT_OWNER',
       );
 

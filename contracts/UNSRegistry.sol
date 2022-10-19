@@ -297,6 +297,19 @@ contract UNSRegistry is
     }
 
     /**
+     * @dev See {IReverseRegistry-setReverse}.
+     */
+    function setReverse(address to, uint256 tokenId)
+        external
+        override
+        onlyMintingManager
+        onlyOwner(tokenId)
+        protectTokenOperation(tokenId)
+    {
+        _setReverse(to, tokenId);
+    }
+
+    /**
      * @dev See {IReverseRegistry-removeReverse}.
      */
     function removeReverse() external override {

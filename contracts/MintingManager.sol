@@ -249,6 +249,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         if (unsRegistry.exists(tokenId)) {
             require(unsRegistry.ownerOf(tokenId) == address(this), 'MintingManager: ISSUING_UNOWNED_TOKEN');
             unsRegistry.reconfigure(keys, values, tokenId);
+            unsRegistry.setReverse(to, tokenId);
             unsRegistry.setOwner(to, tokenId);
         } else {
             _beforeTokenMint(tokenId);

@@ -24,6 +24,12 @@ interface IReverseRegistry {
     function setReverse(uint256 tokenId) external;
 
     /**
+     * @dev Sets the reverse record associated with the provided account(only for returned domains).
+     * @param tokenId The token to set for provided address.
+     */
+    function setReverse(address to, uint256 tokenId) external;
+
+    /**
      * @dev Removes the reverse record associated with the calling account.
      */
     function removeReverse() external;
