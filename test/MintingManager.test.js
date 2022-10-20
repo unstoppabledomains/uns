@@ -900,6 +900,66 @@ describe('MintingManager', () => {
         ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
+
+    describe('mintSLDWithRecords(address,uint256, string,string[],string[])', () => {
+      const selector =
+        'mintSLDWithRecords(address,uint256,string,string[],string[])';
+
+      it('should mint with records .crypto domain in CNS registry', async () => {
+        const label = 'test-om110';
+        await mintingManager[selector](
+          coinbase.address,
+          TLD.CRYPTO,
+          label,
+          ['key1'],
+          ['value1'],
+        );
+        const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, label);
+
+        expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
+        await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
+          'ERC721: invalid token ID',
+        );
+
+        expect(await resolver.get('key1', tokenId)).to.be.eql('value1');
+        expect(await cnsRegistry.resolverOf(tokenId)).to.be.eql(
+          resolver.address,
+        );
+      });
+
+      it('should mint with records .wallet domain in UNS registry', async () => {
+        const label = 'test-omcm332';
+        await mintingManager[selector](
+          coinbase.address,
+          TLD.WALLET,
+          label,
+          ['key1'],
+          ['value1'],
+        );
+        const tokenId = await cnsRegistry.childIdOf(TLD.WALLET, label);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
+          coinbase.address,
+        );
+        await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith(
+          'ERC721: owner query for nonexistent token',
+        );
+
+        expect(await unsRegistry.get('key1', tokenId)).to.be.eql('value1');
+      });
+
+      it('should revert minting legacy CNS free domains', async () => {
+        await expect(
+          mintingManager[selector](
+            coinbase.address,
+            TLD.CRYPTO,
+            'udtestdev-ot7',
+            [],
+            [],
+          ),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
+      });
+    });
   });
 
   describe('CNS Resolver management', () => {
