@@ -109,14 +109,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         emit RemoveTld(tld);
     }
 
-    function mintSLD(
-        address to,
-        uint256 tld,
-        string calldata label
-    ) external override onlyMinter onlyAllowedSLD(tld, label) whenNotPaused {
-        _issue(to, _buildLabels(tld, label));
-    }
-
     function mintSLDWithRecords(
         address to,
         uint256 tld,
@@ -286,18 +278,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function _freeSLDLabel(string calldata label) private pure returns (string memory) {
         return string(abi.encodePacked('uns-devtest-', label));
-    }
-
-    function _uri(uint256 tld, string memory label) private view returns (string memory) {
-        return string(abi.encodePacked(label, '.', _tlds[tld]));
-    }
-
-    function _uri(string[] memory labels) private pure returns (string memory) {
-        bytes memory uri = bytes(labels[0]);
-        for (uint256 i = 1; i < labels.length; i++) {
-            uri = abi.encodePacked(uri, '.', labels[i]);
-        }
-        return string(uri);
     }
 
     function _beforeTokenMint(uint256 tokenId) private {

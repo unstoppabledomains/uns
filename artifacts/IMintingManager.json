@@ -198,29 +198,6 @@
           "internalType": "string",
           "name": "label",
           "type": "string"
-        }
-      ],
-      "name": "mintSLD",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tld",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "label",
-          "type": "string"
         },
         {
           "internalType": "string[]",
