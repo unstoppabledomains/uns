@@ -2,6 +2,7 @@ const { ethers } = require('hardhat');
 const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
 const { ZERO_ADDRESS, TLD } = require('./helpers/constants');
+const { mintDomain } = require('./helpers/registry');
 
 describe('MintingManager', () => {
   const DomainNamePrefix = 'uns-devtest-';
@@ -600,10 +601,12 @@ describe('MintingManager', () => {
       });
 
       it('should revert minting when account is not the SLD owner', async () => {
-        await mintingManager.issueWithRecords(receiver.address, ['test-1sub', 'wallet'], [], []);
+        const labels = ['test-1sub', 'wallet'];
+        await mintingManager.issueWithRecords(receiver.address, labels, [], []);
 
+        labels.unshift('sub');
         await expect(
-          mintingManager.issueWithRecords(coinbase.address, ['sub', 'test-1sub', 'wallet'], [], []),
+          mintingManager.issueWithRecords(coinbase.address, labels, [], []),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
       });
 
@@ -615,11 +618,10 @@ describe('MintingManager', () => {
 
       it('should mint .wallet subdomain', async () => {
         const labels = ['test-1sub2', 'wallet'];
-        await mintingManager.issueWithRecords(mintingManager.address, labels, [], []);
+        await mintingManager.issueWithRecords(coinbase.address, labels, [], []);
 
         labels.unshift('sub');
-        await mintingManager.issueWithRecords(coinbase.address, labels, [], []);
-        const tokenId = await unsRegistry.namehash(labels);
+        const tokenId = await mintDomain(unsRegistry, coinbase, labels);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
           coinbase.address,
@@ -628,11 +630,10 @@ describe('MintingManager', () => {
 
       it('should mint .crypto subdamain in UNS registry when CNS registry undefined', async () => {
         const labels = ['test-1sub3', 'crypto'];
-        await mintingManager.issueWithRecords(mintingManager.address, labels, [], []);
+        await mintingManager.issueWithRecords(coinbase.address, labels, [], []);
 
         labels.unshift('sub');
-        await mintingManager.issueWithRecords(coinbase.address, labels, [], []);
-        const tokenId = await unsRegistry.namehash(labels);
+        const tokenId = await mintDomain(unsRegistry, coinbase, labels);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
           coinbase.address,
