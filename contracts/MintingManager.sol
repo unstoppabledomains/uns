@@ -264,7 +264,9 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function _namehash(string[] memory labels) internal pure returns (uint256) {
         uint256 node = 0x0;
-        for (uint256 i = labels.length; i > 0; i--) node = _namehash(node, labels[i - 1]);
+        for (uint256 i = labels.length; i > 0; i--) {
+            node = _namehash(node, labels[i - 1]);
+        }
         return node;
     }
 

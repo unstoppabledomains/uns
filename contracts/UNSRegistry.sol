@@ -98,7 +98,9 @@ contract UNSRegistry is
 
     function namehash(string[] calldata labels) external pure override returns (uint256) {
         uint256 node = uint256(0x0);
-        for (uint256 i = labels.length; i > 0; i--) node = _namehash(node, labels[i - 1]);
+        for (uint256 i = labels.length; i > 0; i--) {
+            node = _namehash(node, labels[i - 1]);
+        }
         return node;
     }
 
