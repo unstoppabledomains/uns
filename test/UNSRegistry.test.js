@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
 
 const { TLD, ZERO_ADDRESS, DEAD_ADDRESS } = require('./helpers/constants');
-const { mintDomain } = require('./helpers/registry');
+const { mintTLD, mintDomain } = require('./helpers/registry');
 
 const { utils, BigNumber } = ethers;
 
@@ -25,11 +25,7 @@ describe('UNSRegistry', () => {
 
     unsRegistry = await UNSRegistry.deploy();
     await unsRegistry.initialize(coinbase.address);
-    await unsRegistry['mint(address,uint256,string)'](
-      DEAD_ADDRESS,
-      root,
-      'crypto',
-    );
+    await mintTLD(unsRegistry, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
     await unsRegistry.addProxyReader(reader.address);
 
@@ -255,6 +251,65 @@ describe('UNSRegistry', () => {
         await expect(
           unsRegistry.connect(signers[1]).upgradeAll([tokenId]),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_MINTING_MANAGER');
+      });
+    });
+
+    
+    describe('burnTLDL1', async () => {
+      it('should not allow burn TLD tokens with an owner other than 0xdead', async () => {
+        const tokenId = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+        );
+
+        await expect(unsRegistry.connect(coinbase).burnTLDL1(tokenId)).to.be.revertedWith(
+          'Registry: OWNER_NOT_0xDEAD',
+        );
+      });
+
+      it('should burn TLD tokens', async () => {
+        const tldTokenId = await mintTLD(unsRegistry, 'burnl1');
+
+        expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(DEAD_ADDRESS);
+        await unsRegistry.connect(coinbase).burnTLDL1(tldTokenId);
+        await expect(unsRegistry.ownerOf(tldTokenId)).to.be.revertedWith(
+          'ERC721: invalid token ID',
+        );
+      });
+
+      it('should not allow burn TLD tokens if not minting manager', async () => {
+        await expect(unsRegistry.connect(signers[1]).burnTLDL1(TLD.CRYPTO)).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_MINTING_MANAGER',
+        );
+      });
+    });
+
+    describe('moveTLDOwnershipL2', async () => {
+      it('should not allow change TLD tokens ownership transfer with an owner other than 0xdead', async () => {
+        const tokenId = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+        );
+
+        await expect(unsRegistry.connect(coinbase).moveTLDOwnershipL2(tokenId)).to.be.revertedWith(
+          'Registry: OWNER_NOT_0xDEAD',
+        );
+      });
+
+      it('should change TLD tokens ownership to minting manager', async () => {
+        const tldTokenId = await mintTLD(unsRegistry, 'movel2');
+        
+        expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(DEAD_ADDRESS);
+        await unsRegistry.connect(coinbase).moveTLDOwnershipL2(tldTokenId);
+        expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(coinbase.address);
+      });
+
+      it('should not allow change TLD tokens ownership if not minting manager', async () => {
+        await expect(unsRegistry.connect(signers[1]).moveTLDOwnershipL2(TLD.CRYPTO)).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_MINTING_MANAGER',
+        );
       });
     });
   });

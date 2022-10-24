@@ -29,7 +29,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.5.1';
+    string public constant VERSION = '0.5.2';
 
     string internal _prefix;
 
@@ -369,6 +369,22 @@ contract UNSRegistry is
         for (uint256 i = 0; i < tokenIds.length; i++) {
             _upgradedTokens[tokenIds[i]] = true;
         }
+    }
+
+    /**
+     * @dev See {IUNSRegistry-burnTLDL1(uint256)}.
+     */
+    function burnTLDL1(uint256 tokenId) external override onlyMintingManager {
+        require(ownerOf(tokenId) == address(0xdead), 'Registry: OWNER_NOT_0xDEAD');
+        _burn(tokenId);
+    }
+
+    /**
+     * @dev See {IUNSRegistry-moveTLDOwnershipL2(uint256)}.
+     */
+    function moveTLDOwnershipL2(uint256 tokenId) external override onlyMintingManager {
+        require(ownerOf(tokenId) == address(0xdead), 'Registry: OWNER_NOT_0xDEAD');
+        _transfer(address(0xdead), _mintingManager, tokenId);
     }
 
     /// Internal

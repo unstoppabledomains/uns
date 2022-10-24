@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.3.4';
+    string public constant VERSION = '0.3.5';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -215,6 +215,25 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function upgradeAll(uint256[] calldata tokenIds) external onlyMinter {
         unsRegistry.upgradeAll(tokenIds);
+    }
+
+    function _isTldToChangeOwnership(uint256 tld) private view returns (bool) {
+        // 0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2 - .coin token ID
+        return bytes(_tlds[tld]).length > 0 || tld == 0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2;
+    }
+
+    function burnTLDL1(uint256[] calldata tokenIds) external onlyOwner {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            require(_isTldToChangeOwnership(tokenIds[i]), 'MintingManager: TOKEN_ID_NOT_TLD');
+            unsRegistry.burnTLDL1(tokenIds[i]);
+       }
+    }
+
+    function moveTLDOwnershipL2(uint256[] calldata tokenIds) external onlyOwner {
+       for (uint256 i = 0; i < tokenIds.length; i++) {
+            require(_isTldToChangeOwnership(tokenIds[i]), 'MintingManager: TOKEN_ID_NOT_TLD');
+            unsRegistry.moveTLDOwnershipL2(tokenIds[i]);
+       }
     }
 
     function _mintSLD(
