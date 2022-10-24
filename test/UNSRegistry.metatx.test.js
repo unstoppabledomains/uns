@@ -281,6 +281,7 @@ describe('UNSRegistry (metatx)', () => {
         'mint',
         'issue',
         'issueWithRecords',
+        'unlockWithRecords',
         'transferFromFor',
         'burnFor',
         'resetFor',

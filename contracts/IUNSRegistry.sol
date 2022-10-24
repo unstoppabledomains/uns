@@ -97,6 +97,20 @@ interface IUNSRegistry is
     ) external;
 
     /**
+     * @dev unlock token with records
+     * @param to address to unlock the token to
+     * @param tokenId id of the token.
+     * @param keys New record keys
+     * @param values New record values
+     */
+    function unlockWithRecords(
+        address to,
+        uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values
+    ) external;
+
+    /**
      * @dev Stores CNS registry address.
      * It's one-time operation required to set CNS registry address.
      * UNS registry allows to receive ERC721 tokens only from CNS registry,
@@ -122,7 +136,7 @@ interface IUNSRegistry is
      * @param tokenId TLD tokenId to burn
      */
     function burnTLDL1(uint256 tokenId) external;
-    
+
     /**
      * @dev Burn TLD tokens.
      * @param tokenId TLD tokenId to burn

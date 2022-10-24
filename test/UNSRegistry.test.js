@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
 
 const { TLD, ZERO_ADDRESS, DEAD_ADDRESS } = require('./helpers/constants');
-const { mintTLD, mintDomain, mintRandomDomain } = require('./helpers/registry');
+const { mintDomain, mintRandomDomain } = require('./helpers/registry');
 
 const { utils, BigNumber } = ethers;
 
@@ -43,7 +43,7 @@ describe('UNSRegistry', () => {
       await registry.connect(coinbase).setOwner(DEAD_ADDRESS, tokenId);
 
       return tokenId;
-    }
+    };
 
     it('should return zero root', async () => {
       expect(await unsRegistry.root()).to.be.equal(0);
@@ -245,7 +245,6 @@ describe('UNSRegistry', () => {
       });
     });
 
-    
     describe('burnTLDL1', async () => {
       it('should not allow burn TLD tokens with an owner other than 0xdead', async () => {
         const tokenId = await mintDomain(
@@ -291,7 +290,7 @@ describe('UNSRegistry', () => {
 
       it('should change TLD tokens ownership to minting manager', async () => {
         const tldTokenId = await mintTLDToDead(unsRegistry, 'movel2');
-        
+
         expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(DEAD_ADDRESS);
         await unsRegistry.connect(coinbase).moveTLDOwnershipL2(tldTokenId);
         expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(coinbase.address);

@@ -208,14 +208,14 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         for (uint256 i = 0; i < tokenIds.length; i++) {
             require(_isTldToChangeOwnership(tokenIds[i]), 'MintingManager: TOKEN_ID_NOT_TLD');
             unsRegistry.burnTLDL1(tokenIds[i]);
-       }
+        }
     }
 
     function moveTLDOwnershipL2(uint256[] calldata tokenIds) external onlyOwner {
-       for (uint256 i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             require(_isTldToChangeOwnership(tokenIds[i]), 'MintingManager: TOKEN_ID_NOT_TLD');
             unsRegistry.moveTLDOwnershipL2(tokenIds[i]);
-       }
+        }
     }
 
     function _buildLabels(uint256 tld, string memory label) private view returns (string[] memory) {
@@ -238,11 +238,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     ) private {
         uint256 tokenId = _namehash(labels);
 
-        if (unsRegistry.exists(tokenId)) {
-            require(unsRegistry.ownerOf(tokenId) == address(this), 'MintingManager: ISSUING_UNOWNED_TOKEN');
-            unsRegistry.reconfigure(keys, values, tokenId);
-            unsRegistry.setReverse(to, tokenId);
-            unsRegistry.setOwner(to, tokenId);
+        if (_ownerOf(tokenId) == address(this)) {
+            unsRegistry.unlockWithRecords(to, tokenId, keys, values);
         } else {
             _beforeTokenMint(tokenId);
 
@@ -323,15 +320,22 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     /**
-     * @dev namehash('crypto') = 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f
+     * @dev Get token owner ignoring revert when token does not exist
      */
-    function _useCNS(uint256 tld) private view returns (bool) {
-        return address(cnsMintingController) != address(0) && tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
+    function _ownerOf(uint256 tokenId) private view returns (address) {
+        try unsRegistry.ownerOf(tokenId) returns (address _owner) {
+            return _owner;
+        } catch {
+            return address(0);
+        }
     }
 
+    /**
+     * @dev namehash('crypto') = 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f
+     */
     function _useCNS(string[] memory labels) private view returns (bool) {
         uint256 tld = _namehash(uint256(0x0), labels[labels.length - 1]);
-        return _useCNS(tld);
+        return address(cnsMintingController) != address(0) && tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
     }
 
     // Reserved storage space to allow for layout changes in the future.

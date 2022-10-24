@@ -1,5 +1,4 @@
 const { ethers } = require('hardhat');
-const { ZERO_ADDRESS, DEAD_ADDRESS } = require('./constants');
 
 const generateRandomLabel = () => 'domain-' + ethers.utils.hexlify(
   ethers.utils.randomBytes(16),

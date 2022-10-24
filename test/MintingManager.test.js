@@ -305,7 +305,7 @@ describe('MintingManager', () => {
 
         await expect(
           minter.functions['claim(uint256,string)'](TLD.WALLET, domainSuffix),
-        ).to.be.revertedWith('MintingManager: ISSUING_UNOWNED_TOKEN');
+        ).to.be.revertedWith('MintingManager: TOKEN_BLOCKED');
       });
 
       it('should revert minting legacy CNS free domains', async () => {

@@ -97,11 +97,9 @@ contract UNSRegistry is
     }
 
     function namehash(string[] calldata labels) external pure override returns (uint256) {
-        uint256 node = uint256(0x0);
-        for (uint256 i = labels.length; i > 0; i--) {
-            node = _namehash(node, labels[i - 1]);
-        }
-        return node;
+        require(labels.length >= 1, 'Registry: LABELS_LENGTH_BELOW_1');
+        (uint256 tokenId, ) = _namehash(labels);
+        return tokenId;
     }
 
     function exists(uint256 tokenId) external view override(IUNSRegistry, IMintableERC721) returns (bool) {
@@ -115,13 +113,27 @@ contract UNSRegistry is
         emit NewURI(tokenId, uri);
     }
 
+    function unlockWithRecords(
+        address to,
+        uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values
+    ) external override onlyMintingManager {
+        _reconfigure(keys, values, tokenId);
+        _transfer(ownerOf(tokenId), to, tokenId);
+        _safeSetReverse(to, tokenId);
+    }
+
     function mintWithRecords(
         address to,
         string[] calldata labels,
         string[] calldata keys,
         string[] calldata values
     ) external override {
-        uint256 tokenId = _getTokenIdToMint(labels);
+        require(labels.length >= 2, 'Registry: LABELS_LENGTH_BELOW_2');
+        (uint256 tokenId, uint256 parentId) = _namehash(labels);
+        require(_isApprovedOrOwner(_msgSender(), parentId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
         _mint(to, tokenId, _uri(labels));
         _setMany(keys, values, tokenId);
     }
@@ -299,19 +311,6 @@ contract UNSRegistry is
     }
 
     /**
-     * @dev See {IReverseRegistry-setReverse}.
-     */
-    function setReverse(address to, uint256 tokenId)
-        external
-        override
-        onlyMintingManager
-        onlyOwner(tokenId)
-        protectTokenOperation(tokenId)
-    {
-        _setReverse(to, tokenId);
-    }
-
-    /**
      * @dev See {IReverseRegistry-removeReverse}.
      */
     function removeReverse() external override {
@@ -365,26 +364,17 @@ contract UNSRegistry is
 
     /// Internal
 
-    function _getTokenIdToMint(string[] calldata labels) internal view returns (uint256) {
-        require(labels.length >= 2, 'Registry: LABELS_LENGTH_BELOW_2');
-
-        uint256 parentId = 0x0;
-        uint256 tokenId = 0x0;
-
-        for (uint256 i = labels.length; i > 0; i--) {
-            parentId = tokenId;
-            tokenId = _namehash(parentId, labels[i - 1]);
-        }
-
-        require(_isApprovedOrOwner(_msgSender(), parentId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
-
-        return tokenId;
-    }
-
     function _uri(string[] memory labels) private pure returns (string memory) {
         bytes memory uri = bytes(labels[0]);
         for (uint256 i = 1; i < labels.length; i++) uri = abi.encodePacked(uri, '.', labels[i]);
         return string(uri);
+    }
+
+    function _namehash(string[] calldata labels) internal pure returns (uint256 tokenId, uint256 parentId) {
+        for (uint256 i = labels.length; i > 0; i--) {
+            parentId = tokenId;
+            tokenId = _namehash(parentId, labels[i - 1]);
+        }
     }
 
     function _namehash(uint256 tokenId, string memory label) internal pure returns (uint256) {
