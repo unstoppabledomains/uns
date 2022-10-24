@@ -23,12 +23,28 @@ describe('UNSRegistry', () => {
 
     unsRegistry = await UNSRegistry.deploy();
     await unsRegistry.initialize(coinbase.address);
-    await mintTLD(unsRegistry, 'crypto');
+    await unsRegistry['mintTLD(uint256,string)'](
+      root,
+      'crypto',
+    );
     await unsRegistry.setTokenURIPrefix('/');
     await unsRegistry.addProxyReader(reader.address);
   });
 
   describe('General', () => {
+    const mintTLDToDead = async (registry, tld) => {
+      const tokenId = await registry.namehash([tld]);
+
+      await registry['mintTLD(uint256,string)'](
+        tokenId,
+        tld,
+      );
+
+      await registry.connect(coinbase).setOwner(DEAD_ADDRESS, tokenId);
+
+      return tokenId;
+    }
+
     it('should return zero root', async () => {
       expect(await unsRegistry.root()).to.be.equal(0);
     });
@@ -235,7 +251,7 @@ describe('UNSRegistry', () => {
         const tokenId = await mintDomain(
           unsRegistry,
           coinbase.address,
-          TLD.CRYPTO,
+          ['burn0', 'crypto'],
         );
 
         await expect(unsRegistry.connect(coinbase).burnTLDL1(tokenId)).to.be.revertedWith(
@@ -244,7 +260,7 @@ describe('UNSRegistry', () => {
       });
 
       it('should burn TLD tokens', async () => {
-        const tldTokenId = await mintTLD(unsRegistry, 'burnl1');
+        const tldTokenId = await mintTLDToDead(unsRegistry, 'burnl1');
 
         expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(DEAD_ADDRESS);
         await unsRegistry.connect(coinbase).burnTLDL1(tldTokenId);
@@ -265,7 +281,7 @@ describe('UNSRegistry', () => {
         const tokenId = await mintDomain(
           unsRegistry,
           coinbase.address,
-          TLD.CRYPTO,
+          ['move0', 'crypto'],
         );
 
         await expect(unsRegistry.connect(coinbase).moveTLDOwnershipL2(tokenId)).to.be.revertedWith(
@@ -274,7 +290,7 @@ describe('UNSRegistry', () => {
       });
 
       it('should change TLD tokens ownership to minting manager', async () => {
-        const tldTokenId = await mintTLD(unsRegistry, 'movel2');
+        const tldTokenId = await mintTLDToDead(unsRegistry, 'movel2');
         
         expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(DEAD_ADDRESS);
         await unsRegistry.connect(coinbase).moveTLDOwnershipL2(tldTokenId);

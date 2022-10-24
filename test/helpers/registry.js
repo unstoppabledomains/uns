@@ -5,16 +5,6 @@ const generateRandomLabel = () => 'domain-' + ethers.utils.hexlify(
   ethers.utils.randomBytes(16),
 );
 
-const mintTLD = async (registry, tld) => {
-  const tokenId = await registry.childIdOf(ZERO_ADDRESS, tld);
-  await registry['mint(address,uint256,string)'](
-    DEAD_ADDRESS,
-    tokenId,
-    tld,
-  );
-  return tokenId;
-}
-
 // TODO: make a params object instead of arguments list here
 const mintDomain = async (registry, owner, labels, withoutReverse = false, keys = [], values = []) => {
   await registry['mintWithRecords(address,string[],string[],string[])'](owner.address || owner, labels, keys, values);
@@ -37,4 +27,4 @@ const mintRandomDomain = async (registry, owner, tld, withoutReverse = false, ke
   return await registry.namehash(labels);
 };
 
-module.exports = { mintTLD, mintDomain, mintRandomDomain };
+module.exports = { mintDomain, mintRandomDomain };
