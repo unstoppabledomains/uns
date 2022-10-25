@@ -58,6 +58,13 @@ describe('MintingManager (consumption)', () => {
       return [
         {
           func: 'issueWithRecords',
+          note: 'mint',
+          selector: 'issueWithRecords(address,string[],string[],string[])',
+          params: [receiver.address, ['t1-w1-', 'wallet'], [], []],
+        },
+        {
+          func: 'issueWithRecords',
+          note: 'unlock',
           selector: 'issueWithRecords(address,string[],string[],string[])',
           params: [receiver.address, ['t1-w1-', 'wallet'], [], []],
         },
@@ -69,11 +76,12 @@ describe('MintingManager (consumption)', () => {
 
       const cases = getCases();
       for (let i = 0; i < cases.length; i++) {
-        const { selector, params } = cases[i];
+        const { note, selector, params } = cases[i];
         const [acc, labels, ...rest] = params;
         const executeParams = [acc, [labels[0] + 'r', labels[1]], ...rest];
 
         const tokenId = await unsRegistry.namehash(labels);
+        const tokenId2 = await unsRegistry.namehash(executeParams[1]);
         const { req, signature } = await buildExecuteParams(
           selector,
           executeParams,
@@ -93,6 +101,7 @@ describe('MintingManager (consumption)', () => {
         await removeReverse();
 
         result.push({
+          note,
           selector,
           records: Array.isArray(params[2]) ? params[2].length : '-',
           send: tx.receipt.gasUsed.toString(),
@@ -101,6 +110,9 @@ describe('MintingManager (consumption)', () => {
             percDiff(tx.receipt.gasUsed, executeTx.receipt.gasUsed).toFixed(2) +
             ' %',
         });
+
+        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId);
+        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId2);
       }
       console.table(result);
     });

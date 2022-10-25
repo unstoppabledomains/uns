@@ -302,6 +302,55 @@ describe('UNSRegistry', () => {
         );
       });
     });
+
+    describe('unlockWithRecords', async () => {
+      it('should unlock domain with no records', async () => {
+        const tokenId = await mintDomain(unsRegistry, coinbase, ['unlock1', 'crypto'], false, ['key_1'], ['value_1']);
+        await unsRegistry.connect(coinbase).unlockWithRecords(receiver.address, tokenId, [], []);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+        expect(await unsRegistry.get('key_1', tokenId)).to.be.equal('');
+      });
+
+      it('should unlock domain with record', async () => {
+        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['unlock2', 'crypto']);
+
+        await unsRegistry.connect(coinbase).unlockWithRecords(receiver.address, tokenId, ['key_1'], ['value_1']);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+        expect(await unsRegistry.get('key_1', tokenId)).to.be.eql('value_1');
+      });
+
+      it('should produce Transfer event', async () => {
+        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['unlock3', 'crypto']);
+
+        await expect(unsRegistry.unlockWithRecords(receiver.address, tokenId, [], []))
+          .to.emit(unsRegistry, 'Transfer')
+          .withArgs(coinbase.address, receiver.address, tokenId);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+      });
+
+      it('should not produce NewURI event', async () => {
+        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['unlock3-1', 'crypto']);
+
+        await expect(unsRegistry.unlockWithRecords(receiver.address, tokenId, [], []))
+          .to.not.emit(unsRegistry, 'NewURI')
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+      });
+
+      it('should not set reverse if it already exists', async () => {
+        const reverseTokenId = await mintDomain(unsRegistry, receiver.address, ['unlock4', 'crypto'], false);
+        await unsRegistry.connect(receiver).setReverse(reverseTokenId);
+
+        expect(await unsRegistry.reverseOf(receiver.address)).to.be.equal(reverseTokenId);
+
+        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['unlock5', 'crypto'], false);
+        await unsRegistry.connect(coinbase).unlockWithRecords(receiver.address, tokenId, [], []);
+
+        expect(await unsRegistry.reverseOf(receiver.address)).to.be.equal(reverseTokenId);
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+      });
+    });
   });
 
   describe('Registry (minting)', () => {
