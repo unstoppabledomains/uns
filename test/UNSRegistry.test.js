@@ -254,7 +254,6 @@ describe('UNSRegistry', () => {
       });
     });
 
-    
     describe('burnTLDL1', async () => {
       it('should not allow burn TLD tokens with an owner other than 0xdead', async () => {
         const tokenId = await mintDomain(
@@ -300,7 +299,7 @@ describe('UNSRegistry', () => {
 
       it('should change TLD tokens ownership to minting manager', async () => {
         const tldTokenId = await mintTLD(unsRegistry, 'movel2');
-        
+
         expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(DEAD_ADDRESS);
         await unsRegistry.connect(coinbase).moveTLDOwnershipL2(tldTokenId);
         expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(coinbase.address);

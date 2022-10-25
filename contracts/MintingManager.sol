@@ -226,14 +226,14 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         for (uint256 i = 0; i < tokenIds.length; i++) {
             require(_isTldToChangeOwnership(tokenIds[i]), 'MintingManager: TOKEN_ID_NOT_TLD');
             unsRegistry.burnTLDL1(tokenIds[i]);
-       }
+        }
     }
 
     function moveTLDOwnershipL2(uint256[] calldata tokenIds) external onlyOwner {
-       for (uint256 i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             require(_isTldToChangeOwnership(tokenIds[i]), 'MintingManager: TOKEN_ID_NOT_TLD');
             unsRegistry.moveTLDOwnershipL2(tokenIds[i]);
-       }
+        }
     }
 
     function _mintSLD(
