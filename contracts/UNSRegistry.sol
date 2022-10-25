@@ -119,8 +119,9 @@ contract UNSRegistry is
         string[] calldata keys,
         string[] calldata values
     ) external override onlyMintingManager {
-        _reconfigure(keys, values, tokenId);
+        _reset(tokenId);
         _transfer(ownerOf(tokenId), to, tokenId);
+        _setMany(keys, values, tokenId);
         _safeSetReverse(to, tokenId);
     }
 
