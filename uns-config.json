@@ -1,5 +1,5 @@
 {
-    "version": "0.5.5",
+    "version": "0.6.1",
     "networks": {
         "1": {
             "contracts": {
@@ -106,7 +106,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x070e83FCed225184E67c86302493ffFCDB953f71",
-                    "implementation": "0x9B20BF441743AFb0824F40d2CbBBB5877eCBbeF0",
+                    "implementation": "0xD87ecbc9c150751058A7d8D36a29b10582Ab7ad1",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ea",
                     "forwarder": "0x070e83FCed225184E67c86302493ffFCDB953f71"
@@ -119,7 +119,7 @@
                 },
                 "MintingManager": {
                     "address": "0x9ee42D3EB042e06F8Cd241890C4fA0d51e4DA345",
-                    "implementation": "0xcb07E4d7AFd1D4E31c6294c768035619c8A1402C",
+                    "implementation": "0xEDC41E4174FeD7AEB8Ba54b2d425D774bcF91643",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ec",
                     "forwarder": "0x7F9F48cF94C69ce91D4b442DA186F31118ac0185"
@@ -199,9 +199,9 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
+                    "implementation": "0xE96cE2F6546AF59b1ecC91d80fE887e0AAbc91B7",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272eb5",
-                    "implementation": "0xE96cE2F6546AF59b1ecC91d80fE887e0AAbc91B7",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
                 },
                 "CNSRegistry": {
@@ -212,9 +212,9 @@
                 },
                 "MintingManager": {
                     "address": "0x7be83293BeeDc9Eba1bd76c66A65F10F3efaeC26",
+                    "implementation": "0x4726E4a6858eFff6A89A3A7Fc21048b4333825D6",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272f41",
-                    "implementation": "0x4726E4a6858eFff6A89A3A7Fc21048b4333825D6",
                     "forwarder": "0xC37d3c4326ab0E1D2b9D8b916bBdf5715f780fcF"
                 },
                 "ProxyAdmin": {
@@ -292,9 +292,9 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x58a175BEbc8ec21A94ea63Aa5a28743945940EE6",
+                    "implementation": "0xe0aFC4e9E03e4aa67257Df7A2Eca77454309789D",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0d",
-                    "implementation": "0xe0aFC4e9E03e4aa67257Df7A2Eca77454309789D",
                     "forwarder": "0x58a175BEbc8ec21A94ea63Aa5a28743945940EE6"
                 },
                 "CNSRegistry": {
@@ -305,9 +305,9 @@
                 },
                 "MintingManager": {
                     "address": "0x27935e7e85db3c4e7885eB828B9e889BA69a4e7f",
+                    "implementation": "0xa1A2114B0C4bDF9AEe05fdd80801e6267639FAd9",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0f",
-                    "implementation": "0xa1A2114B0C4bDF9AEe05fdd80801e6267639FAd9",
                     "forwarder": "0xC20631145b77a58018E2b10f2282Dd048E12fC81"
                 },
                 "ProxyAdmin": {
@@ -382,9 +382,9 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93",
+                    "implementation": "0xbdb5B4c90e405D76EC3990b3b7b9A6309Ec128B7",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f43",
-                    "implementation": "0x491e814AE593f3029a567661d3Ab591d798884d6",
                     "forwarder": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93"
                 },
                 "CNSRegistry": {
@@ -395,9 +395,9 @@
                 },
                 "MintingManager": {
                     "address": "0x428189346bb3CC52f031A1092fd47C919AC30A9f",
+                    "implementation": "0x2FE554559c918e91F202B2e835BD2027381B0C48",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f4a",
-                    "implementation": "0x93B05621F0E4D6e0A19984Db0BF67fD5796a6740",
                     "forwarder": "0xEf3a491A8750BEC2Dff5339CF6Df94436d432C4d"
                 },
                 "ProxyAdmin": {

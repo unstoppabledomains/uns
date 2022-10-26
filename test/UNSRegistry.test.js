@@ -334,7 +334,7 @@ describe('UNSRegistry', () => {
         const tokenId = await mintDomain(unsRegistry, coinbase.address, ['unlock3-1', 'crypto']);
 
         await expect(unsRegistry.unlockWithRecords(receiver.address, tokenId, [], []))
-          .to.not.emit(unsRegistry, 'NewURI')
+          .to.not.emit(unsRegistry, 'NewURI');
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
       });
 

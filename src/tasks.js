@@ -408,7 +408,6 @@ const upgradeMintingManagerTask = {
     const mintingManager = await upgrades.upgradeProxy(
       MintingManager.address,
       ctx.artifacts.MintingManager,
-      { unsafeAllowRenames: true },
     );
     await mintingManager.deployTransaction.wait();
 
