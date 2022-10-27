@@ -1,11 +1,10 @@
 import fs from 'fs';
 import tar from 'tar';
 import { mergeNetworkConfig } from '../src/config';
-import { Sandbox } from '.';
+import { GANACHE_SERVER_CONFIG, Sandbox } from '.';
 import { Deployer } from '../src/deployer';
 
 // NOTE: Node module execution is used for rebuilding sandbox package
-// TODO: still required?
 if (require.main === module) {
   (async () => {
     try {
@@ -19,10 +18,9 @@ if (require.main === module) {
 
       mergeNetworkConfig(config);
 
-      // const { db_path: dbPath, snapshotPath } = sandbox.options.network;
-      // const {dbPath} = GANACHE_SERVER_CONFIG.database!;
-      // TODO: some issue with TS. fix hardcode. 
-      const dbPath = './.sandbox';
+      // TODO: check if in future version ganache typing resolution for ServerOptions was fixed.
+      // Hardcoing as any for now.
+      const dbPath = (GANACHE_SERVER_CONFIG as any).database.dbPath;
 
       const snapshotPath = Sandbox.snapshotPath();
 

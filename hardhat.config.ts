@@ -5,21 +5,19 @@ import fs from 'fs';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { task } from 'hardhat/config';
 
+type MintersMap = Record<string, string[]>
+
 // We need to extend HardhatUserConfig in order to support custom uns settings.
 declare module "hardhat/types/config" {
   interface HardhatUserConfig {
     uns?: {
-      minters: {
-        [networkName: string]: string[]
-      }
+      minters: MintersMap,
     }
   }
 
   interface HardhatConfig {
-    uns?: {
-      minters: {
-        [networkName: string]: string[]
-      }
+    uns: {
+      minters: MintersMap
     }
   }
 

@@ -1,14 +1,19 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
+import { CNSRegistryForwarder } from '../../typechain-types/contracts/metatx';
+import { CNSRegistry } from '../../typechain-types/dot-crypto/contracts';
+import { MintingController, SignatureController } from '../../typechain-types/dot-crypto/contracts/controllers';
+import { CNSRegistryForwarder__factory } from '../../typechain-types/factories/contracts/metatx';
+import { CNSRegistry__factory } from '../../typechain-types/factories/dot-crypto/contracts';
+import { MintingController__factory, SignatureController__factory } from '../../typechain-types/factories/dot-crypto/contracts/controllers';
 import { TLD } from '../helpers/constants';
-import { sign, buildExecuteFunc } from '../helpers/metatx';
+import { sign, buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 
 describe('CNSRegistry (consumption)', () => {
-  let forwarder: Contract, registry: Contract, mintingController: Contract, signatureController: Contract;
+  let forwarder: CNSRegistryForwarder, registry: CNSRegistry, mintingController: MintingController, signatureController: SignatureController;
   let signers: SignerWithAddress[], owner: SignerWithAddress, receiver: SignerWithAddress, spender: SignerWithAddress;
 
-  let buildExecuteParams;
+  let buildExecuteParams: ExecuteFunc;
 
   const mintDomain = async (label: string, owner: string) => {
     await mintingController.mintSLD(owner, label);
@@ -23,19 +28,14 @@ describe('CNSRegistry (consumption)', () => {
     signers = await ethers.getSigners();
     [owner, receiver, spender] = signers;
 
-    const CNSRegistryForwarder = await ethers.getContractFactory('CNSRegistryForwarder');
-    const CNSRegistry = await ethers.getContractFactory('CNSRegistry');
-    const MintingController = await ethers.getContractFactory('MintingController');
-    const SignatureController = await ethers.getContractFactory('SignatureController');
-
-    registry = await CNSRegistry.deploy();
-    mintingController = await MintingController.deploy(registry.address);
-    signatureController = await SignatureController.deploy(registry.address);
+    registry = await new CNSRegistry__factory(owner).deploy();
+    mintingController = await new MintingController__factory(owner).deploy(registry.address);
+    signatureController = await new SignatureController__factory(owner).deploy(registry.address);
 
     await registry.addController(mintingController.address);
     await registry.addController(signatureController.address);
 
-    forwarder = await CNSRegistryForwarder.deploy(signatureController.address);
+    forwarder = await new CNSRegistryForwarder__factory(owner).deploy(signatureController.address);
 
     buildExecuteParams = buildExecuteFunc(registry.interface, signatureController.address, forwarder);
   });
@@ -47,19 +47,21 @@ describe('CNSRegistry (consumption)', () => {
     // Direct transfer
     const tokenId = await mintDomain(label, owner.address);
     const directTx = await registry.connect(owner).transferFrom(owner.address, receiver.address, tokenId);
-    directTx.receipt = await directTx.wait();
+
+    const directTxReceipt = await directTx.wait();
 
     // Old meta-tx
     const tokenIdFor = await mintDomain(label + 'for', owner.address);
     const dataFor = registry.interface.encodeFunctionData(
-      'transferFrom(address,address,uint256)',
+      'transferFrom',
       [owner.address, receiver.address, tokenIdFor],
     );
     const nonceFor = await signatureController.nonceOf(tokenIdFor);
     const signatureFor = await sign(dataFor, signatureController.address, nonceFor, owner);
     const forTx = await signatureController.connect(spender).transferFromFor(
       owner.address, receiver.address, tokenIdFor, signatureFor);
-    forTx.receipt = await forTx.wait();
+
+    const forTxReceipt = await forTx.wait();
 
     // Forwarder
     const tokenIdForward = await mintDomain(label + 'forward', owner.address);
@@ -69,15 +71,16 @@ describe('CNSRegistry (consumption)', () => {
       owner, tokenIdForward,
     );
     const forwardTx = await forwarder.connect(spender).execute(req, signature);
-    forwardTx.receipt = await forwardTx.wait();
+
+    const forwardTxReceipt = await forwardTx.wait();
 
     result.push({
       selector: 'transferFrom(address,address,uint256)',
-      directTx: directTx.receipt.gasUsed.toString(),
-      forTx: forTx.receipt.gasUsed.toString(),
-      diff1: percDiff(directTx.receipt.gasUsed, forTx.receipt.gasUsed).toFixed(2) + ' %',
-      forwardTx: forwardTx.receipt.gasUsed.toString(),
-      diff2: percDiff(forTx.receipt.gasUsed, forwardTx.receipt.gasUsed).toFixed(2) + ' %',
+      directTx: directTxReceipt.gasUsed.toString(),
+      forTx: forTxReceipt.gasUsed.toString(),
+      diff1: percDiff(directTxReceipt.gasUsed.toNumber(), forTxReceipt.gasUsed.toNumber()).toFixed(2) + ' %',
+      forwardTx: forwardTxReceipt.gasUsed.toString(),
+      diff2: percDiff(forTxReceipt.gasUsed.toNumber(), forwardTxReceipt.gasUsed.toNumber()).toFixed(2) + ' %',
     });
     console.table(result);
   });

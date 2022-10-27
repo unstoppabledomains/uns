@@ -7,11 +7,11 @@ import secp256k1 from 'secp256k1';
 import createKeccakHash from 'keccak';
 import debug from 'debug';
 import {
-  ServerOptions,
   EthereumProvider,
+  ServerOptions,
 } from 'ganache';
 import { GanacheService } from './ganache-service';
-import { HttpNetworkUserConfig, NetworkUserConfig } from 'hardhat/types';
+import { HttpNetworkUserConfig } from 'hardhat/types';
 
 const log = debug('UNS:sandbox');
 
@@ -108,7 +108,7 @@ export class Sandbox {
     }
 
     const service = new GanacheService(GANACHE_SERVER_CONFIG, {
-      url: this.defaultNetworkOptions().url
+      url: this.defaultNetworkOptions().url!
     });
     return new Sandbox(service, options);
   }
@@ -116,10 +116,10 @@ export class Sandbox {
   ganacheService: GanacheService;
   options: SandboxOptions;
   provider: EthereumProvider;
-  private _snapshotId: string;
+  private _snapshotId?: string;
   version: string;
 
-  accounts: Map<any, SandboxAccount>;
+  accounts: Map<string, SandboxAccount>;
 
   constructor (service: GanacheService, options: SandboxOptions = {}) {
     this.ganacheService = service
@@ -192,7 +192,7 @@ export class Sandbox {
   _getAccounts (serverOptions: ServerOptions<'ethereum'>) {
     const { mnemonic, hdPath, totalAccounts } = serverOptions['wallet'];
 
-    const hdKey = HDKey.fromMasterSeed(mnemonicToSeedSync(mnemonic, null));
+    const hdKey = HDKey.fromMasterSeed(mnemonicToSeedSync(mnemonic));
     const accounts = Array(totalAccounts);
 
     for (let index = 0; index < totalAccounts; index++) {

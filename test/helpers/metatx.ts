@@ -1,11 +1,10 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { Contract } from 'ethers';
-import { ethers } from 'hardhat';
-import { TypedDataDomain } from "@ethersproject/abstract-signer";
+import { utils, Contract, BigNumberish } from 'ethers';
+// import { ethers } from 'hardhat';
+// import { TypedDataDomain } from "@ethersproject/abstract-signer";
+import { Interface } from '@ethersproject/abi/';
 
-const { utils, provider } = ethers;
-
-export async function sign (data: string, address: string, nonce: number, signer: SignerWithAddress): Promise<string> {
+export async function sign (data: string, address: string, nonce: BigNumberish | number, signer: SignerWithAddress): Promise<string> {
   return signer.signMessage(
     utils.arrayify(
       utils.solidityKeccak256(
@@ -37,11 +36,31 @@ export async function sign (data: string, address: string, nonce: number, signer
 //   return signer._signTypedData(domain, types, value);
 // };
 
-export function buildExecuteFunc(iface, toAddress, forwarder) {
-  return async (selector, params, from, tokenId) => {
+export type ExecuteFunc = (
+  selector: string,
+  params: any[],
+  from: SignerWithAddress, 
+  tokenId: BigNumberish
+) => Promise<{
+  req: { 
+    from: string,
+    nonce: number, 
+    tokenId: BigNumberish, 
+    data: string
+  }, 
+  signature: string 
+}>
+
+export function buildExecuteFunc(iface: Interface, toAddress: string, forwarder: Contract): ExecuteFunc {
+  return async (selector: string, params: any[], from: SignerWithAddress, tokenId: BigNumberish) => {
     const data = iface.encodeFunctionData(selector, params);
+
     const nonce = await forwarder.nonceOf(tokenId);
     const signature = await sign(data, toAddress, nonce, from);
-    return { req: { from: from.address, nonce, tokenId, data }, signature };
+
+    return { 
+      req: { from: from.address, nonce, tokenId, data }, 
+      signature 
+    };
   };
 };

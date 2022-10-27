@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-     "declaration": true,
+    "declaration": true,
     "declarationMap": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
@@ -13,10 +13,16 @@
     "removeComments": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "strict": false,
+    "strict": true,
+    "alwaysStrict": true,
     "target": "es6"
   },
   "exclude": ["node_modules"],
   "files": ["./hardhat.config.ts"],
-  "include": ["src/**/*", "test/**/*", "sandbox/**/*"]
+  "include": [
+    "src/**/*.ts", 
+    "test/**/*.ts", 
+    "sandbox/**/*.ts",
+    "./node_modules/types-ethereumjs-util/index.d.ts"
+  ]
 }
