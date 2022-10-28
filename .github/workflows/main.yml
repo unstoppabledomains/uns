@@ -23,6 +23,9 @@ jobs:
           restore-keys: yarn-v2-
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true'
+      - run: yarn compile
+        env:
+          FORCE_COLOR: 1
       - run: yarn test
         env:
           FORCE_COLOR: 1
