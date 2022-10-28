@@ -1,8 +1,8 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 const { buildExecuteFunc } = require('./helpers/metatx');
-const { TLD } = require('./helpers/constants');
-const { mintDomain, mintRandomDomain } = require('./helpers/registry');
+const { TLD, DEAD_ADDRESS } = require('./helpers/constants');
+const { mintDomain } = require('./helpers/registry');
 
 describe('UNSRegistry (reverse)', () => {
   let UNSRegistry, unsRegistry, buildExecuteParams;
@@ -18,13 +18,10 @@ describe('UNSRegistry (reverse)', () => {
   beforeEach(async () => {
     unsRegistry = await UNSRegistry.deploy();
     await unsRegistry.initialize(coinbase.address);
-    await unsRegistry['mintTLD(uint256,string)'](
+    await unsRegistry['mint(address,uint256,string)'](
+      DEAD_ADDRESS,
       TLD.CRYPTO,
       'crypto',
-    );
-    await unsRegistry['mintTLD(uint256,string)'](
-      TLD.X,
-      'x',
     );
     await unsRegistry.setTokenURIPrefix('/');
 
@@ -39,13 +36,16 @@ describe('UNSRegistry (reverse)', () => {
 
   describe('Minting', () => {
     it('should set reverse record on minting', async () => {
-      const mintFunction = unsRegistry['mintWithRecords(address,string[],string[],string[])'];
+      const tokenId = await unsRegistry.childIdOf(
+        TLD.CRYPTO,
+        'testminting.crypto',
+      );
+      const mintFunction = unsRegistry['mint(address,uint256,string)'];
 
       const mintTx = await mintFunction(
         owner.address,
-        ['testminting', 'crypto'],
-        [],
-        [],
+        tokenId,
+        'testminting.crypto',
       );
       const mintTxReceipt = await mintTx.wait();
 
@@ -60,14 +60,261 @@ describe('UNSRegistry (reverse)', () => {
       expect(setReverseIndex).to.be.greaterThan(0);
     });
 
-    describe('mintWithRecords(address,string[],string[],string[])', async () => {
+    describe('mint(address,uint256,string)', async () => {
+      const selector = 'mint(address,uint256,string)';
+
       it('should set reverse resolution on mint', async () => {
-        const labels = ['reversemint4', 'crypto'];
-        const tokenId = await unsRegistry.namehash(labels);
+        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'reversemint1');
+
+        await unsRegistry.functions[selector](
+          coinbase.address,
+          tokenId,
+          'reversemint1.crypto',
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
+          coinbase.address,
+        );
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+
+      it('should produce SetReverse event after NewURI', async () => {
+        const tokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint11',
+        );
+
+        const mintTx = await unsRegistry.functions[selector](
+          coinbase.address,
+          tokenId,
+          'reversemint11.crypto',
+        );
+        const mintTxReceipt = await mintTx.wait();
+
+        const newUriEventIndex = mintTxReceipt.events.findIndex(
+          ({ event }) => event === 'NewURI',
+        );
+        const setReverseIndex = mintTxReceipt.events.findIndex(
+          ({ event }) => event === 'SetReverse',
+        );
+
+        expect(setReverseIndex).to.be.greaterThan(0);
+
+        expect(mintTxReceipt.events[setReverseIndex].args).to.deep.equal([
+          coinbase.address,
+          tokenId,
+        ]);
+        expect(setReverseIndex).to.be.greaterThan(newUriEventIndex);
+      });
+
+      it('should not set reverse resolution if already set', async () => {
+        const tokenId = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+          'reversemint12.crypto',
+        );
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+
+        const anotherTokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint13',
+        );
+
+        await expect(
+          unsRegistry.functions[selector](
+            coinbase.address,
+            anotherTokenId,
+            'reversemint13.crypto',
+          ),
+        ).not.to.emit(unsRegistry, 'SetReverse');
+
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+
+      it('should not set reverse resolution when minting to 0xdead address', async () => {
+        const address = DEAD_ADDRESS;
+        await unsRegistry.functions[selector](address, TLD.WALLET, 'wallet');
+
+        expect(await unsRegistry.reverseOf(address)).to.be.equal(0);
+      });
+    });
+
+    describe('safeMint(address,uint256,string)', async () => {
+      const selector = 'safeMint(address,uint256,string)';
+
+      it('should set reverse resolution on mint', async () => {
+        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'reversemint2');
+
+        await unsRegistry.functions[selector](
+          coinbase.address,
+          tokenId,
+          'reversemint2.crypto',
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
+          coinbase.address,
+        );
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+
+      it('should produce SetReverse event after NewURI', async () => {
+        const tokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint21',
+        );
+
+        const mintTx = await unsRegistry.functions[selector](
+          coinbase.address,
+          tokenId,
+          'reversemint21.crypto',
+        );
+        const mintTxReceipt = await mintTx.wait();
+
+        const newUriEventIndex = mintTxReceipt.events.findIndex(
+          ({ event }) => event === 'NewURI',
+        );
+        const setReverseIndex = mintTxReceipt.events.findIndex(
+          ({ event }) => event === 'SetReverse',
+        );
+
+        expect(setReverseIndex).to.be.greaterThan(0);
+
+        expect(mintTxReceipt.events[setReverseIndex].args).to.deep.equal([
+          coinbase.address,
+          tokenId,
+        ]);
+        expect(setReverseIndex).to.be.greaterThan(newUriEventIndex);
+      });
+
+      it('should not set reverse resolution if already set', async () => {
+        const tokenId = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+          'reversemint22.crypto',
+        );
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+
+        const anotherTokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint23',
+        );
+
+        await expect(
+          unsRegistry.functions[selector](
+            coinbase.address,
+            anotherTokenId,
+            'reversemint23.crypto',
+          ),
+        ).not.to.emit(unsRegistry, 'SetReverse');
+
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+    });
+
+    describe('safeMint(address,uint256,string,bytes)', async () => {
+      const selector = 'safeMint(address,uint256,string,bytes)';
+
+      it('should set reverse resolution on mint', async () => {
+        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'reversemint3');
+
+        await unsRegistry.functions[selector](
+          coinbase.address,
+          tokenId,
+          'reversemint3.crypto',
+          '0x',
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
+          coinbase.address,
+        );
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+
+      it('should produce SetReverse event after NewURI', async () => {
+        const tokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint31',
+        );
+
+        const mintTx = await unsRegistry.functions[selector](
+          coinbase.address,
+          tokenId,
+          'reversemint31.crypto',
+          '0x',
+        );
+        const mintTxReceipt = await mintTx.wait();
+
+        const newUriEventIndex = mintTxReceipt.events.findIndex(
+          ({ event }) => event === 'NewURI',
+        );
+        const setReverseIndex = mintTxReceipt.events.findIndex(
+          ({ event }) => event === 'SetReverse',
+        );
+
+        expect(setReverseIndex).to.be.greaterThan(0);
+
+        expect(mintTxReceipt.events[setReverseIndex].args).to.deep.equal([
+          coinbase.address,
+          tokenId,
+        ]);
+        expect(setReverseIndex).to.be.greaterThan(newUriEventIndex);
+      });
+
+      it('should not set reverse resolution if already set', async () => {
+        const tokenId = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+          'reversemint32.crypto',
+        );
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+
+        const anotherTokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint33',
+        );
+
+        await expect(
+          unsRegistry.functions[selector](
+            coinbase.address,
+            anotherTokenId,
+            'reversemint33.crypto',
+            '0x',
+          ),
+        ).not.to.emit(unsRegistry, 'SetReverse');
+
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+    });
+
+    describe('mintWithRecords(address,uint256,string,string[],string[])', async () => {
+      it('should set reverse resolution on mint', async () => {
+        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'reversemint4');
 
         await unsRegistry.mintWithRecords(
           coinbase.address,
-          labels,
+          tokenId,
+          'reversemint4.crypto',
           ['key_1'],
           ['value_1'],
         );
@@ -81,12 +328,15 @@ describe('UNSRegistry (reverse)', () => {
       });
 
       it('should produce SetReverse event after NewURI', async () => {
-        const labels = ['reversemint41', 'crypto'];
-        const tokenId = await unsRegistry.namehash(labels);
+        const tokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint41',
+        );
 
         const mintTx = await unsRegistry.mintWithRecords(
           coinbase.address,
-          labels,
+          tokenId,
+          'reversemint41.crypto',
           ['key_1'],
           ['value_1'],
         );
@@ -109,19 +359,203 @@ describe('UNSRegistry (reverse)', () => {
       });
 
       it('should not set reverse resolution if already set', async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['reversemint42', 'crypto']);
+        const tokenId = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+          'reversemint42.crypto',
+        );
         expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
           tokenId,
         );
 
-        const labels = ['reversemint43', 'crypto'];
+        const anotherTokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint43',
+        );
 
         await expect(
           unsRegistry.mintWithRecords(
             coinbase.address,
-            labels,
+            anotherTokenId,
+            'reversemint43.crypto',
             ['key_1'],
             ['value_1'],
+          ),
+        ).not.to.emit(unsRegistry, 'SetReverse');
+
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+    });
+
+    describe('safeMintWithRecords(address,uint256,string,string[],string[])', async () => {
+      const selector =
+        'safeMintWithRecords(address,uint256,string,string[],string[])';
+
+      it('should set reverse resolution on mint', async () => {
+        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'reversemint5');
+        await unsRegistry[selector](
+          coinbase.address,
+          tokenId,
+          'reversemint5.crypto',
+          ['key_1'],
+          ['value_1'],
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
+          coinbase.address,
+        );
+        expect(await unsRegistry.get('key_1', tokenId)).to.be.eql('value_1');
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+
+      it('should produce SetReverse event after NewURI', async () => {
+        const tokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint51',
+        );
+
+        const mintTx = await unsRegistry[selector](
+          coinbase.address,
+          tokenId,
+          'reversemint51.crypto',
+          ['key_1'],
+          ['value_1'],
+        );
+        const mintTxReceipt = await mintTx.wait();
+
+        const newUriEventIndex = mintTxReceipt.events.findIndex(
+          ({ event }) => event === 'NewURI',
+        );
+        const setReverseIndex = mintTxReceipt.events.findIndex(
+          ({ event }) => event === 'SetReverse',
+        );
+
+        expect(setReverseIndex).to.be.greaterThan(0);
+
+        expect(mintTxReceipt.events[setReverseIndex].args).to.deep.equal([
+          coinbase.address,
+          tokenId,
+        ]);
+        expect(setReverseIndex).to.be.greaterThan(newUriEventIndex);
+      });
+
+      it('should not set reverse resolution if already set', async () => {
+        const tokenId = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+          'reversemint52.crypto',
+        );
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+
+        const anotherTokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint53',
+        );
+
+        await expect(
+          unsRegistry[selector](
+            coinbase.address,
+            anotherTokenId,
+            'reversemint53.crypto',
+            ['key_1'],
+            ['value_1'],
+          ),
+        ).not.to.emit(unsRegistry, 'SetReverse');
+
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+    });
+
+    describe('safeMintWithRecords(address,uint256,string,string[],string[],bytes)', async () => {
+      const selector =
+        'safeMintWithRecords(address,uint256,string,string[],string[],bytes)';
+
+      it('should set reverse resolution on mint', async () => {
+        const tokenId = await unsRegistry.childIdOf(TLD.CRYPTO, 'reversemint6');
+        await unsRegistry[selector](
+          coinbase.address,
+          tokenId,
+          'reversemint6.crypto',
+          ['key_1'],
+          ['value_1'],
+          '0x',
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
+          coinbase.address,
+        );
+        expect(await unsRegistry.get('key_1', tokenId)).to.be.eql('value_1');
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+
+      it('should produce SetReverse event after NewURI', async () => {
+        const tokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint61',
+        );
+
+        const mintTx = await unsRegistry[selector](
+          coinbase.address,
+          tokenId,
+          'reversemint61.crypto',
+          ['key_1'],
+          ['value_1'],
+          '0x',
+        );
+        const mintTxReceipt = await mintTx.wait();
+
+        const newUriEventIndex = mintTxReceipt.events.findIndex(
+          ({ event }) => event === 'NewURI',
+        );
+        const setReverseIndex = mintTxReceipt.events.findIndex(
+          ({ event }) => event === 'SetReverse',
+        );
+
+        expect(setReverseIndex).to.be.greaterThan(0);
+
+        expect(mintTxReceipt.events[setReverseIndex].args).to.deep.equal([
+          coinbase.address,
+          tokenId,
+        ]);
+        expect(setReverseIndex).to.be.greaterThan(newUriEventIndex);
+      });
+
+      it('should not set reverse resolution if already set', async () => {
+        const tokenId = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          TLD.CRYPTO,
+          'reversemint62.crypto',
+        );
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+
+        const anotherTokenId = await unsRegistry.childIdOf(
+          TLD.CRYPTO,
+          'reversemint63',
+        );
+
+        await expect(
+          unsRegistry[selector](
+            coinbase.address,
+            anotherTokenId,
+            'reversemint63.crypto',
+            ['key_1'],
+            ['value_1'],
+            '0x',
           ),
         ).not.to.emit(unsRegistry, 'SetReverse');
 
@@ -137,12 +571,13 @@ describe('UNSRegistry (reverse)', () => {
       const tokenId = await mintDomain(
         unsRegistry,
         owner,
-        ['res_1', 'x'],
+        TLD.X,
+        'res_1',
         true,
       );
       const _unsRegistry = unsRegistry.connect(owner);
 
-      await expect(_unsRegistry['setReverse(uint256)'](tokenId))
+      await expect(_unsRegistry.setReverse(tokenId))
         .to.emit(unsRegistry, 'SetReverse')
         .withArgs(owner.address, tokenId.toString());
 
@@ -150,7 +585,7 @@ describe('UNSRegistry (reverse)', () => {
     });
 
     it('should not resolve reverse record if reader is ProxyReader and token is upgraded', async () => {
-      const tokenId = await mintRandomDomain(unsRegistry, owner, 'x');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X);
 
       await unsRegistry.upgradeAll([tokenId]);
 
@@ -166,12 +601,13 @@ describe('UNSRegistry (reverse)', () => {
       const tokenId = await mintDomain(
         unsRegistry,
         owner,
-        ['res_1', 'x'],
+        TLD.X,
+        'res_1',
         true,
       );
       const _unsRegistry = unsRegistry.connect(owner);
 
-      await expect(_unsRegistry['setReverse(uint256)'](tokenId))
+      await expect(_unsRegistry.setReverse(tokenId))
         .to.emit(unsRegistry, 'SetReverse')
         .withArgs(owner.address, tokenId.toString());
 
@@ -187,12 +623,13 @@ describe('UNSRegistry (reverse)', () => {
       const tokenId = await mintDomain(
         unsRegistry,
         owner,
-        ['res_2', 'x'],
+        TLD.X,
+        'res_2',
         true,
       );
       const _unsRegistry = unsRegistry.connect(receiver);
 
-      await expect(_unsRegistry['setReverse(uint256)'](tokenId)).to.be.revertedWith(
+      await expect(_unsRegistry.setReverse(tokenId)).to.be.revertedWith(
         'Registry: SENDER_IS_NOT_OWNER',
       );
 
@@ -200,7 +637,7 @@ describe('UNSRegistry (reverse)', () => {
     });
 
     it('should remove reverse record on tranfer', async () => {
-      const tokenId = await mintRandomDomain(unsRegistry, owner, 'x');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X);
       const _unsRegistry = unsRegistry.connect(owner);
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
@@ -212,8 +649,8 @@ describe('UNSRegistry (reverse)', () => {
     });
 
     it('should remove reverse record on transfer only for current domain', async () => {
-      const tokenId = await mintRandomDomain(unsRegistry, owner, 'x');
-      const tokenId2 = await mintRandomDomain(unsRegistry, owner, 'x');
+      const tokenId = await mintDomain(unsRegistry, owner, TLD.X);
+      const tokenId2 = await mintDomain(unsRegistry, owner, TLD.X);
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
 
@@ -226,7 +663,7 @@ describe('UNSRegistry (reverse)', () => {
     });
 
     it('should remove reverse record', async () => {
-      await mintDomain(unsRegistry, owner, ['rem_3', 'x']);
+      await mintDomain(unsRegistry, owner, TLD.X, 'rem_3');
       const _unsRegistry = unsRegistry.connect(owner);
 
       await expect(_unsRegistry.removeReverse())
@@ -252,7 +689,8 @@ describe('UNSRegistry (reverse)', () => {
       const tokenId = await mintDomain(
         unsRegistry,
         owner,
-        ['res_mtx_1', 'x'],
+        TLD.X,
+        'res_mtx_1',
         true,
       );
 
@@ -271,7 +709,8 @@ describe('UNSRegistry (reverse)', () => {
       const tokenId = await mintDomain(
         unsRegistry,
         owner,
-        ['res_mtx_2', 'x'],
+        TLD.X,
+        'res_mtx_2',
         true,
       );
 
@@ -292,7 +731,8 @@ describe('UNSRegistry (reverse)', () => {
       const tokenId = await mintDomain(
         unsRegistry,
         owner,
-        ['res_mtx_4', 'x'],
+        TLD.X,
+        'res_mtx_4',
         true,
       );
 
@@ -310,7 +750,7 @@ describe('UNSRegistry (reverse)', () => {
     });
 
     it('should remove reverse record', async () => {
-      await mintDomain(unsRegistry, owner, ['rem_mtx_4', 'x']);
+      await mintDomain(unsRegistry, owner, TLD.X, 'rem_mtx_4');
 
       const { req, signature } = await buildExecuteParams(
         'removeReverse()',
