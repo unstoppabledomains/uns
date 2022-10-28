@@ -17,8 +17,8 @@ contract DotCoinBurner {
     }
 
     function burnAll(bytes32[] calldata labelHashes) external {
-        uint256 firstTokenId;
-        uint256 lastTokenId;
+        uint256 firstTokenId = 0;
+        uint256 lastTokenId = 0;
         for (uint256 i = 0; i < labelHashes.length; i++) {
             uint256 tokenId = uint256(keccak256(abi.encodePacked(dotCoinTld, labelHashes[i])));
             _unsRegistry.transferFrom(_unsRegistry.ownerOf(tokenId), burnAddress, tokenId);
