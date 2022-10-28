@@ -1,16 +1,17 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { utils, BigNumber, Contract } from 'ethers'
+import { utils, BigNumber, Contract, BigNumberish } from 'ethers'
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
-import { TLD, DEAD_ADDRESS } from './helpers/constants';
+import { TLD } from './helpers/constants';
 import { mintDomain } from './helpers/registry';
+import { getFuncSignature } from './helpers/proxy';
 import { UNSRegistry } from '../typechain-types/contracts';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { UNSRegistry__factory } from '../typechain-types/factories/contracts';
-import { Fragment, FunctionFragment } from 'ethers/lib/utils';
+import { FunctionFragment } from 'ethers/lib/utils';
 
 describe('UNSRegistry (metatx)', () => {
-  let unsRegistry: Contract, buildExecuteParams: ExecuteFunc;
+  let unsRegistry: UNSRegistry, buildExecuteParams: ExecuteFunc;
   let signers: SignerWithAddress[], coinbase: SignerWithAddress, owner: SignerWithAddress, nonOwner: SignerWithAddress, receiver: SignerWithAddress, accessControl: SignerWithAddress, operator: SignerWithAddress;
 
   before(async () => {
@@ -20,8 +21,7 @@ describe('UNSRegistry (metatx)', () => {
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
 
     await unsRegistry.initialize(coinbase.address);
-    await unsRegistry['mint(address,uint256,string)'](
-      DEAD_ADDRESS,
+    await unsRegistry['mintTLD(uint256,string)'](
       TLD.CRYPTO,
       'crypto',
     );
@@ -38,12 +38,7 @@ describe('UNSRegistry (metatx)', () => {
     const receiverAddress = '0x1234567890123456789012345678901234567890';
 
     it('should transfer using meta-setOwner', async () => {
-      const tokenId = await mintDomain(
-        unsRegistry as UNSRegistry,
-        owner,
-        TLD.CRYPTO,
-        'res_label_113a',
-      );
+      const tokenId = await mintDomain(unsRegistry, owner, ['res_label_113a', 'crypto']);
 
       const { req, signature } = await buildExecuteParams(
         'setOwner(address,uint256)',
@@ -57,12 +52,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert transfer using meta-setOwner when nonce invalidated', async () => {
-      const tokenId = await mintDomain(
-        unsRegistry as UNSRegistry,
-        owner,
-        TLD.CRYPTO,
-        'res_label_0896',
-      );
+      const tokenId = await mintDomain(unsRegistry, owner, ['res_label_0896', 'crypto']);
 
       const { req, signature } = await buildExecuteParams(
         'setOwner(address,uint256)',
@@ -105,12 +95,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should transfer using meta-transferFrom', async () => {
-      const tokenId = await mintDomain(
-        unsRegistry as UNSRegistry,
-        owner,
-        TLD.CRYPTO,
-        'meta_1591',
-      );
+      const tokenId = await mintDomain(unsRegistry, owner, ['meta_1591', 'crypto']);
 
       const { req, signature } = await buildExecuteParams(
         'transferFrom(address,address,uint256)',
@@ -124,12 +109,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert meta-transferFrom for non-onwer', async () => {
-      const tokenId = await mintDomain(
-        unsRegistry as UNSRegistry,
-        owner,
-        TLD.CRYPTO,
-        'meta_6458',
-      );
+      const tokenId = await mintDomain(unsRegistry, owner, ['meta_6458', 'crypto']);
 
       const { req, signature } = await buildExecuteParams(
         'transferFrom(address,address,uint256)',
@@ -144,12 +124,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should transfer using meta-safeTransferFrom', async () => {
-      const tokenId = await mintDomain(
-        unsRegistry as UNSRegistry,
-        owner,
-        TLD.CRYPTO,
-        'meta_10235',
-      );
+      const tokenId = await mintDomain(unsRegistry, owner, ['meta_10235', 'crypto']);
 
       const { req, signature } = await buildExecuteParams(
         'safeTransferFrom(address,address,uint256)',
@@ -163,12 +138,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert meta-safeTransferFrom for non-onwer', async () => {
-      const tokenId = await mintDomain(
-        unsRegistry as UNSRegistry,
-        owner,
-        TLD.CRYPTO,
-        'meta_e5iuw',
-      );
+      const tokenId = await mintDomain(unsRegistry, owner, ['meta_e5iuw', 'crypto']);
 
       const { req, signature } = await buildExecuteParams(
         'safeTransferFrom(address,address,uint256)',
@@ -185,12 +155,8 @@ describe('UNSRegistry (metatx)', () => {
     // TODO: add tests for safeTransferFrom(address,address,uint256,bytes)
 
     it('should burn using meta-burn', async () => {
-      const tokenId = await mintDomain(
-        unsRegistry as UNSRegistry,
-        owner,
-        TLD.CRYPTO,
-        'meta_ar093',
-      );
+      const tokenId = await mintDomain(unsRegistry, owner, ['meta_ar093', 'crypto']);
+
       const { req, signature } = await buildExecuteParams(
         'burn(uint256)',
         [tokenId],
@@ -205,12 +171,8 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert meta-burn for non-onwer', async () => {
-      const tokenId = await mintDomain(
-        unsRegistry as UNSRegistry,
-        owner,
-        TLD.CRYPTO,
-        'meta_53dg3',
-      );
+      const tokenId = await mintDomain(unsRegistry, owner, ['meta_53dg3', 'crypto']);
+
       const { req, signature } = await buildExecuteParams(
         'burn(uint256)',
         [tokenId],
@@ -232,24 +194,20 @@ describe('UNSRegistry (metatx)', () => {
       );
     };
 
-    const buidRequest = async (fragment: FunctionFragment, from, tokenId, paramsMap) => {
+    const buidRequest = async (fragment: FunctionFragment, from: string, tokenId: BigNumberish, paramsMap: any) => {
+      const contract: Contract = unsRegistry;
+
       const req = {
         from,
         gas: '200000',
         tokenId,
         nonce: Number(await unsRegistry.nonceOf(tokenId)),
-        data: unsRegistry.interface.encodeFunctionData(
-          funcFragmentToSig(fragment),
+        data: contract.interface.encodeFunctionData(
+          getFuncSignature(fragment),
           fragment.inputs.map((x) => paramsMap[x.name]),
         ),
       };
       return req;
-    };
-
-    const funcFragmentToSig = (fragment: FunctionFragment) => {
-      return `${fragment.name}(${fragment.inputs
-        .map((x) => `${x.type} ${x.name}`)
-        .join(',')})`;
     };
 
     describe('Token-based functions (token should not be minted)', () => {
@@ -263,10 +221,7 @@ describe('UNSRegistry (metatx)', () => {
       };
 
       const included = [
-        'mint(address,uint256,string)',
-        'safeMint',
-        'mintWithRecords',
-        'safeMintWithRecords',
+        'issueWithRecords',
       ];
 
       const getFuncs = () => {
@@ -275,7 +230,7 @@ describe('UNSRegistry (metatx)', () => {
           .filter(
             (x) =>
               included.includes(x.name) ||
-              included.includes(funcFragmentToSig(x)),
+              included.includes(getFuncSignature(x)),
           );
       };
 
@@ -285,11 +240,11 @@ describe('UNSRegistry (metatx)', () => {
 
       it('should execute all functions successfully', async () => {
         for (const func of getFuncs()) {
-          const funcSigHash = utils.id(`${funcFragmentToSig(func)}_excl`);
-          paramValueMap.tokenId = await unsRegistry.childIdOf(
-            TLD.CRYPTO,
-            funcSigHash,
-          );
+          const funcSigHash = utils.id(`${getFuncSignature(func)}_excl`);
+          paramValueMap.tokenId = (await unsRegistry.namehash(
+            [
+              funcSigHash, 'crypto'],
+          )).toHexString();
 
           const req = await buidRequest(
             func,
@@ -324,12 +279,12 @@ describe('UNSRegistry (metatx)', () => {
       };
 
       const excluded = [
+        'mintTLD',
         'mint',
-        'safeMint',
-        'mintWithRecords',
-        'safeMintWithRecords',
+        'issue',
+        'issueWithRecords',
+        'unlockWithRecords',
         'transferFromFor',
-        'safeTransferFromFor',
         'burnFor',
         'resetFor',
         'setFor',
@@ -345,6 +300,8 @@ describe('UNSRegistry (metatx)', () => {
         'removeReverse',
         'addProxyReader',
         'upgradeAll',
+        'burnTLDL1',
+        'moveTLDOwnershipL2',
       ];
 
       const getFuncs = () => {
@@ -362,13 +319,9 @@ describe('UNSRegistry (metatx)', () => {
 
       it('should execute all functions successfully', async () => {
         for (const func of getFuncs()) {
-          const funcSigHash = utils.id(`${funcFragmentToSig(func)}_ok`);
-          paramValueMap.tokenId = await mintDomain(
-            unsRegistry as UNSRegistry,
-            owner,
-            TLD.CRYPTO,
-            funcSigHash,
-          );
+          const funcSigHash = utils.id(`${getFuncSignature(func)}_ok`);
+
+          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
 
           const req = await buidRequest(
             func,
@@ -388,14 +341,10 @@ describe('UNSRegistry (metatx)', () => {
 
       it('should revert execution of all token-based functions when used signature', async () => {
         for (const func of getFuncs()) {
-          const funcSig = funcFragmentToSig(func);
+          const funcSig = getFuncSignature(func);
           const funcSigHash = utils.id(`${funcSig}_doubleUse`);
-          paramValueMap.tokenId = await mintDomain(
-            unsRegistry as UNSRegistry,
-            owner,
-            TLD.CRYPTO,
-            funcSigHash,
-          );
+
+          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
 
           const req = await buidRequest(
             func,
@@ -419,14 +368,10 @@ describe('UNSRegistry (metatx)', () => {
 
       it('should revert execution of all token-based functions when nonce invalidated', async () => {
         for (const func of getFuncs()) {
-          const funcSig = funcFragmentToSig(func);
+          const funcSig = getFuncSignature(func);
           const funcSigHash = utils.id(`${funcSig}_nonceInvalidated`);
-          paramValueMap.tokenId = await mintDomain(
-            unsRegistry as UNSRegistry,
-            owner,
-            TLD.CRYPTO,
-            funcSigHash,
-          );
+
+          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
 
           const req = await buidRequest(
             func,
@@ -453,19 +398,12 @@ describe('UNSRegistry (metatx)', () => {
 
       it('should fail execution of all token-based functions when tokenId does not match', async () => {
         for (const func of getFuncs()) {
-          const funcSig = funcFragmentToSig(func);
+          const funcSig = getFuncSignature(func);
           const funcSigHash = utils.id(`${funcSig}_wrongToken`);
-          paramValueMap.tokenId = await mintDomain(
-            unsRegistry as UNSRegistry,
-            owner,
-            TLD.CRYPTO,
-            funcSigHash,
-          );
 
-          const tokenIdForwarder = await unsRegistry.childIdOf(
-            TLD.CRYPTO,
-            utils.id(`_${funcSig}`),
-          );
+          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
+
+          const tokenIdForwarder = await unsRegistry.namehash([utils.id(`_${funcSig}`), 'crypto']);
           const req = await buidRequest(
             func,
             owner.address,
@@ -488,14 +426,10 @@ describe('UNSRegistry (metatx)', () => {
       it('should fail execution of all token-based functions when tokenId is empty', async () => {
         for (const func of getFuncs()) {
           const funcSigHash = utils.id(
-            `${funcFragmentToSig(func)}_emptyTokenId`,
+            `${getFuncSignature(func)}_emptyTokenId`,
           );
-          paramValueMap.tokenId = await mintDomain(
-            unsRegistry as UNSRegistry,
-            owner,
-            TLD.CRYPTO,
-            funcSigHash,
-          );
+
+          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
 
           const req = await buidRequest(func, owner.address, 0, paramValueMap);
 
@@ -514,7 +448,7 @@ describe('UNSRegistry (metatx)', () => {
 
     describe('Non-Token functions', () => {
       const paramValueMap = {
-        label: 'label',
+        labels: ['label', 'crypto'],
         data: '0x',
         role: '0x1000000000000000000000000000000000000000000000000000000000000000',
         key: 'key_nt1',
@@ -543,6 +477,8 @@ describe('UNSRegistry (metatx)', () => {
         'removeReverse',
         'addProxyReader',
         'upgradeAll',
+        'burnTLDL1',
+        'moveTLDOwnershipL2',
       ];
 
       before(async () => {
@@ -560,8 +496,8 @@ describe('UNSRegistry (metatx)', () => {
 
       it('should execute all functions successfully', async () => {
         for (const func of getFuncs()) {
-          const funcSig = funcFragmentToSig(func);
-          paramValueMap.label = utils.id(`${funcSig}_label`);
+          const funcSig = getFuncSignature(func);
+          paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
 
           const req = await buidRequest(
             func,
@@ -581,14 +517,11 @@ describe('UNSRegistry (metatx)', () => {
 
       it('should revert execution of all functions when used signature', async () => {
         for (const func of getFuncs()) {
-          const funcSig = funcFragmentToSig(func);
-          paramValueMap.label = utils.id(`${funcSig}_doubleUse`);
+          const funcSig = getFuncSignature(func);
+          paramValueMap.labels = [utils.id(`${funcSig}_doubleUse`), 'crypto'];
           paramValueMap.key = utils.id(`${funcSig}_doubleUse`);
 
-          const tokenIdForwarder = await unsRegistry.childIdOf(
-            TLD.CRYPTO,
-            utils.id(`_${funcSig}`),
-          );
+          const tokenIdForwarder = await unsRegistry.namehash([utils.id(`_${funcSig}`), 'crypto']);
           const req = await buidRequest(
             func,
             coinbase.address,
@@ -611,8 +544,8 @@ describe('UNSRegistry (metatx)', () => {
 
       it('should revert execution of all functions when used signature and tokenId is empty', async () => {
         for (const func of getFuncs()) {
-          const funcSig = funcFragmentToSig(func);
-          paramValueMap.label = utils.id(`${funcSig}_doubleUse_0`);
+          const funcSig = getFuncSignature(func);
+          paramValueMap.labels = [utils.id(`${funcSig}_doubleUse_0`), 'crypto'];
 
           const tokenId = 0;
           const nonce = await unsRegistry.nonceOf(tokenId);

@@ -4,7 +4,7 @@ import { MintingManager, UNSRegistry } from '../../typechain-types/contracts';
 import { MintingManagerForwarder } from '../../typechain-types/contracts/metatx';
 import { MintingManager__factory, UNSRegistry__factory } from '../../typechain-types/factories/contracts';
 import { MintingManagerForwarder__factory } from '../../typechain-types/factories/contracts/metatx';
-import { ZERO_ADDRESS, TLD } from '../helpers/constants';
+import { ZERO_ADDRESS } from '../helpers/constants';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 
 describe('MintingManager (consumption)', () => {
@@ -50,23 +50,20 @@ describe('MintingManager (consumption)', () => {
     );
   });
 
-  describe('Mint consumprion', () => {
+  describe('Mint consumption', () => {
     const getCases = () => {
       return [
         {
-          func: 'mintSLD',
-          selector: 'mintSLD(address,uint256,string)',
-          params: [receiver.address, TLD.WALLET, 't1-w1-'],
+          func: 'issueWithRecords',
+          note: 'mint',
+          selector: 'issueWithRecords(address,string[],string[],string[])',
+          params: [receiver.address, ['t1-w1-', 'wallet'], [], []],
         },
         {
-          func: 'safeMintSLD',
-          selector: 'safeMintSLD(address,uint256,string)',
-          params: [receiver.address, TLD.WALLET, 't1-m1-'],
-        },
-        {
-          func: 'safeMintSLD',
-          selector: 'safeMintSLD(address,uint256,string,bytes)',
-          params: [receiver.address, TLD.WALLET, 't1-y1-', '0x'],
+          func: 'issueWithRecords',
+          note: 'unlock',
+          selector: 'issueWithRecords(address,string[],string[],string[])',
+          params: [receiver.address, ['t1-w1-', 'wallet'], [], []],
         },
       ];
     };
@@ -76,11 +73,13 @@ describe('MintingManager (consumption)', () => {
 
       const cases = getCases();
       for (let i = 0; i < cases.length; i++) {
-        const { selector, params } = cases[i];
-        const [acc, root, token, ...rest] = params;
-        const executeParams = [acc, root, token + 'r', ...rest];
+        const { note, selector, params } = cases[i];
+        const [acc, labels, ...rest] = params;
+        const executeParams = [acc, [labels[0] + 'r', labels[1]], ...rest];
 
-        const tokenId = await unsRegistry.childIdOf(root, executeParams[2].toString());
+        const tokenId = await unsRegistry.namehash(labels as string[]);
+        const tokenId2 = await unsRegistry.namehash(executeParams[1] as string[]);
+
         const { req, signature } = await buildExecuteParams(
           selector,
           executeParams,
@@ -101,6 +100,7 @@ describe('MintingManager (consumption)', () => {
         await removeReverse();
 
         result.push({
+          note,
           selector,
           records: Array.isArray(params[2]) ? params[2].length : '-',
           send: tx.receipt.gasUsed.toString(),
@@ -109,6 +109,9 @@ describe('MintingManager (consumption)', () => {
             percDiff(tx.receipt.gasUsed.toNumber(), executeTxReceipt.gasUsed.toNumber()).toFixed(2) +
             ' %',
         });
+
+        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId);
+        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId2);
       }
       console.table(result);
     });

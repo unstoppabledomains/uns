@@ -1,18 +1,14 @@
 // process.env.HARDHAT_NETWORK = 'sandbox';
-
 import { Sandbox } from '.';
 import { expect } from 'chai';
 import { ethers, network } from 'hardhat';
-// import UNSNetworkConfig from '../uns-config.json';
-const { BigNumber } = ethers;
-import {readNetworkConfig} from '../src/config';
+import { readNetworkConfig } from '../src/config';
 import { MintingManager__factory, UNSRegistry__factory } from '../typechain-types/factories/contracts';
 import { MintingManager, UNSRegistry } from '../typechain-types/contracts';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 describe('Sandbox', async () => {
   const domainPrefix = 'sandbox';
-  const walletRoot = BigNumber.from('0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230');
 
   let unsRegistry: UNSRegistry, mintingManager: MintingManager;
   let signers: SignerWithAddress[], owner: SignerWithAddress, minter: SignerWithAddress;
@@ -40,24 +36,22 @@ describe('Sandbox', async () => {
   });
 
   it('should mint a token', async () => {
-    const _domainName = `${domainPrefix}_wallet_0`;
+    const labels = [`${domainPrefix}_wallet_0`, 'wallet'];
 
-    const tx = await mintingManager.connect(minter)
-      .mintSLD(owner.address, walletRoot, _domainName);
+    const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], []);
     await tx.wait();
 
-    const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
+    const _walletTokenId = await unsRegistry.namehash(labels);
     expect(await unsRegistry.ownerOf(_walletTokenId)).to.be.eq(owner.address);
   });
 
   it('should mint same token as prev test', async () => {
-    const _domainName = `${domainPrefix}_wallet_0`;
+    const labels = [`${domainPrefix}_wallet_0`, 'wallet'];
 
-    const tx = await mintingManager.connect(minter)
-      .mintSLD(owner.address, walletRoot, _domainName);
+    const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], []);
     await tx.wait();
 
-    const _walletTokenId = await unsRegistry.childIdOf(walletRoot, _domainName);
+    const _walletTokenId = await unsRegistry.namehash(labels);
     expect(await unsRegistry.ownerOf(_walletTokenId)).to.be.eq(owner.address);
   });
 });

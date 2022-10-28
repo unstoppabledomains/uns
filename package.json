@@ -1,6 +1,6 @@
 {
   "name": "uns",
-  "version": "0.5.19",
+  "version": "0.6.0",
   "description": "UNS contracts and tools",
   "main": "hardhat.config.ts",
   "repository": "https://github.com/unstoppabledomains/uns.git",

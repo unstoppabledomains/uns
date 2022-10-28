@@ -1,7 +1,5 @@
-import {ethers} from 'hardhat';
-import {BigNumberish} from 'ethers';
-
-import {UNSRegistry} from '../../typechain-types/contracts/UNSRegistry';
+import { ethers } from 'hardhat';
+import { UNSRegistry } from '../../typechain-types/contracts/UNSRegistry';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 const generateRandomLabel = () => 'domain-' + ethers.utils.hexlify(
@@ -12,21 +10,41 @@ const generateRandomLabel = () => 'domain-' + ethers.utils.hexlify(
 export async function mintDomain(
   registry: UNSRegistry,
   owner: string | SignerWithAddress, 
-  tld: BigNumberish, 
-  label: string = generateRandomLabel(),
-  withoutReverse: boolean = false
+  labels: string[],
+  withoutReverse: boolean = false,
+  keys: string[] = [],
+  values: string[] = [],
 ) {
-  const tokenId = await registry.childIdOf(tld, label);
-
   const ownerIsWallet = !(typeof owner == 'string');
-
   const address = ownerIsWallet ? owner.address : owner;
 
-  await registry['mint(address,uint256,string)'](address, tokenId, label);
+  await registry['mintWithRecords(address,string[],string[],string[])'](address, labels, keys, values);
 
   if (ownerIsWallet && withoutReverse) {
     await registry.connect(owner)['removeReverse()']();
   }
 
-  return tokenId;
+  return await registry.namehash(labels);
 }
+
+export const mintRandomDomain = async (
+  registry: UNSRegistry,
+  owner: string | SignerWithAddress, 
+  tld: string, 
+  withoutReverse = false, 
+  keys = [], 
+  values = []
+) => {
+  const labels = [generateRandomLabel(), tld];
+
+  const ownerIsWallet = !(typeof owner == 'string');
+  const address = ownerIsWallet ? owner.address : owner;
+
+  await registry['mintWithRecords(address,string[],string[],string[])'](address, labels, keys, values);
+
+  if (ownerIsWallet && withoutReverse) {
+    await registry.connect(owner)['removeReverse()']();
+  }
+
+  return await registry.namehash(labels);
+};
