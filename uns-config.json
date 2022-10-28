@@ -375,6 +375,11 @@
                     "address": "0xBDeFCF6429D0AC68236A6BEb321cBD2Ce66B463C",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x1e"
+                },
+                "DotCoinBurner": {
+                    "address": "0x9916Da7338e34B83731d2E029936B0f8Ac593A94",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x26"
                 }
             }
         },
