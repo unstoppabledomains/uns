@@ -8,10 +8,9 @@ import "./IUNSRegistry.sol";
 contract DotCoinBurner {
     address private constant burnAddress = 0x000000000000000000000000000000000000dEaD;
     uint256 private constant dotCoinTld = 53579465778074300087863657375817737732021732340969439625258188808628534548706;
+    IUNSRegistry private immutable _unsRegistry;
 
     event BatchCompleted(uint256 first, uint256 last);
-
-    IUNSRegistry private immutable _unsRegistry;
 
     constructor(IUNSRegistry unsRegistry) {
         _unsRegistry = unsRegistry;
