@@ -630,6 +630,7 @@ const configureReconfigureTldL1Task = {
       BigNumber.from('0x92bba949890cd44a226a8ce54135cf86538cd6c5ca0ccf41877102fd718cc8aa'), // .unstoppable
     ];
     await mintingManager.burnTLDL1(tldTokens);
+
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -639,7 +640,6 @@ const configureReconfigureTldL1Task = {
     }
 
     const { MintingManager } = config.contracts || {};
-    const dependencies = { MintingManager };
     if (MintingManager.address) {
       throw new Error(
         `MintingManager contract not found for network ${network.config.chainId}`,
@@ -648,7 +648,7 @@ const configureReconfigureTldL1Task = {
 
     return dependencies;
   },
-};
+}
 
 const configureReconfigureTldL2Task = {
   tags: ['temp_reconfigure_tld_l2'],
@@ -675,6 +675,7 @@ const configureReconfigureTldL2Task = {
       BigNumber.from('0x92bba949890cd44a226a8ce54135cf86538cd6c5ca0ccf41877102fd718cc8aa'), // .unstoppable
     ];
     await mintingManager.moveTLDOwnershipL2(tldTokens);
+
   },
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -684,7 +685,6 @@ const configureReconfigureTldL2Task = {
     }
 
     const { MintingManager } = config.contracts || {};
-    const dependencies = { MintingManager };
     if (MintingManager.address) {
       throw new Error(
         `MintingManager contract not found for network ${network.config.chainId}`,
@@ -693,7 +693,9 @@ const configureReconfigureTldL2Task = {
 
     return dependencies;
   },
-};
+}
+
+
 
 module.exports = [
   deployCNSTask,

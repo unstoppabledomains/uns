@@ -24,9 +24,10 @@ interface IRegistryReader {
 
     /**
      * @dev Provides child token (subdomain) of provided tokenId. Registry related function.
-     * @param labels array of domain labels splitted by '.' (for `aaa.bbb.crypto` it will be [`aaa`, `bbb`, `crypto`])
+     * @param tokenId uint256 ID of the token
+     * @param label label of subdomain (for `aaa.bbb.crypto` it will be `aaa`)
      */
-    function namehash(string[] calldata labels) external view returns (uint256);
+    function childIdOf(uint256 tokenId, string calldata label) external view returns (uint256);
 
     /**
      * @dev Returns the number of NFTs in `owner`'s account. ERC721 related function.

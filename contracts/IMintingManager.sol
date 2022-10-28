@@ -20,6 +20,46 @@ interface IMintingManager is IERC1967 {
     function removeTld(uint256 tokenId) external;
 
     /**
+     * @dev Mints a Second Level Domain (SLD).
+     * @param to address to mint the new SLD to.
+     * @param tld id of parent token.
+     * @param label SLD label to mint.
+     */
+    function mintSLD(
+        address to,
+        uint256 tld,
+        string calldata label
+    ) external;
+
+    /**
+     * @dev Safely mints a Second Level Domain (SLD).
+     * Implements a ERC721Reciever check unlike mintSLD.
+     * @param to address to mint the new SLD to.
+     * @param tld id of parent token.
+     * @param label SLD label to mint.
+     */
+    function safeMintSLD(
+        address to,
+        uint256 tld,
+        string calldata label
+    ) external;
+
+    /**
+     * @dev Safely mints a Second Level Domain (SLD).
+     * Implements a ERC721Reciever check unlike mintSLD.
+     * @param to address to mint the new SLD to.
+     * @param tld id of parent token.
+     * @param label SLD label to mint.
+     * @param data bytes data to send along with a safe transfer check.
+     */
+    function safeMintSLD(
+        address to,
+        uint256 tld,
+        string calldata label,
+        bytes calldata data
+    ) external;
+
+    /**
      * @dev Mints a Second Level Domain (SLD) with records.
      * @param to address to mint the new SLD to.
      * @param tld id of parent token.
@@ -36,17 +76,39 @@ interface IMintingManager is IERC1967 {
     ) external;
 
     /**
-     * @dev Issues a SLD or subdomain with records.
-     * @param to address to issue the new SLD or subdomain to.
-     * @param labels array of SLD or subdomain name labels splitted by '.' to issue.
+     * @dev Mints a Second Level Domain (SLD) with records.
+     * Implements a ERC721Reciever check unlike mintSLD.
+     * @param to address to mint the new SLD to.
+     * @param tld id of parent token.
+     * @param label SLD label to mint.
      * @param keys Record keys.
      * @param values Record values.
      */
-    function issueWithRecords(
+    function safeMintSLDWithRecords(
         address to,
-        string[] calldata labels,
+        uint256 tld,
+        string calldata label,
         string[] calldata keys,
         string[] calldata values
+    ) external;
+
+    /**
+     * @dev Mints a Second Level Domain (SLD) with records.
+     * Implements a ERC721Reciever check unlike mintSLD.
+     * @param to address to mint the new SLD to.
+     * @param tld id of parent token.
+     * @param label SLD label to mint.
+     * @param keys Record keys.
+     * @param values Record values.
+     * @param data bytes data to send along with a safe transfer check.
+     */
+    function safeMintSLDWithRecords(
+        address to,
+        uint256 tld,
+        string calldata label,
+        string[] calldata keys,
+        string[] calldata values,
+        bytes calldata data
     ) external;
 
     /**
