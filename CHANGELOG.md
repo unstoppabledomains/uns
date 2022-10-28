@@ -1,3 +1,6 @@
+## v0.5.21
+- Add DotCoinBurner smart contract to support batch returns of .coin domains
+
 ## v0.5.20
 - Added ability to burn TLD tokens via MintingManager#burnTLDL1
 - Added ability to move TLD tokens ownership to MintingManager via MintingManager#moveTLDOwnershipL2
