@@ -2,7 +2,6 @@ const { ethers } = require('hardhat');
 const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
 const { ZERO_ADDRESS, TLD } = require('./helpers/constants');
-const { mintDomain } = require('./helpers/registry');
 
 describe('MintingManager', () => {
   const DomainNamePrefix = 'uns-devtest-';
@@ -432,14 +431,6 @@ describe('MintingManager', () => {
     });
 
     describe('mint second level domain', () => {
-      it('should revert minting when account is not minter', async () => {
-        await expect(
-          mintingManager
-            .connect(receiver)
-            .issueWithRecords(coinbase.address, ['test-1ka', 'wallet'], [], []),
-        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-      });
-
       it('should revert minting when tld is invalid', async () => {
         await expect(
           mintingManager.issueWithRecords(coinbase.address, ['test-1ka3', 'unknown'], [], []),
@@ -474,22 +465,14 @@ describe('MintingManager', () => {
     });
 
     describe('mint subdomain', () => {
-      it('should revert minting when account is not minter', async () => {
-        await expect(
-          mintingManager
-            .connect(receiver)
-            .issueWithRecords(coinbase.address, ['sub', 'test-1sub', 'wallet'], [], []),
-        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-      });
-
       it('should revert minting when account is not the SLD owner', async () => {
         const labels = ['test-1sub', 'wallet'];
-        await mintingManager.issueWithRecords(receiver.address, labels, [], []);
+        await mintingManager.connect(coinbase).issueWithRecords(coinbase.address, labels, [], []);
 
         labels.unshift('sub');
         await expect(
-          mintingManager.issueWithRecords(coinbase.address, labels, [], []),
-        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+          mintingManager.connect(receiver).issueWithRecords(coinbase.address, labels, [], []),
+        ).to.be.revertedWith('MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER');
       });
 
       it('should revert minting when tld is invalid', async () => {
@@ -500,25 +483,27 @@ describe('MintingManager', () => {
 
       it('should mint .wallet subdomain', async () => {
         const labels = ['test-1sub2', 'wallet'];
-        await mintingManager.issueWithRecords(coinbase.address, labels, [], []);
+        await mintingManager.connect(coinbase).issueWithRecords(receiver.address, labels, [], []);
 
         labels.unshift('sub');
-        const tokenId = await mintDomain(unsRegistry, coinbase, labels);
+        await mintingManager.connect(receiver).issueWithRecords(receiver.address, labels, [], []);
+        const tokenId = await unsRegistry.namehash(labels);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
+          receiver.address,
         );
       });
 
-      it('should mint .crypto subdamain in UNS registry when CNS registry undefined', async () => {
+      it('should mint .crypto subdomain in UNS registry when CNS registry undefined', async () => {
         const labels = ['test-1sub3', 'crypto'];
-        await mintingManager.issueWithRecords(coinbase.address, labels, [], []);
+        await mintingManager.connect(coinbase).issueWithRecords(receiver.address, labels, [], []);
 
         labels.unshift('sub');
-        const tokenId = await mintDomain(unsRegistry, coinbase, labels);
+        await mintingManager.connect(receiver).issueWithRecords(receiver.address, labels, [], []);
+        const tokenId = await unsRegistry.namehash(labels);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-          coinbase.address,
+          receiver.address,
         );
       });
 

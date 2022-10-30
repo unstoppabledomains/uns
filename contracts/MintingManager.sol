@@ -74,6 +74,13 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _;
     }
 
+    modifier onlyApprovedOrOwner(string[] memory labels) {
+        (, uint256 parentId) = _namehash(labels);
+        address spender = isMinter(_msgSender()) ? address(this) : _msgSender();
+        require(unsRegistry.isApprovedOrOwner(spender, parentId), 'MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER');
+        _;
+    }
+
     function initialize(
         IUNSRegistry unsRegistry_,
         IMintingController cnsMintingController_,
@@ -137,7 +144,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] calldata labels,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMinter onlyAllowed(labels) whenNotPaused {
+    ) external override onlyAllowed(labels) onlyApprovedOrOwner(labels) whenNotPaused {
         _issueWithRecords(to, labels, keys, values);
     }
 
@@ -249,7 +256,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] memory keys,
         string[] memory values
     ) private {
-        uint256 tokenId = _namehash(labels);
+        (uint256 tokenId, ) = _namehash(labels);
 
         if (_ownerOf(tokenId) == address(this)) {
             unsRegistry.unlockWithRecords(to, tokenId, keys, values);
@@ -272,12 +279,11 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
     }
 
-    function _namehash(string[] memory labels) internal pure returns (uint256) {
-        uint256 node = 0x0;
+    function _namehash(string[] memory labels) internal pure returns (uint256 tokenId, uint256 parentId) {
         for (uint256 i = labels.length; i > 0; i--) {
-            node = _namehash(node, labels[i - 1]);
+            parentId = tokenId;
+            tokenId = _namehash(parentId, labels[i - 1]);
         }
-        return node;
     }
 
     function _msgSender() internal view override(ContextUpgradeable, ERC2771Context) returns (address) {
