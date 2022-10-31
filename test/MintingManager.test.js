@@ -162,7 +162,7 @@ describe('MintingManager', () => {
 
   describe('burnTLDL1', async () => {
     before(async () => {
-      [owner, spender] = signers;
+      [, spender] = signers;
 
       unsRegistry = await UNSRegistry.deploy();
       mintingManager = await MintingManager.deploy();
@@ -180,13 +180,13 @@ describe('MintingManager', () => {
 
     it('should burn TLD tokens', async () => {
       const burnl1Tld = 'burnl1';
-      await mintingManager.addTld(burnl1Tld)
+      await mintingManager.addTld(burnl1Tld);
       const burnl1TldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, burnl1Tld);
 
       const coinTld = 'coin';
-      await mintingManager.addTld(coinTld)
+      await mintingManager.addTld(coinTld);
       const coinTldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, coinTld);
-      await mintingManager.removeTld(coinTldTokenId)
+      await mintingManager.removeTld(coinTldTokenId);
 
       expect(await unsRegistry.ownerOf(burnl1TldTokenId)).to.be.equal(DEAD_ADDRESS);
       expect(await unsRegistry.ownerOf(coinTldTokenId)).to.be.equal(DEAD_ADDRESS);
@@ -203,7 +203,7 @@ describe('MintingManager', () => {
 
     it('should allow SLD minting after TLD burn', async () => {
       const tld = 'newtld';
-      await mintingManager.addTld(tld)
+      await mintingManager.addTld(tld);
       const tldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, tld);
 
       await mintingManager.burnTLDL1([tldTokenId]);
@@ -241,13 +241,13 @@ describe('MintingManager', () => {
 
     it('should change TLD tokens ownership to minting manager', async () => {
       const movel2Tld = 'movel2';
-      await mintingManager.addTld(movel2Tld)
+      await mintingManager.addTld(movel2Tld);
       const movel2TldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, movel2Tld);
 
       const coinTld = 'coin';
-      await mintingManager.addTld(coinTld)
+      await mintingManager.addTld(coinTld);
       const coinTldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, coinTld);
-      await mintingManager.removeTld(coinTldTokenId)
+      await mintingManager.removeTld(coinTldTokenId);
 
       expect(await unsRegistry.ownerOf(movel2TldTokenId)).to.be.equal(DEAD_ADDRESS);
       expect(await unsRegistry.ownerOf(coinTldTokenId)).to.be.equal(DEAD_ADDRESS);
@@ -260,7 +260,7 @@ describe('MintingManager', () => {
 
     it('should allow SLD minting after TLD ownership change', async () => {
       const tld = 'newtld';
-      await mintingManager.addTld(tld)
+      await mintingManager.addTld(tld);
       const tldTokenId = await unsRegistry.childIdOf(ZERO_ADDRESS, tld);
 
       await mintingManager.moveTLDOwnershipL2([tldTokenId]);

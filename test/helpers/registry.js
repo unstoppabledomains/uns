@@ -17,7 +17,6 @@ const mintDomain = async (registry, owner, tld, label = generateRandomLabel(), w
   return tokenId;
 };
 
-
 const mintTLD = async (registry, tld) => {
   const tokenId = await registry.childIdOf(ZERO_ADDRESS, tld);
   await registry['mint(address,uint256,string)'](
@@ -26,6 +25,6 @@ const mintTLD = async (registry, tld) => {
     tld,
   );
   return tokenId;
-}
+};
 
 module.exports = { mintTLD, mintDomain };
