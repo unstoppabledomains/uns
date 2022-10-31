@@ -89,12 +89,12 @@ describe('UNSRegistry', () => {
       expect(await unsRegistry.get('key_82', tokenId)).to.be.equal('value_23');
     });
 
-    for (const [key, value] of Object.entries(TLD)) {
+    for (const key of Object.keys(TLD)) {
       it(`should be possible to mint .${key} domain`, async () => {
         const tokenId = await mintDomain(
           unsRegistry,
           coinbase.address,
-          value,
+          [`mint-${key}`, key],
         );
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
       });
