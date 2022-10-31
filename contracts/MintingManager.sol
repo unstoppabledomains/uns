@@ -74,7 +74,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _;
     }
 
-    modifier onlyAllowedMinter(string[] memory labels) {
+    modifier onlyIssuer(string[] memory labels) {
         if (labels.length == 2) {
             require(isMinter(_msgSender()), 'MinterRole: CALLER_IS_NOT_MINTER');
         } else {
@@ -147,7 +147,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] calldata labels,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyAllowedMinter(labels) onlyAllowed(labels) whenNotPaused {
+    ) external override onlyIssuer(labels) onlyAllowed(labels) whenNotPaused {
         _issueWithRecords(to, labels, keys, values);
     }
 
