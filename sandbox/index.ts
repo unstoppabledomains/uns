@@ -8,17 +8,17 @@ import createKeccakHash from 'keccak';
 import debug from 'debug';
 import {
   EthereumProvider,
-  ServerOptions,
+  ProviderOptions,
 } from 'ganache';
 import { GanacheService } from './ganache-service';
 import { HttpNetworkUserConfig } from 'hardhat/types';
+import { unwrap } from '../src/helpers';
 
 const log = debug('UNS:sandbox');
 
-export const GANACHE_SERVER_CONFIG: ServerOptions<'ethereum'> = {
+export const GANACHE_SERVER_CONFIG = {
   chain: {
     chainId: 1337,
-    hardfork: 'istanbul',
     allowUnlimitedContractSize: false,
     vmErrorsOnRPCResponse: true,
   },
@@ -39,7 +39,7 @@ export const GANACHE_SERVER_CONFIG: ServerOptions<'ethereum'> = {
     verbose: false,
     logger: { log: () => {} },
   },
-}
+};
 
 export type SandboxOptions = {
   verbose?: boolean;
@@ -57,16 +57,16 @@ export type SandboxAccount = {
 }
 
 export class Sandbox {
-  static defaultNetworkOptions(): HttpNetworkUserConfig {
+  static defaultNetworkOptions (): HttpNetworkUserConfig {
     return {
       url: 'http://localhost:7545',
       chainId: 1337,
       accounts: {
-        mnemonic: GANACHE_SERVER_CONFIG['wallet'].mnemonic,
-        path: GANACHE_SERVER_CONFIG['wallet'].hdPath,
-        count: GANACHE_SERVER_CONFIG['wallet'].totalAccounts,
-      }
-    }
+        mnemonic: GANACHE_SERVER_CONFIG.wallet.mnemonic,
+        path: GANACHE_SERVER_CONFIG.wallet.hdPath,
+        count: GANACHE_SERVER_CONFIG.wallet.totalAccounts,
+      },
+    };
   }
 
   static async start (options: SandboxOptions): Promise<Sandbox> {
@@ -75,23 +75,23 @@ export class Sandbox {
     return sandbox;
   }
 
-  static snapshotPath(): string {
+  static snapshotPath (): string {
     return path.join(__dirname, 'db.tgz');
   }
 
-  static async create (options: SandboxOptions) {
+  static async create (options: SandboxOptions): Promise<Sandbox> {
     options = {
       clean: true,
       extract: true,
       verbose: false,
-      ...options
+      ...options,
     };
 
     if (options.verbose) {
       debug.enable('UNS:sandbox*');
     }
 
-    const { dbPath } = GANACHE_SERVER_CONFIG['database'];
+    const { dbPath } = GANACHE_SERVER_CONFIG.database;
     const snapshotPath = this.snapshotPath();
 
     if (options.clean) {
@@ -107,30 +107,30 @@ export class Sandbox {
       log(`Prepared sandbox database. [Source: ${snapshotPath}, TargetDir: ${dbPath}]`);
     }
 
-    const service = new GanacheService(GANACHE_SERVER_CONFIG, {
-      url: this.defaultNetworkOptions().url!
+    const service = new GanacheService(GANACHE_SERVER_CONFIG as ProviderOptions<'ethereum'>, {
+      url: unwrap(this.defaultNetworkOptions(), 'url'),
     });
     return new Sandbox(service, options);
   }
 
-  ganacheService: GanacheService;
-  options: SandboxOptions;
-  provider: EthereumProvider;
-  private _snapshotId?: string;
   version: string;
 
-  accounts: Map<string, SandboxAccount>;
+  private ganacheService: GanacheService;
+  private options: SandboxOptions;
+  private provider: EthereumProvider;
+  private snapshotId?: string;
+  private accounts: Map<string, SandboxAccount>;
 
   constructor (service: GanacheService, options: SandboxOptions = {}) {
-    this.ganacheService = service
+    this.ganacheService = service;
     this.options = options;
     this.provider = service.provider;
-    this._snapshotId = undefined;
+    this.snapshotId = undefined;
     this.version = '0.5';
 
-    const accounts = this._getAccounts(GANACHE_SERVER_CONFIG);
+    const accounts = this.getAccounts();
 
-    this.accounts ||= new Map<any, SandboxAccount>([
+    this.accounts ||= new Map<string, SandboxAccount>([
       ['owner', accounts[0]],
       ['minter', accounts[1]],
       ['faucet', accounts[9]],
@@ -152,17 +152,16 @@ export class Sandbox {
 
     if (options.noSnapshot) return;
 
-    this._snapshotId = await this._snapshot();
-    log('Created snapshot', this._snapshotId);
+    this.snapshotId = await this.snapshot();
+    log('Created snapshot', this.snapshotId);
   }
 
   async stop () {
     try {
       await this.ganacheService.stopServer();
       log('Stopped sandbox');
-    } catch (e: any) {
+    } catch (e: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (e.message.includes('Server is not running')) {
-        // GanacheService.error = undefined;
         return;
       }
       throw e;
@@ -170,27 +169,27 @@ export class Sandbox {
   }
 
   async reset () {
-    if (!this._snapshotId) {
+    if (!this.snapshotId) {
       throw new Error('Snapshot not found. Most probably Sandbox has not been started.');
     }
 
-    await this._revert(this._snapshotId);
-    log('Reverted snapshot', this._snapshotId);
+    await this.revert(this.snapshotId);
+    log('Reverted snapshot', this.snapshotId);
 
-    this._snapshotId = await this._snapshot();
-    log('Created snapshot', this._snapshotId);
+    this.snapshotId = await this.snapshot();
+    log('Created snapshot', this.snapshotId);
   }
 
-  async _snapshot () {
+  private async snapshot (): Promise<string> {
     return await this.provider.send('evm_snapshot');
   }
 
-  async _revert (snapshotId: string) {
+  private async revert (snapshotId: string): Promise<boolean> {
     return await this.provider.send('evm_revert', [snapshotId]);
   }
 
-  _getAccounts (serverOptions: ServerOptions<'ethereum'>) {
-    const { mnemonic, hdPath, totalAccounts } = serverOptions['wallet'];
+  private getAccounts (): {privateKey: string, address: string}[] {
+    const { mnemonic, hdPath, totalAccounts } = GANACHE_SERVER_CONFIG.wallet;
 
     const hdKey = HDKey.fromMasterSeed(mnemonicToSeedSync(mnemonic));
     const accounts = Array(totalAccounts);
@@ -200,22 +199,22 @@ export class Sandbox {
 
       accounts[index] = {
         privateKey: '0x' + acc.privateKey.toString('hex'),
-        address: '0x' + this._uncompressedPublicKeyToAddress(acc.publicKey),
+        address: '0x' + this.uncompressedPublicKeyToAddress(acc.publicKey),
       };
     }
 
     return accounts;
   }
 
-  _uncompressedPublicKeyToAddress (uncompressedPublicKey: Buffer) {
+  private uncompressedPublicKeyToAddress (uncompressedPublicKey: Buffer) {
     const compresedPublicKey = secp256k1
       .publicKeyConvert(uncompressedPublicKey, false)
       .slice(1);
 
     const hasher = createKeccakHash('keccak256');
 
-    hasher['_state']?.absorb(compresedPublicKey);
+    hasher['_state']?.absorb(compresedPublicKey); // eslint-disable-line dot-notation
 
     return hasher.digest().subarray(-20).toString('hex');
-  };
+  }
 }

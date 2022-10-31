@@ -1,6 +1,6 @@
-import {network} from 'hardhat';
-import {mergeNetworkConfig, readNetworkConfig} from '../src/config';
-import {Deployer} from '../src/deployer';
+import { network } from 'hardhat';
+import { mergeNetworkConfig, readNetworkConfig } from '../src/config';
+import { Deployer } from '../src/deployer';
 
 const UNSNetworkConfig = readNetworkConfig();
 

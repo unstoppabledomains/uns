@@ -1,13 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { BaseTrie as Trie } from 'merkle-patricia-tree';
 import { rlp, keccak256, toBuffer } from 'ethereumjs-util';
 import Transaction from 'ethereumjs-tx';
 import Common from 'ethereumjs-common';
 import getBlockHeader from 'ethereumjs-block/header-from-rpc';
-import {TransactionReceipt, BlockTransactionObject} from 'web3-eth';
+import { TransactionReceipt, BlockTransactionObject } from 'web3-eth';
 import Web3 from 'web3';
-// import { Buffer } from 'safe-buffer';
-
-// import { TrieNode, EmbeddedNode, Nibbles } from 'merlke-patriciate-tree/trieNode';
 
 // raw header
 function getRawHeader (block) {
@@ -66,10 +65,6 @@ export async function getTxProof (tx: Transaction, block: BlockTransactionObject
     const rawSignedSiblingTx = getTxBytes(siblingTx);
 
     await txTrie.put(path, rawSignedSiblingTx);
-
-    // await new Promise((resolve, reject) => {
-    //   return ;
-    // });
   }
 
   // Promise
@@ -90,7 +85,7 @@ export async function getTxProof (tx: Transaction, block: BlockTransactionObject
       };
       resolve(prf);
     })
-    .catch(reject);
+      .catch(reject);
   });
 }
 
@@ -107,16 +102,7 @@ export function verifyTxProof (proof) {
     for (let i = 0; i < len; i++) {
       currentNode = parentNodes[i];
 
-      // const encodedNode = Buffer.from(
-      //   keccak256(rlp.encode(currentNode)).toString(),
-      //   'hex'
-      // );
-
       const encodedNode = keccak256(rlp.encode(currentNode));
-
-      // console.log(currentNode);
-      // console.log(nodeKey);
-      // console.log(encodedNode);
 
       if (!nodeKey.equals(encodedNode)) {
         return false;
@@ -258,10 +244,14 @@ export function getFakeReceiptBytes (receipt, dummyData) {
   ]);
 }
 
-export async function getReceiptProof (receipt: TransactionReceipt, block: BlockTransactionObject, web3: Web3 | null, receipts: TransactionReceipt[]) {
+export async function getReceiptProof (
+  receipt: TransactionReceipt,
+  block: BlockTransactionObject,
+  web3: Web3 | null,
+  receipts: TransactionReceipt[],
+) {
   const receiptsTrie = new Trie();
-  // TODO: fix this any
-  const receiptPromises: any[] = [];
+  const receiptPromises: Promise<TransactionReceipt>[] = [];
 
   if (!receipts && web3) {
     block.transactions.forEach((tx) => {
@@ -296,6 +286,6 @@ export async function getReceiptProof (receipt: TransactionReceipt, block: Block
       };
       resolve(prf);
     })
-    .catch(reject);
+      .catch(reject);
   });
 }

@@ -15,8 +15,8 @@
     "rebuild:sandbox": "env HARDHAT_NETWORK=sandbox DEBUG=UNS:* ts-node ./sandbox/rebuild.ts",
     "lint": "yarn lint:js && yarn lint:sol",
     "lint:fix": "yarn lint:js:fix && yarn lint:sol:fix",
-    "lint:js": "eslint --ignore-path .gitignore .",
-    "lint:js:fix": "eslint --ignore-path .gitignore . --fix",
+    "lint:ts": "eslint --ignore-path .gitignore .",
+    "lint:ts:fix": "eslint --ignore-path .gitignore . --fix",
     "lint:sol": "solhint 'contracts/**/*.sol' && prettier -c 'contracts/**/*.sol'",
     "lint:sol:fix": "prettier --write \"contracts/**/*.sol\"",
     "deploy:localhost": "hardhat run --network localhost scripts/deploy.js",
@@ -53,6 +53,7 @@
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.7.6",
     "@types/tar": "^6.1.2",
+    "@types/yargs": "^17.0.13",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
     "chai": "^4.3.6",
@@ -86,6 +87,6 @@
     "typechain": "^8.1.0",
     "typescript": "^4.7.4",
     "web3": "^1.2.0",
-    "yargs": "17.0.1"
+    "yargs": "^17.6.0"
   }
 }

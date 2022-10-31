@@ -13,7 +13,12 @@ import { MintableERC721Predicate__factory } from '../typechain-types/factories/c
 import { RootChainManager__factory } from '../typechain-types/factories/contracts/@maticnetwork/pos-portal/RootChainManager.sol';
 
 describe('ChildRegistry', () => {
-  let l1UnsRegistry: UNSRegistry, l2UnsRegistry: UNSRegistry, mintingManager: MintingManager, rootChainManager: RootChainManager, predicate: MintableERC721Predicate, stateSender: DummyStateSender;
+  let l1UnsRegistry: UNSRegistry,
+    l2UnsRegistry: UNSRegistry,
+    mintingManager: MintingManager,
+    rootChainManager: RootChainManager,
+    predicate: MintableERC721Predicate,
+    stateSender: DummyStateSender;
 
   let registryOwner: SignerWithAddress, rcmOwner: SignerWithAddress, predicateOwner: SignerWithAddress, owner: SignerWithAddress;
 

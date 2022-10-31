@@ -12,16 +12,13 @@ if (require.main === module) {
       await sandbox.start({ noSnapshot: true });
 
       const deployer = await Deployer.create();
-    
+
       const config = await deployer.execute(['full', 'deploy_polygon_pos_bridge', 'uns_config_polygon_pos_bridge']);
       await sandbox.stop();
 
       mergeNetworkConfig(config);
 
-      // TODO: check if in future version ganache typing resolution for ServerOptions was fixed.
-      // Hardcoing as any for now.
-      const dbPath = (GANACHE_SERVER_CONFIG as any).database.dbPath;
-
+      const dbPath = GANACHE_SERVER_CONFIG.database.dbPath;
       const snapshotPath = Sandbox.snapshotPath();
 
       await tar.create(

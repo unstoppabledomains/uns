@@ -74,7 +74,11 @@ export const writeCheckpoint = async (contract: Contract, admin: SignerWithAddre
   return await submitCheckpoint(checkpointManager, txn.hash);
 };
 
-export const buildExitInput = async (checkpointManager: SimpleCheckpointManager, receipt: ContractReceipt, checkpointData: any) => {
+export const buildExitInput = async (
+  checkpointManager: SimpleCheckpointManager,
+  receipt: ContractReceipt,
+  checkpointData: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+) => {
   const headerNumber = (await checkpointManager.currentCheckpointNumber()).toNumber();
   const logIndex = receipt.logs
     .findIndex(log => log.topics[0].toLowerCase() === ERC721_TRANSFER_EVENT_SIG.toLowerCase());

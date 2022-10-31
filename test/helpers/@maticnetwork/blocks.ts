@@ -1,7 +1,6 @@
 import { keccak256, BN, toBuffer } from 'ethereumjs-util';
-// import { Buffer } from 'safe-buffer';
 import Web3 from 'web3';
-import {BlockTransactionString, BlockTransactionObject} from 'web3-eth';
+import { BlockTransactionString, BlockTransactionObject } from 'web3-eth';
 
 const sha3 = keccak256;
 

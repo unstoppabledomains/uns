@@ -1,14 +1,15 @@
 import { ethers, network, config } from 'hardhat';
 import path from 'path';
 import fs from 'fs';
-import {merge} from 'lodash';
+import { merge } from 'lodash';
 import debug from 'debug';
-import { Contract, ContractFactory, Transaction, Signer} from 'ethers';
+import { Contract, ContractFactory } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import {Task, tasks} from './tasks';
+import { Task, tasks } from './tasks';
 import { NetworkConfig } from 'hardhat/types';
-import { ArtifactName, UnsConfig, UnsNetworkConfig, UnsContractConfigMap, UnsContractName} from './types';
-import { TransactionResponse } from "@ethersproject/abstract-provider";
+import { ArtifactName, UnsConfig, UnsNetworkConfig, UnsContractConfigMap, UnsContractName } from './types';
+import { TransactionResponse } from '@ethersproject/abstract-provider';
+import { unwrap } from './helpers';
 
 const log = debug('UNS:deployer');
 
@@ -41,7 +42,7 @@ const DEFAULT_OPTIONS: DeployerOptions = {
   proxy: true,
 };
 
-async function getArtifacts(): Promise<ArtifactsMap> {
+async function getArtifacts (): Promise<ArtifactsMap> {
   return {
     CNSRegistry: await ethers.getContractFactory('CNSRegistry'),
     CNSRegistryForwarder: await ethers.getContractFactory('CNSRegistryForwarder'),
@@ -62,7 +63,7 @@ async function getArtifacts(): Promise<ArtifactsMap> {
 }
 
 export class Deployer {
-  public options: DeployerOptions;    
+  public options: DeployerOptions;
   public artifacts: ArtifactsMap;
   public accounts: AccountsMap;
   public log: debug.Debugger;
@@ -70,7 +71,7 @@ export class Deployer {
   public minters: string[];
   public network: NetworkConfig;
 
-  static async create (options?: DeployerOptions) {
+  static async create (options?: DeployerOptions): Promise<Deployer> {
     const [owner] = await ethers.getSigners();
 
     const _unsConfig = config.uns;
@@ -109,7 +110,7 @@ export class Deployer {
     });
   }
 
-  async execute (tags: string[], config?: UnsNetworkConfig) {
+  async execute (tags: string[], config?: UnsNetworkConfig): Promise<UnsConfig> {
     tags = tags || [];
 
     this.log('Execution started');
@@ -129,7 +130,7 @@ export class Deployer {
     return _config;
   }
 
-  getNetworkConfig(): UnsConfig {
+  getNetworkConfig (): UnsConfig {
     const config = this.getDeployConfig();
 
     const emptyConfig = {
@@ -149,24 +150,24 @@ export class Deployer {
           ethers.BigNumber.from(value.transaction.blockNumber).toHexString(),
         forwarder: value.forwarder,
       };
-    };
+    }
 
     return {
       networks: {
-        [this.network.chainId!]: {
+        [unwrap(this.network, 'chainId')]: {
           contracts: contracts as UnsContractConfigMap,
         },
       },
     };
   }
 
-  getDeployConfig(): DeployConfig {
+  getDeployConfig (): DeployConfig {
     const configPath = path.resolve(this.options.basePath, `${this.network.chainId}.json`);
     const file = fs.existsSync(configPath) ? fs.readFileSync(configPath).toString() : '{}';
     return JSON.parse(file.length ? file : '{}');
   }
 
-  async saveContractConfig (name: UnsContractName, contract: Contract, implAddress?: string, forwarder?: Contract) {
+  async saveContractConfig (name: UnsContractName, contract: Contract, implAddress?: string, forwarder?: Contract): Promise<void> {
     const config = this.getDeployConfig();
 
     const _config = merge(config, {
@@ -183,7 +184,7 @@ export class Deployer {
     this._saveConfig(_config);
   }
 
-  async saveForwarderConfig (name: UnsContractName, contract: Contract) {
+  async saveForwarderConfig (name: UnsContractName, contract: Contract): Promise<void> {
     const config = this.getDeployConfig();
 
     const _config = merge(config, {
@@ -198,7 +199,7 @@ export class Deployer {
     this._saveConfig(_config);
   }
 
-  async _saveConfig (config: any) {
+  async _saveConfig (config: unknown) {
     const configPath = path.resolve(this.options.basePath, `${this.network.chainId}.json`);
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
   }

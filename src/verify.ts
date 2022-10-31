@@ -1,7 +1,7 @@
 import { network, run } from 'hardhat';
-import {Deployer} from './deployer';
+import { Deployer } from './deployer';
 
-export default async (ctx: Deployer, address: string, args: any[]) => {
+export default async (ctx: Deployer, address: string, args: unknown[]) => {
   try {
     await run('verify:verify', {
       address,

@@ -1,5 +1,4 @@
 import { zeros, keccak256 } from 'ethereumjs-util';
-// import { Buffer } from 'safe-buffer';
 
 const sha3 = keccak256;
 
@@ -26,7 +25,7 @@ export default class MerkleTree {
     this.createHashes(this.leaves);
   }
 
-  createHashes (nodes: Buffer[]) {
+  createHashes (nodes: Buffer[]): void | false {
     if (nodes.length === 1) {
       return false;
     }
@@ -48,19 +47,19 @@ export default class MerkleTree {
     this.createHashes(treeLevel);
   }
 
-  getLeaves () {
+  getLeaves (): Buffer[] {
     return this.leaves;
   }
 
-  getLayers () {
+  getLayers (): Buffer[][] {
     return this.layers;
   }
 
-  getRoot () {
+  getRoot (): Buffer {
     return this.layers[this.layers.length - 1][0];
   }
 
-  getProof (leaf: Buffer) {
+  getProof (leaf: Buffer): Buffer[] {
     let index = -1;
     for (let i = 0; i < this.leaves.length; i++) {
 
@@ -88,7 +87,7 @@ export default class MerkleTree {
     return proof;
   }
 
-  verify (value: Buffer, index: number, root: Buffer, proof: Buffer[]) {
+  verify (value: Buffer, index: number, root: Buffer, proof: Buffer[]): boolean {
     if (!Array.isArray(proof) || !value || !root) {
       return false;
     }

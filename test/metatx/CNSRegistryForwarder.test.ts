@@ -13,7 +13,12 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumberish } from 'ethers';
 
 describe('CNSRegistryForwarder', () => {
-  let forwarder: CNSRegistryForwarder, registry: CNSRegistry, mintingController: MintingController, signatureController: SignatureController, resolver: Resolver;
+  let forwarder: CNSRegistryForwarder,
+    registry: CNSRegistry,
+    mintingController: MintingController,
+    signatureController: SignatureController,
+    resolver: Resolver;
+
   let signers: SignerWithAddress[], owner: SignerWithAddress, receiver: SignerWithAddress;
   let buildExecuteParams: ExecuteFunc;
 

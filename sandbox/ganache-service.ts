@@ -17,17 +17,17 @@ export class GanacheService {
   public server: Server;
   public provider: EthereumProvider;
 
-  private _serverConfigOptions: ServerConfigOptions;
+  private serverConfigOptions: ServerConfigOptions;
 
-  constructor (options: ServerOptions, serverConfigOptions: ServerConfigOptions) {
-    this._serverConfigOptions = this._validateAndTransformOptions(serverConfigOptions);
+  constructor (options: ServerOptions<'ethereum'>, serverConfigOptions: ServerConfigOptions) {
+    this.serverConfigOptions = this.validateAndTransformOptions(serverConfigOptions);
     this.server = server<'ethereum'>({ ...options });
     this.provider = this.server.provider;
   }
 
   startServer () {
-    const { port } = this._serverConfigOptions;
-    
+    const { port } = this.serverConfigOptions;
+
     if(!port) {
       throw new Error('Port sohuld be defined in the ServerConfigOptions URL');
     }
@@ -39,7 +39,7 @@ export class GanacheService {
     return this.server.close();
   }
 
-  private _validateAndTransformOptions(options: ServerConfigOptions): ServerConfigOptions {
+  private validateAndTransformOptions (options: ServerConfigOptions): ServerConfigOptions {
     const validatedOptions = options;
 
     const url = new URL(options.url);

@@ -1,9 +1,11 @@
-import { ethers, network } from 'hardhat';
-import {readNetworkConfig} from '../src/config';
+import { network } from 'hardhat';
+import { readNetworkConfig } from '../src/config';
 import path from 'path';
 import fs from 'fs';
 import { Contract } from 'ethers';
-import {Event} from '@ethersproject/contracts';
+import { Event } from '@ethersproject/contracts';
+import { UNSRegistry__factory } from '../typechain-types/factories/contracts';
+import { CNSRegistry__factory } from '../typechain-types/factories/dot-crypto/contracts';
 
 const UNSNetworkConfig = readNetworkConfig();
 
@@ -15,9 +17,6 @@ async function main () {
     throw new Error(`Config not found for network ${network.config.chainId}`);
   }
 
-  const UNSRegistryArtifact = await ethers.getContractFactory('UNSRegistry');
-  const CNSRegistryArtifact = await ethers.getContractFactory('CNSRegistry');
-
   const { UNSRegistry, CNSRegistry } = config.contracts || {};
   if (!UNSRegistry || !UNSRegistry.address) {
     throw new Error('Current network configuration does not hase UNSRegistry');
@@ -26,10 +25,10 @@ async function main () {
     throw new Error('Current network configuration does not hase CNSRegistry');
   }
 
-  const unsRegistry = UNSRegistryArtifact.attach(UNSRegistry.address);
+  const unsRegistry = new UNSRegistry__factory().attach(UNSRegistry.address);
   const eventsUNS = await fetchEvents(unsRegistry, parseInt(UNSRegistry.deploymentBlock, 16));
 
-  const cnsRegistry = CNSRegistryArtifact.attach(CNSRegistry.address);
+  const cnsRegistry = new CNSRegistry__factory().attach(CNSRegistry.address);
   const eventsCNS = await fetchEvents(cnsRegistry, parseInt(CNSRegistry.deploymentBlock, 16));
 
   const tokens = eventsUNS.concat(eventsCNS).map((t: Event)=> {
@@ -42,7 +41,7 @@ async function main () {
   console.log('Blocklist complete!');
 }
 
-async function fetchEvents (contract: Contract, fromBlock: number, toBlock?: number, limit: number = 10000): Promise<Array<Event>> {
+async function fetchEvents (contract: Contract, fromBlock: number, toBlock?: number, limit = 10000): Promise<Array<Event>> {
   if (!toBlock) {
     toBlock = await contract.provider.getBlockNumber();
   }
@@ -67,7 +66,7 @@ async function fetchEvents (contract: Contract, fromBlock: number, toBlock?: num
   }
 }
 
-async function save (chainId: number, state: any) {
+async function save (chainId: number, state: unknown) {
   const _path = path.resolve('./.deployer', `${chainId}.blocklist.json`);
   fs.writeFileSync(_path, JSON.stringify(state, null, 2));
 }

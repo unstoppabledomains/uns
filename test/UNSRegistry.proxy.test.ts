@@ -133,9 +133,9 @@ describe('UNSRegistry (proxy)', () => {
 
     it('should not consume additional gas if key hash was set before', async () => {
       const tokenId = await mintDomain(unsRegistry, owner.address, ['heyhash-gas', 'crypto']);
-      let newKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tokenId);
+      const newKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tokenId);
       const newKeyHashTxReceipt = await newKeyHashTx.wait();
-      let exitsKeyHashTx = await unsRegistry.set(
+      const exitsKeyHashTx = await unsRegistry.set(
         'keyhash-gas',
         'value',
         tokenId,

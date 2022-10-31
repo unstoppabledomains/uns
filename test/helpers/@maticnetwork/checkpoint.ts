@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { bufferToHex } from 'ethereumjs-util';
 import assert from 'assert';
 
@@ -11,7 +13,7 @@ import {
 } from './proofs';
 import { getBlockHeader } from './blocks';
 import { childWeb3 } from './contracts';
-import {TransactionReceipt, Transaction, BlockTransactionObject} from 'web3-eth';
+import { TransactionReceipt, Transaction, BlockTransactionObject } from 'web3-eth';
 
 let headerNumber = 0;
 

@@ -1,6 +1,5 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-// TODO: add type declarations for this lib
 import namehash from 'eth-ens-namehash';
 import { ZERO_ADDRESS, TLD } from './helpers/constants';
 import { MintingManager, ProxyReader, UNSRegistry } from '../typechain-types/contracts';
@@ -24,7 +23,11 @@ describe('MintingManager', () => {
     proxyReader: ProxyReader;
 
   let signers: SignerWithAddress[], domainSuffix: string;
-  let coinbase: SignerWithAddress, receiver: SignerWithAddress, developer: SignerWithAddress, spender: SignerWithAddress, resolverSigner: SignerWithAddress;
+  let coinbase: SignerWithAddress,
+    receiver: SignerWithAddress,
+    developer: SignerWithAddress,
+    spender: SignerWithAddress,
+    resolverSigner: SignerWithAddress;
 
   before(async () => {
     signers = await ethers.getSigners();

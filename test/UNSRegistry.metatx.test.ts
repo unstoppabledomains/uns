@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { utils, BigNumber, Contract, BigNumberish } from 'ethers'
+import { utils, BigNumber, Contract, BigNumberish } from 'ethers';
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 import { TLD } from './helpers/constants';
 import { mintDomain } from './helpers/registry';
@@ -12,7 +12,13 @@ import { FunctionFragment } from 'ethers/lib/utils';
 
 describe('UNSRegistry (metatx)', () => {
   let unsRegistry: UNSRegistry, buildExecuteParams: ExecuteFunc;
-  let signers: SignerWithAddress[], coinbase: SignerWithAddress, owner: SignerWithAddress, nonOwner: SignerWithAddress, receiver: SignerWithAddress, accessControl: SignerWithAddress, operator: SignerWithAddress;
+  let signers: SignerWithAddress[],
+    coinbase: SignerWithAddress,
+    owner: SignerWithAddress,
+    nonOwner: SignerWithAddress,
+    receiver: SignerWithAddress,
+    accessControl: SignerWithAddress,
+    operator: SignerWithAddress;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -194,7 +200,12 @@ describe('UNSRegistry (metatx)', () => {
       );
     };
 
-    const buidRequest = async (fragment: FunctionFragment, from: string, tokenId: BigNumberish, paramsMap: any) => {
+    const buidRequest = async (
+      fragment: FunctionFragment,
+      from: string,
+      tokenId: BigNumberish,
+      paramsMap: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+    ) => {
       const contract: Contract = unsRegistry;
 
       const req = {
@@ -217,7 +228,7 @@ describe('UNSRegistry (metatx)', () => {
         keys: ['key1'],
         values: ['value1'],
         to: '',
-        tokenId: ''
+        tokenId: '',
       };
 
       const included = [
@@ -275,7 +286,7 @@ describe('UNSRegistry (metatx)', () => {
         values: ['value1'],
         from: '',
         to: '',
-        tokenId: BigNumber.from('0x0')
+        tokenId: BigNumber.from('0x0'),
       };
 
       const excluded = [

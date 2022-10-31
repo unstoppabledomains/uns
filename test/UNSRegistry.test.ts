@@ -5,14 +5,19 @@ import { TLD, ZERO_ADDRESS, DEAD_ADDRESS } from './helpers/constants';
 import { mintDomain, mintRandomDomain } from './helpers/registry';
 
 import { utils, BigNumber } from 'ethers';
-import {UNSRegistry} from '../typechain-types/contracts';
-import {UNSRegistry__factory} from '../typechain-types/factories/contracts';
+import { UNSRegistry } from '../typechain-types/contracts';
+import { UNSRegistry__factory } from '../typechain-types/factories/contracts';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 describe('UNSRegistry', () => {
   let unsRegistry: UNSRegistry;
 
-  let signers: SignerWithAddress[], coinbase: SignerWithAddress, owner: SignerWithAddress, reader: SignerWithAddress, receiver: SignerWithAddress, accounts: string[];
+  let signers: SignerWithAddress[],
+    coinbase: SignerWithAddress,
+    owner: SignerWithAddress,
+    reader: SignerWithAddress,
+    receiver: SignerWithAddress,
+    accounts: string[];
 
   const root = TLD.CRYPTO;
 
@@ -335,7 +340,7 @@ describe('UNSRegistry', () => {
         const tokenId = await mintDomain(unsRegistry, coinbase.address, ['unlock3-1', 'crypto']);
 
         await expect(unsRegistry.unlockWithRecords(receiver.address, tokenId, [], []))
-          .to.not.emit(unsRegistry, 'NewURI')
+          .to.not.emit(unsRegistry, 'NewURI');
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
       });
 

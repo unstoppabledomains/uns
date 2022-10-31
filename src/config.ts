@@ -1,10 +1,10 @@
 import fs from 'fs';
-import {merge} from 'lodash';
+import { merge } from 'lodash';
 import { UnsConfig } from './types';
 
 const configPath = './uns-config.json';
 
-export function readNetworkConfig(): UnsConfig {
+export function readNetworkConfig (): UnsConfig {
   const file = fs.existsSync(configPath) ? fs.readFileSync(configPath).toString() : '{}';
   return JSON.parse(file.length ? file : '{}');
 }

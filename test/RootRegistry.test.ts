@@ -55,20 +55,6 @@ describe('RootRegistry', () => {
   before(async () => {
     [registryOwner, rcmOwner, predicateOwner, owner, spender] = await ethers.getSigners();
 
-    // UNSRegistry = await ethers.getContractFactory('UNSRegistry');
-    // CNSRegistry = await ethers.getContractFactory('CNSRegistry');
-    // Resolver = await ethers.getContractFactory('Resolver');
-    // MintingController = await ethers.getContractFactory('MintingController');
-    // URIPrefixController = await ethers.getContractFactory('URIPrefixController');
-    // SignatureController = await ethers.getContractFactory('SignatureController');
-    // CNSRegistryForwarder = await ethers.getContractFactory('CNSRegistryForwarder');
-    // MintingManager = await ethers.getContractFactory('MintingManager');
-    // RootChainManager = await ethers.getContractFactory('RootChainManager');
-    // MintableERC721Predicate = await ethers
-    //   .getContractFactory('contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol:MintableERC721Predicate');
-    // DummyStateSender = await ethers.getContractFactory('DummyStateSender');
-    // CheckpointManager = await ethers.getContractFactory('SimpleCheckpointManager');
-
     l1UnsRegistry = await new UNSRegistry__factory(registryOwner).connect(registryOwner).deploy();
 
     cnsRegistry = await new CNSRegistry__factory(registryOwner).deploy();

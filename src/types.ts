@@ -31,7 +31,7 @@ export enum UnsContractName {
   TwitterValidationOperator = 'TwitterValidationOperator',
   FreeMinter = 'FreeMinter',
   MintableERC721Predicate = 'MintableERC721Predicate',
-  RootChainManager = 'RootChainManager' 
+  RootChainManager = 'RootChainManager'
 }
 
 export type UnsContractConfig = {
@@ -56,4 +56,8 @@ export type UnsConfig = {
   networks: {
     [chainId: number]: UnsNetworkConfig
   };
+}
+
+export type DependenciesMap = {
+  [k in ArtifactName]?: UnsContractConfig
 }

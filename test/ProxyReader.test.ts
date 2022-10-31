@@ -22,7 +22,7 @@ describe('ProxyReader', () => {
 
   let unsRegistry: UNSRegistry;
   let cnsRegistry: CNSRegistry;
-  let resolver: Resolver
+  let resolver: Resolver;
   let mintingController: MintingController;
   let proxyReader: ProxyReader;
 

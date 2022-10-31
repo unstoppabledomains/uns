@@ -8,7 +8,13 @@ import { MinterRoleMock } from '../../typechain-types/contracts/mocks';
 
 describe('MinterRole', () => {
   let minterRole: MinterRoleMock;
-  let signers: SignerWithAddress[], coinbase: SignerWithAddress, minter: SignerWithAddress, faucet: SignerWithAddress, receiver: SignerWithAddress, minter2: SignerWithAddress, minter3: SignerWithAddress;
+  let signers: SignerWithAddress[],
+    coinbase: SignerWithAddress,
+    minter: SignerWithAddress,
+    faucet: SignerWithAddress,
+    receiver: SignerWithAddress,
+    minter2: SignerWithAddress,
+    minter3: SignerWithAddress;
 
   before(async () => {
     signers = await ethers.getSigners();

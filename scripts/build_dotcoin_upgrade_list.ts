@@ -1,9 +1,10 @@
-import { ethers, network } from 'hardhat';
+import { network } from 'hardhat';
 import { utils, BigNumber, Contract } from 'ethers';
 import path from 'path';
 import fs from 'fs';
-import {readNetworkConfig} from '../src/config';
-import {Log} from '@ethersproject/abstract-provider';
+import { readNetworkConfig } from '../src/config';
+import { Log } from '@ethersproject/abstract-provider';
+import { UNSRegistry__factory } from '../typechain-types/factories/contracts';
 
 const UnsConfig = readNetworkConfig();
 
@@ -16,13 +17,13 @@ const normalizeTokenId = (bigNumber: BigNumber) => {
 type State =  {
   tokens: {
     [tokenId: string]: {
-      uri: string;      
+      uri: string;
     }
   }
   latestSyncedL1Block: number;
   latestSyncedL2Block: number;
 }
-  
+
 const INITIAL_DB = {
   tokens: {},
   latestSyncedL1Block: 1,
@@ -126,8 +127,7 @@ async function main () {
     throw new Error('Current network configuration does not hase UNSRegistry');
   }
 
-  const unsRegistryFactory = await ethers.getContractFactory('UNSRegistry');
-  const unsRegistryContract = unsRegistryFactory.attach(
+  const unsRegistryContract = new UNSRegistry__factory().attach(
     contractsConfig.UNSRegistry.address,
   );
 

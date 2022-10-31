@@ -8,7 +8,7 @@ import { task } from 'hardhat/config';
 type MintersMap = Record<string, string[]>
 
 // We need to extend HardhatUserConfig in order to support custom uns settings.
-declare module "hardhat/types/config" {
+declare module 'hardhat/types/config' {
   interface HardhatUserConfig {
     uns?: {
       minters: MintersMap,
@@ -22,11 +22,11 @@ declare module "hardhat/types/config" {
   }
 
   interface ProjectPathsUserConfig {
-    flatArtifacts?: string;
+    flatArtifacts: string;
   }
 
   interface ProjectPathsConfig {
-    flatArtifacts?: string;
+    flatArtifacts: string;
   }
 }
 
@@ -34,11 +34,11 @@ import '@typechain/hardhat';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-solhint';
-import '@nomiclabs/hardhat-etherscan'
+import '@nomiclabs/hardhat-etherscan';
 
 import '@openzeppelin/hardhat-upgrades';
 
-// There are no type declarations for 
+// There are no type declarations for
 require('solidity-coverage');
 
 import 'hardhat-gas-reporter';
@@ -47,22 +47,25 @@ import 'hardhat-contract-sizer';
 
 import { Sandbox } from './sandbox';
 
+import yargs from 'yargs/yargs';
+
 /// ENVVAR
 // - ENABLE_GAS_REPORT
 // - ENABLE_CONTRACT_SIZER
 // - CI
-const argv = require('yargs/yargs')()
+const argv = yargs()
   .env('')
   .boolean('enableGasReport')
   .boolean('enableContractSizer')
-  .boolean('ci').argv;
+  .boolean('ci')
+  .parseSync();
 
 task(
   TASK_COMPILE,
   'hook compile task to perform post-compile task',
   async (_, hardhatRuntimeEnv: HardhatRuntimeEnvironment, runSuper) => {
     const { root, flatArtifacts } = hardhatRuntimeEnv.config.paths;
-    const outputDir = path.resolve(root, flatArtifacts!);
+    const outputDir = path.resolve(root, flatArtifacts);
 
     await runSuper();
 
@@ -92,7 +95,6 @@ const settings = {
   },
 };
 
-// Specifing ANY as we have a lot of types here
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [
@@ -225,6 +227,6 @@ const config: HardhatUserConfig = {
       polygon: ['0xd8263053a6d08ef3acbf2381f144b90841726233'],
     },
   },
-}
+};
 
 export default config;

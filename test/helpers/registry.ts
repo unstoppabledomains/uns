@@ -7,11 +7,11 @@ const generateRandomLabel = () => 'domain-' + ethers.utils.hexlify(
 );
 
 // TODO: make a params object instead of arguments list here
-export async function mintDomain(
+export async function mintDomain (
   registry: UNSRegistry,
-  owner: string | SignerWithAddress, 
+  owner: string | SignerWithAddress,
   labels: string[],
-  withoutReverse: boolean = false,
+  withoutReverse = false,
   keys: string[] = [],
   values: string[] = [],
 ) {
@@ -29,11 +29,11 @@ export async function mintDomain(
 
 export const mintRandomDomain = async (
   registry: UNSRegistry,
-  owner: string | SignerWithAddress, 
-  tld: string, 
-  withoutReverse = false, 
-  keys = [], 
-  values = []
+  owner: string | SignerWithAddress,
+  tld: string,
+  withoutReverse = false,
+  keys = [],
+  values = [],
 ) => {
   const labels = [generateRandomLabel(), tld];
 

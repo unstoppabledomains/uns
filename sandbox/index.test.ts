@@ -6,6 +6,7 @@ import { readNetworkConfig } from '../src/config';
 import { MintingManager__factory, UNSRegistry__factory } from '../typechain-types/factories/contracts';
 import { MintingManager, UNSRegistry } from '../typechain-types/contracts';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { unwrap } from '../src/helpers';
 
 describe('Sandbox', async () => {
   const domainPrefix = 'sandbox';
@@ -21,7 +22,7 @@ describe('Sandbox', async () => {
     signers = await ethers.getSigners();
     [owner, minter] = signers;
 
-    const {contracts} = readNetworkConfig().networks[network.config.chainId!];
+    const { contracts } = readNetworkConfig().networks[unwrap(network.config, 'chainId')];
 
     unsRegistry = new UNSRegistry__factory(owner).attach(contracts.UNSRegistry.address);
     mintingManager = new MintingManager__factory(owner).attach(contracts.MintingManager.address);

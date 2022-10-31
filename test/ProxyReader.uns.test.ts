@@ -1,32 +1,30 @@
-const { ethers } = require('hardhat');
-const { expect } = require('chai');
+import { ethers } from 'hardhat';
+import { expect } from 'chai';
 
-const { ZERO_ADDRESS, TLD } = require('./helpers/constants');
-const { mintDomain } = require('./helpers/registry');
-const { getInterfaceId } = require('./helpers/proxy');
-
-const { utils } = ethers;
+import { ZERO_ADDRESS, TLD } from './helpers/constants';
+import { mintDomain } from './helpers/registry';
+import { getInterfaceId } from './helpers/proxy';
+import { BigNumber, utils } from 'ethers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { ProxyReader, UNSRegistry } from '../typechain-types/contracts';
+import { ProxyReader__factory, UNSRegistry__factory } from '../typechain-types/factories/contracts';
 
 describe('ProxyReader (UNS only)', () => {
   const domainName = 'test_42';
   const keys = ['test.key1', 'test.key2'];
   const values = ['test.value1', 'test.value2'];
 
-  let UNSRegistry, ProxyReader;
-  let unsRegistry, proxy;
-  let signers, coinbase, accounts;
-  let walletTokenId, cryptoTokenId;
+  let unsRegistry: UNSRegistry, proxy: ProxyReader;
+  let signers: SignerWithAddress[], coinbase: SignerWithAddress, accounts: string[];
+  let walletTokenId: BigNumber, cryptoTokenId: BigNumber;
 
   before(async () => {
     signers = await ethers.getSigners();
     [coinbase] = signers;
     [, ...accounts] = signers.map(s => s.address);
 
-    UNSRegistry = await ethers.getContractFactory('UNSRegistry');
-    ProxyReader = await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader');
-
     // deploy UNS
-    unsRegistry = await UNSRegistry.deploy();
+    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address);
     await unsRegistry.setTokenURIPrefix('/');
 
@@ -40,7 +38,7 @@ describe('ProxyReader (UNS only)', () => {
     // mint .crypto
     cryptoTokenId = await mintDomain(unsRegistry, coinbase, [domainName, 'crypto'], true);
 
-    proxy = await ProxyReader.deploy(unsRegistry.address, ZERO_ADDRESS);
+    proxy = await new ProxyReader__factory(coinbase).deploy(unsRegistry.address, ZERO_ADDRESS);
   });
 
   it('should support IERC165 interface', async () => {
@@ -57,7 +55,7 @@ describe('ProxyReader (UNS only)', () => {
         'ownerOf', 'getApproved', 'isApprovedForAll', 'exists', 'reverseOf',
       ];
 
-      const interfaceId = getInterfaceId(ProxyReader, functions);
+      const interfaceId = getInterfaceId(proxy, functions);
       expect(await proxy.supportsInterface(interfaceId)).to.be.equal(true);
     });
 
@@ -313,7 +311,7 @@ describe('ProxyReader (UNS only)', () => {
     it('should support IRecordReader interface', async () => {
       const functions = ['get', 'getByHash', 'getMany', 'getManyByHash'];
 
-      const interfaceId = getInterfaceId(ProxyReader, functions);
+      const interfaceId = getInterfaceId(proxy, functions);
       expect(await proxy.supportsInterface(interfaceId)).to.be.equal(true);
     });
 
@@ -453,7 +451,7 @@ describe('ProxyReader (UNS only)', () => {
     it('should support IDataReader interface', async () => {
       const functions = ['getData', 'getDataForMany', 'getDataByHash', 'getDataByHashForMany', 'ownerOfForMany'];
 
-      const interfaceId = getInterfaceId(ProxyReader, functions);
+      const interfaceId = getInterfaceId(proxy, functions);
       expect(await proxy.supportsInterface(interfaceId)).to.be.equal(true);
     });
 

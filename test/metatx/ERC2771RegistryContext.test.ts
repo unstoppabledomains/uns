@@ -11,7 +11,7 @@ describe('ERC2771RegistryContext', () => {
 
   before(async () => {
     signers = await ethers.getSigners();
-    [coinbase,] = signers;
+    [coinbase] = signers;
     [, ...accounts] = signers.map(s => s.address);
 
     context = await new ERC2771RegistryContextMock__factory(coinbase).deploy();

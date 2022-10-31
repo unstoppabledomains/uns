@@ -13,7 +13,7 @@ export const getInterfaceId = (proxyReader: ProxyReader, functions: string[]): s
 
   for (const functionName of functions) {
     const funcInterface = Object.values(proxyReader.interface.functions).find((x) => x.name === functionName);
-    
+
     if(!funcInterface) {
       throw new Error('getInterfaceId: could not find function with name ' + functionName);
     }

@@ -12,7 +12,12 @@ import { ResolverForwarder__factory } from '../../typechain-types/factories/cont
 import { BigNumber } from 'ethers';
 
 describe('ResolverForwarder', () => {
-  let forwarder: ResolverForwarder, registry: CNSRegistry, mintingController: MintingController, signatureController: SignatureController, resolver: Resolver;
+  let forwarder: ResolverForwarder,
+    registry: CNSRegistry,
+    mintingController: MintingController,
+    signatureController: SignatureController,
+    resolver: Resolver;
+
   let signers: SignerWithAddress[], owner: SignerWithAddress;
   let buildExecuteParams: ExecuteFunc;
 

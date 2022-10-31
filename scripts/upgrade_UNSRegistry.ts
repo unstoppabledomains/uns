@@ -1,13 +1,11 @@
-const { network } = require('hardhat');
-
-const { mergeNetworkConfig } = require('../src/config');
-const Deployer = require('../src/deployer');
-const NetworkConfig = require('./../uns-config.json');
+import { network } from 'hardhat';
+import { mergeNetworkConfig, readNetworkConfig } from '../src/config';
+import { Deployer } from '../src/deployer';
 
 async function main () {
   console.log('Network:', network.name);
 
-  const config = NetworkConfig.networks[network.config.chainId];
+  const config = readNetworkConfig()[network.config.chainId];
   if (!config) {
     throw new Error(`UNS config not found for network ${network.config.chainId}`);
   }

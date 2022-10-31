@@ -1,6 +1,6 @@
-import {network} from 'hardhat';
-import {mergeNetworkConfig} from '../src/config';
-import {Deployer} from '../src/deployer';
+import { network } from 'hardhat';
+import { mergeNetworkConfig } from '../src/config';
+import { Deployer } from '../src/deployer';
 
 async function main () {
   console.log('Network:', network.name);
