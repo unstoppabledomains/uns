@@ -74,10 +74,13 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _;
     }
 
-    modifier onlyApprovedOrOwner(string[] memory labels) {
-        (, uint256 parentId) = _namehash(labels);
-        address spender = isMinter(_msgSender()) ? address(this) : _msgSender();
-        require(unsRegistry.isApprovedOrOwner(spender, parentId), 'MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    modifier onlyAllowedMinter(string[] memory labels) {
+        if (labels.length == 2) {
+            require(isMinter(_msgSender()), 'MinterRole: CALLER_IS_NOT_MINTER');
+        } else {
+            (, uint256 parentId) = _namehash(labels);
+            require(unsRegistry.isApprovedOrOwner(_msgSender(), parentId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+        }
         _;
     }
 
@@ -144,7 +147,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] calldata labels,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyAllowed(labels) onlyApprovedOrOwner(labels) whenNotPaused {
+    ) external override onlyAllowedMinter(labels) onlyAllowed(labels) whenNotPaused {
         _issueWithRecords(to, labels, keys, values);
     }
 

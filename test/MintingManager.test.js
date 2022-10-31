@@ -472,13 +472,7 @@ describe('MintingManager', () => {
         labels.unshift('sub');
         await expect(
           mintingManager.connect(receiver).issueWithRecords(coinbase.address, labels, [], []),
-        ).to.be.revertedWith('MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER');
-      });
-
-      it('should revert minting when tld is invalid', async () => {
-        await expect(
-          mintingManager.issueWithRecords(coinbase.address, ['sub', 'test-1sub', 'unknown'], [], []),
-        ).to.be.revertedWith('MintingManager: TLD_NOT_REGISTERED');
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
       });
 
       it('should mint .wallet subdomain', async () => {
@@ -505,12 +499,6 @@ describe('MintingManager', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
           receiver.address,
         );
-      });
-
-      it('should revert minting legacy CNS free domains', async () => {
-        await expect(
-          mintingManager.issueWithRecords(coinbase.address, ['sub', 'udtestdev-t4', 'crypto'], [], []),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
     });
   });
