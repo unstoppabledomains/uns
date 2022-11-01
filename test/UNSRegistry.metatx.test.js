@@ -19,10 +19,7 @@ describe('UNSRegistry (metatx)', () => {
 
     unsRegistry = await UNSRegistry.deploy();
     await unsRegistry.initialize(coinbase.address);
-    await unsRegistry['mintTLD(uint256,string)'](
-      TLD.CRYPTO,
-      'crypto',
-    );
+    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
 
     buildExecuteParams = buildExecuteFunc(

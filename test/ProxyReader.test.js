@@ -40,7 +40,7 @@ describe('ProxyReader', () => {
     resolver = await Resolver.deploy(cnsRegistry.address, mintingController.address);
 
     // mint .wallet TLD
-    await unsRegistry['mintTLD(uint256,string)'](TLD.WALLET, 'wallet');
+    await unsRegistry.mintTLD(TLD.WALLET, 'wallet');
 
     // mint .wallet
     walletTokenId = await mintDomain(unsRegistry, coinbase.address, [domainName, 'wallet']);

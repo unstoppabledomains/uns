@@ -29,7 +29,8 @@
     "start:node": "hardhat node",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test:sol",
     "make:uml": "npx sol2uml ./contracts -b UNSRegistry,MintingManager,ProxyReader -o ./assets/uns.svg -i ./contracts/mocks",
-    "analyze": "slither . --hardhat-artifacts-directory ./.artifacts --sarif slither.sarif --config-file .slither.json"
+    "analyze": "slither . --hardhat-artifacts-directory ./.artifacts --sarif slither.sarif --config-file .slither.json",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
@@ -63,7 +64,7 @@
     "prettier-plugin-solidity": "^1.0.0-beta.24",
     "solhint": "^3.3.7",
     "solidity-coverage": "^0.8.0",
-    "tar": "^6.1.0",
+    "tar": "^6.1.9",
     "yargs": "17.0.1"
   }
 }

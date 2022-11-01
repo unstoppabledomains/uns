@@ -74,6 +74,16 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _;
     }
 
+    modifier onlyIssuer(string[] memory labels) {
+        if (labels.length == 2) {
+            require(isMinter(_msgSender()), 'MintingManager: CALLER_IS_NOT_MINTER');
+        } else {
+            (, uint256 parentId) = _namehash(labels);
+            require(unsRegistry.isApprovedOrOwner(_msgSender(), parentId), 'MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER');
+        }
+        _;
+    }
+
     function initialize(
         IUNSRegistry unsRegistry_,
         IMintingController cnsMintingController_,
@@ -92,7 +102,20 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         __Blocklist_init_unchained();
         __Pausable_init_unchained();
 
-        string[11] memory tlds = ['crypto', 'wallet', 'x', 'nft', 'blockchain', 'bitcoin', '888', 'dao', 'zil', 'polygon', 'unstoppable'];
+        string[12] memory tlds = [
+            'crypto',
+            'wallet',
+            'x',
+            'nft',
+            'blockchain',
+            'bitcoin',
+            '888',
+            'dao',
+            'zil',
+            'polygon',
+            'unstoppable',
+            'klever'
+        ];
         for (uint256 i = 0; i < tlds.length; i++) {
             _addTld(tlds[i]);
         }
@@ -124,7 +147,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] calldata labels,
         string[] calldata keys,
         string[] calldata values
-    ) external override onlyMinter onlyAllowed(labels) whenNotPaused {
+    ) external override onlyIssuer(labels) onlyAllowed(labels) whenNotPaused {
         _issueWithRecords(to, labels, keys, values);
     }
 
@@ -236,7 +259,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] memory keys,
         string[] memory values
     ) private {
-        uint256 tokenId = _namehash(labels);
+        (uint256 tokenId, ) = _namehash(labels);
 
         if (_ownerOf(tokenId) == address(this)) {
             unsRegistry.unlockWithRecords(to, tokenId, keys, values);
@@ -259,12 +282,11 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
     }
 
-    function _namehash(string[] memory labels) internal pure returns (uint256) {
-        uint256 node = 0x0;
+    function _namehash(string[] memory labels) internal pure returns (uint256 tokenId, uint256 parentId) {
         for (uint256 i = labels.length; i > 0; i--) {
-            node = _namehash(node, labels[i - 1]);
+            parentId = tokenId;
+            tokenId = _namehash(parentId, labels[i - 1]);
         }
-        return node;
     }
 
     function _msgSender() internal view override(ContextUpgradeable, ERC2771Context) returns (address) {

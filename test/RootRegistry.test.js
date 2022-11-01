@@ -31,7 +31,7 @@ describe('RootRegistry', () => {
   };
 
   const mintDomainL2 = async (owner, labels) => {
-    await l2UnsRegistry['mintWithRecords(address,string[],string[],string[])'](owner, labels, [], []);
+    await l2UnsRegistry.mintWithRecords(owner, labels, [], []);
     return await l2UnsRegistry.namehash(labels);
   };
 
@@ -86,10 +86,7 @@ describe('RootRegistry', () => {
     l2UnsRegistry = await UNSRegistry.connect(registryOwner).deploy();
     await l2UnsRegistry.initialize(registryOwner.address);
     await l2UnsRegistry.setChildChainManager(registryOwner.address);
-    await l2UnsRegistry['mintTLD(uint256,string)'](
-      TLD.WALLET,
-      'wallet',
-    );
+    await l2UnsRegistry.mintTLD(TLD.WALLET, 'wallet');
 
     // deploy state sender
     stateSender = await DummyStateSender.deploy();
