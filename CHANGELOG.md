@@ -1,3 +1,8 @@
+## v0.5.22
+
+- Remove `ERC20`, `BEP20`, and `MATIC` options for `0ZK`
+- Add single-chain `0ZK` option
+
 ## v0.5.21
 
 - Add `.klever` TLD
