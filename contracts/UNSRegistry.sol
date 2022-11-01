@@ -97,9 +97,7 @@ contract UNSRegistry is
     }
 
     function namehash(string[] calldata labels) external pure override returns (uint256) {
-        require(labels.length >= 1, 'Registry: LABELS_LENGTH_BELOW_1');
-        (uint256 tokenId, ) = _namehash(labels);
-        return tokenId;
+        return _namehash(labels);
     }
 
     function exists(uint256 tokenId) external view override(IUNSRegistry, IMintableERC721) returns (bool) {
@@ -130,10 +128,8 @@ contract UNSRegistry is
         string[] calldata labels,
         string[] calldata keys,
         string[] calldata values
-    ) external override {
-        require(labels.length >= 2, 'Registry: LABELS_LENGTH_BELOW_2');
-        (uint256 tokenId, uint256 parentId) = _namehash(labels);
-        require(_isApprovedOrOwner(_msgSender(), parentId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    ) external override onlyMintingManager {
+        uint256 tokenId = _namehash(labels);
 
         _mint(to, tokenId, _uri(labels));
         _setMany(keys, values, tokenId);
@@ -367,15 +363,18 @@ contract UNSRegistry is
 
     function _uri(string[] memory labels) private pure returns (string memory) {
         bytes memory uri = bytes(labels[0]);
-        for (uint256 i = 1; i < labels.length; i++) uri = abi.encodePacked(uri, '.', labels[i]);
+        for (uint256 i = 1; i < labels.length; i++) {
+            uri = abi.encodePacked(uri, '.', labels[i]);
+        }
         return string(uri);
     }
 
-    function _namehash(string[] calldata labels) internal pure returns (uint256 tokenId, uint256 parentId) {
+    function _namehash(string[] memory labels) internal pure returns (uint256) {
+        uint256 node = 0x0;
         for (uint256 i = labels.length; i > 0; i--) {
-            parentId = tokenId;
-            tokenId = _namehash(parentId, labels[i - 1]);
+            node = _namehash(node, labels[i - 1]);
         }
+        return node;
     }
 
     function _namehash(uint256 tokenId, string memory label) internal pure returns (uint256) {

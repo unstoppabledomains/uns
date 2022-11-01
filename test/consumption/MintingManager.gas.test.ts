@@ -69,7 +69,7 @@ describe('MintingManager (consumption)', () => {
     };
 
     it('Consumption', async () => {
-      const result: any[] = [];
+      const result: unknown[] = [];
 
       const cases = getCases();
       for (let i = 0; i < cases.length; i++) {

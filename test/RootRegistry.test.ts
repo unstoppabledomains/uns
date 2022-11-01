@@ -1,10 +1,10 @@
-import { MintingManager, UNSRegistry } from "../typechain-types/contracts";
+import { MintingManager, UNSRegistry } from '../typechain-types/contracts';
 
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 
 import { TLD, ZERO_ADDRESS } from './helpers/constants';
-import { sign, buildExecuteFunc } from './helpers/metatx';
+import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 import {
   buildPredicateExitInput,
   buildPredicateMetadataExitInput,
@@ -13,32 +13,43 @@ import {
   buildExitInput,
 } from './helpers/polygon';
 import { utils } from 'ethers';
-import { MintingManager__factory, UNSRegistry__factory } from "../typechain-types/factories/contracts";
-import { CNSRegistry__factory, Resolver__factory } from "../typechain-types/factories/dot-crypto/contracts";
-import { MintingController__factory, SignatureController__factory, URIPrefixController__factory } from "../typechain-types/factories/dot-crypto/contracts/controllers";
-import { CNSRegistryForwarder__factory } from "../typechain-types/factories/contracts/metatx";
-import { DummyStateSender__factory } from "../typechain-types/factories/contracts/@maticnetwork/pos-portal/DummyStateSender.sol";
-import { SimpleCheckpointManager__factory } from "../typechain-types/factories/contracts/@maticnetwork/pos-portal/SimpleCheckpointManager.sol";
-import { MintableERC721Predicate__factory } from "../typechain-types/factories/contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol";
-import { RootChainManager__factory } from "../typechain-types/factories/contracts/@maticnetwork/pos-portal/RootChainManager.sol";
-import { CNSRegistry, Resolver } from "../typechain-types/dot-crypto/contracts";
-import { MintingController, SignatureController, URIPrefixController } from "../typechain-types/dot-crypto/contracts/controllers";
-import { CNSRegistryForwarder } from "../typechain-types/contracts/metatx";
-import { RootChainManager } from "../typechain-types/contracts/@maticnetwork/pos-portal/RootChainManager.sol";
-import { MintableERC721Predicate } from "../typechain-types/contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol";
-import { DummyStateSender } from "../typechain-types/contracts/@maticnetwork/pos-portal/DummyStateSender.sol";
-import { SimpleCheckpointManager } from "../typechain-types/contracts/@maticnetwork/pos-portal/SimpleCheckpointManager.sol";
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { MintingManager__factory, UNSRegistry__factory } from '../typechain-types/factories/contracts';
+import { CNSRegistry__factory, Resolver__factory } from '../typechain-types/factories/dot-crypto/contracts';
+import {
+  MintingController__factory,
+  SignatureController__factory,
+  URIPrefixController__factory,
+} from '../typechain-types/factories/dot-crypto/contracts/controllers';
+import { CNSRegistryForwarder__factory } from '../typechain-types/factories/contracts/metatx';
+import { DummyStateSender__factory } from '../typechain-types/factories/contracts/@maticnetwork/pos-portal/DummyStateSender.sol';
+import { SimpleCheckpointManager__factory } from '../typechain-types/factories/contracts/@maticnetwork/pos-portal/SimpleCheckpointManager.sol';
+import { MintableERC721Predicate__factory } from '../typechain-types/factories/contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol';
+import { RootChainManager__factory } from '../typechain-types/factories/contracts/@maticnetwork/pos-portal/RootChainManager.sol';
+import { CNSRegistry, Resolver } from '../typechain-types/dot-crypto/contracts';
+import { MintingController, SignatureController, URIPrefixController } from '../typechain-types/dot-crypto/contracts/controllers';
+import { CNSRegistryForwarder } from '../typechain-types/contracts/metatx';
+import { RootChainManager } from '../typechain-types/contracts/@maticnetwork/pos-portal/RootChainManager.sol';
+import { MintableERC721Predicate } from '../typechain-types/contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol';
+import { DummyStateSender } from '../typechain-types/contracts/@maticnetwork/pos-portal/DummyStateSender.sol';
+import { SimpleCheckpointManager } from '../typechain-types/contracts/@maticnetwork/pos-portal/SimpleCheckpointManager.sol';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 describe('RootRegistry', () => {
   let l1UnsRegistry: UNSRegistry, l2UnsRegistry: UNSRegistry, mintingManager: MintingManager, cnsRegistry: CNSRegistry;
   let resolver: Resolver, mintingController: MintingController, uriPrefixController: URIPrefixController, signatureController: SignatureController;
   let cnsForwarder: CNSRegistryForwarder;
-  let rootChainManager: RootChainManager, predicate: MintableERC721Predicate, stateSender: DummyStateSender, checkpointManager: SimpleCheckpointManager;
+  let rootChainManager: RootChainManager,
+    predicate: MintableERC721Predicate,
+    stateSender: DummyStateSender,
+    checkpointManager: SimpleCheckpointManager;
 
-  let registryOwner: SignerWithAddress, rcmOwner: SignerWithAddress, predicateOwner: SignerWithAddress, owner: SignerWithAddress, spender: SignerWithAddress;
+  let registryOwner: SignerWithAddress,
+    rcmOwner: SignerWithAddress,
+    predicateOwner: SignerWithAddress,
+    owner: SignerWithAddress,
+    spender: SignerWithAddress;
 
-  let buildExecuteCnsParams, buildExecuteUnsParams;
+  let buildExecuteCnsParams: ExecuteFunc, buildExecuteUnsParams: ExecuteFunc;
 
   const abiCoder = new utils.AbiCoder();
 
@@ -48,7 +59,7 @@ describe('RootRegistry', () => {
   };
 
   const mintDomainL2 = async (owner, labels) => {
-    await l2UnsRegistry['mintWithRecords(address,string[],string[],string[])'](owner, labels, [], []);
+    await l2UnsRegistry.mintWithRecords(owner, labels, [], []);
     return await l2UnsRegistry.namehash(labels);
   };
 
@@ -89,10 +100,7 @@ describe('RootRegistry', () => {
     l2UnsRegistry = await new UNSRegistry__factory(registryOwner).connect(registryOwner).deploy();
     await l2UnsRegistry.initialize(registryOwner.address);
     await l2UnsRegistry.setChildChainManager(registryOwner.address);
-    await l2UnsRegistry['mintTLD(uint256,string)'](
-      TLD.WALLET,
-      'wallet',
-    );
+    await l2UnsRegistry.mintTLD(TLD.WALLET, 'wallet');
 
     // deploy state sender
     stateSender = await new DummyStateSender__factory(registryOwner).deploy();

@@ -13,7 +13,7 @@
     "test:sol": "hardhat test --typecheck",
     "test:sandbox": "env HARDHAT_NETWORK=sandbox mocha --require ts-node/register ./sandbox/**/*.test.ts",
     "rebuild:sandbox": "env HARDHAT_NETWORK=sandbox DEBUG=UNS:* ts-node ./sandbox/rebuild.ts",
-    "lint": "yarn lint:js && yarn lint:sol",
+    "lint": "yarn lint:ts && yarn lint:sol",
     "lint:fix": "yarn lint:js:fix && yarn lint:sol:fix",
     "lint:ts": "eslint --ignore-path .gitignore .",
     "lint:ts:fix": "eslint --ignore-path .gitignore . --fix",
@@ -29,7 +29,8 @@
     "start:node": "hardhat node",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test:sol",
     "make:uml": "npx sol2uml ./contracts -b UNSRegistry,MintingManager,ProxyReader -o ./assets/uns.svg -i ./contracts/mocks",
-    "analyze": "slither . --hardhat-artifacts-directory ./.artifacts --sarif slither.sarif --config-file .slither.json"
+    "analyze": "slither . --hardhat-artifacts-directory ./.artifacts --sarif slither.sarif --config-file .slither.json",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@ethereumjs/tx": "^4.0.1",
@@ -81,7 +82,7 @@
     "prettier-plugin-solidity": "^1.0.0-beta.24",
     "solhint": "^3.3.7",
     "solidity-coverage": "^0.8.0",
-    "tar": "^6.1.0",
+    "tar": "^6.1.9",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.0",

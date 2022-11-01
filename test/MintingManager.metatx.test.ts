@@ -55,7 +55,7 @@ describe('MintingManager (metatx)', () => {
 
     await expect(
       forwarder.execute(req, signature),
-    ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+    ).to.be.revertedWith('MintingManager: CALLER_IS_NOT_MINTER');
   });
 
   it('should revert execution when signature is not valid', async () => {

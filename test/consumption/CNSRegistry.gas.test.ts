@@ -41,7 +41,7 @@ describe('CNSRegistry (consumption)', () => {
   });
 
   it('`transferFrom` consumption', async () => {
-    const result: any[] = [];
+    const result: unknown[] = [];
     const label = 'cons-d1-';
 
     // Direct transfer

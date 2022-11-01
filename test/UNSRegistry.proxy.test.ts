@@ -10,7 +10,7 @@ import { UNSRegistry__factory } from '../typechain-types/factories/contracts';
 
 describe('UNSRegistry (proxy)', () => {
   let unsRegistry: UNSRegistry;
-  let unsRegistryFactory: UNSRegistry__factory;
+  let unsRegistryFactory: UNSRegistry__factory; // eslint-disable-line camelcase
 
   let buildExecuteParams: ExecuteFunc;
 
@@ -25,10 +25,7 @@ describe('UNSRegistry (proxy)', () => {
       initializer: 'initialize',
     }) as UNSRegistry;
 
-    await unsRegistry['mintTLD(uint256,string)'](
-      TLD.CRYPTO,
-      'crypto',
-    );
+    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
 
     buildExecuteParams = buildExecuteFunc(unsRegistry.interface, unsRegistry.address, unsRegistry);
