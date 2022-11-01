@@ -1,7 +1,14 @@
-## v0.5.22
+## v0.6.1
 
 - Remove `ERC20`, `BEP20`, and `MATIC` options for `0ZK`
 - Add single-chain `0ZK` option
+
+## v0.6.0
+
+- UNSRegistry@0.6.0 receives support for subdomains
+- MintingManager@0.4.0 receives support for subdomains
+- ProxyReader@0.3.0 receives support for subdomains
+
 
 ## v0.5.21
 
