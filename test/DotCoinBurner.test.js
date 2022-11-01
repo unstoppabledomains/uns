@@ -54,6 +54,22 @@ describe('DotCoinBurner', () => {
       .withArgs(firstTokenId, lastTokenId);
   });
 
+  it('should emit correct BatchCompleted event for 1 domain', async () => {
+    const label = 'batch-completed-single-domain';
+    const labelHash = solidityKeccak256(['string'], [label]);
+    const mintedTokenId = await mintDomain(unsRegistry, accounts[0], DotCoinTld, label);
+    await unsRegistry.connect(accounts[0]).setApprovalForAll(dotCoinBurner.address, true);
+    await expect(dotCoinBurner.burnAll([labelHash]))
+      .to.emit(dotCoinBurner, 'BatchCompleted')
+      .withArgs(mintedTokenId, mintedTokenId);
+  });
+
+  it('should not emit BatchCompleted event arguments are empty', async () => {
+    await unsRegistry.connect(accounts[0]).setApprovalForAll(dotCoinBurner.address, true);
+    await expect(dotCoinBurner.burnAll([]))
+      .not.to.emit(dotCoinBurner, 'BatchCompleted');
+  });
+
   it('should burn all passed domains from multiple owners', async () => {
     const mintedTokenIds = [];
     const labelHashes = [];
