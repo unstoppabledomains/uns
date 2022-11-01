@@ -23,7 +23,7 @@ describe('UNSRegistry', () => {
 
     unsRegistry = await UNSRegistry.deploy();
     await unsRegistry.initialize(coinbase.address);
-    await unsRegistry['mintTLD(uint256,string)'](root, 'crypto');
+    await unsRegistry.mintTLD(root, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
     await unsRegistry.addProxyReader(reader.address);
   });
@@ -32,7 +32,7 @@ describe('UNSRegistry', () => {
     const mintTLDToDead = async (registry, tld) => {
       const tokenId = await registry.namehash([tld]);
 
-      await registry['mintTLD(uint256,string)'](tokenId, tld);
+      await registry.mintTLD(tokenId, tld);
 
       await registry.connect(coinbase).setOwner(DEAD_ADDRESS, tokenId);
 

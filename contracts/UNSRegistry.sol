@@ -97,7 +97,6 @@ contract UNSRegistry is
     }
 
     function namehash(string[] calldata labels) external pure override returns (uint256) {
-        require(labels.length >= 1, 'Registry: LABELS_LENGTH_BELOW_1');
         return _namehash(labels);
     }
 

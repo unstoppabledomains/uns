@@ -18,8 +18,8 @@ describe('UNSRegistry (reverse)', () => {
   beforeEach(async () => {
     unsRegistry = await UNSRegistry.deploy();
     await unsRegistry.initialize(coinbase.address);
-    await unsRegistry['mintTLD(uint256,string)'](TLD.CRYPTO, 'crypto');
-    await unsRegistry['mintTLD(uint256,string)'](TLD.X, 'x');
+    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistry.mintTLD(TLD.X, 'x');
     await unsRegistry.setTokenURIPrefix('/');
 
     buildExecuteParams = buildExecuteFunc(unsRegistry.interface, unsRegistry.address, unsRegistry);

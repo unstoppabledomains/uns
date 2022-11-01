@@ -31,8 +31,8 @@ describe('ProxyReader (UNS only)', () => {
     await unsRegistry.setTokenURIPrefix('/');
 
     // mint TLDs
-    await unsRegistry['mintTLD(uint256,string)'](TLD.WALLET, 'wallet');
-    await unsRegistry['mintTLD(uint256,string)'](TLD.CRYPTO, 'crypto');
+    await unsRegistry.mintTLD(TLD.WALLET, 'wallet');
+    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
 
     // mint .wallet
     walletTokenId = await mintDomain(unsRegistry, coinbase, [domainName, 'wallet'], true);

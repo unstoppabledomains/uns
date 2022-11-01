@@ -27,10 +27,7 @@ describe('UNSRegistry (proxy)', () => {
     unsRegistry = await upgrades.deployProxy(UNSRegistry, [owner.address], {
       initializer: 'initialize',
     });
-    await unsRegistry['mintTLD(uint256,string)'](
-      TLD.CRYPTO,
-      'crypto',
-    );
+    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
   });
 
