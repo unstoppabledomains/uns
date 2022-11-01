@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.3.5';
+    string public constant VERSION = '0.3.6';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -73,7 +73,20 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         __Blocklist_init_unchained();
         __Pausable_init_unchained();
 
-        string[11] memory tlds = ['crypto', 'wallet', 'x', 'nft', 'blockchain', 'bitcoin', '888', 'dao', 'zil', 'polygon', 'unstoppable'];
+        string[12] memory tlds = [
+            'crypto',
+            'wallet',
+            'x',
+            'nft',
+            'blockchain',
+            'bitcoin',
+            '888',
+            'dao',
+            'zil',
+            'polygon',
+            'unstoppable',
+            'klever'
+        ];
         for (uint256 i = 0; i < tlds.length; i++) {
             _addTld(tlds[i]);
         }
@@ -226,14 +239,14 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         for (uint256 i = 0; i < tokenIds.length; i++) {
             require(_isTldToChangeOwnership(tokenIds[i]), 'MintingManager: TOKEN_ID_NOT_TLD');
             unsRegistry.burnTLDL1(tokenIds[i]);
-       }
+        }
     }
 
     function moveTLDOwnershipL2(uint256[] calldata tokenIds) external onlyOwner {
-       for (uint256 i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             require(_isTldToChangeOwnership(tokenIds[i]), 'MintingManager: TOKEN_ID_NOT_TLD');
             unsRegistry.moveTLDOwnershipL2(tokenIds[i]);
-       }
+        }
     }
 
     function _mintSLD(

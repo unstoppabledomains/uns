@@ -192,7 +192,7 @@ interface IUNSRegistry is
      * @param tokenId TLD tokenId to burn
      */
     function burnTLDL1(uint256 tokenId) external;
-    
+
     /**
      * @dev Burn TLD tokens.
      * @param tokenId TLD tokenId to burn

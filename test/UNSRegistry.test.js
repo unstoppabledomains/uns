@@ -82,6 +82,17 @@ describe('UNSRegistry', () => {
       expect(await unsRegistry.get('key_82', tokenId)).to.be.equal('value_23');
     });
 
+    for (const [key, value] of Object.entries(TLD)) {
+      it(`should be possible to mint .${key} domain`, async () => {
+        const tokenId = await mintDomain(
+          unsRegistry,
+          coinbase.address,
+          value,
+        );
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+      });
+    }
+
     describe('childIdOf', () => {
       it('should return valid childId', async () => {
         const tokenId = await unsRegistry.childIdOf(root, '12ew3');
@@ -254,7 +265,6 @@ describe('UNSRegistry', () => {
       });
     });
 
-    
     describe('burnTLDL1', async () => {
       it('should not allow burn TLD tokens with an owner other than 0xdead', async () => {
         const tokenId = await mintDomain(
@@ -300,7 +310,7 @@ describe('UNSRegistry', () => {
 
       it('should change TLD tokens ownership to minting manager', async () => {
         const tldTokenId = await mintTLD(unsRegistry, 'movel2');
-        
+
         expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(DEAD_ADDRESS);
         await unsRegistry.connect(coinbase).moveTLDOwnershipL2(tldTokenId);
         expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(coinbase.address);
