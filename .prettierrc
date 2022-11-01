@@ -9,6 +9,12 @@
         "singleQuote": true,
         "explicitTypes": "always"
       }
+    },
+    {
+      "files": "*.js",
+      "options": {
+        "printWidth": 120
+      }
     }
   ]
 }
