@@ -76,10 +76,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     modifier onlyIssuer(string[] memory labels) {
         if (labels.length == 2) {
-            require(isMinter(_msgSender()), 'MinterRole: CALLER_IS_NOT_MINTER');
+            require(isMinter(_msgSender()), 'MintingManager: CALLER_IS_NOT_MINTER');
         } else {
             (, uint256 parentId) = _namehash(labels);
-            require(unsRegistry.isApprovedOrOwner(_msgSender(), parentId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+            require(unsRegistry.isApprovedOrOwner(_msgSender(), parentId), 'MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER');
         }
         _;
     }

@@ -31,7 +31,7 @@ describe('RootRegistry', () => {
   };
 
   const mintDomainL2 = async (owner, labels) => {
-    await l2UnsRegistry['mintWithRecords(address,string[],string[],string[])'](owner, labels, [], []);
+    await l2UnsRegistry.mintWithRecords(owner, labels, [], []);
     return await l2UnsRegistry.namehash(labels);
   };
 

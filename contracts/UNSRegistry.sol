@@ -364,7 +364,9 @@ contract UNSRegistry is
 
     function _uri(string[] memory labels) private pure returns (string memory) {
         bytes memory uri = bytes(labels[0]);
-        for (uint256 i = 1; i < labels.length; i++) uri = abi.encodePacked(uri, '.', labels[i]);
+        for (uint256 i = 1; i < labels.length; i++) {
+            uri = abi.encodePacked(uri, '.', labels[i]);
+        }
         return string(uri);
     }
 
