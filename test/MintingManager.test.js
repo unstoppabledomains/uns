@@ -93,39 +93,6 @@ describe('MintingManager', () => {
     });
   });
 
-  describe('upgradeAll', () => {
-    before(async () => {
-      [, , receiver, resolver] = signers;
-
-      unsRegistry = await UNSRegistry.deploy();
-      mintingManager = await MintingManager.deploy();
-      await unsRegistry.initialize(mintingManager.address);
-
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-      await mintingManager.addMinter(coinbase.address);
-    });
-
-    it('should successfully mark tokens as upgraded', async () => {
-      const labels = ['upgrade-tokens-test', 'crypto'];
-      await mintingManager.issueWithRecords(receiver.address, labels, [], []);
-      const tokenId = await unsRegistry.namehash(labels);
-
-      await mintingManager.upgradeAll([tokenId]);
-
-      expect(unsRegistry.connect(receiver).burn(tokenId)).to.be.revertedWith('Registry: TOKEN_UPGRADED');
-    });
-
-    it('should revert if not minter', async () => {
-      const labels = ['upgrade-tokens-test-2', 'crypto'];
-      await mintingManager.issueWithRecords(receiver.address, labels, [], []);
-      const tokenId = await unsRegistry.namehash(labels);
-
-      await expect(mintingManager.connect(signers[1]).upgradeAll([tokenId])).to.be.revertedWith(
-        'MinterRole: CALLER_IS_NOT_MINTER',
-      );
-    });
-  });
-
   describe('TLD management', () => {
     before(async () => {
       [, spender] = signers;

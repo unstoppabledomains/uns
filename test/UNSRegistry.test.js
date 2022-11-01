@@ -2,7 +2,7 @@ const { ethers } = require('hardhat');
 const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
 
-const { TLD, ZERO_ADDRESS, DEAD_ADDRESS } = require('./helpers/constants');
+const { TLD, ZERO_ADDRESS } = require('./helpers/constants');
 const { mintDomain, mintRandomDomain } = require('./helpers/registry');
 
 const { utils, BigNumber } = ethers;
@@ -29,16 +29,6 @@ describe('UNSRegistry', () => {
   });
 
   describe('General', () => {
-    const mintTLDToDead = async (registry, tld) => {
-      const tokenId = await registry.namehash([tld]);
-
-      await registry.mintTLD(tokenId, tld);
-
-      await registry.connect(coinbase).setOwner(DEAD_ADDRESS, tokenId);
-
-      return tokenId;
-    };
-
     it('should return zero root', async () => {
       expect(await unsRegistry.root()).to.be.equal(0);
     });
@@ -191,103 +181,6 @@ describe('UNSRegistry', () => {
         await expect(unsRegistry.connect(signers[1]).upgradeAll([tokenId])).to.be.revertedWith(
           'Registry: SENDER_IS_NOT_MINTING_MANAGER',
         );
-      });
-    });
-
-    describe('burnTLDL1', async () => {
-      it('should not allow burn TLD tokens with an owner other than 0xdead', async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['burn0', 'crypto']);
-
-        await expect(unsRegistry.connect(coinbase).burnTLDL1(tokenId)).to.be.revertedWith('Registry: OWNER_NOT_0xDEAD');
-      });
-
-      it('should burn TLD tokens', async () => {
-        const tldTokenId = await mintTLDToDead(unsRegistry, 'burnl1');
-
-        expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(DEAD_ADDRESS);
-        await unsRegistry.connect(coinbase).burnTLDL1(tldTokenId);
-        await expect(unsRegistry.ownerOf(tldTokenId)).to.be.revertedWith('ERC721: invalid token ID');
-      });
-
-      it('should not allow burn TLD tokens if not minting manager', async () => {
-        await expect(unsRegistry.connect(signers[1]).burnTLDL1(TLD.CRYPTO)).to.be.revertedWith(
-          'Registry: SENDER_IS_NOT_MINTING_MANAGER',
-        );
-      });
-    });
-
-    describe('moveTLDOwnershipL2', async () => {
-      it('should not allow change TLD tokens ownership transfer with an owner other than 0xdead', async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['move0', 'crypto']);
-
-        await expect(unsRegistry.connect(coinbase).moveTLDOwnershipL2(tokenId)).to.be.revertedWith(
-          'Registry: OWNER_NOT_0xDEAD',
-        );
-      });
-
-      it('should change TLD tokens ownership to minting manager', async () => {
-        const tldTokenId = await mintTLDToDead(unsRegistry, 'movel2');
-
-        expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(DEAD_ADDRESS);
-        await unsRegistry.connect(coinbase).moveTLDOwnershipL2(tldTokenId);
-        expect(await unsRegistry.ownerOf(tldTokenId)).to.be.equal(coinbase.address);
-      });
-
-      it('should not allow change TLD tokens ownership if not minting manager', async () => {
-        await expect(unsRegistry.connect(signers[1]).moveTLDOwnershipL2(TLD.CRYPTO)).to.be.revertedWith(
-          'Registry: SENDER_IS_NOT_MINTING_MANAGER',
-        );
-      });
-    });
-
-    describe('unlockWithRecords', async () => {
-      it('should unlock domain with no records', async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase, ['unlock1', 'crypto'], false, ['key_1'], ['value_1']);
-        await unsRegistry.connect(coinbase).unlockWithRecords(receiver.address, tokenId, [], []);
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
-        expect(await unsRegistry.get('key_1', tokenId)).to.be.equal('');
-      });
-
-      it('should unlock domain with record', async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['unlock2', 'crypto']);
-
-        await unsRegistry.connect(coinbase).unlockWithRecords(receiver.address, tokenId, ['key_1'], ['value_1']);
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
-        expect(await unsRegistry.get('key_1', tokenId)).to.be.eql('value_1');
-      });
-
-      it('should produce Transfer event', async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['unlock3', 'crypto']);
-
-        await expect(unsRegistry.unlockWithRecords(receiver.address, tokenId, [], []))
-          .to.emit(unsRegistry, 'Transfer')
-          .withArgs(coinbase.address, receiver.address, tokenId);
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
-      });
-
-      it('should not produce NewURI event', async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['unlock3-1', 'crypto']);
-
-        await expect(unsRegistry.unlockWithRecords(receiver.address, tokenId, [], [])).to.not.emit(
-          unsRegistry,
-          'NewURI',
-        );
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
-      });
-
-      it('should not set reverse if it already exists', async () => {
-        const reverseTokenId = await mintDomain(unsRegistry, receiver.address, ['unlock4', 'crypto'], false);
-        await unsRegistry.connect(receiver).setReverse(reverseTokenId);
-
-        expect(await unsRegistry.reverseOf(receiver.address)).to.be.equal(reverseTokenId);
-
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['unlock5', 'crypto'], false);
-        await unsRegistry.connect(coinbase).unlockWithRecords(receiver.address, tokenId, [], []);
-
-        expect(await unsRegistry.reverseOf(receiver.address)).to.be.equal(reverseTokenId);
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
       });
     });
   });

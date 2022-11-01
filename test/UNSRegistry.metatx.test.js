@@ -294,9 +294,6 @@ describe('UNSRegistry (metatx)', () => {
         'setReverse',
         'removeReverse',
         'addProxyReader',
-        'upgradeAll',
-        'burnTLDL1',
-        'moveTLDOwnershipL2',
       ];
 
       const getFuncs = () => {
@@ -462,9 +459,6 @@ describe('UNSRegistry (metatx)', () => {
         'withdrawWithMetadata',
         'removeReverse',
         'addProxyReader',
-        'upgradeAll',
-        'burnTLDL1',
-        'moveTLDOwnershipL2',
       ];
 
       before(async () => {

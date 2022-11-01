@@ -124,22 +124,4 @@ interface IUNSRegistry is
      * @param addr address of ProxyReader
      */
     function addProxyReader(address addr) external;
-
-    /**
-     * @dev Marks tokens as upgraded.
-     * @param tokenIds[] list of tokenIds to mark upgraded
-     */
-    function upgradeAll(uint256[] calldata tokenIds) external;
-
-    /**
-     * @dev Burn TLD tokens.
-     * @param tokenId TLD tokenId to burn
-     */
-    function burnTLDL1(uint256 tokenId) external;
-
-    /**
-     * @dev Burn TLD tokens.
-     * @param tokenId TLD tokenId to burn
-     */
-    function moveTLDOwnershipL2(uint256 tokenId) external;
 }

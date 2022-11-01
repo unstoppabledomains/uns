@@ -334,31 +334,6 @@ contract UNSRegistry is
         _proxyReaders[addr] = true;
     }
 
-    /**
-     * @dev See {IUNSRegistry-upgradeAll(uint256[])}.
-     */
-    function upgradeAll(uint256[] calldata tokenIds) external override onlyMintingManager {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            _upgradedTokens[tokenIds[i]] = true;
-        }
-    }
-
-    /**
-     * @dev See {IUNSRegistry-burnTLDL1(uint256)}.
-     */
-    function burnTLDL1(uint256 tokenId) external override onlyMintingManager {
-        require(ownerOf(tokenId) == address(0xdead), 'Registry: OWNER_NOT_0xDEAD');
-        _burn(tokenId);
-    }
-
-    /**
-     * @dev See {IUNSRegistry-moveTLDOwnershipL2(uint256)}.
-     */
-    function moveTLDOwnershipL2(uint256 tokenId) external override onlyMintingManager {
-        require(ownerOf(tokenId) == address(0xdead), 'Registry: OWNER_NOT_0xDEAD');
-        _transfer(address(0xdead), _mintingManager, tokenId);
-    }
-
     /// Internal
 
     function _uri(string[] memory labels) private pure returns (string memory) {

@@ -334,19 +334,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "burnTLDL1",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "address",
           "name": "user",
           "type": "address"
@@ -650,19 +637,6 @@
         }
       ],
       "name": "mintWithRecords",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "moveTLDOwnershipL2",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -1162,19 +1136,6 @@
         }
       ],
       "name": "unlockWithRecords",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "tokenIds",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "upgradeAll",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
