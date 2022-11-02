@@ -48,11 +48,10 @@ interface IUNSRegistry is
     function resolverOf(uint256 tokenId) external view returns (address);
 
     /**
-     * @dev Provides child token (subdomain) of provided tokenId.
-     * @param tokenId uint256 ID of the token
-     * @param label label of subdomain (for `aaa.bbb.crypto` it will be `aaa`)
+     * @dev Provides namehashe of the provided domain labels.
+     * @param labels array of domain labels splitted by '.' (for `aaa.bbb.crypto` it will be [`aaa`, `bbb`, `crypto`])
      */
-    function childIdOf(uint256 tokenId, string calldata label) external pure returns (uint256);
+    function namehash(string[] calldata labels) external pure returns (uint256);
 
     /**
      * @dev Existence of token.
@@ -77,93 +76,38 @@ interface IUNSRegistry is
     function burn(uint256 tokenId) external;
 
     /**
-     * @dev Mints token.
-     * @param to address to mint the new SLD to.
-     * @param tokenId id of token.
-     * @param uri domain URI.
+     * @dev Mints root token.
+     * @param tokenId id of TLD token.
+     * @param uri TLD URI.
      */
-    function mint(
-        address to,
-        uint256 tokenId,
-        string calldata uri
-    ) external;
+    function mintTLD(uint256 tokenId, string calldata uri) external;
 
     /**
-     * @dev Safely mints token.
-     * Implements a ERC721Reciever check unlike mint.
-     * @param to address to mint the new SLD to.
-     * @param tokenId id of token.
-     * @param uri domain URI.
-     */
-    function safeMint(
-        address to,
-        uint256 tokenId,
-        string calldata uri
-    ) external;
-
-    /**
-     * @dev Safely mints token.
-     * Implements a ERC721Reciever check unlike mint.
-     * @param to address to mint the new SLD to.
-     * @param tokenId id of token.
-     * @param uri domain URI.
-     * @param data bytes data to send along with a safe transfer check
-     */
-    function safeMint(
-        address to,
-        uint256 tokenId,
-        string calldata uri,
-        bytes calldata data
-    ) external;
-
-    /**
-     * @dev Mints token with records
-     * @param to address to mint the new SLD to
-     * @param tokenId id of token
+     * @dev mints token with records
+     * @param to address to mint the new SLD or subdomain to
+     * @param labels array of SLD or subdomain name labels splitted by '.' to mint.
      * @param keys New record keys
      * @param values New record values
-     * @param uri domain URI
      */
     function mintWithRecords(
         address to,
-        uint256 tokenId,
-        string calldata uri,
+        string[] calldata labels,
         string[] calldata keys,
         string[] calldata values
     ) external;
 
     /**
-     * @dev Safely mints token with records
-     * @param to address to mint the new SLD to
-     * @param tokenId id of token
+     * @dev unlock token with records
+     * @param to address to unlock the token to
+     * @param tokenId id of the token.
      * @param keys New record keys
      * @param values New record values
-     * @param uri domain URI
      */
-    function safeMintWithRecords(
+    function unlockWithRecords(
         address to,
         uint256 tokenId,
-        string calldata uri,
         string[] calldata keys,
         string[] calldata values
-    ) external;
-
-    /**
-     * @dev Safely mints token with records
-     * @param to address to mint the new SLD to
-     * @param tokenId id of token
-     * @param keys New record keys
-     * @param values New record values
-     * @param uri domain URI
-     * @param data bytes data to send along with a safe transfer check
-     */
-    function safeMintWithRecords(
-        address to,
-        uint256 tokenId,
-        string calldata uri,
-        string[] calldata keys,
-        string[] calldata values,
-        bytes calldata data
     ) external;
 
     /**
