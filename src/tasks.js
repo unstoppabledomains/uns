@@ -772,6 +772,42 @@ const configureReconfigureTldL2Task = {
   },
 };
 
+const deployDotCoinBurnerTask = {
+  tags: ['dot_coin_burner', 'full'],
+  priority: 200,
+  run: async (ctx, dependencies) => {
+    const { owner } = ctx.accounts;
+    const {
+      UNSRegistry,
+    } = dependencies;
+
+    const dotCoinBurner = await ctx.artifacts.DotCoinBurner
+      .connect(owner)
+      .deploy(UNSRegistry.address);
+    await ctx.saveContractConfig('DotCoinBurner', dotCoinBurner);
+    await dotCoinBurner.deployTransaction.wait();
+    await verify(ctx, dotCoinBurner.address, [UNSRegistry.address]);
+  },
+  ensureDependencies: (ctx, config) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const {
+      UNSRegistry,
+    } = config.contracts || {};
+    const dependencies = {
+      UNSRegistry,
+    };
+
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    }
+
+    return dependencies;
+  },
+};
+
 module.exports = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -787,4 +823,5 @@ module.exports = [
   configureDotCoinTask,
   configureReconfigureTldL1Task,
   configureReconfigureTldL2Task,
+  deployDotCoinBurnerTask,
 ];
