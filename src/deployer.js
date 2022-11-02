@@ -30,6 +30,7 @@ async function _getArtifacts () {
     CheckpointManager: await ethers.getContractFactory('SimpleCheckpointManager'),
     MintableERC721Predicate: await ethers.getContractFactory('MintableERC721Predicate'),
     RootChainManager: await ethers.getContractFactory('RootChainManager'),
+    DotCoinBurner: await ethers.getContractFactory('DotCoinBurner'),
   };
 }
 
