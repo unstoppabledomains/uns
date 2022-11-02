@@ -24,17 +24,11 @@ describe('DotCoinBurner', () => {
     // deploy UNS regisry
     unsRegistry = await UNSRegistryFactory.deploy();
     await unsRegistry.initialize(coinbase.address);
-
-    // deploy Dot Coin Burner
-    dotCoinBurner = await DotCoinBurnerFactory.deploy(unsRegistry.address);
   });
 
   beforeEach(async () => {
-    // Contract should not be approved spender by default
-    for (let i = 0; i < signers.length; i++) {
-      await unsRegistry.connect(signers[i])
-        .setApprovalForAll(dotCoinBurner.address, false);
-    }
+    // deploy Dot Coin Burner
+    dotCoinBurner = await DotCoinBurnerFactory.deploy(unsRegistry.address);
   });
 
   it('should emit BatchCompleted event', async () => {
