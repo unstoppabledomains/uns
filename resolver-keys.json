@@ -2108,7 +2108,7 @@
     },
     "crypto.KLV.address": {
       "deprecatedKeyName": "KLV",
-      "validationRegex": "^(klv)[a-z0-9]{59}$",
+      "validationRegex": "^((k|K)(l|L)(v|V))[a-zA-Z0-9]{59}$",
       "deprecated": false
     },
     "crypto.BTCST.address": {
