@@ -1,3 +1,9 @@
+## v0.6.2
+
+- Upgrade UNSRegistry@0.6.0 on Mainnet and Polygon
+- Upgrade MintingManager@0.4.0 on Mainnet and Polygon
+- Upgrade ProxyReader@0.3.0 on all Goerli, Mumbai, Mainnet and Polygon
+
 ## v0.6.1
 
 - Upgrade UNSRegistry@0.6.0 on Goerli and Mumbai
