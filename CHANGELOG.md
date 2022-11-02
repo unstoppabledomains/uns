@@ -14,11 +14,8 @@
 - MintingManager@0.4.0 receives support for subdomains
 - ProxyReader@0.3.0 receives support for subdomains
 
-<<<<<<< HEAD
-=======
 ## v0.5.22
 - Add DotCoinBurner smart contract to support batch returns of .coin domains
->>>>>>> main
 
 ## v0.5.21
 
