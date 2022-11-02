@@ -1,5 +1,5 @@
 ## v0.6.2
-- `.klever address validation regex is updated.
+- .klever address validation regex is updated.
 
 ## v0.6.1
 
