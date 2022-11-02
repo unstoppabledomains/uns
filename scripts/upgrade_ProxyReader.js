@@ -13,7 +13,8 @@ async function main () {
   }
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['upgrade_minting_manager'], config);
+  const deployConfig = await deployer.execute(['upgrade_proxy_reeader'], config);
+
   mergeNetworkConfig(deployConfig);
 }
 

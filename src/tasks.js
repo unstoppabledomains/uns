@@ -263,16 +263,30 @@ const deployUNSProxyReaderTask = {
     const { owner } = ctx.accounts;
     const { CNSRegistry, UNSRegistry, MintingManager } = dependencies;
 
-    const proxyReader = await ctx.artifacts.ProxyReader.connect(owner).deploy(
-      UNSRegistry.address,
-      CNSRegistry.address,
+    const proxyReader = await upgrades.deployProxy(
+      ctx.artifacts.ProxyReader.connect(owner),
+      [ UNSRegistry.address, CNSRegistry.address ],
+      { unsafeAllow: ['delegatecall'] },
     );
-    await ctx.saveContractConfig('ProxyReader', proxyReader);
     await proxyReader.deployTransaction.wait();
+
     await verify(ctx, proxyReader.address, [
       UNSRegistry.address,
       CNSRegistry.address,
     ]);
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+    await ctx.saveContractConfig('ProxyAdmin', proxyAdmin);
+
+    const proxyReaderImpl = await proxyAdmin.callStatic.getProxyImplementation(
+      proxyReader.address,
+    );
+    await ctx.saveContractConfig(
+      'ProxyReader',
+      proxyReader,
+      proxyReaderImpl,
+    );
+    await verify(ctx, proxyReaderImpl, []);
 
     const mintingManager = ctx.artifacts.MintingManager.attach(
       MintingManager.address,
@@ -493,6 +507,54 @@ const upgradeMintingManagerTask = {
     }
 
     const dependencies = { MintingManager };
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(
+          `${key} contract not found for network ${network.config.chainId}`,
+        );
+      }
+    }
+
+    return dependencies;
+  },
+};
+
+const upgradeProxyReaderTask = {
+  tags: ['upgrade_proxy_reeader'],
+  priority: 105,
+  run: async (ctx, { ProxyReader }) => {
+    const proxyReader = await upgrades.upgradeProxy(
+      ProxyReader.address,
+      ctx.artifacts.ProxyReader,
+      { unsafeAllow: ['delegatecall'] },
+    );
+    await proxyReader.deployTransaction.wait();
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+    await ctx.saveContractConfig('ProxyAdmin', proxyAdmin);
+
+    const proxyReaderImpl = await proxyAdmin.callStatic.getProxyImplementation(
+      proxyReader.address,
+    );
+
+    await ctx.saveContractConfig(
+      'ProxyReader',
+      proxyReader,
+      proxyReaderImpl,
+    );
+    await verify(ctx, proxyReaderImpl, []);
+  },
+  ensureDependencies: (ctx, config) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { MintingManager, ProxyAdmin, UNSRegistry, CNSRegistry } = config.contracts || {};
+    if (!ProxyAdmin || !ProxyAdmin.address) {
+      throw new Error(
+        'Current network configuration does not support upgrading',
+      );
+    }
+
+    const dependencies = { MintingManager, UNSRegistry, CNSRegistry };
     for (const [key, value] of Object.entries(dependencies)) {
       if (!value || !value.address) {
         throw new Error(
@@ -781,6 +843,7 @@ module.exports = [
   deployMMForwarderTask,
   upgradeUNSRegistryTask,
   upgradeMintingManagerTask,
+  upgradeProxyReaderTask,
   configureCnsMigrationTask,
   deployPolygonPosBridgeTask,
   configurePolygonPosBridgeTask,

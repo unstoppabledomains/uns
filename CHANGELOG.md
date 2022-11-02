@@ -1,3 +1,6 @@
+## v0.6.1
+- Made ProxyReader@0.4.0 upgradeable
+
 ## v0.6.0
 
 - UNSRegistry@0.6.0 receives support for subdomains

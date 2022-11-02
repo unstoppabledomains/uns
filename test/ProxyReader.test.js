@@ -49,7 +49,8 @@ describe('ProxyReader', () => {
     cryptoTokenId = await unsRegistry.namehash([domainName, 'crypto']);
     await mintingController.mintSLDWithResolver(coinbase.address, domainName, resolver.address);
 
-    proxy = await ProxyReader.deploy(unsRegistry.address, cnsRegistry.address);
+    proxy = await ProxyReader.deploy();
+    await proxy.initialize(unsRegistry.address, cnsRegistry.address);
   });
 
   it('should support IERC165 interface', async () => {

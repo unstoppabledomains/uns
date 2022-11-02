@@ -40,7 +40,8 @@ describe('ProxyReader (UNS only)', () => {
     // mint .crypto
     cryptoTokenId = await mintDomain(unsRegistry, coinbase, [domainName, 'crypto'], true);
 
-    proxy = await ProxyReader.deploy(unsRegistry.address, ZERO_ADDRESS);
+    proxy = await ProxyReader.deploy();
+    await proxy.initialize(unsRegistry.address, ZERO_ADDRESS);
   });
 
   it('should support IERC165 interface', async () => {
