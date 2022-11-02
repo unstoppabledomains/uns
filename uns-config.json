@@ -99,6 +99,11 @@
                     "address": "0xA0c68C638235ee32657e8f720a23ceC1bFc77C77",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xa3cf4d"
+                },
+                "DotCoinBurner": {
+                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0xf2559d"
                 }
             }
         },
@@ -290,6 +295,11 @@
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
+                },
+                "DotCoinBurner": {
+                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0217a61f"
                 }
             }
         },
