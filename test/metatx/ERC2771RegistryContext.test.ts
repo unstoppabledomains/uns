@@ -2,8 +2,8 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { utils, BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { ERC2771RegistryContextMock__factory } from '../../typechain-types/factories/contracts/mocks';
-import { ERC2771RegistryContextMock } from '../../typechain-types/contracts/mocks';
+import { ERC2771RegistryContextMock__factory } from '../../types/factories/contracts/mocks';
+import { ERC2771RegistryContextMock } from '../../types/contracts/mocks';
 
 describe('ERC2771RegistryContext', () => {
   let context: ERC2771RegistryContextMock;

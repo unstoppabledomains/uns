@@ -1,12 +1,13 @@
 import { network } from 'hardhat';
+import merge from 'lodash.merge';
 import { mergeNetworkConfig, readNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
-import merge from 'lodash.merge';
 
 async function main () {
   console.log('Network:', network.name);
 
-  const config = merge(readNetworkConfig()[network.config.chainId], {
+  const chainId: number = network.config.chainId!;
+  const config = merge(readNetworkConfig()[chainId], {
     contracts: {
       CNSRegistry: { address: '0x0000000000000000000000000000000000000000' },
       MintingController: { address: '0x0000000000000000000000000000000000000000' },
@@ -16,7 +17,7 @@ async function main () {
   });
 
   if (!config) {
-    throw new Error(`Config not found for network ${network.config.chainId}`);
+    throw new Error(`Config not found for network ${chainId}`);
   }
 
   const deployer = await Deployer.create();

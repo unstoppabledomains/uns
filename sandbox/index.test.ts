@@ -1,12 +1,12 @@
 // process.env.HARDHAT_NETWORK = 'sandbox';
-import { Sandbox } from '.';
 import { expect } from 'chai';
 import { ethers, network } from 'hardhat';
-import { readNetworkConfig } from '../src/config';
-import { MintingManager__factory, UNSRegistry__factory } from '../typechain-types/factories/contracts';
-import { MintingManager, UNSRegistry } from '../typechain-types/contracts';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { readNetworkConfig } from '../src/config';
+import { MintingManager__factory, UNSRegistry__factory } from '../types/factories/contracts';
+import { MintingManager, UNSRegistry } from '../types/contracts';
 import { unwrap } from '../src/helpers';
+import { Sandbox } from '.';
 
 describe('Sandbox', async () => {
   const domainPrefix = 'sandbox';

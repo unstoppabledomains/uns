@@ -1,8 +1,8 @@
 import fs from 'fs';
 import tar from 'tar';
 import { mergeNetworkConfig } from '../src/config';
-import { GANACHE_SERVER_CONFIG, Sandbox } from '.';
 import { Deployer } from '../src/deployer';
+import { GANACHE_SERVER_CONFIG, Sandbox } from '.';
 
 // NOTE: Node module execution is used for rebuilding sandbox package
 if (require.main === module) {

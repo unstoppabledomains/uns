@@ -1,6 +1,6 @@
 import fs from 'fs';
-import tar from 'tar';
 import path from 'path';
+import tar from 'tar';
 import HDKey from 'hdkey';
 import { mnemonicToSeedSync } from 'bip39';
 import secp256k1 from 'secp256k1';
@@ -10,9 +10,9 @@ import {
   EthereumProvider,
   ProviderOptions,
 } from 'ganache';
-import { GanacheService } from './ganache-service';
 import { HttpNetworkUserConfig } from 'hardhat/types';
 import { unwrap } from '../src/helpers';
+import { GanacheService } from './ganache-service';
 
 const log = debug('UNS:sandbox');
 
@@ -213,7 +213,8 @@ export class Sandbox {
 
     const hasher = createKeccakHash('keccak256');
 
-    hasher['_state']?.absorb(compresedPublicKey); // eslint-disable-line dot-notation
+    // eslint-disable-next-line dot-notation
+    hasher['_state']?.absorb(compresedPublicKey);
 
     return hasher.digest().subarray(-20).toString('hex');
   }

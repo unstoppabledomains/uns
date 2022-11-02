@@ -1,6 +1,6 @@
 import { utils, BigNumber } from 'ethers';
 import { FunctionFragment } from 'ethers/lib/utils';
-import { ProxyReader } from '../../typechain-types/contracts';
+import { ProxyReader } from '../../types/contracts';
 
 export const getFuncSignature = (fragment: FunctionFragment): string => {
   return `${fragment.name}(${fragment.inputs

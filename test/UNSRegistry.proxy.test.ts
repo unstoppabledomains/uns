@@ -1,12 +1,12 @@
 import { ethers, upgrades } from 'hardhat';
 import { expect } from 'chai';
-import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
-import { TLD } from './helpers/constants';
-import { mintDomain } from './helpers/registry';
 import { utils, BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { UNSRegistry } from '../typechain-types/contracts';
-import { UNSRegistry__factory } from '../typechain-types/factories/contracts';
+import { UNSRegistry } from '../types/contracts';
+import { UNSRegistry__factory } from '../types/factories/contracts';
+import { mintDomain } from './helpers/registry';
+import { TLD } from './helpers/constants';
+import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 
 describe('UNSRegistry (proxy)', () => {
   let unsRegistry: UNSRegistry;

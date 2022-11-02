@@ -7,9 +7,10 @@ const UNSNetworkConfig = readNetworkConfig();
 async function main () {
   console.log('Network:', network.name);
 
-  const config = UNSNetworkConfig.networks[network.config.chainId];
+  const chainId: number = network.config.chainId!;
+  const config = UNSNetworkConfig.networks[chainId];
   if (!config) {
-    throw new Error(`Config not found for network ${network.config.chainId}`);
+    throw new Error(`Config not found for network ${chainId}`);
   }
 
   const deployer = await Deployer.create();

@@ -1,15 +1,23 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
-import { MintingManager, UNSRegistry } from '../../typechain-types/contracts';
-import { MintingManagerForwarder } from '../../typechain-types/contracts/metatx';
-import { MintingManager__factory, UNSRegistry__factory } from '../../typechain-types/factories/contracts';
-import { MintingManagerForwarder__factory } from '../../typechain-types/factories/contracts/metatx';
+import { MintingManager, UNSRegistry } from '../../types/contracts';
+import { MintingManagerForwarder } from '../../types/contracts/metatx';
+import {
+  MintingManager__factory,
+  UNSRegistry__factory,
+} from '../../types/factories/contracts';
+import { MintingManagerForwarder__factory } from '../../types/factories/contracts/metatx';
 import { ZERO_ADDRESS } from '../helpers/constants';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 
 describe('MintingManager (consumption)', () => {
-  let unsRegistry: UNSRegistry, mintingManager: MintingManager, forwarder: MintingManagerForwarder;
-  let signers: SignerWithAddress[], coinbase: SignerWithAddress, receiver: SignerWithAddress, spender: SignerWithAddress;
+  let unsRegistry: UNSRegistry,
+    mintingManager: MintingManager,
+    forwarder: MintingManagerForwarder;
+  let signers: SignerWithAddress[],
+    coinbase: SignerWithAddress,
+    receiver: SignerWithAddress,
+    spender: SignerWithAddress;
 
   function percDiff (a: number, b: number) {
     return -((a - b) / a) * 100;
@@ -30,7 +38,9 @@ describe('MintingManager (consumption)', () => {
     mintingManager = await new MintingManager__factory(coinbase).deploy();
     await unsRegistry.initialize(mintingManager.address);
 
-    forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(mintingManager.address);
+    forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(
+      mintingManager.address,
+    );
 
     await mintingManager.initialize(
       unsRegistry.address,
@@ -78,7 +88,9 @@ describe('MintingManager (consumption)', () => {
         const executeParams = [acc, [labels[0] + 'r', labels[1]], ...rest];
 
         const tokenId = await unsRegistry.namehash(labels as string[]);
-        const tokenId2 = await unsRegistry.namehash(executeParams[1] as string[]);
+        const tokenId2 = await unsRegistry.namehash(
+          executeParams[1] as string[],
+        );
 
         const { req, signature } = await buildExecuteParams(
           selector,
@@ -106,12 +118,18 @@ describe('MintingManager (consumption)', () => {
           send: tx.receipt.gasUsed.toString(),
           execute: executeTxReceipt.gasUsed.toString(),
           increase:
-            percDiff(tx.receipt.gasUsed.toNumber(), executeTxReceipt.gasUsed.toNumber()).toFixed(2) +
-            ' %',
+            percDiff(
+              tx.receipt.gasUsed.toNumber(),
+              executeTxReceipt.gasUsed.toNumber(),
+            ).toFixed(2) + ' %',
         });
 
-        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId);
-        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId2);
+        await unsRegistry
+          .connect(receiver)
+          .setOwner(mintingManager.address, tokenId);
+        await unsRegistry
+          .connect(receiver)
+          .setOwner(mintingManager.address, tokenId2);
       }
       console.table(result);
     });

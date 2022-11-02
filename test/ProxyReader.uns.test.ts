@@ -1,13 +1,13 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 
-import { ZERO_ADDRESS, TLD } from './helpers/constants';
-import { mintDomain } from './helpers/registry';
-import { getInterfaceId } from './helpers/proxy';
 import { BigNumber, utils } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { ProxyReader, UNSRegistry } from '../typechain-types/contracts';
-import { ProxyReader__factory, UNSRegistry__factory } from '../typechain-types/factories/contracts';
+import { ProxyReader, UNSRegistry } from '../types/contracts';
+import { ProxyReader__factory, UNSRegistry__factory } from '../types/factories/contracts';
+import { getInterfaceId } from './helpers/proxy';
+import { mintDomain } from './helpers/registry';
+import { ZERO_ADDRESS, TLD } from './helpers/constants';
 
 describe('ProxyReader (UNS only)', () => {
   const domainName = 'test_42';

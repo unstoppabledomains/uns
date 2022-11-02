@@ -1,18 +1,18 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 
-import { DEAD_ADDRESS, ZERO_ADDRESS, TLD } from './helpers/constants';
-import { mintDomain } from './helpers/registry';
 
 import { utils, BigNumber } from 'ethers';
-import { ProxyReader__factory, UNSRegistry__factory } from '../typechain-types/factories/contracts';
-import { ProxyReader, UNSRegistry } from '../typechain-types/contracts';
-import { CNSRegistry, Resolver } from '../typechain-types/dot-crypto/contracts';
-import { MintingController } from '../typechain-types/dot-crypto/contracts/controllers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { CNSRegistry__factory, Resolver__factory } from '../typechain-types/factories/dot-crypto/contracts';
-import { MintingController__factory } from '../typechain-types/factories/dot-crypto/contracts/controllers';
 import { Result } from 'ethers/lib/utils';
+import { ProxyReader__factory, UNSRegistry__factory } from '../types/factories/contracts';
+import { ProxyReader, UNSRegistry } from '../types/contracts';
+import { CNSRegistry, Resolver } from '../types/dot-crypto/contracts';
+import { MintingController } from '../types/dot-crypto/contracts/controllers';
+import { CNSRegistry__factory, Resolver__factory } from '../types/factories/dot-crypto/contracts';
+import { MintingController__factory } from '../types/factories/dot-crypto/contracts/controllers';
+import { mintDomain } from './helpers/registry';
+import { DEAD_ADDRESS, ZERO_ADDRESS, TLD } from './helpers/constants';
 import { getInterfaceId } from './helpers/proxy';
 
 describe('ProxyReader', () => {

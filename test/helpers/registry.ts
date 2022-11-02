@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
-import { UNSRegistry } from '../../typechain-types/contracts/UNSRegistry';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { UNSRegistry } from '../../types/contracts/UNSRegistry';
 
 const generateRandomLabel = () => 'domain-' + ethers.utils.hexlify(
   ethers.utils.randomBytes(16),

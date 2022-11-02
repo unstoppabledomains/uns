@@ -5,9 +5,10 @@ import { Deployer } from '../src/deployer';
 async function main () {
   console.log('Network:', network.name);
 
-  const config = readNetworkConfig()[network.config.chainId];
+  const chainId: number = network.config.chainId!;
+  const config = readNetworkConfig()[chainId];
   if (!config) {
-    throw new Error(`Config not found for network ${network.config.chainId}`);
+    throw new Error(`Config not found for network ${chainId}`);
   }
 
   const deployer = await Deployer.create();

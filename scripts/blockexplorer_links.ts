@@ -13,9 +13,10 @@ const Config = JSON.parse(
 
 const ContractNames = Object.keys(Config.networks['1'].contracts);
 
-const isValidAddress = (address?: string): address is string => {
-  return address && address !== '0x0000000000000000000000000000000000000000';
+const isValidAddress = (address?: string): boolean => {
+  return !!address && address !== '0x0000000000000000000000000000000000000000';
 };
+
 const BlockExplorerUrls = {
   1: 'https://etherscan.io',
   5: 'https://goerli.etherscan.io',
@@ -49,7 +50,7 @@ const contractLinks = (
         ? [address]
         : [];
   return addresses.length
-    ? addresses.map((a) => link(network, a)).join('<br/>')
+    ? addresses.map((a) => link(network, a!)).join('<br/>')
     : '&mdash;';
 };
 

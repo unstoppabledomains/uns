@@ -1,13 +1,13 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 
-import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 import { utils, BigNumber } from 'ethers';
-import { ERC2771ContextMock } from '../../typechain-types/contracts/mocks';
-import { MintingManagerForwarder } from '../../typechain-types/contracts/metatx';
-import { ERC2771ContextMock__factory } from '../../typechain-types/factories/contracts/mocks';
-import { MintingManagerForwarder__factory } from '../../typechain-types/factories/contracts/metatx';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
+import { ERC2771ContextMock } from '../../types/contracts/mocks';
+import { MintingManagerForwarder } from '../../types/contracts/metatx';
+import { ERC2771ContextMock__factory } from '../../types/factories/contracts/mocks';
+import { MintingManagerForwarder__factory } from '../../types/factories/contracts/metatx';
 
 describe('ERC2771Context', () => {
   let context: ERC2771ContextMock, forwarder: MintingManagerForwarder;

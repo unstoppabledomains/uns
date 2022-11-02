@@ -1,18 +1,19 @@
-import { network } from 'hardhat';
-import { readNetworkConfig } from '../src/config';
 import path from 'path';
 import fs from 'fs';
+import { network } from 'hardhat';
 import { Contract } from 'ethers';
 import { Event } from '@ethersproject/contracts';
-import { UNSRegistry__factory } from '../typechain-types/factories/contracts';
-import { CNSRegistry__factory } from '../typechain-types/factories/dot-crypto/contracts';
+import { readNetworkConfig } from '../src/config';
+import { UNSRegistry__factory } from '../types/factories/contracts';
+import { CNSRegistry__factory } from '../types/factories/dot-crypto/contracts';
 
 const UNSNetworkConfig = readNetworkConfig();
 
 async function main () {
   console.log('Network:', network.name);
 
-  const config = UNSNetworkConfig.networks[network.config.chainId];
+  const chainId: number = network.config.chainId!;
+  const config = UNSNetworkConfig.networks[chainId];
   if (!config) {
     throw new Error(`Config not found for network ${network.config.chainId}`);
   }
@@ -31,17 +32,26 @@ async function main () {
   const cnsRegistry = new CNSRegistry__factory().attach(CNSRegistry.address);
   const eventsCNS = await fetchEvents(cnsRegistry, parseInt(CNSRegistry.deploymentBlock, 16));
 
-  const tokens = eventsUNS.concat(eventsCNS).map((t: Event)=> {
-    return '0x' + t.args.tokenId.toHexString()
-      .replace(/^(0x)?/, '')
-      .padStart(64, '0');
+  const tokens = eventsUNS.concat(eventsCNS).map((t: Event) => {
+    return (
+      '0x' +
+      t.args.tokenId
+        .toHexString()
+        .replace(/^(0x)?/, '')
+        .padStart(64, '0')
+    );
   });
-  await save(network.config.chainId, { tokens: [...new Set(tokens)] });
+  await save(chainId, { tokens: [...new Set(tokens)] });
 
   console.log('Blocklist complete!');
 }
 
-async function fetchEvents (contract: Contract, fromBlock: number, toBlock?: number, limit = 10000): Promise<Array<Event>> {
+async function fetchEvents (
+  contract: Contract,
+  fromBlock: number,
+  toBlock?: number,
+  limit = 10000,
+): Promise<Array<Event>> {
   if (!toBlock) {
     toBlock = await contract.provider.getBlockNumber();
   }
@@ -73,7 +83,7 @@ async function save (chainId: number, state: unknown) {
 
 main()
   .then(() => process.exit(0))
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exit(1);
   });

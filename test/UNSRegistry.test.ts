@@ -1,13 +1,13 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import namehash from 'eth-ens-namehash';
+import { utils, BigNumber } from 'ethers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { UNSRegistry } from '../types/contracts';
+import { UNSRegistry__factory } from '../types/factories/contracts';
 import { TLD, ZERO_ADDRESS, DEAD_ADDRESS } from './helpers/constants';
 import { mintDomain, mintRandomDomain } from './helpers/registry';
 
-import { utils, BigNumber } from 'ethers';
-import { UNSRegistry } from '../typechain-types/contracts';
-import { UNSRegistry__factory } from '../typechain-types/factories/contracts';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 describe('UNSRegistry', () => {
   let unsRegistry: UNSRegistry;

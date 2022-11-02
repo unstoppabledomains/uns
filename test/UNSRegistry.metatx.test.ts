@@ -1,14 +1,14 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { utils, BigNumber, Contract, BigNumberish } from 'ethers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { FunctionFragment } from 'ethers/lib/utils';
+import { UNSRegistry } from '../types/contracts';
+import { UNSRegistry__factory } from '../types/factories/contracts';
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 import { TLD } from './helpers/constants';
 import { mintDomain } from './helpers/registry';
 import { getFuncSignature } from './helpers/proxy';
-import { UNSRegistry } from '../typechain-types/contracts';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { UNSRegistry__factory } from '../typechain-types/factories/contracts';
-import { FunctionFragment } from 'ethers/lib/utils';
 
 describe('UNSRegistry (metatx)', () => {
   let unsRegistry: UNSRegistry, buildExecuteParams: ExecuteFunc;

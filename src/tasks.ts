@@ -1,11 +1,10 @@
 import { network, upgrades } from 'hardhat';
-import { Contract } from 'ethers';
+import { Contract, BigNumber, utils } from 'ethers';
 import { merge } from 'lodash';
 import { ZERO_ADDRESS } from '../test/helpers/constants';
 import { Deployer } from './deployer';
 import { ArtifactName, DependenciesMap, UnsContractName, UnsNetworkConfig } from './types';
 import verify from './verify';
-import { BigNumber, utils } from 'ethers';
 import { unwrap, unwrapDependencies } from './helpers';
 
 export type Task = {
@@ -28,6 +27,7 @@ export const deployCNSTask: Task = {
       Resolver,
     } = ctx.artifacts;
 
+    // CNS Registry
     const cnsRegistry = await CNSRegistry.connect(owner).deploy();
     await ctx.saveContractConfig(UnsContractName.CNSRegistry, cnsRegistry);
     await cnsRegistry.deployTransaction.wait();
@@ -681,18 +681,18 @@ const configureReconfigureTldL1Task = {
 
     // Burn TLD tokens
     const tldTokens = [
-      BigNumber.from('0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2'), // .coin
-      BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f'), // .crypto
-      BigNumber.from('0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230'), // .wallet
-      BigNumber.from('0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d'), // .x
-      BigNumber.from('0xb75cf4f3d8bc3deb317ed5216d898899d5cc6a783f65f6768eb9bcb89428670d'), // .nft
-      BigNumber.from('0x4118ebbd893ecbb9f5d7a817c7d8039c1bd991b56ea243e2ae84d0a1b2c950a7'), // .blockchain
-      BigNumber.from('0x042fb01c1e43fb4a32f85b41c821e17d2faeac58cfc5fb23f80bc00c940f85e3'), // .bitcoin
-      BigNumber.from('0x5c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e'), // .888
-      BigNumber.from('0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553'), // .dao
-      BigNumber.from('0xd81bbfcee722494b885e891546eeac23d0eedcd44038d7a2f6ef9ec2f9e0d239'), // .zil
-      BigNumber.from('0xed9ce6b49a0e2c56c57c86795b131bd6df792312183994c3cf3de1516cfe92d6'), // .polygon
-      BigNumber.from('0x92bba949890cd44a226a8ce54135cf86538cd6c5ca0ccf41877102fd718cc8aa'), // .unstoppable
+      '0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2', // .coin
+      '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f', // .crypto
+      '0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230', // .wallet
+      '0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d', // .x
+      '0xb75cf4f3d8bc3deb317ed5216d898899d5cc6a783f65f6768eb9bcb89428670d', // .nft
+      '0x4118ebbd893ecbb9f5d7a817c7d8039c1bd991b56ea243e2ae84d0a1b2c950a7', // .blockchain
+      '0x042fb01c1e43fb4a32f85b41c821e17d2faeac58cfc5fb23f80bc00c940f85e3', // .bitcoin
+      '0x5c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e', // .888
+      '0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553', // .dao
+      '0xd81bbfcee722494b885e891546eeac23d0eedcd44038d7a2f6ef9ec2f9e0d239', // .zil
+      '0xed9ce6b49a0e2c56c57c86795b131bd6df792312183994c3cf3de1516cfe92d6', // .polygon
+      '0x92bba949890cd44a226a8ce54135cf86538cd6c5ca0ccf41877102fd718cc8aa', // .unstoppable
     ];
     await mintingManager.burnTLDL1(tldTokens);
   },
@@ -728,17 +728,18 @@ const configureReconfigureTldL2Task: Task = {
 
     // Transfer TLD tokens ownership to MintingManager
     const tldTokens = [
-      BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f'), // .crypto
-      BigNumber.from('0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230'), // .wallet
-      BigNumber.from('0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d'), // .x
-      BigNumber.from('0xb75cf4f3d8bc3deb317ed5216d898899d5cc6a783f65f6768eb9bcb89428670d'), // .nft
-      BigNumber.from('0x4118ebbd893ecbb9f5d7a817c7d8039c1bd991b56ea243e2ae84d0a1b2c950a7'), // .blockchain
-      BigNumber.from('0x042fb01c1e43fb4a32f85b41c821e17d2faeac58cfc5fb23f80bc00c940f85e3'), // .bitcoin
-      BigNumber.from('0x5c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e'), // .888
-      BigNumber.from('0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553'), // .dao
-      BigNumber.from('0xd81bbfcee722494b885e891546eeac23d0eedcd44038d7a2f6ef9ec2f9e0d239'), // .zil
-      BigNumber.from('0xed9ce6b49a0e2c56c57c86795b131bd6df792312183994c3cf3de1516cfe92d6'), // .polygon
-      BigNumber.from('0x92bba949890cd44a226a8ce54135cf86538cd6c5ca0ccf41877102fd718cc8aa'), // .unstoppable
+      '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f', // .crypto
+      '0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230', // .wallet
+      '0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d', // .x
+      '0xb75cf4f3d8bc3deb317ed5216d898899d5cc6a783f65f6768eb9bcb89428670d', // .nft
+      '0x4118ebbd893ecbb9f5d7a817c7d8039c1bd991b56ea243e2ae84d0a1b2c950a7', // .blockchain
+      '0x042fb01c1e43fb4a32f85b41c821e17d2faeac58cfc5fb23f80bc00c940f85e3', // .bitcoin
+      '0x5c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e', // .888
+      '0xb5f2bbf81da581299d4ff7af60560c0ac854196f5227328d2d0c2bb0df33e553', // .dao
+      '0xd81bbfcee722494b885e891546eeac23d0eedcd44038d7a2f6ef9ec2f9e0d239', // .zil
+      '0xed9ce6b49a0e2c56c57c86795b131bd6df792312183994c3cf3de1516cfe92d6', // .polygon
+      '0x92bba949890cd44a226a8ce54135cf86538cd6c5ca0ccf41877102fd718cc8aa', // .unstoppable
+      '0xa18784bb78ee0f577251fb21ad5cac7a140ab47e9414e3c7af5125e3e1d28923',  // .klever
     ];
     await mintingManager.moveTLDOwnershipL2(tldTokens);
   },

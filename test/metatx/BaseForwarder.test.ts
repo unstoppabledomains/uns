@@ -1,12 +1,12 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { buildExecuteFunc, ExecuteFunc } from './../helpers/metatx';
 import { BigNumber, Contract } from 'ethers';
-import { BaseForwarderMock } from '../../typechain-types/contracts/mocks';
-import { BaseForwarderMock__factory } from '../../typechain-types/factories/contracts/mocks';
-import { ERC1271SimpleWallet } from '../../typechain-types/contracts/utils';
-import { ERC1271SimpleWallet__factory } from '../../typechain-types/factories/contracts/utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { BaseForwarderMock } from '../../types/contracts/mocks';
+import { BaseForwarderMock__factory } from '../../types/factories/contracts/mocks';
+import { ERC1271SimpleWallet } from '../../types/contracts/utils';
+import { ERC1271SimpleWallet__factory } from '../../types/factories/contracts/utils';
+import { buildExecuteFunc, ExecuteFunc } from './../helpers/metatx';
 
 describe('BaseForwarder', () => {
   let forwarder: BaseForwarderMock;

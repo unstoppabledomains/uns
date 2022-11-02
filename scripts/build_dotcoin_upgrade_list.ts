@@ -1,10 +1,10 @@
-import { network } from 'hardhat';
-import { utils, BigNumber, Contract } from 'ethers';
 import path from 'path';
 import fs from 'fs';
-import { readNetworkConfig } from '../src/config';
+import { network } from 'hardhat';
+import { utils, BigNumber, Contract } from 'ethers';
 import { Log } from '@ethersproject/abstract-provider';
-import { UNSRegistry__factory } from '../typechain-types/factories/contracts';
+import { readNetworkConfig } from '../src/config';
+import { UNSRegistry__factory } from '../types/factories/contracts';
 
 const UnsConfig = readNetworkConfig();
 
@@ -14,15 +14,15 @@ const normalizeTokenId = (bigNumber: BigNumber) => {
   return utils.hexZeroPad(bigNumber.toHexString(), 32).toLowerCase();
 };
 
-type State =  {
+type State = {
   tokens: {
     [tokenId: string]: {
       uri: string;
-    }
-  }
+    };
+  };
   latestSyncedL1Block: number;
   latestSyncedL2Block: number;
-}
+};
 
 const INITIAL_DB = {
   tokens: {},
@@ -60,7 +60,13 @@ function getContractsConfig (chainId: number) {
   };
 }
 
-async function fetchLogs (contract: Contract, topics: string[], fromBlock: number, toBlock: number, limit: number): Promise<Array<Log>> {
+async function fetchLogs (
+  contract: Contract,
+  topics: string[],
+  fromBlock: number,
+  toBlock: number,
+  limit: number,
+): Promise<Array<Log>> {
   const maxBlock = fromBlock + limit;
   const _toBlock = Math.min(maxBlock, toBlock);
 
@@ -113,7 +119,7 @@ function saveState (chainId: number, state: State) {
 }
 
 async function main () {
-  const chainId = network.config.chainId;
+  const chainId: number = network.config.chainId!;
 
   console.log('Network:', network.name + ' ChainID: ' + chainId);
 
@@ -131,7 +137,7 @@ async function main () {
     contractsConfig.UNSRegistry.address,
   );
 
-  const currentState = readState(network.config.chainId);
+  const currentState = readState(chainId);
   const newState = JSON.parse(JSON.stringify(currentState));
 
   const latestSyncedBlock = contractsConfig.additionalConfiguration.isL1
@@ -184,7 +190,7 @@ async function main () {
 
   console.log('Logs processed. Writing... \n');
 
-  saveState(network.config.chainId, newState);
+  saveState(chainId, newState);
 
   console.log('Completed');
 }

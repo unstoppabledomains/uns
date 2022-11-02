@@ -1,10 +1,10 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
-import { ZERO_ADDRESS } from './../helpers/constants';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { MinterRoleMock__factory } from '../../typechain-types/factories/contracts/mocks';
-import { MinterRoleMock } from '../../typechain-types/contracts/mocks';
+import { MinterRoleMock__factory } from '../../types/factories/contracts/mocks';
+import { MinterRoleMock } from '../../types/contracts/mocks';
+import { ZERO_ADDRESS } from './../helpers/constants';
 
 describe('MinterRole', () => {
   let minterRole: MinterRoleMock;

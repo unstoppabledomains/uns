@@ -1,7 +1,7 @@
-import { HardhatUserConfig } from 'hardhat/types/config';
-import { TASK_COMPILE } from 'hardhat/builtin-tasks/task-names';
 import path from 'path';
 import fs from 'fs';
+import { HardhatUserConfig } from 'hardhat/types/config';
+import { TASK_COMPILE } from 'hardhat/builtin-tasks/task-names';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { task } from 'hardhat/config';
 
@@ -42,12 +42,10 @@ import '@openzeppelin/hardhat-upgrades';
 require('solidity-coverage');
 
 import 'hardhat-gas-reporter';
-
 import 'hardhat-contract-sizer';
+import yargs from 'yargs/yargs';
 
 import { Sandbox } from './sandbox';
-
-import yargs from 'yargs/yargs';
 
 /// ENVVAR
 // - ENABLE_GAS_REPORT
@@ -63,8 +61,8 @@ const argv = yargs()
 task(
   TASK_COMPILE,
   'hook compile task to perform post-compile task',
-  async (_, hardhatRuntimeEnv: HardhatRuntimeEnvironment, runSuper) => {
-    const { root, flatArtifacts } = hardhatRuntimeEnv.config.paths;
+  async (_, hre: HardhatRuntimeEnvironment, runSuper) => {
+    const { root, flatArtifacts } = hre.config.paths;
     const outputDir = path.resolve(root, flatArtifacts);
 
     await runSuper();
@@ -74,7 +72,7 @@ task(
     }
     fs.mkdirSync(outputDir, { recursive: true });
 
-    for (const artifactPath of await hardhatRuntimeEnv.artifacts.getArtifactPaths()) {
+    for (const artifactPath of await hre.artifacts.getArtifactPaths()) {
       const artifact = fs.readFileSync(artifactPath);
       const { abi, contractName } = JSON.parse(artifact.toString());
       if (!abi.length || contractName.includes('Mock')) continue;
@@ -170,6 +168,10 @@ const config: HardhatUserConfig = {
       loggingEnabled: true,
     },
   },
+  typechain: {
+    outDir: 'types',
+    target: 'ethers-v5',
+  },
   gasReporter: {
     enabled: argv.enableGasReport,
     currency: 'USD',
@@ -191,10 +193,10 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      mainnet: process.env.ETHERSCAN_API_KEY,
-      goerli: process.env.ETHERSCAN_API_KEY,
-      polygon: process.env.POLYGONSCAN_API_KEY,
-      polygonMumbai: process.env.POLYGONSCAN_API_KEY,
+      mainnet: process.env.ETHERSCAN_API_KEY!,
+      goerli: process.env.ETHERSCAN_API_KEY!,
+      polygon: process.env.POLYGONSCAN_API_KEY!,
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY!,
     },
   },
   abiExporter: {

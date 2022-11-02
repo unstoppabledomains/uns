@@ -1,10 +1,10 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 import { BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { UNSRegistryForwarderMock } from '../../typechain-types/contracts/mocks';
-import { UNSRegistryForwarderMock__factory } from '../../typechain-types/factories/contracts/mocks';
+import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
+import { UNSRegistryForwarderMock } from '../../types/contracts/mocks';
+import { UNSRegistryForwarderMock__factory } from '../../types/factories/contracts/mocks';
 
 describe('UNSRegistryForwarder', () => {
   let forwarder: UNSRegistryForwarderMock;

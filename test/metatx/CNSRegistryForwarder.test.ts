@@ -1,16 +1,28 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 
-import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
-import { TLD } from '../helpers/constants';
-import { CNSRegistry__factory, Resolver__factory } from '../../typechain-types/factories/dot-crypto/contracts';
-import { MintingController__factory, SignatureController__factory } from '../../typechain-types/factories/dot-crypto/contracts/controllers';
-import { CNSRegistryForwarder__factory } from '../../typechain-types/factories/contracts/metatx';
-import { CNSRegistryForwarder } from '../../typechain-types/contracts/metatx';
-import { CNSRegistry, Resolver } from '../../typechain-types/dot-crypto/contracts';
-import { MintingController, SignatureController } from '../../typechain-types/dot-crypto/contracts/controllers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumberish } from 'ethers';
+import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
+import { TLD } from '../helpers/constants';
+import {
+  CNSRegistry__factory,
+  Resolver__factory,
+} from '../../types/factories/dot-crypto/contracts';
+import {
+  MintingController__factory,
+  SignatureController__factory,
+} from '../../types/factories/dot-crypto/contracts/controllers';
+import { CNSRegistryForwarder__factory } from '../../types/factories/contracts/metatx';
+import { CNSRegistryForwarder } from '../../types/contracts/metatx';
+import {
+  CNSRegistry,
+  Resolver,
+} from '../../types/dot-crypto/contracts';
+import {
+  MintingController,
+  SignatureController,
+} from '../../types/dot-crypto/contracts/controllers';
 
 describe('CNSRegistryForwarder', () => {
   let forwarder: CNSRegistryForwarder,
@@ -19,7 +31,9 @@ describe('CNSRegistryForwarder', () => {
     signatureController: SignatureController,
     resolver: Resolver;
 
-  let signers: SignerWithAddress[], owner: SignerWithAddress, receiver: SignerWithAddress;
+  let signers: SignerWithAddress[],
+    owner: SignerWithAddress,
+    receiver: SignerWithAddress;
   let buildExecuteParams: ExecuteFunc;
 
   const mintDomain = async (label: string, owner: string) => {
@@ -27,7 +41,11 @@ describe('CNSRegistryForwarder', () => {
     return await registry.childIdOf(TLD.CRYPTO, label);
   };
 
-  const buildTransfer = async (from: SignerWithAddress, toAddress: string, tokenId: BigNumberish) => {
+  const buildTransfer = async (
+    from: SignerWithAddress,
+    toAddress: string,
+    tokenId: BigNumberish,
+  ) => {
     return await buildExecuteParams(
       'transferFrom(address,address,uint256)',
       [from.address, toAddress, tokenId],
@@ -41,16 +59,29 @@ describe('CNSRegistryForwarder', () => {
     [owner, receiver] = signers;
 
     registry = await new CNSRegistry__factory(owner).deploy();
-    mintingController = await new MintingController__factory(owner).deploy(registry.address);
-    signatureController = await new SignatureController__factory(owner).deploy(registry.address);
-    resolver = await new Resolver__factory(owner).deploy(registry.address, mintingController.address);
+    mintingController = await new MintingController__factory(owner).deploy(
+      registry.address,
+    );
+    signatureController = await new SignatureController__factory(owner).deploy(
+      registry.address,
+    );
+    resolver = await new Resolver__factory(owner).deploy(
+      registry.address,
+      mintingController.address,
+    );
 
     await registry.addController(mintingController.address);
     await registry.addController(signatureController.address);
 
-    forwarder = await new CNSRegistryForwarder__factory(owner).deploy(signatureController.address);
+    forwarder = await new CNSRegistryForwarder__factory(owner).deploy(
+      signatureController.address,
+    );
 
-    buildExecuteParams = buildExecuteFunc(registry.interface, signatureController.address, forwarder);
+    buildExecuteParams = buildExecuteFunc(
+      registry.interface,
+      signatureController.address,
+      forwarder,
+    );
   });
 
   describe('nonceOf', () => {
@@ -62,7 +93,11 @@ describe('CNSRegistryForwarder', () => {
       expect(nonceF).to.be.equal(0);
       expect(nonceF).to.be.equal(nonceS);
 
-      const { req, signature } = await buildTransfer(owner, receiver.address, tokenId);
+      const { req, signature } = await buildTransfer(
+        owner,
+        receiver.address,
+        tokenId,
+      );
       await forwarder.execute(req, signature);
 
       nonceF = await forwarder.nonceOf(tokenId);
@@ -75,7 +110,11 @@ describe('CNSRegistryForwarder', () => {
   describe('verify', () => {
     it('should verify successfully', async () => {
       const tokenId = await mintDomain('test_foo_10', owner.address);
-      const { req, signature } = await buildTransfer(owner, receiver.address, tokenId);
+      const { req, signature } = await buildTransfer(
+        owner,
+        receiver.address,
+        tokenId,
+      );
 
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
     });
@@ -85,7 +124,8 @@ describe('CNSRegistryForwarder', () => {
       const { req, signature } = await buildExecuteParams(
         'setOwner(address,uint256)',
         [receiver.address, tokenId],
-        owner, tokenId,
+        owner,
+        tokenId,
       );
 
       expect(await forwarder.verify(req, signature)).to.be.equal(false);
@@ -93,14 +133,24 @@ describe('CNSRegistryForwarder', () => {
 
     it('should fail verification when nonce is incorrect', async () => {
       const tokenId = await mintDomain('test_foo_14', owner.address);
-      const { req, signature } = await buildTransfer(owner, receiver.address, tokenId);
+      const { req, signature } = await buildTransfer(
+        owner,
+        receiver.address,
+        tokenId,
+      );
 
-      expect(await forwarder.verify({ ...req, nonce: 100 }, signature)).to.be.equal(false);
+      expect(
+        await forwarder.verify({ ...req, nonce: 100 }, signature),
+      ).to.be.equal(false);
     });
 
     it('should fail verification when signature used', async () => {
       const tokenId = await mintDomain('test_foo_15', owner.address);
-      const { req, signature } = await buildTransfer(owner, receiver.address, tokenId);
+      const { req, signature } = await buildTransfer(
+        owner,
+        receiver.address,
+        tokenId,
+      );
       await forwarder.execute(req, signature);
 
       expect(await forwarder.verify(req, signature)).to.be.equal(false);
@@ -110,7 +160,11 @@ describe('CNSRegistryForwarder', () => {
   describe('execute', () => {
     it('should execute `transferFrom` for token', async () => {
       const tokenId = await mintDomain('test_goo__1', owner.address);
-      const { req, signature } = await buildTransfer(owner, receiver.address, tokenId);
+      const { req, signature } = await buildTransfer(
+        owner,
+        receiver.address,
+        tokenId,
+      );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
       await forwarder.execute(req, signature);
@@ -122,7 +176,9 @@ describe('CNSRegistryForwarder', () => {
       const tokenId = await mintDomain('test_goo__2', owner.address);
       const { req, signature } = await buildExecuteParams(
         'safeTransferFrom(address,address,uint256)',
-        [owner.address, receiver.address, tokenId], owner, tokenId,
+        [owner.address, receiver.address, tokenId],
+        owner,
+        tokenId,
       );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
@@ -135,7 +191,9 @@ describe('CNSRegistryForwarder', () => {
       const tokenId = await mintDomain('test_goo__3', owner.address);
       const { req, signature } = await buildExecuteParams(
         'safeTransferFrom(address,address,uint256,bytes)',
-        [owner.address, receiver.address, tokenId, '0x'], owner, tokenId,
+        [owner.address, receiver.address, tokenId, '0x'],
+        owner,
+        tokenId,
       );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
@@ -146,56 +204,73 @@ describe('CNSRegistryForwarder', () => {
 
     it('should execute `burn` for token', async () => {
       const tokenId = await mintDomain('test_goo__4', owner.address);
-      const { req, signature } = await buildExecuteParams('burn(uint256)', [tokenId], owner, tokenId);
+      const { req, signature } = await buildExecuteParams(
+        'burn(uint256)',
+        [tokenId],
+        owner,
+        tokenId,
+      );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
       await forwarder.execute(req, signature);
 
-      await expect(
-        registry.ownerOf(tokenId),
-      ).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      await expect(registry.ownerOf(tokenId)).to.be.revertedWith(
+        'ERC721: owner query for nonexistent token',
+      );
     });
 
     it('should execute `mintChild` for token', async () => {
       const tokenId = await mintDomain('test_goo__5', owner.address);
       const { req, signature } = await buildExecuteParams(
         'mintChild(address,uint256,string)',
-        [receiver.address, tokenId, 'test'], owner, tokenId,
+        [receiver.address, tokenId, 'test'],
+        owner,
+        tokenId,
       );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
       await forwarder.execute(req, signature);
 
       const childTokenId = await registry.childIdOf(tokenId, 'test');
-      expect(await registry.ownerOf(childTokenId)).to.be.equal(receiver.address);
+      expect(await registry.ownerOf(childTokenId)).to.be.equal(
+        receiver.address,
+      );
     });
 
     it('should execute `safeMintChild` for token', async () => {
       const tokenId = await mintDomain('test_goo__6', owner.address);
       const { req, signature } = await buildExecuteParams(
         'safeMintChild(address,uint256,string)',
-        [receiver.address, tokenId, 'test'], owner, tokenId,
+        [receiver.address, tokenId, 'test'],
+        owner,
+        tokenId,
       );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
       await forwarder.execute(req, signature);
 
       const childTokenId = await registry.childIdOf(tokenId, 'test');
-      expect(await registry.ownerOf(childTokenId)).to.be.equal(receiver.address);
+      expect(await registry.ownerOf(childTokenId)).to.be.equal(
+        receiver.address,
+      );
     });
 
     it('should execute `safeMintChild(bytes)` for token', async () => {
       const tokenId = await mintDomain('test_goo__7', owner.address);
       const { req, signature } = await buildExecuteParams(
         'safeMintChild(address,uint256,string,bytes)',
-        [receiver.address, tokenId, 'test', '0x'], owner, tokenId,
+        [receiver.address, tokenId, 'test', '0x'],
+        owner,
+        tokenId,
       );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
       await forwarder.execute(req, signature);
 
       const childTokenId = await registry.childIdOf(tokenId, 'test');
-      expect(await registry.ownerOf(childTokenId)).to.be.equal(receiver.address);
+      expect(await registry.ownerOf(childTokenId)).to.be.equal(
+        receiver.address,
+      );
     });
 
     it('should execute `transferFromChild` for token', async () => {
@@ -207,13 +282,17 @@ describe('CNSRegistryForwarder', () => {
 
       const { req, signature } = await buildExecuteParams(
         'transferFromChild(address,address,uint256,string)',
-        [owner.address, receiver.address, tokenId, 'test'], owner, tokenId,
+        [owner.address, receiver.address, tokenId, 'test'],
+        owner,
+        tokenId,
       );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
       await forwarder.execute(req, signature);
 
-      expect(await registry.ownerOf(childTokenId)).to.be.equal(receiver.address);
+      expect(await registry.ownerOf(childTokenId)).to.be.equal(
+        receiver.address,
+      );
     });
 
     it('should execute `safeTransferFromChild` for token', async () => {
@@ -225,13 +304,17 @@ describe('CNSRegistryForwarder', () => {
 
       const { req, signature } = await buildExecuteParams(
         'safeTransferFromChild(address,address,uint256,string)',
-        [owner.address, receiver.address, tokenId, 'test'], owner, tokenId,
+        [owner.address, receiver.address, tokenId, 'test'],
+        owner,
+        tokenId,
       );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
       await forwarder.execute(req, signature);
 
-      expect(await registry.ownerOf(childTokenId)).to.be.equal(receiver.address);
+      expect(await registry.ownerOf(childTokenId)).to.be.equal(
+        receiver.address,
+      );
     });
 
     it('should execute `safeTransferFromChild(bytes)` for token', async () => {
@@ -243,13 +326,17 @@ describe('CNSRegistryForwarder', () => {
 
       const { req, signature } = await buildExecuteParams(
         'safeTransferFromChild(address,address,uint256,string,bytes)',
-        [owner.address, receiver.address, tokenId, 'test', '0x'], owner, tokenId,
+        [owner.address, receiver.address, tokenId, 'test', '0x'],
+        owner,
+        tokenId,
       );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
       await forwarder.execute(req, signature);
 
-      expect(await registry.ownerOf(childTokenId)).to.be.equal(receiver.address);
+      expect(await registry.ownerOf(childTokenId)).to.be.equal(
+        receiver.address,
+      );
     });
 
     it('should execute `burnChild` for token', async () => {
@@ -260,15 +347,18 @@ describe('CNSRegistryForwarder', () => {
       expect(await registry.ownerOf(childTokenId)).to.be.equal(owner.address);
 
       const { req, signature } = await buildExecuteParams(
-        'burnChild(uint256,string)', [tokenId, 'test'], owner, tokenId,
+        'burnChild(uint256,string)',
+        [tokenId, 'test'],
+        owner,
+        tokenId,
       );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
       await forwarder.execute(req, signature);
 
-      await expect(
-        registry.ownerOf(childTokenId),
-      ).to.be.revertedWith('ERC721: owner query for nonexistent token');
+      await expect(registry.ownerOf(childTokenId)).to.be.revertedWith(
+        'ERC721: owner query for nonexistent token',
+      );
       expect(await registry.ownerOf(tokenId)).to.be.equal(owner.address);
     });
 
@@ -277,7 +367,10 @@ describe('CNSRegistryForwarder', () => {
       await expect(registry.resolverOf(tokenId)).to.be.revertedWith('');
 
       const { req, signature } = await buildExecuteParams(
-        'resolveTo(address,uint256)', [resolver.address, tokenId], owner, tokenId,
+        'resolveTo(address,uint256)',
+        [resolver.address, tokenId],
+        owner,
+        tokenId,
       );
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
