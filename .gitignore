@@ -41,3 +41,4 @@ cache
 .deployer
 
 slither.sarif
+.DS_Store
