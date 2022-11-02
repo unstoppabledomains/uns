@@ -464,7 +464,6 @@ const upgradeMintingManagerTask = {
     const mintingManager = await upgrades.upgradeProxy(
       MintingManager.address,
       ctx.artifacts.MintingManager,
-      { unsafeAllowRenames: true },
     );
     await mintingManager.deployTransaction.wait();
 
@@ -706,19 +705,18 @@ const configureReconfigureTldL1Task = {
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    if (network.config.chainId !== 1 && network.config.chainId !== 5) {
-      throw new Error(
-        'Current network configuration does not support burning TLD',
-      );
+    const { chainId } = network.config;
+    if (![1, 5].includes(chainId)) {
+      throw new Error('Current network configuration does not support burning TLD');
     }
 
     const { MintingManager } = config.contracts || {};
     const dependencies = { MintingManager };
-    if (MintingManager.address) {
-      throw new Error(
-        `MintingManager contract not found for network ${network.config.chainId}`,
-      );
-    }
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${chainId}`);
+      }
+    };
 
     return dependencies;
   },
@@ -754,18 +752,53 @@ const configureReconfigureTldL2Task = {
   ensureDependencies: (ctx, config) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    if (network.config.chainId !== 137 && network.config.chainId !== 80001) {
-      throw new Error(
-        'Current network configuration does not support moving TLD ownership',
-      );
+    const { chainId } = network.config;
+    if (![137, 80001].includes(chainId)) {
+      throw new Error('Current network configuration does not support moving TLD ownership');
     }
 
     const { MintingManager } = config.contracts || {};
     const dependencies = { MintingManager };
-    if (MintingManager.address) {
-      throw new Error(
-        `MintingManager contract not found for network ${network.config.chainId}`,
-      );
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${chainId}`);
+      }
+    };
+
+    return dependencies;
+  },
+};
+
+const deployDotCoinBurnerTask = {
+  tags: ['dot_coin_burner', 'full'],
+  priority: 200,
+  run: async (ctx, dependencies) => {
+    const { owner } = ctx.accounts;
+    const {
+      UNSRegistry,
+    } = dependencies;
+
+    const dotCoinBurner = await ctx.artifacts.DotCoinBurner
+      .connect(owner)
+      .deploy(UNSRegistry.address);
+    await ctx.saveContractConfig('DotCoinBurner', dotCoinBurner);
+    await dotCoinBurner.deployTransaction.wait();
+    await verify(ctx, dotCoinBurner.address, [UNSRegistry.address]);
+  },
+  ensureDependencies: (ctx, config) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const {
+      UNSRegistry,
+    } = config.contracts || {};
+    const dependencies = {
+      UNSRegistry,
+    };
+
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
     }
 
     return dependencies;
@@ -787,4 +820,5 @@ module.exports = [
   configureDotCoinTask,
   configureReconfigureTldL1Task,
   configureReconfigureTldL2Task,
+  deployDotCoinBurnerTask,
 ];

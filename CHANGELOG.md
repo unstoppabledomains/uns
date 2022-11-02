@@ -1,7 +1,12 @@
-## v0.6.1
+## v0.6.2
 
 - Remove `ERC20`, `BEP20`, and `MATIC` options for `0ZK`
 - Add single-chain `0ZK` option
+
+## v0.6.1
+
+- Upgrade UNSRegistry@0.6.0 on Goerli and Mumbai
+- Upgrade MintingManager@0.4.0 on Goerli and Mumbai
 
 ## v0.6.0
 
@@ -9,6 +14,11 @@
 - MintingManager@0.4.0 receives support for subdomains
 - ProxyReader@0.3.0 receives support for subdomains
 
+<<<<<<< HEAD
+=======
+## v0.5.22
+- Add DotCoinBurner smart contract to support batch returns of .coin domains
+>>>>>>> main
 
 ## v0.5.21
 

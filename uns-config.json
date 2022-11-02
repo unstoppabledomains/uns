@@ -1,5 +1,5 @@
 {
-    "version": "0.5.4",
+    "version": "0.6.0",
     "networks": {
         "1": {
             "contracts": {
@@ -99,6 +99,11 @@
                     "address": "0xA0c68C638235ee32657e8f720a23ceC1bFc77C77",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xa3cf4d"
+                },
+                "DotCoinBurner": {
+                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0xf2559d"
                 }
             }
         },
@@ -106,7 +111,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x070e83FCed225184E67c86302493ffFCDB953f71",
-                    "implementation": "0xF5e6e88d12fE21fbD53AA7579E0d722DDa749804",
+                    "implementation": "0x2704a7E3106460a4b2316DB1808df2e429998145",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ea",
                     "forwarder": "0x070e83FCed225184E67c86302493ffFCDB953f71"
@@ -119,7 +124,7 @@
                 },
                 "MintingManager": {
                     "address": "0x9ee42D3EB042e06F8Cd241890C4fA0d51e4DA345",
-                    "implementation": "0x926C1D3947947c2796D6dC6A1c6012280e6a29F4",
+                    "implementation": "0x914df58A6c8fBfa7734917c6A60c4253aEb8a5C6",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ec",
                     "forwarder": "0x7F9F48cF94C69ce91D4b442DA186F31118ac0185"
@@ -192,6 +197,11 @@
                     "address": "0xBbD7cBFA79faee899Eaf900F13C9065bF03B1A74",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x2dc9b9"
+                },
+                "DotCoinBurner": {
+                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x781df4"
                 }
             }
         },
@@ -199,9 +209,9 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
+                    "implementation": "0xE96cE2F6546AF59b1ecC91d80fE887e0AAbc91B7",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272eb5",
-                    "implementation": "0xE96cE2F6546AF59b1ecC91d80fE887e0AAbc91B7",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
                 },
                 "CNSRegistry": {
@@ -212,9 +222,9 @@
                 },
                 "MintingManager": {
                     "address": "0x7be83293BeeDc9Eba1bd76c66A65F10F3efaeC26",
+                    "implementation": "0x4726E4a6858eFff6A89A3A7Fc21048b4333825D6",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272f41",
-                    "implementation": "0x4726E4a6858eFff6A89A3A7Fc21048b4333825D6",
                     "forwarder": "0xC37d3c4326ab0E1D2b9D8b916bBdf5715f780fcF"
                 },
                 "ProxyAdmin": {
@@ -285,6 +295,11 @@
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
+                },
+                "DotCoinBurner": {
+                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0217a61f"
                 }
             }
         },
@@ -292,9 +307,9 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x58a175BEbc8ec21A94ea63Aa5a28743945940EE6",
+                    "implementation": "0xe0aFC4e9E03e4aa67257Df7A2Eca77454309789D",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0d",
-                    "implementation": "0xe0aFC4e9E03e4aa67257Df7A2Eca77454309789D",
                     "forwarder": "0x58a175BEbc8ec21A94ea63Aa5a28743945940EE6"
                 },
                 "CNSRegistry": {
@@ -305,9 +320,9 @@
                 },
                 "MintingManager": {
                     "address": "0x27935e7e85db3c4e7885eB828B9e889BA69a4e7f",
+                    "implementation": "0xa1A2114B0C4bDF9AEe05fdd80801e6267639FAd9",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0f",
-                    "implementation": "0xa1A2114B0C4bDF9AEe05fdd80801e6267639FAd9",
                     "forwarder": "0xC20631145b77a58018E2b10f2282Dd048E12fC81"
                 },
                 "ProxyAdmin": {
@@ -375,6 +390,11 @@
                     "address": "0xBDeFCF6429D0AC68236A6BEb321cBD2Ce66B463C",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x1e"
+                },
+                "DotCoinBurner": {
+                    "address": "0x9916Da7338e34B83731d2E029936B0f8Ac593A94",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x26"
                 }
             }
         },
@@ -382,9 +402,9 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93",
+                    "implementation": "0x4Ee389840f21e18e0CA1f9E612C9B72FdE16F3bE",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f43",
-                    "implementation": "0xc7C84B247661ab766115E27a20BD39E324c81dBD",
                     "forwarder": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93"
                 },
                 "CNSRegistry": {
@@ -395,9 +415,9 @@
                 },
                 "MintingManager": {
                     "address": "0x428189346bb3CC52f031A1092fd47C919AC30A9f",
+                    "implementation": "0x8d0A19fA1ef2dbb442788Af668680B09314460B1",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f4a",
-                    "implementation": "0x41F3B5e1dDCb7fF4578a71C8431dadE9be9B2CE4",
                     "forwarder": "0xEf3a491A8750BEC2Dff5339CF6Df94436d432C4d"
                 },
                 "ProxyAdmin": {
@@ -468,6 +488,11 @@
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
+                },
+                "DotCoinBurner": {
+                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x01b95986"
                 }
             }
         }
