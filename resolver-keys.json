@@ -1,5 +1,5 @@
 {
-  "version": "2.1.14",
+  "version": "2.1.15",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2108,7 +2108,7 @@
     },
     "crypto.KLV.address": {
       "deprecatedKeyName": "KLV",
-      "validationRegex": "^[T][a-zA-HJ-NP-Z0-9]{33}$",
+      "validationRegex": "^((k|K)(l|L)(v|V))[a-zA-Z0-9]{59}$",
       "deprecated": false
     },
     "crypto.BTCST.address": {
