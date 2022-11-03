@@ -1,3 +1,6 @@
+## v0.6.4
+- Migrated the repository to `typescript`
+
 ## v0.6.3
 
 - Upgrade UNSRegistry@0.6.0 on Mainnet and Polygon

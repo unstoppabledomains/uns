@@ -51,10 +51,10 @@ Base HD Path:  m/44'/60'/0'/0/{account_index}
 ### Example of usage
 
 ```
-const Sandbox = require('./sandbox');
+import { Sandbox } from './sandbox';
 
 describe('Test', async () => {
-  let sandbox = undefined;
+  let sandbox: Sandbox;
 
   before(async () => {
     sandbox = await Sandbox.create();
