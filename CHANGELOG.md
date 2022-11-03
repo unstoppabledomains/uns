@@ -1,8 +1,15 @@
-## v0.6.3
+## v0.6.4
 - Migrated the repository to `typescript`
 
+## v0.6.3
+
+- Upgrade UNSRegistry@0.6.0 on Mainnet and Polygon
+- Upgrade MintingManager@0.4.0 on Mainnet and Polygon
+- Upgrade ProxyReader@0.3.0 on Goerli, Mumbai, Mainnet and Polygon
+
 ## v0.6.2
-- .klever address validation regex is updated.
+
+- Update `KLV` regular expression
 
 ## v0.6.1
 
