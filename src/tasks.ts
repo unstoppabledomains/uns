@@ -769,7 +769,7 @@ const deployDotCoinBurnerTask = {
   priority: 200,
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const { owner } = ctx.accounts;
-    const UNSRegistry = unwrap(dependencies, ArtifactName.MintingManager);
+    const UNSRegistry = unwrap(dependencies, ArtifactName.UNSRegistry);
 
     const dotCoinBurner = await ctx.artifacts.DotCoinBurner
       .connect(owner)
