@@ -1,11 +1,15 @@
 {
+  "root": true,
   "extends" : [
-    "standard",
-    "plugin:promise/recommended"
+    "plugin:promise/recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
+  "parser": "@typescript-eslint/parser",
   "plugins": [
+    "import",
     "mocha-no-only",
-    "promise"
+    "promise",
+    "@typescript-eslint"
   ],
   "env": {
     "browser" : true,
@@ -20,13 +24,15 @@
     "usePlugin": false,
     "extendEnvironment": false
   },
+  "ignorePatterns": [
+    "types/**/*"
+  ],
   "rules": {
     // Strict mode
     "strict": ["error", "global"],
-
     // Code style
     "array-bracket-spacing": ["off"],
-    "camelcase": ["error", {"properties": "always"}],
+    "camelcase": ["error", {"properties": "always", "ignoreImports": true}],
     "comma-dangle": ["error", "always-multiline"],
     "comma-spacing": ["error", {"before": false, "after": true}],
     "dot-notation": ["error", {"allowKeywords": true, "allowPattern": ""}],
@@ -35,7 +41,7 @@
     "generator-star-spacing": ["error", "before"],
     "indent": ["error", 2],
     "linebreak-style": ["error", "unix"],
-    "max-len": ["error", 120, 2],
+    "max-len": ["error", { "code": 120, "tabWidth": 2, "ignorePattern": "^import\\W.*" }],
     "no-debugger": "off",
     "no-dupe-args": "error",
     "no-dupe-keys": "error",
@@ -54,7 +60,10 @@
     "mocha-no-only/mocha-no-only": ["error"],
 
     "promise/always-return": "off",
-    "promise/avoid-new": "off"
+    "promise/avoid-new": "off",
+    "import/order": ["error"],
+
+    "@typescript-eslint/no-empty-function": "off"
   },
   "parserOptions": {
     "ecmaVersion": 2018

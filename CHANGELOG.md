@@ -1,7 +1,20 @@
+## v0.6.5
+
+- Mark `ERC20`, `BEP20`, and `MATIC` options for `0ZK` as deprecated
+- Rename single-chain `0ZK` option
+
+## v0.6.4
+- Migrated the repository to `typescript`
+
+## v0.6.3
+
+- Upgrade UNSRegistry@0.6.0 on Mainnet and Polygon
+- Upgrade MintingManager@0.4.0 on Mainnet and Polygon
+- Upgrade ProxyReader@0.3.0 on Goerli, Mumbai, Mainnet and Polygon
+
 ## v0.6.2
 
-- Remove `ERC20`, `BEP20`, and `MATIC` options for `0ZK`
-- Add single-chain `0ZK` option
+- Update `KLV` regular expression
 
 ## v0.6.1
 
