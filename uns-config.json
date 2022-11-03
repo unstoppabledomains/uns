@@ -1,5 +1,5 @@
 {
-    "version": "0.6.5",
+    "version": "0.6.2",
     "networks": {
         "1": {
             "contracts": {
@@ -393,16 +393,12 @@
                 "RootChainManager": {
                     "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
                     "legacyAddresses": [],
-<<<<<<< HEAD
                     "deploymentBlock": "0x1f"
-=======
-                    "deploymentBlock": "0x1e"
                 },
                 "DotCoinBurner": {
-                    "address": "0x9916Da7338e34B83731d2E029936B0f8Ac593A94",
+                    "address": "0x54563a9e1cD2dCBD0BCA90D3CFA4A647e02C404a",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x26"
->>>>>>> origin/main
+                    "deploymentBlock": "0x27"
                 }
             }
         },
