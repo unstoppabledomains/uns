@@ -7,15 +7,6 @@ import './@maticnetwork/IMintableERC721.sol';
 
 interface IRootRegistry is IMintableERC721 {
     /**
-     * @dev Stores RootChainManager address.
-     * It's one-time operation required to set RootChainManager address.
-     * RootChainManager is a contract responsible for bridging Ethereum
-     * and Polygon networks.
-     * @param rootChainManager address of RootChainManager contract
-     */
-    function setRootChainManager(address rootChainManager) external;
-
-    /**
      * @dev Deposits token to Polygon through RootChainManager contract.
      * @param tokenId id of token
      */

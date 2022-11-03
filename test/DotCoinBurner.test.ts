@@ -8,6 +8,7 @@ import { DotCoinBurner, UNSRegistry } from '../types/contracts';
 import {
   TLD,
   DEAD_ADDRESS,
+  ZERO_ADDRESS,
 } from './helpers/constants';
 import { mintDomain } from './helpers/registry';
 
@@ -22,7 +23,7 @@ describe('DotCoinBurner', () => {
 
     // deploy UNS regisry
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-    await unsRegistry.initialize(coinbase.address);
+    await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
   });
 
   beforeEach(async () => {

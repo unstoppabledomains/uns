@@ -111,35 +111,8 @@ interface IUNSRegistry is
     ) external;
 
     /**
-     * @dev Stores CNS registry address.
-     * It's one-time operation required to set CNS registry address.
-     * UNS registry allows to receive ERC721 tokens only from CNS registry,
-     * by supporting ERC721Receiver interface.
-     * @param registry address of CNS registry contract
-     */
-    function setCNSRegistry(address registry) external;
-
-    /**
      * @dev Adds ProxyReader address
      * @param addr address of ProxyReader
      */
     function addProxyReader(address addr) external;
-
-    /**
-     * @dev Marks tokens as upgraded.
-     * @param tokenIds[] list of tokenIds to mark upgraded
-     */
-    function upgradeAll(uint256[] calldata tokenIds) external;
-
-    /**
-     * @dev Burn TLD tokens.
-     * @param tokenId TLD tokenId to burn
-     */
-    function burnTLDL1(uint256 tokenId) external;
-
-    /**
-     * @dev Burn TLD tokens.
-     * @param tokenId TLD tokenId to burn
-     */
-    function moveTLDOwnershipL2(uint256 tokenId) external;
 }

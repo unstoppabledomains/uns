@@ -2,13 +2,16 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { UNSRegistry } from '../types/contracts';
+import { UNSRegistryMock } from '../types/contracts/mocks';
 import { UNSRegistry__factory } from '../types/factories/contracts';
+import { UNSRegistryMock__factory } from '../types/factories/contracts/mocks';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
-import { TLD } from './helpers/constants';
+import { TLD, ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain, mintRandomDomain } from './helpers/registry';
 
 describe('UNSRegistry (reverse)', () => {
   let unsRegistry: UNSRegistry;
+  let unsRegistryMock: UNSRegistryMock;
 
   let signers: SignerWithAddress[],
     coinbase: SignerWithAddress,
@@ -25,7 +28,7 @@ describe('UNSRegistry (reverse)', () => {
   beforeEach(async () => {
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
 
-    await unsRegistry.initialize(coinbase.address);
+    await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.mintTLD(TLD.X, 'x');
     await unsRegistry.setTokenURIPrefix('/');
@@ -37,6 +40,14 @@ describe('UNSRegistry (reverse)', () => {
     );
 
     await unsRegistry.addProxyReader(reader.address);
+
+    // mock
+    unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
+    await unsRegistryMock.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+    await unsRegistryMock.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistryMock.mintTLD(TLD.X, 'x');
+    await unsRegistryMock.setTokenURIPrefix('/');
+    await unsRegistryMock.addProxyReader(reader.address);
   });
 
   describe('Minting', () => {
@@ -155,16 +166,12 @@ describe('UNSRegistry (reverse)', () => {
     });
 
     it('should not resolve reverse record if reader is ProxyReader and token is upgraded', async () => {
-      const tokenId = await mintRandomDomain(unsRegistry, owner, 'x');
+      const tokenId = await mintRandomDomain(unsRegistryMock, owner, 'x');
 
-      await unsRegistry.upgradeAll([tokenId]);
+      await unsRegistryMock.upgradeAll([tokenId]);
 
-      expect(
-        await unsRegistry.connect(reader).reverseOf(owner.address),
-      ).to.be.equal(0);
-      expect(
-        await unsRegistry.connect(coinbase).reverseOf(owner.address),
-      ).to.be.equal(tokenId);
+      expect(await unsRegistryMock.connect(reader).reverseOf(owner.address)).to.be.equal(0);
+      expect(await unsRegistryMock.connect(coinbase).reverseOf(owner.address)).to.be.equal(tokenId);
     });
 
     it('should set reverse record (case-insensitive address)', async () => {

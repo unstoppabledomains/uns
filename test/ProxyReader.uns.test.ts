@@ -25,7 +25,7 @@ describe('ProxyReader (UNS only)', () => {
 
     // deploy UNS
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-    await unsRegistry.initialize(coinbase.address);
+    await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.setTokenURIPrefix('/');
 
     // mint TLDs

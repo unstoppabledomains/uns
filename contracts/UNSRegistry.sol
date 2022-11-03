@@ -29,7 +29,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.6.0';
+    string public constant VERSION = '0.6.1';
 
     string internal _prefix;
 
@@ -65,12 +65,20 @@ contract UNSRegistry is
         _;
     }
 
-    function initialize(address mintingManager) public initializer {
+    function initialize(
+        address mintingManager,
+        address cnsRegistry,
+        address rootChainManager,
+        address clientChainManager
+    ) public initializer {
         _mintingManager = mintingManager;
+        StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value = cnsRegistry;
 
         __ERC721_init_unchained('Unstoppable Domains', 'UD');
         __ERC2771RegistryContext_init_unchained();
         __UNSRegistryForwarder_init_unchained();
+        __RootRegistry_init(rootChainManager);
+        __ChildRegistry_init(clientChainManager);
     }
 
     /// ERC721 Metadata extension
@@ -164,11 +172,6 @@ contract UNSRegistry is
 
     // This is the keccak-256 hash of "uns.cns_registry" subtracted by 1
     bytes32 internal constant _CNS_REGISTRY_SLOT = 0x8ffb960699dc2ba88f34d0e41c029c3c36c95149679fe1d0153a9582bec92378;
-
-    function setCNSRegistry(address registry) external override {
-        require(StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value == address(0), 'Registry: CNS_REGISTRY_NOT_EMPTY');
-        StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value = registry;
-    }
 
     function onERC721Received(
         address,
@@ -332,31 +335,6 @@ contract UNSRegistry is
      */
     function addProxyReader(address addr) external override onlyMintingManager {
         _proxyReaders[addr] = true;
-    }
-
-    /**
-     * @dev See {IUNSRegistry-upgradeAll(uint256[])}.
-     */
-    function upgradeAll(uint256[] calldata tokenIds) external override onlyMintingManager {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            _upgradedTokens[tokenIds[i]] = true;
-        }
-    }
-
-    /**
-     * @dev See {IUNSRegistry-burnTLDL1(uint256)}.
-     */
-    function burnTLDL1(uint256 tokenId) external override onlyMintingManager {
-        require(ownerOf(tokenId) == address(0xdead), 'Registry: OWNER_NOT_0xDEAD');
-        _burn(tokenId);
-    }
-
-    /**
-     * @dev See {IUNSRegistry-moveTLDOwnershipL2(uint256)}.
-     */
-    function moveTLDOwnershipL2(uint256 tokenId) external override onlyMintingManager {
-        require(ownerOf(tokenId) == address(0xdead), 'Registry: OWNER_NOT_0xDEAD');
-        _transfer(address(0xdead), _mintingManager, tokenId);
     }
 
     /// Internal

@@ -348,19 +348,6 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "rootChainManager",
-          "type": "address"
-        }
-      ],
-      "name": "setRootChainManager",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "bytes4",
           "name": "interfaceId",
           "type": "bytes4"

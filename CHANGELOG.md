@@ -1,3 +1,7 @@
+## v0.6.11
+- UNSRegistry@0.6.1 cleanup
+- MintingManager@0.4.2 cleanup
+
 ## v0.6.10
 - Deploy new version of DotCoinBurner contract with indexed `BatchCompleted` event properties
 

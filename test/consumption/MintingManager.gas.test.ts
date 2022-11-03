@@ -36,7 +36,7 @@ describe('MintingManager (consumption)', () => {
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     mintingManager = await new MintingManager__factory(coinbase).deploy();
-    await unsRegistry.initialize(mintingManager.address);
+    await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
     forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(
       mintingManager.address,
