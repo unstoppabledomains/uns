@@ -1,7 +1,7 @@
 ## v0.6.5
 
-- Mark `ERC20`, `BEP20`, and `MATIC` options for `0ZK` as deprecated
-- Rename single-chain `0ZK` option
+- Mark `ERC20`, `BEP20`, `MATIC`, and `0ZK` versions for `Railgun` as deprecated
+- Add single-chain `0ZK` version for `Railgun
 
 ## v0.6.4
 - Migrated the repository to `typescript`

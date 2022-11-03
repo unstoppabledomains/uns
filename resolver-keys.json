@@ -1,5 +1,5 @@
 {
-  "version": "2.1.15",
+  "version": "2.1.16",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2510,6 +2510,26 @@
       "deprecatedKeyName": "BEAM",
       "deprecated": false,
       "validationRegex": null
+    },
+    "crypto.0ZK.version.ERC20.address": {
+      "deprecatedKeyName": "0ZK_ERC20",
+      "validationRegex": "(^0zk1)([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{52})([qzyxg2vwsj5kc6u7])(unpd9kxwatwq)([qpzry9x8])([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{57})",
+      "deprecated": true
+    },
+    "crypto.0ZK.version.BEP20.address": {
+      "deprecatedKeyName": "0ZK_BEP20",
+      "validationRegex": "(^0zk1)([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{52})([qzyxg2vwsj5kc6u7])(unpd9kxwatw8)([qpzry9x8])([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{57})",
+      "deprecated": true
+    },
+    "crypto.0ZK.version.MATIC.address": {
+      "deprecatedKeyName": "0ZK_MATIC",
+      "validationRegex": "(^0zk1)([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{52})([qzyxg2vwsj5kc6u7])(unpd9kxwatw3)([qpzry9x8])([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{57})",
+      "deprecated": true
+    },
+    "crypto.0ZK.version.0ZK.address": {
+      "deprecatedKeyName": "0ZK_0ZK",
+      "validationRegex": "(^0zk1)([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{52})([pr98ftd03n4hemal])(rv7j6fe3z53l)([ce6mua7l])([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{57})",
+      "deprecated": true
     },
     "crypto.0ZK.address": {
       "deprecatedKeyName": "0ZK",
