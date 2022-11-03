@@ -44,3 +44,5 @@ cache
 
 # typechain
 types
+
+slither.sarif
