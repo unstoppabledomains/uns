@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.0';
+    string public constant VERSION = '0.4.1';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -261,7 +261,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     ) private {
         (uint256 tokenId, ) = _namehash(labels);
 
-        if (_ownerOf(tokenId) == address(this)) {
+        if (unsRegistry.exists(tokenId) && unsRegistry.ownerOf(tokenId) == address(this)) {
             unsRegistry.unlockWithRecords(to, tokenId, keys, values);
         } else {
             _beforeTokenMint(tokenId);
@@ -339,17 +339,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     function _isTld(string memory tld) private view returns (bool) {
         uint256 tldId = _namehash(uint256(0x0), tld);
         return _isTld(tldId);
-    }
-
-    /**
-     * @dev Get token owner ignoring revert when token does not exist
-     */
-    function _ownerOf(uint256 tokenId) private view returns (address) {
-        try unsRegistry.ownerOf(tokenId) returns (address _owner) {
-            return _owner;
-        } catch {
-            return address(0);
-        }
     }
 
     /**
