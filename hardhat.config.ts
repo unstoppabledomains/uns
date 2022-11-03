@@ -4,6 +4,7 @@ import { HardhatUserConfig } from 'hardhat/types/config';
 import { TASK_COMPILE } from 'hardhat/builtin-tasks/task-names';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { task } from 'hardhat/config';
+import { pickBy } from 'lodash';
 
 type MintersMap = Record<string, string[]>
 
@@ -85,7 +86,6 @@ task(
 
 // NOTE: Order matters
 import 'hardhat-abi-exporter';
-import { unwrap } from './src/helpers';
 
 const settings = {
   optimizer: {
@@ -193,12 +193,12 @@ const config: HardhatUserConfig = {
     timeout: 100000,
   },
   etherscan: {
-    apiKey: {
-      mainnet: unwrap(process.env, 'ETHERSCAN_API_KEY'),
-      goerli: unwrap(process.env, 'ETHERSCAN_API_KEY'),
-      polygon: unwrap(process.env, 'POLYGONSCAN_API_KEY'),
-      polygonMumbai: unwrap(process.env, 'POLYGONSCAN_API_KEY'),
-    },
+    apiKey: pickBy({
+      mainnet: process.env.ETHERSCAN_API_KEY,
+      goerli: process.env.ETHERSCAN_API_KEY,
+      polygon: process.env.POLYGONSCAN_API_KEY,
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY,
+    }) as Record<string, string>,
   },
   abiExporter: {
     path: './artifacts/abi',
