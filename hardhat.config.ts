@@ -85,6 +85,7 @@ task(
 
 // NOTE: Order matters
 import 'hardhat-abi-exporter';
+import { unwrap } from './src/helpers';
 
 const settings = {
   optimizer: {
@@ -193,10 +194,10 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      mainnet: process.env.ETHERSCAN_API_KEY!,
-      goerli: process.env.ETHERSCAN_API_KEY!,
-      polygon: process.env.POLYGONSCAN_API_KEY!,
-      polygonMumbai: process.env.POLYGONSCAN_API_KEY!,
+      mainnet: unwrap(process.env, 'ETHERSCAN_API_KEY'),
+      goerli: unwrap(process.env, 'ETHERSCAN_API_KEY'),
+      polygon: unwrap(process.env, 'POLYGONSCAN_API_KEY'),
+      polygonMumbai: unwrap(process.env, 'POLYGONSCAN_API_KEY'),
     },
   },
   abiExporter: {

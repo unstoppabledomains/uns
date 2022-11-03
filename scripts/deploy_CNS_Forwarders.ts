@@ -1,14 +1,13 @@
 import { network } from 'hardhat';
 import { mergeNetworkConfig, readNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
-
-const UNSNetworkConfig = readNetworkConfig();
+import { unwrap } from '../src/helpers';
 
 async function main () {
   console.log('Network:', network.name);
 
-  const chainId: number = network.config.chainId!;
-  const config = UNSNetworkConfig.networks[chainId];
+  const chainId: number = unwrap(network.config, 'chainId');
+  const config = readNetworkConfig().networks[chainId];
   if (!config) {
     throw new Error(`Config not found for network ${chainId}`);
   }

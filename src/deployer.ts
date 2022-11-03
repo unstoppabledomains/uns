@@ -75,6 +75,7 @@ async function getArtifacts (): Promise<ArtifactsMap> {
       'MintableERC721Predicate',
     ),
     RootChainManager: await ethers.getContractFactory('RootChainManager'),
+    DotCoinBurner: await ethers.getContractFactory('DotCoinBurner'),
   };
 }
 

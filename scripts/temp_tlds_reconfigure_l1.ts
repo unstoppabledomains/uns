@@ -1,21 +1,23 @@
 import { network } from 'hardhat';
+
 import { readNetworkConfig, mergeNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
-import { unwrap } from '../src/helpers';
-
-const NetworkConfig = readNetworkConfig();
 
 async function main () {
   console.log('Network:', network.name);
 
-  const chainId: number = unwrap(network.config, 'chainId');
-  const config = NetworkConfig.networks[chainId];
+  const config = readNetworkConfig().networks[network.config.chainId];
   if (!config) {
-    throw new Error(`Config not found for network ${chainId}`);
+    throw new Error(
+      `UNS config not found for network ${network.config.chainId}`,
+    );
   }
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['uns_config_polygon_pos_bridge'], config);
+  const deployConfig = await deployer.execute(
+    ['upgrade_registry', 'upgrade_minting_manager', 'temp_reconfigure_tld_l1'],
+    config,
+  );
   mergeNetworkConfig(deployConfig);
 }
 

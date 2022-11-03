@@ -2,11 +2,12 @@ import { network } from 'hardhat';
 import merge from 'lodash.merge';
 import { mergeNetworkConfig, readNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
+import { unwrap } from '../src/helpers';
 
 async function main () {
   console.log('Network:', network.name);
 
-  const chainId: number = network.config.chainId!;
+  const chainId: number = unwrap(network.config, 'chainId');
   const config = merge(readNetworkConfig()[chainId], {
     contracts: {
       CNSRegistry: { address: '0x0000000000000000000000000000000000000000' },

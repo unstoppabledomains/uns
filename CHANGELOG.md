@@ -1,8 +1,16 @@
+## v0.6.1
+
+- Upgrade UNSRegistry@0.6.0 on Goerli and Mumbai
+- Upgrade MintingManager@0.4.0 on Goerli and Mumbai
+
 ## v0.6.0
 
 - UNSRegistry@0.6.0 receives support for subdomains
 - MintingManager@0.4.0 receives support for subdomains
 - ProxyReader@0.3.0 receives support for subdomains
+
+## v0.5.22
+- Add DotCoinBurner smart contract to support batch returns of .coin domains
 
 ## v0.5.21
 

@@ -101,6 +101,7 @@ describe('UNSRegistry (reverse)', () => {
 
         expect(setReverseIndex).to.be.greaterThan(0);
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         expect(mintTxReceipt.events?.[setReverseIndex!].args).to.deep.equal([
           coinbase.address,
           tokenId,

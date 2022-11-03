@@ -50,7 +50,7 @@ const contractLinks = (
         ? [address]
         : [];
   return addresses.length
-    ? addresses.map((a) => link(network, a!)).join('<br/>')
+    ? addresses.map((a) => link(network, a)).join('<br/>')
     : '&mdash;';
 };
 

@@ -5,6 +5,7 @@ import { utils, BigNumber, Contract } from 'ethers';
 import { Log } from '@ethersproject/abstract-provider';
 import { readNetworkConfig } from '../src/config';
 import { UNSRegistry__factory } from '../types/factories/contracts';
+import { unwrap } from '../src/helpers';
 
 const UnsConfig = readNetworkConfig();
 
@@ -119,7 +120,7 @@ function saveState (chainId: number, state: State) {
 }
 
 async function main () {
-  const chainId: number = network.config.chainId!;
+  const chainId: number = unwrap(network.config, 'chainId');
 
   console.log('Network:', network.name + ' ChainID: ' + chainId);
 

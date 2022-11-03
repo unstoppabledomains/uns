@@ -40,7 +40,7 @@ cache
 .sandbox
 .deployer
 
-slither.sarif
+.DS_Store
 
 # typechain
 types

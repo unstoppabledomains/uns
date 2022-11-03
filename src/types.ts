@@ -14,6 +14,7 @@ export enum ArtifactName {
   CheckpointManager = 'SimpleCheckpointManager',
   MintableERC721Predicate = 'MintableERC721Predicate',
   RootChainManager = 'RootChainManager',
+  DotCoinBurner = 'DotCoinBurner',
 }
 
 export enum UnsContractName {
@@ -31,7 +32,8 @@ export enum UnsContractName {
   TwitterValidationOperator = 'TwitterValidationOperator',
   FreeMinter = 'FreeMinter',
   MintableERC721Predicate = 'MintableERC721Predicate',
-  RootChainManager = 'RootChainManager'
+  RootChainManager = 'RootChainManager',
+  DotCoinBurner = 'DotCoinBurner',
 }
 
 export type UnsContractConfig = {
