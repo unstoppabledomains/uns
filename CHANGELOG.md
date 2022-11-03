@@ -1,3 +1,6 @@
+## v0.6.3
+- Migrated the repository to `typescript`
+
 ## v0.6.2
 - .klever address validation regex is updated.
 

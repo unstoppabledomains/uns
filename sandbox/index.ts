@@ -146,7 +146,7 @@ export class Sandbox {
     });
   }
 
-  async start (options: SandboxStartOptions = { noSnapshot: false }) {
+  async start (options: SandboxStartOptions = { noSnapshot: false }): Promise<void> {
     await this.ganacheService.startServer();
     log('Started sandbox');
 
@@ -156,7 +156,7 @@ export class Sandbox {
     log('Created snapshot', this.snapshotId);
   }
 
-  async stop () {
+  async stop (): Promise<void> {
     try {
       await this.ganacheService.stopServer();
       log('Stopped sandbox');
@@ -168,7 +168,7 @@ export class Sandbox {
     }
   }
 
-  async reset () {
+  async reset (): Promise<void> {
     if (!this.snapshotId) {
       throw new Error('Snapshot not found. Most probably Sandbox has not been started.');
     }
