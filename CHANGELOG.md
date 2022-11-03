@@ -1,8 +1,12 @@
-## v0.6.2
+## v0.6.3
 
 - Upgrade UNSRegistry@0.6.0 on Mainnet and Polygon
 - Upgrade MintingManager@0.4.0 on Mainnet and Polygon
 - Upgrade ProxyReader@0.3.0 on Goerli, Mumbai, Mainnet and Polygon
+
+## v0.6.2
+
+- Update `KLV` regular expression
 
 ## v0.6.1
 
