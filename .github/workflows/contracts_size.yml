@@ -18,12 +18,11 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16.x
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         id: cache
         with:
           path: '**/node_modules'
-          key: yarn-v2-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-v2-
+          key: uns-yarn-${{ hashFiles('**/yarn.lock') }}
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true'
       - run: yarn compile:size
@@ -42,12 +41,11 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16.x
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         id: cache
         with:
           path: '**/node_modules'
-          key: yarn-v2-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-v2-
+          key: uns-yarn-${{ hashFiles('**/yarn.lock') }}
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true'
       - uses: actions/download-artifact@v3
