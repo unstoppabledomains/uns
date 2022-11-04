@@ -1,6 +1,6 @@
 {
   "name": "uns",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "UNS contracts and tools",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "private": true,
@@ -13,7 +13,7 @@
     "test:sandbox": "env HARDHAT_NETWORK=sandbox mocha --require ts-node/register ./sandbox/**/*.test.ts",
     "rebuild:sandbox": "env HARDHAT_NETWORK=sandbox DEBUG=UNS:* ts-node ./sandbox/rebuild.ts",
     "lint": "yarn lint:ts && yarn lint:sol",
-    "lint:fix": "yarn lint:js:fix && yarn lint:sol:fix",
+    "lint:fix": "yarn lint:ts:fix && yarn lint:sol:fix",
     "lint:ts": "eslint --ignore-path .gitignore .",
     "lint:ts:fix": "eslint --ignore-path .gitignore . --fix",
     "lint:sol": "solhint 'contracts/**/*.sol' && prettier -c 'contracts/**/*.sol'",
