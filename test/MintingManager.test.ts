@@ -518,16 +518,26 @@ describe('MintingManager', () => {
         expect(await unsRegistry.get('key1', tokenId)).to.be.eql('value1');
       });
 
-      it('should issue with records returned .wallet domain in UNS registry', async () => {
+      it('should issue with records returned .wallet domains in UNS registry', async () => {
         const labels = ['returned1', 'wallet'];
-        await mintingManager[selector](coinbase.address, labels, ['key1'], ['value1']);
+        await mintingManager[selector](signers[2].address, labels, ['key1'], ['value1']);
         const tokenId = await unsRegistry.namehash(labels);
-        await unsRegistry.connect(coinbase).setOwner(mintingManager.address, tokenId);
+
+        const labelsSub = ['sub', 'returned1', 'wallet'];
+        await mintingManager.connect(signers[2])[selector](signers[2].address, labelsSub, ['key1'], ['value1']);
+        const tokenIdSub = await unsRegistry.namehash(labelsSub);
+
+        await unsRegistry.connect(signers[2]).setOwner(mintingManager.address, tokenIdSub);
+        await unsRegistry.connect(signers[2]).setOwner(mintingManager.address, tokenId);
 
         await mintingManager[selector](signers[1].address, labels, ['key1'], ['value2']);
-
         expect(await unsRegistry.ownerOf(tokenId)).to.be.eql(signers[1].address);
         expect(await unsRegistry.get('key1', tokenId)).to.be.eql('value2');
+        expect(await unsRegistry.reverseOf(signers[1].address)).to.be.equal(tokenId);
+
+        await mintingManager.connect(signers[1])[selector](signers[1].address, labelsSub, ['key1'], ['value2']);
+        expect(await unsRegistry.ownerOf(tokenIdSub)).to.be.eql(signers[1].address);
+        expect(await unsRegistry.get('key1', tokenIdSub)).to.be.eql('value2');
         expect(await unsRegistry.reverseOf(signers[1].address)).to.be.equal(tokenId);
       });
 
