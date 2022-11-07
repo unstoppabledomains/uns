@@ -6,9 +6,9 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
-import './IChildRegistry.sol';
+import './@maticnetwork/IChildToken.sol';
 
-abstract contract ChildRegistry is ERC721Upgradeable, IChildRegistry {
+abstract contract ChildRegistry is ERC721Upgradeable, IChildToken {
     // limit batching of tokens due to gas limit restrictions
     uint256 public constant BATCH_LIMIT = 20;
 
