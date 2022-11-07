@@ -264,11 +264,6 @@ const deployUNSProxyReaderTask: Task = {
     );
     await proxyReader.deployTransaction.wait();
 
-    await verify(ctx, proxyReader.address, [
-      UNSRegistry.address,
-      CNSRegistry.address,
-    ]);
-
     const proxyAdmin = await upgrades.admin.getInstance();
     await ctx.saveContractConfig(UnsContractName.ProxyReader, proxyAdmin);
 
@@ -503,7 +498,7 @@ const upgradeMintingManagerTask: Task = {
 };
 
 const upgradeProxyReaderTask = {
-  tags: ['upgrade_proxy_reeader'],
+  tags: ['upgrade_proxy_reader'],
   priority: 105,
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const [ProxyReader] = unwrap(dependencies, ArtifactName.ProxyReader);
