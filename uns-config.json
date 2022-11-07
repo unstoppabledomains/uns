@@ -1,5 +1,5 @@
 {
-    "version": "0.6.1",
+    "version": "0.6.2",
     "networks": {
         "1": {
             "contracts": {
@@ -369,9 +369,10 @@
                     "forwarder": "0x11dD97b7Ca847DfB6504e61B7B9Eb30F55E554a0"
                 },
                 "ProxyReader": {
-                    "address": "0x4e44E79e0cEc05D9e62e952B2088c02A3C450aeC",
+                    "address": "0x107733feD96C4Cd390c944a31F5425A7FB98Ae5e",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x14"
+                    "deploymentBlock": "0x15",
+                    "implementation": "0x4e44E79e0cEc05D9e62e952B2088c02A3C450aeC"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",
@@ -385,19 +386,19 @@
                     "deprecated": true
                 },
                 "MintableERC721Predicate": {
-                    "address": "0x930d66d6D8780fBb38e3668F31f46DB506AA721c",
+                    "address": "0x2f5e6eed50C839835BD2873d428E1683793Ad09D",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x1c"
+                    "deploymentBlock": "0x1d"
                 },
                 "RootChainManager": {
-                    "address": "0xBDeFCF6429D0AC68236A6BEb321cBD2Ce66B463C",
+                    "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x1e"
+                    "deploymentBlock": "0x1f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x9916Da7338e34B83731d2E029936B0f8Ac593A94",
+                    "address": "0x54563a9e1cD2dCBD0BCA90D3CFA4A647e02C404a",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x26"
+                    "deploymentBlock": "0x27"
                 }
             }
         },

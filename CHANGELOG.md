@@ -1,3 +1,6 @@
+## v0.6.6
+- Made ProxyReader@0.4.0 upgradeable
+
 ## v0.6.5
 - Remove MintingManager._ownerOf and use exists & ownerOf instead
 

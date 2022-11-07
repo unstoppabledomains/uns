@@ -72,8 +72,11 @@ describe('MintingManager', () => {
       await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.addMinter(coinbase.address);
 
-      proxyReader = await new ProxyReader__factory(coinbase).deploy(unsRegistry.address, cnsRegistry.address);
-      proxyReader2 = await new ProxyReader__factory(coinbase).deploy(unsRegistry.address, cnsRegistry.address);
+      proxyReader = await new ProxyReader__factory(coinbase).deploy();
+      await proxyReader.initialize(unsRegistry.address, cnsRegistry.address);
+
+      proxyReader2 = await new ProxyReader__factory(coinbase).deploy();
+      await proxyReader2.initialize(unsRegistry.address, cnsRegistry.address);
     });
 
     it('adds ProxyReader addresses', async () => {
