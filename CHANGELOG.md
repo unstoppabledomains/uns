@@ -1,3 +1,6 @@
+## v0.6.7
+- Deploy ProxyReader@0.4.0 on Goerli, Mumbai, Mainnet and Polygon
+
 ## v0.6.6
 - Made ProxyReader@0.4.0 upgradeable
 

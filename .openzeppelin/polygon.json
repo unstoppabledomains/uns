@@ -14,6 +14,11 @@
       "address": "0x7be83293BeeDc9Eba1bd76c66A65F10F3efaeC26",
       "txHash": "0x6a6385eac43e60db8e88ac4b537a432720d88973045e5a2b553c510493a7e153",
       "kind": "transparent"
+    },
+    {
+      "address": "0x91EDd8708062bd4233f4Dd0FCE15A7cb4d500091",
+      "txHash": "0xfa57c2d5caea25d847bf8bb77494425332c0ae839bc92a08556ee1ee2b3891ea",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -2248,6 +2253,97 @@
               }
             ],
             "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "f8735e133b0f1c80cc79186feeb67371aedff8e2d4d9b1af54d6c6eeda74b270": {
+      "address": "0x9D0F27232b5c364488083e3B10F6963F635Ae521",
+      "txHash": "0x1f5def73a3694d50db605ce5115ea9d6e83cc22333026848ea32dccfde464d31",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC165Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:41"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "MulticallUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol:50"
+          },
+          {
+            "label": "_unsRegistry",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_contract(IUNSRegistry)1359",
+            "contract": "ProxyReader",
+            "src": "contracts/ProxyReader.sol:22"
+          },
+          {
+            "label": "_cnsRegistry",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_contract(ICNSRegistry)2680",
+            "contract": "ProxyReader",
+            "src": "contracts/ProxyReader.sol:23"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ProxyReader",
+            "src": "contracts/ProxyReader.sol:335"
+          }
+        ],
+        "types": {
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(ICNSRegistry)2680": {
+            "label": "contract ICNSRegistry",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IUNSRegistry)1359": {
+            "label": "contract IUNSRegistry",
+            "numberOfBytes": "20"
           },
           "t_uint256": {
             "label": "uint256",
