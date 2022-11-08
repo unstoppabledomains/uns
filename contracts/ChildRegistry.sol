@@ -16,13 +16,13 @@ abstract contract ChildRegistry is ERC721Upgradeable, IChildToken {
     bytes32 internal constant _CHILD_CHAIN_MANAGER_SLOT = 0x8bea9a6f8afd34f4e29c585f854e0cc5161431bf5fc299d468454d33dce53b87;
 
     // solhint-disable-next-line func-name-mixedcase
-    function __ChildRegistry_init(address clientChainManager) internal onlyInitializing {
-        __ChildRegistry_init_unchained(clientChainManager);
+    function __ChildRegistry_init(address childChainManager) internal onlyInitializing {
+        __ChildRegistry_init_unchained(childChainManager);
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __ChildRegistry_init_unchained(address clientChainManager) internal onlyInitializing {
-        StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value = clientChainManager;
+    function __ChildRegistry_init_unchained(address childChainManager) internal onlyInitializing {
+        StorageSlotUpgradeable.getAddressSlot(_CHILD_CHAIN_MANAGER_SLOT).value = childChainManager;
     }
 
     function deposit(address user, bytes calldata depositData) external override {

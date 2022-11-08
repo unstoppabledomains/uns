@@ -655,7 +655,7 @@
         },
         {
           "internalType": "address",
-          "name": "clientChainManager",
+          "name": "childChainManager",
           "type": "address"
         }
       ],

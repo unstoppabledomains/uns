@@ -69,7 +69,7 @@ contract UNSRegistry is
         address mintingManager,
         address cnsRegistry,
         address rootChainManager,
-        address clientChainManager
+        address childChainManager
     ) public initializer {
         _mintingManager = mintingManager;
         StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value = cnsRegistry;
@@ -78,7 +78,7 @@ contract UNSRegistry is
         __ERC2771RegistryContext_init_unchained();
         __UNSRegistryForwarder_init_unchained();
         __RootRegistry_init(rootChainManager);
-        __ChildRegistry_init(clientChainManager);
+        __ChildRegistry_init(childChainManager);
     }
 
     /// ERC721 Metadata extension
