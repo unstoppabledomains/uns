@@ -1,3 +1,6 @@
+## v0.6.7
+- Add `SUI` token to resolver list
+
 ## v0.6.6
 - Made ProxyReader@0.4.0 upgradeable
 
