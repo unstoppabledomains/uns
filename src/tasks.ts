@@ -229,12 +229,14 @@ const deployUNSTask = {
 
     const {
       CNSRegistry,
+      RootChainManager,
       MintingController,
       URIPrefixController,
       Resolver,
     } = config.contracts || {};
     const dependencies = {
       CNSRegistry,
+      RootChainManager,
       MintingController,
       URIPrefixController,
       Resolver,

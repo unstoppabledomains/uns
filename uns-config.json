@@ -392,14 +392,14 @@
                     "deprecated": true
                 },
                 "MintableERC721Predicate": {
-                    "address": "0x2f5e6eed50C839835BD2873d428E1683793Ad09D",
+                    "address": "0xCE4bb7Dc1Eb9DCe75743dE6a4B48534fD427Ef51",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x1d"
+                    "deploymentBlock": "0x19"
                 },
                 "RootChainManager": {
-                    "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
+                    "address": "0x7c3c91245769c8B7450aD522792deC4bd4bf797f",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x1f"
+                    "deploymentBlock": "0x1b"
                 },
                 "DotCoinBurner": {
                     "address": "0x54563a9e1cD2dCBD0BCA90D3CFA4A647e02C404a",
