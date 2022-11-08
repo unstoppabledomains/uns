@@ -1,3 +1,7 @@
+## v0.6.8
+
+- Mark `ERC20`, `BEP20`, and `MATIC` versions for `Railgun` as deprecated
+
 ## v0.6.7
 - Deploy ProxyReader@0.4.0 on Goerli, Mumbai, Mainnet and Polygon
 
