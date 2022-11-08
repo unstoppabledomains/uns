@@ -248,23 +248,38 @@ const deployUNSProxyReaderTask: Task = {
     const { owner } = ctx.accounts;
 
     const [
-      CNSRegistry,
       UNSRegistry,
+      CNSRegistry,
       MintingManager,
     ] = unwrapDependencies(dependencies, [
-      ArtifactName.CNSRegistry,
       ArtifactName.UNSRegistry,
+      ArtifactName.CNSRegistry,
       ArtifactName.MintingManager,
     ]);
 
-    const proxyReader = await ctx.artifacts[ArtifactName.ProxyReader]
-      .connect(owner)
-      .deploy(UNSRegistry.address, CNSRegistry.address);
-    await ctx.saveContractConfig(UnsContractName.ProxyReader, proxyReader);
+    const proxyReader = await upgrades.deployProxy(
+      ctx.artifacts.ProxyReader.connect(owner),
+      [ UNSRegistry.address, CNSRegistry.address ],
+      { unsafeAllow: ['delegatecall'] },
+    );
     await proxyReader.deployTransaction.wait();
-    await verify(ctx, proxyReader.address, [UNSRegistry.address, CNSRegistry.address]);
 
-    const mintingManager = ctx.artifacts.MintingManager.attach(MintingManager.address);
+    const proxyAdmin = await upgrades.admin.getInstance();
+    await ctx.saveContractConfig(UnsContractName.ProxyReader, proxyAdmin);
+
+    const proxyReaderImpl = await proxyAdmin.callStatic.getProxyImplementation(
+      proxyReader.address,
+    );
+    await ctx.saveContractConfig(
+      UnsContractName.ProxyReader,
+      proxyReader,
+      proxyReaderImpl,
+    );
+    await verify(ctx, proxyReaderImpl, []);
+
+    const mintingManager = ctx.artifacts.MintingManager.attach(
+      MintingManager.address,
+    );
 
     await mintingManager.connect(owner).addProxyReaders([proxyReader.address]);
   },
@@ -482,6 +497,55 @@ const upgradeMintingManagerTask: Task = {
   },
 };
 
+const upgradeProxyReaderTask = {
+  tags: ['upgrade_proxy_reader'],
+  priority: 105,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const [ProxyReader] = unwrap(dependencies, ArtifactName.ProxyReader);
+
+    const proxyReader = await upgrades.upgradeProxy(
+      ProxyReader.address,
+      ctx.artifacts.ProxyReader,
+      { unsafeAllow: ['delegatecall'] },
+    );
+    await proxyReader.deployTransaction.wait();
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+    await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
+
+    const proxyReaderImpl = await proxyAdmin.callStatic.getProxyImplementation(
+      proxyReader.address,
+    );
+
+    await ctx.saveContractConfig(
+      UnsContractName.ProxyReader,
+      proxyReader,
+      proxyReaderImpl,
+    );
+    await verify(ctx, proxyReaderImpl, []);
+  },
+  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { MintingManager, ProxyAdmin, UNSRegistry, CNSRegistry } = config.contracts || {};
+    if (!ProxyAdmin || !ProxyAdmin.address) {
+      throw new Error(
+        'Current network configuration does not support upgrading',
+      );
+    }
+
+    const dependencies = { MintingManager, UNSRegistry, CNSRegistry };
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(
+          `${key} contract not found for network ${network.config.chainId}`,
+        );
+      }
+    }
+
+    return dependencies;
+  },
+};
 
 /**
  * The task configure CNS domain migration to UNS.
@@ -807,6 +871,7 @@ export const tasks: Task[] = [
   deployMMForwarderTask,
   upgradeUNSRegistryTask,
   upgradeMintingManagerTask,
+  upgradeProxyReaderTask,
   configureCnsMigrationTask,
   deployPolygonPosBridgeTask,
   configurePolygonPosBridgeTask,

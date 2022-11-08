@@ -17,14 +17,17 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
     using AddressUpgradeable for address;
 
     string public constant NAME = 'UNS: Proxy Reader';
-    string public constant VERSION = '0.3.0';
+    string public constant VERSION = '0.4.0';
 
-    IUNSRegistry private immutable _unsRegistry;
-    ICNSRegistry private immutable _cnsRegistry;
+    IUNSRegistry private _unsRegistry;
+    ICNSRegistry private _cnsRegistry;
 
-    constructor(IUNSRegistry unsRegistry, ICNSRegistry cnsRegistry) {
+    function initialize(IUNSRegistry unsRegistry, ICNSRegistry cnsRegistry) public initializer {
         _unsRegistry = unsRegistry;
         _cnsRegistry = cnsRegistry;
+
+        __ERC165_init_unchained();
+        __Multicall_init_unchained();
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
@@ -327,4 +330,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
             return address(0);
         }
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] __gap;
 }

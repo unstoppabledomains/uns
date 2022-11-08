@@ -1,7 +1,5 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-
-
 import { utils, BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Result } from 'ethers/lib/utils';
@@ -56,7 +54,8 @@ describe('ProxyReader', () => {
     cryptoTokenId = await unsRegistry.namehash([domainName, 'crypto']);
     await mintingController.mintSLDWithResolver(coinbase.address, domainName, resolver.address);
 
-    proxyReader = await new ProxyReader__factory(coinbase).deploy(unsRegistry.address, cnsRegistry.address);
+    proxyReader = await new ProxyReader__factory(coinbase).deploy();
+    await proxyReader.initialize(unsRegistry.address, cnsRegistry.address);
   });
 
   it('should support IERC165 interface', async () => {

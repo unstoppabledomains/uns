@@ -1,7 +1,16 @@
-## v0.6.5
+## v0.6.8
 
-- Mark `ERC20`, `BEP20`, `MATIC`, and `0ZK` versions for `Railgun` as deprecated
-- Add single-chain `0ZK` version for `Railgun
+- Mark `ERC20`, `BEP20`, and `MATIC` versions for `Railgun` as deprecated
+
+## v0.6.7
+- Deploy ProxyReader@0.4.0 on Goerli, Mumbai, Mainnet and Polygon
+
+## v0.6.6
+- Made ProxyReader@0.4.0 upgradeable
+
+## v0.6.5
+- Remove MintingManager._ownerOf and use exists & ownerOf instead
+>>>>>>> main
 
 ## v0.6.4
 - Migrated the repository to `typescript`
