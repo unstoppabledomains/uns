@@ -10,7 +10,6 @@
 
 ## v0.6.5
 - Remove MintingManager._ownerOf and use exists & ownerOf instead
->>>>>>> main
 
 ## v0.6.4
 - Migrated the repository to `typescript`
