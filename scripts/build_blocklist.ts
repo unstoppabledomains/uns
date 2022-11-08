@@ -3,18 +3,16 @@ import fs from 'fs';
 import { network } from 'hardhat';
 import { Contract } from 'ethers';
 import { Event } from '@ethersproject/contracts';
-import { readNetworkConfig } from '../src/config';
+import { getNetworkConfig } from '../src/config';
 import { unwrap } from '../src/helpers';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { CNSRegistry__factory } from '../types/factories/dot-crypto/contracts';
-
-const UNSNetworkConfig = readNetworkConfig();
 
 async function main () {
   console.log('Network:', network.name);
 
   const chainId: number = unwrap(network.config, 'chainId');
-  const config = UNSNetworkConfig.networks[chainId];
+  const config = getNetworkConfig(chainId);
   if (!config) {
     throw new Error(`Config not found for network ${network.config.chainId}`);
   }

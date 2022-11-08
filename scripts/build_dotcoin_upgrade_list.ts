@@ -3,11 +3,9 @@ import fs from 'fs';
 import { network } from 'hardhat';
 import { utils, BigNumber, Contract } from 'ethers';
 import { Log } from '@ethersproject/abstract-provider';
-import { readNetworkConfig } from '../src/config';
+import { getNetworkConfig } from '../src/config';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { unwrap } from '../src/helpers';
-
-const UnsConfig = readNetworkConfig();
 
 const NEW_URI_EVENT_TOPIC = utils.id('NewURI(uint256,string)');
 
@@ -56,7 +54,7 @@ const SCOPED_NETWORK_CONFIG = {
 
 function getContractsConfig (chainId: number) {
   return {
-    ...UnsConfig.networks[chainId.toString()].contracts,
+    ...getNetworkConfig(chainId).contracts,
     additionalConfiguration: SCOPED_NETWORK_CONFIG[chainId],
   };
 }
@@ -71,9 +69,7 @@ async function fetchLogs (
   const maxBlock = fromBlock + limit;
   const _toBlock = Math.min(maxBlock, toBlock);
 
-  console.log(
-    `Fetching events blocks [${contract.address}: ${fromBlock}-${_toBlock}]`,
-  );
+  console.log(`Fetching events blocks [${contract.address}: ${fromBlock}-${_toBlock}]`);
 
   try {
     const events = await contract.provider.getLogs({
@@ -83,11 +79,7 @@ async function fetchLogs (
       toBlock: _toBlock,
     });
 
-    return toBlock > maxBlock
-      ? events.concat(
-        await fetchLogs(contract, topics, _toBlock, toBlock, limit),
-      )
-      : events;
+    return toBlock > maxBlock ? events.concat(await fetchLogs(contract, topics, _toBlock, toBlock, limit)) : events;
   } catch (err) {
     console.log('FAIL', err);
 
@@ -108,9 +100,7 @@ function readState (chainId: number) {
   try {
     return JSON.parse(fs.readFileSync(resolveStatePath(chainId)).toString());
   } catch (err) {
-    console.log(
-      `Could not load current state for chainId: ${chainId}. Using initial`,
-    );
+    console.log(`Could not load current state for chainId: ${chainId}. Using initial`);
     return INITIAL_DB;
   }
 }
@@ -134,9 +124,7 @@ async function main () {
     throw new Error('Current network configuration does not hase UNSRegistry');
   }
 
-  const unsRegistryContract = new UNSRegistry__factory().attach(
-    contractsConfig.UNSRegistry.address,
-  );
+  const unsRegistryContract = new UNSRegistry__factory().attach(contractsConfig.UNSRegistry.address);
 
   const currentState = readState(chainId);
   const newState = JSON.parse(JSON.stringify(currentState));
@@ -145,10 +133,7 @@ async function main () {
     ? currentState.latestSyncedL1Block
     : currentState.latestSyncedL2Block;
 
-  const fromBlock = Math.max(
-    latestSyncedBlock,
-    parseInt(contractsConfig.UNSRegistry.deploymentBlock),
-  );
+  const fromBlock = Math.max(latestSyncedBlock, parseInt(contractsConfig.UNSRegistry.deploymentBlock));
   const toBlock = await unsRegistryContract.provider.getBlockNumber();
 
   console.log('Fetching events from ' + fromBlock + ' to ' + toBlock);
@@ -163,9 +148,7 @@ async function main () {
 
   console.log(`Logs fetched. Found ${result.length} logs. Processing...`);
 
-  const parsedLogs = result.map((log) =>
-    unsRegistryContract.interface.parseLog(log),
-  );
+  const parsedLogs = result.map((log) => unsRegistryContract.interface.parseLog(log));
 
   parsedLogs.forEach(({ name, args }) => {
     if (name !== 'NewURI') {

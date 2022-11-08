@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import { ethers, network } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { readNetworkConfig } from '../src/config';
+import { getNetworkConfig } from '../src/config';
 import { MintingManager__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { MintingManager, UNSRegistry } from '../types/contracts';
 import { unwrap } from '../src/helpers';
@@ -22,7 +22,8 @@ describe('Sandbox', async () => {
     signers = await ethers.getSigners();
     [owner, minter] = signers;
 
-    const { contracts } = readNetworkConfig().networks[unwrap(network.config, 'chainId')];
+    const chainId: number = unwrap(network.config, 'chainId');
+    const { contracts } = getNetworkConfig(chainId);
 
     unsRegistry = new UNSRegistry__factory(owner).attach(contracts.UNSRegistry.address);
     mintingManager = new MintingManager__factory(owner).attach(contracts.MintingManager.address);
