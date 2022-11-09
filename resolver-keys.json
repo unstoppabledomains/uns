@@ -2535,6 +2535,11 @@
       "deprecatedKeyName": "SUI",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
+    },
+    "crypto.MOON.address": {
+      "deprecatedKeyName": "MOON",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
     }
   }
 }
