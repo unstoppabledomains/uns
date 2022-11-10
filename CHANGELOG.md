@@ -1,3 +1,6 @@
+## v0.6.9
+- Deploy new version of DotCoinBurner contract with indexed `BatchCompleted` event properties
+
 ## v0.6.8
 
 - Mark `ERC20`, `BEP20`, and `MATIC` versions for `Railgun` as deprecated
