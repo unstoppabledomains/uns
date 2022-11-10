@@ -1,5 +1,8 @@
-## v0.6.9
+## v0.6.10
 - Deploy new version of DotCoinBurner contract with indexed `BatchCompleted` event properties
+
+## v0.6.9
+- Add `SUI` and `MOON` tokens to resolver list
 
 ## v0.6.8
 
