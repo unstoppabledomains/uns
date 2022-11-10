@@ -1,5 +1,5 @@
 {
-    "version": "0.6.2",
+    "version": "0.6.3",
     "networks": {
         "1": {
             "contracts": {
@@ -104,9 +104,9 @@
                     "deploymentBlock": "0xa3cf4d"
                 },
                 "DotCoinBurner": {
-                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0xf2559d"
+                    "deploymentBlock": "0xf335e0"
                 }
             }
         },
@@ -205,9 +205,9 @@
                     "deploymentBlock": "0x2dc9b9"
                 },
                 "DotCoinBurner": {
-                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x781df4"
+                    "deploymentBlock": "0x78f5ac"
                 }
             }
         },
@@ -306,9 +306,9 @@
                     "deploymentBlock": "0x0"
                 },
                 "DotCoinBurner": {
-                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x0217a61f"
+                    "deploymentBlock": "0x021cac00"
                 }
             }
         },
@@ -503,9 +503,9 @@
                     "deploymentBlock": "0x0"
                 },
                 "DotCoinBurner": {
-                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x01b95986"
+                    "deploymentBlock": "0x01bbafc7"
                 }
             }
         }
