@@ -15,7 +15,7 @@ contract DotCoinBurner {
     address private constant _BURN_ADDRESS = 0x000000000000000000000000000000000000dEaD;
     IUNSRegistry private immutable _unsRegistry;
 
-    event BatchCompleted(uint256 first, uint256 last);
+    event BatchCompleted(uint256 indexed first, uint256 indexed last);
 
     constructor(IUNSRegistry unsRegistry) {
         _unsRegistry = unsRegistry;

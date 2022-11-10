@@ -1,5 +1,5 @@
 {
-    "version": "0.6.1",
+    "version": "0.6.3",
     "networks": {
         "1": {
             "contracts": {
@@ -67,8 +67,10 @@
                     "forwarder": "0x486eb10E4F48C038513ECAf11585Ca2779768CF2"
                 },
                 "ProxyReader": {
-                    "address": "0x6E68f3EaAD2CC946C6CC7f4859251d8D70Dd3EDB",
+                    "address": "0x578853aa776Eef10CeE6c4dd2B5862bdcE767A8B",
+                    "implementation": "0xfE97D99558BDe54FB9Cb20F0C45f9199bB8df0a0",
                     "legacyAddresses": [
+                        "0x6E68f3EaAD2CC946C6CC7f4859251d8D70Dd3EDB",
                         "0x1BDc0fD4fbABeed3E611fd6195fCd5d41dcEF393",
                         "0x58034A288D2E56B661c9056A0C27273E5460B63c",
                         "0xc3C2BAB5e3e52DBF311b2aAcEf2e40344f19494E",
@@ -76,7 +78,7 @@
                         "0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5",
                         "0x7ea9Ee21077F84339eDa9C80048ec6db678642B1"
                     ],
-                    "deploymentBlock": "0xf259ef"
+                    "deploymentBlock": "0xf2f03c"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x2F659766E3D08561CA3408FbAba7C0749ab2c402",
@@ -102,9 +104,9 @@
                     "deploymentBlock": "0xa3cf4d"
                 },
                 "DotCoinBurner": {
-                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0xf2559d"
+                    "deploymentBlock": "0xf335e0"
                 }
             }
         },
@@ -171,13 +173,15 @@
                     "forwarder": "0xFCc1A95B7287Ae7a8B7cA813F12991dF5714d4C7"
                 },
                 "ProxyReader": {
-                    "address": "0x77cb0e7503Ea82315421BcF0eE9603451cd285F6",
+                    "address": "0x76007c52C73972A441aFA1A0E1016B140ffdE689",
+                    "implementation": "0x0B0A42A7FeA63e75396D0dcD77626F706AB9Fdfb",
                     "legacyAddresses": [
+                        "0x77cb0e7503Ea82315421BcF0eE9603451cd285F6",
                         "0xE3b961856C417d081a02cBa0161a051268F52677",
                         "0x9A70ff906D422C2FD0F7B94244D6b36DB62Ee982",
                         "0xFc5f608149f4D9e2Ed0733efFe9DD57ee24BCF68"
                     ],
-                    "deploymentBlock": "0x783722"
+                    "deploymentBlock": "0x78b972"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",
@@ -201,9 +205,9 @@
                     "deploymentBlock": "0x2dc9b9"
                 },
                 "DotCoinBurner": {
-                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x781df4"
+                    "deploymentBlock": "0x78f5ac"
                 }
             }
         },
@@ -270,13 +274,15 @@
                     "forwarder": "0x0000000000000000000000000000000000000000"
                 },
                 "ProxyReader": {
-                    "address": "0x68Af8fFFCdC6218836C62Bc2Fd2D35dA544471dD",
+                    "address": "0x91EDd8708062bd4233f4Dd0FCE15A7cb4d500091",
+                    "implementation": "0x9D0F27232b5c364488083e3B10F6963F635Ae521",
                     "legacyAddresses": [
+                        "0x68Af8fFFCdC6218836C62Bc2Fd2D35dA544471dD",
                         "0x3E67b8c702a1292d1CEb025494C84367fcb12b45",
                         "0x423F2531bd5d3C3D4EF7C318c2D1d9BEDE67c680",
                         "0xA3f32c8cd786dc089Bd1fC175F2707223aeE5d00"
                     ],
-                    "deploymentBlock": "0x0217c220"
+                    "deploymentBlock": "0x021b1c05"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",
@@ -300,9 +306,9 @@
                     "deploymentBlock": "0x0"
                 },
                 "DotCoinBurner": {
-                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x0217a61f"
+                    "deploymentBlock": "0x021cac00"
                 }
             }
         },
@@ -370,6 +376,7 @@
                 },
                 "ProxyReader": {
                     "address": "0x4e44E79e0cEc05D9e62e952B2088c02A3C450aeC",
+                    "implementation": "0x4e44E79e0cEc05D9e62e952B2088c02A3C450aeC",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x14"
                 },
@@ -464,13 +471,15 @@
                     "forwarder": "0x0000000000000000000000000000000000000000"
                 },
                 "ProxyReader": {
-                    "address": "0x71f7C0A978A541aB13Bd5783470f38b0dd71Cf78",
+                    "address": "0xBD4674F11d512120dFc8BAe5f84963d7419A5db2",
+                    "implementation": "0xacE4C348E1703657201082Ba449aA45ADf8F936a",
                     "legacyAddresses": [
+                        "0x71f7C0A978A541aB13Bd5783470f38b0dd71Cf78",
                         "0x6fe7c857C1B0E54492C8762f27e0a45CA7ff264B",
                         "0xbd9e01F6513E7C05f71Bf21d419a3bDF1EA9104b",
                         "0x332A8191905fA8E6eeA7350B5799F225B8ed30a9"
                     ],
-                    "deploymentBlock": "0x01b9a028"
+                    "deploymentBlock": "0x01bb07d3"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",
@@ -494,9 +503,9 @@
                     "deploymentBlock": "0x0"
                 },
                 "DotCoinBurner": {
-                    "address": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x01b95986"
+                    "deploymentBlock": "0x01bbafc7"
                 }
             }
         }
