@@ -20,22 +20,6 @@ interface IMintingManager is IERC1967 {
     function removeTld(uint256 tokenId) external;
 
     /**
-     * @dev Mints a Second Level Domain (SLD) with records.
-     * @param to address to mint the new SLD to.
-     * @param tld id of parent token.
-     * @param label SLD label to mint.
-     * @param keys Record keys.
-     * @param values Record values.
-     */
-    function mintSLDWithRecords(
-        address to,
-        uint256 tld,
-        string calldata label,
-        string[] calldata keys,
-        string[] calldata values
-    ) external;
-
-    /**
      * @dev Issues a SLD or subdomain with records.
      * @param to address to issue the new SLD or subdomain to.
      * @param labels array of SLD or subdomain name labels splitted by '.' to issue.

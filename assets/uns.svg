@@ -94,7 +94,7 @@
 <text text-anchor="start" x="6197.7524" y="-1329.3" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;BATCH_LIMIT: uint256</text>
 <polyline fill="none" stroke="#000000" points="6189.7524,-1321.1 6522.5934,-1321.1 "/>
 <text text-anchor="start" x="6197.7524" y="-1304.5" font-family="Times,serif" font-size="14.00" fill="#000000">External:</text>
-<text text-anchor="start" x="6197.7524" y="-1287.7" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;setChildChainManager(clientChainManager: address)</text>
+<text text-anchor="start" x="6197.7524" y="-1287.7" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;setChildChainManager(childChainManager: address)</text>
 <text text-anchor="start" x="6197.7524" y="-1270.9" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;deposit(user: address, depositData: bytes)</text>
 <text text-anchor="start" x="6197.7524" y="-1254.1" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;withdraw(tokenId: uint256)</text>
 <text text-anchor="start" x="6197.7524" y="-1237.3" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;withdrawBatch(tokenIds: uint256[])</text>

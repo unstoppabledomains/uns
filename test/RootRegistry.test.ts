@@ -36,8 +36,6 @@ import { DummyStateSender } from '../types/contracts/@maticnetwork/pos-portal/Du
 import { SimpleCheckpointManager } from '../types/contracts/@maticnetwork/pos-portal/SimpleCheckpointManager.sol';
 import {
   buildPredicateExitInput,
-  buildPredicateMetadataExitInput,
-  buildPredicateBatchExitInput,
   writeCheckpoint,
   buildExitInput,
 } from './helpers/polygon';
@@ -112,30 +110,13 @@ describe('RootRegistry', () => {
     await cnsRegistry.addController(uriPrefixController.address);
 
     mintingManager = await new MintingManager__factory(registryOwner).deploy();
-    await l1UnsRegistry.initialize(mintingManager.address);
-    await l1UnsRegistry.setCNSRegistry(cnsRegistry.address);
 
     await mintingController.addMinter(mintingManager.address);
     await uriPrefixController.addWhitelisted(mintingManager.address);
 
-    await mintingManager.initialize(
-      l1UnsRegistry.address,
-      mintingController.address,
-      uriPrefixController.address,
-      resolver.address,
-      ZERO_ADDRESS,
-    );
-    await mintingManager.addMinter(registryOwner.address);
-    await mintingManager.setTokenURIPrefix(
-      'https://metadata.unstoppabledomains.ooo/metadata/',
-    );
-
     l2UnsRegistry = await new UNSRegistry__factory(registryOwner)
       .connect(registryOwner)
       .deploy();
-    await l2UnsRegistry.initialize(registryOwner.address);
-    await l2UnsRegistry.setChildChainManager(registryOwner.address);
-    await l2UnsRegistry.mintTLD(TLD.WALLET, 'wallet');
 
     // deploy state sender
     stateSender = await new DummyStateSender__factory(registryOwner).deploy();
@@ -173,7 +154,22 @@ describe('RootRegistry', () => {
     );
 
     // post-configuration
-    await l1UnsRegistry.setRootChainManager(rootChainManager.address);
+    await l1UnsRegistry.initialize(mintingManager.address, cnsRegistry.address, rootChainManager.address, ZERO_ADDRESS);
+
+    await l2UnsRegistry.initialize(registryOwner.address, ZERO_ADDRESS, ZERO_ADDRESS, registryOwner.address);
+    await l2UnsRegistry.mintTLD(TLD.WALLET, 'wallet');
+
+    await mintingManager.initialize(
+      l1UnsRegistry.address,
+      mintingController.address,
+      uriPrefixController.address,
+      resolver.address,
+      ZERO_ADDRESS,
+    );
+    await mintingManager.addMinter(registryOwner.address);
+    await mintingManager.setTokenURIPrefix(
+      'https://metadata.unstoppabledomains.ooo/metadata/',
+    );
 
     buildExecuteCnsParams = buildExecuteFunc(
       cnsRegistry.interface,
@@ -185,12 +181,6 @@ describe('RootRegistry', () => {
       l1UnsRegistry.address,
       l1UnsRegistry,
     );
-  });
-
-  it('should revert when set RootChainManager multiple times', async () => {
-    await expect(
-      l1UnsRegistry.setRootChainManager(rootChainManager.address),
-    ).to.be.revertedWith('Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY');
   });
 
   describe('Deposit', () => {
@@ -563,109 +553,6 @@ describe('RootRegistry', () => {
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
     });
 
-    it('should withdraw multiple domains', async () => {
-      const tokenId1 = await mintDomainL1(owner.address, [
-        'poly-2w-as1',
-        'wallet',
-      ]);
-      await l1UnsRegistry.connect(owner).depositToPolygon(tokenId1);
-      expect(await l1UnsRegistry.ownerOf(tokenId1)).to.be.equal(
-        predicate.address,
-      );
-
-      const tokenId2 = await mintDomainL1(owner.address, [
-        'poly-2w-aq1',
-        'wallet',
-      ]);
-      await l1UnsRegistry.connect(owner).depositToPolygon(tokenId2);
-      expect(await l1UnsRegistry.ownerOf(tokenId2)).to.be.equal(
-        predicate.address,
-      );
-
-      const inputData = buildPredicateBatchExitInput(owner.address, [
-        tokenId1,
-        tokenId2,
-      ]);
-      await predicate.exitTokens(
-        ZERO_ADDRESS,
-        l1UnsRegistry.address,
-        inputData,
-      );
-
-      expect(await l1UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
-      expect(await l1UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
-    });
-
-    it('should mint multiple domains on withdraw while they were minted on L2', async () => {
-      const tokenId1 = await l1UnsRegistry.namehash(['poly-2wm-as1', 'wallet']);
-      await expect(l1UnsRegistry.ownerOf(tokenId1)).to.be.revertedWith(
-        'ERC721: invalid token ID',
-      );
-
-      const tokenId2 = await l1UnsRegistry.namehash(['poly-2wm-aq1', 'wallet']);
-      await expect(l1UnsRegistry.ownerOf(tokenId2)).to.be.revertedWith(
-        'ERC721: invalid token ID',
-      );
-
-      const inputData = buildPredicateBatchExitInput(owner.address, [
-        tokenId1,
-        tokenId2,
-      ]);
-      await predicate.exitTokens(
-        ZERO_ADDRESS,
-        l1UnsRegistry.address,
-        inputData,
-      );
-
-      expect(await l1UnsRegistry.ownerOf(tokenId1)).to.be.equal(owner.address);
-      expect(await l1UnsRegistry.ownerOf(tokenId2)).to.be.equal(owner.address);
-    });
-
-    it('should withdraw a domain with metadata', async () => {
-      const tokenId = await mintDomainL1(owner.address, [
-        'poly-1wmm-as1',
-        'wallet',
-      ]);
-      await l1UnsRegistry.connect(owner).depositToPolygon(tokenId);
-      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(
-        predicate.address,
-      );
-
-      const inputData = buildPredicateMetadataExitInput(
-        owner.address,
-        ZERO_ADDRESS,
-        tokenId,
-      );
-      await predicate.exitTokens(
-        ZERO_ADDRESS,
-        l1UnsRegistry.address,
-        inputData,
-      );
-
-      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
-    });
-
-    it('should mint a domain with metadata on withdraw while it was minted on L2', async () => {
-      const tokenId = await l1UnsRegistry.namehash(['poly-1wmm-as2', 'wallet']);
-      await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-        'ERC721: invalid token ID',
-      );
-
-      const inputData = buildPredicateMetadataExitInput(
-        owner.address,
-        ZERO_ADDRESS,
-        tokenId,
-        '0x',
-      );
-      await predicate.exitTokens(
-        ZERO_ADDRESS,
-        l1UnsRegistry.address,
-        inputData,
-      );
-
-      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
-    });
-
     it('should revert mint(onlyPredicate) by non-predicate', async () => {
       const tokenId = await l1UnsRegistry.namehash([
         'poly-1w-revert',
@@ -673,20 +560,6 @@ describe('RootRegistry', () => {
       ]);
       await expect(
         l1UnsRegistry['mint(address,uint256)'](owner.address, tokenId),
-      ).to.be.revertedWith('Registry: INSUFFICIENT_PERMISSIONS');
-    });
-
-    it('should revert mint(onlyPredicate) with metadata by non-predicate', async () => {
-      const tokenId = await l1UnsRegistry.namehash([
-        'poly-1w-revert',
-        'wallet',
-      ]);
-      await expect(
-        l1UnsRegistry['mint(address,uint256,bytes)'](
-          owner.address,
-          tokenId,
-          '0x',
-        ),
       ).to.be.revertedWith('Registry: INSUFFICIENT_PERMISSIONS');
     });
   });
@@ -716,7 +589,7 @@ describe('RootRegistry', () => {
       // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
       const txn = await l2UnsRegistry
         .connect(owner)
-        .withdraw(tokenId, { gasPrice: 1000000000 });
+        .burn(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
       const { setCheckPointTx, checkpointData } = await writeCheckpoint(
@@ -744,7 +617,7 @@ describe('RootRegistry', () => {
       // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
       const txn = await l2UnsRegistry
         .connect(owner)
-        .withdraw(tokenId, { gasPrice: 1000000000 });
+        .burn(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
       const { setCheckPointTx, checkpointData } = await writeCheckpoint(
@@ -774,7 +647,7 @@ describe('RootRegistry', () => {
       // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
       const txn = await l2UnsRegistry
         .connect(owner)
-        .withdraw(tokenId, { gasPrice: 1000000000 });
+        .burn(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
       const { setCheckPointTx, checkpointData } = await writeCheckpoint(
@@ -805,7 +678,7 @@ describe('RootRegistry', () => {
       // Legacy transaction (with `gasPrice`), because proof calculation does not work for EIP1559
       const txn = await l2UnsRegistry
         .connect(owner)
-        .withdraw(tokenId, { gasPrice: 1000000000 });
+        .burn(tokenId, { gasPrice: 1000000000 });
       const receipt = await txn.wait();
 
       const { setCheckPointTx, checkpointData } = await writeCheckpoint(

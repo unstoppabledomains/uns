@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.1';
+    string public constant VERSION = '0.4.2';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -132,16 +132,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         emit RemoveTld(tld);
     }
 
-    function mintSLDWithRecords(
-        address to,
-        uint256 tld,
-        string calldata label,
-        string[] calldata keys,
-        string[] calldata values
-    ) external override onlyMinter onlyAllowedSLD(tld, label) whenNotPaused {
-        _issueWithRecords(to, _buildLabels(tld, label), keys, values);
-    }
-
     function issueWithRecords(
         address to,
         string[] calldata labels,
@@ -173,10 +163,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), keys, values);
     }
 
-    function setResolver(address resolver) external onlyOwner {
-        cnsResolver = IResolver(resolver);
-    }
-
     function setTokenURIPrefix(string calldata prefix) external override onlyOwner {
         unsRegistry.setTokenURIPrefix(prefix);
         if (address(cnsURIPrefixController) != address(0x0)) {
@@ -188,20 +174,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _setForwarder(forwarder);
     }
 
-    function disableBlocklist() external onlyOwner {
-        _disableBlocklist();
-    }
-
-    function enableBlocklist() external onlyOwner {
-        _enableBlocklist();
-    }
-
     function blocklist(uint256 tokenId) external onlyMinter {
         _block(tokenId);
-    }
-
-    function blocklistAll(uint256[] calldata tokenIds) external onlyMinter {
-        _blockAll(tokenIds);
     }
 
     function pause() external onlyOwner {
@@ -215,29 +189,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     function addProxyReaders(address[] calldata addrs) external onlyOwner {
         for (uint256 i = 0; i < addrs.length; i++) {
             unsRegistry.addProxyReader(addrs[i]);
-        }
-    }
-
-    function upgradeAll(uint256[] calldata tokenIds) external onlyMinter {
-        unsRegistry.upgradeAll(tokenIds);
-    }
-
-    function _isTldToChangeOwnership(uint256 tld) private view returns (bool) {
-        // 0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2 - .coin token ID
-        return bytes(_tlds[tld]).length > 0 || tld == 0x7674e7282552c15f203b9c4a6025aeaf28176ef7f5451b280f9bada3f8bc98e2;
-    }
-
-    function burnTLDL1(uint256[] calldata tokenIds) external onlyOwner {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            require(_isTldToChangeOwnership(tokenIds[i]), 'MintingManager: TOKEN_ID_NOT_TLD');
-            unsRegistry.burnTLDL1(tokenIds[i]);
-        }
-    }
-
-    function moveTLDOwnershipL2(uint256[] calldata tokenIds) external onlyOwner {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            require(_isTldToChangeOwnership(tokenIds[i]), 'MintingManager: TOKEN_ID_NOT_TLD');
-            unsRegistry.moveTLDOwnershipL2(tokenIds[i]);
         }
     }
 

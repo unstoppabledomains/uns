@@ -5,7 +5,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { mintDomain } from './helpers/registry';
-import { TLD } from './helpers/constants';
+import { TLD, ZERO_ADDRESS } from './helpers/constants';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 
 describe('UNSRegistry (proxy)', () => {
@@ -21,9 +21,11 @@ describe('UNSRegistry (proxy)', () => {
     [owner, receiver] = signers;
 
     unsRegistryFactory = new UNSRegistry__factory(owner);
-    unsRegistry = await upgrades.deployProxy(unsRegistryFactory, [owner.address], {
-      initializer: 'initialize',
-    }) as UNSRegistry;
+    unsRegistry = await upgrades.deployProxy(
+      unsRegistryFactory,
+      [owner.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS], {
+        initializer: 'initialize',
+      }) as UNSRegistry;
 
     await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');

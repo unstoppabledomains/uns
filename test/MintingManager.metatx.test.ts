@@ -33,7 +33,7 @@ describe('MintingManager (metatx)', () => {
       [],
       { initializer: false },
     )) as MintingManager;
-    await unsRegistry.initialize(mintingManager.address);
+    await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
     forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(
       mintingManager.address,

@@ -7,7 +7,7 @@ import { CNSRegistry } from '../types/dot-crypto/contracts';
 import { ProxyReader__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { CNSRegistry__factory } from '../types/factories/dot-crypto/contracts';
 import { mintDomain } from './helpers/registry';
-import { TLD } from './helpers/constants';
+import { TLD, ZERO_ADDRESS } from './helpers/constants';
 
 describe('ProxyReader (proxy)', () => {
   let unsRegistry: UNSRegistry, cnsRegistry: CNSRegistry, proxyReader: ProxyReader;
@@ -23,7 +23,7 @@ describe('ProxyReader (proxy)', () => {
   beforeEach(async () => {
     // deploy UNS
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-    await unsRegistry.initialize(coinbase.address);
+    await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.setTokenURIPrefix('/');
 
     // deploy CNS

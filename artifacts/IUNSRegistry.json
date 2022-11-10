@@ -250,25 +250,6 @@
       "type": "event"
     },
     {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "user",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256[]",
-          "name": "tokenIds",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "WithdrawnBatch",
-      "type": "event"
-    },
-    {
       "inputs": [
         {
           "internalType": "address",
@@ -327,19 +308,6 @@
         }
       ],
       "name": "burn",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "burnTLDL1",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -655,19 +623,6 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "moveTLDOwnershipL2",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [],
       "name": "name",
       "outputs": [
@@ -951,19 +906,6 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "registry",
-          "type": "address"
-        }
-      ],
-      "name": "setCNSRegistry",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "string[]",
           "name": "keys",
           "type": "string[]"
@@ -1034,19 +976,6 @@
         }
       ],
       "name": "setReverse",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "rootChainManager",
-          "type": "address"
-        }
-      ],
-      "name": "setRootChainManager",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -1169,45 +1098,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint256[]",
-          "name": "tokenIds",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "upgradeAll",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "withdraw",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "tokenIds",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "withdrawBatch",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "bytes",
           "name": "inputData",
           "type": "bytes"
@@ -1229,19 +1119,6 @@
         }
       ],
       "name": "withdrawFromPolygon",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "withdrawWithMetadata",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

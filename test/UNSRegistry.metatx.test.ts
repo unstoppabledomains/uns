@@ -6,7 +6,7 @@ import { FunctionFragment } from 'ethers/lib/utils';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
-import { TLD } from './helpers/constants';
+import { TLD, ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain } from './helpers/registry';
 import { getFuncSignature } from './helpers/proxy';
 
@@ -26,7 +26,7 @@ describe('UNSRegistry (metatx)', () => {
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
 
-    await unsRegistry.initialize(coinbase.address);
+    await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
 
@@ -301,15 +301,9 @@ describe('UNSRegistry (metatx)', () => {
         'depositToPolygon', // requires rootChainManager contract
         'withdrawFromPolygon', // requires rootChainManager contract
         'onERC721Received',
-        'withdraw',
-        'withdrawBatch',
-        'withdrawWithMetadata',
         'setReverse',
         'removeReverse',
         'addProxyReader',
-        'upgradeAll',
-        'burnTLDL1',
-        'moveTLDOwnershipL2',
       ];
 
       const getFuncs = () => {
@@ -475,18 +469,9 @@ describe('UNSRegistry (metatx)', () => {
         'initialize',
         'transferOwnership', // might influence tests
         'renounceOwnership', // might influence tests
-        'setRootChainManager',
-        'setChildChainManager',
-        'setCNSRegistry',
         'deposit', // requires childChainManager contract
-        'withdraw',
-        'withdrawBatch',
-        'withdrawWithMetadata',
         'removeReverse',
         'addProxyReader',
-        'upgradeAll',
-        'burnTLDL1',
-        'moveTLDOwnershipL2',
       ];
 
       before(async () => {

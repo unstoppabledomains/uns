@@ -97,14 +97,4 @@ abstract contract Blocklist is Initializable, ContextUpgradeable {
             _block(tokenIds[i]);
         }
     }
-
-    function _disableBlocklist() internal whenEnabled {
-        StorageSlotUpgradeable.getBooleanSlot(_BLOCKLIST_DISABLED_SLOT).value = true;
-        emit BlocklistDisabled(_msgSender());
-    }
-
-    function _enableBlocklist() internal whenDisabled {
-        StorageSlotUpgradeable.getBooleanSlot(_BLOCKLIST_DISABLED_SLOT).value = false;
-        emit BlocklistEnabled(_msgSender());
-    }
 }

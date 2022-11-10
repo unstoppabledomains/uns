@@ -19,11 +19,13 @@ abstract contract RootRegistry is ERC721Upgradeable, IRootRegistry {
         _;
     }
 
-    function setRootChainManager(address rootChainManager) external override {
-        require(
-            StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value == address(0),
-            'Registry: ROOT_CHAIN_MANEGER_NOT_EMPTY'
-        );
+    // solhint-disable-next-line func-name-mixedcase
+    function __RootRegistry_init(address rootChainManager) internal onlyInitializing {
+        __RootRegistry_init_unchained(rootChainManager);
+    }
+
+    // solhint-disable-next-line func-name-mixedcase
+    function __RootRegistry_init_unchained(address rootChainManager) internal onlyInitializing {
         StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value = rootChainManager;
     }
 
