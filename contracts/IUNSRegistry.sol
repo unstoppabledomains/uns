@@ -10,6 +10,7 @@ import './IERC1967.sol';
 import './IRecordStorage.sol';
 import './IReverseRegistry.sol';
 import './IRootRegistry.sol';
+import './@maticnetwork/IChildToken.sol';
 
 interface IUNSRegistry is
     IERC1967,
@@ -17,7 +18,8 @@ interface IUNSRegistry is
     IERC721ReceiverUpgradeable,
     IRecordStorage,
     IReverseRegistry,
-    IRootRegistry
+    IRootRegistry,
+    IChildToken
 {
     event NewURI(uint256 indexed tokenId, string uri);
 
