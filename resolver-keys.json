@@ -2530,6 +2530,16 @@
       "deprecatedKeyName": "0ZK_0ZK",
       "validationRegex": "(^0zk1)([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{52})([pr98ftd03n4hemal])(rv7j6fe3z53l)([ce6mua7l])([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{57})",
       "deprecated": false
+    },
+    "crypto.SUI.address": {
+      "deprecatedKeyName": "SUI",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.MOON.address": {
+      "deprecatedKeyName": "MOON",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
     }
   }
 }
