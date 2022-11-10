@@ -1,11 +1,7 @@
 name: Contracts size
 
 on:
-  push:
-    branches:
-      - master
   pull_request: {}
-  workflow_dispatch: {}
 
 jobs:
   target-contracts-size:
