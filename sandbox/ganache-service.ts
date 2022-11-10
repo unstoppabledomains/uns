@@ -21,7 +21,7 @@ export class GanacheService {
 
   constructor (options: ServerOptions<'ethereum'>, serverConfigOptions: ServerConfigOptions) {
     this.serverConfigOptions = this.validateAndTransformOptions(serverConfigOptions);
-    this.server = server<'ethereum'>({ ...options });
+    this.server = server<'ethereum'>(options);
     this.provider = this.server.provider;
   }
 

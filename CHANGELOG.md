@@ -1,3 +1,6 @@
+## v0.6.12
+- Automated release workflow, fixed TS build
+
 ## v0.6.11
 - UNSRegistry@0.6.1 cleanup
 - MintingManager@0.4.2 cleanup
@@ -9,7 +12,6 @@
 - Add `SUI` and `MOON` tokens to resolver list
 
 ## v0.6.8
-
 - Mark `ERC20`, `BEP20`, and `MATIC` versions for `Railgun` as deprecated
 
 ## v0.6.7

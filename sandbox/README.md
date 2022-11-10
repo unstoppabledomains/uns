@@ -6,7 +6,6 @@ The tool allows to spin-up blockchain environment(emulator) with pre-deployed UN
 
 - URL: http://localhost:7545
 - CHAIN_ID: 1337
-
 ### Accounts
 
 The emulator uses mnemonic for preparing list of accounts. It always has strict list of accounts:
@@ -51,7 +50,7 @@ Base HD Path:  m/44'/60'/0'/0/{account_index}
 ### Example of usage
 
 ```
-import { Sandbox } from './sandbox';
+import { Sandbox } from 'uns';
 
 describe('Test', async () => {
   let sandbox: Sandbox;

@@ -69,7 +69,7 @@ export class Sandbox {
     };
   }
 
-  static async start (options: SandboxOptions): Promise<Sandbox> {
+  static async start (options: SandboxOptions = {}): Promise<Sandbox> {
     const sandbox = await Sandbox.create(options);
     await sandbox.start();
     return sandbox;
@@ -119,7 +119,7 @@ export class Sandbox {
   private options: SandboxOptions;
   private provider: EthereumProvider;
   private snapshotId?: string;
-  private accounts: Map<string, SandboxAccount>;
+  public accounts: Record<string, SandboxAccount>;
 
   constructor (service: GanacheService, options: SandboxOptions = {}) {
     this.ganacheService = service;
@@ -130,11 +130,11 @@ export class Sandbox {
 
     const accounts = this.getAccounts();
 
-    this.accounts ||= new Map<string, SandboxAccount>([
-      ['owner', accounts[0]],
-      ['minter', accounts[1]],
-      ['faucet', accounts[9]],
-    ]);
+    this.accounts ||= {
+      'owner': accounts[0],
+      'minter': accounts[1],
+      'faucet': accounts[9],
+    };
 
     accounts.forEach((account, index) => {
       this.accounts[index] = account;
@@ -195,7 +195,7 @@ export class Sandbox {
     const accounts = Array(totalAccounts);
 
     for (let index = 0; index < totalAccounts; index++) {
-      const acc = hdKey.derive(hdPath + index);
+      const acc = hdKey.derive(hdPath + '/' + index);
 
       accounts[index] = {
         privateKey: '0x' + acc.privateKey.toString('hex'),

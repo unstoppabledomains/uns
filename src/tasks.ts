@@ -1,5 +1,5 @@
 import { network, upgrades } from 'hardhat';
-import { Contract, BigNumber, utils } from 'ethers';
+import { Contract, utils } from 'ethers';
 import { merge } from 'lodash';
 import { ZERO_ADDRESS } from '../test/helpers/constants';
 import { Deployer } from './deployer';

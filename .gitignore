@@ -43,6 +43,6 @@ cache
 .DS_Store
 
 # typechain
-types
+/types
 
 slither.sarif

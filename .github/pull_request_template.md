@@ -23,11 +23,6 @@
 ### 6. Package versioning
 - [ ] Make sure that the `patch` version of package is increased if valuable changes have been made to the package. It includes contracts update, configs update, etc.
 - [ ] Make sure that the `major.minor` version of package is synced with version of `UNSRegistry` contract.
-- [ ] Make sure `tag` was released for the new version of the package in order to be able to add the package as a dependency.
-  ```
-  git tag v{version}
-  git push origin --tags
-  ```
 - [ ] Make sure that the `CHANGELOG` is updated with short description for the new version. 
 ### 7. Code review
 - [ ] `resolver-keys.json` code review is required from **DevTools** team
