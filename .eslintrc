@@ -25,7 +25,9 @@
     "extendEnvironment": false
   },
   "ignorePatterns": [
-    "types/**/*"
+    "types/**/*",
+    "**/*.js",
+    "**/*.d.ts"
   ],
   "rules": {
     // Strict mode

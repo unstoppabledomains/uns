@@ -5,6 +5,7 @@
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["es6"],
     "module": "commonjs",
@@ -12,17 +13,25 @@
     "noImplicitAny": false,
     "removeComments": true,
     "resolveJsonModule": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "strict": true,
     "alwaysStrict": true,
-    "target": "es6"
+    "target": "es6",
+    "outDir": "dist"
   },
-  "exclude": ["node_modules"],
-  "files": ["./hardhat.config.ts"],
+  "files": [
+    "./hardhat.config.ts",
+    "./index.ts",
+    "./uns-config.json"
+  ],
   "include": [
-    "src/**/*.ts", 
-    "test/**/*.ts", 
-    "sandbox/**/*.ts",
-    "./node_modules/types-ethereumjs-util/index.d.ts"
+    "./sandbox/index.ts",
+    "./src/types.ts",
+    "./src/config.ts",
+    "./types/**/*.ts"
+  ],
+  "exclude": [
+    "**/*.test.ts",
+    "node_modules"
   ]
 }
