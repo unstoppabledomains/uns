@@ -15,15 +15,10 @@
 ### 4. Configs versioning
 - [ ] Make sure that the version of `uns-config.json` is increased if changes have been made to the config.
 - [ ] Make sure that the version of `resolver-keys.json` is increased if changes have been made to the config.
-### 5. Sandbox
-- [ ] Make sure that the Sandbox is updated if changes have been made to contracts or deployment configuration.
-  ```
-  yarn rebuild:sandbox
-  ```
-### 6. Package versioning
+### 5. Package versioning
 - [ ] Make sure that the `patch` version of package is increased if valuable changes have been made to the package. It includes contracts update, configs update, etc.
 - [ ] Make sure that the `major.minor` version of package is synced with version of `UNSRegistry` contract.
 - [ ] Make sure that the `CHANGELOG` is updated with short description for the new version. 
-### 7. Code review
+### 6. Code review
 - [ ] `resolver-keys.json` code review is required from **DevTools** team
 - [ ] For all other changes code review is required from **Registry** team
