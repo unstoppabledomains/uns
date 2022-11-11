@@ -5,12 +5,15 @@ on:
     branches:
       - main
   workflow_dispatch: {}
+
 jobs:
   release:
     runs-on: ubuntu-latest
     concurrency: uns-release
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}
 
       - name: 'Extract current package version'
         run: node -p -e '`PACKAGE_VERSION=${"v" + require("./package.json").version}`' >> $GITHUB_ENV
