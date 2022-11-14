@@ -51,32 +51,35 @@ describe('UNSRegistry (reverse)', () => {
   });
 
   describe('Minting', () => {
-    it('should set reverse record on minting', async () => {
-      const mintTx = await unsRegistry.mintWithRecords(
-        owner.address,
-        ['testminting', 'crypto'],
-        [],
-        [],
-      );
-      const mintTxReceipt = await mintTx.wait();
-
-      const newUriEventIndex = mintTxReceipt.events?.findIndex(
-        ({ event }) => event === 'NewURI',
-      );
-      const setReverseIndex = mintTxReceipt.events?.findIndex(
-        ({ event }) => event === 'SetReverse',
-      );
-
-      expect(newUriEventIndex).to.be.greaterThan(0);
-      expect(setReverseIndex).to.be.greaterThan(0);
-    });
-
     describe('mintWithRecords(address,string[],string[],string[])', async () => {
+      const selector = 'mintWithRecords(address,string[],string[],string[])';
+
+      it('should produce both NewURI and SetReverse events', async () => {
+        const mintWithRecords = unsRegistry[selector];
+        const mintTx = await mintWithRecords(
+          owner.address,
+          ['testminting', 'crypto'],
+          [],
+          [],
+        );
+        const mintTxReceipt = await mintTx.wait();
+
+        const newUriEventIndex = mintTxReceipt.events?.findIndex(
+          ({ event }) => event === 'NewURI',
+        );
+        const setReverseIndex = mintTxReceipt.events?.findIndex(
+          ({ event }) => event === 'SetReverse',
+        );
+
+        expect(newUriEventIndex).to.be.greaterThan(0);
+        expect(setReverseIndex).to.be.greaterThan(0);
+      });
+
       it('should set reverse resolution on mint', async () => {
         const labels = ['reversemint4', 'crypto'];
         const tokenId = await unsRegistry.namehash(labels);
 
-        await unsRegistry.mintWithRecords(
+        await unsRegistry[selector](
           coinbase.address,
           labels,
           ['key_1'],
@@ -95,7 +98,7 @@ describe('UNSRegistry (reverse)', () => {
         const labels = ['reversemint41', 'crypto'];
         const tokenId = await unsRegistry.namehash(labels);
 
-        const mintTx = await unsRegistry.mintWithRecords(
+        const mintTx = await unsRegistry[selector](
           coinbase.address,
           labels,
           ['key_1'],
@@ -133,11 +136,154 @@ describe('UNSRegistry (reverse)', () => {
         const labels = ['reversemint43', 'crypto'];
 
         await expect(
-          unsRegistry.mintWithRecords(
+          unsRegistry[selector](
             coinbase.address,
             labels,
             ['key_1'],
             ['value_1'],
+          ),
+        ).not.to.emit(unsRegistry, 'SetReverse');
+
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+    });
+
+    describe('mintWithRecords(address,string[],string[],string[],bool)', async () => {
+      const selector = 'mintWithRecords(address,string[],string[],string[],bool)';
+
+      it('should produce NewURI and SetReverse events', async () => {
+        const mintTx = await unsRegistry[selector](
+          owner.address,
+          ['testminting', 'crypto'],
+          [],
+          [],
+          true,
+        );
+        const mintTxReceipt = await mintTx.wait();
+
+        const newUriEventIndex = mintTxReceipt.events?.findIndex(
+          ({ event }) => event === 'NewURI',
+        );
+        const setReverseIndex = mintTxReceipt.events?.findIndex(
+          ({ event }) => event === 'SetReverse',
+        );
+
+        expect(newUriEventIndex).to.be.greaterThan(0);
+        expect(setReverseIndex).to.be.greaterThan(0);
+      });
+
+      it('should only produce NewURI and not SetReverse events with setReverse = false', async () => {
+        const mintTx = await unsRegistry[selector](
+          owner.address,
+          ['testminting2', 'crypto'],
+          [],
+          [],
+          false,
+        );
+        const mintTxReceipt = await mintTx.wait();
+
+        const newUriEventIndex = mintTxReceipt.events?.findIndex(
+          ({ event }) => event === 'NewURI',
+        );
+        const setReverseIndex = mintTxReceipt.events?.findIndex(
+          ({ event }) => event === 'SetReverse',
+        );
+
+        expect(newUriEventIndex).to.be.greaterThan(0);
+        expect(setReverseIndex).to.be.equal(-1);
+      });
+
+      it('should set reverse resolution on mint', async () => {
+        const labels = ['reversemint4_2', 'crypto'];
+        const tokenId = await unsRegistry.namehash(labels);
+
+        await unsRegistry[selector](
+          coinbase.address,
+          labels,
+          ['key_1'],
+          ['value_1'],
+          true,
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
+          coinbase.address,
+        );
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+      });
+
+      it('should not set reverse resolution on mint if withReverse = false', async () => {
+        const labels = ['reversemint4_21', 'crypto'];
+        const tokenId = await unsRegistry.namehash(labels);
+
+        await unsRegistry[selector](
+          coinbase.address,
+          labels,
+          ['key_1'],
+          ['value_1'],
+          false,
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
+          coinbase.address,
+        );
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          ZERO_ADDRESS,
+        );
+      });
+
+      it('should produce SetReverse event after NewURI', async () => {
+        const labels = ['reversemint41_2', 'crypto'];
+        const tokenId = await unsRegistry.namehash(labels);
+
+        const mintTx = await unsRegistry[selector](
+          coinbase.address,
+          labels,
+          ['key_1'],
+          ['value_1'],
+          true,
+        );
+        const mintTxReceipt = await mintTx.wait();
+
+        const newUriEventIndex = mintTxReceipt.events?.findIndex(
+          ({ event }) => event === 'NewURI',
+        );
+        const setReverseIndex = mintTxReceipt.events?.findIndex(
+          ({ event }) => event === 'SetReverse',
+        );
+
+        expect(setReverseIndex).to.be.greaterThan(0);
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect(mintTxReceipt.events?.[setReverseIndex!].args).to.deep.equal([
+          coinbase.address,
+          tokenId,
+        ]);
+
+        expect(setReverseIndex).to.be.greaterThan(newUriEventIndex);
+      });
+
+      it('should not set reverse resolution if already set', async () => {
+        const tokenId = await mintDomain(unsRegistry, coinbase.address, [
+          'reversemint42_2',
+          'crypto',
+        ]);
+        expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
+          tokenId,
+        );
+
+        const labels = ['reversemint43', 'crypto'];
+
+        await expect(
+          unsRegistry[selector](
+            coinbase.address,
+            labels,
+            ['key_1'],
+            ['value_1'],
+            true,
           ),
         ).not.to.emit(unsRegistry, 'SetReverse');
 

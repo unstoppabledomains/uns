@@ -67,13 +67,13 @@ describe('RootRegistry', () => {
 
   const abiCoder = new utils.AbiCoder();
 
-  const mintDomainL1 = async (owner, labels) => {
-    await mintingManager.issueWithRecords(owner, labels, [], []);
+  const mintDomainL1 = async (owner: string, labels: string[]) => {
+    await mintingManager['issueWithRecords(address,string[],string[],string[],bool)'](owner, labels, [], [], true);
     return await l1UnsRegistry.namehash(labels);
   };
 
-  const mintDomainL2 = async (owner, labels) => {
-    await l2UnsRegistry.mintWithRecords(owner, labels, [], []);
+  const mintDomainL2 = async (owner: string, labels: string[]) => {
+    await l2UnsRegistry['mintWithRecords(address,string[],string[],string[],bool)'](owner, labels, [], [], true);
     return await l2UnsRegistry.namehash(labels);
   };
 

@@ -125,10 +125,17 @@ contract UNSRegistry is
         string[] calldata keys,
         string[] calldata values
     ) external override onlyMintingManager {
-        _reset(tokenId);
-        _transfer(ownerOf(tokenId), to, tokenId);
-        _setMany(keys, values, tokenId);
-        _safeSetReverse(to, tokenId);
+        _unlockWithRecords(to, tokenId, keys, values, true);
+    }
+
+    function unlockWithRecords(
+        address to,
+        uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values,
+        bool withReverse
+    ) external override onlyMintingManager {
+        _unlockWithRecords(to, tokenId, keys, values, withReverse);
     }
 
     function mintWithRecords(
@@ -137,10 +144,17 @@ contract UNSRegistry is
         string[] calldata keys,
         string[] calldata values
     ) external override onlyMintingManager {
-        uint256 tokenId = _namehash(labels);
+        _mintWithRecords(to, labels, keys, values, true);
+    }
 
-        _mint(to, tokenId, _uri(labels));
-        _setMany(keys, values, tokenId);
+    function mintWithRecords(
+        address to,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        bool withReverse
+    ) external override onlyMintingManager {
+        _mintWithRecords(to, labels, keys, values, withReverse);
     }
 
     /// Transfering
@@ -339,6 +353,35 @@ contract UNSRegistry is
 
     /// Internal
 
+    function _mintWithRecords(
+        address to,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        bool withReverse
+    ) internal {
+        uint256 tokenId = _namehash(labels);
+
+        _mint(to, tokenId, _uri(labels), withReverse);
+        _setMany(keys, values, tokenId);
+    }
+
+    function _unlockWithRecords(
+        address to,
+        uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values,
+        bool withReverse
+    ) internal {
+        _reset(tokenId);
+        _transfer(ownerOf(tokenId), to, tokenId);
+        _setMany(keys, values, tokenId);
+
+        if (withReverse) {
+            _safeSetReverse(to, tokenId);
+        }
+    }
+
     function _uri(string[] memory labels) private pure returns (string memory) {
         bytes memory uri = bytes(labels[0]);
         for (uint256 i = 1; i < labels.length; i++) {
@@ -363,12 +406,16 @@ contract UNSRegistry is
     function _mint(
         address to,
         uint256 tokenId,
-        string memory uri
+        string memory uri,
+        bool withReverse
     ) internal {
         _mint(to, tokenId);
         emit NewURI(tokenId, uri);
-        /// set reverse must be after emission of New URL event in order to keep events' order
-        _safeSetReverse(to, tokenId);
+
+        if (withReverse) {
+            // set reverse must be after emission of New URL event in order to keep events' order
+            _safeSetReverse(to, tokenId);
+        }
     }
 
     function _baseURI() internal view override(ERC721Upgradeable) returns (string memory) {

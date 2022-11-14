@@ -208,12 +208,13 @@ const deployUNSTask = {
     config = merge(ctx.getDeployConfig(), config);
 
     const { CNSRegistry, MintingController, URIPrefixController, Resolver, RootChainManager } = config.contracts || {};
+
     const dependencies = {
       CNSRegistry,
+      RootChainManager,
       MintingController,
       URIPrefixController,
       Resolver,
-      RootChainManager,
     };
 
     for (const [key, value] of Object.entries(dependencies)) {

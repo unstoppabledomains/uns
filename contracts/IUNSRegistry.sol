@@ -83,7 +83,7 @@ interface IUNSRegistry is
     function mintTLD(uint256 tokenId, string calldata uri) external;
 
     /**
-     * @dev mints token with records
+     * @dev (Deprecated) mints token with records
      * @param to address to mint the new SLD or subdomain to
      * @param labels array of SLD or subdomain name labels splitted by '.' to mint.
      * @param keys New record keys
@@ -97,7 +97,23 @@ interface IUNSRegistry is
     ) external;
 
     /**
-     * @dev unlock token with records
+     * @dev mints token with records
+     * @param to address to mint the new SLD or subdomain to
+     * @param labels array of SLD or subdomain name labels splitted by '.' to mint.
+     * @param keys New record keys
+     * @param values New record values
+     * @param withReverse Flag whether to install reverse resolution
+     */
+    function mintWithRecords(
+        address to,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        bool withReverse
+    ) external;
+
+    /**
+     * @dev (Deprecated) unlock token with records
      * @param to address to unlock the token to
      * @param tokenId id of the token.
      * @param keys New record keys
@@ -108,6 +124,22 @@ interface IUNSRegistry is
         uint256 tokenId,
         string[] calldata keys,
         string[] calldata values
+    ) external;
+
+    /**
+     * @dev unlock token with records
+     * @param to address to unlock the token to
+     * @param tokenId id of the token.
+     * @param keys New record keys
+     * @param values New record values
+     * @param withReverse Flag indicating whether to install reverse resolution
+     */
+    function unlockWithRecords(
+        address to,
+        uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values,
+        bool withReverse
     ) external;
 
     /**

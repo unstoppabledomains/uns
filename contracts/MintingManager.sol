@@ -44,14 +44,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
     modifier onlyAllowedSLD(uint256 tld, string memory label) {
-        require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
-        Strings.Slice memory _label = label.toSlice();
-        if (_label._len > 10) {
-            require(
-                _label.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
-                'MintingManager: TOKEN_LABEL_PROHIBITED'
-            );
-        }
+        _ensureAllowedSLD(tld, label);
         _;
     }
 
@@ -63,14 +56,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      */
     modifier onlyAllowed(string[] memory labels) {
         require(labels.length >= 2, 'MintingManager: LABELS_LENGTH_BELOW_2');
-        require(_isTld(labels[labels.length - 1]), 'MintingManager: TLD_NOT_REGISTERED');
-        Strings.Slice memory _label = labels[labels.length - 2].toSlice();
-        if (_label._len > 10) {
-            require(
-                _label.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
-                'MintingManager: TOKEN_LABEL_PROHIBITED'
-            );
-        }
+
+        _ensureAllowedSLD(_namehash(0x0, labels[labels.length - 1]), labels[labels.length - 2]);
         _;
     }
 
@@ -138,11 +125,34 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] calldata keys,
         string[] calldata values
     ) external override onlyIssuer(labels) onlyAllowed(labels) whenNotPaused {
-        _issueWithRecords(to, labels, keys, values);
+        _issueWithRecords(to, labels, keys, values, true);
+    }
+
+    function issueWithRecords(
+        address to,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        bool withReverse
+    ) external override onlyIssuer(labels) onlyAllowed(labels) whenNotPaused {
+        _issueWithRecords(to, labels, keys, values, withReverse);
+    }
+
+    function bulkIssue(BulkSLDIssueRequest[] calldata requests) external override onlyMinter {
+        for (uint256 i = 0; i < requests.length; i++) {
+            _ensureAllowedSLD(requests[i].tld, requests[i].label);
+
+            string[] memory labels = _buildLabels(requests[i].tld, requests[i].label);
+            (uint256 tokenId, ) = _namehash(labels);
+
+            if (!unsRegistry.exists(tokenId)) {
+                _issue(requests[i].to, labels, false);
+            }
+        }
     }
 
     function claim(uint256 tld, string calldata label) external override onlyAllowedSLD(tld, label) whenNotPaused {
-        _issue(_msgSender(), _buildLabels(tld, _freeSLDLabel(label)));
+        _issue(_msgSender(), _buildLabels(tld, _freeSLDLabel(label)), true);
     }
 
     function claimTo(
@@ -150,7 +160,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         uint256 tld,
         string calldata label
     ) external override onlyAllowedSLD(tld, label) whenNotPaused {
-        _issue(to, _buildLabels(tld, _freeSLDLabel(label)));
+        _issue(to, _buildLabels(tld, _freeSLDLabel(label)), true);
     }
 
     function claimToWithRecords(
@@ -160,7 +170,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] calldata keys,
         string[] calldata values
     ) external override onlyAllowedSLD(tld, label) whenNotPaused {
-        _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), keys, values);
+        _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), keys, values, true);
     }
 
     function setTokenURIPrefix(string calldata prefix) external override onlyOwner {
@@ -199,21 +209,26 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         return labels;
     }
 
-    function _issue(address to, string[] memory labels) private {
+    function _issue(
+        address to,
+        string[] memory labels,
+        bool withReverse
+    ) private {
         string[] memory empty;
-        _issueWithRecords(to, labels, empty, empty);
+        _issueWithRecords(to, labels, empty, empty, withReverse);
     }
 
     function _issueWithRecords(
         address to,
         string[] memory labels,
         string[] memory keys,
-        string[] memory values
+        string[] memory values,
+        bool withReverse
     ) private {
         (uint256 tokenId, ) = _namehash(labels);
 
         if (unsRegistry.exists(tokenId) && unsRegistry.ownerOf(tokenId) == address(this)) {
-            unsRegistry.unlockWithRecords(to, tokenId, keys, values);
+            unsRegistry.unlockWithRecords(to, tokenId, keys, values, withReverse);
         } else {
             _beforeTokenMint(tokenId);
 
@@ -223,7 +238,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
                     cnsResolver.preconfigure(keys, values, tokenId);
                 }
             } else {
-                unsRegistry.mintWithRecords(to, labels, keys, values);
+                unsRegistry.mintWithRecords(to, labels, keys, values, withReverse);
             }
         }
     }
@@ -259,6 +274,17 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         }
     }
 
+    function _ensureAllowedSLD(uint256 tld, string memory label) private view {
+        require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
+        Strings.Slice memory _label = label.toSlice();
+        if (_label._len > 10) {
+            require(
+                _label.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
+                'MintingManager: TOKEN_LABEL_PROHIBITED'
+            );
+        }
+    }
+
     /**
      * @dev The function adds TLD and mint token in UNS Registry.
      * Current MintingManager has '.crypto' TLD registered, but UNS Registry does not have '.crypto' token.
@@ -282,14 +308,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      */
     function _isTld(uint256 tld) private view returns (bool) {
         return bytes(_tlds[tld]).length > 0;
-    }
-
-    /**
-     * @dev This function checks whether TLD exists
-     */
-    function _isTld(string memory tld) private view returns (bool) {
-        uint256 tldId = _namehash(uint256(0x0), tld);
-        return _isTld(tldId);
     }
 
     /**
