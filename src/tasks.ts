@@ -471,7 +471,7 @@ const upgradeProxyReaderTask = {
  */
 const deployPolygonPosBridgeTask: Task = {
   tags: ['polygon_pos_bridge', 'full'],
-  priority: 5,
+  priority: 6,
   run: async (ctx: Deployer) => {
     const { owner } = ctx.accounts;
 
@@ -488,8 +488,6 @@ const deployPolygonPosBridgeTask: Task = {
     await rootChainManager.initialize(owner.address);
     await rootChainManager.setCheckpointManager(checkpointManager.address);
     await rootChainManager.setStateSender(stateSender.address);
-
-    await predicate.grantRole(await predicate.MANAGER_ROLE(), rootChainManager.address);
     await ctx.saveContractConfig(UnsContractName.RootChainManager, rootChainManager);
   },
   ensureDependencies: () => ({}),
@@ -512,6 +510,9 @@ const configurePolygonPosBridgeTask: Task = {
     const tokenType = utils.keccak256(UNSRegistry.address);
     await rootChainManager.registerPredicate(tokenType, MintableERC721Predicate.address);
     await rootChainManager.mapToken(UNSRegistry.address, UNSRegistry.address, tokenType);
+
+    const predicate = ctx.artifacts.MintableERC721Predicate.attach(MintableERC721Predicate.address).connect(owner);
+    await predicate.grantRole(await predicate.MANAGER_ROLE(), rootChainManager.address);
   },
   ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
