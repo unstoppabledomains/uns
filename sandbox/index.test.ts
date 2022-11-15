@@ -17,6 +17,7 @@ describe('Sandbox', async () => {
 
   let unsRegistry: UNSRegistry, cnsRegistry: CNSRegistry, mintingManager: MintingManager;
   let signers: SignerWithAddress[], owner: SignerWithAddress, minter: SignerWithAddress;
+  let predicateAddress: string;
 
   let sandbox: Sandbox;
 
@@ -34,6 +35,8 @@ describe('Sandbox', async () => {
     unsRegistry = new UNSRegistry__factory(owner).attach(contracts.UNSRegistry.address);
     cnsRegistry = new CNSRegistry__factory(owner).attach(contracts.CNSRegistry.address);
     mintingManager = new MintingManager__factory(owner).attach(contracts.MintingManager.address);
+
+    predicateAddress = contracts.MintableERC721Predicate.address;
   });
 
   beforeEach(async () => {
@@ -89,6 +92,28 @@ describe('Sandbox', async () => {
     );
 
     expect(await unsRegistry.ownerOf(tokenId)).to.be.eq(owner.address);
+    // Somehow error cannot be decoded automatically here, used try...catch
+    try {
+      await cnsRegistry.callStatic.ownerOf(tokenId);
+      assert.fail('Error is ecpected');
+    } catch (error) {}
+  });
+
+  it('should migrate token from CNS to UNS L2', async () => {
+    const labels = [domainPrefix, 'crypto'];
+    const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, domainPrefix);
+
+    const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], []);
+    await tx.wait();
+
+    await cnsRegistry['safeTransferFrom(address,address,uint256,bytes)'](
+      owner.address,
+      unsRegistry.address,
+      tokenId,
+      abiCoder.encode(['bool'], [true]),
+    );
+
+    expect(await unsRegistry.ownerOf(tokenId)).to.be.eq(predicateAddress);
     // Somehow error cannot be decoded automatically here, used try...catch
     try {
       await cnsRegistry.callStatic.ownerOf(tokenId);
