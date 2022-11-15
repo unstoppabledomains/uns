@@ -1,6 +1,6 @@
 {
   "name": "uns",
-  "version": "0.6.12",
+  "version": "0.6.13",
   "description": "UNS contracts and tools",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "main": "./dist/index.js",
@@ -9,6 +9,7 @@
   "scripts": {
     "compile": "hardhat compile --force;",
     "build:package": "yarn compile; rm -Rf dist/*; tsc",
+    "build:ci": "yarn build:package && yarn rebuild:sandbox && yarn copy:assets",
     "copy:assets": "cp sandbox/db.tgz dist/sandbox/; cp uns-config.json dist/",
     "compile:size": "env ENABLE_CONTRACT_SIZER=true yarn compile",
     "coverage": "hardhat coverage",

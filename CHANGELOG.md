@@ -1,29 +1,42 @@
+## v0.6.13
+
+- [Bugfix] Sandbox deployment
+
 ## v0.6.12
+
 - Automated release workflow, fixed TS build
 
 ## v0.6.11
+
 - UNSRegistry@0.6.1 cleanup
 - MintingManager@0.4.2 cleanup
 
 ## v0.6.10
+
 - Deploy new version of DotCoinBurner contract with indexed `BatchCompleted` event properties
 
 ## v0.6.9
+
 - Add `SUI` and `MOON` tokens to resolver list
 
 ## v0.6.8
+
 - Mark `ERC20`, `BEP20`, and `MATIC` versions for `Railgun` as deprecated
 
 ## v0.6.7
+
 - Deploy ProxyReader@0.4.0 on Goerli, Mumbai, Mainnet and Polygon
 
 ## v0.6.6
+
 - Made ProxyReader@0.4.0 upgradeable
 
 ## v0.6.5
+
 - Remove MintingManager._ownerOf and use exists & ownerOf instead
 
 ## v0.6.4
+
 - Migrated the repository to `typescript`
 
 ## v0.6.3
