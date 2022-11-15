@@ -470,7 +470,7 @@ const upgradeProxyReaderTask = {
  * It is required for emulation of Bridge for test environments.
  */
 const deployPolygonPosBridgeTask: Task = {
-  tags: ['deploy_polygon_pos_bridge', 'full'],
+  tags: ['polygon_pos_bridge', 'full'],
   priority: 5,
   run: async (ctx: Deployer) => {
     const { owner } = ctx.accounts;
@@ -492,20 +492,7 @@ const deployPolygonPosBridgeTask: Task = {
     await predicate.grantRole(await predicate.MANAGER_ROLE(), rootChainManager.address);
     await ctx.saveContractConfig(UnsContractName.RootChainManager, rootChainManager);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
-    config = merge(ctx.getDeployConfig(), config);
-
-    const { UNSRegistry } = config.contracts || {};
-    const dependencies = { UNSRegistry };
-
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
-  },
+  ensureDependencies: () => ({}),
 };
 
 const configurePolygonPosBridgeTask: Task = {
@@ -524,7 +511,7 @@ const configurePolygonPosBridgeTask: Task = {
 
     const tokenType = utils.keccak256(UNSRegistry.address);
     await rootChainManager.registerPredicate(tokenType, MintableERC721Predicate.address);
-    await rootChainManager.mapToken(UNSRegistry.address, ZERO_ADDRESS, tokenType);
+    await rootChainManager.mapToken(UNSRegistry.address, UNSRegistry.address, tokenType);
   },
   ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
