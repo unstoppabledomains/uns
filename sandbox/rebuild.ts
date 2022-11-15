@@ -13,7 +13,7 @@ if (require.main === module) {
 
       const deployer = await Deployer.create();
 
-      const config = await deployer.execute(['full', 'deploy_polygon_pos_bridge', 'uns_config_polygon_pos_bridge']);
+      const config = await deployer.execute(['full', 'config_polygon_pos_bridge']);
       await sandbox.stop();
 
       mergeNetworkConfig(config);
