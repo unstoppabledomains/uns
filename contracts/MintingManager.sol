@@ -145,14 +145,16 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             string[] memory labels = _buildLabels(requests[i].tld, requests[i].label);
             (uint256 tokenId, ) = _namehash(labels);
 
+            string[] memory empty;
             if (!unsRegistry.exists(tokenId)) {
-                _issue(requests[i].to, labels, false);
+                _issueWithRecords(requests[i].to, labels, empty, empty, false);
             }
         }
     }
 
     function claim(uint256 tld, string calldata label) external override onlyAllowedSLD(tld, label) whenNotPaused {
-        _issue(_msgSender(), _buildLabels(tld, _freeSLDLabel(label)), true);
+        string[] memory empty;
+        _issueWithRecords(_msgSender(), _buildLabels(tld, _freeSLDLabel(label)), empty, empty, true);
     }
 
     function claimTo(
@@ -160,7 +162,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         uint256 tld,
         string calldata label
     ) external override onlyAllowedSLD(tld, label) whenNotPaused {
-        _issue(to, _buildLabels(tld, _freeSLDLabel(label)), true);
+        string[] memory empty;
+        _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), empty, empty, true);
     }
 
     function claimToWithRecords(
@@ -207,15 +210,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         labels[0] = label;
         labels[1] = _tlds[tld];
         return labels;
-    }
-
-    function _issue(
-        address to,
-        string[] memory labels,
-        bool withReverse
-    ) private {
-        string[] memory empty;
-        _issueWithRecords(to, labels, empty, empty, withReverse);
     }
 
     function _issueWithRecords(

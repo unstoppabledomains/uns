@@ -6,20 +6,20 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { task } from 'hardhat/config';
 import { pickBy } from 'lodash';
 
-type MintersMap = Record<string, string[]>
+type MintersMap = Record<string, string[]>;
 
 // We need to extend HardhatUserConfig in order to support custom uns settings.
 declare module 'hardhat/types/config' {
   interface HardhatUserConfig {
     uns?: {
-      minters: MintersMap,
-    }
+      minters: MintersMap;
+    };
   }
 
   interface HardhatConfig {
     uns: {
-      minters: MintersMap
-    }
+      minters: MintersMap;
+    };
   }
 
   interface ProjectPathsUserConfig {
@@ -52,12 +52,7 @@ import { Sandbox } from './sandbox';
 // - ENABLE_GAS_REPORT
 // - ENABLE_CONTRACT_SIZER
 // - CI
-const argv = yargs()
-  .env('')
-  .boolean('enableGasReport')
-  .boolean('enableContractSizer')
-  .boolean('ci')
-  .parseSync();
+const argv = yargs().env('').boolean('enableGasReport').boolean('enableContractSizer').boolean('ci').parseSync();
 
 task(
   TASK_COMPILE,
@@ -140,32 +135,24 @@ const config: HardhatUserConfig = {
     goerli: {
       url: `https://goerli.infura.io/v3/${process.env.GOERLI_INFURA_KEY}`,
       chainId: 5,
-      accounts: process.env.GOERLI_UNS_PRIVATE_KEY
-        ? [process.env.GOERLI_UNS_PRIVATE_KEY]
-        : undefined,
+      accounts: process.env.GOERLI_UNS_PRIVATE_KEY ? [process.env.GOERLI_UNS_PRIVATE_KEY] : undefined,
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.MAINNET_INFURA_KEY}`,
       chainId: 1,
-      accounts: process.env.MAINNET_UNS_PRIVATE_KEY
-        ? [process.env.MAINNET_UNS_PRIVATE_KEY]
-        : undefined,
+      accounts: process.env.MAINNET_UNS_PRIVATE_KEY ? [process.env.MAINNET_UNS_PRIVATE_KEY] : undefined,
       loggingEnabled: true,
     },
     mumbai: {
       url: `https://polygon-mumbai.infura.io/v3/${process.env.MUMBAI_INFURA_KEY}`,
       chainId: 80001,
-      accounts: process.env.MUMBAI_UNS_PRIVATE_KEY
-        ? [process.env.MUMBAI_UNS_PRIVATE_KEY]
-        : undefined,
+      accounts: process.env.MUMBAI_UNS_PRIVATE_KEY ? [process.env.MUMBAI_UNS_PRIVATE_KEY] : undefined,
       loggingEnabled: true,
     },
     polygon: {
       url: `https://polygon-mainnet.infura.io/v3/${process.env.POLYGON_INFURA_KEY}`,
       chainId: 137,
-      accounts: process.env.POLYGON_UNS_PRIVATE_KEY
-        ? [process.env.POLYGON_UNS_PRIVATE_KEY]
-        : undefined,
+      accounts: process.env.POLYGON_UNS_PRIVATE_KEY ? [process.env.POLYGON_UNS_PRIVATE_KEY] : undefined,
       loggingEnabled: true,
     },
   },
@@ -177,11 +164,7 @@ const config: HardhatUserConfig = {
     enabled: argv.enableGasReport,
     currency: 'USD',
     outputFile: argv.ci ? 'gas-report.txt' : undefined,
-    excludeContracts: [
-      'ERC721ReceiverMock',
-      'ERC2771RegistryContextMock',
-      'ERC20Upgradeable',
-    ],
+    excludeContracts: ['ERC721ReceiverMock', 'ERC2771RegistryContextMock', 'ERC20Upgradeable'],
   },
   contractSizer: {
     alphaSort: true,
@@ -191,6 +174,7 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 100000,
+    require: ['./test/helpers/setup.ts'],
   },
   etherscan: {
     apiKey: pickBy({
