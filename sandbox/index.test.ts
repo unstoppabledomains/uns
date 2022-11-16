@@ -50,7 +50,9 @@ describe('Sandbox', async () => {
   it('should mint a token', async () => {
     const labels = [`${domainPrefix}_wallet_0`, 'wallet'];
 
-    const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], []);
+    const tx = await mintingManager
+      .connect(minter)
+      ['issueWithRecords(address,string[],string[],string[],bool)'](owner.address, labels, [], [], true);
     await tx.wait();
 
     const tokenId = await unsRegistry.namehash(labels);
@@ -60,7 +62,9 @@ describe('Sandbox', async () => {
   it('should mint same token as prev test', async () => {
     const labels = [`${domainPrefix}_wallet_0`, 'wallet'];
 
-    const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], []);
+    const tx = await mintingManager
+      .connect(minter)
+      ['issueWithRecords(address,string[],string[],string[],bool)'](owner.address, labels, [], [], true);
     await tx.wait();
 
     const tokenId = await unsRegistry.namehash(labels);
@@ -70,7 +74,9 @@ describe('Sandbox', async () => {
   it('should mint a token in CNS', async () => {
     const labels = [domainPrefix, 'crypto'];
 
-    const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], []);
+    const tx = await mintingManager
+      .connect(minter)
+      ['issueWithRecords(address,string[],string[],string[])'](owner.address, labels, [], []);
     await tx.wait();
 
     const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, domainPrefix);
@@ -81,7 +87,9 @@ describe('Sandbox', async () => {
     const labels = [domainPrefix, 'crypto'];
     const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, domainPrefix);
 
-    const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], []);
+    const tx = await mintingManager
+      .connect(minter)
+      ['issueWithRecords(address,string[],string[],string[])'](owner.address, labels, [], []);
     await tx.wait();
 
     await cnsRegistry['safeTransferFrom(address,address,uint256,bytes)'](
@@ -103,7 +111,9 @@ describe('Sandbox', async () => {
     const labels = [domainPrefix, 'crypto'];
     const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, domainPrefix);
 
-    const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], []);
+    const tx = await mintingManager
+      .connect(minter)
+      ['issueWithRecords(address,string[],string[],string[])'](owner.address, labels, [], []);
     await tx.wait();
 
     await cnsRegistry['safeTransferFrom(address,address,uint256,bytes)'](

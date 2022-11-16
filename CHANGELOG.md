@@ -1,3 +1,7 @@
+## v0.6.14
+
+- Added enforcing minting, bulkMint support
+
 ## v0.6.13
 
 - [Bugfix] Sandbox deployment

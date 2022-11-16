@@ -66,14 +66,14 @@ describe('MintingManager (consumption)', () => {
         {
           func: 'issueWithRecords',
           note: 'mint',
-          selector: 'issueWithRecords(address,string[],string[],string[])',
-          params: [receiver.address, ['t1-w1-', 'wallet'], [], []],
+          selector: 'issueWithRecords(address,string[],string[],string[],bool)',
+          params: [receiver.address, ['t1-w1-', 'wallet'], [], [], true],
         },
         {
           func: 'issueWithRecords',
           note: 'unlock',
-          selector: 'issueWithRecords(address,string[],string[],string[])',
-          params: [receiver.address, ['t1-w1-', 'wallet'], [], []],
+          selector: 'issueWithRecords(address,string[],string[],string[],bool)',
+          params: [receiver.address, ['t1-w1-', 'wallet'], [], [], true],
         },
       ];
     };

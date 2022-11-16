@@ -1,18 +1,15 @@
 import { artifacts } from 'hardhat';
-import {
-  BigNumberish,
-  Contract,
-  ContractReceipt,
-  ContractTransaction,
-  utils,
-} from 'ethers';
+import { BigNumberish, Contract, ContractReceipt, ContractTransaction, utils } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { SimpleCheckpointManager } from '../../types/contracts/@maticnetwork/pos-portal/SimpleCheckpointManager.sol';
 import { submitCheckpoint } from './@maticnetwork/checkpoint';
 import { childWeb3 } from './@maticnetwork/contracts';
 
-const ERC721_TRANSFER_EVENT_SIG =
-  '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+/**
+ * keccak256('Transfer(address,address,uint256)') =
+ *    0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef
+ */
+const ERC721_TRANSFER_EVENT_SIG = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
 const abiCoder = new utils.AbiCoder();
 
@@ -21,26 +18,13 @@ export const buildPredicateExitInput = async (
   receiver: string,
   tokenId: BigNumberish,
 ): Promise<string> => {
-  /**
-   * keccak256('Transfer(address,address,uint256)') =
-   *    0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef
-   */
   return utils.RLP.encode([
     '0x', // skip first elem
-    [
-      '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-      withdrawer,
-      receiver,
-      abiCoder.encode(['uint256'], [tokenId]),
-    ],
+    [ERC721_TRANSFER_EVENT_SIG, withdrawer, receiver, abiCoder.encode(['uint256'], [tokenId])],
   ]);
 };
 
-export const writeCheckpoint = async (
-  contract: Contract,
-  admin: SignerWithAddress,
-  txn: ContractTransaction,
-) => {
+export const writeCheckpoint = async (contract: Contract, admin: SignerWithAddress, txn: ContractTransaction) => {
   const abi = (await artifacts.readArtifact('SimpleCheckpointManager')).abi;
   const checkpointManager = new childWeb3.eth.Contract(abi, contract.address, {
     from: admin.address,
@@ -53,12 +37,9 @@ export const buildExitInput = async (
   receipt: ContractReceipt,
   checkpointData: any, // eslint-disable-line @typescript-eslint/no-explicit-any
 ) => {
-  const headerNumber = (
-    await checkpointManager.currentCheckpointNumber()
-  ).toNumber();
+  const headerNumber = (await checkpointManager.currentCheckpointNumber()).toNumber();
   const logIndex = receipt.logs.findIndex(
-    (log) =>
-      log.topics[0].toLowerCase() === ERC721_TRANSFER_EVENT_SIG.toLowerCase(),
+    (log) => log.topics[0].toLowerCase() === ERC721_TRANSFER_EVENT_SIG.toLowerCase(),
   );
 
   return utils.hexlify(
