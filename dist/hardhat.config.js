@@ -28,12 +28,7 @@ require("hardhat-gas-reporter");
 require("hardhat-contract-sizer");
 const yargs_1 = __importDefault(require("yargs/yargs"));
 const sandbox_1 = require("./sandbox");
-const argv = (0, yargs_1.default)()
-    .env('')
-    .boolean('enableGasReport')
-    .boolean('enableContractSizer')
-    .boolean('ci')
-    .parseSync();
+const argv = (0, yargs_1.default)().env('').boolean('enableGasReport').boolean('enableContractSizer').boolean('ci').parseSync();
 (0, config_1.task)(task_names_1.TASK_COMPILE, 'hook compile task to perform post-compile task', (_, hre, runSuper) => __awaiter(void 0, void 0, void 0, function* () {
     const { root, flatArtifacts } = hre.config.paths;
     const outputDir = path_1.default.resolve(root, flatArtifacts);
@@ -98,32 +93,24 @@ const config = {
         goerli: {
             url: `https://goerli.infura.io/v3/${process.env.GOERLI_INFURA_KEY}`,
             chainId: 5,
-            accounts: process.env.GOERLI_UNS_PRIVATE_KEY
-                ? [process.env.GOERLI_UNS_PRIVATE_KEY]
-                : undefined,
+            accounts: process.env.GOERLI_UNS_PRIVATE_KEY ? [process.env.GOERLI_UNS_PRIVATE_KEY] : undefined,
         },
         mainnet: {
             url: `https://mainnet.infura.io/v3/${process.env.MAINNET_INFURA_KEY}`,
             chainId: 1,
-            accounts: process.env.MAINNET_UNS_PRIVATE_KEY
-                ? [process.env.MAINNET_UNS_PRIVATE_KEY]
-                : undefined,
+            accounts: process.env.MAINNET_UNS_PRIVATE_KEY ? [process.env.MAINNET_UNS_PRIVATE_KEY] : undefined,
             loggingEnabled: true,
         },
         mumbai: {
             url: `https://polygon-mumbai.infura.io/v3/${process.env.MUMBAI_INFURA_KEY}`,
             chainId: 80001,
-            accounts: process.env.MUMBAI_UNS_PRIVATE_KEY
-                ? [process.env.MUMBAI_UNS_PRIVATE_KEY]
-                : undefined,
+            accounts: process.env.MUMBAI_UNS_PRIVATE_KEY ? [process.env.MUMBAI_UNS_PRIVATE_KEY] : undefined,
             loggingEnabled: true,
         },
         polygon: {
             url: `https://polygon-mainnet.infura.io/v3/${process.env.POLYGON_INFURA_KEY}`,
             chainId: 137,
-            accounts: process.env.POLYGON_UNS_PRIVATE_KEY
-                ? [process.env.POLYGON_UNS_PRIVATE_KEY]
-                : undefined,
+            accounts: process.env.POLYGON_UNS_PRIVATE_KEY ? [process.env.POLYGON_UNS_PRIVATE_KEY] : undefined,
             loggingEnabled: true,
         },
     },
@@ -135,11 +122,7 @@ const config = {
         enabled: argv.enableGasReport,
         currency: 'USD',
         outputFile: argv.ci ? 'gas-report.txt' : undefined,
-        excludeContracts: [
-            'ERC721ReceiverMock',
-            'ERC2771RegistryContextMock',
-            'ERC20Upgradeable',
-        ],
+        excludeContracts: ['ERC721ReceiverMock', 'ERC2771RegistryContextMock', 'ERC20Upgradeable'],
     },
     contractSizer: {
         alphaSort: true,
@@ -149,6 +132,7 @@ const config = {
     },
     mocha: {
         timeout: 100000,
+        require: ['./test/helpers/setup.ts'],
     },
     etherscan: {
         apiKey: (0, lodash_1.pickBy)({

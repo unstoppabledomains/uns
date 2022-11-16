@@ -623,6 +623,39 @@ const _abi = [
         type: "function",
     },
     {
+        inputs: [
+            {
+                internalType: "address",
+                name: "to",
+                type: "address",
+            },
+            {
+                internalType: "string[]",
+                name: "labels",
+                type: "string[]",
+            },
+            {
+                internalType: "string[]",
+                name: "keys",
+                type: "string[]",
+            },
+            {
+                internalType: "string[]",
+                name: "values",
+                type: "string[]",
+            },
+            {
+                internalType: "bool",
+                name: "withReverse",
+                type: "bool",
+            },
+        ],
+        name: "mintWithRecords",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
         inputs: [],
         name: "name",
         outputs: [
@@ -1088,6 +1121,39 @@ const _abi = [
                 internalType: "string[]",
                 name: "values",
                 type: "string[]",
+            },
+        ],
+        name: "unlockWithRecords",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
+                name: "to",
+                type: "address",
+            },
+            {
+                internalType: "uint256",
+                name: "tokenId",
+                type: "uint256",
+            },
+            {
+                internalType: "string[]",
+                name: "keys",
+                type: "string[]",
+            },
+            {
+                internalType: "string[]",
+                name: "values",
+                type: "string[]",
+            },
+            {
+                internalType: "bool",
+                name: "withReverse",
+                type: "bool",
             },
         ],
         name: "unlockWithRecords",

@@ -50,6 +50,7 @@ export interface UNSRegistryInterface extends utils.Interface {
         "mint(address,uint256,bytes)": FunctionFragment;
         "mintTLD(uint256,string)": FunctionFragment;
         "mintWithRecords(address,string[],string[],string[])": FunctionFragment;
+        "mintWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
         "name()": FunctionFragment;
         "namehash(string[])": FunctionFragment;
         "nonceOf(uint256)": FunctionFragment;
@@ -76,10 +77,11 @@ export interface UNSRegistryInterface extends utils.Interface {
         "tokenURI(uint256)": FunctionFragment;
         "transferFrom(address,address,uint256)": FunctionFragment;
         "unlockWithRecords(address,uint256,string[],string[])": FunctionFragment;
+        "unlockWithRecords(address,uint256,string[],string[],bool)": FunctionFragment;
         "verify((address,uint256,uint256,bytes),bytes)": FunctionFragment;
         "withdrawFromPolygon(bytes,uint256,string[],string[])": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "BATCH_LIMIT" | "NAME" | "VERSION" | "addKey" | "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "execute" | "exists" | "get" | "getApproved" | "getByHash" | "getKey" | "getKeys" | "getMany" | "getManyByHash" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "isTrustedForwarder" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "name" | "namehash" | "nonceOf" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseOf" | "root" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "verify" | "withdrawFromPolygon"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "BATCH_LIMIT" | "NAME" | "VERSION" | "addKey" | "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "execute" | "exists" | "get" | "getApproved" | "getByHash" | "getKey" | "getKeys" | "getMany" | "getManyByHash" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "isTrustedForwarder" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords(address,string[],string[],string[])" | "mintWithRecords(address,string[],string[],string[],bool)" | "name" | "namehash" | "nonceOf" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseOf" | "root" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords(address,uint256,string[],string[])" | "unlockWithRecords(address,uint256,string[],string[],bool)" | "verify" | "withdrawFromPolygon"): FunctionFragment;
     encodeFunctionData(functionFragment: "BATCH_LIMIT", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
     encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
@@ -115,11 +117,18 @@ export interface UNSRegistryInterface extends utils.Interface {
         PromiseOrValue<BytesLike>
     ]): string;
     encodeFunctionData(functionFragment: "mintTLD", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "mintWithRecords", values: [
+    encodeFunctionData(functionFragment: "mintWithRecords(address,string[],string[],string[])", values: [
         PromiseOrValue<string>,
         PromiseOrValue<string>[],
         PromiseOrValue<string>[],
         PromiseOrValue<string>[]
+    ]): string;
+    encodeFunctionData(functionFragment: "mintWithRecords(address,string[],string[],string[],bool)", values: [
+        PromiseOrValue<string>,
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<boolean>
     ]): string;
     encodeFunctionData(functionFragment: "name", values?: undefined): string;
     encodeFunctionData(functionFragment: "namehash", values: [PromiseOrValue<string>[]]): string;
@@ -184,11 +193,18 @@ export interface UNSRegistryInterface extends utils.Interface {
         PromiseOrValue<string>,
         PromiseOrValue<BigNumberish>
     ]): string;
-    encodeFunctionData(functionFragment: "unlockWithRecords", values: [
+    encodeFunctionData(functionFragment: "unlockWithRecords(address,uint256,string[],string[])", values: [
         PromiseOrValue<string>,
         PromiseOrValue<BigNumberish>,
         PromiseOrValue<string>[],
         PromiseOrValue<string>[]
+    ]): string;
+    encodeFunctionData(functionFragment: "unlockWithRecords(address,uint256,string[],string[],bool)", values: [
+        PromiseOrValue<string>,
+        PromiseOrValue<BigNumberish>,
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<boolean>
     ]): string;
     encodeFunctionData(functionFragment: "verify", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
     encodeFunctionData(functionFragment: "withdrawFromPolygon", values: [
@@ -223,7 +239,8 @@ export interface UNSRegistryInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "mint(address,uint256)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "mint(address,uint256,bytes)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "mintTLD", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "mintWithRecords", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "mintWithRecords(address,string[],string[],string[])", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "mintWithRecords(address,string[],string[],string[],bool)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "namehash", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "nonceOf", data: BytesLike): Result;
@@ -249,7 +266,8 @@ export interface UNSRegistryInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferFrom", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "unlockWithRecords", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "unlockWithRecords(address,uint256,string[],string[])", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "unlockWithRecords(address,uint256,string[],string[],bool)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "verify", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdrawFromPolygon", data: BytesLike): Result;
     events: {
@@ -466,7 +484,10 @@ export interface UNSRegistry extends BaseContract {
         mintTLD(tokenId: PromiseOrValue<BigNumberish>, uri: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
-        mintWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+        "mintWithRecords(address,string[],string[],string[])"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        "mintWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         name(overrides?: CallOverrides): Promise<[string]>;
@@ -526,7 +547,10 @@ export interface UNSRegistry extends BaseContract {
         transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
-        unlockWithRecords(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+        "unlockWithRecords(address,uint256,string[],string[])"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        "unlockWithRecords(address,uint256,string[],string[],bool)"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
@@ -588,7 +612,10 @@ export interface UNSRegistry extends BaseContract {
     mintTLD(tokenId: PromiseOrValue<BigNumberish>, uri: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
-    mintWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+    "mintWithRecords(address,string[],string[],string[])"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    "mintWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     name(overrides?: CallOverrides): Promise<string>;
@@ -646,7 +673,10 @@ export interface UNSRegistry extends BaseContract {
     transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
-    unlockWithRecords(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+    "unlockWithRecords(address,uint256,string[],string[])"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    "unlockWithRecords(address,uint256,string[],string[],bool)"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
@@ -686,7 +716,8 @@ export interface UNSRegistry extends BaseContract {
         "mint(address,uint256)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         "mint(address,uint256,bytes)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg2: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
         mintTLD(tokenId: PromiseOrValue<BigNumberish>, uri: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        mintWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
+        "mintWithRecords(address,string[],string[],string[])"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
+        "mintWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         name(overrides?: CallOverrides): Promise<string>;
         namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<BigNumber>;
         nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
@@ -712,7 +743,8 @@ export interface UNSRegistry extends BaseContract {
         symbol(overrides?: CallOverrides): Promise<string>;
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        unlockWithRecords(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
+        "unlockWithRecords(address,uint256,string[],string[])"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
+        "unlockWithRecords(address,uint256,string[],string[],bool)"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
         withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
     };
@@ -793,7 +825,10 @@ export interface UNSRegistry extends BaseContract {
         mintTLD(tokenId: PromiseOrValue<BigNumberish>, uri: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
-        mintWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+        "mintWithRecords(address,string[],string[],string[])"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        "mintWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         name(overrides?: CallOverrides): Promise<BigNumber>;
@@ -851,7 +886,10 @@ export interface UNSRegistry extends BaseContract {
         transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
-        unlockWithRecords(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+        "unlockWithRecords(address,uint256,string[],string[])"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        "unlockWithRecords(address,uint256,string[],string[],bool)"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
@@ -908,7 +946,10 @@ export interface UNSRegistry extends BaseContract {
         mintTLD(tokenId: PromiseOrValue<BigNumberish>, uri: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
-        mintWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+        "mintWithRecords(address,string[],string[],string[])"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        "mintWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -966,7 +1007,10 @@ export interface UNSRegistry extends BaseContract {
         transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
-        unlockWithRecords(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+        "unlockWithRecords(address,uint256,string[],string[])"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        "unlockWithRecords(address,uint256,string[],string[],bool)"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;

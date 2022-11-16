@@ -83,6 +83,36 @@ const _abi = [
     {
         inputs: [
             {
+                components: [
+                    {
+                        internalType: "address",
+                        name: "to",
+                        type: "address",
+                    },
+                    {
+                        internalType: "string",
+                        name: "label",
+                        type: "string",
+                    },
+                    {
+                        internalType: "uint256",
+                        name: "tld",
+                        type: "uint256",
+                    },
+                ],
+                internalType: "struct IMintingManager.BulkSLDIssueRequest[]",
+                name: "requests",
+                type: "tuple[]",
+            },
+        ],
+        name: "bulkIssue",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
                 internalType: "uint256",
                 name: "tld",
                 type: "uint256",
@@ -150,6 +180,39 @@ const _abi = [
             },
         ],
         name: "claimToWithRecords",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
+                name: "to",
+                type: "address",
+            },
+            {
+                internalType: "string[]",
+                name: "labels",
+                type: "string[]",
+            },
+            {
+                internalType: "string[]",
+                name: "keys",
+                type: "string[]",
+            },
+            {
+                internalType: "string[]",
+                name: "values",
+                type: "string[]",
+            },
+            {
+                internalType: "bool",
+                name: "withReverse",
+                type: "bool",
+            },
+        ],
+        name: "issueWithRecords",
         outputs: [],
         stateMutability: "nonpayable",
         type: "function",
