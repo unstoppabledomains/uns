@@ -214,7 +214,7 @@ describe('MintingManager', () => {
     });
 
     beforeEach(() => {
-      domainSuffix = `prefixed-domain-${Math.random() * 1000}`;
+      domainSuffix = `prefixed-domain-${Math.floor((Math.random() * 1000))}`;
     });
 
     describe('claim(uint256,string)', () => {
