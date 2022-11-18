@@ -9,7 +9,10 @@ import { MintingController, URIPrefixController } from '../types/dot-crypto/cont
 import { MintingManager__factory, ProxyReader__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { MintingManagerMock__factory, UNSRegistryMock__factory } from '../types/factories/contracts/mocks';
 import { CNSRegistry__factory, Resolver__factory } from '../types/factories/dot-crypto/contracts';
-import { MintingController__factory, URIPrefixController__factory } from '../types/factories/dot-crypto/contracts/controllers';
+import {
+  MintingController__factory,
+  URIPrefixController__factory,
+} from '../types/factories/dot-crypto/contracts/controllers';
 import { ZERO_ADDRESS, TLD } from './helpers/constants';
 
 describe('MintingManager', () => {
@@ -54,9 +57,7 @@ describe('MintingManager', () => {
 
       expect(await mintingManager.owner()).to.be.equal(receiver.address);
 
-      await expect(
-        mintingManager.connect(coinbase).pause(),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(mintingManager.connect(coinbase).pause()).to.be.revertedWith('Ownable: caller is not the owner');
     });
   });
 
@@ -69,8 +70,8 @@ describe('MintingManager', () => {
       unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
       mintingManager = await new MintingManager__factory(coinbase).deploy();
       cnsRegistry = await new CNSRegistry__factory(coinbase).deploy();
-      unsRegistryMock =  await new UNSRegistryMock__factory(coinbase).deploy();
-      mintingManagerMock =  await new MintingManagerMock__factory(coinbase).deploy();
+      unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
+      mintingManagerMock = await new MintingManagerMock__factory(coinbase).deploy();
 
       await unsRegistryMock.initialize(mintingManagerMock.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
@@ -177,9 +178,9 @@ describe('MintingManager', () => {
 
         const issueWithRecords = mintingManager['issueWithRecords(address,string[],string[],string[],bool)'];
 
-        await expect(
-          issueWithRecords(coinbase.address, ['sld-domain-qq', tld], [], [], true),
-        ).to.be.revertedWith('MintingManager: TLD_NOT_REGISTERED');
+        await expect(issueWithRecords(coinbase.address, ['sld-domain-qq', tld], [], [], true)).to.be.revertedWith(
+          'MintingManager: TLD_NOT_REGISTERED',
+        );
       });
 
       it('should revert removing TLD when not registred', async () => {
@@ -214,7 +215,7 @@ describe('MintingManager', () => {
     });
 
     beforeEach(() => {
-      domainSuffix = `prefixed-domain-${Math.floor((Math.random() * 1000))}`;
+      domainSuffix = `prefixed-domain-${Math.floor(Math.random() * 1000)}`;
     });
 
     describe('claim(uint256,string)', () => {
@@ -314,9 +315,9 @@ describe('MintingManager', () => {
         const selector = 'issueWithRecords(address,string[],string[],string[])';
 
         it('should revert minting when tld is invalid', async () => {
-          await expect(
-            mintingManager[selector](coinbase.address, ['test-1ka3', 'unknown'], [], []),
-          ).to.be.revertedWith('MintingManager: TLD_NOT_REGISTERED');
+          await expect(mintingManager[selector](coinbase.address, ['test-1ka3', 'unknown'], [], [])).to.be.revertedWith(
+            'MintingManager: TLD_NOT_REGISTERED',
+          );
         });
 
         it('should mint .wallet domain', async () => {
@@ -390,9 +391,9 @@ describe('MintingManager', () => {
 
           labels.unshift('sub');
 
-          await expect(
-            mintingManager.connect(receiver)[selector](coinbase.address, labels, [], []),
-          ).to.be.revertedWith('MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER');
+          await expect(mintingManager.connect(receiver)[selector](coinbase.address, labels, [], [])).to.be.revertedWith(
+            'MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER',
+          );
         });
 
         it('should mint .wallet subdomain', async () => {
@@ -462,6 +463,29 @@ describe('MintingManager', () => {
         });
       });
     });
+
+    describe('label verification', () => {
+      const selector = 'issueWithRecords(address,string[],string[],string[])';
+      it('should not allow to mint domains with invalid labels', async () => {
+        const labels = ['', '-', 'Q', 'q-', '-q', 'qwerty-', 'qwertY', '*', '$3123', '\tq', 'q\n'];
+        for (const label of labels) {
+          await expect(mintingManager[selector](coinbase.address, [label, 'x'], [], [])).to.be.revertedWith(
+            'MintingManager: LABEL_INVALID',
+          );
+        }
+      });
+
+      it('should allow to mint domains with valid labels', async () => {
+        const labels = ['q', 'q1', 'qw-erty', 'qw3rty', 'qw3-rty1'];
+        for (const label of labels) {
+          const _labels = [label, 'x'];
+          await mintingManager[selector](coinbase.address, _labels, [], []);
+
+          const tokenId = await unsRegistry.namehash(_labels);
+          expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+        }
+      });
+    });
   });
 
   describe('Tld-based minting', () => {
@@ -472,14 +496,9 @@ describe('MintingManager', () => {
       mintingController = await new MintingController__factory(coinbase).deploy(cnsRegistry.address);
       await cnsRegistry.addController(mintingController.address);
 
-      resolver = await new Resolver__factory(coinbase).deploy(
-        cnsRegistry.address,
-        mintingController.address,
-      );
+      resolver = await new Resolver__factory(coinbase).deploy(cnsRegistry.address, mintingController.address);
 
-      uriPrefixController = await new URIPrefixController__factory(coinbase).deploy(
-        cnsRegistry.address,
-      );
+      uriPrefixController = await new URIPrefixController__factory(coinbase).deploy(cnsRegistry.address);
       await cnsRegistry.addController(uriPrefixController.address);
 
       mintingManager = await new MintingManager__factory(coinbase).deploy();
@@ -631,13 +650,7 @@ describe('MintingManager', () => {
       const selector = 'issueWithRecords(address,string[],string[],string[],bool)';
 
       it('should mint with records .crypto domain in CNS registry', async () => {
-        await mintingManager[selector](
-          coinbase.address,
-          ['test-m110-2', 'crypto'],
-          ['key1'],
-          ['value1'],
-          true,
-        );
+        await mintingManager[selector](coinbase.address, ['test-m110-2', 'crypto'], ['key1'], ['value1'], true);
 
         const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test-m110');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
@@ -648,13 +661,7 @@ describe('MintingManager', () => {
       });
 
       it('should mint with records .wallet domain in UNS registry', async () => {
-        await mintingManager[selector](
-          coinbase.address,
-          ['test-mcm332-2', 'wallet'],
-          ['key1'],
-          ['value1'],
-          true,
-        );
+        await mintingManager[selector](coinbase.address, ['test-mcm332-2', 'wallet'], ['key1'], ['value1'], true);
 
         const tokenId = await cnsRegistry.childIdOf(TLD.WALLET, 'test-mcm332');
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
@@ -772,9 +779,9 @@ describe('MintingManager', () => {
 
       it('should revert if not minter', async () => {
         await expect(
-          mintingManager.connect(signers[1]).bulkIssue([
-            { to: coinbase.address, label: 'belk-issue-not-minter-test', tld: TLD.X },
-          ]),
+          mintingManager
+            .connect(signers[1])
+            .bulkIssue([{ to: coinbase.address, label: 'belk-issue-not-minter-test', tld: TLD.X }]),
         ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
       });
 
@@ -832,10 +839,7 @@ describe('MintingManager', () => {
 
         await mintingManager['issueWithRecords(address,string[],string[],string[],bool)'](
           coinbase.address,
-          [
-            'test-block-49vh',
-            'wallet',
-          ],
+          ['test-block-49vh', 'wallet'],
           [],
           [],
           true,
@@ -942,9 +946,9 @@ describe('MintingManager', () => {
       it('should revert mint when paused', async () => {
         const issueWithRecords = mintingManager['issueWithRecords(address,string[],string[],string[])'];
 
-        await expect(
-          issueWithRecords(coinbase.address, ['test-paused-mint', 'wallet'], [], []),
-        ).to.be.revertedWith('Pausable: PAUSED');
+        await expect(issueWithRecords(coinbase.address, ['test-paused-mint', 'wallet'], [], [])).to.be.revertedWith(
+          'Pausable: PAUSED',
+        );
       });
 
       it('should revert mint withReverse when paused', async () => {
@@ -1002,9 +1006,9 @@ describe('MintingManager', () => {
 
         const issueWithRecords = mintingManager['issueWithRecords(address,string[],string[],string[],bool)'];
 
-        await expect(
-          issueWithRecords(coinbase.address, ['test-pausable', 'wallet'], [], [], true),
-        ).to.be.revertedWith('Pausable: PAUSED');
+        await expect(issueWithRecords(coinbase.address, ['test-pausable', 'wallet'], [], [], true)).to.be.revertedWith(
+          'Pausable: PAUSED',
+        );
 
         // Unpaused
         await expect(mintingManager.unpause()).to.emit(mintingManager, 'Unpaused').withArgs(coinbase.address);

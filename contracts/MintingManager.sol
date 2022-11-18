@@ -44,7 +44,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
     modifier onlyAllowedSLD(uint256 tld, string memory label) {
-        _ensureAllowed(tld, label, label);
+        _ensureAllowed(tld, label);
         _;
     }
 
@@ -56,7 +56,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      */
     modifier onlyAllowed(string[] memory labels) {
         require(labels.length >= 2, 'MintingManager: LABELS_LENGTH_BELOW_2');
-        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[labels.length - 2], labels[0]);
+        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[labels.length - 2]);
         _;
     }
 
@@ -139,7 +139,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function bulkIssue(BulkSLDIssueRequest[] calldata requests) external override onlyMinter {
         for (uint256 i = 0; i < requests.length; i++) {
-            _ensureAllowed(requests[i].tld, requests[i].label, requests[i].label);
+            _ensureAllowed(requests[i].tld, requests[i].label);
 
             string[] memory labels = _buildLabels(requests[i].tld, requests[i].label);
             (uint256 tokenId, ) = _namehash(labels);
@@ -267,16 +267,12 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         }
     }
 
-    function _ensureAllowed(
-        uint256 tld,
-        string memory sld,
-        string memory label
-    ) private view {
+    function _ensureAllowed(uint256 tld, string memory label) private view {
         require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
-        Strings.Slice memory _sld = sld.toSlice();
-        if (_sld._len > 10) {
+        Strings.Slice memory _label = label.toSlice();
+        if (_label._len > 10) {
             require(
-                _sld.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
+                _label.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
                 'MintingManager: TOKEN_LABEL_PROHIBITED'
             );
         }
