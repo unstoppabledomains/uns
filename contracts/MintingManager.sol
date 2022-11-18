@@ -316,21 +316,23 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         return address(cnsMintingController) != address(0) && tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
     }
 
+    /**
+     * The label must start with a letter, end with a letter or digit,
+     * and have as interior characters only letters, digits, and hyphen.
+     */
     function _isValidLabel(string memory str) private pure returns (bool) {
+        if (bytes(str).length == 0) {
+            return false;
+        }
+
         uint256 ptr;
         /* solium-disable-next-line security/no-inline-assembly */
         assembly {
             ptr := add(str, 0x20)
         }
 
-        for (uint256 i = 0; i < bytes(str).length; i++) {
-            bytes1 ptrdata;
-            /* solium-disable-next-line security/no-inline-assembly */
-            assembly {
-                ptrdata := mload(add(ptr, i))
-            }
-
-            uint8 data = uint8(ptrdata);
+        for (uint256 i = 1; i < bytes(str).length - 1; i++) {
+            uint8 data = _charAt(ptr, i);
             if (
                 data != 45 && // hyphen (-)
                 !(data >= 48 && data <= 57) && // 0-9
@@ -340,21 +342,29 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             }
         }
 
-        bytes1 fptrdata;
-        /* solium-disable-next-line security/no-inline-assembly */
-        assembly {
-            fptrdata := mload(ptr)
+        // first char must be letter
+        uint8 fdata = _charAt(ptr, 0);
+        bool fvalid = fdata >= 97 && fdata <= 122; // a-z
+
+        // last char must be letter or digit
+        bool lvalid = true;
+        if (bytes(str).length > 1) {
+            uint8 ldata = _charAt(ptr, bytes(str).length - 1);
+            lvalid =
+                (ldata >= 48 && ldata <= 57) || // 0-9
+                (ldata >= 97 && ldata <= 122); // a-z
         }
 
-        uint256 lastindex = bytes(str).length - 1;
-        bytes1 lptrdata;
+        return fvalid && lvalid;
+    }
+
+    function _charAt(uint256 ptr, uint256 index) private pure returns (uint8) {
+        bytes1 ptrdata;
         /* solium-disable-next-line security/no-inline-assembly */
         assembly {
-            lptrdata := mload(add(ptr, lastindex))
+            ptrdata := mload(add(ptr, index))
         }
-
-        // do not allow a hyphen(-) as the first or last character
-        return uint8(fptrdata) != 45 && uint8(lptrdata) != 45;
+        return uint8(ptrdata);
     }
 
     // Reserved storage space to allow for layout changes in the future.
