@@ -476,7 +476,7 @@ describe('MintingManager', () => {
       });
 
       it('should allow to mint domains with valid labels', async () => {
-        const labels = ['q', 'q1', 'qw-erty', 'qw3rty', 'qw3-rty1'];
+        const labels = ['q', 'q1', '1q', '1-q', 'qw-erty', 'qw3rty', 'qw3-rty1'];
         for (const label of labels) {
           const _labels = [label, 'x'];
           await mintingManager[selector](coinbase.address, _labels, [], []);

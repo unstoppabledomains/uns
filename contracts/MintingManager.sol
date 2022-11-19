@@ -338,9 +338,9 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             }
         }
 
-        // first char must be letter
+        // first char must be letter or digit
         uint8 fdata = _charAt(ptr, 0);
-        bool fvalid = fdata >= 97 && fdata <= 122; // a-z
+        bool fvalid = (fdata >= 48 && fdata <= 57) || (fdata >= 97 && fdata <= 122); // a-z0-9
 
         // last char must be letter or digit
         bool lvalid = true;
