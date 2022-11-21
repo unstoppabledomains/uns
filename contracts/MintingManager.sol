@@ -313,7 +313,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     /**
-     * The label must start with a letter, end with a letter or digit,
+     * The label must start with a letter or digit, end with a letter or digit,
      * and have as interior characters only letters, digits, and hyphen.
      */
     function _isValidLabel(string memory str) private pure returns (bool) {
@@ -340,7 +340,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
         // first char must be letter or digit
         uint8 fdata = _charAt(ptr, 0);
-        bool fvalid = (fdata >= 48 && fdata <= 57) || (fdata >= 97 && fdata <= 122); // a-z0-9
+        bool fvalid = (fdata >= 48 && fdata <= 57) || (fdata >= 97 && fdata <= 122); // 0-9a-z
 
         // last char must be letter or digit
         bool lvalid = true;
