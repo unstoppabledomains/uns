@@ -1463,7 +1463,7 @@
     },
     "crypto.NEAR.address": {
       "deprecatedKeyName": "NEAR",
-      "validationRegex": "^0x[a-zA-Z0-9]*$",
+      "validationRegex": "^((([a-z\\d]+[\\-_])*[a-z\\d]+\\.)*([a-z\\d]+[\\-_])*[a-z\\d]+)|([a-f0-9]{64})$",
       "deprecated": false
     },
     "crypto.HNT.address": {
