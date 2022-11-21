@@ -313,8 +313,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     /**
-     * The label must start with a letter or digit, end with a letter or digit,
-     * and have as interior characters only letters, digits, and hyphen.
+     * The label must contains letters, digits, and hyphen.
      */
     function _isValidLabel(string memory str) private pure returns (bool) {
         if (bytes(str).length == 0) {
@@ -327,7 +326,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             ptr := add(str, 0x20)
         }
 
-        for (uint256 i = 1; i < bytes(str).length - 1; i++) {
+        for (uint256 i = 0; i < bytes(str).length; i++) {
             uint8 data = _charAt(ptr, i);
             if (
                 data != 45 && // hyphen (-)
@@ -337,21 +336,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
                 return false;
             }
         }
-
-        // first char must be letter or digit
-        uint8 fdata = _charAt(ptr, 0);
-        bool fvalid = (fdata >= 48 && fdata <= 57) || (fdata >= 97 && fdata <= 122); // 0-9a-z
-
-        // last char must be letter or digit
-        bool lvalid = true;
-        if (bytes(str).length > 1) {
-            uint8 ldata = _charAt(ptr, bytes(str).length - 1);
-            lvalid =
-                (ldata >= 48 && ldata <= 57) || // 0-9
-                (ldata >= 97 && ldata <= 122); // a-z
-        }
-
-        return fvalid && lvalid;
+        return true;
     }
 
     function _charAt(uint256 ptr, uint256 index) private pure returns (uint8) {

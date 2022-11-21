@@ -467,7 +467,7 @@ describe('MintingManager', () => {
     describe('label verification', () => {
       const selector = 'issueWithRecords(address,string[],string[],string[])';
       it('should not allow to mint domains with invalid labels', async () => {
-        const labels = ['', '-', 'Q', 'q-', '-q', 'qwerty-', 'qwertY', 'qwErty', '*', '$3123', '\tq', 'q\n', '@'];
+        const labels = ['', 'Q', 'qwertY', 'qwErty', '*', '$3123', '\tq', 'q\n', '@'];
         for (const label of labels) {
           await expect(mintingManager[selector](coinbase.address, [label, 'x'], [], [])).to.be.revertedWith(
             'MintingManager: LABEL_INVALID',
@@ -476,7 +476,7 @@ describe('MintingManager', () => {
       });
 
       it('should allow to mint domains with valid labels', async () => {
-        const labels = ['q', '1', 'q1', '1q', '1-q', 'qw-erty', 'qw3rty', 'qw3-rty1'];
+        const labels = ['-', 'q', 'q-', '-q', '1', 'q1', '1q', '1-q', 'qwerty-', 'qw-erty', 'qw3rty', 'qw3-rty1'];
         for (const label of labels) {
           const _labels = [label, 'x'];
           await mintingManager[selector](coinbase.address, _labels, [], []);
