@@ -1,5 +1,5 @@
 {
-    "version": "0.6.4",
+    "version": "0.6.5",
     "networks": {
         "1": {
             "contracts": {
@@ -114,7 +114,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x070e83FCed225184E67c86302493ffFCDB953f71",
-                    "implementation": "0x2704a7E3106460a4b2316DB1808df2e429998145",
+                    "implementation": "0x21cb8483557dcF7638496f6389b7f9E074429aB8",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ea",
                     "forwarder": "0x070e83FCed225184E67c86302493ffFCDB953f71"
@@ -127,7 +127,7 @@
                 },
                 "MintingManager": {
                     "address": "0x9ee42D3EB042e06F8Cd241890C4fA0d51e4DA345",
-                    "implementation": "0x914df58A6c8fBfa7734917c6A60c4253aEb8a5C6",
+                    "implementation": "0x7cA1cE20edAbf0176408AAc0D25020C6D66fcF1a",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ec",
                     "forwarder": "0x7F9F48cF94C69ce91D4b442DA186F31118ac0185"
@@ -412,7 +412,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93",
-                    "implementation": "0x4Ee389840f21e18e0CA1f9E612C9B72FdE16F3bE",
+                    "implementation": "0x4fec01ba3a4E0Df28c1A54b488be36370E0Bef85",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f43",
                     "forwarder": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93"
@@ -425,7 +425,7 @@
                 },
                 "MintingManager": {
                     "address": "0x428189346bb3CC52f031A1092fd47C919AC30A9f",
-                    "implementation": "0x8d0A19fA1ef2dbb442788Af668680B09314460B1",
+                    "implementation": "0x1f640d001F0219B1B14cD04E54759Aa5f7412665",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f4a",
                     "forwarder": "0xEf3a491A8750BEC2Dff5339CF6Df94436d432C4d"
