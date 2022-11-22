@@ -469,16 +469,18 @@ describe('MintingManager', () => {
       const issueWithRecordsWithReverse = 'issueWithRecords(address,string[],string[],string[],bool)';
 
       it('should not allow to mint domains with invalid labels', async () => {
-        const labels = [' ', 'Q', 'qwertY', 'qwErty', '*', '$3123', '\tq', 'q\n', '@', 'k.h'];
+        const labels = ['', ' ', 'Q', 'qwertY', 'qwErty', '*', '$3123', '\tq', 'q\n', '@', 'k.h'];
         await mintingManager[issueWithRecords](coinbase.address, ['test1', 'x'], [], []);
 
         for (const label of labels) {
-          await expect(
-            mintingManager[issueWithRecords](coinbase.address, [label, 'test1', 'x'], [], []),
-          ).to.be.revertedWith('MintingManager: LABEL_INVALID');
-          await expect(
-            mintingManager[issueWithRecordsWithReverse](coinbase.address, [label, 'test1', 'x'], [], [], false),
-          ).to.be.revertedWith('MintingManager: LABEL_INVALID');
+          if (label) {
+            await expect(
+              mintingManager[issueWithRecords](coinbase.address, [label, 'test1', 'x'], [], []),
+            ).to.be.revertedWith('MintingManager: LABEL_INVALID');
+            await expect(
+              mintingManager[issueWithRecordsWithReverse](coinbase.address, [label, 'test1', 'x'], [], [], false),
+            ).to.be.revertedWith('MintingManager: LABEL_INVALID');
+          }
           await expect(mintingManager.claim(TLD.X, label)).to.be.revertedWith('MintingManager: LABEL_INVALID');
           await expect(mintingManager.claimTo(coinbase.address, TLD.X, label)).to.be.revertedWith(
             'MintingManager: LABEL_INVALID',
