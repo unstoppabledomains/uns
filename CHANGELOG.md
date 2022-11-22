@@ -1,3 +1,7 @@
+## v0.6.15
+
+- MintingManager@0.4.4 added domain label validation
+
 ## v0.6.14
 
 - Added enforcing minting, bulkMint support
