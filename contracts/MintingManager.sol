@@ -56,7 +56,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      */
     modifier onlyAllowed(string[] memory labels) {
         require(labels.length >= 2, 'MintingManager: LABELS_LENGTH_BELOW_2');
-        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[labels.length - 2]);
+        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[0]);
         _;
     }
 
