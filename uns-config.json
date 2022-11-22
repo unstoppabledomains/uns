@@ -5,7 +5,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x049aba7510f45BA5b64ea9E658E342F904DB358D",
-                    "implementation": "0xe2D8Ada972AEA3D9b2D9755324aCb55a99B410cb",
+                    "implementation": "0x952254Ca7925ABAdd9E141AAbcCD6e1cF684147F",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xc2fede",
                     "forwarder": "0x049aba7510f45BA5b64ea9E658E342F904DB358D"
@@ -18,7 +18,7 @@
                 },
                 "MintingManager": {
                     "address": "0x2a7084870bB724175a3C96Da8FaA55128fa3E19D",
-                    "implementation": "0xED6EB2dfD0F0D0a98b0b8695A8E9056E55feFC85",
+                    "implementation": "0xf51b669Df92d68394a1FFBC6Ae84bf016290687C",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xc2fee0",
                     "forwarder": "0xb970fbCF52cd8111c76c379D4f2FE12E7f8AE7fb"
@@ -215,7 +215,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
-                    "implementation": "0x4e4Fe33d43C6B925EEA3f18527A1794a7370aFF6",
+                    "implementation": "0x3F72a5647295e857C6a90a071Aed99B2A0534fE2",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272eb5",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
@@ -228,7 +228,7 @@
                 },
                 "MintingManager": {
                     "address": "0x7be83293BeeDc9Eba1bd76c66A65F10F3efaeC26",
-                    "implementation": "0x480589b28f57Ab694246EFa21b23306093350845",
+                    "implementation": "0x723a38c8e57DB4bc884cB8BE7CDF83A5789A9c3A",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272f41",
                     "forwarder": "0xC37d3c4326ab0E1D2b9D8b916bBdf5715f780fcF"
