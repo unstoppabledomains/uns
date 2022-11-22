@@ -48,7 +48,7 @@ describe('Sandbox', async () => {
   });
 
   it('should mint a token', async () => {
-    const labels = [`${domainPrefix}_wallet_0`, 'wallet'];
+    const labels = [`${domainPrefix}-wallet-0`, 'wallet'];
 
     const tx = await mintingManager
       .connect(minter)
@@ -60,7 +60,7 @@ describe('Sandbox', async () => {
   });
 
   it('should mint same token as prev test', async () => {
-    const labels = [`${domainPrefix}_wallet_0`, 'wallet'];
+    const labels = [`${domainPrefix}-wallet-0`, 'wallet'];
 
     const tx = await mintingManager
       .connect(minter)
