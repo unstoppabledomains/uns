@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.4';
+    string public constant VERSION = '0.4.5';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -56,7 +56,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      */
     modifier onlyAllowed(string[] memory labels) {
         require(labels.length >= 2, 'MintingManager: LABELS_LENGTH_BELOW_2');
-        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[labels.length - 2]);
+        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[0]);
         _;
     }
 

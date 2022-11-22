@@ -465,11 +465,27 @@ describe('MintingManager', () => {
     });
 
     describe('label verification', () => {
-      const selector = 'issueWithRecords(address,string[],string[],string[])';
+      const issueWithRecords = 'issueWithRecords(address,string[],string[],string[])';
+      const issueWithRecordsWithReverse = 'issueWithRecords(address,string[],string[],string[],bool)';
+
       it('should not allow to mint domains with invalid labels', async () => {
-        const labels = ['', 'Q', 'qwertY', 'qwErty', '*', '$3123', '\tq', 'q\n', '@'];
+        const labels = ['', ' ', 'Q', 'qwertY', 'qwErty', '*', '$3123', '\tq', 'q\n', '@', 'k.h'];
+        await mintingManager[issueWithRecords](coinbase.address, ['test1', 'x'], [], []);
+
         for (const label of labels) {
-          await expect(mintingManager[selector](coinbase.address, [label, 'x'], [], [])).to.be.revertedWith(
+          if (label) {
+            await expect(
+              mintingManager[issueWithRecords](coinbase.address, [label, 'test1', 'x'], [], []),
+            ).to.be.revertedWith('MintingManager: LABEL_INVALID');
+            await expect(
+              mintingManager[issueWithRecordsWithReverse](coinbase.address, [label, 'test1', 'x'], [], [], false),
+            ).to.be.revertedWith('MintingManager: LABEL_INVALID');
+          }
+          await expect(mintingManager.claim(TLD.X, label)).to.be.revertedWith('MintingManager: LABEL_INVALID');
+          await expect(mintingManager.claimTo(coinbase.address, TLD.X, label)).to.be.revertedWith(
+            'MintingManager: LABEL_INVALID',
+          );
+          await expect(mintingManager.claimToWithRecords(coinbase.address, TLD.X, label, [], [])).to.be.revertedWith(
             'MintingManager: LABEL_INVALID',
           );
         }
@@ -477,12 +493,19 @@ describe('MintingManager', () => {
 
       it('should allow to mint domains with valid labels', async () => {
         const labels = ['-', 'q', 'q-', '-q', '1', 'q1', '1q', '1-q', 'qwerty-', 'qw-erty', 'qw3rty', 'qw3-rty1'];
-        for (const label of labels) {
-          const _labels = [label, 'x'];
-          await mintingManager[selector](coinbase.address, _labels, [], []);
+        await mintingManager[issueWithRecords](coinbase.address, ['test2', 'x'], [], []);
 
-          const tokenId = await unsRegistry.namehash(_labels);
-          expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+        for (const label of labels) {
+          const domainLabels = [label, 'x'];
+          const subdomainLabels = [label, 'test2', 'x'];
+          await mintingManager[issueWithRecords](coinbase.address, domainLabels, [], []);
+          await mintingManager[issueWithRecords](coinbase.address, subdomainLabels, [], []);
+
+          const domainTokenId = await unsRegistry.namehash(domainLabels);
+          expect(await unsRegistry.ownerOf(domainTokenId)).to.be.equal(coinbase.address);
+
+          const subdomainTkenId = await unsRegistry.namehash(domainLabels);
+          expect(await unsRegistry.ownerOf(subdomainTkenId)).to.be.equal(coinbase.address);
         }
       });
     });

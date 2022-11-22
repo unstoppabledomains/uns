@@ -1,3 +1,8 @@
+## v0.6.17
+
+- MintingManager@0.4.5 fix domain label validation
+- Upgrade MintingManager@0.4.5 on Goerli, Mumbai, Mainnet and Polygon
+
 ## v0.6.16
 
 - Upgrade UNSRegistry@0.6.2 on Goerli, Mumbai, Mainnet and Polygon
