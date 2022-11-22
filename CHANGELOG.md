@@ -1,3 +1,7 @@
+## v0.6.16
+
+- Add `SWEAT` token to resolver list
+
 ## v0.6.15
 
 - MintingManager@0.4.4 added domain label validation
