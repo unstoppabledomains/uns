@@ -1,11 +1,11 @@
 {
-    "version": "0.6.4",
+    "version": "0.6.5",
     "networks": {
         "1": {
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x049aba7510f45BA5b64ea9E658E342F904DB358D",
-                    "implementation": "0xe2D8Ada972AEA3D9b2D9755324aCb55a99B410cb",
+                    "implementation": "0x952254Ca7925ABAdd9E141AAbcCD6e1cF684147F",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xc2fede",
                     "forwarder": "0x049aba7510f45BA5b64ea9E658E342F904DB358D"
@@ -18,7 +18,7 @@
                 },
                 "MintingManager": {
                     "address": "0x2a7084870bB724175a3C96Da8FaA55128fa3E19D",
-                    "implementation": "0xED6EB2dfD0F0D0a98b0b8695A8E9056E55feFC85",
+                    "implementation": "0xf51b669Df92d68394a1FFBC6Ae84bf016290687C",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xc2fee0",
                     "forwarder": "0xb970fbCF52cd8111c76c379D4f2FE12E7f8AE7fb"
@@ -114,7 +114,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x070e83FCed225184E67c86302493ffFCDB953f71",
-                    "implementation": "0x2704a7E3106460a4b2316DB1808df2e429998145",
+                    "implementation": "0x21cb8483557dcF7638496f6389b7f9E074429aB8",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ea",
                     "forwarder": "0x070e83FCed225184E67c86302493ffFCDB953f71"
@@ -127,7 +127,7 @@
                 },
                 "MintingManager": {
                     "address": "0x9ee42D3EB042e06F8Cd241890C4fA0d51e4DA345",
-                    "implementation": "0x914df58A6c8fBfa7734917c6A60c4253aEb8a5C6",
+                    "implementation": "0x7cA1cE20edAbf0176408AAc0D25020C6D66fcF1a",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ec",
                     "forwarder": "0x7F9F48cF94C69ce91D4b442DA186F31118ac0185"
@@ -215,7 +215,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
-                    "implementation": "0x4e4Fe33d43C6B925EEA3f18527A1794a7370aFF6",
+                    "implementation": "0x3F72a5647295e857C6a90a071Aed99B2A0534fE2",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272eb5",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
@@ -228,7 +228,7 @@
                 },
                 "MintingManager": {
                     "address": "0x7be83293BeeDc9Eba1bd76c66A65F10F3efaeC26",
-                    "implementation": "0x480589b28f57Ab694246EFa21b23306093350845",
+                    "implementation": "0x723a38c8e57DB4bc884cB8BE7CDF83A5789A9c3A",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272f41",
                     "forwarder": "0xC37d3c4326ab0E1D2b9D8b916bBdf5715f780fcF"
@@ -412,7 +412,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93",
-                    "implementation": "0x4Ee389840f21e18e0CA1f9E612C9B72FdE16F3bE",
+                    "implementation": "0x4fec01ba3a4E0Df28c1A54b488be36370E0Bef85",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f43",
                     "forwarder": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93"
@@ -425,7 +425,7 @@
                 },
                 "MintingManager": {
                     "address": "0x428189346bb3CC52f031A1092fd47C919AC30A9f",
-                    "implementation": "0x8d0A19fA1ef2dbb442788Af668680B09314460B1",
+                    "implementation": "0x1f640d001F0219B1B14cD04E54759Aa5f7412665",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f4a",
                     "forwarder": "0xEf3a491A8750BEC2Dff5339CF6Df94436d432C4d"
