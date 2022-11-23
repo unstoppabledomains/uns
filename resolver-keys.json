@@ -1,5 +1,5 @@
 {
-  "version": "2.1.16",
+  "version": "2.1.17",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2539,6 +2539,16 @@
     "crypto.MOON.address": {
       "deprecatedKeyName": "MOON",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.SWEAT.version.ERC20.address": {
+      "deprecatedKeyName": "SWEAT_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.SWEAT.version.NEP-141.address": {
+      "deprecatedKeyName": "SWEAT_NEP-141",
+      "validationRegex": "^([a-f0-9]{64})|([a-z\\d_-]{2,59}\\.near)$",
       "deprecated": false
     }
   }

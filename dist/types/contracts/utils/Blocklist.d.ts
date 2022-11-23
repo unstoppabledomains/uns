@@ -4,17 +4,11 @@ import type { Listener, Provider } from "@ethersproject/providers";
 import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
 export interface BlocklistInterface extends utils.Interface {
     functions: {
-        "areBlocked(uint256[])": FunctionFragment;
         "isBlocked(uint256)": FunctionFragment;
-        "isBlocklistDisabled()": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "areBlocked" | "isBlocked" | "isBlocklistDisabled"): FunctionFragment;
-    encodeFunctionData(functionFragment: "areBlocked", values: [PromiseOrValue<BigNumberish>[]]): string;
+    getFunction(nameOrSignatureOrTopic: "isBlocked"): FunctionFragment;
     encodeFunctionData(functionFragment: "isBlocked", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "isBlocklistDisabled", values?: undefined): string;
-    decodeFunctionResult(functionFragment: "areBlocked", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isBlocked", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "isBlocklistDisabled", data: BytesLike): Result;
     events: {
         "Blocked(uint256)": EventFragment;
         "BlocklistDisabled(address)": EventFragment;
@@ -65,19 +59,11 @@ export interface Blocklist extends BaseContract {
     once: OnEvent<this>;
     removeListener: OnEvent<this>;
     functions: {
-        areBlocked(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[boolean[]] & {
-            values: boolean[];
-        }>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
-        isBlocklistDisabled(overrides?: CallOverrides): Promise<[boolean]>;
     };
-    areBlocked(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<boolean[]>;
     isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-    isBlocklistDisabled(overrides?: CallOverrides): Promise<boolean>;
     callStatic: {
-        areBlocked(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<boolean[]>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-        isBlocklistDisabled(overrides?: CallOverrides): Promise<boolean>;
     };
     filters: {
         "Blocked(uint256)"(tokenId?: null): BlockedEventFilter;
@@ -90,14 +76,10 @@ export interface Blocklist extends BaseContract {
         Initialized(version?: null): InitializedEventFilter;
     };
     estimateGas: {
-        areBlocked(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        isBlocklistDisabled(overrides?: CallOverrides): Promise<BigNumber>;
     };
     populateTransaction: {
-        areBlocked(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isBlocklistDisabled(overrides?: CallOverrides): Promise<PopulatedTransaction>;
     };
 }
 //# sourceMappingURL=Blocklist.d.ts.map

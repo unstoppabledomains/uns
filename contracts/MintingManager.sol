@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.4';
+    string public constant VERSION = '0.4.6';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -56,7 +56,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      */
     modifier onlyAllowed(string[] memory labels) {
         require(labels.length >= 2, 'MintingManager: LABELS_LENGTH_BELOW_2');
-        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[labels.length - 2]);
+        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[0]);
         _;
     }
 
@@ -85,7 +85,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         __Ownable_init_unchained();
         __MinterRole_init_unchained();
         __ERC2771Context_init_unchained(forwarder);
-        __Blocklist_init_unchained();
         __Pausable_init_unchained();
 
         string[12] memory tlds = [
@@ -261,10 +260,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     function _beforeTokenMint(uint256 tokenId) private {
-        if (!isBlocklistDisabled()) {
-            require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
-            _block(tokenId);
-        }
+        require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
+        _block(tokenId);
     }
 
     function _ensureAllowed(uint256 tld, string memory label) private view {

@@ -24,7 +24,6 @@ export interface MintingManagerInterface extends utils.Interface {
         "addMinters(address[])": FunctionFragment;
         "addProxyReaders(address[])": FunctionFragment;
         "addTld(string)": FunctionFragment;
-        "areBlocked(uint256[])": FunctionFragment;
         "blocklist(uint256)": FunctionFragment;
         "bulkIssue((address,string,uint256)[])": FunctionFragment;
         "claim(uint256,string)": FunctionFragment;
@@ -39,7 +38,6 @@ export interface MintingManagerInterface extends utils.Interface {
         "hasRole(bytes32,address)": FunctionFragment;
         "initialize(address,address,address,address,address)": FunctionFragment;
         "isBlocked(uint256)": FunctionFragment;
-        "isBlocklistDisabled()": FunctionFragment;
         "isMinter(address)": FunctionFragment;
         "isTrustedForwarder(address)": FunctionFragment;
         "issueWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
@@ -62,7 +60,7 @@ export interface MintingManagerInterface extends utils.Interface {
         "unpause()": FunctionFragment;
         "unsRegistry()": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "areBlocked" | "blocklist" | "bulkIssue" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isBlocklistDisabled" | "isMinter" | "isTrustedForwarder" | "issueWithRecords(address,string[],string[],string[],bool)" | "issueWithRecords(address,string[],string[],string[])" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsRegistry"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "blocklist" | "bulkIssue" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords(address,string[],string[],string[],bool)" | "issueWithRecords(address,string[],string[],string[])" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsRegistry"): FunctionFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
@@ -71,7 +69,6 @@ export interface MintingManagerInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "addMinters", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "addProxyReaders", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "areBlocked", values: [PromiseOrValue<BigNumberish>[]]): string;
     encodeFunctionData(functionFragment: "blocklist", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "bulkIssue", values: [IMintingManager.BulkSLDIssueRequestStruct[]]): string;
     encodeFunctionData(functionFragment: "claim", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
@@ -102,7 +99,6 @@ export interface MintingManagerInterface extends utils.Interface {
         PromiseOrValue<string>
     ]): string;
     encodeFunctionData(functionFragment: "isBlocked", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "isBlocklistDisabled", values?: undefined): string;
     encodeFunctionData(functionFragment: "isMinter", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "isTrustedForwarder", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "issueWithRecords(address,string[],string[],string[],bool)", values: [
@@ -143,7 +139,6 @@ export interface MintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "addMinters", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addProxyReaders", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addTld", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "areBlocked", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "blocklist", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "bulkIssue", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
@@ -158,7 +153,6 @@ export interface MintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isBlocked", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "isBlocklistDisabled", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isTrustedForwarder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "issueWithRecords(address,string[],string[],string[],bool)", data: BytesLike): Result;
@@ -343,9 +337,6 @@ export interface MintingManager extends BaseContract {
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
-        areBlocked(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[boolean[]] & {
-            values: boolean[];
-        }>;
         blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -376,7 +367,6 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
-        isBlocklistDisabled(overrides?: CallOverrides): Promise<[boolean]>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
         "issueWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
@@ -445,7 +435,6 @@ export interface MintingManager extends BaseContract {
     addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
-    areBlocked(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<boolean[]>;
     blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -476,7 +465,6 @@ export interface MintingManager extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-    isBlocklistDisabled(overrides?: CallOverrides): Promise<boolean>;
     isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
     isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
     "issueWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
@@ -537,7 +525,6 @@ export interface MintingManager extends BaseContract {
         addMinters(accounts: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         addTld(tld: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        areBlocked(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<boolean[]>;
         blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: CallOverrides): Promise<void>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
@@ -552,7 +539,6 @@ export interface MintingManager extends BaseContract {
         hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-        isBlocklistDisabled(overrides?: CallOverrides): Promise<boolean>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         "issueWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
@@ -622,7 +608,6 @@ export interface MintingManager extends BaseContract {
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
-        areBlocked(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
         blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
@@ -653,7 +638,6 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        isBlocklistDisabled(overrides?: CallOverrides): Promise<BigNumber>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         "issueWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
@@ -723,7 +707,6 @@ export interface MintingManager extends BaseContract {
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
-        areBlocked(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
         blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
@@ -754,7 +737,6 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isBlocklistDisabled(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         "issueWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
