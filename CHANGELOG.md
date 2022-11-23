@@ -1,3 +1,9 @@
+## v0.6.18
+
+- Blocklist cleanup
+- Pausable cleanup
+- MintingManager@0.4.6 isBlocklistDisabled removed
+
 ## v0.6.17
 
 - MintingManager@0.4.5 fix domain label validation

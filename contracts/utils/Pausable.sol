@@ -35,7 +35,6 @@ abstract contract Pausable is Initializable, ContextUpgradeable {
      */
     // solhint-disable-next-line func-name-mixedcase
     function __Pausable_init() internal onlyInitializing {
-        __Context_init_unchained();
         __Pausable_init_unchained();
     }
 
