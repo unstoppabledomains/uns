@@ -1,3 +1,8 @@
+
+## v0.6.19
+
+- Add `SWEAT` token to resolver list
+
 ## v0.6.18
 
 - Blocklist cleanup
