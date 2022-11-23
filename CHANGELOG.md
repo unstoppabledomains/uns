@@ -1,3 +1,6 @@
+## v0.6.20
+
+- Update validation regex for 'NEAR'
 
 ## v0.6.19
 
