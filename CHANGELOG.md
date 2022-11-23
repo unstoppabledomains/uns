@@ -1,3 +1,6 @@
+## v0.6.20
+
+- Update validation regular expression for NEAR protocol
 
 ## v0.6.19
 
