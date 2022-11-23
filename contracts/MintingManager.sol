@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.3';
+    string public constant VERSION = '0.4.4';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -44,7 +44,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
     modifier onlyAllowedSLD(uint256 tld, string memory label) {
-        _ensureAllowedSLD(tld, label);
+        _ensureAllowed(tld, label);
         _;
     }
 
@@ -56,8 +56,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      */
     modifier onlyAllowed(string[] memory labels) {
         require(labels.length >= 2, 'MintingManager: LABELS_LENGTH_BELOW_2');
-
-        _ensureAllowedSLD(_namehash(0x0, labels[labels.length - 1]), labels[labels.length - 2]);
+        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[labels.length - 2]);
         _;
     }
 
@@ -140,7 +139,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function bulkIssue(BulkSLDIssueRequest[] calldata requests) external override onlyMinter {
         for (uint256 i = 0; i < requests.length; i++) {
-            _ensureAllowedSLD(requests[i].tld, requests[i].label);
+            _ensureAllowed(requests[i].tld, requests[i].label);
 
             string[] memory labels = _buildLabels(requests[i].tld, requests[i].label);
             (uint256 tokenId, ) = _namehash(labels);
@@ -268,7 +267,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         }
     }
 
-    function _ensureAllowedSLD(uint256 tld, string memory label) private view {
+    function _ensureAllowed(uint256 tld, string memory label) private view {
         require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
         Strings.Slice memory _label = label.toSlice();
         if (_label._len > 10) {
@@ -277,6 +276,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
                 'MintingManager: TOKEN_LABEL_PROHIBITED'
             );
         }
+        require(_isValidLabel(label), 'MintingManager: LABEL_INVALID');
     }
 
     /**
@@ -310,6 +310,42 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     function _useCNS(string[] memory labels) private view returns (bool) {
         uint256 tld = _namehash(uint256(0x0), labels[labels.length - 1]);
         return address(cnsMintingController) != address(0) && tld == 0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f;
+    }
+
+    /**
+     * The label must contains letters, digits, and hyphen.
+     */
+    function _isValidLabel(string memory str) private pure returns (bool) {
+        if (bytes(str).length == 0) {
+            return false;
+        }
+
+        uint256 ptr;
+        /* solium-disable-next-line security/no-inline-assembly */
+        assembly {
+            ptr := add(str, 0x20)
+        }
+
+        for (uint256 i = 0; i < bytes(str).length; i++) {
+            uint8 data = _charAt(ptr, i);
+            if (
+                data != 45 && // hyphen (-)
+                !(data >= 48 && data <= 57) && // 0-9
+                !(data >= 97 && data <= 122) // a-z
+            ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function _charAt(uint256 ptr, uint256 index) private pure returns (uint8) {
+        bytes1 ptrdata;
+        /* solium-disable-next-line security/no-inline-assembly */
+        assembly {
+            ptrdata := mload(add(ptr, index))
+        }
+        return uint8(ptrdata);
     }
 
     // Reserved storage space to allow for layout changes in the future.

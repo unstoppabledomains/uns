@@ -2,18 +2,13 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
 import { MintingManager, UNSRegistry } from '../../types/contracts';
 import { MintingManagerForwarder } from '../../types/contracts/metatx';
-import {
-  MintingManager__factory,
-  UNSRegistry__factory,
-} from '../../types/factories/contracts';
+import { MintingManager__factory, UNSRegistry__factory } from '../../types/factories/contracts';
 import { MintingManagerForwarder__factory } from '../../types/factories/contracts/metatx';
 import { ZERO_ADDRESS } from '../helpers/constants';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 
 describe('MintingManager (consumption)', () => {
-  let unsRegistry: UNSRegistry,
-    mintingManager: MintingManager,
-    forwarder: MintingManagerForwarder;
+  let unsRegistry: UNSRegistry, mintingManager: MintingManager, forwarder: MintingManagerForwarder;
   let signers: SignerWithAddress[],
     coinbase: SignerWithAddress,
     receiver: SignerWithAddress,
@@ -26,8 +21,11 @@ describe('MintingManager (consumption)', () => {
   let buildExecuteParams: ExecuteFunc;
 
   async function removeReverse () {
-    const removeReverseTx = await unsRegistry.connect(receiver).removeReverse();
-    await removeReverseTx.wait();
+    const rr = await unsRegistry.reverseOf(receiver.address);
+    if (rr.toString() !== '0') {
+      const removeReverseTx = await unsRegistry.connect(receiver).removeReverse();
+      await removeReverseTx.wait();
+    }
   }
 
   before(async () => {
@@ -38,26 +36,14 @@ describe('MintingManager (consumption)', () => {
     mintingManager = await new MintingManager__factory(coinbase).deploy();
     await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-    forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(
-      mintingManager.address,
-    );
+    forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(mintingManager.address);
 
-    await mintingManager.initialize(
-      unsRegistry.address,
-      ZERO_ADDRESS,
-      ZERO_ADDRESS,
-      ZERO_ADDRESS,
-      ZERO_ADDRESS,
-    );
+    await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await mintingManager.addMinter(coinbase.address);
     await mintingManager.setTokenURIPrefix('/');
     await mintingManager.setForwarder(forwarder.address);
 
-    buildExecuteParams = buildExecuteFunc(
-      mintingManager.interface,
-      mintingManager.address,
-      forwarder,
-    );
+    buildExecuteParams = buildExecuteFunc(mintingManager.interface, mintingManager.address, forwarder);
   });
 
   describe('Mint consumption', () => {
@@ -67,13 +53,13 @@ describe('MintingManager (consumption)', () => {
           func: 'issueWithRecords',
           note: 'mint',
           selector: 'issueWithRecords(address,string[],string[],string[],bool)',
-          params: [receiver.address, ['t1-w1-', 'wallet'], [], [], true],
+          params: [receiver.address, ['t1-w1', 'wallet'], [], [], true],
         },
         {
           func: 'issueWithRecords',
           note: 'unlock',
           selector: 'issueWithRecords(address,string[],string[],string[],bool)',
-          params: [receiver.address, ['t1-w1-', 'wallet'], [], [], true],
+          params: [receiver.address, ['t1-w1', 'wallet'], [], [], true],
         },
       ];
     };
@@ -88,19 +74,10 @@ describe('MintingManager (consumption)', () => {
         const executeParams = [acc, [labels[0] + 'r', labels[1]], ...rest];
 
         const tokenId = await unsRegistry.namehash(labels as string[]);
-        const tokenId2 = await unsRegistry.namehash(
-          executeParams[1] as string[],
-        );
+        const tokenId2 = await unsRegistry.namehash(executeParams[1] as string[]);
 
-        const { req, signature } = await buildExecuteParams(
-          selector,
-          executeParams,
-          coinbase,
-          tokenId,
-        );
-        const executeTx = await forwarder
-          .connect(spender)
-          .execute(req, signature);
+        const { req, signature } = await buildExecuteParams(selector, executeParams, coinbase, tokenId);
+        const executeTx = await forwarder.connect(spender).execute(req, signature);
 
         const executeTxReceipt = await executeTx.wait();
 
@@ -117,19 +94,11 @@ describe('MintingManager (consumption)', () => {
           records: Array.isArray(params[2]) ? params[2].length : '-',
           send: tx.receipt.gasUsed.toString(),
           execute: executeTxReceipt.gasUsed.toString(),
-          increase:
-            percDiff(
-              tx.receipt.gasUsed.toNumber(),
-              executeTxReceipt.gasUsed.toNumber(),
-            ).toFixed(2) + ' %',
+          increase: percDiff(tx.receipt.gasUsed.toNumber(), executeTxReceipt.gasUsed.toNumber()).toFixed(2) + ' %',
         });
 
-        await unsRegistry
-          .connect(receiver)
-          .setOwner(mintingManager.address, tokenId);
-        await unsRegistry
-          .connect(receiver)
-          .setOwner(mintingManager.address, tokenId2);
+        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId);
+        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId2);
       }
       console.table(result);
     });
