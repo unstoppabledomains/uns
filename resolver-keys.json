@@ -1,5 +1,5 @@
 {
-  "version": "2.1.17",
+  "version": "2.1.18",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -1463,7 +1463,7 @@
     },
     "crypto.NEAR.address": {
       "deprecatedKeyName": "NEAR",
-      "validationRegex": "^0x[a-zA-Z0-9]*$",
+      "validationRegex": "^((([a-z\\d]+[\\-_])*[a-z\\d]+\\.)*([a-z\\d]+[\\-_])*[a-z\\d]+)|([a-f0-9]{64})$",
       "deprecated": false
     },
     "crypto.HNT.address": {
