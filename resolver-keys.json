@@ -1,5 +1,5 @@
 {
-  "version": "2.1.18",
+  "version": "2.1.19",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2510,6 +2510,11 @@
       "deprecatedKeyName": "BEAM",
       "deprecated": false,
       "validationRegex": null
+    },
+    "crypto.DESO.address": {
+      "deprecatedKeyName": "DESO",
+      "deprecated": false,
+      "validationRegex": "^[a-zA-Z0-9]{54,55}$"
     },
     "crypto.0ZK.version.ERC20.address": {
       "deprecatedKeyName": "0ZK_ERC20",
