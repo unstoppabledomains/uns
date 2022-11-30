@@ -2516,6 +2516,11 @@
       "deprecated": false,
       "validationRegex": "^[a-zA-Z0-9]{54,55}$"
     },
+    "crypto.FLR.address": {
+      "deprecatedKeyName": "FLR",
+      "deprecated": false,
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
     "crypto.0ZK.version.ERC20.address": {
       "deprecatedKeyName": "0ZK_ERC20",
       "validationRegex": "(^0zk1)([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{52})([qzyxg2vwsj5kc6u7])(unpd9kxwatwq)([qpzry9x8])([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{57})",
