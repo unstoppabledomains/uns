@@ -1,3 +1,9 @@
+## v0.6.21
+
+- Add `DESO` token to resolver list
+- Add `FLR` token to resolver list
+- Add `SGB` token to resolver list
+
 ## v0.6.20
 
 - Update validation regex for 'NEAR'
