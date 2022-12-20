@@ -1,3 +1,11 @@
+## v0.6.22
+
+- Add multi-chain records for `BNB` token
+- Add multi-chain records for `USDC` token
+- Update validation regex for `ONE`
+- Update validation regex for `XVG`
+- Update validation regex for `LSK`
+
 ## v0.6.21
 
 - Add `DESO` token to resolver list

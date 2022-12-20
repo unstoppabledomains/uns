@@ -1,5 +1,5 @@
 {
-  "version": "2.1.19",
+  "version": "2.1.20",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -58,8 +58,33 @@
     },
     "crypto.USDC.address": {
       "deprecatedKeyName": "USDC",
+      "deprecated": true,
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "crypto.USDC.version.ERC20.address": {
+      "deprecatedKeyName": "USDC_ERC20",
       "deprecated": false,
       "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "crypto.USDC.version.OKT.address": {
+      "deprecatedKeyName": "USDC_OKT",
+      "deprecated": false,
+      "validationRegex": "^0x[a-fA-F0-9]{40}$|^ex[a-zA-HJ-NP-Z0-9]{6,90}$"
+    },
+    "crypto.USDC.version.MATIC.address": {
+      "deprecatedKeyName": "USDC_MATIC",
+      "deprecated": false,
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "crypto.USDC.version.SOL.address": {
+      "deprecatedKeyName": "USDC_SOL",
+      "deprecated": false,
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "crypto.USDC.version.AVAX.address": {
+      "deprecatedKeyName": "USDC_AVAX",
+      "deprecated": false,
+      "validationRegex": "^[a-zA-Z0-9]*$"
     },
     "crypto.BAT.address": {
       "deprecatedKeyName": "BAT",
@@ -143,8 +168,18 @@
     },
     "crypto.BNB.address": {
       "deprecatedKeyName": "BNB",
-      "deprecated": false,
+      "deprecated": true,
       "validationRegex": "^bnb[0-9a-z]{39}$"
+    },
+    "crypto.BNB.version.BEP2.address": {
+      "deprecatedKeyName": "BNB_BEP2",
+      "deprecated": false,
+      "validationRegex": "^(bnb|tbnb)[a-zA-HJ-NP-Z0-9]{39}$"
+    },
+    "crypto.BNB.version.BEP20.address": {
+      "deprecatedKeyName": "BNB_BEP20",
+      "deprecated": false,
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
     },
     "crypto.BTG.address": {
       "deprecatedKeyName": "BTG",
@@ -249,7 +284,7 @@
     "crypto.LSK.address": {
       "deprecatedKeyName": "LSK",
       "deprecated": false,
-      "validationRegex": "^\\d{1,21}[L]$"
+      "validationRegex": "^\\d{1,21}[L]$|^[0-9a-z]{3}[23456789abcdefghjkmnopqrstuvwxyz]{38}$"
     },
     "crypto.ATOM.address": {
       "deprecatedKeyName": "ATOM",
@@ -329,7 +364,7 @@
     "crypto.XVG.address": {
       "deprecatedKeyName": "XVG",
       "deprecated": false,
-      "validationRegex": "^[a-zA-Z0-9]{34}$"
+      "validationRegex": "^[a-zA-Z0-9]{34}$|^[1-9A-HJ-NP-Za-km-z]{95}$"
     },
     "crypto.ALGO.address": {
       "deprecatedKeyName": "ALGO",
@@ -349,7 +384,7 @@
     "crypto.ONE.address": {
       "deprecatedKeyName": "ONE",
       "deprecated": false,
-      "validationRegex": "^one[a-zA-Z0-9]{39}$"
+      "validationRegex": "^one[a-zA-Z0-9]{39}$|^0x[a-fA-F0-9]{40}$"
     },
     "crypto.BNTY.address": {
       "deprecatedKeyName": "BNTY",
