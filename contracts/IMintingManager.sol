@@ -9,12 +9,6 @@ interface IMintingManager is IERC1967 {
     event NewTld(uint256 indexed tokenId, string tld);
     event RemoveTld(uint256 indexed tokenId);
 
-    struct BulkSLDIssueRequest {
-        address to;
-        string label;
-        uint256 tld;
-    }
-
     /**
      * @dev Adds new TLD
      */
@@ -24,20 +18,6 @@ interface IMintingManager is IERC1967 {
      * @dev Removes TLD
      */
     function removeTld(uint256 tokenId) external;
-
-    /**
-     * @dev (Deprecated) Issues a domain with records.
-     * @param to address to issue the new SLD or subdomain to.
-     * @param labels array of SLD or subdomain name labels splitted by '.' to issue.
-     * @param keys Record keys.
-     * @param values Record values.
-     */
-    function issueWithRecords(
-        address to,
-        string[] calldata labels,
-        string[] calldata keys,
-        string[] calldata values
-    ) external;
 
     /**
      * @dev Issues a domain with records.
@@ -54,12 +34,6 @@ interface IMintingManager is IERC1967 {
         string[] calldata values,
         bool withReverse
     ) external;
-
-    /**
-     * @dev Issues a SLD in bulk
-     * @param requests List of requests for domains to issue
-     */
-    function bulkIssue(BulkSLDIssueRequest[] calldata requests) external;
 
     /**
      * @dev Claims free domain. The fuction adds prefix to label.

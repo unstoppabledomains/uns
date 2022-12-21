@@ -83,20 +83,6 @@ interface IUNSRegistry is
     function mintTLD(uint256 tokenId, string calldata uri) external;
 
     /**
-     * @dev (Deprecated) mints token with records
-     * @param to address to mint the new SLD or subdomain to
-     * @param labels array of SLD or subdomain name labels splitted by '.' to mint.
-     * @param keys New record keys
-     * @param values New record values
-     */
-    function mintWithRecords(
-        address to,
-        string[] calldata labels,
-        string[] calldata keys,
-        string[] calldata values
-    ) external;
-
-    /**
      * @dev mints token with records
      * @param to address to mint the new SLD or subdomain to
      * @param labels array of SLD or subdomain name labels splitted by '.' to mint.
@@ -110,20 +96,6 @@ interface IUNSRegistry is
         string[] calldata keys,
         string[] calldata values,
         bool withReverse
-    ) external;
-
-    /**
-     * @dev (Deprecated) unlock token with records
-     * @param to address to unlock the token to
-     * @param tokenId id of the token.
-     * @param keys New record keys
-     * @param values New record values
-     */
-    function unlockWithRecords(
-        address to,
-        uint256 tokenId,
-        string[] calldata keys,
-        string[] calldata values
     ) external;
 
     /**

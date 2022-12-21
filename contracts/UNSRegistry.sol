@@ -29,7 +29,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.6.2';
+    string public constant VERSION = '0.6.3';
 
     string internal _prefix;
 
@@ -123,28 +123,16 @@ contract UNSRegistry is
         address to,
         uint256 tokenId,
         string[] calldata keys,
-        string[] calldata values
-    ) external override onlyMintingManager {
-        _unlockWithRecords(to, tokenId, keys, values, true);
-    }
-
-    function unlockWithRecords(
-        address to,
-        uint256 tokenId,
-        string[] calldata keys,
         string[] calldata values,
         bool withReverse
     ) external override onlyMintingManager {
-        _unlockWithRecords(to, tokenId, keys, values, withReverse);
-    }
+        _reset(tokenId);
+        _transfer(ownerOf(tokenId), to, tokenId);
+        _setMany(keys, values, tokenId);
 
-    function mintWithRecords(
-        address to,
-        string[] calldata labels,
-        string[] calldata keys,
-        string[] calldata values
-    ) external override onlyMintingManager {
-        _mintWithRecords(to, labels, keys, values, true);
+        if (withReverse) {
+            _safeSetReverse(to, tokenId);
+        }
     }
 
     function mintWithRecords(
@@ -154,7 +142,10 @@ contract UNSRegistry is
         string[] calldata values,
         bool withReverse
     ) external override onlyMintingManager {
-        _mintWithRecords(to, labels, keys, values, withReverse);
+        uint256 tokenId = _namehash(labels);
+
+        _mint(to, tokenId, _uri(labels), withReverse);
+        _setMany(keys, values, tokenId);
     }
 
     /// Transfering
@@ -352,35 +343,6 @@ contract UNSRegistry is
     }
 
     /// Internal
-
-    function _mintWithRecords(
-        address to,
-        string[] calldata labels,
-        string[] calldata keys,
-        string[] calldata values,
-        bool withReverse
-    ) internal {
-        uint256 tokenId = _namehash(labels);
-
-        _mint(to, tokenId, _uri(labels), withReverse);
-        _setMany(keys, values, tokenId);
-    }
-
-    function _unlockWithRecords(
-        address to,
-        uint256 tokenId,
-        string[] calldata keys,
-        string[] calldata values,
-        bool withReverse
-    ) internal {
-        _reset(tokenId);
-        _transfer(ownerOf(tokenId), to, tokenId);
-        _setMany(keys, values, tokenId);
-
-        if (withReverse) {
-            _safeSetReverse(to, tokenId);
-        }
-    }
 
     function _uri(string[] memory labels) private pure returns (string memory) {
         bytes memory uri = bytes(labels[0]);
