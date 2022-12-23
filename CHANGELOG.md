@@ -1,3 +1,6 @@
+## v0.6.23
+- Forbid domain names minting with leading and ending hyphens (`-test1-.crypto`, `unstoppable-.crypto`, etc.) 
+
 ## v0.6.22
 
 - Add multi-chain records for `BNB` token
