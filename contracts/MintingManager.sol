@@ -323,15 +323,25 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             ptr := add(str, 0x20)
         }
 
-        uint8 hyphen = 45;
         uint256 labelLength = bytes(str).length;
-        if (_charAt(ptr, 0) == hyphen || _charAt(ptr, labelLength - 1) == hyphen) {
+        uint8 charData = _charAt(ptr, 0); // first symbol
+        if (
+            !(charData >= 48 && charData <= 57) && !(charData >= 97 && charData <= 122) // 0-9 and a-z
+        ) {
             return false;
         }
-        for (uint256 i = 0; i < labelLength; i++) {
+        if (labelLength > 1) {
+            charData = _charAt(ptr, labelLength - 1); // last symbol
+            if (
+                !(charData >= 48 && charData <= 57) && !(charData >= 97 && charData <= 122) // 0-9 and a-z
+            ) {
+                return false;
+            }
+        }
+        for (uint256 i = 1; i < labelLength - 1; i++) {
             uint8 data = _charAt(ptr, i);
             if (
-                data != hyphen && // hyphen (-)
+                data != 45 && // hyphen (-)
                 !(data >= 48 && data <= 57) && // 0-9
                 !(data >= 97 && data <= 122) // a-z
             ) {

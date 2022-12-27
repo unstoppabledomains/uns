@@ -484,6 +484,9 @@ describe('MintingManager', () => {
           '-asd',
           'dsa2-',
           '-dddd-',
+          '-',
+          '--',
+          '-----',
         ];
         await mintingManager[issueWithRecords](coinbase.address, ['test1', 'x'], [], []);
 
