@@ -134,7 +134,7 @@ export class Deployer {
     });
   }
 
-  async execute (tags: string[], config?: UnsNetworkConfig): Promise<UnsConfig> {
+  async execute (tags: string[], config?: UnsNetworkConfig, params?: Record<string, string>): Promise<UnsConfig> {
     tags = tags || [];
 
     this.log('Execution started');
@@ -144,11 +144,11 @@ export class Deployer {
     )) {
       if (!tags.some((t) => task.tags.includes(t.toLowerCase()))) continue;
 
-      this.log('Executing task', { tags: task.tags });
+      this.log('Executing task', { tags: task.tags, params });
 
       const dependencies = task.ensureDependencies(this, config);
 
-      await task.run(this, dependencies);
+      await task.run(this, dependencies, params);
     }
 
     const _config = this.getNetworkConfig();
