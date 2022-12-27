@@ -1,5 +1,10 @@
 ## v0.6.24
+
 - Forbid domain names minting with leading and ending hyphens (`-test1-.crypto`, `unstoppable-.crypto`, etc.) 
+
+## v0.6.23
+
+- Add `.hi` TLD
 
 ## v0.6.22
 
