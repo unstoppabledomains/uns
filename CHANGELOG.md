@@ -1,3 +1,7 @@
+## v0.6.23
+
+- Add `.hi` TLD
+
 ## v0.6.22
 
 - Add multi-chain records for `BNB` token

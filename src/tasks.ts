@@ -10,7 +10,7 @@ import { unwrap, unwrapDependencies } from './helpers';
 export type Task = {
   tags: string[];
   priority: number;
-  run: (ctx: Deployer, dependencies: DependenciesMap) => Promise<void>;
+  run: (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => Promise<void>;
   ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => DependenciesMap;
 };
 
@@ -565,6 +565,42 @@ const deployDotCoinBurnerTask = {
   },
 };
 
+const addTLDTask = {
+  tags: ['add_tld'],
+  priority: 0,
+  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
+    const tld = params?.tld;
+    if (!tld) {
+      throw new Error('Tld parameter is not provided');
+    }
+
+    const chainId = network.config.chainId;
+    if (!chainId || ![137, 80001].includes(chainId)) {
+      throw new Error('Unsupported network');
+    }
+
+    // const { owner } = ctx.accounts;
+    // const MintingManager = unwrap(dependencies, ArtifactName.MintingManager);
+
+    // const mintingManager = ctx.artifacts.MintingManager.attach(MintingManager.address).connect(owner);
+    // await mintingManager.addTld(tld.toLowerCase());
+  },
+  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { MintingManager } = config.contracts || {};
+
+    const dependencies = { MintingManager };
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    }
+
+    return dependencies;
+  },
+};
+
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -578,4 +614,5 @@ export const tasks: Task[] = [
   deployPolygonPosBridgeTask,
   configurePolygonPosBridgeTask,
   deployDotCoinBurnerTask,
+  addTLDTask,
 ];
