@@ -579,11 +579,11 @@ const addTLDTask = {
       throw new Error('Unsupported network');
     }
 
-    // const { owner } = ctx.accounts;
-    // const MintingManager = unwrap(dependencies, ArtifactName.MintingManager);
+    const { owner } = ctx.accounts;
+    const MintingManager = unwrap(dependencies, ArtifactName.MintingManager);
 
-    // const mintingManager = ctx.artifacts.MintingManager.attach(MintingManager.address).connect(owner);
-    // await mintingManager.addTld(tld.toLowerCase());
+    const mintingManager = ctx.artifacts.MintingManager.attach(MintingManager.address).connect(owner);
+    await mintingManager.addTld(tld.toLowerCase());
   },
   ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
