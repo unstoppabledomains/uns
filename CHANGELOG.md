@@ -1,5 +1,12 @@
 ## v0.6.23
 
+- Add `POKT` token to resolver list
+- Add `KAI` token to resolver list
+- Add `XLA` token to resolver list
+- Add `APT` token to resolver list
+
+## v0.6.23
+
 - Add `.hi` TLD
 
 ## v0.6.22
