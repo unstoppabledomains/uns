@@ -1,4 +1,4 @@
-## v0.6.23
+## v0.6.24
 
 - Add `POKT` token to resolver list
 - Add `KAI` token to resolver list
