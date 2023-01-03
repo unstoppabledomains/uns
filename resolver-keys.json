@@ -1,5 +1,5 @@
 {
-  "version": "2.1.20",
+  "version": "2.1.21",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2599,6 +2599,26 @@
     "crypto.SWEAT.version.NEP-141.address": {
       "deprecatedKeyName": "SWEAT_NEP-141",
       "validationRegex": "^([a-f0-9]{64})|([a-z\\d_-]{2,59}\\.near)$",
+      "deprecated": false
+    },
+    "crypto.POKT.address": {
+      "deprecatedKeyName": "POKT",
+      "validationRegex": "^[0-9a-fA-F]{40}$",
+      "deprecated": false
+    },
+    "crypto.KAI.address": {
+      "deprecatedKeyName": "KAI",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.XLA.address": {
+      "deprecatedKeyName": "XLA",
+      "validationRegex": "^0x[a-zA-Z0-9]*$",
+      "deprecated": false
+    },
+    "crypto.APT.address": {
+      "deprecatedKeyName": "APT",
+      "validationRegex": "^0x[a-f0-9]{64}$",
       "deprecated": false
     }
   }
