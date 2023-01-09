@@ -1,5 +1,5 @@
 {
-  "version": "2.1.21",
+  "version": "2.1.22",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2619,6 +2619,11 @@
     "crypto.APT.address": {
       "deprecatedKeyName": "APT",
       "validationRegex": "^0x[a-f0-9]{64}$",
+      "deprecated": false
+    },
+    "crypto.GTH.address": {
+      "deprecatedKeyName": "GTH",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     }
   }
