@@ -7,13 +7,7 @@ import { Contract, ContractFactory } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { NetworkConfig } from 'hardhat/types';
 import { TransactionResponse } from '@ethersproject/abstract-provider';
-import {
-  ArtifactName,
-  UnsConfig,
-  UnsNetworkConfig,
-  UnsContractConfigMap,
-  UnsContractName,
-} from './types';
+import { ArtifactName, UnsConfig, UnsNetworkConfig, UnsContractConfigMap, UnsContractName } from './types';
 import { Task, tasks } from './tasks';
 import { unwrap } from './helpers';
 
@@ -51,9 +45,7 @@ const DEFAULT_OPTIONS: DeployerOptions = {
 async function getArtifacts (): Promise<ArtifactsMap> {
   return {
     CNSRegistry: await ethers.getContractFactory('CNSRegistry'),
-    CNSRegistryForwarder: await ethers.getContractFactory(
-      'CNSRegistryForwarder',
-    ),
+    CNSRegistryForwarder: await ethers.getContractFactory('CNSRegistryForwarder'),
     SignatureController: await ethers.getContractFactory('SignatureController'),
     MintingController: await ethers.getContractFactory('MintingController'),
     URIPrefixController: await ethers.getContractFactory('URIPrefixController'),
@@ -61,19 +53,11 @@ async function getArtifacts (): Promise<ArtifactsMap> {
     ResolverForwarder: await ethers.getContractFactory('ResolverForwarder'),
     UNSRegistry: await ethers.getContractFactory('UNSRegistry'),
     MintingManager: await ethers.getContractFactory('MintingManager'),
-    MintingManagerForwarder: await ethers.getContractFactory(
-      'MintingManagerForwarder',
-    ),
-    ProxyReader: await ethers.getContractFactory(
-      'contracts/ProxyReader.sol:ProxyReader',
-    ),
+    MintingManagerForwarder: await ethers.getContractFactory('MintingManagerForwarder'),
+    ProxyReader: await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader'),
     DummyStateSender: await ethers.getContractFactory('DummyStateSender'),
-    SimpleCheckpointManager: await ethers.getContractFactory(
-      'SimpleCheckpointManager',
-    ),
-    MintableERC721Predicate: await ethers.getContractFactory(
-      'MintableERC721Predicate',
-    ),
+    SimpleCheckpointManager: await ethers.getContractFactory('SimpleCheckpointManager'),
+    MintableERC721Predicate: await ethers.getContractFactory('MintableERC721Predicate'),
     RootChainManager: await ethers.getContractFactory('RootChainManager'),
     DotCoinBurner: await ethers.getContractFactory('DotCoinBurner'),
   };
@@ -86,6 +70,7 @@ export class Deployer {
   public log: debug.Debugger;
 
   public minters: string[];
+  public multisig: string;
   public network: NetworkConfig;
 
   static async create (options?: DeployerOptions): Promise<Deployer> {
@@ -98,6 +83,7 @@ export class Deployer {
       await getArtifacts(),
       { owner },
       _unsConfig.minters[network.name],
+      _unsConfig.multisig[network.name],
     );
   }
 
@@ -106,7 +92,12 @@ export class Deployer {
     artifacts: ArtifactsMap,
     accounts: AccountsMap,
     minters: string[],
+    multisig: string,
   ) {
+    if (!multisig) {
+      throw new Error('Multisig address is not set');
+    }
+
     this.options = {
       ...DEFAULT_OPTIONS,
       ...options,
@@ -114,6 +105,7 @@ export class Deployer {
     this.artifacts = artifacts;
     this.accounts = accounts;
     this.minters = minters;
+    this.multisig = multisig;
     this.network = network.config;
 
     this.log = log;
@@ -139,9 +131,7 @@ export class Deployer {
 
     this.log('Execution started');
 
-    for (const task of tasks.sort(
-      (a: Task, b: Task) => a.priority - b.priority,
-    )) {
+    for (const task of tasks.sort((a: Task, b: Task) => a.priority - b.priority)) {
       if (!tags.some((t) => task.tags.includes(t.toLowerCase()))) continue;
 
       this.log('Executing task', { tags: task.tags, params });
@@ -172,9 +162,7 @@ export class Deployer {
         ...emptyConfig,
         address: value.address,
         implementation: value.implementation,
-        deploymentBlock:
-          value.transaction &&
-          ethers.BigNumber.from(value.transaction.blockNumber).toHexString(),
+        deploymentBlock: value.transaction && ethers.BigNumber.from(value.transaction.blockNumber).toHexString(),
         forwarder: value.forwarder,
       };
     }
@@ -189,13 +177,8 @@ export class Deployer {
   }
 
   getDeployConfig (): DeployConfig {
-    const configPath = path.resolve(
-      this.options.basePath,
-      `${this.network.chainId}.json`,
-    );
-    const file = fs.existsSync(configPath)
-      ? fs.readFileSync(configPath).toString()
-      : '{}';
+    const configPath = path.resolve(this.options.basePath, `${this.network.chainId}.json`);
+    const file = fs.existsSync(configPath) ? fs.readFileSync(configPath).toString() : '{}';
     return JSON.parse(file.length ? file : '{}');
   }
 
@@ -212,9 +195,7 @@ export class Deployer {
         [name]: {
           address: contract.address,
           implementation: implAddress,
-          transaction:
-            contract.deployTransaction &&
-            (await contract.deployTransaction.wait()),
+          transaction: contract.deployTransaction && (await contract.deployTransaction.wait()),
           forwarder: forwarder && forwarder.address,
         },
       },
@@ -223,10 +204,7 @@ export class Deployer {
     this._saveConfig(_config);
   }
 
-  async saveForwarderConfig (
-    name: UnsContractName,
-    contract: Contract,
-  ): Promise<void> {
+  async saveForwarderConfig (name: UnsContractName, contract: Contract): Promise<void> {
     const config = this.getDeployConfig();
 
     const _config = merge(config, {
@@ -242,10 +220,7 @@ export class Deployer {
   }
 
   async _saveConfig (config: unknown) {
-    const configPath = path.resolve(
-      this.options.basePath,
-      `${this.network.chainId}.json`,
-    );
+    const configPath = path.resolve(this.options.basePath, `${this.network.chainId}.json`);
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
   }
 }

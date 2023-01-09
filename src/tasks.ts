@@ -1,4 +1,4 @@
-import { network, upgrades } from 'hardhat';
+import { network, upgrades, defender } from 'hardhat';
 import { Contract, utils } from 'ethers';
 import { merge } from 'lodash';
 import { ZERO_ADDRESS } from '../test/helpers/constants';
@@ -428,11 +428,11 @@ const upgradeMintingManagerTask: Task = {
   },
 };
 
-const upgradeProxyReaderTask = {
+const upgradeProxyReaderTask: Task = {
   tags: ['upgrade_proxy_reader'],
   priority: 105,
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
-    const [ProxyReader] = unwrap(dependencies, ArtifactName.ProxyReader);
+    const ProxyReader = unwrap(dependencies, ArtifactName.ProxyReader);
 
     const proxyReader = await upgrades.upgradeProxy(ProxyReader.address, ctx.artifacts.ProxyReader, {
       unsafeAllow: ['delegatecall'],
@@ -450,12 +450,122 @@ const upgradeProxyReaderTask = {
   ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { MintingManager, ProxyAdmin, UNSRegistry, CNSRegistry } = config.contracts || {};
+    const { ProxyReader, ProxyAdmin } = config.contracts || {};
     if (!ProxyAdmin || !ProxyAdmin.address) {
       throw new Error('Current network configuration does not support upgrading');
     }
 
-    const dependencies = { MintingManager, UNSRegistry, CNSRegistry };
+    const dependencies = { ProxyReader };
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    }
+
+    return dependencies;
+  },
+};
+
+const proposeUNSRegistryTask: Task = {
+  tags: ['propose_registry'],
+  priority: 110,
+  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
+    const UNSRegistry = unwrap(dependencies, ArtifactName.UNSRegistry);
+
+    const version = params?.version;
+    if (!version) {
+      throw new Error('Version parameter is not provided');
+    }
+
+    ctx.log('Preparing proposal...');
+    const proposal = await defender.proposeUpgrade(UNSRegistry.address, ctx.artifacts.UNSRegistry, {
+      title: `Propose UNSRegistry to V${version}`,
+      multisig: ctx.multisig,
+    });
+    ctx.log('Upgrade proposal created at:', proposal.url);
+  },
+  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { UNSRegistry, ProxyAdmin } = config.contracts || {};
+    if (!ProxyAdmin || !ProxyAdmin.address) {
+      throw new Error('Current network configuration does not support upgrading');
+    }
+    const dependencies = { UNSRegistry };
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    }
+
+    return dependencies;
+  },
+};
+
+const proposeMintingManagerTask: Task = {
+  tags: ['propose_minting_manager'],
+  priority: 110,
+  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
+    const MintingManager = unwrap(dependencies, ArtifactName.MintingManager);
+
+    const version = params?.version;
+    if (!version) {
+      throw new Error('Version parameter is not provided');
+    }
+
+    ctx.log('Preparing proposal...');
+    const proposal = await defender.proposeUpgrade(MintingManager.address, ctx.artifacts.MintingManager, {
+      title: `Propose MintingManager to V${version}`,
+      multisig: ctx.multisig,
+    });
+    ctx.log('Upgrade proposal created at:', proposal.url);
+  },
+  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { MintingManager, ProxyAdmin } = config.contracts || {};
+    if (!ProxyAdmin || !ProxyAdmin.address) {
+      throw new Error('Current network configuration does not support upgrading');
+    }
+
+    const dependencies = { MintingManager };
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    }
+
+    return dependencies;
+  },
+};
+
+const proposeProxyReaderTask: Task = {
+  tags: ['propose_proxy_reader'],
+  priority: 110,
+  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
+    const ProxyReader = unwrap(dependencies, ArtifactName.ProxyReader);
+
+    const version = params?.version;
+    if (!version) {
+      throw new Error('Version parameter is not provided');
+    }
+
+    ctx.log('Preparing proposal...');
+    const proposal = await defender.proposeUpgrade(ProxyReader.address, ctx.artifacts.ProxyReader, {
+      title: `Propose ProxyReader to V${version}`,
+      multisig: ctx.multisig,
+    });
+    ctx.log('Upgrade proposal created at:', proposal.url);
+  },
+  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { ProxyReader, ProxyAdmin } = config.contracts || {};
+    if (!ProxyAdmin || !ProxyAdmin.address) {
+      throw new Error('Current network configuration does not support upgrading');
+    }
+
+    const dependencies = { ProxyReader };
     for (const [key, value] of Object.entries(dependencies)) {
       if (!value || !value.address) {
         throw new Error(`${key} contract not found for network ${network.config.chainId}`);
@@ -535,7 +645,7 @@ const configurePolygonPosBridgeTask: Task = {
   },
 };
 
-const deployDotCoinBurnerTask = {
+const deployDotCoinBurnerTask: Task = {
   tags: ['dot_coin_burner', 'full'],
   priority: 200,
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
@@ -565,42 +675,6 @@ const deployDotCoinBurnerTask = {
   },
 };
 
-const addTLDTask = {
-  tags: ['add_tld'],
-  priority: 0,
-  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
-    const tld = params?.tld;
-    if (!tld) {
-      throw new Error('Tld parameter is not provided');
-    }
-
-    const chainId = network.config.chainId;
-    if (!chainId || ![137, 80001].includes(chainId)) {
-      throw new Error('Unsupported network');
-    }
-
-    const { owner } = ctx.accounts;
-    const MintingManager = unwrap(dependencies, ArtifactName.MintingManager);
-
-    const mintingManager = ctx.artifacts.MintingManager.attach(MintingManager.address).connect(owner);
-    await mintingManager.addTld(tld.toLowerCase());
-  },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
-    config = merge(ctx.getDeployConfig(), config);
-
-    const { MintingManager } = config.contracts || {};
-
-    const dependencies = { MintingManager };
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
-  },
-};
-
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -611,8 +685,10 @@ export const tasks: Task[] = [
   upgradeUNSRegistryTask,
   upgradeMintingManagerTask,
   upgradeProxyReaderTask,
+  proposeUNSRegistryTask,
+  proposeMintingManagerTask,
+  proposeProxyReaderTask,
   deployPolygonPosBridgeTask,
   configurePolygonPosBridgeTask,
   deployDotCoinBurnerTask,
-  addTLDTask,
 ];

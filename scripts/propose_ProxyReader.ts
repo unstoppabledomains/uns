@@ -1,5 +1,5 @@
 import { network } from 'hardhat';
-import { getNetworkConfig } from '../src/config';
+import { getNetworkConfig, mergeNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
 import { unwrap } from '../src/helpers';
 
@@ -13,7 +13,8 @@ async function main () {
   }
 
   const deployer = await Deployer.create();
-  await deployer.execute(['add_tld'], config, { tld: 'hi' });
+  const deployConfig = await deployer.execute(['propose_proxy_reader'], config, { version: '' });
+  mergeNetworkConfig(deployConfig);
 }
 
 main()
