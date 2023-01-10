@@ -463,7 +463,6 @@ describe('MintingManager', () => {
         });
 
         it('should mint subdomain by a token operator', async () => {
-          const selector = 'issueWithRecords(address,string[],string[],string[],bool)';
           const labels = ['test-10sub-2', 'wallet'];
 
           const tokenId = await unsRegistry.namehash(labels);
@@ -479,7 +478,6 @@ describe('MintingManager', () => {
         });
 
         it('should mint subdomain by an operator', async () => {
-          const selector = 'issueWithRecords(address,string[],string[],string[],bool)';
           const labels = ['test-11sub-2', 'wallet'];
 
           await mintingManager.connect(coinbase)[selector](coinbase.address, labels, [], [], false);
