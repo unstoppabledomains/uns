@@ -461,6 +461,37 @@ describe('MintingManager', () => {
 
           expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
         });
+
+        it('should mint subdomain by a token operator', async () => {
+          const selector = 'issueWithRecords(address,string[],string[],string[],bool)';
+          const labels = ['test-10sub-2', 'wallet'];
+
+          const tokenId = await unsRegistry.namehash(labels);
+          await mintingManager.connect(coinbase)[selector](coinbase.address, labels, [], [], false);
+          await unsRegistry.connect(coinbase).approve(receiver.address, tokenId);
+
+          labels.unshift('sub');
+
+          await mintingManager.connect(receiver)[selector](receiver.address, labels, [], [], false);
+
+          const subTokenId = await unsRegistry.namehash(labels);
+          expect(await unsRegistry.ownerOf(subTokenId)).to.be.equal(receiver.address);
+        });
+
+        it('should mint subdomain by an operator', async () => {
+          const selector = 'issueWithRecords(address,string[],string[],string[],bool)';
+          const labels = ['test-11sub-2', 'wallet'];
+
+          await mintingManager.connect(coinbase)[selector](coinbase.address, labels, [], [], false);
+          await unsRegistry.connect(coinbase).setApprovalForAll(receiver.address, true);
+
+          labels.unshift('sub');
+
+          await mintingManager.connect(receiver)[selector](receiver.address, labels, [], [], false);
+
+          const subTokenId = await unsRegistry.namehash(labels);
+          expect(await unsRegistry.ownerOf(subTokenId)).to.be.equal(receiver.address);
+        });
       });
     });
 
