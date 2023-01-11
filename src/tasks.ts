@@ -479,7 +479,7 @@ const proposeUNSRegistryTask: Task = {
 
     ctx.log('Preparing proposal...');
     const proposal = await defender.proposeUpgrade(UNSRegistry.address, ctx.artifacts.UNSRegistry, {
-      title: `Propose UNSRegistry to V${version}`,
+      title: `Propose UNSRegistry to v${version}`,
       multisig: ctx.multisig,
     });
     ctx.log('Upgrade proposal created at:', proposal.url);
@@ -515,7 +515,7 @@ const proposeMintingManagerTask: Task = {
 
     ctx.log('Preparing proposal...');
     const proposal = await defender.proposeUpgrade(MintingManager.address, ctx.artifacts.MintingManager, {
-      title: `Propose MintingManager to V${version}`,
+      title: `Propose MintingManager to v${version}`,
       multisig: ctx.multisig,
     });
     // TODO: update config and vefiry implementation
@@ -554,7 +554,7 @@ const proposeProxyReaderTask: Task = {
 
     ctx.log('Preparing proposal...');
     const proposal = await defender.proposeUpgrade(ProxyReader.address, ctx.artifacts.ProxyReader, {
-      title: `Propose ProxyReader to V${version}`,
+      title: `Propose ProxyReader to v${version}`,
       multisig: ctx.multisig,
     });
     ctx.log('Upgrade proposal created at:', proposal.url);
