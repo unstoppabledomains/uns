@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.6';
+    string public constant VERSION = '0.4.7';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -324,8 +324,25 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             ptr := add(str, 0x20)
         }
 
-        for (uint256 i = 0; i < bytes(str).length; i++) {
-            uint8 data = _charAt(ptr, i);
+        uint8 data = _charAt(ptr, 0); // first symbol
+        if (
+            !(data >= 48 && data <= 57) && !(data >= 97 && data <= 122) // 0-9 and a-z
+        ) {
+            return false;
+        }
+
+        uint256 labelLength = bytes(str).length;
+        if (labelLength > 1) {
+            data = _charAt(ptr, labelLength - 1); // last symbol
+            if (
+                !(data >= 48 && data <= 57) && !(data >= 97 && data <= 122) // 0-9 and a-z
+            ) {
+                return false;
+            }
+        }
+
+        for (uint256 i = 1; i < labelLength - 1; i++) {
+            data = _charAt(ptr, i);
             if (
                 data != 45 && // hyphen (-)
                 !(data >= 48 && data <= 57) && // 0-9
