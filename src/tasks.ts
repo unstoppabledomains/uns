@@ -518,6 +518,8 @@ const proposeMintingManagerTask: Task = {
       title: `Propose MintingManager to V${version}`,
       multisig: ctx.multisig,
     });
+    // TODO: update config and vefiry implementation
+    ctx.log('Proposal:', JSON.stringify(proposal));
     ctx.log('Upgrade proposal created at:', proposal.url);
   },
   ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
