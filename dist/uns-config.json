@@ -1,5 +1,5 @@
 {
-    "version": "0.6.6",
+    "version": "0.6.7",
     "networks": {
         "1": {
             "contracts": {
@@ -127,7 +127,7 @@
                 },
                 "MintingManager": {
                     "address": "0x9ee42D3EB042e06F8Cd241890C4fA0d51e4DA345",
-                    "implementation": "0x1b27fbDD2C9E850f8B6f8892FE36Cd31B3C8902C",
+                    "implementation": "0xE09Bda3970F594A1D551FbEb0629e0E6fA165f46",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ec",
                     "forwarder": "0x7F9F48cF94C69ce91D4b442DA186F31118ac0185"

@@ -41,6 +41,7 @@ jobs:
       - run: yarn compile
         env:
           FORCE_COLOR: 1
+      - run: yarn build:package
       - run: yarn test
         env:
           FORCE_COLOR: 1

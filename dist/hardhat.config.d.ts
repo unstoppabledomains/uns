@@ -4,6 +4,7 @@ declare module 'hardhat/types/config' {
     interface HardhatUserConfig {
         uns?: {
             minters: MintersMap;
+            multisig: Record<string, string>;
         };
     }
     interface HardhatConfig {
@@ -24,6 +25,7 @@ import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-solhint';
 import '@nomiclabs/hardhat-etherscan';
 import '@openzeppelin/hardhat-upgrades';
+import '@openzeppelin/hardhat-defender';
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
 import 'hardhat-abi-exporter';
