@@ -23,6 +23,8 @@ jobs:
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true'
       - run: yarn lint
+      - run: yarn build:package
+      - run: yarn rebuild:sandbox
 
   test:
     runs-on: ubuntu-latest
@@ -41,7 +43,6 @@ jobs:
       - run: yarn compile
         env:
           FORCE_COLOR: 1
-      - run: yarn build:package
       - run: yarn test
         env:
           FORCE_COLOR: 1
