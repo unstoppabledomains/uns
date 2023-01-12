@@ -1,6 +1,6 @@
 {
   "name": "uns",
-  "version": "0.6.25",
+  "version": "0.6.26",
   "description": "UNS contracts and tools",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "main": "./dist/index.js",
@@ -45,6 +45,7 @@
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "2.3.0",
     "@openzeppelin/contracts-upgradeable": "^4.7.3",
+    "@openzeppelin/hardhat-defender": "^1.8.1",
     "@openzeppelin/hardhat-upgrades": "^1.20.0",
     "@openzeppelin/upgrades-core": "^1.19.1",
     "@typechain/ethers-v5": "^10.1.0",
@@ -92,8 +93,8 @@
     "yargs": "^17.6.0"
   },
   "dependencies": {
+    "bip39": "^3.0.0",
     "ganache": "^7.4.0",
-    "web3": "^1.7.4",
-    "bip39": "^3.0.0"
+    "web3": "^1.7.4"
   }
 }

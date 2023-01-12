@@ -1,3 +1,7 @@
+## v0.6.26
+
+- Add OpenZeppelin Defender support
+
 ## v0.6.25
 
 - Forbid domain names minting with leading and ending hyphens (`-test1-.crypto`, `unstoppable-.crypto`, etc.) 

@@ -13,6 +13,7 @@ declare module 'hardhat/types/config' {
   interface HardhatUserConfig {
     uns?: {
       minters: MintersMap;
+      multisig: Record<string, string>;
     };
   }
 
@@ -38,6 +39,7 @@ import '@nomiclabs/hardhat-solhint';
 import '@nomiclabs/hardhat-etherscan';
 
 import '@openzeppelin/hardhat-upgrades';
+import '@openzeppelin/hardhat-defender';
 
 // There are no type declarations for
 require('solidity-coverage');
@@ -213,6 +215,16 @@ const config: HardhatUserConfig = {
       mumbai: ['0xc152ba5caa9db5883f2cfefb984610fd3bd7914a'],
       polygon: ['0xd8263053a6d08ef3acbf2381f144b90841726233'],
     },
+    multisig: {
+      mainnet: '0x6bEca92600be24179ae70A430AEF4aE632fddDc8',
+      polygon: '0xC8E1B5c41c42ad1cE8336714cA2b2f2588F0a337',
+      goerli: '0x6DB268C88b8659141936F70e5e8acAa3f10597e8',
+      mumbai: '0xFce156303580bA8cC44D07aDcc7723A12E596244',
+    },
+  },
+  defender: {
+    apiKey: process.env.DEFENDER_API_KEY || '',
+    apiSecret: process.env.DEFENDER_API_SECRET || '',
   },
 };
 
