@@ -10,6 +10,7 @@ declare module 'hardhat/types/config' {
     interface HardhatConfig {
         uns: {
             minters: MintersMap;
+            multisig: Record<string, string>;
         };
     }
     interface ProjectPathsUserConfig {
