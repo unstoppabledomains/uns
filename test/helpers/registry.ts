@@ -18,8 +18,7 @@ export async function mintDomain (
   const ownerIsWallet = !(typeof owner == 'string');
   const address = ownerIsWallet ? owner.address : owner;
 
-  const mintWithRecords = registry.functions['mintWithRecords(address,string[],string[],string[],bool)'];
-  await mintWithRecords(address, labels, keys, values, !withoutReverse);
+  await registry.mintWithRecords(address, labels, keys, values, !withoutReverse);
 
   return await registry.namehash(labels);
 }
@@ -37,11 +36,7 @@ export const mintRandomDomain = async (
   const ownerIsWallet = !(typeof owner == 'string');
   const address = ownerIsWallet ? owner.address : owner;
 
-  await registry['mintWithRecords(address,string[],string[],string[])'](address, labels, keys, values);
-
-  if (ownerIsWallet && withoutReverse) {
-    await registry.connect(owner)['removeReverse()']();
-  }
+  await registry.mintWithRecords(address, labels, keys, values, !withoutReverse);
 
   return await registry.namehash(labels);
 };

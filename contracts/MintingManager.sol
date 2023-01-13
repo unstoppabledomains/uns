@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.7';
+    string public constant VERSION = '0.4.8';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -122,33 +122,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         address to,
         string[] calldata labels,
         string[] calldata keys,
-        string[] calldata values
-    ) external override onlyIssuer(labels) onlyAllowed(labels) whenNotPaused {
-        _issueWithRecords(to, labels, keys, values, true);
-    }
-
-    function issueWithRecords(
-        address to,
-        string[] calldata labels,
-        string[] calldata keys,
         string[] calldata values,
         bool withReverse
     ) external override onlyIssuer(labels) onlyAllowed(labels) whenNotPaused {
         _issueWithRecords(to, labels, keys, values, withReverse);
-    }
-
-    function bulkIssue(BulkSLDIssueRequest[] calldata requests) external override onlyMinter {
-        for (uint256 i = 0; i < requests.length; i++) {
-            _ensureAllowed(requests[i].tld, requests[i].label);
-
-            string[] memory labels = _buildLabels(requests[i].tld, requests[i].label);
-            (uint256 tokenId, ) = _namehash(labels);
-
-            string[] memory empty;
-            if (!unsRegistry.exists(tokenId)) {
-                _issueWithRecords(requests[i].to, labels, empty, empty, false);
-            }
-        }
     }
 
     function claim(uint256 tld, string calldata label) external override onlyAllowedSLD(tld, label) whenNotPaused {

@@ -1,6 +1,12 @@
+## v0.6.27
+
+- UNSRegistry@0.6.3 Cleanup deprecated methods
+- MintingManager@0.4.8 Cleanup deprecated methods
+
 ## v0.6.26
 
 - Add OpenZeppelin Defender support
+- Upgrade MintingManager@0.4.7 on Goerli
 
 ## v0.6.25
 

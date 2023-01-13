@@ -59,8 +59,8 @@ describe('MintingManager (metatx)', () => {
   it('should mint through forwarder', async () => {
     const tokenId = await unsRegistry.namehash(['test-qw11', 'wallet']);
     const { req, signature } = await buildExecuteParams(
-      'issueWithRecords(address,string[],string[],string[])',
-      [receiver.address, ['test-qw11', 'wallet'], [], []],
+      'issueWithRecords(address,string[],string[],string[],bool)',
+      [receiver.address, ['test-qw11', 'wallet'], [], [], true],
       coinbase,
       tokenId,
     );
@@ -73,8 +73,8 @@ describe('MintingManager (metatx)', () => {
   it('should revert forwarding when forwarder not trusted', async () => {
     const tokenId = await unsRegistry.namehash(['test-qw11', 'wallet']);
     const { req, signature } = await buildExecuteParams(
-      'issueWithRecords(address,string[],string[],string[])',
-      [receiver.address, ['test-qw11', 'wallet'], [], []],
+      'issueWithRecords(address,string[],string[],string[],bool)',
+      [receiver.address, ['test-qw11', 'wallet'], [], [], true],
       coinbase,
       tokenId,
     );
@@ -89,8 +89,8 @@ describe('MintingManager (metatx)', () => {
   it('should revert execution when signature is not valid', async () => {
     const tokenId = await unsRegistry.namehash(['test-qw1341', 'wallet']);
     const { req, signature } = await buildExecuteParams(
-      'issueWithRecords(address,string[],string[],string[])',
-      [receiver.address, ['test-qw1341', 'wallet'], [], []],
+      'issueWithRecords(address,string[],string[],string[],bool)',
+      [receiver.address, ['test-qw1341', 'wallet'], [], [], true],
       coinbase,
       tokenId,
     );
@@ -103,8 +103,8 @@ describe('MintingManager (metatx)', () => {
   it('should revert execution when used signature', async () => {
     const tokenId = await unsRegistry.namehash(['test-qw1341', 'wallet']);
     const { req, signature } = await buildExecuteParams(
-      'issueWithRecords(address,string[],string[],string[])',
-      [receiver.address, ['test-qw1341', 'wallet'], [], []],
+      'issueWithRecords(address,string[],string[],string[],bool)',
+      [receiver.address, ['test-qw1341', 'wallet'], [], [], true],
       coinbase,
       tokenId,
     );
