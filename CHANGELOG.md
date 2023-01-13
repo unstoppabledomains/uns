@@ -6,6 +6,7 @@
 ## v0.6.26
 
 - Add OpenZeppelin Defender support
+- Upgrade MintingManager@0.4.7 on Goerli
 
 ## v0.6.25
 
