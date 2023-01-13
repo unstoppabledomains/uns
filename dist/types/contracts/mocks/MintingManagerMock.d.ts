@@ -2,18 +2,6 @@ import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, C
 import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
-export declare namespace IMintingManager {
-    type BulkSLDIssueRequestStruct = {
-        to: PromiseOrValue<string>;
-        label: PromiseOrValue<string>;
-        tld: PromiseOrValue<BigNumberish>;
-    };
-    type BulkSLDIssueRequestStructOutput = [string, string, BigNumber] & {
-        to: string;
-        label: string;
-        tld: BigNumber;
-    };
-}
 export interface MintingManagerMockInterface extends utils.Interface {
     functions: {
         "DEFAULT_ADMIN_ROLE()": FunctionFragment;
@@ -25,7 +13,6 @@ export interface MintingManagerMockInterface extends utils.Interface {
         "addProxyReaders(address[])": FunctionFragment;
         "addTld(string)": FunctionFragment;
         "blocklist(uint256)": FunctionFragment;
-        "bulkIssue((address,string,uint256)[])": FunctionFragment;
         "claim(uint256,string)": FunctionFragment;
         "claimTo(address,uint256,string)": FunctionFragment;
         "claimToWithRecords(address,uint256,string,string[],string[])": FunctionFragment;
@@ -41,7 +28,6 @@ export interface MintingManagerMockInterface extends utils.Interface {
         "isMinter(address)": FunctionFragment;
         "isTrustedForwarder(address)": FunctionFragment;
         "issueWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
-        "issueWithRecords(address,string[],string[],string[])": FunctionFragment;
         "owner()": FunctionFragment;
         "pause()": FunctionFragment;
         "paused()": FunctionFragment;
@@ -61,7 +47,7 @@ export interface MintingManagerMockInterface extends utils.Interface {
         "unsRegistry()": FunctionFragment;
         "upgradeAll(uint256[])": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "blocklist" | "bulkIssue" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords(address,string[],string[],string[],bool)" | "issueWithRecords(address,string[],string[],string[])" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsRegistry" | "upgradeAll"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "blocklist" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsRegistry" | "upgradeAll"): FunctionFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
@@ -71,7 +57,6 @@ export interface MintingManagerMockInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "addProxyReaders", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "blocklist", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "bulkIssue", values: [IMintingManager.BulkSLDIssueRequestStruct[]]): string;
     encodeFunctionData(functionFragment: "claim", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "claimTo", values: [
         PromiseOrValue<string>,
@@ -102,18 +87,12 @@ export interface MintingManagerMockInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "isBlocked", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "isMinter", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "isTrustedForwarder", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "issueWithRecords(address,string[],string[],string[],bool)", values: [
+    encodeFunctionData(functionFragment: "issueWithRecords", values: [
         PromiseOrValue<string>,
         PromiseOrValue<string>[],
         PromiseOrValue<string>[],
         PromiseOrValue<string>[],
         PromiseOrValue<boolean>
-    ]): string;
-    encodeFunctionData(functionFragment: "issueWithRecords(address,string[],string[],string[])", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[]
     ]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "pause", values?: undefined): string;
@@ -142,7 +121,6 @@ export interface MintingManagerMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "addProxyReaders", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addTld", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "blocklist", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "bulkIssue", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimTo", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimToWithRecords", data: BytesLike): Result;
@@ -157,8 +135,7 @@ export interface MintingManagerMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "isBlocked", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isTrustedForwarder", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "issueWithRecords(address,string[],string[],string[],bool)", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "issueWithRecords(address,string[],string[],string[])", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "issueWithRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
@@ -343,9 +320,6 @@ export interface MintingManagerMock extends BaseContract {
         blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
-        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -372,10 +346,7 @@ export interface MintingManagerMock extends BaseContract {
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        "issueWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "issueWithRecords(address,string[],string[],string[])"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         owner(overrides?: CallOverrides): Promise<[string]>;
@@ -444,9 +415,6 @@ export interface MintingManagerMock extends BaseContract {
     blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
-    bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
     claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -473,10 +441,7 @@ export interface MintingManagerMock extends BaseContract {
     isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
     isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
     isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    "issueWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "issueWithRecords(address,string[],string[],string[])"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+    issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     owner(overrides?: CallOverrides): Promise<string>;
@@ -535,7 +500,6 @@ export interface MintingManagerMock extends BaseContract {
         addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         addTld(tld: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: CallOverrides): Promise<void>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
@@ -550,8 +514,7 @@ export interface MintingManagerMock extends BaseContract {
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        "issueWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        "issueWithRecords(address,string[],string[],string[])"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
+        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         owner(overrides?: CallOverrides): Promise<string>;
         pause(overrides?: CallOverrides): Promise<void>;
         paused(overrides?: CallOverrides): Promise<boolean>;
@@ -621,9 +584,6 @@ export interface MintingManagerMock extends BaseContract {
         blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
-        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
@@ -650,10 +610,7 @@ export interface MintingManagerMock extends BaseContract {
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        "issueWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "issueWithRecords(address,string[],string[],string[])"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         owner(overrides?: CallOverrides): Promise<BigNumber>;
@@ -723,9 +680,6 @@ export interface MintingManagerMock extends BaseContract {
         blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
-        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
@@ -752,10 +706,7 @@ export interface MintingManagerMock extends BaseContract {
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        "issueWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "issueWithRecords(address,string[],string[],string[])"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
+        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
