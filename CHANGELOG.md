@@ -1,11 +1,11 @@
 ## v0.6.27
 
-- Add OpenZeppelin Defender support
+- UNSRegistry@0.6.3 Cleanup deprecated methods
+- MintingManager@0.4.8 Cleanup deprecated methods
 
 ## v0.6.26
 
-- UNSRegistry@0.6.3 Cleanup deprecated methods
-- MintingManager@0.4.8 Cleanup deprecated methods
+- Add OpenZeppelin Defender support
 
 ## v0.6.25
 
