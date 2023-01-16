@@ -1,3 +1,7 @@
+## v0.6.28
+
+- Fix `XLA` token regex
+
 ## v0.6.27
 
 - UNSRegistry@0.6.3 Cleanup deprecated methods
