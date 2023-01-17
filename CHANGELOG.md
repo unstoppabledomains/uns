@@ -1,3 +1,7 @@
+## v0.6.30
+
+- Fix `HBAR` token regex
+
 ## v0.6.29
 
 - Fix `XLA` token regex

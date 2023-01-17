@@ -1,5 +1,5 @@
 {
-  "version": "2.1.23",
+  "version": "2.1.24",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -1378,7 +1378,7 @@
     },
     "crypto.HBAR.address": {
       "deprecatedKeyName": "HBAR",
-      "validationRegex": "^(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))(?:-([a-z]{5}))?$",
+      "validationRegex": "^(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))$",
       "deprecated": false
     },
     "crypto.TEL.version.ERC20.address": {
