@@ -18,11 +18,13 @@ abstract contract Blocklist is Initializable, ContextUpgradeable {
 
     /**
      * @dev Emitted when the blocklist disabled by `account`.
+     * @custom:deprecated Blocklist is now always enabled.
      */
     event BlocklistDisabled(address account);
 
     /**
      * @dev Emitted when the blocklist enabled by `account`.
+     * @custom:deprecated Blocklist is now always enabled.
      */
     event BlocklistEnabled(address account);
 
