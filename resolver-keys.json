@@ -2620,6 +2620,11 @@
       "deprecatedKeyName": "APT",
       "validationRegex": "^0x[a-f0-9]{64}$",
       "deprecated": false
+    },
+    "crypto.GTH.address": {
+      "deprecatedKeyName": "GTH",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
     }
   }
 }

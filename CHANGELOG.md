@@ -1,5 +1,6 @@
 ## v0.6.28
 
+- Add `GTH` token to resolver list
 - Fix `XLA` token regex
 
 ## v0.6.27
