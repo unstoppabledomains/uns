@@ -53,6 +53,7 @@ async function getArtifacts (): Promise<ArtifactsMap> {
     ResolverForwarder: await ethers.getContractFactory('ResolverForwarder'),
     UNSRegistry: await ethers.getContractFactory('UNSRegistry'),
     MintingManager: await ethers.getContractFactory('MintingManager'),
+    UNSOperator: await ethers.getContractFactory('UNSOperator'),
     MintingManagerForwarder: await ethers.getContractFactory('MintingManagerForwarder'),
     ProxyReader: await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader'),
     DummyStateSender: await ethers.getContractFactory('DummyStateSender'),

@@ -38,7 +38,14 @@ describe('MintingManager (consumption)', () => {
 
     forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(mintingManager.address);
 
-    await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+    await mintingManager.initialize(
+      unsRegistry.address,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+    );
     await mintingManager.addMinter(coinbase.address);
     await mintingManager.setTokenURIPrefix('/');
     await mintingManager.setForwarder(forwarder.address);

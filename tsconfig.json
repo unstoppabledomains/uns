@@ -25,13 +25,9 @@
     "./uns-config.json"
   ],
   "include": [
-    "./sandbox/index.ts",
-    "./src/types.ts",
-    "./src/config.ts",
-    "./types/**/*.ts"
-  ],
-  "exclude": [
-    "**/*.test.ts",
-    "node_modules"
+    "./sandbox/**/*.ts",
+    "./src/*.ts",
+    "./types/**/*.ts",
+    "./test/**/*.ts"
   ]
 }

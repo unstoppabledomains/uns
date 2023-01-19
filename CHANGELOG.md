@@ -1,3 +1,9 @@
+## v0.6.31
+
+- MintingManager@0.4.10 fixed minting subdomains from minter when parent is approved for UNSOperator
+- UNSOperator@0.1.0 Added plain upgradeable contract
+- Ensured dev environments so that hardhat.config.ts and related dependencies are properly included in tests
+
 ## v0.6.30
 
 - MintingManager@0.4.9 remove blocklist method
