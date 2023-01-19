@@ -1,3 +1,7 @@
+## v0.6.30
+
+- MintingManager@0.4.9 remove blocklist method
+
 ## v0.6.29
 
 - Fix `XLA` token regex

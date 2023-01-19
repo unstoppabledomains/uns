@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.8';
+    string public constant VERSION = '0.4.9';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -161,10 +161,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function setForwarder(address forwarder) external onlyOwner {
         _setForwarder(forwarder);
-    }
-
-    function blocklist(uint256 tokenId) external onlyMinter {
-        _block(tokenId);
     }
 
     function pause() external onlyOwner {
