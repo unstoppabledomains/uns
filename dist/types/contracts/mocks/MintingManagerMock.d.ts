@@ -12,7 +12,6 @@ export interface MintingManagerMockInterface extends utils.Interface {
         "addMinters(address[])": FunctionFragment;
         "addProxyReaders(address[])": FunctionFragment;
         "addTld(string)": FunctionFragment;
-        "blocklist(uint256)": FunctionFragment;
         "claim(uint256,string)": FunctionFragment;
         "claimTo(address,uint256,string)": FunctionFragment;
         "claimToWithRecords(address,uint256,string,string[],string[])": FunctionFragment;
@@ -47,7 +46,7 @@ export interface MintingManagerMockInterface extends utils.Interface {
         "unsRegistry()": FunctionFragment;
         "upgradeAll(uint256[])": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "blocklist" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsRegistry" | "upgradeAll"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsRegistry" | "upgradeAll"): FunctionFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
@@ -56,7 +55,6 @@ export interface MintingManagerMockInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "addMinters", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "addProxyReaders", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "blocklist", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "claim", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "claimTo", values: [
         PromiseOrValue<string>,
@@ -120,7 +118,6 @@ export interface MintingManagerMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "addMinters", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addProxyReaders", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addTld", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "blocklist", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimTo", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimToWithRecords", data: BytesLike): Result;
@@ -317,9 +314,6 @@ export interface MintingManagerMock extends BaseContract {
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
-        blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -412,9 +406,6 @@ export interface MintingManagerMock extends BaseContract {
     addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
-    blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
     claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -499,7 +490,6 @@ export interface MintingManagerMock extends BaseContract {
         addMinters(accounts: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         addTld(tld: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
@@ -579,9 +569,6 @@ export interface MintingManagerMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
@@ -675,9 +662,6 @@ export interface MintingManagerMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        blocklist(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
