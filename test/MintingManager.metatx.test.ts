@@ -44,6 +44,7 @@ describe('MintingManager (metatx)', () => {
       ZERO_ADDRESS,
       ZERO_ADDRESS,
       ZERO_ADDRESS,
+      ZERO_ADDRESS,
       forwarder.address,
     );
     await mintingManager.addMinter(coinbase.address);

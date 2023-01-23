@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "files": [
+    "./hardhat.config.ts",
+    "./index.ts",
+    "./uns-config.json"
+  ],
+  "include": [
+    "./sandbox/index.ts",
+    "./src/types.ts",
+    "./src/config.ts",
+    "./types/**/*.ts"
+  ]
+}

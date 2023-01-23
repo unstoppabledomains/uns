@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.9';
+    string public constant VERSION = '0.4.10';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -35,6 +35,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      * `namehash` = uint256(keccak256(abi.encodePacked(uint256(0x0), keccak256(abi.encodePacked(label)))))
      */
     mapping(uint256 => string) internal _tlds;
+
+    address public unsOperator;
 
     /**
      * @dev The modifier checks domain's tld and label on mint.
@@ -65,7 +67,12 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             require(isMinter(_msgSender()), 'MintingManager: CALLER_IS_NOT_MINTER');
         } else {
             (, uint256 parentId) = _namehash(labels);
-            require(unsRegistry.isApprovedOrOwner(_msgSender(), parentId), 'MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER');
+
+            require(
+                unsRegistry.isApprovedOrOwner(_msgSender(), parentId) ||
+                    (unsRegistry.isApprovedOrOwner(unsOperator, parentId) && isMinter(_msgSender())),
+                'MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER'
+            );
         }
         _;
     }
@@ -75,12 +82,14 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         IMintingController cnsMintingController_,
         IURIPrefixController cnsURIPrefixController_,
         IResolver cnsResolver_,
+        address unsOperator_,
         address forwarder
     ) public initializer {
         unsRegistry = unsRegistry_;
         cnsMintingController = cnsMintingController_;
         cnsURIPrefixController = cnsURIPrefixController_;
         cnsResolver = cnsResolver_;
+        unsOperator = unsOperator_;
 
         __Ownable_init_unchained();
         __MinterRole_init_unchained();
@@ -161,6 +170,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function setForwarder(address forwarder) external onlyOwner {
         _setForwarder(forwarder);
+    }
+
+    function setOperator(address operator) external onlyOwner {
+        unsOperator = operator;
     }
 
     function pause() external onlyOwner {
@@ -337,5 +350,5 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     // Reserved storage space to allow for layout changes in the future.
-    uint256[50] private __gap;
+    uint256[49] private __gap;
 }

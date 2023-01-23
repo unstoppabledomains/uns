@@ -2,11 +2,11 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import namehash from 'eth-ens-namehash';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { MintingManager, ProxyReader, UNSRegistry } from '../types/contracts';
+import { MintingManager, ProxyReader, UNSOperator, UNSRegistry } from '../types/contracts';
 import { MintingManagerMock, UNSRegistryMock } from '../types/contracts/mocks';
 import { CNSRegistry, Resolver } from '../types/dot-crypto/contracts';
 import { MintingController, URIPrefixController } from '../types/dot-crypto/contracts/controllers';
-import { MintingManager__factory, ProxyReader__factory, UNSRegistry__factory } from '../types/factories/contracts';
+import { MintingManager__factory, ProxyReader__factory, UNSOperator__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { MintingManagerMock__factory, UNSRegistryMock__factory } from '../types/factories/contracts/mocks';
 import { CNSRegistry__factory, Resolver__factory } from '../types/factories/dot-crypto/contracts';
 import {
@@ -20,6 +20,7 @@ describe('MintingManager', () => {
 
   let unsRegistry: UNSRegistry,
     unsRegistryMock: UNSRegistryMock,
+    unsOperator: UNSOperator,
     cnsRegistry: CNSRegistry,
     resolver: Resolver,
     mintingController: MintingController,
@@ -47,7 +48,14 @@ describe('MintingManager', () => {
       mintingManager = await new MintingManager__factory(coinbase).deploy();
       await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
     });
 
     it('should transfer ownership', async () => {
@@ -77,6 +85,7 @@ describe('MintingManager', () => {
 
       await mintingManagerMock.initialize(
         unsRegistryMock.address,
+        ZERO_ADDRESS,
         ZERO_ADDRESS,
         ZERO_ADDRESS,
         ZERO_ADDRESS,
@@ -118,6 +127,53 @@ describe('MintingManager', () => {
     });
   });
 
+  describe('setOperator', async () => {
+    before(async () => {
+      [, , receiver] = signers;
+
+      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+      mintingManager = await new MintingManager__factory(coinbase).deploy();
+      unsOperator = await new UNSOperator__factory(coinbase).deploy();
+
+      await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
+      await mintingManager.addMinter(coinbase.address);
+    });
+
+    it('saves UNSOperator address', async () => {
+      await mintingManager.connect(coinbase).setOperator(unsOperator.address);
+
+      const labels = ['uns-operator-subdomain-test', 'crypto'];
+      await mintingManager.connect(coinbase).issueWithRecords(receiver.address, labels, [], [], true);
+
+      await unsRegistry.connect(receiver).approve(
+        unsOperator.address,
+        await unsRegistry.namehash(labels),
+      );
+
+      const subdomainLabels = ['sub', ...labels];
+
+      await mintingManager.connect(coinbase).issueWithRecords(coinbase.address, subdomainLabels, [], [], true);
+      const subdomainTokenId = await unsRegistry.namehash(subdomainLabels);
+
+      expect(await unsRegistry.ownerOf(subdomainTokenId)).to.equal(coinbase.address);
+    });
+
+    it('should revert if not owner', async () => {
+      await expect(mintingManager.connect(signers[1]).setOperator(unsOperator.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
+    });
+  });
+
   describe('TLD management', () => {
     before(async () => {
       [, spender] = signers;
@@ -126,7 +182,14 @@ describe('MintingManager', () => {
       mintingManager = await new MintingManager__factory(coinbase).deploy();
       await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
       await mintingManager.addMinter(coinbase.address);
     });
 
@@ -207,7 +270,14 @@ describe('MintingManager', () => {
       mintingManager = await new MintingManager__factory(coinbase).deploy();
       await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
       await mintingManager.setTokenURIPrefix('/');
     });
 
@@ -299,10 +369,19 @@ describe('MintingManager', () => {
       [, , receiver, spender] = signers;
 
       unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+      unsOperator = await new UNSOperator__factory(coinbase).deploy();
       mintingManager = await new MintingManager__factory(coinbase).deploy();
+
       await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        unsOperator.address,
+        ZERO_ADDRESS,
+      );
       await mintingManager.addMinter(coinbase.address);
       await mintingManager.setTokenURIPrefix('/');
     });
@@ -350,6 +429,53 @@ describe('MintingManager', () => {
         await expect(
           mintingManager.connect(receiver).issueWithRecords(coinbase.address, labels, [], [], true),
         ).to.be.revertedWith('MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('should mint when account is minter and parent domain is approved for UNSOperator', async () => {
+        const labels = ['test-1sub-operator', 'wallet'];
+
+        await mintingManager.connect(coinbase).issueWithRecords(receiver.address, labels, [], [], true);
+        const parentTokenId = await unsRegistry.namehash(labels);
+
+        await unsRegistry.connect(receiver).approve(unsOperator.address, parentTokenId);
+
+        const subdomainLabels = ['sub', ...labels];
+        const tokenId = await unsRegistry.namehash(subdomainLabels);
+
+        await mintingManager.connect(coinbase).issueWithRecords(receiver.address, subdomainLabels, [], [], true);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.equal(receiver.address);
+      });
+
+      it('should revert when domain is approved for UNSOperator and account is not owner or minter', async () => {
+        const labels = ['test-1sub-operator2', 'wallet'];
+
+        await mintingManager.connect(coinbase).issueWithRecords(receiver.address, labels, [], [], true);
+        const parentTokenId = await unsRegistry.namehash(labels);
+
+        await unsRegistry.connect(receiver).approve(unsOperator.address, parentTokenId);
+
+        labels.unshift('sub');
+
+        await expect(
+          mintingManager.connect(spender).issueWithRecords(receiver.address, labels, [], [], true),
+        ).to.be.revertedWith('MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('should mint when account is owner and parent domain is approved for UNSOperator', async () => {
+        const labels = ['test-1sub-operator3', 'wallet'];
+
+        await mintingManager.connect(coinbase).issueWithRecords(receiver.address, labels, [], [], true);
+        const parentTokenId = await unsRegistry.namehash(labels);
+
+        await unsRegistry.connect(receiver).approve(unsOperator.address, parentTokenId);
+
+        const subdomainLabels = ['sub', ...labels];
+        const tokenId = await unsRegistry.namehash(subdomainLabels);
+
+        await mintingManager.connect(receiver).issueWithRecords(receiver.address, subdomainLabels, [], [], true);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.equal(receiver.address);
       });
 
       it('should mint .wallet subdomain', async () => {
@@ -501,6 +627,7 @@ describe('MintingManager', () => {
         mintingController.address,
         uriPrefixController.address,
         resolver.address,
+        ZERO_ADDRESS,
         ZERO_ADDRESS,
       );
       await mintingManager.addMinter(coinbase.address);
@@ -685,7 +812,14 @@ describe('MintingManager', () => {
       mintingManager = await new MintingManager__factory(coinbase).deploy();
 
       await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-      await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
     });
 
     it('should return zero resolver when initialized by zero address', async () => {
@@ -700,7 +834,14 @@ describe('MintingManager', () => {
         mintingManager = await new MintingManager__factory(coinbase).deploy();
         await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-        await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+        await mintingManager.initialize(
+          unsRegistry.address,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+        );
         await mintingManager.addMinter(coinbase.address);
       });
 
@@ -721,7 +862,6 @@ describe('MintingManager', () => {
       });
 
       it('should revert minting when token blocked', async () => {
-        const tokenId = await unsRegistry.namehash(['test-block-3pef', 'wallet']);
         await mintingManager.issueWithRecords(coinbase.address, ['test-block-3pef', 'wallet'], [], [], true);
 
         await expect(
@@ -730,7 +870,6 @@ describe('MintingManager', () => {
       });
 
       it('should revert claim when blocked', async () => {
-        const tokenId = await unsRegistry.namehash([`${DomainNamePrefix}test-block-90dh`, 'wallet']);
         await mintingManager.claim(TLD.WALLET, 'test-block-90dh');
 
         await expect(mintingManager.claim(TLD.WALLET, 'test-block-90dh')).to.be.revertedWith(
@@ -739,7 +878,6 @@ describe('MintingManager', () => {
       });
 
       it('should revert claimTo when blocked', async () => {
-        const tokenId = await unsRegistry.namehash([`${DomainNamePrefix}test-block-8fdb`, 'wallet']);
         await mintingManager.claimTo(coinbase.address, TLD.WALLET, 'test-block-8fdb');
 
         await expect(mintingManager.claimTo(coinbase.address, TLD.WALLET, 'test-block-8fdb')).to.be.revertedWith(
@@ -748,7 +886,6 @@ describe('MintingManager', () => {
       });
 
       it('should revert claim with records when blocked', async () => {
-        const tokenId = await unsRegistry.namehash([`${DomainNamePrefix}test-block-u4nf`, 'wallet']);
         await mintingManager.claimToWithRecords(coinbase.address, TLD.WALLET, 'test-block-u4nf', [], []);
 
         await expect(
@@ -776,7 +913,15 @@ describe('MintingManager', () => {
         mintingManager = await new MintingManager__factory(coinbase).deploy();
         await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-        await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+        await mintingManager.initialize(
+          unsRegistry.address,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+        );
+
         await mintingManager.addMinter(coinbase.address);
         await mintingManager.pause();
       });
@@ -821,7 +966,14 @@ describe('MintingManager', () => {
         mintingManager = await new MintingManager__factory(coinbase).deploy();
         await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-        await mintingManager.initialize(unsRegistry.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+        await mintingManager.initialize(
+          unsRegistry.address,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+        );
         await mintingManager.addMinter(coinbase.address);
       });
 

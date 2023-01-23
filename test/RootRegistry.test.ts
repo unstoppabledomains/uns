@@ -119,6 +119,7 @@ describe('RootRegistry', () => {
       uriPrefixController.address,
       resolver.address,
       ZERO_ADDRESS,
+      ZERO_ADDRESS,
     );
     await mintingManager.addMinter(registryOwner.address);
     await mintingManager.setTokenURIPrefix('https://metadata.unstoppabledomains.ooo/metadata/');

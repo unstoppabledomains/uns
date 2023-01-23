@@ -136,9 +136,12 @@ const deployUNSTask = {
 
     let unsRegistry: Contract;
     let mintingManager: Contract;
+    let unsOperator: Contract;
     let proxyAdmin: Contract;
+
     let unsRegistryImpl: string;
     let mintingManagerImpl: string;
+    let unsOperatorImpl: string;
 
     if (ctx.options.proxy) {
       unsRegistry = await upgrades.deployProxy(ctx.artifacts.UNSRegistry.connect(owner), [], { initializer: false });
@@ -148,6 +151,9 @@ const deployUNSTask = {
         initializer: false,
       });
       await mintingManager.deployTransaction.wait();
+
+      unsOperator = await upgrades.deployProxy(ctx.artifacts.UNSOperator.connect(owner), []);
+      await unsOperator.deployTransaction.wait();
 
       proxyAdmin = await upgrades.admin.getInstance();
       await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
@@ -159,6 +165,10 @@ const deployUNSTask = {
       mintingManagerImpl = await proxyAdmin.callStatic.getProxyImplementation(mintingManager.address);
       await ctx.saveContractConfig(UnsContractName.MintingManager, mintingManager, mintingManagerImpl);
       await verify(ctx, mintingManagerImpl, []);
+
+      unsOperatorImpl = await proxyAdmin.callStatic.getProxyImplementation(unsOperator.address);
+      await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);
+      await verify(ctx, unsOperatorImpl, []);
     } else {
       unsRegistry = await ctx.artifacts.UNSRegistry.connect(owner).deploy();
       await ctx.saveContractConfig(UnsContractName.UNSRegistry, unsRegistry);
@@ -169,6 +179,11 @@ const deployUNSTask = {
       await ctx.saveContractConfig(UnsContractName.MintingManager, mintingManager);
       await mintingManager.deployTransaction.wait();
       await verify(ctx, mintingManager.address, []);
+
+      unsOperator = await ctx.artifacts.UNSOperator.connect(owner).deploy();
+      await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator);
+      await unsOperator.deployTransaction.wait();
+      await verify(ctx, unsOperator.address, []);
     }
 
     const registryInitTx = await unsRegistry
@@ -188,6 +203,7 @@ const deployUNSTask = {
         MintingController.address,
         URIPrefixController.address,
         Resolver.address,
+        unsOperator.address,
         forwarder.address,
       );
     await mintingManagerInitTx.wait();
@@ -359,6 +375,46 @@ const deployMMForwarderTask = {
   },
 };
 
+const deployUNSOperatorTask: Task = {
+  tags: ['uns_operator'],
+  priority: 100,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const { owner } = ctx.accounts;
+    const MintingManager = unwrap(dependencies, ArtifactName.MintingManager);
+
+    const unsOperator = await upgrades.deployProxy(ctx.artifacts.UNSOperator.connect(owner), []);
+    await unsOperator.deployTransaction.wait();
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+
+    const unsOperatorImpl = await proxyAdmin.callStatic.getProxyImplementation(unsOperator.address);
+    await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);
+    await verify(ctx, unsOperatorImpl, []);
+
+    const mintingManager = ctx.artifacts.MintingManager.attach(MintingManager.address);
+
+    const setOperatorTx = await mintingManager.connect(owner).setOperator(unsOperator.address);
+    await setOperatorTx.wait();
+  },
+  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { MintingManager, ProxyAdmin } = config.contracts || {};
+    const dependencies = {
+      MintingManager,
+      ProxyAdmin,
+    };
+
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    }
+
+    return dependencies;
+  },
+};
+
 const upgradeUNSRegistryTask: Task = {
   tags: ['upgrade_registry'],
   priority: 100,
@@ -456,6 +512,43 @@ const upgradeProxyReaderTask: Task = {
     }
 
     const dependencies = { ProxyReader };
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    }
+
+    return dependencies;
+  },
+};
+
+const upgradeUNSOperatorTask: Task = {
+  tags: ['upgrade_uns_operator'],
+  priority: 105,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const UNSOperator = unwrap(dependencies, ArtifactName.UNSOperator);
+
+    const unsOperator = await upgrades.upgradeProxy(UNSOperator.address, ctx.artifacts.UNSOperator);
+    await unsOperator.deployTransaction.wait();
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+    await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
+
+    const unsOperatorImpl = await proxyAdmin.callStatic.getProxyImplementation(unsOperator.address);
+
+    await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);
+    await verify(ctx, unsOperatorImpl, []);
+  },
+  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { UNSOperator, ProxyAdmin } = config.contracts || {};
+
+    if (!ProxyAdmin || !ProxyAdmin.address) {
+      throw new Error('Current network configuration does not support upgrading');
+    }
+
+    const dependencies = { UNSOperator };
     for (const [key, value] of Object.entries(dependencies)) {
       if (!value || !value.address) {
         throw new Error(`${key} contract not found for network ${network.config.chainId}`);
@@ -693,4 +786,6 @@ export const tasks: Task[] = [
   deployPolygonPosBridgeTask,
   configurePolygonPosBridgeTask,
   deployDotCoinBurnerTask,
+  deployUNSOperatorTask,
+  upgradeUNSOperatorTask,
 ];

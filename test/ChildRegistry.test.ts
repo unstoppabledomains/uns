@@ -84,6 +84,7 @@ describe('ChildRegistry', () => {
       ZERO_ADDRESS,
       ZERO_ADDRESS,
       ZERO_ADDRESS,
+      ZERO_ADDRESS,
     );
     await mintingManager.addMinter(registryOwner.address);
   });
