@@ -22,7 +22,7 @@ export interface MintingManagerInterface extends utils.Interface {
         "getRoleAdmin(bytes32)": FunctionFragment;
         "grantRole(bytes32,address)": FunctionFragment;
         "hasRole(bytes32,address)": FunctionFragment;
-        "initialize(address,address,address,address,address)": FunctionFragment;
+        "initialize(address,address,address,address,address,address)": FunctionFragment;
         "isBlocked(uint256)": FunctionFragment;
         "isMinter(address)": FunctionFragment;
         "isTrustedForwarder(address)": FunctionFragment;
@@ -39,13 +39,15 @@ export interface MintingManagerInterface extends utils.Interface {
         "revokeRole(bytes32,address)": FunctionFragment;
         "rotateMinter(address)": FunctionFragment;
         "setForwarder(address)": FunctionFragment;
+        "setOperator(address)": FunctionFragment;
         "setTokenURIPrefix(string)": FunctionFragment;
         "supportsInterface(bytes4)": FunctionFragment;
         "transferOwnership(address)": FunctionFragment;
         "unpause()": FunctionFragment;
+        "unsOperator()": FunctionFragment;
         "unsRegistry()": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsRegistry"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry"): FunctionFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
@@ -79,6 +81,7 @@ export interface MintingManagerInterface extends utils.Interface {
         PromiseOrValue<string>,
         PromiseOrValue<string>,
         PromiseOrValue<string>,
+        PromiseOrValue<string>,
         PromiseOrValue<string>
     ]): string;
     encodeFunctionData(functionFragment: "isBlocked", values: [PromiseOrValue<BigNumberish>]): string;
@@ -103,10 +106,12 @@ export interface MintingManagerInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "revokeRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "rotateMinter", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "setForwarder", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "setOperator", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "setTokenURIPrefix", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
     encodeFunctionData(functionFragment: "transferOwnership", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+    encodeFunctionData(functionFragment: "unsOperator", values?: undefined): string;
     encodeFunctionData(functionFragment: "unsRegistry", values?: undefined): string;
     decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "MINTER_ROLE", data: BytesLike): Result;
@@ -143,10 +148,12 @@ export interface MintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "rotateMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setForwarder", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setOperator", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setTokenURIPrefix", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "unsOperator", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unsRegistry", data: BytesLike): Result;
     events: {
         "AdminChanged(address,address)": EventFragment;
@@ -331,7 +338,7 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
+        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, unsOperator_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
@@ -372,6 +379,9 @@ export interface MintingManager extends BaseContract {
         setForwarder(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        setOperator(operator: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -382,6 +392,7 @@ export interface MintingManager extends BaseContract {
         unpause(overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        unsOperator(overrides?: CallOverrides): Promise<[string]>;
         unsRegistry(overrides?: CallOverrides): Promise<[string]>;
     };
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -420,7 +431,7 @@ export interface MintingManager extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
+    initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, unsOperator_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
@@ -461,6 +472,9 @@ export interface MintingManager extends BaseContract {
     setForwarder(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
+    setOperator(operator: PromiseOrValue<string>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -471,6 +485,7 @@ export interface MintingManager extends BaseContract {
     unpause(overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
+    unsOperator(overrides?: CallOverrides): Promise<string>;
     unsRegistry(overrides?: CallOverrides): Promise<string>;
     callStatic: {
         DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -491,7 +506,7 @@ export interface MintingManager extends BaseContract {
         getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
         grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
+        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, unsOperator_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
@@ -508,10 +523,12 @@ export interface MintingManager extends BaseContract {
         revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         rotateMinter(receiver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         setForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
+        setOperator(operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
         transferOwnership(newOwner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         unpause(overrides?: CallOverrides): Promise<void>;
+        unsOperator(overrides?: CallOverrides): Promise<string>;
         unsRegistry(overrides?: CallOverrides): Promise<string>;
     };
     filters: {
@@ -581,7 +598,7 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
+        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, unsOperator_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
@@ -622,6 +639,9 @@ export interface MintingManager extends BaseContract {
         setForwarder(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
+        setOperator(operator: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
@@ -632,6 +652,7 @@ export interface MintingManager extends BaseContract {
         unpause(overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
+        unsOperator(overrides?: CallOverrides): Promise<BigNumber>;
         unsRegistry(overrides?: CallOverrides): Promise<BigNumber>;
     };
     populateTransaction: {
@@ -671,7 +692,7 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
+        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, unsOperator_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -712,6 +733,9 @@ export interface MintingManager extends BaseContract {
         setForwarder(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
+        setOperator(operator: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
@@ -722,6 +746,7 @@ export interface MintingManager extends BaseContract {
         unpause(overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
+        unsOperator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         unsRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
     };
 }

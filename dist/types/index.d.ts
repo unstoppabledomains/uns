@@ -159,6 +159,8 @@ export type { RecordStorage } from "./contracts/RecordStorage";
 export { RecordStorage__factory } from "./factories/contracts/RecordStorage__factory";
 export type { RootRegistry } from "./contracts/RootRegistry";
 export { RootRegistry__factory } from "./factories/contracts/RootRegistry__factory";
+export type { UNSOperator } from "./contracts/UNSOperator";
+export { UNSOperator__factory } from "./factories/contracts/UNSOperator__factory";
 export type { UNSRegistry } from "./contracts/UNSRegistry";
 export { UNSRegistry__factory } from "./factories/contracts/UNSRegistry__factory";
 export type { Blocklist } from "./contracts/utils/Blocklist";

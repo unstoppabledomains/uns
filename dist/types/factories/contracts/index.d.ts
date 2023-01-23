@@ -20,5 +20,6 @@ export { MintingManager__factory } from "./MintingManager__factory";
 export { ProxyReader__factory } from "./ProxyReader__factory";
 export { RecordStorage__factory } from "./RecordStorage__factory";
 export { RootRegistry__factory } from "./RootRegistry__factory";
+export { UNSOperator__factory } from "./UNSOperator__factory";
 export { UNSRegistry__factory } from "./UNSRegistry__factory";
 //# sourceMappingURL=index.d.ts.map

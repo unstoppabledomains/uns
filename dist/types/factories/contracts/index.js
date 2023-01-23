@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UNSRegistry__factory = exports.RootRegistry__factory = exports.RecordStorage__factory = exports.ProxyReader__factory = exports.MintingManager__factory = exports.KeyStorage__factory = exports.IUNSRegistry__factory = exports.IRootRegistry__factory = exports.IReverseRegistry__factory = exports.IRegistryReader__factory = exports.IRecordStorage__factory = exports.IRecordReader__factory = exports.IMintingManager__factory = exports.IERC1967__factory = exports.IDataReader__factory = exports.DotCoinBurner__factory = exports.ChildRegistry__factory = exports.utils = exports.roles = exports.mocks = exports.metatx = exports.cns = exports.maticnetwork = void 0;
+exports.UNSRegistry__factory = exports.UNSOperator__factory = exports.RootRegistry__factory = exports.RecordStorage__factory = exports.ProxyReader__factory = exports.MintingManager__factory = exports.KeyStorage__factory = exports.IUNSRegistry__factory = exports.IRootRegistry__factory = exports.IReverseRegistry__factory = exports.IRegistryReader__factory = exports.IRecordStorage__factory = exports.IRecordReader__factory = exports.IMintingManager__factory = exports.IERC1967__factory = exports.IDataReader__factory = exports.DotCoinBurner__factory = exports.ChildRegistry__factory = exports.utils = exports.roles = exports.mocks = exports.metatx = exports.cns = exports.maticnetwork = void 0;
 exports.maticnetwork = __importStar(require("./@maticnetwork"));
 exports.cns = __importStar(require("./cns"));
 exports.metatx = __importStar(require("./metatx"));
@@ -62,5 +62,7 @@ var RecordStorage__factory_1 = require("./RecordStorage__factory");
 Object.defineProperty(exports, "RecordStorage__factory", { enumerable: true, get: function () { return RecordStorage__factory_1.RecordStorage__factory; } });
 var RootRegistry__factory_1 = require("./RootRegistry__factory");
 Object.defineProperty(exports, "RootRegistry__factory", { enumerable: true, get: function () { return RootRegistry__factory_1.RootRegistry__factory; } });
+var UNSOperator__factory_1 = require("./UNSOperator__factory");
+Object.defineProperty(exports, "UNSOperator__factory", { enumerable: true, get: function () { return UNSOperator__factory_1.UNSOperator__factory; } });
 var UNSRegistry__factory_1 = require("./UNSRegistry__factory");
 Object.defineProperty(exports, "UNSRegistry__factory", { enumerable: true, get: function () { return UNSRegistry__factory_1.UNSRegistry__factory; } });

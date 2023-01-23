@@ -26,5 +26,6 @@ export type { MintingManager } from "./MintingManager";
 export type { ProxyReader } from "./ProxyReader";
 export type { RecordStorage } from "./RecordStorage";
 export type { RootRegistry } from "./RootRegistry";
+export type { UNSOperator } from "./UNSOperator";
 export type { UNSRegistry } from "./UNSRegistry";
 //# sourceMappingURL=index.d.ts.map
