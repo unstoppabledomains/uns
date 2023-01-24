@@ -37,7 +37,7 @@ The contract addresses are distributed via a [UNS Config File](https://github.co
 
     ### Recipient:
 
-    In order to support `EIP-2771` recepient should implement `Context`.
+    In order to support `EIP-2771` recipient should implement `Context`.
 
     ```solidity
     interface Context {
@@ -177,7 +177,7 @@ Mumbai | MUMBAI_INFURA_KEY <br /> MUMBAI_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_
 
 ## Backward incompatibility
 
-Note: List of changes which makes UNS and CNS backward incompatibile
+Note: List of changes which makes UNS and CNS backward incompatible
 
 ### Events
 
@@ -202,7 +202,7 @@ Note: List of changes which makes UNS and CNS backward incompatibile
 * `function resolveTo(address to, uint256 tokenId) external {}` 
   * Removed - UNS uses a single Resolver which is Registry itself.
 * `function resolverOf(uint256 tokenId)`
-  * Now always returns Regsitry address itself
+  * Now always returns Registry address itself
 
 ---
 ## Sandbox
