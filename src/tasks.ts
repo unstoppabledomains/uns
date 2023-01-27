@@ -378,9 +378,8 @@ const deployMMForwarderTask = {
 const deployUNSOperatorTask: Task = {
   tags: ['uns_operator'],
   priority: 100,
-  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+  run: async (ctx: Deployer) => {
     const { owner } = ctx.accounts;
-    const MintingManager = unwrap(dependencies, ArtifactName.MintingManager);
 
     const unsOperator = await upgrades.deployProxy(ctx.artifacts.UNSOperator.connect(owner), []);
     await unsOperator.deployTransaction.wait();
@@ -390,28 +389,16 @@ const deployUNSOperatorTask: Task = {
     const unsOperatorImpl = await proxyAdmin.callStatic.getProxyImplementation(unsOperator.address);
     await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);
     await verify(ctx, unsOperatorImpl, []);
-
-    const mintingManager = ctx.artifacts.MintingManager.attach(MintingManager.address);
-
-    const setOperatorTx = await mintingManager.connect(owner).setOperator(unsOperator.address);
-    await setOperatorTx.wait();
   },
   ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { MintingManager, ProxyAdmin } = config.contracts || {};
-    const dependencies = {
-      MintingManager,
-      ProxyAdmin,
-    };
-
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
+    const { ProxyAdmin } = config.contracts || {};
+    if (!ProxyAdmin || !ProxyAdmin.address) {
+      throw new Error('Current network configuration does not support upgrading');
     }
 
-    return dependencies;
+    return {};
   },
 };
 
@@ -575,6 +562,14 @@ const proposeUNSRegistryTask: Task = {
       title: `Propose UNSRegistry to v${version}`,
       multisig: ctx.multisig,
     });
+    if (proposal.metadata?.newImplementationAddress) {
+      await ctx.saveContractConfig(
+        UnsContractName.UNSRegistry,
+        ctx.artifacts.UNSRegistry.attach(UNSRegistry.address),
+        proposal.metadata.newImplementationAddress,
+      );
+      await verify(ctx, proposal.metadata.newImplementationAddress, []);
+    }
     ctx.log('Upgrade proposal created at:', proposal.url);
   },
   ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
@@ -611,8 +606,14 @@ const proposeMintingManagerTask: Task = {
       title: `Propose MintingManager to v${version}`,
       multisig: ctx.multisig,
     });
-    // TODO: update config and vefiry implementation
-    ctx.log('Proposal:', JSON.stringify(proposal));
+    if (proposal.metadata?.newImplementationAddress) {
+      await ctx.saveContractConfig(
+        UnsContractName.MintingManager,
+        ctx.artifacts.MintingManager.attach(MintingManager.address),
+        proposal.metadata.newImplementationAddress,
+      );
+      await verify(ctx, proposal.metadata.newImplementationAddress, []);
+    }
     ctx.log('Upgrade proposal created at:', proposal.url);
   },
   ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
@@ -650,6 +651,14 @@ const proposeProxyReaderTask: Task = {
       title: `Propose ProxyReader to v${version}`,
       multisig: ctx.multisig,
     });
+    if (proposal.metadata?.newImplementationAddress) {
+      await ctx.saveContractConfig(
+        UnsContractName.ProxyReader,
+        ctx.artifacts.ProxyReader.attach(ProxyReader.address),
+        proposal.metadata.newImplementationAddress,
+      );
+      await verify(ctx, proposal.metadata.newImplementationAddress, []);
+    }
     ctx.log('Upgrade proposal created at:', proposal.url);
   },
   ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
