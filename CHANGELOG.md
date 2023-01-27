@@ -1,3 +1,8 @@
+## v0.6.32
+
+- Deploy UNSOperator@0.1.0 on Goerli, Mumbai
+- Upgrade MintingManager@0.4.10 on Goerli, Mumbai
+
 ## v0.6.31
 
 - MintingManager@0.4.10 fixed minting subdomains from minter when parent is approved for UNSOperator
