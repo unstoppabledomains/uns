@@ -36,7 +36,7 @@ contract UNSRegistry is
     address internal _mintingManager;
 
     mapping(address => uint256) internal _reverses;
-    
+
     mapping(uint256 => string) internal _tokenNames;
 
     mapping(address => bool) internal _proxyReaders;
@@ -314,7 +314,7 @@ contract UNSRegistry is
     /**
      * Remains for temporary backward compatibility
      * @custom:deprecated
-     * 
+     *
      * @dev See {IReverseRegistry-setReverse}.
      */
     function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
@@ -445,7 +445,11 @@ contract UNSRegistry is
         emit SetReverse(addr, tokenId);
     }
 
-    function _setReverse(address addr, uint256 tokenId, string memory uri) internal {
+    function _setReverse(
+        address addr,
+        uint256 tokenId,
+        string memory uri
+    ) internal {
         if (bytes(_tokenNames[tokenId]).length == 0) {
             _tokenNames[tokenId] = uri;
         }
@@ -453,7 +457,11 @@ contract UNSRegistry is
         emit SetReverse(addr, tokenId);
     }
 
-    function _safeSetReverse(address addr, uint256 tokenId, string memory uri) internal {
+    function _safeSetReverse(
+        address addr,
+        uint256 tokenId,
+        string memory uri
+    ) internal {
         if (address(0xdead) != addr && _reverses[addr] == 0) {
             _setReverse(addr, tokenId, uri);
         }

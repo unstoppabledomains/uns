@@ -472,7 +472,7 @@ describe('UNSRegistry (metatx)', () => {
         'deposit', // requires childChainManager contract
         'removeReverse',
         'addProxyReader',
-        'setReverse' // covered in separate test case
+        'setReverse', // covered in separate test case
       ];
 
       before(async () => {
@@ -512,7 +512,7 @@ describe('UNSRegistry (metatx)', () => {
       it('should execute setReverse(string[] labels) correctly', async () => {
         const setReverseFunc = registryFuncs()
           .filter((x) => !x.inputs.filter((i) => i.name === 'tokenId').length)
-          .filter((x) => x.name == 'setReverse')[0];
+          .filter((x) => x.name === 'setReverse')[0];
         const funcSig = getFuncSignature(setReverseFunc);
         paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
         const tokenId = await mintDomain(unsRegistry, owner, paramValueMap.labels);

@@ -53,7 +53,7 @@ describe('ProxyReader (UNS only)', () => {
     it('should support IRegistryReader interface', async () => {
       const functions = [
         'tokenURI', 'isApprovedOrOwner', 'resolverOf', 'namehash', 'balanceOf',
-        'ownerOf', 'getApproved', 'isApprovedForAll', 'exists', 'reverseOf', 'reverseNameOf'
+        'ownerOf', 'getApproved', 'isApprovedForAll', 'exists', 'reverseOf', 'reverseNameOf',
       ];
 
       const interfaceId = getInterfaceId(proxyReader, functions);
