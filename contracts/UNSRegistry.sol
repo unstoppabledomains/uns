@@ -36,6 +36,8 @@ contract UNSRegistry is
     address internal _mintingManager;
 
     mapping(address => uint256) internal _reverses;
+    
+    mapping(uint256 => string) internal _tokenNames;
 
     mapping(address => bool) internal _proxyReaders;
 
@@ -122,6 +124,7 @@ contract UNSRegistry is
     function unlockWithRecords(
         address to,
         uint256 tokenId,
+        string[] calldata labels,
         string[] calldata keys,
         string[] calldata values,
         bool withReverse
@@ -131,7 +134,7 @@ contract UNSRegistry is
         _setMany(keys, values, tokenId);
 
         if (withReverse) {
-            _safeSetReverse(to, tokenId);
+            _safeSetReverse(to, tokenId, _uri(labels));
         }
     }
 
@@ -309,10 +312,27 @@ contract UNSRegistry is
     }
 
     /**
+     * Remains for temporary backward compatibility
+     * @custom:deprecated
+     * 
      * @dev See {IReverseRegistry-setReverse}.
      */
     function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
         _setReverse(_msgSender(), tokenId);
+    }
+
+    /**
+     * @dev See {IReverseRegistry-setReverse}.
+     */
+    function setReverse(string[] memory labels) external override {
+        uint256 tokenId = _namehash(labels);
+        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
+        if (isTrustedForwarder(msg.sender)) {
+            require(tokenId == _msgToken(), 'Registry: TOKEN_INVALID');
+        } else {
+            _invalidateNonce(tokenId);
+        }
+        _setReverse(_msgSender(), tokenId, _uri(labels));
     }
 
     /**
@@ -325,6 +345,8 @@ contract UNSRegistry is
     }
 
     /**
+     * Remains for temporary backward compatibility
+     * @custom:deprecated
      * @dev See {IReverseRegistry-reverseOf}.
      */
     function reverseOf(address addr) external view override returns (uint256 reverse) {
@@ -332,6 +354,13 @@ contract UNSRegistry is
 
         if (!_isReadRestricted(tokenId)) {
             reverse = tokenId;
+        }
+    }
+
+    function reverseNameOf(address addr) external view override returns (string memory reverseUri) {
+        uint256 tokenId = _reverses[addr];
+        if (!_isReadRestricted(tokenId)) {
+            reverseUri = _tokenNames[tokenId];
         }
     }
 
@@ -376,7 +405,7 @@ contract UNSRegistry is
 
         if (withReverse) {
             // set reverse must be after emission of New URL event in order to keep events' order
-            _safeSetReverse(to, tokenId);
+            _safeSetReverse(to, tokenId, uri);
         }
     }
 
@@ -407,14 +436,26 @@ contract UNSRegistry is
         }
     }
 
+    /**
+     * Remains for temporary backward compatibility
+     * @custom:deprecated
+     */
     function _setReverse(address addr, uint256 tokenId) internal {
         _reverses[addr] = tokenId;
         emit SetReverse(addr, tokenId);
     }
 
-    function _safeSetReverse(address addr, uint256 tokenId) internal {
+    function _setReverse(address addr, uint256 tokenId, string memory uri) internal {
+        if (bytes(_tokenNames[tokenId]).length == 0) {
+            _tokenNames[tokenId] = uri;
+        }
+        _reverses[addr] = tokenId;
+        emit SetReverse(addr, tokenId);
+    }
+
+    function _safeSetReverse(address addr, uint256 tokenId, string memory uri) internal {
         if (address(0xdead) != addr && _reverses[addr] == 0) {
-            _setReverse(addr, tokenId);
+            _setReverse(addr, tokenId, uri);
         }
     }
 

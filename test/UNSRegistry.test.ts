@@ -238,10 +238,11 @@ describe('UNSRegistry', () => {
 
     describe('unlockWithRecords(address,uint256,string[],string[],bool)', async () => {
       it('should properly unlock domain and set new records without reverse', async () => {
+        const labels = ['label_12324_unlock2', 'crypto'];
         const tokenId = await mintDomain(
           unsRegistry,
           coinbase,
-          ['label_12324_unlock2', 'crypto'],
+          labels,
           true,
           ['key'],
           ['value'],
@@ -253,6 +254,7 @@ describe('UNSRegistry', () => {
         await unsRegistry.connect(coinbase).unlockWithRecords(
           receiver.address,
           tokenId,
+          labels,
           ['new-key'],
           ['new-value'],
           false,
@@ -264,10 +266,11 @@ describe('UNSRegistry', () => {
       });
 
       it('should properly unlock domain and set new records with reverse', async () => {
+        const labels = ['label_12324_unlock3', 'crypto'];
         const tokenId = await mintDomain(
           unsRegistry,
           coinbase,
-          ['label_12324_unlock3', 'crypto'],
+          labels,
           false,
           ['key'],
           ['value'],
@@ -279,6 +282,7 @@ describe('UNSRegistry', () => {
         await unsRegistry.connect(coinbase).unlockWithRecords(
           receiver.address,
           tokenId,
+          labels,
           ['new-key'],
           ['new-value'],
           true,

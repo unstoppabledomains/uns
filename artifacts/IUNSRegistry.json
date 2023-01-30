@@ -782,6 +782,25 @@
           "type": "address"
         }
       ],
+      "name": "reverseNameOf",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
+      ],
       "name": "reverseOf",
       "outputs": [
         {
@@ -988,6 +1007,19 @@
     {
       "inputs": [
         {
+          "internalType": "string[]",
+          "name": "labels",
+          "type": "string[]"
+        }
+      ],
+      "name": "setReverse",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "string",
           "name": "prefix",
           "type": "string"
@@ -1083,6 +1115,11 @@
           "internalType": "uint256",
           "name": "tokenId",
           "type": "uint256"
+        },
+        {
+          "internalType": "string[]",
+          "name": "labels",
+          "type": "string[]"
         },
         {
           "internalType": "string[]",

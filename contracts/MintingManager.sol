@@ -207,7 +207,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         (uint256 tokenId, ) = _namehash(labels);
 
         if (unsRegistry.exists(tokenId) && unsRegistry.ownerOf(tokenId) == address(this)) {
-            unsRegistry.unlockWithRecords(to, tokenId, keys, values, withReverse);
+            unsRegistry.unlockWithRecords(to, tokenId, labels, keys, values, withReverse);
         } else {
             _beforeTokenMint(tokenId);
 
