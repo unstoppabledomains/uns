@@ -29,7 +29,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.6.3';
+    string public constant VERSION = '0.6.4';
 
     string internal _prefix;
 

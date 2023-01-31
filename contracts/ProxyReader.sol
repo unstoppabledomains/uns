@@ -17,7 +17,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
     using AddressUpgradeable for address;
 
     string public constant NAME = 'UNS: Proxy Reader';
-    string public constant VERSION = '0.4.0';
+    string public constant VERSION = '0.4.1';
 
     IUNSRegistry private _unsRegistry;
     ICNSRegistry private _cnsRegistry;
