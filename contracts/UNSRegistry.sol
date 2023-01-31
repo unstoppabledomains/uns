@@ -325,6 +325,10 @@ contract UNSRegistry is
      * @dev See {IReverseRegistry-setReverse}.
      */
     function setReverse(string[] memory labels) external override {
+        /**
+         * Inline onlyOwner(tokenId) protectTokenOperation(tokenId) modifiers
+         * code to avoid multiple tokenId calculations and save gas
+         */
         uint256 tokenId = _namehash(labels);
         require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
         if (isTrustedForwarder(msg.sender)) {
@@ -332,6 +336,7 @@ contract UNSRegistry is
         } else {
             _invalidateNonce(tokenId);
         }
+
         _setReverse(_msgSender(), tokenId, _uri(labels));
     }
 
