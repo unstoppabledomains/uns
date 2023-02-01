@@ -39,9 +39,7 @@ interface IReverseRegistry {
     function removeReverse() external;
 
     /**
-     * Remains for temporary backward compatibility
-     * @custom:deprecated
-     *
+     * @custom:deprecated Use reverseNameOf instead
      * @dev Returns the reverse record for a given account's reverse record.
      * @param addr The address of the reverse record.
      * @return tokenId The token associated with the address.
