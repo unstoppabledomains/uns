@@ -63,7 +63,7 @@ interface IRegistryReader {
 
     /**
      * @dev Used to convert ethereum address to a readable domain name.
-     * @param addr The address of the reverse record.
+     * @param addr ethereum address to be reverse resolved.
      * @return uri Domain name associated with the address.
      */
     function reverseNameOf(address addr) external view returns (string memory);
