@@ -62,7 +62,7 @@ interface IRegistryReader {
     function reverseOf(address addr) external view returns (uint256);
 
     /**
-     * @dev Returns the reverse record for a given account's reverse record.
+     * @dev Used to convert ethereum address to a readable domain name.
      * @param addr The address of the reverse record.
      * @return uri Domain name associated with the address.
      */
