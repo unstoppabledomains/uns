@@ -376,6 +376,15 @@ contract UNSRegistry is
         _proxyReaders[addr] = true;
     }
 
+    /**
+     * @dev See {IUNSRegistry-backfillReverseNames(string[][])}
+     */
+    function backfillReverseNames(string[][] memory domains) external override onlyMintingManager {
+        for (uint256 i = 0; i < domains.length; i++) {
+            _tokenNames[_namehash(domains[i])] = _uri(domains[i]);
+        }
+    }
+
     /// Internal
 
     function _uri(string[] memory labels) private pure returns (string memory) {

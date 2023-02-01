@@ -121,4 +121,13 @@ interface IUNSRegistry is
      * @param addr address of ProxyReader
      */
     function addProxyReader(address addr) external;
+
+    /**
+     * @dev TEMPORARY function allows to insert tokenId => domainName mappings to support
+     *      new `reverseNameOf(address) returns (string domainName)` function
+     * @param domains Domain names list.
+     *        Each domain name represented as array of labels splitted by '.'
+     *        (for `aaa.bbb.crypto` it will be [`aaa`, `bbb`, `crypto`])
+     */
+    function backfillReverseNames(string[][] memory domains) external;
 }

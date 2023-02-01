@@ -116,4 +116,90 @@ describe('MintingManager (metatx)', () => {
       'MintingManagerForwarder: SIGNATURE_INVALID',
     );
   });
+
+  describe('Backfill reverse names though MintingManager (metatx)', () => {
+    it('should backfill domain name', async () => {
+      const labels = ['minting-manager-backfill-metatx', 'wallet'];
+      const uri = labels.join('.');
+      await mintingManager.issueWithRecords(receiver.address, labels, [], [], false);
+      const tokenId = ethers.utils.namehash(labels.join('.'));
+      await unsRegistry.connect(receiver)['setReverse(uint256)'](tokenId);
+      expect(await unsRegistry.reverseNameOf(receiver.address)).to.be.eq('');
+
+      const { req, signature } = await buildExecuteParams(
+        'backfillReverseNames(string[][])',
+        [[labels]],
+        coinbase,
+        0,
+      );
+      await forwarder.execute(req, signature);
+      expect(await unsRegistry.reverseNameOf(receiver.address)).to.be.eq(uri);
+    });
+
+    it('should not allow backfilling from non-allowed address', async () => {
+      const labels = ['minting-manager-backfill-metatx', 'wallet'];
+      const { req, signature } = await buildExecuteParams(
+        'backfillReverseNames(string[][])',
+        [[labels]],
+        receiver,
+        0,
+      );
+      await expect(forwarder.execute(req, signature))
+        .to.be.revertedWith('MintingManager: CALLER_IS_NOT_MINTER');
+    });
+
+    it('should backfill multiple domain names', async () => {
+      const domains = [
+        ['minting-manager-multiple-backfill-metatx-1', 'x'],
+        ['minting-manager-multiple-backfill-metatx-2', 'x'],
+        ['minting-manager-multiple-backfill-metatx-3', 'x'],
+      ];
+      for (const labels of domains) {
+        await mintingManager.issueWithRecords(receiver.address, labels, [], [], false);
+        const tokenId =  ethers.utils.namehash(labels.join('.'));
+        await unsRegistry.connect(receiver)['setReverse(uint256)'](tokenId);
+        expect(await unsRegistry.reverseNameOf(receiver.address)).to.be.eq('');
+      }
+      const { req, signature } = await buildExecuteParams(
+        'backfillReverseNames(string[][])',
+        [domains],
+        coinbase,
+        0,
+      );
+      await forwarder.execute(req, signature);
+      for (const labels of domains) {
+        const uri = labels.join('.');
+        const tokenId = ethers.utils.namehash(uri);
+        await unsRegistry.connect(receiver)['setReverse(uint256)'](tokenId);
+        expect(await unsRegistry.reverseNameOf(receiver.address)).to.be.eq(uri);
+      }
+    });
+
+    it('calculate gas amounts for batches', async () => {
+      const result: unknown[] = [];
+      for (const i of [1, 2, 3, 5, 10, 15, 20, 30, 50, 100]) {
+        result.push(await generateBatchBackfill(i));
+      }
+      console.table(result);
+    });
+
+    async function generateBatchBackfill (amount: number) {
+      const domains: string[][] = [];
+      for (let i = 0; i < amount; i++) {
+        domains.push([`generate-batch-backfill-${i}`, 'x']);
+      }
+      const { req, signature } = await buildExecuteParams(
+        'backfillReverseNames(string[][])',
+        [domains],
+        coinbase,
+        0,
+      );
+      const tx = await forwarder.execute(req, signature);
+      const txReceipt = await tx.wait();
+      return {
+        domainsAmount: amount,
+        gasUsed: txReceipt.gasUsed.toString(),
+      };
+    }
+  });
 });

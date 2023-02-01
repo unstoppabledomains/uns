@@ -190,6 +190,14 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         }
     }
 
+    /**
+     * @dev See {IUNSRegistry-backfillReverseNames(string[][])}
+     */
+    function backfillReverseNames(string[][] memory domains) external {
+        require(isMinter(_msgSender()), 'MintingManager: CALLER_IS_NOT_MINTER');
+        unsRegistry.backfillReverseNames(domains);
+    }
+
     function _buildLabels(uint256 tld, string memory label) private view returns (string[] memory) {
         string[] memory labels = new string[](2);
         labels[0] = label;

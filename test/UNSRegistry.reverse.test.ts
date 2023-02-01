@@ -498,4 +498,76 @@ describe('UNSRegistry (reverse)', () => {
       expect(await unsRegistry.reverseNameOf(owner.address)).to.be.equal('');
     });
   });
+
+  describe('Backfill reverse names', () => {
+    it('should backfill domain name', async () => {
+      const labels = ['backfill-1', 'x'];
+      const uri = labels.join('.');
+      const tokenId = await mintDomain(
+        unsRegistry,
+        owner,
+        labels,
+        true,
+      );
+      const _unsRegistry = unsRegistry.connect(owner);
+      await _unsRegistry['setReverse(uint256)'](tokenId);
+      expect(await unsRegistry.reverseNameOf(owner.address)).to.be.eq('');
+
+      await unsRegistry.backfillReverseNames([labels]);
+      expect(await unsRegistry.reverseNameOf(owner.address)).to.be.eq(uri);
+    });
+
+    it('should backfill multiple domain names', async () => {
+      const domains = [
+        ['multiple-backfill-1', 'x'],
+        ['multiple-backfill-2', 'x'],
+        ['multiple-backfill-3', 'x'],
+      ];
+      for (const labels of domains) {
+        const tokenId = await mintDomain(
+          unsRegistry,
+          owner,
+          labels,
+          true,
+        );
+        await unsRegistry.connect(owner)['setReverse(uint256)'](tokenId);
+        expect(await unsRegistry.reverseNameOf(owner.address)).to.be.eq('');
+      }
+      await unsRegistry.backfillReverseNames(domains);
+      for (const labels of domains) {
+        const uri = labels.join('.');
+        const tokenId = ethers.utils.namehash(uri);
+        await unsRegistry.connect(owner)['setReverse(uint256)'](tokenId);
+        expect(await unsRegistry.reverseNameOf(owner.address)).to.be.eq(uri);
+      }
+    });
+
+    it('should backfill domain name using MetaTx', async () => {
+      const labels = ['backfill-meta-1', 'x'];
+      const uri = labels.join('.');
+      const tokenId = await mintDomain(
+        unsRegistry,
+        owner,
+        labels,
+        true,
+      );
+      const _unsRegistry = unsRegistry.connect(owner);
+      await _unsRegistry['setReverse(uint256)'](tokenId);
+      expect(await unsRegistry.reverseNameOf(owner.address)).to.be.eq('');
+      const { req, signature } = await buildExecuteParams(
+        'backfillReverseNames(string[][])',
+        [[labels]],
+        coinbase,
+        coinbase.address,
+      );
+      await unsRegistry.execute(req, signature);
+      expect(await unsRegistry.reverseNameOf(owner.address)).to.be.eq(uri);
+    });
+
+    it('should not allow backfilling from non-allowed address', async () => {
+      const labels = ['non-allowed-backfill-meta-1', 'x'];
+      await expect(unsRegistry.connect(owner).backfillReverseNames([labels]))
+        .to.be.revertedWith('Registry: SENDER_IS_NOT_MINTING_MANAGER');
+    });
+  });
 });

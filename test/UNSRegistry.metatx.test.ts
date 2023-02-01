@@ -451,6 +451,10 @@ describe('UNSRegistry (metatx)', () => {
     describe('Non-Token functions', () => {
       const paramValueMap = {
         labels: ['label', 'crypto'],
+        domains: [[
+          'domain-label',
+          'crypto',
+        ]],
         data: '0x',
         role: '0x1000000000000000000000000000000000000000000000000000000000000000',
         key: 'key_nt1',
