@@ -2,8 +2,8 @@
 
 - Add new `setReverse(string[])` function to support unhashing for reverse resolution
 - Add `reverseNameOf(address) (string)` function. Returns domain name for provided address
-- Mark `setReverse(uint256)` as deprecated. Method will be removed in the next update
-- Add temporary `backfillReverseNames(string[][])` function to backfill `tokenId => domainName` mapping for existing reverse resolution records
+- Mark `setReverse(uint256)` as deprecated. Function will be removed in the next update
+- Add temporary `backfillReverseNames(string[][])` function to backfill `tokenId => domainName` mapping for existing reverse resolution records. Function will be removed in the next update
 
 ## v0.6.32
 
