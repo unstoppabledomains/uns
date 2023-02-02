@@ -37,11 +37,11 @@ contract UNSRegistry is
 
     mapping(address => uint256) internal _reverses;
 
-    mapping(uint256 => string) internal _tokenNames;
-
     mapping(address => bool) internal _proxyReaders;
 
     mapping(uint256 => bool) internal _upgradedTokens;
+
+    mapping(uint256 => string) internal _tokenNames;
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
