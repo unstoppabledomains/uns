@@ -18,9 +18,7 @@ interface IReverseRegistry {
     event RemoveReverse(address indexed addr);
 
     /**
-     * Remains for temporary backward compatibility
-     * @custom:deprecated
-     *
+     * @custom:deprecated Remains for temporary backward compatibility
      * @dev Sets the reverse record associated with the calling account.
      * @param tokenId The token to set for this address.
      */
