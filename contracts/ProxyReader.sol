@@ -93,10 +93,6 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
         return _exists(tokenId);
     }
 
-    /**
-     * @custom:deprecated
-     * Remains for temporary backward compatibility
-     */
     function reverseOf(address addr) external view override returns (uint256) {
         return _unsRegistry.reverseOf(addr);
     }
