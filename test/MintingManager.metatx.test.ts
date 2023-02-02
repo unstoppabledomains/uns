@@ -177,7 +177,7 @@ describe('MintingManager (metatx)', () => {
 
     it('calculate gas amounts for batches', async () => {
       const result: unknown[] = [];
-      for (const i of [1, 2, 3, 5, 10, 15, 20, 30, 50, 100]) {
+      for (const i of [1, 2, 3, 50, 55, 60]) {
         result.push(await generateBatchBackfill(i));
       }
       console.table(result);
@@ -186,7 +186,7 @@ describe('MintingManager (metatx)', () => {
     async function generateBatchBackfill (amount: number) {
       const domains: string[][] = [];
       for (let i = 0; i < amount; i++) {
-        domains.push([`generate-batch-backfill-${i}`, 'x']);
+        domains.push([`generate-batch-${i}-${amount}`, 'x']);
       }
       const { req, signature } = await buildExecuteParams(
         'backfillReverseNames(string[][])',
