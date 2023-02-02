@@ -350,8 +350,7 @@ contract UNSRegistry is
     }
 
     /**
-     * Remains for temporary backward compatibility
-     * @custom:deprecated
+     * @custom:deprecated Remains for temporary backward compatibility
      * @dev See {IReverseRegistry-reverseOf}.
      */
     function reverseOf(address addr) external view override returns (uint256 reverse) {
