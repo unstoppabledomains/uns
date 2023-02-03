@@ -464,8 +464,7 @@ contract UNSRegistry is
         if (bytes(_tokenNames[tokenId]).length == 0) {
             _tokenNames[tokenId] = uri;
         }
-        _reverses[addr] = tokenId;
-        emit SetReverse(addr, tokenId);
+        _setReverse(addr, tokenId);
     }
 
     function _safeSetReverse(
