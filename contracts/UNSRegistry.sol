@@ -312,8 +312,7 @@ contract UNSRegistry is
     }
 
     /**
-     * Remains for temporary backward compatibility
-     * @custom:deprecated
+     * @custom:deprecated Remains for temporary backward compatibility
      *
      * @dev See {IReverseRegistry-setReverse}.
      */
