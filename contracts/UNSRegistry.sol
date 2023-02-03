@@ -121,18 +121,32 @@ contract UNSRegistry is
         emit NewURI(tokenId, uri);
     }
 
+    /**
+     * @custom:deprecated Remains for temporary backward compatibility
+     * @dev See {IUNSRegistry-unlockWithRecords}.
+     */
     function unlockWithRecords(
         address to,
         uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values,
+        bool withReverse
+    ) external override onlyMintingManager {
+        _unlockWithRecords(to, tokenId, keys, values);
+        if (withReverse) {
+            _safeSetReverse(to, tokenId);
+        }
+    }
+
+    function unlockWithRecords(
+        address to,
         string[] calldata labels,
         string[] calldata keys,
         string[] calldata values,
         bool withReverse
     ) external override onlyMintingManager {
-        _reset(tokenId);
-        _transfer(ownerOf(tokenId), to, tokenId);
-        _setMany(keys, values, tokenId);
-
+        uint256 tokenId = _namehash(labels);
+        _unlockWithRecords(to, tokenId, keys, values);
         if (withReverse) {
             _safeSetReverse(to, tokenId, _uri(labels));
         }
@@ -463,6 +477,29 @@ contract UNSRegistry is
         if (address(0xdead) != addr && _reverses[addr] == 0) {
             _setReverse(addr, tokenId, uri);
         }
+    }
+
+    /**
+     * @custom:deprecated Remains for temporary backward compatibility
+     */
+    function _safeSetReverse(address addr, uint256 tokenId) internal {
+        if (address(0xdead) != addr && _reverses[addr] == 0) {
+            _setReverse(addr, tokenId);
+        }
+    }
+
+    /**
+     * @custom:deprecated Remains for temporary backward compatibility
+     */
+    function _unlockWithRecords(
+        address to,
+        uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values
+    ) internal {
+        _reset(tokenId);
+        _transfer(ownerOf(tokenId), to, tokenId);
+        _setMany(keys, values, tokenId);
     }
 
     function _removeReverse(address addr) internal {

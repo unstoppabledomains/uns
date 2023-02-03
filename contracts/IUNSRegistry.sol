@@ -99,10 +99,11 @@ interface IUNSRegistry is
     ) external;
 
     /**
+     * @custom:deprecated Remains for temporary backward compatibility
+     *
      * @dev unlock token with records
      * @param to address to unlock the token to
      * @param tokenId id of the token.
-     * @param labels array of domain labels splitted by '.' (for `aaa.bbb.crypto` it will be [`aaa`, `bbb`, `crypto`])
      * @param keys New record keys
      * @param values New record values
      * @param withReverse Flag indicating whether to install reverse resolution
@@ -110,6 +111,21 @@ interface IUNSRegistry is
     function unlockWithRecords(
         address to,
         uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values,
+        bool withReverse
+    ) external;
+
+    /**
+     * @dev unlock token with records
+     * @param to address to unlock the token to
+     * @param labels array of domain labels splitted by '.' (for `aaa.bbb.crypto` it will be [`aaa`, `bbb`, `crypto`])
+     * @param keys New record keys
+     * @param values New record values
+     * @param withReverse Flag indicating whether to install reverse resolution
+     */
+    function unlockWithRecords(
+        address to,
         string[] calldata labels,
         string[] calldata keys,
         string[] calldata values,
