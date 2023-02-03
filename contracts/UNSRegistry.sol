@@ -449,8 +449,7 @@ contract UNSRegistry is
     }
 
     /**
-     * Remains for temporary backward compatibility
-     * @custom:deprecated
+     * @custom:deprecated Remains for temporary backward compatibility
      */
     function _setReverse(address addr, uint256 tokenId) internal {
         _reverses[addr] = tokenId;
