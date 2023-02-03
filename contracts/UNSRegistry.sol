@@ -323,20 +323,8 @@ contract UNSRegistry is
     /**
      * @dev See {IReverseRegistry-setReverse}.
      */
-    function setReverse(string[] memory labels) external override {
-        /**
-         * Inline onlyOwner(tokenId) protectTokenOperation(tokenId) modifiers
-         * code to avoid multiple tokenId calculations and save gas
-         */
-        uint256 tokenId = _namehash(labels);
-        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
-        if (isTrustedForwarder(msg.sender)) {
-            require(tokenId == _msgToken(), 'Registry: TOKEN_INVALID');
-        } else {
-            _invalidateNonce(tokenId);
-        }
-
-        _setReverse(_msgSender(), tokenId, _uri(labels));
+    function setReverse(string[] memory labels) external override onlyOwner(_namehash(labels)) protectTokenOperation(_namehash(labels)) {
+        _setReverse(_msgSender(), _namehash(labels), _uri(labels));
     }
 
     /**
@@ -487,5 +475,5 @@ contract UNSRegistry is
     }
 
     // Reserved storage space to allow for layout changes in the future.
-    uint256[47] private __gap;
+    uint256[46] private __gap;
 }
