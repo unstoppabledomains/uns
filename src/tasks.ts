@@ -650,6 +650,7 @@ const proposeProxyReaderTask: Task = {
     const proposal = await defender.proposeUpgrade(ProxyReader.address, ctx.artifacts.ProxyReader, {
       title: `Propose ProxyReader to v${version}`,
       multisig: ctx.multisig,
+      unsafeAllow: ['delegatecall'],
     });
     if (proposal.metadata?.newImplementationAddress) {
       await ctx.saveContractConfig(
