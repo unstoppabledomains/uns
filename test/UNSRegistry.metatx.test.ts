@@ -451,6 +451,10 @@ describe('UNSRegistry (metatx)', () => {
     describe('Non-Token functions', () => {
       const paramValueMap = {
         labels: ['label', 'crypto'],
+        domains: [[
+          'domain-label',
+          'crypto',
+        ]],
         data: '0x',
         role: '0x1000000000000000000000000000000000000000000000000000000000000000',
         key: 'key_nt1',
@@ -472,6 +476,8 @@ describe('UNSRegistry (metatx)', () => {
         'deposit', // requires childChainManager contract
         'removeReverse',
         'addProxyReader',
+        'setReverse', // covered in separate test case
+        'unlockWithRecords', // covered in separate test case
       ];
 
       before(async () => {
@@ -506,6 +512,50 @@ describe('UNSRegistry (metatx)', () => {
           );
           await unsRegistry.execute(req, signature);
         }
+      });
+
+      it('should execute setReverse(string[]) correctly', async () => {
+        const setReverseFunc = registryFuncs()
+          .filter((x) => !x.inputs.filter((i) => i.name === 'tokenId').length)
+          .filter((x) => x.name === 'setReverse')[0];
+        const funcSig = getFuncSignature(setReverseFunc);
+        paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
+        const tokenId = await mintDomain(unsRegistry, owner, paramValueMap.labels);
+        const req = await buidRequest(
+          setReverseFunc,
+          owner.address,
+          tokenId,
+          paramValueMap,
+        );
+        const signature = await sign(
+          req.data,
+          unsRegistry.address,
+          req.nonce,
+          owner,
+        );
+        await unsRegistry.execute(req, signature);
+      });
+
+      it('should execute unlockWithRecords(address,string[],string[],string[],bool) correctly', async () => {
+        const unlockWithRecordsLabels = registryFuncs()
+          .filter((x) => !x.inputs.filter((i) => i.name === 'tokenId').length)
+          .filter((x) => x.name === 'unlockWithRecords')[0];
+        const funcSig = getFuncSignature(unlockWithRecordsLabels);
+        paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
+        const tokenId = await mintDomain(unsRegistry, owner, paramValueMap.labels);
+        const req = await buidRequest(
+          unlockWithRecordsLabels,
+          coinbase.address,
+          tokenId,
+          paramValueMap,
+        );
+        const signature = await sign(
+          req.data,
+          unsRegistry.address,
+          req.nonce,
+          coinbase,
+        );
+        await unsRegistry.execute(req, signature);
       });
 
       it('should revert execution of all functions when used signature', async () => {

@@ -99,6 +99,8 @@ interface IUNSRegistry is
     ) external;
 
     /**
+     * @custom:deprecated Remains for temporary backward compatibility
+     *
      * @dev unlock token with records
      * @param to address to unlock the token to
      * @param tokenId id of the token.
@@ -115,8 +117,33 @@ interface IUNSRegistry is
     ) external;
 
     /**
+     * @dev unlock token with records
+     * @param to address to unlock the token to
+     * @param labels array of domain labels splitted by '.' (for `aaa.bbb.crypto` it will be [`aaa`, `bbb`, `crypto`])
+     * @param keys New record keys
+     * @param values New record values
+     * @param withReverse Flag indicating whether to install reverse resolution
+     */
+    function unlockWithRecords(
+        address to,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        bool withReverse
+    ) external;
+
+    /**
      * @dev Adds ProxyReader address
      * @param addr address of ProxyReader
      */
     function addProxyReader(address addr) external;
+
+    /**
+     * @dev TEMPORARY function allows to insert tokenId => domainName mappings to support
+     *      new `reverseNameOf(address) returns (string domainName)` function
+     * @param domains Domain names list.
+     *        Each domain name represented as array of labels splitted by '.'
+     *        (for `aaa.bbb.crypto` it will be [`aaa`, `bbb`, `crypto`])
+     */
+    function backfillReverseNames(string[][] memory domains) external;
 }

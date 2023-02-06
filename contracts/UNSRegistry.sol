@@ -29,7 +29,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.6.3';
+    string public constant VERSION = '0.6.4';
 
     string internal _prefix;
 
@@ -40,6 +40,8 @@ contract UNSRegistry is
     mapping(address => bool) internal _proxyReaders;
 
     mapping(uint256 => bool) internal _upgradedTokens;
+
+    mapping(uint256 => string) internal _tokenNames;
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
@@ -52,16 +54,12 @@ contract UNSRegistry is
     }
 
     modifier protectTokenOperation(uint256 tokenId) {
-        if (isTrustedForwarder(msg.sender)) {
-            require(tokenId == _msgToken(), 'Registry: TOKEN_INVALID');
-        } else {
-            _invalidateNonce(tokenId);
-        }
+        _protectTokenOperation(tokenId);
         _;
     }
 
     modifier onlyOwner(uint256 tokenId) {
-        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
+        _onlyOwner(tokenId);
         _;
     }
 
@@ -119,6 +117,10 @@ contract UNSRegistry is
         emit NewURI(tokenId, uri);
     }
 
+    /**
+     * @custom:deprecated Remains for temporary backward compatibility
+     * @dev See {IUNSRegistry-unlockWithRecords}.
+     */
     function unlockWithRecords(
         address to,
         uint256 tokenId,
@@ -126,12 +128,23 @@ contract UNSRegistry is
         string[] calldata values,
         bool withReverse
     ) external override onlyMintingManager {
-        _reset(tokenId);
-        _transfer(ownerOf(tokenId), to, tokenId);
-        _setMany(keys, values, tokenId);
-
+        _unlockWithRecords(to, tokenId, keys, values);
         if (withReverse) {
             _safeSetReverse(to, tokenId);
+        }
+    }
+
+    function unlockWithRecords(
+        address to,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        bool withReverse
+    ) external override onlyMintingManager {
+        uint256 tokenId = _namehash(labels);
+        _unlockWithRecords(to, tokenId, keys, values);
+        if (withReverse) {
+            _safeSetReverse(to, tokenId, _uri(labels));
         }
     }
 
@@ -309,10 +322,22 @@ contract UNSRegistry is
     }
 
     /**
+     * @custom:deprecated Remains for temporary backward compatibility
+     *
      * @dev See {IReverseRegistry-setReverse}.
      */
     function setReverse(uint256 tokenId) external override onlyOwner(tokenId) protectTokenOperation(tokenId) {
         _setReverse(_msgSender(), tokenId);
+    }
+
+    /**
+     * @dev See {IReverseRegistry-setReverse}.
+     */
+    function setReverse(string[] memory labels) external override {
+        uint256 tokenId = _namehash(labels);
+        _onlyOwner(tokenId);
+        _protectTokenOperation(tokenId);
+        _setReverse(_msgSender(), tokenId, _uri(labels));
     }
 
     /**
@@ -325,6 +350,7 @@ contract UNSRegistry is
     }
 
     /**
+     * @custom:deprecated Remains for temporary backward compatibility
      * @dev See {IReverseRegistry-reverseOf}.
      */
     function reverseOf(address addr) external view override returns (uint256 reverse) {
@@ -335,11 +361,27 @@ contract UNSRegistry is
         }
     }
 
+    function reverseNameOf(address addr) external view override returns (string memory reverseUri) {
+        uint256 tokenId = _reverses[addr];
+        if (!_isReadRestricted(tokenId)) {
+            reverseUri = _tokenNames[tokenId];
+        }
+    }
+
     /**
      * @dev See {IUNSRegistry-addProxyReader(address)}.
      */
     function addProxyReader(address addr) external override onlyMintingManager {
         _proxyReaders[addr] = true;
+    }
+
+    /**
+     * @dev See {IUNSRegistry-backfillReverseNames(string[][])}
+     */
+    function backfillReverseNames(string[][] memory domains) external override onlyMintingManager {
+        for (uint256 i = 0; i < domains.length; i++) {
+            _tokenNames[_namehash(domains[i])] = _uri(domains[i]);
+        }
     }
 
     /// Internal
@@ -376,7 +418,7 @@ contract UNSRegistry is
 
         if (withReverse) {
             // set reverse must be after emission of New URL event in order to keep events' order
-            _safeSetReverse(to, tokenId);
+            _safeSetReverse(to, tokenId, uri);
         }
     }
 
@@ -407,15 +449,56 @@ contract UNSRegistry is
         }
     }
 
+    /**
+     * @custom:deprecated Remains for temporary backward compatibility
+     */
     function _setReverse(address addr, uint256 tokenId) internal {
         _reverses[addr] = tokenId;
         emit SetReverse(addr, tokenId);
     }
 
+    function _setReverse(
+        address addr,
+        uint256 tokenId,
+        string memory uri
+    ) internal {
+        if (bytes(_tokenNames[tokenId]).length == 0) {
+            _tokenNames[tokenId] = uri;
+        }
+        _setReverse(addr, tokenId);
+    }
+
+    function _safeSetReverse(
+        address addr,
+        uint256 tokenId,
+        string memory uri
+    ) internal {
+        if (address(0xdead) != addr && _reverses[addr] == 0) {
+            _setReverse(addr, tokenId, uri);
+        }
+    }
+
+    /**
+     * @custom:deprecated Remains for temporary backward compatibility
+     */
     function _safeSetReverse(address addr, uint256 tokenId) internal {
         if (address(0xdead) != addr && _reverses[addr] == 0) {
             _setReverse(addr, tokenId);
         }
+    }
+
+    /**
+     * @custom:deprecated Remains for temporary backward compatibility
+     */
+    function _unlockWithRecords(
+        address to,
+        uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values
+    ) internal {
+        _reset(tokenId);
+        _transfer(ownerOf(tokenId), to, tokenId);
+        _setMany(keys, values, tokenId);
     }
 
     function _removeReverse(address addr) internal {
@@ -427,6 +510,18 @@ contract UNSRegistry is
         return _upgradedTokens[tokenId] && _proxyReaders[_msgSender()];
     }
 
+    function _protectTokenOperation(uint256 tokenId) internal {
+        if (isTrustedForwarder(msg.sender)) {
+            require(tokenId == _msgToken(), 'Registry: TOKEN_INVALID');
+        } else {
+            _invalidateNonce(tokenId);
+        }
+    }
+
+    function _onlyOwner(uint256 tokenId) internal view {
+        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
+    }
+
     // Reserved storage space to allow for layout changes in the future.
-    uint256[47] private __gap;
+    uint256[46] private __gap;
 }

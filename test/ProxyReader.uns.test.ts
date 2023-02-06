@@ -53,7 +53,7 @@ describe('ProxyReader (UNS only)', () => {
     it('should support IRegistryReader interface', async () => {
       const functions = [
         'tokenURI', 'isApprovedOrOwner', 'resolverOf', 'namehash', 'balanceOf',
-        'ownerOf', 'getApproved', 'isApprovedForAll', 'exists', 'reverseOf',
+        'ownerOf', 'getApproved', 'isApprovedForAll', 'exists', 'reverseOf', 'reverseNameOf',
       ];
 
       const interfaceId = getInterfaceId(proxyReader, functions);
@@ -296,14 +296,19 @@ describe('ProxyReader (UNS only)', () => {
     describe('reverseOf', () => {
       it('should return empty reverse record when it is not set', async () => {
         expect(await proxyReader.reverseOf(coinbase.address)).to.be.equal(0);
+        expect(await proxyReader.reverseNameOf(coinbase.address)).to.be.equal('');
       });
 
       it('should return reverse record', async () => {
         const owner = signers[3];
+        const labels = ['hey_hoy_11sfg', 'wallet'];
+        const uri = labels.join('.');
         const tokenId = await mintDomain(unsRegistry, owner.address, ['hey_hoy_11sfg', 'wallet']);
         await unsRegistry.connect(owner)['setReverse(uint256)'](tokenId);
+        await unsRegistry.connect(owner)['setReverse(string[])'](labels);
 
         expect(await proxyReader.reverseOf(owner.address)).to.be.equal(tokenId);
+        expect(await proxyReader.reverseNameOf(owner.address)).to.be.equal(uri);
       });
     });
   });

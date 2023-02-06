@@ -283,6 +283,19 @@
     {
       "inputs": [
         {
+          "internalType": "string[][]",
+          "name": "domains",
+          "type": "string[][]"
+        }
+      ],
+      "name": "backfillReverseNames",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
           "name": "owner",
           "type": "address"
@@ -782,6 +795,25 @@
           "type": "address"
         }
       ],
+      "name": "reverseNameOf",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
+      ],
       "name": "reverseOf",
       "outputs": [
         {
@@ -988,6 +1020,19 @@
     {
       "inputs": [
         {
+          "internalType": "string[]",
+          "name": "labels",
+          "type": "string[]"
+        }
+      ],
+      "name": "setReverse",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "string",
           "name": "prefix",
           "type": "string"
@@ -1068,6 +1113,39 @@
         }
       ],
       "name": "transferFrom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "string[]",
+          "name": "labels",
+          "type": "string[]"
+        },
+        {
+          "internalType": "string[]",
+          "name": "keys",
+          "type": "string[]"
+        },
+        {
+          "internalType": "string[]",
+          "name": "values",
+          "type": "string[]"
+        },
+        {
+          "internalType": "bool",
+          "name": "withReverse",
+          "type": "bool"
+        }
+      ],
+      "name": "unlockWithRecords",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

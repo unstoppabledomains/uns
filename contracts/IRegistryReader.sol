@@ -54,9 +54,17 @@ interface IRegistryReader {
     function exists(uint256 tokenId) external view returns (bool);
 
     /**
+     * @custom:deprecated Use reverseNameOf instead
      * @dev Returns the reverse record for a given account's reverse record.
      * @param addr The address of the reverse record.
      * @return tokenId The token associated with the address.
      */
     function reverseOf(address addr) external view returns (uint256);
+
+    /**
+     * @dev Used to convert ethereum address to a readable domain name.
+     * @param addr ethereum address to be reverse resolved.
+     * @return uri Domain name associated with the address.
+     */
+    function reverseNameOf(address addr) external view returns (string memory);
 }

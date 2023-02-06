@@ -17,7 +17,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
     using AddressUpgradeable for address;
 
     string public constant NAME = 'UNS: Proxy Reader';
-    string public constant VERSION = '0.4.0';
+    string public constant VERSION = '0.4.1';
 
     IUNSRegistry private _unsRegistry;
     ICNSRegistry private _cnsRegistry;
@@ -95,6 +95,10 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader
 
     function reverseOf(address addr) external view override returns (uint256) {
         return _unsRegistry.reverseOf(addr);
+    }
+
+    function reverseNameOf(address addr) external view override returns (string memory) {
+        return _unsRegistry.reverseNameOf(addr);
     }
 
     function get(string calldata key, uint256 tokenId) external view override returns (string memory value) {
