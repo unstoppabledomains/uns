@@ -193,8 +193,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     /**
      * @dev See {IUNSRegistry-backfillReverseNames(string[][])}
      */
-    function backfillReverseNames(string[][] memory domains) external {
-        require(isMinter(_msgSender()), 'MintingManager: CALLER_IS_NOT_MINTER');
+    function backfillReverseNames(string[][] memory domains) external onlyMinter {
         unsRegistry.backfillReverseNames(domains);
     }
 

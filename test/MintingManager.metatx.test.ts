@@ -145,7 +145,7 @@ describe('MintingManager (metatx)', () => {
         0,
       );
       await expect(forwarder.execute(req, signature))
-        .to.be.revertedWith('MintingManager: CALLER_IS_NOT_MINTER');
+        .to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
     });
 
     it('should backfill multiple domain names', async () => {

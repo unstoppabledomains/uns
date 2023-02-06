@@ -1072,7 +1072,7 @@ describe('MintingManager', () => {
     it('should not allow to backfill domains from non-allowed adddress', async () => {
       const labels = ['minting-manager-non-allowed-backfill-meta-1', 'x'];
       await expect(mintingManager.connect(spender).backfillReverseNames([labels]))
-        .to.be.revertedWith('MintingManager: CALLER_IS_NOT_MINTER');
+        .to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
     });
   });
 });

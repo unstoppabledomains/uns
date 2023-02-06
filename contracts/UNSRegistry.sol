@@ -54,16 +54,12 @@ contract UNSRegistry is
     }
 
     modifier protectTokenOperation(uint256 tokenId) {
-        if (isTrustedForwarder(msg.sender)) {
-            require(tokenId == _msgToken(), 'Registry: TOKEN_INVALID');
-        } else {
-            _invalidateNonce(tokenId);
-        }
+        _protectTokenOperation(tokenId);
         _;
     }
 
     modifier onlyOwner(uint256 tokenId) {
-        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
+        _onlyOwner(tokenId);
         _;
     }
 
@@ -337,8 +333,11 @@ contract UNSRegistry is
     /**
      * @dev See {IReverseRegistry-setReverse}.
      */
-    function setReverse(string[] memory labels) external override onlyOwner(_namehash(labels)) protectTokenOperation(_namehash(labels)) {
-        _setReverse(_msgSender(), _namehash(labels), _uri(labels));
+    function setReverse(string[] memory labels) external override {
+        uint256 tokenId = _namehash(labels);
+        _onlyOwner(tokenId);
+        _protectTokenOperation(tokenId);
+        _setReverse(_msgSender(), tokenId, _uri(labels));
     }
 
     /**
@@ -509,6 +508,18 @@ contract UNSRegistry is
 
     function _isReadRestricted(uint256 tokenId) internal view override returns (bool) {
         return _upgradedTokens[tokenId] && _proxyReaders[_msgSender()];
+    }
+
+    function _protectTokenOperation(uint256 tokenId) internal {
+        if (isTrustedForwarder(msg.sender)) {
+            require(tokenId == _msgToken(), 'Registry: TOKEN_INVALID');
+        } else {
+            _invalidateNonce(tokenId);
+        }
+    }
+
+    function _onlyOwner(uint256 tokenId) internal view {
+        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
     }
 
     // Reserved storage space to allow for layout changes in the future.
