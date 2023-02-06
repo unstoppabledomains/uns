@@ -26,11 +26,12 @@ export interface ProxyReaderInterface extends utils.Interface {
         "ownerOfForMany(uint256[])": FunctionFragment;
         "registryOf(uint256)": FunctionFragment;
         "resolverOf(uint256)": FunctionFragment;
+        "reverseNameOf(address)": FunctionFragment;
         "reverseOf(address)": FunctionFragment;
         "supportsInterface(bytes4)": FunctionFragment;
         "tokenURI(uint256)": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "NAME" | "VERSION" | "balanceOf" | "exists" | "get" | "getApproved" | "getByHash" | "getData" | "getDataByHash" | "getDataByHashForMany" | "getDataForMany" | "getMany" | "getManyByHash" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "multicall" | "namehash" | "ownerOf" | "ownerOfForMany" | "registryOf" | "resolverOf" | "reverseOf" | "supportsInterface" | "tokenURI"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "NAME" | "VERSION" | "balanceOf" | "exists" | "get" | "getApproved" | "getByHash" | "getData" | "getDataByHash" | "getDataByHashForMany" | "getDataForMany" | "getMany" | "getManyByHash" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "multicall" | "namehash" | "ownerOf" | "ownerOfForMany" | "registryOf" | "resolverOf" | "reverseNameOf" | "reverseOf" | "supportsInterface" | "tokenURI"): FunctionFragment;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
     encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
     encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>]): string;
@@ -53,6 +54,7 @@ export interface ProxyReaderInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "ownerOfForMany", values: [PromiseOrValue<BigNumberish>[]]): string;
     encodeFunctionData(functionFragment: "registryOf", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "resolverOf", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "reverseNameOf", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "reverseOf", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
     encodeFunctionData(functionFragment: "tokenURI", values: [PromiseOrValue<BigNumberish>]): string;
@@ -78,6 +80,7 @@ export interface ProxyReaderInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "ownerOfForMany", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "registryOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "resolverOf", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "reverseNameOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "reverseOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
@@ -180,6 +183,7 @@ export interface ProxyReader extends BaseContract {
         }>;
         registryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[string]>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber]>;
         supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
@@ -252,6 +256,7 @@ export interface ProxyReader extends BaseContract {
     ownerOfForMany(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<string[]>;
     registryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
     resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
+    reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
     reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
     supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
     tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
@@ -320,6 +325,7 @@ export interface ProxyReader extends BaseContract {
         ownerOfForMany(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<string[]>;
         registryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
@@ -355,6 +361,7 @@ export interface ProxyReader extends BaseContract {
         ownerOfForMany(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
         registryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
@@ -386,6 +393,7 @@ export interface ProxyReader extends BaseContract {
         ownerOfForMany(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
         registryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;

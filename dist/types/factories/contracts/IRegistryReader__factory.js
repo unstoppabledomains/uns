@@ -173,6 +173,25 @@ const _abi = [
                 type: "address",
             },
         ],
+        name: "reverseNameOf",
+        outputs: [
+            {
+                internalType: "string",
+                name: "",
+                type: "string",
+            },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
+                name: "addr",
+                type: "address",
+            },
+        ],
         name: "reverseOf",
         outputs: [
             {

@@ -29,6 +29,7 @@ export interface UNSRegistryInterface extends utils.Interface {
         "addKey(string)": FunctionFragment;
         "addProxyReader(address)": FunctionFragment;
         "approve(address,uint256)": FunctionFragment;
+        "backfillReverseNames(string[][])": FunctionFragment;
         "balanceOf(address)": FunctionFragment;
         "burn(uint256)": FunctionFragment;
         "deposit(address,bytes)": FunctionFragment;
@@ -59,6 +60,7 @@ export interface UNSRegistryInterface extends utils.Interface {
         "removeReverse()": FunctionFragment;
         "reset(uint256)": FunctionFragment;
         "resolverOf(uint256)": FunctionFragment;
+        "reverseNameOf(address)": FunctionFragment;
         "reverseOf(address)": FunctionFragment;
         "root()": FunctionFragment;
         "safeTransferFrom(address,address,uint256)": FunctionFragment;
@@ -70,22 +72,25 @@ export interface UNSRegistryInterface extends utils.Interface {
         "setManyByHash(uint256[],string[],uint256)": FunctionFragment;
         "setOwner(address,uint256)": FunctionFragment;
         "setReverse(uint256)": FunctionFragment;
+        "setReverse(string[])": FunctionFragment;
         "setTokenURIPrefix(string)": FunctionFragment;
         "supportsInterface(bytes4)": FunctionFragment;
         "symbol()": FunctionFragment;
         "tokenURI(uint256)": FunctionFragment;
         "transferFrom(address,address,uint256)": FunctionFragment;
+        "unlockWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
         "unlockWithRecords(address,uint256,string[],string[],bool)": FunctionFragment;
         "verify((address,uint256,uint256,bytes),bytes)": FunctionFragment;
         "withdrawFromPolygon(bytes,uint256,string[],string[])": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "BATCH_LIMIT" | "NAME" | "VERSION" | "addKey" | "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "execute" | "exists" | "get" | "getApproved" | "getByHash" | "getKey" | "getKeys" | "getMany" | "getManyByHash" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "isTrustedForwarder" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "name" | "namehash" | "nonceOf" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseOf" | "root" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "verify" | "withdrawFromPolygon"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "BATCH_LIMIT" | "NAME" | "VERSION" | "addKey" | "addProxyReader" | "approve" | "backfillReverseNames" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "execute" | "exists" | "get" | "getApproved" | "getByHash" | "getKey" | "getKeys" | "getMany" | "getManyByHash" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "isTrustedForwarder" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "name" | "namehash" | "nonceOf" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseNameOf" | "reverseOf" | "root" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse(uint256)" | "setReverse(string[])" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords(address,string[],string[],string[],bool)" | "unlockWithRecords(address,uint256,string[],string[],bool)" | "verify" | "withdrawFromPolygon"): FunctionFragment;
     encodeFunctionData(functionFragment: "BATCH_LIMIT", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
     encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
     encodeFunctionData(functionFragment: "addKey", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "addProxyReader", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "approve", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "backfillReverseNames", values: [PromiseOrValue<string>[][]]): string;
     encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "burn", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "deposit", values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]): string;
@@ -140,6 +145,7 @@ export interface UNSRegistryInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "removeReverse", values?: undefined): string;
     encodeFunctionData(functionFragment: "reset", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "resolverOf", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "reverseNameOf", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "reverseOf", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "root", values?: undefined): string;
     encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256)", values: [
@@ -175,7 +181,8 @@ export interface UNSRegistryInterface extends utils.Interface {
         PromiseOrValue<BigNumberish>
     ]): string;
     encodeFunctionData(functionFragment: "setOwner", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "setReverse", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "setReverse(uint256)", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "setReverse(string[])", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "setTokenURIPrefix", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
     encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
@@ -185,7 +192,14 @@ export interface UNSRegistryInterface extends utils.Interface {
         PromiseOrValue<string>,
         PromiseOrValue<BigNumberish>
     ]): string;
-    encodeFunctionData(functionFragment: "unlockWithRecords", values: [
+    encodeFunctionData(functionFragment: "unlockWithRecords(address,string[],string[],string[],bool)", values: [
+        PromiseOrValue<string>,
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<boolean>
+    ]): string;
+    encodeFunctionData(functionFragment: "unlockWithRecords(address,uint256,string[],string[],bool)", values: [
         PromiseOrValue<string>,
         PromiseOrValue<BigNumberish>,
         PromiseOrValue<string>[],
@@ -205,6 +219,7 @@ export interface UNSRegistryInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "addKey", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addProxyReader", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "backfillReverseNames", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
@@ -235,6 +250,7 @@ export interface UNSRegistryInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "removeReverse", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "reset", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "resolverOf", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "reverseNameOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "reverseOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "root", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "safeTransferFrom(address,address,uint256)", data: BytesLike): Result;
@@ -245,13 +261,15 @@ export interface UNSRegistryInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "setMany", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setManyByHash", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setOwner", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "setReverse", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setReverse(uint256)", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setReverse(string[])", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setTokenURIPrefix", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferFrom", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "unlockWithRecords", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "unlockWithRecords(address,string[],string[],string[],bool)", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "unlockWithRecords(address,uint256,string[],string[],bool)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "verify", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdrawFromPolygon", data: BytesLike): Result;
     events: {
@@ -420,6 +438,9 @@ export interface UNSRegistry extends BaseContract {
         approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        backfillReverseNames(domains: PromiseOrValue<string>[][], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber]>;
         burn(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
@@ -488,6 +509,9 @@ export interface UNSRegistry extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[string] & {
+            reverseUri: string;
+        }>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber] & {
             reverse: BigNumber;
         }>;
@@ -516,7 +540,10 @@ export interface UNSRegistry extends BaseContract {
         setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
-        setReverse(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+        "setReverse(uint256)"(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        "setReverse(string[])"(labels: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
@@ -528,7 +555,10 @@ export interface UNSRegistry extends BaseContract {
         transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
-        unlockWithRecords(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+        "unlockWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        "unlockWithRecords(address,uint256,string[],string[],bool)"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
@@ -546,6 +576,9 @@ export interface UNSRegistry extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    backfillReverseNames(domains: PromiseOrValue<string>[][], overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
@@ -610,6 +643,7 @@ export interface UNSRegistry extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
+    reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
     reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
     root(overrides?: CallOverrides): Promise<BigNumber>;
     "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
@@ -636,7 +670,10 @@ export interface UNSRegistry extends BaseContract {
     setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
-    setReverse(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+    "setReverse(uint256)"(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    "setReverse(string[])"(labels: PromiseOrValue<string>[], overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
@@ -648,7 +685,10 @@ export interface UNSRegistry extends BaseContract {
     transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
-    unlockWithRecords(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+    "unlockWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    "unlockWithRecords(address,uint256,string[],string[],bool)"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
@@ -662,6 +702,7 @@ export interface UNSRegistry extends BaseContract {
         addKey(key: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         addProxyReader(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
+        backfillReverseNames(domains: PromiseOrValue<string>[][], overrides?: CallOverrides): Promise<void>;
         balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         burn(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         deposit(user: PromiseOrValue<string>, depositData: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
@@ -698,6 +739,7 @@ export interface UNSRegistry extends BaseContract {
         removeReverse(overrides?: CallOverrides): Promise<void>;
         reset(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         root(overrides?: CallOverrides): Promise<BigNumber>;
         "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
@@ -708,13 +750,15 @@ export interface UNSRegistry extends BaseContract {
         setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        setReverse(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
+        "setReverse(uint256)"(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
+        "setReverse(string[])"(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
         symbol(overrides?: CallOverrides): Promise<string>;
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        unlockWithRecords(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
+        "unlockWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
+        "unlockWithRecords(address,uint256,string[],string[],bool)"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
         withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
     };
@@ -757,6 +801,9 @@ export interface UNSRegistry extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        backfillReverseNames(domains: PromiseOrValue<string>[][], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
@@ -815,6 +862,7 @@ export interface UNSRegistry extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         root(overrides?: CallOverrides): Promise<BigNumber>;
         "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
@@ -841,7 +889,10 @@ export interface UNSRegistry extends BaseContract {
         setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
-        setReverse(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+        "setReverse(uint256)"(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        "setReverse(string[])"(labels: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
@@ -853,7 +904,10 @@ export interface UNSRegistry extends BaseContract {
         transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
-        unlockWithRecords(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+        "unlockWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        "unlockWithRecords(address,uint256,string[],string[],bool)"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
@@ -872,6 +926,9 @@ export interface UNSRegistry extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        backfillReverseNames(domains: PromiseOrValue<string>[][], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -930,6 +987,7 @@ export interface UNSRegistry extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         root(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
@@ -956,7 +1014,10 @@ export interface UNSRegistry extends BaseContract {
         setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
-        setReverse(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+        "setReverse(uint256)"(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        "setReverse(string[])"(labels: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
@@ -968,7 +1029,10 @@ export interface UNSRegistry extends BaseContract {
         transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
-        unlockWithRecords(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+        "unlockWithRecords(address,string[],string[],string[],bool)"(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        "unlockWithRecords(address,uint256,string[],string[],bool)"(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;

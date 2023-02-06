@@ -12,10 +12,11 @@ export interface IRegistryReaderInterface extends utils.Interface {
         "namehash(string[])": FunctionFragment;
         "ownerOf(uint256)": FunctionFragment;
         "resolverOf(uint256)": FunctionFragment;
+        "reverseNameOf(address)": FunctionFragment;
         "reverseOf(address)": FunctionFragment;
         "tokenURI(uint256)": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "balanceOf" | "exists" | "getApproved" | "isApprovedForAll" | "isApprovedOrOwner" | "namehash" | "ownerOf" | "resolverOf" | "reverseOf" | "tokenURI"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "balanceOf" | "exists" | "getApproved" | "isApprovedForAll" | "isApprovedOrOwner" | "namehash" | "ownerOf" | "resolverOf" | "reverseNameOf" | "reverseOf" | "tokenURI"): FunctionFragment;
     encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "exists", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "getApproved", values: [PromiseOrValue<BigNumberish>]): string;
@@ -24,6 +25,7 @@ export interface IRegistryReaderInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "namehash", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "ownerOf", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "resolverOf", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "reverseNameOf", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "reverseOf", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "tokenURI", values: [PromiseOrValue<BigNumberish>]): string;
     decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -34,6 +36,7 @@ export interface IRegistryReaderInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "namehash", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "resolverOf", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "reverseNameOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "reverseOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
     events: {};
@@ -61,6 +64,7 @@ export interface IRegistryReader extends BaseContract {
         namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<[BigNumber]>;
         ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[string]>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber]>;
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
     };
@@ -72,6 +76,7 @@ export interface IRegistryReader extends BaseContract {
     namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<BigNumber>;
     ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
     resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
+    reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
     reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
     tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
     callStatic: {
@@ -83,6 +88,7 @@ export interface IRegistryReader extends BaseContract {
         namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<BigNumber>;
         ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
     };
@@ -96,6 +102,7 @@ export interface IRegistryReader extends BaseContract {
         namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<BigNumber>;
         ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
     };
@@ -108,6 +115,7 @@ export interface IRegistryReader extends BaseContract {
         namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
         ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
     };
