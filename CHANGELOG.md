@@ -1,3 +1,6 @@
+## v0.6.34
+- Deploy new versions of `MintingManager`, `UNSRegistry` and `ProxyReader` to `Mumbai` and `Goerli` testnets
+
 ## v0.6.33
 
 - Add new `setReverse(string[])` function to support unhashing for reverse resolution
