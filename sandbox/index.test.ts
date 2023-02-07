@@ -10,7 +10,7 @@ import { MintingManager, UNSRegistry } from '../types/contracts';
 import { CNSRegistry } from '../types/dot-crypto/contracts';
 import { unwrap } from '../src/helpers';
 import { TLD } from '../test/helpers/constants';
-import { Sandbox } from '.';
+import { Sandbox, SandboxNetworkOptions } from '.';
 
 describe('Sandbox', async () => {
   const domainPrefix = 'sandbox';
@@ -119,5 +119,19 @@ describe('Sandbox', async () => {
       await cnsRegistry.callStatic.ownerOf(tokenId);
       assert.fail('Error is ecpected');
     } catch (error) {}
+  });
+});
+
+describe('Sandbox (multiple instances)', async () => {
+  it('should be able to run multiple instances', async () => {
+    const sandbox = await Sandbox.start({
+      verbose: true,
+      network: {
+        url: 'http://localhost:7546',
+        chainId: 1338,
+        dbPath: './.sandbox/_l2',
+      } as SandboxNetworkOptions,
+    });
+    await sandbox.stop();
   });
 });
