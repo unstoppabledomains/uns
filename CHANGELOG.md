@@ -1,5 +1,7 @@
 ## v0.6.34
-- Deploy new versions of `MintingManager`, `UNSRegistry` and `ProxyReader` to `Mumbai` and `Goerli` testnets
+- Upgrade UNSRegistry@0.6.4 on Goerli, Mumbai
+- Upgrade MintingManager@0.4.11 on Goerli, Mumbai
+- Upgrade ProxyReader@0.4.1 on Goerli, Mumbai
 
 ## v0.6.33
 
