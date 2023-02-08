@@ -10,7 +10,7 @@ import { MintingManager, UNSRegistry } from '../types/contracts';
 import { CNSRegistry } from '../types/dot-crypto/contracts';
 import { unwrap } from '../src/helpers';
 import { TLD } from '../test/helpers/constants';
-import { Sandbox, SandboxNetworkOptions } from '.';
+import { Sandbox } from '.';
 
 describe('Sandbox', async () => {
   const domainPrefix = 'sandbox';
