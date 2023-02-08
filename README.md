@@ -258,7 +258,7 @@ There are configs networks [Mainnet](https://static.matic.network/network/mainne
 ## Deploy to localhost
 
 0. Pull the PR
-1. Make sure there is a nerwork config in `uns-config.json`. If not, add it
+1. Make sure there is a network config in the `uns-config.json`
     ```
     {
       ...
@@ -268,11 +268,11 @@ There are configs networks [Mainnet](https://static.matic.network/network/mainne
       }
     }
     ```
-2. Run node in one terminal
+2. Launch the node in the terminal
     ```
     yarn hardhat node
     ```
-3. Run deploy in second terminal
+3. Run the deployment command in another terminal
     ```
     yarn hardhat run --network localhost scripts/deploy_full.ts
     ```
