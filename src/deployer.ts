@@ -95,7 +95,7 @@ export class Deployer {
     minters: string[],
     multisig: string,
   ) {
-    if (!multisig && network.name !== 'sandbox') {
+    if (!multisig && !['sandbox', 'localhost'].includes(network.name)) {
       throw new Error('Multisig address is not set');
     }
 

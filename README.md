@@ -254,3 +254,25 @@ yarn hardhat run --network mumbai scripts/deploy_UNS_only.ts
 
 ## L2 Polygon
 There are configs networks [Mainnet](https://static.matic.network/network/mainnet/v1/index.json), [Testnet](https://static.matic.network/network/testnet/mumbai/index.json)
+
+## Deploy to localhost
+
+0. Pull the PR
+1. Make sure there is a nerwork config in `uns-config.json`. If not, add it
+    ```
+    {
+      ...
+      "networks": {
+        ...
+        "31337": {}
+      }
+    }
+    ```
+2. Run node in one terminal
+    ```
+    yarn hardhat node
+    ```
+3. Run deploy in second terminal
+    ```
+    yarn hardhat run --network localhost scripts/deploy_full.ts
+    ```
