@@ -130,7 +130,7 @@ describe('Sandbox (multiple instances)', async () => {
         url: 'http://localhost:7546',
         chainId: 1338,
         dbPath: './.sandbox/_l2',
-      } as SandboxNetworkOptions,
+      },
     });
     await sandbox.stop();
   });

@@ -38,7 +38,7 @@ export type SandboxOptions = {
   verbose?: boolean;
   clean?: boolean;
   extract?: boolean;
-  network?: SandboxNetworkOptions;
+  network?: Partial<SandboxNetworkOptions>;
 };
 
 export type SandboxStartOptions = {
