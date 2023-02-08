@@ -204,10 +204,16 @@ Note: List of changes which makes UNS and CNS backward incompatible
 * `function resolverOf(uint256 tokenId)`
   * Now always returns Registry address itself
 
+
 ---
+# Development
+
 ## Sandbox
 
-[>> README](./sandbox/README.md)
+See the [>> README](./sandbox/README.md)
+
+&nbsp;
+
 
 ## Deploying contracts
 

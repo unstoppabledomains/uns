@@ -1,6 +1,32 @@
-## Sandbox
+# `Sandbox`
 
 The tool allows to spin-up blockchain environment(emulator) with pre-deployed UNS(including CNS) smart contracts. It is useful for unit/integration testing. In order to simplify test setup, the state of the environment can be restored to initial state of the sandbox.
+
+&nbsp;
+
+## Quickstart
+_Running Sandbox locally as a `testnet`_
+```
+yarn ts-node sandbox/run.ts
+```
+
+&nbsp;
+
+## Development
+### Running scripts
+```
+yarn hardhat run --network sandbox ../uns/scripts/deploy_full.ts
+```
+_`Note:`_ this will overwrite `uns-config.json` with new values once you deploy the smart contracts.
+
+&nbsp;
+
+### Interacting with the `Sandbox`
+```
+yarn hardhat console --network sandbox
+> let cnsRegistry = await ethers.getContractAt('CNSRegistry', 0x4Eb9dE1Fc0d800e941F326d6699E9E11969557ea);
+> cnsRegistry.
+```
 
 ### Network config
 
@@ -78,7 +104,7 @@ describe('Test', async () => {
 })
 ```
 
-### Sandbox DB snapshot
+## Rebuilding the Sandbox DB snapshot
 
 Sandbox has database snapshot of blockchain in order to spin-up the environment.
 The snapshot is prebuilded and included in a package with the sandbox.
