@@ -1,3 +1,9 @@
+## v0.6.36
+
+- Upgrade UNSRegistry@0.6.4 on Mainnet, Polygon
+- Upgrade MintingManager@0.4.11 on Mainnet, Polygon
+- Upgrade ProxyReader@0.4.1 on Mainnet, Polygon
+
 ## v0.6.33
 
 - Add new `setReverse(string[])` function to support unhashing for reverse resolution
