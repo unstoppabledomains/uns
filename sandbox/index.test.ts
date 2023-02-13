@@ -121,3 +121,17 @@ describe('Sandbox', async () => {
     } catch (error) {}
   });
 });
+
+describe('Sandbox (multiple instances)', async () => {
+  it('should be able to run multiple instances', async () => {
+    const sandbox = await Sandbox.start({
+      verbose: true,
+      network: {
+        url: 'http://localhost:7546',
+        chainId: 1338,
+        dbPath: './.sandbox/_l2',
+      },
+    });
+    await sandbox.stop();
+  });
+});

@@ -6,65 +6,78 @@ import { mnemonicToSeedSync } from 'bip39';
 import secp256k1 from 'secp256k1';
 import createKeccakHash from 'keccak';
 import debug from 'debug';
-import {
-  EthereumProvider,
-  ProviderOptions,
-} from 'ganache';
+import { EthereumProvider } from 'ganache';
 import { HttpNetworkUserConfig } from 'hardhat/types';
 import { unwrap } from '../src/helpers';
 import { GanacheService } from './ganache-service';
 
 const log = debug('UNS:sandbox');
 
-export const GANACHE_SERVER_CONFIG = {
-  chain: {
-    chainId: 1337,
-    allowUnlimitedContractSize: false,
-    vmErrorsOnRPCResponse: true,
-  },
-  miner: {
-    defaultGasPrice: 20000000000,
-    blockGasLimit: 6721975,
-  },
-  wallet: {
-    totalAccounts: 10,
-    mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
-    defaultBalance: 1000,
-    hdPath: 'm/44\'/60\'/0\'/0',
-  },
-  database: {
-    dbPath: './.sandbox',
-  },
-  logging: {
-    verbose: false,
-    logger: { log: () => {} },
-  },
+export type SandboxNetworkOptions = {
+  url: string;
+  port?: number;
+  hostname?: string;
+  chainId: number;
+  hardfork: string;
+  gasPrice: number;
+  gasLimit: number;
+  allowUnlimitedContractSize: boolean;
+  locked: boolean;
+  mnemonic: string;
+  hdPath: string;
+  totalAccounts: number;
+  defaultBalanceEther: number;
+  dbPath: string;
+  snapshotPath: string;
+  keepAliveTimeout: number;
+  vmErrorsOnRpcResponse: boolean;
+  logger: { log: (message: string) => void };
 };
 
 export type SandboxOptions = {
   verbose?: boolean;
-  clean?: boolean
-  extract?: boolean
-}
+  clean?: boolean;
+  extract?: boolean;
+  network?: Partial<SandboxNetworkOptions>;
+};
 
 export type SandboxStartOptions = {
-  noSnapshot?: boolean
-}
+  noSnapshot?: boolean;
+};
 
 export type SandboxAccount = {
   address: string;
   privateKey: string;
-}
+};
+
+const DEFAULT_SERVER_CONFIG: SandboxNetworkOptions = {
+  url: 'http://localhost:7545',
+  gasPrice: 20000000000,
+  gasLimit: 6721975,
+  defaultBalanceEther: 1000,
+  totalAccounts: 10,
+  hardfork: 'istanbul',
+  allowUnlimitedContractSize: false,
+  locked: false,
+  hdPath: 'm/44\'/60\'/0\'/0/',
+  keepAliveTimeout: 5000,
+  mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
+  chainId: 1337,
+  dbPath: './.sandbox',
+  snapshotPath: path.join(__dirname, 'db.tgz'),
+  vmErrorsOnRpcResponse: true,
+  logger: { log: () => {} },
+};
 
 export class Sandbox {
   static defaultNetworkOptions (): HttpNetworkUserConfig {
     return {
-      url: 'http://localhost:7545',
-      chainId: 1337,
+      url: DEFAULT_SERVER_CONFIG.url,
+      chainId: DEFAULT_SERVER_CONFIG.chainId,
       accounts: {
-        mnemonic: GANACHE_SERVER_CONFIG.wallet.mnemonic,
-        path: GANACHE_SERVER_CONFIG.wallet.hdPath,
-        count: GANACHE_SERVER_CONFIG.wallet.totalAccounts,
+        mnemonic: DEFAULT_SERVER_CONFIG.mnemonic,
+        path: DEFAULT_SERVER_CONFIG.hdPath,
+        count: DEFAULT_SERVER_CONFIG.totalAccounts,
       },
     };
   }
@@ -75,10 +88,6 @@ export class Sandbox {
     return sandbox;
   }
 
-  static snapshotPath (): string {
-    return path.join(__dirname, 'db.tgz');
-  }
-
   static async create (options: SandboxOptions): Promise<Sandbox> {
     options = {
       clean: true,
@@ -86,13 +95,16 @@ export class Sandbox {
       verbose: false,
       ...options,
     };
+    const networkOptions: SandboxNetworkOptions = {
+      ...DEFAULT_SERVER_CONFIG,
+      ...options.network,
+    };
 
     if (options.verbose) {
       debug.enable('UNS:sandbox*');
     }
 
-    const { dbPath } = GANACHE_SERVER_CONFIG.database;
-    const snapshotPath = this.snapshotPath();
+    const { dbPath, snapshotPath } = networkOptions;
 
     if (options.clean) {
       if (fs.existsSync(dbPath)) {
@@ -107,19 +119,17 @@ export class Sandbox {
       log(`Prepared sandbox database. [Source: ${snapshotPath}, TargetDir: ${dbPath}]`);
     }
 
-    const service = new GanacheService(GANACHE_SERVER_CONFIG as ProviderOptions<'ethereum'>, {
-      url: unwrap(this.defaultNetworkOptions(), 'url'),
-    });
-    return new Sandbox(service, options);
+    const service = new GanacheService({ ...networkOptions });
+    return new Sandbox(service, { ...options, network: networkOptions });
   }
 
   version: string;
+  public accounts: Record<string, SandboxAccount>;
+  public options: SandboxOptions;
 
   private ganacheService: GanacheService;
-  private options: SandboxOptions;
   private provider: EthereumProvider;
   private snapshotId?: string;
-  public accounts: Record<string, SandboxAccount>;
 
   constructor (service: GanacheService, options: SandboxOptions = {}) {
     this.ganacheService = service;
@@ -128,12 +138,12 @@ export class Sandbox {
     this.snapshotId = undefined;
     this.version = '0.6';
 
-    const accounts = this.getAccounts();
+    const accounts = this.getAccounts(unwrap(this.options, 'network'));
 
     this.accounts ||= {
-      'owner': accounts[0],
-      'minter': accounts[1],
-      'faucet': accounts[9],
+      owner: accounts[0],
+      minter: accounts[1],
+      faucet: accounts[9],
     };
 
     accounts.forEach((account, index) => {
@@ -188,14 +198,14 @@ export class Sandbox {
     return await this.provider.send('evm_revert', [snapshotId]);
   }
 
-  private getAccounts (): {privateKey: string, address: string}[] {
-    const { mnemonic, hdPath, totalAccounts } = GANACHE_SERVER_CONFIG.wallet;
+  private getAccounts (options: SandboxNetworkOptions): { privateKey: string; address: string }[] {
+    const { mnemonic, hdPath, totalAccounts } = options;
 
     const hdKey = HDKey.fromMasterSeed(mnemonicToSeedSync(mnemonic));
     const accounts = Array(totalAccounts);
 
     for (let index = 0; index < totalAccounts; index++) {
-      const acc = hdKey.derive(hdPath + '/' + index);
+      const acc = hdKey.derive(hdPath + index);
 
       accounts[index] = {
         privateKey: '0x' + acc.privateKey.toString('hex'),
@@ -207,9 +217,7 @@ export class Sandbox {
   }
 
   private uncompressedPublicKeyToAddress (uncompressedPublicKey: Buffer) {
-    const compresedPublicKey = secp256k1
-      .publicKeyConvert(uncompressedPublicKey, false)
-      .slice(1);
+    const compresedPublicKey = secp256k1.publicKeyConvert(uncompressedPublicKey, false).slice(1);
 
     const hasher = createKeccakHash('keccak256');
 

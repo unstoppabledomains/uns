@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Sandbox = exports.GANACHE_SERVER_CONFIG = void 0;
+exports.Sandbox = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const tar_1 = __importDefault(require("tar"));
@@ -24,29 +24,23 @@ const debug_1 = __importDefault(require("debug"));
 const helpers_1 = require("../src/helpers");
 const ganache_service_1 = require("./ganache-service");
 const log = (0, debug_1.default)('UNS:sandbox');
-exports.GANACHE_SERVER_CONFIG = {
-    chain: {
-        chainId: 1337,
-        allowUnlimitedContractSize: false,
-        vmErrorsOnRPCResponse: true,
-    },
-    miner: {
-        defaultGasPrice: 20000000000,
-        blockGasLimit: 6721975,
-    },
-    wallet: {
-        totalAccounts: 10,
-        mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
-        defaultBalance: 1000,
-        hdPath: 'm/44\'/60\'/0\'/0',
-    },
-    database: {
-        dbPath: './.sandbox',
-    },
-    logging: {
-        verbose: false,
-        logger: { log: () => { } },
-    },
+const DEFAULT_SERVER_CONFIG = {
+    url: 'http://localhost:7545',
+    gasPrice: 20000000000,
+    gasLimit: 6721975,
+    defaultBalanceEther: 1000,
+    totalAccounts: 10,
+    hardfork: 'istanbul',
+    allowUnlimitedContractSize: false,
+    locked: false,
+    hdPath: 'm/44\'/60\'/0\'/0/',
+    keepAliveTimeout: 5000,
+    mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
+    chainId: 1337,
+    dbPath: './.sandbox',
+    snapshotPath: path_1.default.join(__dirname, 'db.tgz'),
+    vmErrorsOnRpcResponse: true,
+    logger: { log: () => { } },
 };
 class Sandbox {
     constructor(service, options = {}) {
@@ -55,11 +49,11 @@ class Sandbox {
         this.provider = service.provider;
         this.snapshotId = undefined;
         this.version = '0.6';
-        const accounts = this.getAccounts();
+        const accounts = this.getAccounts((0, helpers_1.unwrap)(this.options, 'network'));
         this.accounts || (this.accounts = {
-            'owner': accounts[0],
-            'minter': accounts[1],
-            'faucet': accounts[9],
+            owner: accounts[0],
+            minter: accounts[1],
+            faucet: accounts[9],
         });
         accounts.forEach((account, index) => {
             this.accounts[index] = account;
@@ -71,12 +65,12 @@ class Sandbox {
     }
     static defaultNetworkOptions() {
         return {
-            url: 'http://localhost:7545',
-            chainId: 1337,
+            url: DEFAULT_SERVER_CONFIG.url,
+            chainId: DEFAULT_SERVER_CONFIG.chainId,
             accounts: {
-                mnemonic: exports.GANACHE_SERVER_CONFIG.wallet.mnemonic,
-                path: exports.GANACHE_SERVER_CONFIG.wallet.hdPath,
-                count: exports.GANACHE_SERVER_CONFIG.wallet.totalAccounts,
+                mnemonic: DEFAULT_SERVER_CONFIG.mnemonic,
+                path: DEFAULT_SERVER_CONFIG.hdPath,
+                count: DEFAULT_SERVER_CONFIG.totalAccounts,
             },
         };
     }
@@ -87,17 +81,14 @@ class Sandbox {
             return sandbox;
         });
     }
-    static snapshotPath() {
-        return path_1.default.join(__dirname, 'db.tgz');
-    }
     static create(options) {
         return __awaiter(this, void 0, void 0, function* () {
             options = Object.assign({ clean: true, extract: true, verbose: false }, options);
+            const networkOptions = Object.assign(Object.assign({}, DEFAULT_SERVER_CONFIG), options.network);
             if (options.verbose) {
                 debug_1.default.enable('UNS:sandbox*');
             }
-            const { dbPath } = exports.GANACHE_SERVER_CONFIG.database;
-            const snapshotPath = this.snapshotPath();
+            const { dbPath, snapshotPath } = networkOptions;
             if (options.clean) {
                 if (fs_1.default.existsSync(dbPath)) {
                     fs_1.default.rmdirSync(dbPath, { recursive: true });
@@ -109,10 +100,8 @@ class Sandbox {
                 yield tar_1.default.extract({ cwd: dbPath, file: snapshotPath });
                 log(`Prepared sandbox database. [Source: ${snapshotPath}, TargetDir: ${dbPath}]`);
             }
-            const service = new ganache_service_1.GanacheService(exports.GANACHE_SERVER_CONFIG, {
-                url: (0, helpers_1.unwrap)(this.defaultNetworkOptions(), 'url'),
-            });
-            return new Sandbox(service, options);
+            const service = new ganache_service_1.GanacheService(Object.assign({}, networkOptions));
+            return new Sandbox(service, Object.assign(Object.assign({}, options), { network: networkOptions }));
         });
     }
     start(options = { noSnapshot: false }) {
@@ -160,12 +149,12 @@ class Sandbox {
             return yield this.provider.send('evm_revert', [snapshotId]);
         });
     }
-    getAccounts() {
-        const { mnemonic, hdPath, totalAccounts } = exports.GANACHE_SERVER_CONFIG.wallet;
+    getAccounts(options) {
+        const { mnemonic, hdPath, totalAccounts } = options;
         const hdKey = hdkey_1.default.fromMasterSeed((0, bip39_1.mnemonicToSeedSync)(mnemonic));
         const accounts = Array(totalAccounts);
         for (let index = 0; index < totalAccounts; index++) {
-            const acc = hdKey.derive(hdPath + '/' + index);
+            const acc = hdKey.derive(hdPath + index);
             accounts[index] = {
                 privateKey: '0x' + acc.privateKey.toString('hex'),
                 address: '0x' + this.uncompressedPublicKeyToAddress(acc.publicKey),
@@ -175,9 +164,7 @@ class Sandbox {
     }
     uncompressedPublicKeyToAddress(uncompressedPublicKey) {
         var _a;
-        const compresedPublicKey = secp256k1_1.default
-            .publicKeyConvert(uncompressedPublicKey, false)
-            .slice(1);
+        const compresedPublicKey = secp256k1_1.default.publicKeyConvert(uncompressedPublicKey, false).slice(1);
         const hasher = (0, keccak_1.default)('keccak256');
         (_a = hasher['_state']) === null || _a === void 0 ? void 0 : _a.absorb(compresedPublicKey);
         return hasher.digest().subarray(-20).toString('hex');

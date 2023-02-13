@@ -1,35 +1,32 @@
 import { HttpNetworkUserConfig } from 'hardhat/types';
 import { GanacheService } from './ganache-service';
-export declare const GANACHE_SERVER_CONFIG: {
-    chain: {
-        chainId: number;
-        allowUnlimitedContractSize: boolean;
-        vmErrorsOnRPCResponse: boolean;
-    };
-    miner: {
-        defaultGasPrice: number;
-        blockGasLimit: number;
-    };
-    wallet: {
-        totalAccounts: number;
-        mnemonic: string;
-        defaultBalance: number;
-        hdPath: string;
-    };
-    database: {
-        dbPath: string;
-    };
-    logging: {
-        verbose: boolean;
-        logger: {
-            log: () => void;
-        };
+export declare type SandboxNetworkOptions = {
+    url: string;
+    port?: number;
+    hostname?: string;
+    chainId: number;
+    hardfork: string;
+    gasPrice: number;
+    gasLimit: number;
+    allowUnlimitedContractSize: boolean;
+    locked: boolean;
+    mnemonic: string;
+    hdPath: string;
+    totalAccounts: number;
+    defaultBalanceEther: number;
+    dbPath: string;
+    snapshotPath: string;
+    keepAliveTimeout: number;
+    vmErrorsOnRpcResponse: boolean;
+    logger: {
+        log: (message: string) => void;
     };
 };
 export declare type SandboxOptions = {
     verbose?: boolean;
     clean?: boolean;
     extract?: boolean;
+    network?: Partial<SandboxNetworkOptions>;
 };
 export declare type SandboxStartOptions = {
     noSnapshot?: boolean;
@@ -41,14 +38,13 @@ export declare type SandboxAccount = {
 export declare class Sandbox {
     static defaultNetworkOptions(): HttpNetworkUserConfig;
     static start(options?: SandboxOptions): Promise<Sandbox>;
-    static snapshotPath(): string;
     static create(options: SandboxOptions): Promise<Sandbox>;
     version: string;
+    accounts: Record<string, SandboxAccount>;
+    options: SandboxOptions;
     private ganacheService;
-    private options;
     private provider;
     private snapshotId?;
-    accounts: Record<string, SandboxAccount>;
     constructor(service: GanacheService, options?: SandboxOptions);
     start(options?: SandboxStartOptions): Promise<void>;
     stop(): Promise<void>;

@@ -4,6 +4,16 @@
 - Upgrade MintingManager@0.4.11 on Mainnet, Polygon
 - Upgrade ProxyReader@0.4.1 on Mainnet, Polygon
 
+## v0.6.35
+
+- Fix Sandbox to make it possible to run multiple instances (issue since v0.6.4)
+
+## v0.6.34
+
+- Upgrade UNSRegistry@0.6.4 on Goerli, Mumbai
+- Upgrade MintingManager@0.4.11 on Goerli, Mumbai
+- Upgrade ProxyReader@0.4.1 on Goerli, Mumbai
+
 ## v0.6.33
 
 - Add new `setReverse(string[])` function to support unhashing for reverse resolution
