@@ -1,3 +1,7 @@
+## v0.6.37
+
+- Deploy UNSOperator@0.1.0 on Mainnet, Polygon
+
 ## v0.6.36
 
 - Upgrade UNSRegistry@0.6.4 on Mainnet, Polygon
