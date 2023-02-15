@@ -36,7 +36,7 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
   describe('Set Reverse Consumption', () => {
     it('compare gas usage for different setReverse functions', async () => {
       const result: unknown[] = [];
-      for (const domainLength of [9, 10, 11, 16, 30, 31, 32, 33, 34, 35]) {
+      for (const domainLength of [3, 9, 10, 11, 16, 30, 31, 32, 33, 34, 35, 36, 38, 40]) {
         result.push(await generateSetReverseTransactions(domainLength));
       }
       console.table(result);
@@ -66,11 +66,46 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
       const newTxReceipt =
         await (await unsRegistry.execute(newSetReverseParams.req, newSetReverseParams.signature)).wait();
 
+      const subdomainLabels = ['a', ...labels];
+      const subdomainUri = subdomainLabels.join('.');
+      const subdomainTokenId = await mintDomain(unsRegistry, owner, subdomainLabels);
+      const newSubdomainsSetReverseParams = await buildExecuteParams(
+        'setReverse(string[])',
+        [subdomainLabels],
+        owner,
+        subdomainTokenId,
+      );
+      const newSubdomainTxReceipt =
+        await (await unsRegistry
+          .execute(
+            newSubdomainsSetReverseParams.req,
+            newSubdomainsSetReverseParams.signature,
+          )).wait();
+
+      const secondLevelSubdomainLabels = ['b', ...subdomainLabels];
+      const secondLevelSubdomainUri = secondLevelSubdomainLabels.join('.');
+      const secondLevelSubdomainTokenId = await mintDomain(unsRegistry, owner, secondLevelSubdomainLabels);
+      const newSecondLevelSubdomainSetReverseParams = await buildExecuteParams(
+        'setReverse(string[])',
+        [secondLevelSubdomainLabels],
+        owner,
+        secondLevelSubdomainTokenId,
+      );
+      const newSecondLevelSubdomainTxReceipt =
+        await (await unsRegistry
+          .execute(
+            newSecondLevelSubdomainSetReverseParams.req,
+            newSecondLevelSubdomainSetReverseParams.signature,
+          )).wait();
+
       return {
-        'Domain Name': uri,
-        'Length': uri.length,
-        'setReverse(uint256 tokenId)': legacyTxReceipt.gasUsed.toString(),
-        'setReverse(string[] labels)': newTxReceipt.gasUsed.toString(),
+        'legacy reverse gas': legacyTxReceipt.gasUsed.toString(),
+        'length': uri.length,
+        'gas': newTxReceipt.gasUsed.toString(),
+        '1 level subdomain length': subdomainUri.length,
+        '1 level subdomain gas': newSubdomainTxReceipt.gasUsed.toString(),
+        '2 level subdomain length': secondLevelSubdomainUri.length,
+        '2 level subdomain gas': newSecondLevelSubdomainTxReceipt.gasUsed.toString(),
       };
     }
   });
