@@ -1,5 +1,5 @@
 {
-    "version": "0.6.10",
+    "version": "0.6.11",
     "networks": {
         "1": {
             "contracts": {
@@ -22,6 +22,12 @@
                     "legacyAddresses": [],
                     "deploymentBlock": "0xc2fee0",
                     "forwarder": "0xb970fbCF52cd8111c76c379D4f2FE12E7f8AE7fb"
+                },
+                "UNSOperator": {
+                    "address": "0x28400c6e89f11a99fD7145a24d39c19f949Ab86e",
+                    "implementation": "0x4f78Db4b434128a45C6236bd61dFf2258637cd7f",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0xfdd3a7"
                 },
                 "ProxyAdmin": {
                     "address": "0xAA16DA78110D9A9742c760a1a064F28654Ab93de",
@@ -238,6 +244,12 @@
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272f41",
                     "forwarder": "0xC37d3c4326ab0E1D2b9D8b916bBdf5715f780fcF"
+                },
+                "UNSOperator": {
+                    "address": "0x8f0c61C9BD21d3a5c078FB03eCA01AE2Ff5380dB",
+                    "implementation": "0xbB101ae4B5Df5F9375112D38D9f5a3394916EA97",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x025809c0"
                 },
                 "ProxyAdmin": {
                     "address": "0xe1D668052D52388F52b90f4d1798DB2b04bC3b88",
