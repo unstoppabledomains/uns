@@ -1,3 +1,7 @@
+## v0.6.38
+
+- Fix `LSK` token regex
+
 ## v0.6.37
 
 - Deploy UNSOperator@0.1.0 on Mainnet, Polygon
