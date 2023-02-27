@@ -284,7 +284,7 @@
     "crypto.LSK.address": {
       "deprecatedKeyName": "LSK",
       "deprecated": false,
-      "validationRegex": "^\\d{1,21}[L]$|^[0-9a-z]{3}[23456789abcdefghjkmnopqrstuvwxyz]{38}$"
+      "validationRegex": "^[0-9a-z]{3}[23456789abcdefghjkmnopqrstuvwxyz]{38}$"
     },
     "crypto.ATOM.address": {
       "deprecatedKeyName": "ATOM",
