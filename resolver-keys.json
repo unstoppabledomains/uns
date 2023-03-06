@@ -2625,6 +2625,16 @@
       "deprecatedKeyName": "GTH",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
+    },
+    "crypto.HI.version.ERC20.address": {
+      "deprecatedKeyName": "HI_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.HI.version.BEP20.address": {
+      "deprecatedKeyName": "HI_BEP20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
     }
   }
 }

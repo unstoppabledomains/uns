@@ -1,3 +1,7 @@
+## v0.6.40
+
+- Add `HI` token to resolver list
+
 ## v0.6.39
 
 - Add `.kresus` TLD
