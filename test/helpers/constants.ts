@@ -22,4 +22,5 @@ export const TLD = {
   UNSTOPPABLE: BigNumber.from('0x92bba949890cd44a226a8ce54135cf86538cd6c5ca0ccf41877102fd718cc8aa'),
   KLEVER: BigNumber.from('0xa18784bb78ee0f577251fb21ad5cac7a140ab47e9414e3c7af5125e3e1d28923'),
   HI: BigNumber.from('0xfdb51f7f56d9b1149db5ce99afcf60dda4416fd6fb8dc0649fec13cd03e1803e'),
+  KRESUS: BigNumber.from('0x2acf53593112265ba651274f0e33a6b3fe86f92bbee4d39211540592fde6b0f3'),
 };

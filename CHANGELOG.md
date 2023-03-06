@@ -1,3 +1,7 @@
+## v0.6.39
+
+- Add `.kresus` TLD
+
 ## v0.6.38
 
 - Fix `LSK` token regex
