@@ -1039,13 +1039,10 @@ describe('MintingManager', () => {
     it('should backfill domain name', async () => {
       const labels = ['minting-manager-backfill', 'wallet'];
       const uri = labels.join('.');
-      await mintingManager.issueWithRecords(spender.address, labels, [], [], false);
       const tokenId = ethers.utils.namehash(uri);
-      await unsRegistry.connect(spender)['setReverse(uint256)'](tokenId);
-      expect(await unsRegistry.reverseNameOf(spender.address)).to.be.eq('');
+      await mintingManagerMock.connect(coinbase).backfillReverseNames([labels]);
+      expect(await unsRegistryMock.getTokenName(tokenId)).to.be.eq(uri);
 
-      await mintingManager.connect(coinbase).backfillReverseNames([labels]);
-      expect(await unsRegistry.reverseNameOf(spender.address)).to.be.eq(uri);
     });
 
     it('should backfill multiple domain names', async () => {
@@ -1054,18 +1051,11 @@ describe('MintingManager', () => {
         ['minting-manager-multiple-backfill-2', 'x'],
         ['minting-manager-multiple-backfill-3', 'x'],
       ];
-      for (const labels of domains) {
-        await mintingManager.issueWithRecords(spender.address, labels, [], [], false);
-        const tokenId =  ethers.utils.namehash(labels.join('.'));
-        await unsRegistry.connect(spender)['setReverse(uint256)'](tokenId);
-        expect(await unsRegistry.reverseNameOf(spender.address)).to.be.eq('');
-      }
-      await mintingManager.connect(coinbase).backfillReverseNames(domains);
+      await mintingManagerMock.connect(coinbase).backfillReverseNames(domains);
       for (const labels of domains) {
         const uri = labels.join('.');
         const tokenId = ethers.utils.namehash(uri);
-        await unsRegistry.connect(spender)['setReverse(uint256)'](tokenId);
-        expect(await unsRegistry.reverseNameOf(spender.address)).to.be.eq(uri);
+        expect(await unsRegistryMock.getTokenName(tokenId)).to.be.eq(uri);
       }
     });
 
