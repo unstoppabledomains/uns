@@ -2,7 +2,8 @@
 
 ### Breaking changes
 
-- Remove `setReverse(uint256)` function from `UnsRegistry`
+- Remove `setReverse(uint256)` function from `UNSRegistry`
+- Remove `unlockWithRecords(address,uint256,string[],string[],bool)` function from `UNSRegistry`
 
 ## v0.6.39
 
