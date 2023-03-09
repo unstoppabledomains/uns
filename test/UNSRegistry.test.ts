@@ -308,7 +308,7 @@ describe('UNSRegistry', () => {
           ['new-key'],
           ['new-value'],
           true,
-        )).to.be.revertedWith('s');
+        )).to.be.revertedWith('Registry: SENDER_IS_NOT_MINTING_MANAGER');
       });
     });
   });
