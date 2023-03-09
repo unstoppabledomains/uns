@@ -1,3 +1,9 @@
+## v0.7.1
+
+- Remove `backfillReverseNames(string[][])` function from `UNSRegistry`
+- Remove `backfillReverseNames(string[][])` function from `MintingManager`
+
+
 ## v0.7.0
 
 ### Breaking changes
