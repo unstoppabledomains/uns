@@ -18,13 +18,6 @@ interface IReverseRegistry {
     event RemoveReverse(address indexed addr);
 
     /**
-     * @custom:deprecated Remains for temporary backward compatibility
-     * @dev Sets the reverse record associated with the calling account.
-     * @param tokenId The token to set for this address.
-     */
-    function setReverse(uint256 tokenId) external;
-
-    /**
      * @dev Sets the reverse record associated with the calling account.
      * @param labels array of domain labels splitted by '.' (for `aaa.bbb.crypto` it will be [`aaa`, `bbb`, `crypto`])
      */

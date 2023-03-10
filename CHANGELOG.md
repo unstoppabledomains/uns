@@ -1,3 +1,13 @@
+## v0.7.0
+
+### Breaking changes
+
+- Remove `setReverse(uint256)` function from `UNSRegistry`
+
+### Non-breaking changes
+
+- Remove `unlockWithRecords(address,uint256,string[],string[],bool)` function from `UNSRegistry`
+
 ## v0.6.39
 
 - Add `.kresus` TLD

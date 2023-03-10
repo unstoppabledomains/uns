@@ -11,4 +11,8 @@ contract UNSRegistryMock is UNSRegistry {
             _upgradedTokens[tokenIds[i]] = true;
         }
     }
+
+    function getTokenName(uint256 tokenId) external view returns (string memory) {
+        return _tokenNames[tokenId];
+    }
 }

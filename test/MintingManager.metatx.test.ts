@@ -1,13 +1,16 @@
 import { ethers, upgrades } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { namehash } from 'ethers/lib/utils';
 import { MintingManager, UNSRegistry } from '../types/contracts';
 import { MintingManagerForwarder } from '../types/contracts/metatx';
 import {
   MintingManager__factory,
   UNSRegistry__factory,
 } from '../types/factories/contracts';
+import { UNSRegistryMock__factory } from '../types/factories/contracts/mocks';
 import { MintingManagerForwarder__factory } from '../types/factories/contracts/metatx';
+import { UNSRegistryMock } from '../types';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 import { ZERO_ADDRESS } from './helpers/constants';
 
@@ -118,33 +121,66 @@ describe('MintingManager (metatx)', () => {
   });
 
   describe('Backfill reverse names though MintingManager (metatx)', () => {
+    let unsRegistryMock: UNSRegistryMock,
+      mintingManagerMock: MintingManager,
+      forwarderMock: MintingManagerForwarder,
+      buildExecuteParamsMock: ExecuteFunc;
+
+    beforeEach(async () => {
+      unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
+
+      mintingManagerMock = (await upgrades.deployProxy(
+        new MintingManager__factory(coinbase),
+        [],
+        { initializer: false },
+      )) as MintingManager;
+      await unsRegistryMock.initialize(mintingManagerMock.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+
+      forwarderMock = await new MintingManagerForwarder__factory(coinbase).deploy(
+        mintingManagerMock.address,
+      );
+
+      await mintingManagerMock.initialize(
+        unsRegistryMock.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        forwarderMock.address,
+      );
+      await mintingManagerMock.addMinter(coinbase.address);
+      await mintingManagerMock.setTokenURIPrefix('/');
+
+      buildExecuteParamsMock = buildExecuteFunc(
+        mintingManagerMock.interface,
+        mintingManagerMock.address,
+        forwarderMock,
+      );
+    });
+
     it('should backfill domain name', async () => {
       const labels = ['minting-manager-backfill-metatx', 'wallet'];
       const uri = labels.join('.');
-      await mintingManager.issueWithRecords(receiver.address, labels, [], [], false);
-      const tokenId = ethers.utils.namehash(labels.join('.'));
-      await unsRegistry.connect(receiver)['setReverse(uint256)'](tokenId);
-      expect(await unsRegistry.reverseNameOf(receiver.address)).to.be.eq('');
-
-      const { req, signature } = await buildExecuteParams(
+      const tokenId = namehash(uri);
+      const { req, signature } = await buildExecuteParamsMock(
         'backfillReverseNames(string[][])',
         [[labels]],
         coinbase,
         0,
       );
-      await forwarder.execute(req, signature);
-      expect(await unsRegistry.reverseNameOf(receiver.address)).to.be.eq(uri);
+      await forwarderMock.execute(req, signature);
+      expect(await unsRegistryMock.getTokenName(tokenId)).to.be.eq(uri);
     });
 
     it('should not allow backfilling from non-allowed address', async () => {
       const labels = ['minting-manager-backfill-metatx', 'wallet'];
-      const { req, signature } = await buildExecuteParams(
+      const { req, signature } = await buildExecuteParamsMock(
         'backfillReverseNames(string[][])',
         [[labels]],
         receiver,
         0,
       );
-      await expect(forwarder.execute(req, signature))
+      await expect(forwarderMock.execute(req, signature))
         .to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
     });
 
@@ -154,24 +190,17 @@ describe('MintingManager (metatx)', () => {
         ['minting-manager-multiple-backfill-metatx-2', 'x'],
         ['minting-manager-multiple-backfill-metatx-3', 'x'],
       ];
-      for (const labels of domains) {
-        await mintingManager.issueWithRecords(receiver.address, labels, [], [], false);
-        const tokenId =  ethers.utils.namehash(labels.join('.'));
-        await unsRegistry.connect(receiver)['setReverse(uint256)'](tokenId);
-        expect(await unsRegistry.reverseNameOf(receiver.address)).to.be.eq('');
-      }
-      const { req, signature } = await buildExecuteParams(
+      const { req, signature } = await buildExecuteParamsMock(
         'backfillReverseNames(string[][])',
         [domains],
         coinbase,
         0,
       );
-      await forwarder.execute(req, signature);
+      await forwarderMock.execute(req, signature);
       for (const labels of domains) {
         const uri = labels.join('.');
         const tokenId = ethers.utils.namehash(uri);
-        await unsRegistry.connect(receiver)['setReverse(uint256)'](tokenId);
-        expect(await unsRegistry.reverseNameOf(receiver.address)).to.be.eq(uri);
+        expect(await unsRegistryMock.getTokenName(tokenId)).to.be.eq(uri);
       }
     });
   });
