@@ -48,14 +48,6 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
       const labels = [name, 'x'];
       const uri = labels.join('.');
       const tokenId = await mintDomain(unsRegistry, owner, labels);
-      const legacySetReverseParams = await buildExecuteParams(
-        'setReverse(uint256)',
-        [tokenId],
-        owner,
-        tokenId,
-      );
-      const legacyTxReceipt =
-        await (await unsRegistry.execute(legacySetReverseParams.req, legacySetReverseParams.signature)).wait();
 
       const newSetReverseParams = await buildExecuteParams(
         'setReverse(string[])',
@@ -99,7 +91,6 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
           )).wait();
 
       return {
-        'legacy reverse gas': legacyTxReceipt.gasUsed.toString(),
         'length': uri.length,
         'gas': newTxReceipt.gasUsed.toString(),
         '1 level subdomain length': subdomainUri.length,

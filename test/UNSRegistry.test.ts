@@ -291,39 +291,10 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.get('new-key', tokenId)).to.be.equal('new-value');
         expect(await unsRegistry.reverseOf(receiver.address)).to.be.equal(tokenId);
       });
-    });
 
-    describe('unlockWithRecords(address,uint256,string[],string[],bool)', async () => {
-      it('should properly unlock domain and set new records without reverse - tokenId', async () => {
-        const labels = ['label-unlock-tokenid-1', 'crypto'];
-        const tokenId = await mintDomain(
-          unsRegistry,
-          coinbase,
-          labels,
-          true,
-          ['key'],
-          ['value'],
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
-        expect(await unsRegistry.get('key', tokenId)).to.be.equal('value');
-
-        await unsRegistry.connect(coinbase)['unlockWithRecords(address,uint256,string[],string[],bool)'](
-          alternativeReceiver.address,
-          tokenId,
-          ['new-key'],
-          ['new-value'],
-          false,
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(alternativeReceiver.address);
-        expect(await unsRegistry.get('new-key', tokenId)).to.be.equal('new-value');
-        expect(await unsRegistry.reverseOf(alternativeReceiver.address)).to.be.equal(0);
-      });
-
-      it('should properly unlock domain and set new records with reverse - tokenId', async () => {
-        const labels = ['label-unlock-tokenid-2', 'crypto'];
-        const tokenId = await mintDomain(
+      it('should fail if called by non-allowed address', async () => {
+        const labels = ['label_12324_unlock_fail', 'crypto'];
+        await mintDomain(
           unsRegistry,
           coinbase,
           labels,
@@ -331,21 +302,13 @@ describe('UNSRegistry', () => {
           ['key'],
           ['value'],
         );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
-        expect(await unsRegistry.get('key', tokenId)).to.be.equal('value');
-
-        await unsRegistry.connect(coinbase)['unlockWithRecords(address,uint256,string[],string[],bool)'](
-          alternativeReceiver.address,
-          tokenId,
+        await expect(unsRegistry.connect(receiver)['unlockWithRecords(address,string[],string[],string[],bool)'](
+          receiver.address,
+          labels,
           ['new-key'],
           ['new-value'],
           true,
-        );
-
-        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(alternativeReceiver.address);
-        expect(await unsRegistry.get('new-key', tokenId)).to.be.equal('new-value');
-        expect(await unsRegistry.reverseOf(alternativeReceiver.address)).to.be.equal(tokenId);
+        )).to.be.revertedWith('Registry: SENDER_IS_NOT_MINTING_MANAGER');
       });
     });
   });
