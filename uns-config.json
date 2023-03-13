@@ -1,11 +1,11 @@
 {
-    "version": "0.6.11",
+    "version": "0.6.12",
     "networks": {
         "1": {
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x049aba7510f45BA5b64ea9E658E342F904DB358D",
-                    "implementation": "0x7b29DaC7b5D3A90696c8B059CBF1FaE9af32FA28",
+                    "implementation": "0xCd451149ffa9d059030528917842bcE14327DfD6",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xc2fede",
                     "forwarder": "0x049aba7510f45BA5b64ea9E658E342F904DB358D"
@@ -120,7 +120,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x070e83FCed225184E67c86302493ffFCDB953f71",
-                    "implementation": "0x7b29DaC7b5D3A90696c8B059CBF1FaE9af32FA28",
+                    "implementation": "0x2ab164829617D51cD8c29848b8DcE163bFAF70aa",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5b57ea",
                     "forwarder": "0x070e83FCed225184E67c86302493ffFCDB953f71"
@@ -227,7 +227,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
-                    "implementation": "0x7b29DaC7b5D3A90696c8B059CBF1FaE9af32FA28",
+                    "implementation": "0xC893a4FEDe508eD3C2c6869F6b3Dd3307d6853C8",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272eb5",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
@@ -436,7 +436,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93",
-                    "implementation": "0x7b29DaC7b5D3A90696c8B059CBF1FaE9af32FA28",
+                    "implementation": "0x4FF860525ccb6E992E0A4579860465f7EF581aed",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f43",
                     "forwarder": "0x2a93C52E7B6E7054870758e15A1446E769EdfB93"
