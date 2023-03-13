@@ -83,19 +83,6 @@ const _abi = [
     {
         inputs: [
             {
-                internalType: "uint256",
-                name: "tokenId",
-                type: "uint256",
-            },
-        ],
-        name: "setReverse",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-    },
-    {
-        inputs: [
-            {
                 internalType: "string[]",
                 name: "labels",
                 type: "string[]",
