@@ -1,3 +1,7 @@
+## v0.7.1
+
+- Add `HI` token to resolver list
+
 ## v0.7.0
 
 ### Breaking changes
