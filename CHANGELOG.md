@@ -1,5 +1,7 @@
-## v0.7.2
+## v0.7.3
+- Add `VERSE` token to resolver list
 
+## v0.7.2
 - Upgrade UNSRegistry@0.7.0 on Mainnet, Polygon, Mumbai, Goerli
 
 ## v0.7.1
