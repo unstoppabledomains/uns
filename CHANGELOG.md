@@ -1,3 +1,7 @@
+## v0.7.2
+
+- Upgrade UNSRegistry@0.7.0 on Mainnet, Polygon, Mumbai, Goerli
+
 ## v0.7.1
 
 - Add `HI` token to resolver list
