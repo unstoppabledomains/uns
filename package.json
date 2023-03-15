@@ -33,7 +33,8 @@
     "start:node": "hardhat node",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test:sol",
     "make:uml": "npx sol2uml ./contracts -b UNSRegistry,MintingManager,ProxyReader -o ./assets/uns.svg -i ./contracts/mocks",
-    "analyze": "slither . --hardhat-artifacts-directory ./.artifacts --sarif slither.sarif --config-file .slither.json"
+    "analyze": "slither . --hardhat-artifacts-directory ./.artifacts --sarif slither.sarif --config-file .slither.json",
+    "postinstall": "([ -d ./.git ] && yarn husky install)"
   },
   "devDependencies": {
     "@ethereumjs/tx": "^4.0.1",
