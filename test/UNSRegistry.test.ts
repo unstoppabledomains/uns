@@ -19,14 +19,13 @@ describe('UNSRegistry', () => {
     owner: SignerWithAddress,
     reader: SignerWithAddress,
     receiver: SignerWithAddress,
-    alternativeReceiver: SignerWithAddress,
     accounts: string[];
 
   const root = TLD.CRYPTO;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [coinbase, owner, reader, receiver, alternativeReceiver] = signers;
+    [coinbase, owner, reader, receiver] = signers;
     [, ...accounts] = signers.map((s) => s.address);
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
