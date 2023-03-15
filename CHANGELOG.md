@@ -1,6 +1,10 @@
-## v0.7.4
+## v0.7.5
 
 - Add `MCONTENT` token for `ERC20` && `BEP20` to resolver list
+
+## v0.7.4
+
+- Upgraded yarn version to `v3`. Deduped some packages.
 
 ## v0.7.3
 
