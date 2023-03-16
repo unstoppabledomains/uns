@@ -46,13 +46,7 @@ jobs:
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true' && steps.latesttag.outputs.tag != env.PACKAGE_VERSION
 
-      - run: yarn build:package
-        if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
-
-      - run: yarn rebuild:sandbox
-        if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
-
-      - run: yarn copy:assets
+      - run: yarn build:ci
         if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
 
       - uses: stefanzweifel/git-auto-commit-action@v4
