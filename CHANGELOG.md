@@ -1,6 +1,11 @@
-## v0.7.5
+## v0.7.6
 
 - Add `MCONTENT` token for `ERC20` && `BEP20` to resolver list
+
+## v0.7.5
+
+- Remove `backfillReverseNames(string[][])` function from `UNSRegistry`
+- Remove `backfillReverseNames(string[][])` function from `MintingManager`
 
 ## v0.7.4
 

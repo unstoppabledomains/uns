@@ -29,7 +29,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.7.0';
+    string public constant VERSION = '0.7.1';
 
     string internal _prefix;
 
@@ -349,15 +349,6 @@ contract UNSRegistry is
      */
     function addProxyReader(address addr) external override onlyMintingManager {
         _proxyReaders[addr] = true;
-    }
-
-    /**
-     * @dev See {IUNSRegistry-backfillReverseNames(string[][])}
-     */
-    function backfillReverseNames(string[][] memory domains) external override onlyMintingManager {
-        for (uint256 i = 0; i < domains.length; i++) {
-            _tokenNames[_namehash(domains[i])] = _uri(domains[i]);
-        }
     }
 
     /// Internal

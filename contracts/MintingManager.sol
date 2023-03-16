@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.11';
+    string public constant VERSION = '0.4.12';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -189,13 +189,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         for (uint256 i = 0; i < addrs.length; i++) {
             unsRegistry.addProxyReader(addrs[i]);
         }
-    }
-
-    /**
-     * @dev See {IUNSRegistry-backfillReverseNames(string[][])}
-     */
-    function backfillReverseNames(string[][] memory domains) external onlyMinter {
-        unsRegistry.backfillReverseNames(domains);
     }
 
     function _buildLabels(uint256 tld, string memory label) private view returns (string[] memory) {
