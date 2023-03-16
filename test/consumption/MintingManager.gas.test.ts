@@ -110,33 +110,4 @@ describe('MintingManager (consumption)', () => {
       console.table(result);
     });
   });
-
-  describe('Reverse backfill consumption', () => {
-    it('calculate gas amounts for batches', async () => {
-      const result: unknown[] = [];
-      for (const i of [1, 2, 3, 50, 55, 60]) {
-        result.push(await generateBatchBackfill(i));
-      }
-      console.table(result);
-    });
-
-    async function generateBatchBackfill (amount: number) {
-      const domains: string[][] = [];
-      for (let i = 0; i < amount; i++) {
-        domains.push([`generate-batch-${i}-${amount}`, 'x']);
-      }
-      const { req, signature } = await buildExecuteParams(
-        'backfillReverseNames(string[][])',
-        [domains],
-        coinbase,
-        0,
-      );
-      const tx = await forwarder.execute(req, signature);
-      const txReceipt = await tx.wait();
-      return {
-        domainsAmount: amount,
-        gasUsed: txReceipt.gasUsed.toString(),
-      };
-    }
-  });
 });

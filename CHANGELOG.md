@@ -1,9 +1,13 @@
+## v0.7.5
+
+- Remove `backfillReverseNames(string[][])` function from `UNSRegistry`
+- Remove `backfillReverseNames(string[][])` function from `MintingManager`
+
 ## v0.7.4
 
 - Upgraded yarn version to `v3`. Deduped some packages.
 
 ## v0.7.3
-
 - Add `VERSE` token to resolver list
 
 ## v0.7.2

@@ -1,6 +1,5 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { namehash } from 'ethers/lib/utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistryMock } from '../types/contracts/mocks';
@@ -19,8 +18,7 @@ describe('UNSRegistry (reverse)', () => {
     owner: SignerWithAddress,
     receiver: SignerWithAddress,
     reader: SignerWithAddress;
-  let buildExecuteParams: ExecuteFunc,
-    buildExecuteParamsMock: ExecuteFunc;
+  let buildExecuteParams: ExecuteFunc;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -50,12 +48,6 @@ describe('UNSRegistry (reverse)', () => {
     await unsRegistryMock.mintTLD(TLD.X, 'x');
     await unsRegistryMock.setTokenURIPrefix('/');
     await unsRegistryMock.addProxyReader(reader.address);
-
-    buildExecuteParamsMock = buildExecuteFunc(
-      unsRegistryMock.interface,
-      unsRegistryMock.address,
-      unsRegistryMock,
-    );
   });
 
   describe('Minting', () => {
@@ -476,52 +468,6 @@ describe('UNSRegistry (reverse)', () => {
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
       expect(await unsRegistry.reverseNameOf(owner.address)).to.be.equal('');
-    });
-  });
-
-  describe('Backfill reverse names', () => {
-    it('should backfill domain name', async () => {
-      const labels = ['backfill-1', 'x'];
-      const uri = labels.join('.');
-      const tokenId = namehash(uri);
-      await unsRegistryMock.backfillReverseNames([labels]);
-      expect(await unsRegistryMock.getTokenName(tokenId)).to.be.eq(uri);
-    });
-
-    it('should backfill multiple domain names', async () => {
-      const domains = [
-        ['multiple-backfill-1', 'x'],
-        ['multiple-backfill-2', 'x'],
-        ['multiple-backfill-3', 'x'],
-      ];
-      const tx = await unsRegistryMock.backfillReverseNames(domains);
-      for (const labels of domains) {
-        const uri = labels.join('.');
-        const tokenId = namehash(uri);
-        expect(await unsRegistryMock.getTokenName(tokenId)).to.be.eq(uri);
-      }
-      const receipt = await tx.wait();
-      expect(receipt.status).to.be.eq(1);
-    });
-
-    it('should backfill domain name using MetaTx', async () => {
-      const labels = ['backfill-meta-1', 'x'];
-      const uri = labels.join('.');
-      const tokenId = namehash(uri);
-      const { req, signature } = await buildExecuteParamsMock(
-        'backfillReverseNames(string[][])',
-        [[labels]],
-        coinbase,
-        coinbase.address,
-      );
-      await unsRegistryMock.execute(req, signature);
-      expect(await unsRegistryMock.getTokenName(tokenId)).to.be.eq(uri);
-    });
-
-    it('should not allow backfilling from non-allowed address', async () => {
-      const labels = ['non-allowed-backfill-meta-1', 'x'];
-      await expect(unsRegistry.connect(owner).backfillReverseNames([labels]))
-        .to.be.revertedWith('Registry: SENDER_IS_NOT_MINTING_MANAGER');
     });
   });
 });

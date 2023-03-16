@@ -1,6 +1,6 @@
 {
   "name": "uns",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "UNS contracts and tools",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "main": "./dist/index.js",
