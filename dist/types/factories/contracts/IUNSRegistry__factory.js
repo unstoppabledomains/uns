@@ -283,19 +283,6 @@ const _abi = [
     {
         inputs: [
             {
-                internalType: "string[][]",
-                name: "domains",
-                type: "string[][]",
-            },
-        ],
-        name: "backfillReverseNames",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-    },
-    {
-        inputs: [
-            {
                 internalType: "address",
                 name: "owner",
                 type: "address",
