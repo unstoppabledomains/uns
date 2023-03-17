@@ -1,5 +1,5 @@
 {
-  "version": "2.1.25",
+  "version": "2.1.26",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2298,6 +2298,16 @@
     },
     "crypto.ALPHA.version.BEP20.address": {
       "deprecatedKeyName": "ALPHA_BEP20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.MCONTENT.version.ERC20.address": {
+      "deprecatedKeyName": "MCONTENT_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.MCONTENT.version.BEP20.address": {
+      "deprecatedKeyName": "MCONTENT_BEP20",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     },

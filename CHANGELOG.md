@@ -1,3 +1,7 @@
+## v0.7.6
+
+- Add `MCONTENT` token for `ERC20` && `BEP20` to resolver list
+
 ## v0.7.5
 
 - Remove `backfillReverseNames(string[][])` function from `UNSRegistry`
@@ -8,9 +12,11 @@
 - Upgraded yarn version to `v3`. Deduped some packages.
 
 ## v0.7.3
+
 - Add `VERSE` token to resolver list
 
 ## v0.7.2
+
 - Upgrade UNSRegistry@0.7.0 on Mainnet, Polygon, Mumbai, Goerli
 
 ## v0.7.1
@@ -98,7 +104,7 @@
 
 ## v0.6.25
 
-- Forbid domain names minting with leading and ending hyphens (`-test1-.crypto`, `unstoppable-.crypto`, etc.) 
+- Forbid domain names minting with leading and ending hyphens (`-test1-.crypto`, `unstoppable-.crypto`, etc.)
 
 ## v0.6.24
 
@@ -192,7 +198,7 @@
 
 ## v0.6.5
 
-- Remove MintingManager._ownerOf and use exists & ownerOf instead
+- Remove MintingManager.\_ownerOf and use exists & ownerOf instead
 
 ## v0.6.4
 
@@ -220,6 +226,7 @@
 - ProxyReader@0.3.0 receives support for subdomains
 
 ## v0.5.22
+
 - Add DotCoinBurner smart contract to support batch returns of .coin domains
 
 ## v0.5.21
