@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.12';
+    string public constant VERSION = '0.4.13';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -205,7 +205,13 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] memory values,
         bool withReverse
     ) private {
-        (uint256 tokenId, ) = _namehash(labels);
+        (uint256 tokenId, uint256 parentId) = _namehash(labels);
+
+        // reverse record is limited for subdomains, it is possible to set a reverse record
+        // to the same address as the parent domain owner
+        if (withReverse && labels.length > 2 && unsRegistry.ownerOf(parentId) != to) {
+            revert('MintingManager: REVERSE_RECORD_NOT_ALLOWED');
+        }
 
         if (unsRegistry.exists(tokenId) && unsRegistry.ownerOf(tokenId) == address(this)) {
             unsRegistry.unlockWithRecords(to, labels, keys, values, withReverse);

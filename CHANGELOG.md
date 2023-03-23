@@ -1,3 +1,7 @@
+## v0.7.7
+
+- Issuing of subdomains with reverse record is limited in MintingManager. It is possible to set a reverse record to the same address as the parent domain owner.
+
 ## v0.7.6
 
 - Add `MCONTENT` token for `ERC20` && `BEP20` to resolver list
