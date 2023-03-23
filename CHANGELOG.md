@@ -1,3 +1,7 @@
+## v0.7.8
+
+- Upgrade MintingManager@0.4.13 on Mainnet, Polygon, Mumbai, Goerli
+
 ## v0.7.7
 
 - Issuing of subdomains with reverse record is limited in MintingManager. It is possible to set a reverse record to the same address as the parent domain owner.
