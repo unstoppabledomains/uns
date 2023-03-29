@@ -351,6 +351,20 @@ contract UNSRegistry is
         _proxyReaders[addr] = true;
     }
 
+    /**
+     * @dev The one time function to clean up reverse records from UD contracts.
+     */
+    function cleanReverseFromUDContracts() external {
+        address[3] memory _udContracts = [
+            0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f,
+            0x049aba7510f45BA5b64ea9E658E342F904DB358D,
+            0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe
+        ];
+        for (uint256 i = 0; i < _udContracts.length; i++) {
+            _removeReverse(_udContracts[i]);
+        }
+    }
+
     /// Internal
 
     function _uri(string[] memory labels) private pure returns (string memory) {
