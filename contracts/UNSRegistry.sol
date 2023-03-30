@@ -29,7 +29,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.7.1';
+    string public constant VERSION = '0.7.2';
 
     string internal _prefix;
 
@@ -349,6 +349,20 @@ contract UNSRegistry is
      */
     function addProxyReader(address addr) external override onlyMintingManager {
         _proxyReaders[addr] = true;
+    }
+
+    /**
+     * @dev The one time function to clean up reverse records from UD contracts.
+     */
+    function cleanReverseFromUDContracts() external {
+        address[3] memory _udContracts = [
+            address(this), // UNSRegistry L2
+            0x049aba7510f45BA5b64ea9E658E342F904DB358D, // UNSRegistry L1
+            0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe // CNSRegistry L1
+        ];
+        for (uint256 i = 0; i < _udContracts.length; i++) {
+            _removeReverse(_udContracts[i]);
+        }
     }
 
     /// Internal

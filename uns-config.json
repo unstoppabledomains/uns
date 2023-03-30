@@ -1,5 +1,5 @@
 {
-    "version": "0.7.1",
+    "version": "0.7.2",
     "networks": {
         "1": {
             "contracts": {
@@ -227,7 +227,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
-                    "implementation": "0xC893a4FEDe508eD3C2c6869F6b3Dd3307d6853C8",
+                    "implementation": "0x0301cc5242A1F039799E8F806302Dc2140421971",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272eb5",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
