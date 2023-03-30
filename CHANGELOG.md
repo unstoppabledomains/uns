@@ -1,6 +1,7 @@
 ## v0.7.9
 
 - Add temporary `cleanReverseFromUDContracts` function to UNSRegistry in order to remove reverse records assigned to UNS contracts.
+- Upgrade UNSRegistry@0.7.2 on Polygon
 
 ## v0.7.8
 
