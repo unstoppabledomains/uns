@@ -31,6 +31,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         "approve(address,uint256)": FunctionFragment;
         "balanceOf(address)": FunctionFragment;
         "burn(uint256)": FunctionFragment;
+        "cleanReverseFromUDContracts()": FunctionFragment;
         "deposit(address,bytes)": FunctionFragment;
         "depositToPolygon(uint256)": FunctionFragment;
         "execute((address,uint256,uint256,bytes),bytes)": FunctionFragment;
@@ -82,7 +83,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         "verify((address,uint256,uint256,bytes),bytes)": FunctionFragment;
         "withdrawFromPolygon(bytes,uint256,string[],string[])": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "BATCH_LIMIT" | "NAME" | "VERSION" | "addKey" | "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "execute" | "exists" | "get" | "getApproved" | "getByHash" | "getKey" | "getKeys" | "getMany" | "getManyByHash" | "getTokenName" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "isTrustedForwarder" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "name" | "namehash" | "nonceOf" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseNameOf" | "reverseOf" | "root" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "upgradeAll" | "verify" | "withdrawFromPolygon"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "BATCH_LIMIT" | "NAME" | "VERSION" | "addKey" | "addProxyReader" | "approve" | "balanceOf" | "burn" | "cleanReverseFromUDContracts" | "deposit" | "depositToPolygon" | "execute" | "exists" | "get" | "getApproved" | "getByHash" | "getKey" | "getKeys" | "getMany" | "getManyByHash" | "getTokenName" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "isTrustedForwarder" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "name" | "namehash" | "nonceOf" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseNameOf" | "reverseOf" | "root" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "upgradeAll" | "verify" | "withdrawFromPolygon"): FunctionFragment;
     encodeFunctionData(functionFragment: "BATCH_LIMIT", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
     encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
@@ -91,6 +92,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "approve", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "burn", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "cleanReverseFromUDContracts", values?: undefined): string;
     encodeFunctionData(functionFragment: "deposit", values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]): string;
     encodeFunctionData(functionFragment: "depositToPolygon", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "execute", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
@@ -213,6 +215,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "cleanReverseFromUDContracts", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "depositToPolygon", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
@@ -433,6 +436,9 @@ export interface UNSRegistryMock extends BaseContract {
         burn(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        cleanReverseFromUDContracts(overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         deposit(user: PromiseOrValue<string>, depositData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -568,6 +574,9 @@ export interface UNSRegistryMock extends BaseContract {
     burn(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
+    cleanReverseFromUDContracts(overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     deposit(user: PromiseOrValue<string>, depositData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -685,6 +694,7 @@ export interface UNSRegistryMock extends BaseContract {
         approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         burn(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
+        cleanReverseFromUDContracts(overrides?: CallOverrides): Promise<void>;
         deposit(user: PromiseOrValue<string>, depositData: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
         depositToPolygon(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
@@ -785,6 +795,9 @@ export interface UNSRegistryMock extends BaseContract {
         }): Promise<BigNumber>;
         balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         burn(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        cleanReverseFromUDContracts(overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         deposit(user: PromiseOrValue<string>, depositData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
@@ -905,6 +918,9 @@ export interface UNSRegistryMock extends BaseContract {
         }): Promise<PopulatedTransaction>;
         balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         burn(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        cleanReverseFromUDContracts(overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         deposit(user: PromiseOrValue<string>, depositData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
