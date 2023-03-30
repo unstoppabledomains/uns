@@ -1,3 +1,7 @@
+## v0.7.10
+
+- UNSRegistry@0.7.3 cleanup, remove temporary `cleanReverseFromUDContracts` function.
+
 ## v0.7.9
 
 - Add temporary `cleanReverseFromUDContracts` function to UNSRegistry in order to remove reverse records assigned to UNS contracts.
