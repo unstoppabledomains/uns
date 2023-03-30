@@ -1,3 +1,7 @@
+## v0.7.9
+
+- Add temporary `cleanReverseFromUDContracts` function to UNSRegistry in order to remove reverse records assigned to UNS contracts.
+
 ## v0.7.8
 
 - Upgrade MintingManager@0.4.13 on Mainnet, Polygon, Mumbai, Goerli
