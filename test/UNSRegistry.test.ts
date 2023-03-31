@@ -21,8 +21,6 @@ describe('UNSRegistry', () => {
     receiver: SignerWithAddress,
     accounts: string[];
 
-  const root = TLD.CRYPTO;
-
   before(async () => {
     signers = await ethers.getSigners();
     [coinbase, owner, reader, receiver] = signers;
@@ -31,14 +29,14 @@ describe('UNSRegistry', () => {
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
 
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistry.mintTLD(root, 'crypto');
+    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
     await unsRegistry.addProxyReader(reader.address);
 
     // mock
     unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
     await unsRegistryMock.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistryMock.mintTLD(root, 'crypto');
+    await unsRegistryMock.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistryMock.setTokenURIPrefix('/');
     await unsRegistryMock.addProxyReader(reader.address);
   });
@@ -60,13 +58,13 @@ describe('UNSRegistry', () => {
     });
 
     it('should set URI prefix', async () => {
-      expect(await unsRegistry.tokenURI(root)).to.be.equal(`/${root}`);
+      expect(await unsRegistry.tokenURI(TLD.CRYPTO)).to.be.equal(`/${TLD.CRYPTO}`);
 
       await unsRegistry.setTokenURIPrefix('prefix-');
-      expect(await unsRegistry.tokenURI(root)).to.be.equal(`prefix-${root}`);
+      expect(await unsRegistry.tokenURI(TLD.CRYPTO)).to.be.equal(`prefix-${TLD.CRYPTO}`);
 
       await unsRegistry.setTokenURIPrefix('/');
-      expect(await unsRegistry.tokenURI(root)).to.be.equal(`/${root}`);
+      expect(await unsRegistry.tokenURI(TLD.CRYPTO)).to.be.equal(`/${TLD.CRYPTO}`);
     });
 
     it('should emit Transfer event on set owner', async () => {
@@ -210,15 +208,8 @@ describe('UNSRegistry', () => {
         const labels = ['label_38f7', 'crypto'];
         const tokenId = await unsRegistry.namehash(labels);
 
-        await expect(
-          unsRegistry.mintWithRecords(
-            coinbase.address,
-            labels,
-            ['key1'],
-            ['42'],
-            true,
-          ),
-        ).to.emit(unsRegistry, 'NewURI')
+        await expect(unsRegistry.mintWithRecords(coinbase.address, labels, ['key1'], ['42'], true))
+          .to.emit(unsRegistry, 'NewURI')
           .withArgs(tokenId, 'label_38f7.crypto');
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
@@ -239,25 +230,20 @@ describe('UNSRegistry', () => {
     describe('unlockWithRecords(address,string[],string[],string[],bool)', async () => {
       it('should properly unlock domain and set new records without reverse', async () => {
         const labels = ['label_12324_unlock2', 'crypto'];
-        const tokenId = await mintDomain(
-          unsRegistry,
-          coinbase,
-          labels,
-          true,
-          ['key'],
-          ['value'],
-        );
+        const tokenId = await mintDomain(unsRegistry, coinbase, labels, true, ['key'], ['value']);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         expect(await unsRegistry.get('key', tokenId)).to.be.equal('value');
 
-        await unsRegistry.connect(coinbase)['unlockWithRecords(address,string[],string[],string[],bool)'](
-          receiver.address,
-          labels,
-          ['new-key'],
-          ['new-value'],
-          false,
-        );
+        await unsRegistry
+          .connect(coinbase)
+          ['unlockWithRecords(address,string[],string[],string[],bool)'](
+            receiver.address,
+            labels,
+            ['new-key'],
+            ['new-value'],
+            false,
+          );
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
         expect(await unsRegistry.get('new-key', tokenId)).to.be.equal('new-value');
@@ -266,25 +252,20 @@ describe('UNSRegistry', () => {
 
       it('should properly unlock domain and set new records with reverse', async () => {
         const labels = ['label_12324_unlock3', 'crypto'];
-        const tokenId = await mintDomain(
-          unsRegistry,
-          coinbase,
-          labels,
-          false,
-          ['key'],
-          ['value'],
-        );
+        const tokenId = await mintDomain(unsRegistry, coinbase, labels, false, ['key'], ['value']);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         expect(await unsRegistry.get('key', tokenId)).to.be.equal('value');
 
-        await unsRegistry.connect(coinbase)['unlockWithRecords(address,string[],string[],string[],bool)'](
-          receiver.address,
-          labels,
-          ['new-key'],
-          ['new-value'],
-          true,
-        );
+        await unsRegistry
+          .connect(coinbase)
+          ['unlockWithRecords(address,string[],string[],string[],bool)'](
+            receiver.address,
+            labels,
+            ['new-key'],
+            ['new-value'],
+            true,
+          );
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
         expect(await unsRegistry.get('new-key', tokenId)).to.be.equal('new-value');
@@ -293,21 +274,18 @@ describe('UNSRegistry', () => {
 
       it('should fail if called by non-allowed address', async () => {
         const labels = ['label_12324_unlock_fail', 'crypto'];
-        await mintDomain(
-          unsRegistry,
-          coinbase,
-          labels,
-          false,
-          ['key'],
-          ['value'],
-        );
-        await expect(unsRegistry.connect(receiver)['unlockWithRecords(address,string[],string[],string[],bool)'](
-          receiver.address,
-          labels,
-          ['new-key'],
-          ['new-value'],
-          true,
-        )).to.be.revertedWith('Registry: SENDER_IS_NOT_MINTING_MANAGER');
+        await mintDomain(unsRegistry, coinbase, labels, false, ['key'], ['value']);
+        await expect(
+          unsRegistry
+            .connect(receiver)
+            ['unlockWithRecords(address,string[],string[],string[],bool)'](
+              receiver.address,
+              labels,
+              ['new-key'],
+              ['new-value'],
+              true,
+            ),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_MINTING_MANAGER');
       });
     });
   });
@@ -558,9 +536,7 @@ describe('UNSRegistry', () => {
 
         await expect(unsRegistry.reset(tokenId)).to.emit(unsRegistry, 'ResetRecords').withArgs(tokenId.toString());
 
-        expect(
-          await unsRegistry.getMany(['key1', 'key2'], tokenId),
-        ).to.deep.equal(['', '']);
+        expect(await unsRegistry.getMany(['key1', 'key2'], tokenId)).to.deep.equal(['', '']);
       });
 
       it('should fail if not owner', async () => {
@@ -570,9 +546,7 @@ describe('UNSRegistry', () => {
           'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
         );
 
-        expect(
-          await unsRegistry.getMany(['key1', 'key2'], tokenId),
-        ).to.deep.equal(['value1', 'value2']);
+        expect(await unsRegistry.getMany(['key1', 'key2'], tokenId)).to.deep.equal(['value1', 'value2']);
       });
     });
 
@@ -659,9 +633,10 @@ describe('UNSRegistry', () => {
 
         expect(resultingValues).to.be.deep.equal(['', '']);
 
-        expect(
-          await unsRegistryMock.connect(coinbase).getManyByHash(hashedKeys, tokenId),
-        ).to.be.deep.equal([keys, values]);
+        expect(await unsRegistryMock.connect(coinbase).getManyByHash(hashedKeys, tokenId)).to.be.deep.equal([
+          keys,
+          values,
+        ]);
       });
 
       it('should set record by hash', async () => {
@@ -718,22 +693,12 @@ describe('UNSRegistry', () => {
       });
 
       it('should not consume additional gas if key hash was set before', async () => {
-        const newKeyHashTx = await unsRegistry.set(
-          'keyhash-gas',
-          'value',
-          tokenId,
-        );
+        const newKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tokenId);
         const newKeyHashTxReceipt = await newKeyHashTx.wait();
-        const exitsKeyHashTx = await unsRegistry.set(
-          'keyhash-gas',
-          'value',
-          tokenId,
-        );
+        const exitsKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tokenId);
         const exitsKeyHashTxReceipt = await exitsKeyHashTx.wait();
 
-        expect(newKeyHashTxReceipt.gasUsed).to.be.above(
-          exitsKeyHashTxReceipt.gasUsed,
-        );
+        expect(newKeyHashTxReceipt.gasUsed).to.be.above(exitsKeyHashTxReceipt.gasUsed);
 
         const newKeyHashTx2 = await unsRegistry.setMany(
           ['keyhash-gas-1', 'keyhash-gas-2'],
@@ -748,9 +713,7 @@ describe('UNSRegistry', () => {
         );
         const exitsKeyHashTxReceipt2 = await exitsKeyHashTx2.wait();
 
-        expect(newKeyHashTxReceipt2.gasUsed).to.be.above(
-          exitsKeyHashTxReceipt2.gasUsed,
-        );
+        expect(newKeyHashTxReceipt2.gasUsed).to.be.above(exitsKeyHashTxReceipt2.gasUsed);
 
         const newKeyHashTx3 = await unsRegistry.setMany(
           ['keyhash-gas-3', 'keyhash-gas-4', 'keyhash-gas-5'],
@@ -765,9 +728,7 @@ describe('UNSRegistry', () => {
         );
         const exitsKeyHashTxReceipt3 = await exitsKeyHashTx3.wait();
 
-        expect(newKeyHashTxReceipt3.gasUsed).to.be.above(
-          exitsKeyHashTxReceipt3.gasUsed,
-        );
+        expect(newKeyHashTxReceipt3.gasUsed).to.be.above(exitsKeyHashTxReceipt3.gasUsed);
       });
     });
   });
