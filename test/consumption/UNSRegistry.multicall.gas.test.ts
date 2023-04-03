@@ -1,5 +1,6 @@
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { Interface } from 'ethers/lib/utils';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
 import { TLD, ZERO_ADDRESS } from '../helpers/constants';
@@ -13,9 +14,9 @@ describe('UNSRegistry Multicall (consumption)', () => {
   }
 
   async function prepParams (params: unknown[][], labels: string[]) {
-    const _params: any[] = [];
+    const _params: unknown[][] = [];
     for (const param of params) {
-      const _pms: any[] = [];
+      const _pms: unknown[] = [];
       for (const p of param) {
         if (typeof p != 'string') {
           _pms.push(p);
@@ -122,12 +123,10 @@ describe('UNSRegistry Multicall (consumption)', () => {
       const labels2 = [labels[0] + '-multi', labels[1]];
       const params2 = await prepParams(params, labels2);
 
+      const iface: Interface = unsRegistry.interface;
       const tx = await unsRegistry.multicall(
         selectors.map((selector, index) =>
-          unsRegistry.interface.encodeFunctionData(
-            unsRegistry.interface.functions[selector].name,
-            params2[index] as any,
-          ),
+          iface.encodeFunctionData(unsRegistry.interface.functions[selector].name, params2[index]),
         ),
       );
       const receipt = await tx.wait();
