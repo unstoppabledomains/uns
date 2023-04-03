@@ -5,6 +5,7 @@ import { MintingManagerForwarder } from '../../types/contracts/metatx';
 import { MintingManager__factory, UNSRegistry__factory } from '../../types/factories/contracts';
 import { MintingManagerForwarder__factory } from '../../types/factories/contracts/metatx';
 import { ZERO_ADDRESS } from '../helpers/constants';
+import { percDiff } from '../helpers/consumption';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 
 describe('MintingManager (consumption)', () => {
@@ -13,10 +14,6 @@ describe('MintingManager (consumption)', () => {
     coinbase: SignerWithAddress,
     receiver: SignerWithAddress,
     spender: SignerWithAddress;
-
-  function percDiff (a: number, b: number) {
-    return -((a - b) / a) * 100;
-  }
 
   let buildExecuteParams: ExecuteFunc;
 
@@ -101,7 +98,7 @@ describe('MintingManager (consumption)', () => {
           records: Array.isArray(params[2]) ? params[2].length : '-',
           send: tx.receipt.gasUsed.toString(),
           execute: executeTxReceipt.gasUsed.toString(),
-          increase: percDiff(tx.receipt.gasUsed.toNumber(), executeTxReceipt.gasUsed.toNumber()).toFixed(2) + ' %',
+          increase: percDiff(tx.receipt.gasUsed.toNumber(), executeTxReceipt.gasUsed.toNumber()) + ' %',
         });
 
         await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId);

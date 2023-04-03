@@ -1,5 +1,5 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { utils, Contract, BigNumberish } from 'ethers';
+import { utils, Contract, BigNumberish, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi/';
 
 export async function sign (
@@ -9,12 +9,7 @@ export async function sign (
   signer: SignerWithAddress,
 ): Promise<string> {
   return signer.signMessage(
-    utils.arrayify(
-      utils.solidityKeccak256(
-        [ 'bytes32', 'address', 'uint256' ],
-        [ utils.keccak256(data), address, nonce ],
-      ),
-    ),
+    utils.arrayify(utils.solidityKeccak256(['bytes32', 'address', 'uint256'], [utils.keccak256(data), address, nonce])),
   );
 }
 
@@ -22,26 +17,33 @@ export type ExecuteFunc = (
   selector: string,
   params: unknown[],
   from: SignerWithAddress,
-  tokenId: BigNumberish
+  tokenId: BigNumberish,
+  nonce?: BigNumber,
 ) => Promise<{
   req: {
-    from: string,
-    nonce: number,
-    tokenId: BigNumberish,
-    data: string
-  },
-  signature: string
-}>
+    from: string;
+    nonce: number;
+    tokenId: BigNumberish;
+    data: string;
+  };
+  signature: string;
+}>;
 
 export function buildExecuteFunc (iface: Interface, toAddress: string, forwarder: Contract): ExecuteFunc {
-  return async (selector: string, params: unknown[], from: SignerWithAddress, tokenId: BigNumberish) => {
+  return async (
+    selector: string,
+    params: unknown[],
+    from: SignerWithAddress,
+    tokenId: BigNumberish,
+    nonce?: BigNumber,
+  ) => {
     const data = iface.encodeFunctionData(selector, params);
 
-    const nonce = await forwarder.nonceOf(tokenId);
-    const signature = await sign(data, toAddress, nonce, from);
+    const _nonce = nonce || (await forwarder.nonceOf(tokenId));
+    const signature = await sign(data, toAddress, _nonce, from);
 
     return {
-      req: { from: from.address, nonce, tokenId, data },
+      req: { from: from.address, nonce: _nonce, tokenId, data },
       signature,
     };
   };

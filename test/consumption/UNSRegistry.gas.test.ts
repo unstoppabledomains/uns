@@ -4,14 +4,11 @@ import { BigNumber, utils } from 'ethers';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
 import { TLD, ZERO_ADDRESS } from '../helpers/constants';
+import { percDiff } from '../helpers/consumption';
 
 describe('UNSRegistry (consumption)', () => {
   let unsRegistry: UNSRegistry;
   let signers: SignerWithAddress[], coinbase: SignerWithAddress;
-
-  function percDiff (a: number, b: number) {
-    return -((a - b) / a) * 100;
-  }
 
   const initializeKey = async (key) => {
     await unsRegistry.addKey(key);
@@ -92,7 +89,7 @@ describe('UNSRegistry (consumption)', () => {
         recordLen: params1[0].length,
         set: tx1.receipt.gasUsed.toString(),
         setByHash: tx2.receipt.gasUsed.toString(),
-        increase: percDiff(tx1.receipt.gasUsed.toNumber(), tx2.receipt.gasUsed.toNumber()).toFixed(2) + ' %',
+        increase: percDiff(tx1.receipt.gasUsed.toNumber(), tx2.receipt.gasUsed.toNumber()) + ' %',
       });
     }
     console.table(result);
@@ -165,7 +162,7 @@ describe('UNSRegistry (consumption)', () => {
         records: params1[0].length,
         setMany: tx1.receipt.gasUsed.toString(),
         setManyByHash: tx2.receipt.gasUsed.toString(),
-        increase: percDiff(tx1.receipt.gasUsed.toNumber(), tx2.receipt.gasUsed.toNumber()).toFixed(2) + ' %',
+        increase: percDiff(tx1.receipt.gasUsed.toNumber(), tx2.receipt.gasUsed.toNumber()) + ' %',
       });
     }
     console.table(result);

@@ -4,14 +4,11 @@ import { Interface } from 'ethers/lib/utils';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
 import { TLD, ZERO_ADDRESS } from '../helpers/constants';
+import { percDiff } from '../helpers/consumption';
 
 describe('UNSRegistry Multicall (consumption)', () => {
   let unsRegistry: UNSRegistry;
   let signers: SignerWithAddress[], coinbase: SignerWithAddress, receiver: SignerWithAddress;
-
-  function percDiff (a: number, b: number) {
-    return -((a - b) / a) * 100;
-  }
 
   async function prepParams (params: unknown[][], labels: string[]) {
     const _params: unknown[][] = [];
@@ -135,7 +132,7 @@ describe('UNSRegistry Multicall (consumption)', () => {
         name,
         seq: cumGasUsed.toString(),
         multicall: receipt.gasUsed.toString(),
-        increase: percDiff(cumGasUsed, receipt.gasUsed.toNumber()).toFixed(2) + ' %',
+        increase: percDiff(cumGasUsed, receipt.gasUsed.toNumber()) + ' %',
       });
     }
     console.table(result);

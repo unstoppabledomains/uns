@@ -463,4 +463,55 @@ describe('UNSRegistry (metatx)', () => {
       });
     });
   });
+
+  describe('Multicall', () => {
+    it.skip('should ', async () => {
+      const labels = ['res_label_m1', 'crypto'];
+      const tokenId = await unsRegistry.namehash(labels);
+
+      console.log('coinbase', coinbase.address);
+      const { req, signature } = await buildExecuteParams(
+        'multicall(bytes[])',
+        [
+          [
+            unsRegistry.interface.encodeFunctionData('mintWithRecords', [coinbase.address, labels, [], [], false]),
+            unsRegistry.interface.encodeFunctionData('setOwner', [receiver.address, tokenId]),
+          ],
+        ],
+        coinbase,
+        tokenId,
+      );
+      await unsRegistry.connect(nonOwner).execute(req, signature);
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+    });
+
+    it('should execute multiple meta txs through multicall', async () => {
+      const labels = ['res_label_m1', 'crypto'];
+      const tokenId = await unsRegistry.namehash(labels);
+
+      const mintMetaParams = await buildExecuteParams(
+        'mintWithRecords(address,string[],string[],string[],bool)',
+        [owner.address, labels, [], [], false],
+        coinbase,
+        tokenId,
+        BigNumber.from(0),
+      );
+
+      const transferMetaParams = await buildExecuteParams(
+        'setOwner(address,uint256)',
+        [receiver.address, tokenId],
+        owner,
+        tokenId,
+        BigNumber.from(1),
+      );
+
+      await unsRegistry.multicall([
+        unsRegistry.interface.encodeFunctionData('execute', [mintMetaParams.req, mintMetaParams.signature]),
+        unsRegistry.interface.encodeFunctionData('execute', [transferMetaParams.req, transferMetaParams.signature]),
+      ]);
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+    });
+  });
 });
