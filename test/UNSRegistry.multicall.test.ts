@@ -6,7 +6,6 @@ import { TLD, ZERO_ADDRESS } from './helpers/constants';
 
 describe('UNSRegistry (multicall)', () => {
   let unsRegistry: UNSRegistry;
-
   let signers: SignerWithAddress[], coinbase: SignerWithAddress, owner: SignerWithAddress;
 
   before(async () => {
@@ -14,13 +13,12 @@ describe('UNSRegistry (multicall)', () => {
     [coinbase, owner] = signers;
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
   });
 
-  it('should return zero root', async () => {
+  it('should mint domain, set records and transfer domain', async () => {
     const labels = ['mul_1', 'crypto'];
     const tokenId = await unsRegistry.namehash(labels);
 

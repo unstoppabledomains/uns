@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol';
 
 import './ChildRegistry.sol';
 import './cns/ICNSRegistry.sol';
@@ -14,6 +13,7 @@ import './RecordStorage.sol';
 import './RootRegistry.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/UNSRegistryForwarder.sol';
+import './utils/Multicall.sol';
 
 /**
  * @title UNSRegistry
@@ -27,7 +27,7 @@ contract UNSRegistry is
     UNSRegistryForwarder,
     RootRegistry,
     ChildRegistry,
-    MulticallUpgradeable,
+    Multicall,
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
@@ -79,7 +79,6 @@ contract UNSRegistry is
         __UNSRegistryForwarder_init_unchained();
         __RootRegistry_init(rootChainManager);
         __ChildRegistry_init(childChainManager);
-        __Multicall_init_unchained();
     }
 
     /// ERC721 Metadata extension

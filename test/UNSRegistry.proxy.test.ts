@@ -4,12 +4,14 @@ import { utils, BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
+import { UNSRegistryV07__factory } from '../types';
 import { mintDomain } from './helpers/registry';
 import { TLD, ZERO_ADDRESS } from './helpers/constants';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 
 describe('UNSRegistry (proxy)', () => {
   let unsRegistry: UNSRegistry;
+  let unsRegistryV07Factory: UNSRegistryV07__factory; // eslint-disable-line camelcase
   let unsRegistryFactory: UNSRegistry__factory; // eslint-disable-line camelcase
 
   let buildExecuteParams: ExecuteFunc;
@@ -20,9 +22,11 @@ describe('UNSRegistry (proxy)', () => {
     signers = await ethers.getSigners();
     [owner, receiver] = signers;
 
+    unsRegistryV07Factory = new UNSRegistryV07__factory(owner);
     unsRegistryFactory = new UNSRegistry__factory(owner);
+
     unsRegistry = (await upgrades.deployProxy(
-      unsRegistryFactory,
+      unsRegistryV07Factory,
       [owner.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS],
       {
         initializer: 'initialize',
