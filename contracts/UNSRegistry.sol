@@ -353,6 +353,16 @@ contract UNSRegistry is
         _proxyReaders[addr] = true;
     }
 
+    function multicall(bytes[] calldata data) public override returns (bytes[] memory results) {
+        bytes[] memory _data = data;
+        if (isTrustedForwarder(msg.sender)) {
+            for (uint256 i = 0; i < data.length; i++) {
+                _data[i] = _buildData(_msgSender(), _msgToken(), data[i], '');
+            }
+        }
+        return super.multicall(_data);
+    }
+
     /// Internal
 
     function _uri(string[] memory labels) private pure returns (string memory) {

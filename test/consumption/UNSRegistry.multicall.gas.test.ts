@@ -64,7 +64,7 @@ describe('UNSRegistry Multicall (consumption)', () => {
         ],
       },
       {
-        name: 'mintWithRecords(2) + set + setOwner',
+        name: 'mintWithRecords(3) + set + setOwner',
         labels: ['tm1-o1', 'crypto'],
         selectors: [
           'mintWithRecords(address,string[],string[],string[],bool)',
@@ -72,13 +72,19 @@ describe('UNSRegistry Multicall (consumption)', () => {
           'setOwner(address,uint256)',
         ],
         params: [
-          [coinbase.address, '{labels}/0', ['o898219c054e083f4241', 'r898219c054e083f4241'], ['v1', 'v2'], false],
+          [
+            coinbase.address,
+            '{labels}/0',
+            ['o898219c054e083f4241', 'r898219c054e083f4241', 'r898219c054e083f4242'],
+            ['v1', 'v2', 'v3'],
+            false,
+          ],
           ['ks1', 'vs1', '{token_id}/0'],
           [receiver.address, '{token_id}/0'],
         ],
       },
       {
-        name: 'mintWithRecords(2) + setMany(2) + setOwner',
+        name: 'mintWithRecords(3) + setMany(2) + setOwner',
         labels: ['tm1-o2', 'crypto'],
         selectors: [
           'mintWithRecords(address,string[],string[],string[],bool)',
@@ -86,13 +92,13 @@ describe('UNSRegistry Multicall (consumption)', () => {
           'setOwner(address,uint256)',
         ],
         params: [
-          [coinbase.address, '{labels}/0', ['k1', 'k2'], ['v1', 'v2'], false],
+          [coinbase.address, '{labels}/0', ['k1', 'k2', 'k3'], ['v1', 'v2', 'v3'], false],
           [['ks1', 'ks2'], ['vs1', 'vs2'], '{token_id}/0'],
           [receiver.address, '{token_id}/0'],
         ],
       },
       {
-        name: '3 * mintWithRecords(2)',
+        name: '3 * mintWithRecords(3)',
         labels: ['tm1-o3', 'crypto'],
         selectors: [
           'mintWithRecords(address,string[],string[],string[],bool)',
@@ -100,9 +106,27 @@ describe('UNSRegistry Multicall (consumption)', () => {
           'mintWithRecords(address,string[],string[],string[],bool)',
         ],
         params: [
-          [coinbase.address, '{labels}/0', ['k1', '9898219c054e083f4241'], ['v1', 'v2'], false],
-          [coinbase.address, '{labels}/1', ['k1', '9898219c054e083f4242'], ['v1', 'v2'], false],
-          [coinbase.address, '{labels}/2', ['k1', '9898219c054e083f4243'], ['v1', 'v2'], false],
+          [
+            coinbase.address,
+            '{labels}/0',
+            ['k1', '9898219c054e083f4241', '9898219c054e083f4251'],
+            ['v1', 'v2', 'v3'],
+            false,
+          ],
+          [
+            coinbase.address,
+            '{labels}/1',
+            ['k1', '9898219c054e083f4242', '9898219c054e083f4252'],
+            ['v1', 'v2', 'v3'],
+            false,
+          ],
+          [
+            coinbase.address,
+            '{labels}/2',
+            ['k1', '9898219c054e083f4243', '9898219c054e083f4253'],
+            ['v1', 'v2', 'v3'],
+            false,
+          ],
         ],
       },
     ];
