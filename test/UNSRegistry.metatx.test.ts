@@ -469,7 +469,6 @@ describe('UNSRegistry (metatx)', () => {
       const labels = ['res_label_mb3', 'crypto'];
       const tokenId = await unsRegistry.namehash(labels);
 
-      console.log('coinbase', coinbase.address);
       const { req, signature } = await buildExecuteParams(
         'multicall(bytes[])',
         [
