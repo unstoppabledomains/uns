@@ -15,5 +15,6 @@ module.exports = {
     '@maticnetwork/RootChainManagerStorage.sol',
     'utils/MultiSend.sol',
     'utils/ERC1271SimpleWallet.sol',
+    'history/UNSRegistryV07.sol',
   ],
 };
