@@ -1,6 +1,6 @@
 ## v0.8.0
 
-- Add `multicall` function to UNSRegistry. The function allows to merge multiple transaction into one. It can be used in meta-transactions as well as merge meta-transactions and regular transactions.
+- Add `multicall` function to UNSRegistry. The function executes a batch of function calls. It can be used in meta-transactions.
 
 ## v0.7.10
 
