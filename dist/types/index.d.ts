@@ -95,6 +95,8 @@ export type { IURIPrefixController } from "./contracts/cns/IURIPrefixController"
 export { IURIPrefixController__factory } from "./factories/contracts/cns/IURIPrefixController__factory";
 export type { DotCoinBurner } from "./contracts/DotCoinBurner";
 export { DotCoinBurner__factory } from "./factories/contracts/DotCoinBurner__factory";
+export type { UNSRegistryV07 } from "./contracts/history/UNSRegistryV07";
+export { UNSRegistryV07__factory } from "./factories/contracts/history/UNSRegistryV07__factory";
 export type { IDataReader } from "./contracts/IDataReader";
 export { IDataReader__factory } from "./factories/contracts/IDataReader__factory";
 export type { IERC1967 } from "./contracts/IERC1967";
@@ -167,6 +169,8 @@ export type { Blocklist } from "./contracts/utils/Blocklist";
 export { Blocklist__factory } from "./factories/contracts/utils/Blocklist__factory";
 export type { ERC1271SimpleWallet } from "./contracts/utils/ERC1271SimpleWallet";
 export { ERC1271SimpleWallet__factory } from "./factories/contracts/utils/ERC1271SimpleWallet__factory";
+export type { Multicall } from "./contracts/utils/Multicall";
+export { Multicall__factory } from "./factories/contracts/utils/Multicall__factory";
 export type { MultiSend } from "./contracts/utils/MultiSend";
 export { MultiSend__factory } from "./factories/contracts/utils/MultiSend__factory";
 export type { Pausable } from "./contracts/utils/Pausable";

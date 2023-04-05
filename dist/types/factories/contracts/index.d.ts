@@ -1,5 +1,6 @@
 export * as maticnetwork from "./@maticnetwork";
 export * as cns from "./cns";
+export * as history from "./history";
 export * as metatx from "./metatx";
 export * as mocks from "./mocks";
 export * as roles from "./roles";

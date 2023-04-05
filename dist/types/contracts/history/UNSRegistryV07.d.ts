@@ -21,7 +21,7 @@ export declare namespace IForwarder {
         data: string;
     };
 }
-export interface UNSRegistryMockInterface extends utils.Interface {
+export interface UNSRegistryV07Interface extends utils.Interface {
     functions: {
         "BATCH_LIMIT()": FunctionFragment;
         "NAME()": FunctionFragment;
@@ -42,7 +42,6 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         "getKeys(uint256[])": FunctionFragment;
         "getMany(string[],uint256)": FunctionFragment;
         "getManyByHash(uint256[],uint256)": FunctionFragment;
-        "getTokenName(uint256)": FunctionFragment;
         "initialize(address,address,address,address)": FunctionFragment;
         "isApprovedForAll(address,address)": FunctionFragment;
         "isApprovedOrOwner(address,uint256)": FunctionFragment;
@@ -51,7 +50,6 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         "mint(address,uint256,bytes)": FunctionFragment;
         "mintTLD(uint256,string)": FunctionFragment;
         "mintWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
-        "multicall(bytes[])": FunctionFragment;
         "name()": FunctionFragment;
         "namehash(string[])": FunctionFragment;
         "nonceOf(uint256)": FunctionFragment;
@@ -79,11 +77,10 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         "tokenURI(uint256)": FunctionFragment;
         "transferFrom(address,address,uint256)": FunctionFragment;
         "unlockWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
-        "upgradeAll(uint256[])": FunctionFragment;
         "verify((address,uint256,uint256,bytes),bytes)": FunctionFragment;
         "withdrawFromPolygon(bytes,uint256,string[],string[])": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "BATCH_LIMIT" | "NAME" | "VERSION" | "addKey" | "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "execute" | "exists" | "get" | "getApproved" | "getByHash" | "getKey" | "getKeys" | "getMany" | "getManyByHash" | "getTokenName" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "isTrustedForwarder" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "multicall" | "name" | "namehash" | "nonceOf" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseNameOf" | "reverseOf" | "root" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "upgradeAll" | "verify" | "withdrawFromPolygon"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "BATCH_LIMIT" | "NAME" | "VERSION" | "addKey" | "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "execute" | "exists" | "get" | "getApproved" | "getByHash" | "getKey" | "getKeys" | "getMany" | "getManyByHash" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "isTrustedForwarder" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "name" | "namehash" | "nonceOf" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseNameOf" | "reverseOf" | "root" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "verify" | "withdrawFromPolygon"): FunctionFragment;
     encodeFunctionData(functionFragment: "BATCH_LIMIT", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
     encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
@@ -103,7 +100,6 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "getKeys", values: [PromiseOrValue<BigNumberish>[]]): string;
     encodeFunctionData(functionFragment: "getMany", values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "getManyByHash", values: [PromiseOrValue<BigNumberish>[], PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getTokenName", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "initialize", values: [
         PromiseOrValue<string>,
         PromiseOrValue<string>,
@@ -127,7 +123,6 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         PromiseOrValue<string>[],
         PromiseOrValue<boolean>
     ]): string;
-    encodeFunctionData(functionFragment: "multicall", values: [PromiseOrValue<BytesLike>[]]): string;
     encodeFunctionData(functionFragment: "name", values?: undefined): string;
     encodeFunctionData(functionFragment: "namehash", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "nonceOf", values: [PromiseOrValue<BigNumberish>]): string;
@@ -199,7 +194,6 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         PromiseOrValue<string>[],
         PromiseOrValue<boolean>
     ]): string;
-    encodeFunctionData(functionFragment: "upgradeAll", values: [PromiseOrValue<BigNumberish>[]]): string;
     encodeFunctionData(functionFragment: "verify", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
     encodeFunctionData(functionFragment: "withdrawFromPolygon", values: [
         PromiseOrValue<BytesLike>,
@@ -226,7 +220,6 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "getKeys", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getMany", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getManyByHash", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "getTokenName", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isApprovedForAll", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isApprovedOrOwner", data: BytesLike): Result;
@@ -235,7 +228,6 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "mint(address,uint256,bytes)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "mintTLD", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "mintWithRecords", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "multicall", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "namehash", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "nonceOf", data: BytesLike): Result;
@@ -263,7 +255,6 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferFrom", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unlockWithRecords", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "upgradeAll", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "verify", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdrawFromPolygon", data: BytesLike): Result;
     events: {
@@ -405,11 +396,11 @@ export interface UpgradedEventObject {
 }
 export declare type UpgradedEvent = TypedEvent<[string], UpgradedEventObject>;
 export declare type UpgradedEventFilter = TypedEventFilter<UpgradedEvent>;
-export interface UNSRegistryMock extends BaseContract {
+export interface UNSRegistryV07 extends BaseContract {
     connect(signerOrProvider: Signer | Provider | string): this;
     attach(addressOrName: string): this;
     deployed(): Promise<this>;
-    interface: UNSRegistryMockInterface;
+    interface: UNSRegistryV07Interface;
     queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
     listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
     listeners(eventName?: string): Array<Listener>;
@@ -465,7 +456,6 @@ export interface UNSRegistryMock extends BaseContract {
             keys: string[];
             values: string[];
         }>;
-        getTokenName(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
         initialize(mintingManager: PromiseOrValue<string>, cnsRegistry: PromiseOrValue<string>, rootChainManager: PromiseOrValue<string>, childChainManager: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -482,9 +472,6 @@ export interface UNSRegistryMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         mintWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         name(overrides?: CallOverrides): Promise<[string]>;
@@ -550,9 +537,6 @@ export interface UNSRegistryMock extends BaseContract {
         unlockWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
         withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
@@ -597,7 +581,6 @@ export interface UNSRegistryMock extends BaseContract {
         keys: string[];
         values: string[];
     }>;
-    getTokenName(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
     initialize(mintingManager: PromiseOrValue<string>, cnsRegistry: PromiseOrValue<string>, rootChainManager: PromiseOrValue<string>, childChainManager: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -614,9 +597,6 @@ export interface UNSRegistryMock extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     mintWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     name(overrides?: CallOverrides): Promise<string>;
@@ -678,9 +658,6 @@ export interface UNSRegistryMock extends BaseContract {
     unlockWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
-    upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
     verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
     withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
         from?: PromiseOrValue<string>;
@@ -711,7 +688,6 @@ export interface UNSRegistryMock extends BaseContract {
             keys: string[];
             values: string[];
         }>;
-        getTokenName(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         initialize(mintingManager: PromiseOrValue<string>, cnsRegistry: PromiseOrValue<string>, rootChainManager: PromiseOrValue<string>, childChainManager: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
@@ -720,7 +696,6 @@ export interface UNSRegistryMock extends BaseContract {
         "mint(address,uint256,bytes)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg2: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
         mintTLD(tokenId: PromiseOrValue<BigNumberish>, uri: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         mintWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: CallOverrides): Promise<string[]>;
         name(overrides?: CallOverrides): Promise<string>;
         namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<BigNumber>;
         nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
@@ -748,7 +723,6 @@ export interface UNSRegistryMock extends BaseContract {
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         unlockWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<void>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
         withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
     };
@@ -814,7 +788,6 @@ export interface UNSRegistryMock extends BaseContract {
         getKeys(hashes: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
         getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getTokenName(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         initialize(mintingManager: PromiseOrValue<string>, cnsRegistry: PromiseOrValue<string>, rootChainManager: PromiseOrValue<string>, childChainManager: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
@@ -831,9 +804,6 @@ export interface UNSRegistryMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         mintWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         name(overrides?: CallOverrides): Promise<BigNumber>;
@@ -895,9 +865,6 @@ export interface UNSRegistryMock extends BaseContract {
         unlockWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
         withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
@@ -937,7 +904,6 @@ export interface UNSRegistryMock extends BaseContract {
         getKeys(hashes: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getTokenName(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         initialize(mintingManager: PromiseOrValue<string>, cnsRegistry: PromiseOrValue<string>, rootChainManager: PromiseOrValue<string>, childChainManager: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
@@ -954,9 +920,6 @@ export interface UNSRegistryMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         mintWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1018,13 +981,10 @@ export interface UNSRegistryMock extends BaseContract {
         unlockWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
     };
 }
-//# sourceMappingURL=UNSRegistryMock.d.ts.map
+//# sourceMappingURL=UNSRegistryV07.d.ts.map

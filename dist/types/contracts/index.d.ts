@@ -2,6 +2,8 @@ import type * as maticnetwork from "./@maticnetwork";
 export type { maticnetwork };
 import type * as cns from "./cns";
 export type { cns };
+import type * as history from "./history";
+export type { history };
 import type * as metatx from "./metatx";
 export type { metatx };
 import type * as mocks from "./mocks";
