@@ -2,10 +2,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
 import { CNSRegistryForwarder } from '../../types/contracts/metatx';
 import { CNSRegistry } from '../../types/dot-crypto/contracts';
-import {
-  MintingController,
-  SignatureController,
-} from '../../types/dot-crypto/contracts/controllers';
+import { MintingController, SignatureController } from '../../types/dot-crypto/contracts/controllers';
 import { CNSRegistryForwarder__factory } from '../../types/factories/contracts/metatx';
 import { CNSRegistry__factory } from '../../types/factories/dot-crypto/contracts';
 import {
@@ -13,6 +10,7 @@ import {
   SignatureController__factory,
 } from '../../types/factories/dot-crypto/contracts/controllers';
 import { TLD } from '../helpers/constants';
+import { percDiff } from '../helpers/consumption';
 import { sign, buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 
 describe('CNSRegistry (consumption)', () => {
@@ -20,10 +18,7 @@ describe('CNSRegistry (consumption)', () => {
     registry: CNSRegistry,
     mintingController: MintingController,
     signatureController: SignatureController;
-  let signers: SignerWithAddress[],
-    owner: SignerWithAddress,
-    receiver: SignerWithAddress,
-    spender: SignerWithAddress;
+  let signers: SignerWithAddress[], owner: SignerWithAddress, receiver: SignerWithAddress, spender: SignerWithAddress;
 
   let buildExecuteParams: ExecuteFunc;
 
@@ -32,34 +27,20 @@ describe('CNSRegistry (consumption)', () => {
     return await registry.childIdOf(TLD.CRYPTO, label);
   };
 
-  function percDiff (a: number, b: number) {
-    return -((a - b) / a) * 100;
-  }
-
   before(async () => {
     signers = await ethers.getSigners();
     [owner, receiver, spender] = signers;
 
     registry = await new CNSRegistry__factory(owner).deploy();
-    mintingController = await new MintingController__factory(owner).deploy(
-      registry.address,
-    );
-    signatureController = await new SignatureController__factory(owner).deploy(
-      registry.address,
-    );
+    mintingController = await new MintingController__factory(owner).deploy(registry.address);
+    signatureController = await new SignatureController__factory(owner).deploy(registry.address);
 
     await registry.addController(mintingController.address);
     await registry.addController(signatureController.address);
 
-    forwarder = await new CNSRegistryForwarder__factory(owner).deploy(
-      signatureController.address,
-    );
+    forwarder = await new CNSRegistryForwarder__factory(owner).deploy(signatureController.address);
 
-    buildExecuteParams = buildExecuteFunc(
-      registry.interface,
-      signatureController.address,
-      forwarder,
-    );
+    buildExecuteParams = buildExecuteFunc(registry.interface, signatureController.address, forwarder);
   });
 
   it('`transferFrom` consumption', async () => {
@@ -68,9 +49,7 @@ describe('CNSRegistry (consumption)', () => {
 
     // Direct transfer
     const tokenId = await mintDomain(label, owner.address);
-    const directTx = await registry
-      .connect(owner)
-      .transferFrom(owner.address, receiver.address, tokenId);
+    const directTx = await registry.connect(owner).transferFrom(owner.address, receiver.address, tokenId);
 
     const directTxReceipt = await directTx.wait();
 
@@ -82,20 +61,10 @@ describe('CNSRegistry (consumption)', () => {
       tokenIdFor,
     ]);
     const nonceFor = await signatureController.nonceOf(tokenIdFor);
-    const signatureFor = await sign(
-      dataFor,
-      signatureController.address,
-      nonceFor,
-      owner,
-    );
+    const signatureFor = await sign(dataFor, signatureController.address, nonceFor, owner);
     const forTx = await signatureController
       .connect(spender)
-      .transferFromFor(
-        owner.address,
-        receiver.address,
-        tokenIdFor,
-        signatureFor,
-      );
+      .transferFromFor(owner.address, receiver.address, tokenIdFor, signatureFor);
 
     const forTxReceipt = await forTx.wait();
 
@@ -115,17 +84,9 @@ describe('CNSRegistry (consumption)', () => {
       selector: 'transferFrom(address,address,uint256)',
       directTx: directTxReceipt.gasUsed.toString(),
       forTx: forTxReceipt.gasUsed.toString(),
-      diff1:
-        percDiff(
-          directTxReceipt.gasUsed.toNumber(),
-          forTxReceipt.gasUsed.toNumber(),
-        ).toFixed(2) + ' %',
+      diff1: percDiff(directTxReceipt.gasUsed.toNumber(), forTxReceipt.gasUsed.toNumber()) + ' %',
       forwardTx: forwardTxReceipt.gasUsed.toString(),
-      diff2:
-        percDiff(
-          forTxReceipt.gasUsed.toNumber(),
-          forwardTxReceipt.gasUsed.toNumber(),
-        ).toFixed(2) + ' %',
+      diff2: percDiff(forTxReceipt.gasUsed.toNumber(), forwardTxReceipt.gasUsed.toNumber()) + ' %',
     });
     console.table(result);
   });

@@ -6,32 +6,30 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
-import './ChildRegistry.sol';
-import './cns/ICNSRegistry.sol';
-import './IUNSRegistry.sol';
-import './RecordStorage.sol';
-import './RootRegistry.sol';
-import './metatx/ERC2771RegistryContext.sol';
-import './metatx/UNSRegistryForwarder.sol';
-import './utils/Multicall.sol';
+import './../ChildRegistry.sol';
+import './../cns/ICNSRegistry.sol';
+import './../IUNSRegistry.sol';
+import './../RecordStorage.sol';
+import './../RootRegistry.sol';
+import './../metatx/ERC2771RegistryContext.sol';
+import './../metatx/UNSRegistryForwarder.sol';
 
 /**
  * @title UNSRegistry
  * @dev An ERC721 Token see https://eips.ethereum.org/EIPS/eip-721. With
  * additional functions so other trusted contracts to interact with the tokens.
  */
-contract UNSRegistry is
+contract UNSRegistryV07 is
     ERC721Upgradeable,
     ERC2771RegistryContext,
     RecordStorage,
     UNSRegistryForwarder,
     RootRegistry,
     ChildRegistry,
-    Multicall,
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.8.0';
+    string public constant VERSION = '0.7.3';
 
     string internal _prefix;
 
@@ -193,7 +191,7 @@ contract UNSRegistry is
                 _mint(from, tokenId);
             }
 
-            return UNSRegistry.onERC721Received.selector;
+            return UNSRegistryV07.onERC721Received.selector;
         }
 
         revert('Registry: ERC721_RECEIVING_PROHIBITED');
@@ -351,16 +349,6 @@ contract UNSRegistry is
      */
     function addProxyReader(address addr) external override onlyMintingManager {
         _proxyReaders[addr] = true;
-    }
-
-    function multicall(bytes[] calldata data) public override returns (bytes[] memory results) {
-        bytes[] memory _data = data;
-        if (isTrustedForwarder(msg.sender)) {
-            for (uint256 i = 0; i < data.length; i++) {
-                _data[i] = _buildData(_msgSender(), _msgToken(), data[i], '');
-            }
-        }
-        return super.multicall(_data);
     }
 
     /// Internal

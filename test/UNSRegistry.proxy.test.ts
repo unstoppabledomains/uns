@@ -4,12 +4,14 @@ import { utils, BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
+import { UNSRegistryV07__factory } from '../types';
 import { mintDomain } from './helpers/registry';
 import { TLD, ZERO_ADDRESS } from './helpers/constants';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 
 describe('UNSRegistry (proxy)', () => {
   let unsRegistry: UNSRegistry;
+  let unsRegistryV07Factory: UNSRegistryV07__factory; // eslint-disable-line camelcase
   let unsRegistryFactory: UNSRegistry__factory; // eslint-disable-line camelcase
 
   let buildExecuteParams: ExecuteFunc;
@@ -20,12 +22,17 @@ describe('UNSRegistry (proxy)', () => {
     signers = await ethers.getSigners();
     [owner, receiver] = signers;
 
+    unsRegistryV07Factory = new UNSRegistryV07__factory(owner);
     unsRegistryFactory = new UNSRegistry__factory(owner);
-    unsRegistry = await upgrades.deployProxy(
-      unsRegistryFactory,
-      [owner.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS], {
+
+    unsRegistry = (await upgrades.deployProxy(
+      unsRegistryV07Factory,
+      [owner.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS],
+      {
         initializer: 'initialize',
-      }) as UNSRegistry;
+        unsafeAllow: ['delegatecall'],
+      },
+    )) as UNSRegistry;
 
     await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
@@ -35,9 +42,7 @@ describe('UNSRegistry (proxy)', () => {
 
   describe('Registry', () => {
     it('should construct itself correctly', async () => {
-      expect(TLD.CRYPTO).to.be.equal(
-        '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
-      );
+      expect(TLD.CRYPTO).to.be.equal('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
     });
 
     it('should resolve properly', async () => {
@@ -53,9 +58,7 @@ describe('UNSRegistry (proxy)', () => {
       expect(await unsRegistry.tokenURI(tokenId)).to.be.equal(`/${tokenId}`);
 
       await unsRegistry.setTokenURIPrefix('prefix-');
-      expect(await unsRegistry.tokenURI(tokenId)).to.be.equal(
-        `prefix-${tokenId}`,
-      );
+      expect(await unsRegistry.tokenURI(tokenId)).to.be.equal(`prefix-${tokenId}`);
 
       await unsRegistry.setTokenURIPrefix('/');
       expect(await unsRegistry.tokenURI(tokenId)).to.be.equal(`/${tokenId}`);
@@ -67,9 +70,7 @@ describe('UNSRegistry (proxy)', () => {
       const tokenId = await unsRegistry.namehash(['label_931', 'crypto']);
 
       // should fail to set name if not owner
-      await expect(unsRegistry.set('key', 'value', tokenId)).to.be.revertedWith(
-        'ERC721: invalid token ID',
-      );
+      await expect(unsRegistry.set('key', 'value', tokenId)).to.be.revertedWith('ERC721: invalid token ID');
 
       await mintDomain(unsRegistry, owner.address, ['label_931', 'crypto']);
       await unsRegistry.set('key', 'value', tokenId);
@@ -77,32 +78,24 @@ describe('UNSRegistry (proxy)', () => {
 
       // should setMany
       await unsRegistry.setMany(['key1'], ['value1'], tokenId);
-      await unsRegistry.setMany(
-        ['key2', 'key3'],
-        ['value2', 'value3'],
-        tokenId,
-      );
-      await unsRegistry.setMany(
-        ['key4', 'key5', 'key6'],
-        ['value4', 'value5', 'value6'],
-        tokenId,
-      );
-      expect(
-        await unsRegistry.getMany(
-          ['key1', 'key2', 'key3', 'key4', 'key5', 'key6'],
-          tokenId,
-        ),
-      ).to.be.eql(['value1', 'value2', 'value3', 'value4', 'value5', 'value6']);
+      await unsRegistry.setMany(['key2', 'key3'], ['value2', 'value3'], tokenId);
+      await unsRegistry.setMany(['key4', 'key5', 'key6'], ['value4', 'value5', 'value6'], tokenId);
+      expect(await unsRegistry.getMany(['key1', 'key2', 'key3', 'key4', 'key5', 'key6'], tokenId)).to.be.eql([
+        'value1',
+        'value2',
+        'value3',
+        'value4',
+        'value5',
+        'value6',
+      ]);
 
       // should reset
-      await expect(unsRegistry.reset(tokenId))
-        .to.emit(unsRegistry, 'ResetRecords')
-        .withArgs(tokenId.toString());
+      await expect(unsRegistry.reset(tokenId)).to.emit(unsRegistry, 'ResetRecords').withArgs(tokenId.toString());
 
       // should fail to set name if not owned
-      await expect(
-        unsRegistry.connect(signers[1]).set('key', 'value', tokenId),
-      ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.connect(signers[1]).set('key', 'value', tokenId)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
 
     it('should get key by hash', async () => {
@@ -111,9 +104,7 @@ describe('UNSRegistry (proxy)', () => {
 
       await unsRegistry.set(expectedKey, 'value', tokenId);
 
-      const keyFromHash = await unsRegistry.getKey(
-        BigNumber.from(utils.id(expectedKey)),
-      );
+      const keyFromHash = await unsRegistry.getKey(BigNumber.from(utils.id(expectedKey)));
       expect(keyFromHash).to.be.equal(expectedKey);
     });
 
@@ -123,9 +114,7 @@ describe('UNSRegistry (proxy)', () => {
 
       await unsRegistry.setMany(expectedKeys, ['value', 'value'], tokenId);
 
-      const expectedKeyHashes = expectedKeys.map((key) =>
-        BigNumber.from(utils.id(key)),
-      );
+      const expectedKeyHashes = expectedKeys.map((key) => BigNumber.from(utils.id(key)));
       const keysFromHashes = await unsRegistry.getKeys(expectedKeyHashes);
       expect(keysFromHashes).to.be.eql(expectedKeys);
     });
@@ -134,15 +123,9 @@ describe('UNSRegistry (proxy)', () => {
       const tokenId = await mintDomain(unsRegistry, owner.address, ['heyhash-gas', 'crypto']);
       const newKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tokenId);
       const newKeyHashTxReceipt = await newKeyHashTx.wait();
-      const exitsKeyHashTx = await unsRegistry.set(
-        'keyhash-gas',
-        'value',
-        tokenId,
-      );
+      const exitsKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tokenId);
       const exitsKeyHashTxReceipt = await exitsKeyHashTx.wait();
-      expect(newKeyHashTxReceipt.gasUsed).to.be.above(
-        exitsKeyHashTxReceipt.gasUsed,
-      );
+      expect(newKeyHashTxReceipt.gasUsed).to.be.above(exitsKeyHashTxReceipt.gasUsed);
 
       const newKeyHashTx2 = await unsRegistry.setMany(
         ['keyhash-gas-1', 'keyhash-gas-2'],
@@ -156,9 +139,7 @@ describe('UNSRegistry (proxy)', () => {
         tokenId,
       );
       const exitsKeyHashTxReceipt2 = await exitsKeyHashTx2.wait();
-      expect(newKeyHashTxReceipt2.gasUsed).to.be.above(
-        exitsKeyHashTxReceipt2.gasUsed,
-      );
+      expect(newKeyHashTxReceipt2.gasUsed).to.be.above(exitsKeyHashTxReceipt2.gasUsed);
 
       const newKeyHashTx3 = await unsRegistry.setMany(
         ['keyhash-gas-3', 'keyhash-gas-4', 'keyhash-gas-5'],
@@ -172,9 +153,7 @@ describe('UNSRegistry (proxy)', () => {
         tokenId,
       );
       const exitsKeyHashTxReceipt3 = await exitsKeyHashTx3.wait();
-      expect(newKeyHashTxReceipt3.gasUsed).to.be.above(
-        exitsKeyHashTxReceipt3.gasUsed,
-      );
+      expect(newKeyHashTxReceipt3.gasUsed).to.be.above(exitsKeyHashTxReceipt3.gasUsed);
     });
 
     it('should get value by key hash', async () => {
@@ -210,10 +189,7 @@ describe('UNSRegistry (proxy)', () => {
         .to.emit(unsRegistry, 'NewKey')
         .withArgs(tokenId, utils.id(key), key);
 
-      await expect(unsRegistry.set(key, value, tokenId)).not.to.emit(
-        unsRegistry,
-        'NewKey',
-      );
+      await expect(unsRegistry.set(key, value, tokenId)).not.to.emit(unsRegistry, 'NewKey');
     });
 
     it('should emit correct Set event', async () => {
@@ -232,16 +208,12 @@ describe('UNSRegistry (proxy)', () => {
       await unsRegistry.reconfigure(['new-key'], ['new-value'], tokenId);
 
       expect(await unsRegistry.get('old-key', tokenId)).to.be.equal('');
-      expect(await unsRegistry.get('new-key', tokenId)).to.be.equal(
-        'new-value',
-      );
+      expect(await unsRegistry.get('new-key', tokenId)).to.be.equal('new-value');
 
       // should fail when trying to reconfigure non-owned domain
-      await expect(
-        unsRegistry
-          .connect(signers[1])
-          .reconfigure(['new-key'], ['new-value'], tokenId),
-      ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.connect(signers[1]).reconfigure(['new-key'], ['new-value'], tokenId)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
 
     it('should keep forwarding storage layout consistent after upgrade', async () => {
@@ -257,10 +229,9 @@ describe('UNSRegistry (proxy)', () => {
       await unsRegistry.execute(params1.req, params1.signature);
       expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(1);
 
-      unsRegistry = await upgrades.upgradeProxy(
-        unsRegistry.address,
-        unsRegistryFactory,
-      ) as UNSRegistry;
+      unsRegistry = (await upgrades.upgradeProxy(unsRegistry.address, unsRegistryFactory, {
+        unsafeAllow: ['delegatecall'],
+      })) as UNSRegistry;
 
       expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(1);
 

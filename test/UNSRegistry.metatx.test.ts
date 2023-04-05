@@ -30,11 +30,7 @@ describe('UNSRegistry (metatx)', () => {
     await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
 
-    buildExecuteParams = buildExecuteFunc(
-      unsRegistry.interface,
-      unsRegistry.address,
-      unsRegistry,
-    );
+    buildExecuteParams = buildExecuteFunc(unsRegistry.interface, unsRegistry.address, unsRegistry);
   });
 
   describe('General', () => {
@@ -65,9 +61,7 @@ describe('UNSRegistry (metatx)', () => {
       );
       await unsRegistry.connect(owner).set('key', 'value', tokenId);
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
-        'UNSRegistryForwarder: SIGNATURE_INVALID',
-      );
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('UNSRegistryForwarder: SIGNATURE_INVALID');
     });
 
     it('should setApprovalForAll using meta-setApprovalForAll', async () => {
@@ -79,9 +73,7 @@ describe('UNSRegistry (metatx)', () => {
       );
 
       await unsRegistry.execute(req, signature);
-      expect(
-        await unsRegistry.isApprovedForAll(owner.address, operator.address),
-      ).to.be.equal(true);
+      expect(await unsRegistry.isApprovedForAll(owner.address, operator.address)).to.be.equal(true);
     });
 
     it('should revert meta-setApprovalForAll for non-onwer', async () => {
@@ -92,9 +84,9 @@ describe('UNSRegistry (metatx)', () => {
         0,
       );
 
-      await expect(
-        unsRegistry.execute({ ...req, from: owner.address }, signature),
-      ).to.be.revertedWith('UNSRegistryForwarder: SIGNATURE_INVALID');
+      await expect(unsRegistry.execute({ ...req, from: owner.address }, signature)).to.be.revertedWith(
+        'UNSRegistryForwarder: SIGNATURE_INVALID',
+      );
     });
 
     it('should transfer using meta-transferFrom', async () => {
@@ -121,9 +113,7 @@ describe('UNSRegistry (metatx)', () => {
         tokenId,
       );
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
-        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
-      );
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     });
 
     it('should transfer using meta-safeTransferFrom', async () => {
@@ -150,9 +140,7 @@ describe('UNSRegistry (metatx)', () => {
         tokenId,
       );
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
-        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
-      );
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     });
 
     // TODO: add tests for safeTransferFrom(address,address,uint256,bytes)
@@ -160,40 +148,25 @@ describe('UNSRegistry (metatx)', () => {
     it('should burn using meta-burn', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, ['meta_ar093', 'crypto']);
 
-      const { req, signature } = await buildExecuteParams(
-        'burn(uint256)',
-        [tokenId],
-        owner,
-        tokenId,
-      );
+      const { req, signature } = await buildExecuteParams('burn(uint256)', [tokenId], owner, tokenId);
       await unsRegistry.execute(req, signature);
 
-      await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith(
-        'ERC721: invalid token ID',
-      );
+      await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: invalid token ID');
     });
 
     it('should revert meta-burn for non-onwer', async () => {
       const tokenId = await mintDomain(unsRegistry, owner, ['meta_53dg3', 'crypto']);
 
-      const { req, signature } = await buildExecuteParams(
-        'burn(uint256)',
-        [tokenId],
-        nonOwner,
-        tokenId,
-      );
+      const { req, signature } = await buildExecuteParams('burn(uint256)', [tokenId], nonOwner, tokenId);
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
-        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
-      );
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     });
   });
 
   describe('ABI-based', () => {
     const registryFuncs = () => {
       return Object.values(unsRegistry.interface.functions).filter(
-        (fragment: FunctionFragment) =>
-          !['view', 'pure'].includes(fragment.stateMutability),
+        (fragment: FunctionFragment) => !['view', 'pure'].includes(fragment.stateMutability),
       );
     };
 
@@ -228,18 +201,12 @@ describe('UNSRegistry (metatx)', () => {
         tokenId: '',
       };
 
-      const included = [
-        'issueWithRecords',
-      ];
+      const included = ['issueWithRecords'];
 
       const getFuncs = () => {
         return registryFuncs()
           .filter((x) => x.inputs.filter((i) => i.name === 'tokenId').length)
-          .filter(
-            (x) =>
-              included.includes(x.name) ||
-              included.includes(getFuncSignature(x)),
-          );
+          .filter((x) => included.includes(x.name) || included.includes(getFuncSignature(x)));
       };
 
       before(async () => {
@@ -249,23 +216,10 @@ describe('UNSRegistry (metatx)', () => {
       it('should execute all functions successfully', async () => {
         for (const func of getFuncs()) {
           const funcSigHash = utils.id(`${getFuncSignature(func)}_excl`);
-          paramValueMap.tokenId = (await unsRegistry.namehash(
-            [
-              funcSigHash, 'crypto'],
-          )).toHexString();
+          paramValueMap.tokenId = (await unsRegistry.namehash([funcSigHash, 'crypto'])).toHexString();
 
-          const req = await buidRequest(
-            func,
-            coinbase.address,
-            paramValueMap.tokenId,
-            paramValueMap,
-          );
-          const signature = await sign(
-            req.data,
-            unsRegistry.address,
-            req.nonce,
-            coinbase,
-          );
+          const req = await buidRequest(func, coinbase.address, paramValueMap.tokenId, paramValueMap);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
           await unsRegistry.execute(req, signature);
         }
       });
@@ -325,18 +279,8 @@ describe('UNSRegistry (metatx)', () => {
 
           paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
 
-          const req = await buidRequest(
-            func,
-            owner.address,
-            paramValueMap.tokenId,
-            paramValueMap,
-          );
-          const signature = await sign(
-            req.data,
-            unsRegistry.address,
-            req.nonce,
-            owner,
-          );
+          const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
           await unsRegistry.execute(req, signature);
         }
       });
@@ -348,18 +292,8 @@ describe('UNSRegistry (metatx)', () => {
 
           paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
 
-          const req = await buidRequest(
-            func,
-            owner.address,
-            paramValueMap.tokenId,
-            paramValueMap,
-          );
-          const signature = await sign(
-            req.data,
-            unsRegistry.address,
-            req.nonce,
-            owner,
-          );
+          const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
           await unsRegistry.execute(req, signature);
 
           await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
@@ -375,22 +309,10 @@ describe('UNSRegistry (metatx)', () => {
 
           paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
 
-          const req = await buidRequest(
-            func,
-            owner.address,
-            paramValueMap.tokenId,
-            paramValueMap,
-          );
-          const signature = await sign(
-            req.data,
-            unsRegistry.address,
-            req.nonce,
-            owner,
-          );
+          const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
 
-          await unsRegistry
-            .connect(owner)
-            .set('key', 'value', paramValueMap.tokenId);
+          await unsRegistry.connect(owner).set('key', 'value', paramValueMap.tokenId);
 
           await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
             'UNSRegistryForwarder: SIGNATURE_INVALID',
@@ -406,44 +328,23 @@ describe('UNSRegistry (metatx)', () => {
           paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
 
           const tokenIdForwarder = await unsRegistry.namehash([utils.id(`_${funcSig}`), 'crypto']);
-          const req = await buidRequest(
-            func,
-            owner.address,
-            tokenIdForwarder,
-            paramValueMap,
-          );
+          const req = await buidRequest(func, owner.address, tokenIdForwarder, paramValueMap);
 
-          const signature = await sign(
-            req.data,
-            unsRegistry.address,
-            req.nonce,
-            owner,
-          );
-          await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
-            'Registry: TOKEN_INVALID',
-          );
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+          await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: TOKEN_INVALID');
         }
       });
 
       it('should fail execution of all token-based functions when tokenId is empty', async () => {
         for (const func of getFuncs()) {
-          const funcSigHash = utils.id(
-            `${getFuncSignature(func)}_emptyTokenId`,
-          );
+          const funcSigHash = utils.id(`${getFuncSignature(func)}_emptyTokenId`);
 
           paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
 
           const req = await buidRequest(func, owner.address, 0, paramValueMap);
 
-          const signature = await sign(
-            req.data,
-            unsRegistry.address,
-            req.nonce,
-            owner,
-          );
-          await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
-            'Registry: TOKEN_INVALID',
-          );
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+          await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: TOKEN_INVALID');
         }
       });
     });
@@ -451,10 +352,7 @@ describe('UNSRegistry (metatx)', () => {
     describe('Non-Token functions', () => {
       const paramValueMap = {
         labels: ['label', 'crypto'],
-        domains: [[
-          'domain-label',
-          'crypto',
-        ]],
+        domains: [['domain-label', 'crypto']],
         data: '0x',
         role: '0x1000000000000000000000000000000000000000000000000000000000000000',
         key: 'key_nt1',
@@ -478,6 +376,7 @@ describe('UNSRegistry (metatx)', () => {
         'addProxyReader',
         'setReverse', // covered in separate test case
         'unlockWithRecords', // covered in separate test case
+        'multicall',
       ];
 
       before(async () => {
@@ -498,18 +397,8 @@ describe('UNSRegistry (metatx)', () => {
           const funcSig = getFuncSignature(func);
           paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
 
-          const req = await buidRequest(
-            func,
-            coinbase.address,
-            0,
-            paramValueMap,
-          );
-          const signature = await sign(
-            req.data,
-            unsRegistry.address,
-            req.nonce,
-            coinbase,
-          );
+          const req = await buidRequest(func, coinbase.address, 0, paramValueMap);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
           await unsRegistry.execute(req, signature);
         }
       });
@@ -521,18 +410,8 @@ describe('UNSRegistry (metatx)', () => {
         const funcSig = getFuncSignature(setReverseFunc);
         paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
         const tokenId = await mintDomain(unsRegistry, owner, paramValueMap.labels);
-        const req = await buidRequest(
-          setReverseFunc,
-          owner.address,
-          tokenId,
-          paramValueMap,
-        );
-        const signature = await sign(
-          req.data,
-          unsRegistry.address,
-          req.nonce,
-          owner,
-        );
+        const req = await buidRequest(setReverseFunc, owner.address, tokenId, paramValueMap);
+        const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
         await unsRegistry.execute(req, signature);
       });
 
@@ -543,18 +422,8 @@ describe('UNSRegistry (metatx)', () => {
         const funcSig = getFuncSignature(unlockWithRecordsLabels);
         paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
         const tokenId = await mintDomain(unsRegistry, owner, paramValueMap.labels);
-        const req = await buidRequest(
-          unlockWithRecordsLabels,
-          coinbase.address,
-          tokenId,
-          paramValueMap,
-        );
-        const signature = await sign(
-          req.data,
-          unsRegistry.address,
-          req.nonce,
-          coinbase,
-        );
+        const req = await buidRequest(unlockWithRecordsLabels, coinbase.address, tokenId, paramValueMap);
+        const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
         await unsRegistry.execute(req, signature);
       });
 
@@ -565,18 +434,8 @@ describe('UNSRegistry (metatx)', () => {
           paramValueMap.key = utils.id(`${funcSig}_doubleUse`);
 
           const tokenIdForwarder = await unsRegistry.namehash([utils.id(`_${funcSig}`), 'crypto']);
-          const req = await buidRequest(
-            func,
-            coinbase.address,
-            tokenIdForwarder,
-            paramValueMap,
-          );
-          const signature = await sign(
-            req.data,
-            unsRegistry.address,
-            req.nonce,
-            coinbase,
-          );
+          const req = await buidRequest(func, coinbase.address, tokenIdForwarder, paramValueMap);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
           await unsRegistry.execute(req, signature);
 
           await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
@@ -592,18 +451,8 @@ describe('UNSRegistry (metatx)', () => {
 
           const tokenId = 0;
           const nonce = await unsRegistry.nonceOf(tokenId);
-          const req = await buidRequest(
-            func,
-            coinbase.address,
-            tokenId,
-            paramValueMap,
-          );
-          const signature = await sign(
-            req.data,
-            unsRegistry.address,
-            req.nonce,
-            coinbase,
-          );
+          const req = await buidRequest(func, coinbase.address, tokenId, paramValueMap);
+          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
           await unsRegistry.execute(req, signature);
 
           expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(nonce.add(1));
@@ -612,6 +461,76 @@ describe('UNSRegistry (metatx)', () => {
           );
         }
       });
+    });
+  });
+
+  describe('Multicall', () => {
+    it('should execute meta tx with multicall', async () => {
+      const labels = ['res_label_mb3', 'crypto'];
+      const tokenId = await unsRegistry.namehash(labels);
+
+      const { req, signature } = await buildExecuteParams(
+        'multicall(bytes[])',
+        [
+          [
+            unsRegistry.interface.encodeFunctionData('mintWithRecords', [coinbase.address, labels, [], [], false]),
+            unsRegistry.interface.encodeFunctionData('setOwner', [receiver.address, tokenId]),
+          ],
+        ],
+        coinbase,
+        tokenId,
+      );
+      await unsRegistry.connect(nonOwner).execute(req, signature);
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+    });
+
+    it('should execute multiple meta txs through multicall', async () => {
+      const labels = ['res_label_m1', 'crypto'];
+      const tokenId = await unsRegistry.namehash(labels);
+
+      const mintMetaParams = await buildExecuteParams(
+        'mintWithRecords(address,string[],string[],string[],bool)',
+        [owner.address, labels, [], [], false],
+        coinbase,
+        tokenId,
+        BigNumber.from(0),
+      );
+
+      const transferMetaParams = await buildExecuteParams(
+        'setOwner(address,uint256)',
+        [receiver.address, tokenId],
+        owner,
+        tokenId,
+        BigNumber.from(1),
+      );
+
+      await unsRegistry.multicall([
+        unsRegistry.interface.encodeFunctionData('execute', [mintMetaParams.req, mintMetaParams.signature]),
+        unsRegistry.interface.encodeFunctionData('execute', [transferMetaParams.req, transferMetaParams.signature]),
+      ]);
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+    });
+
+    it('should execute multiple regular and meta txs through multicall', async () => {
+      const labels = ['res_label_m2', 'crypto'];
+      const tokenId = await unsRegistry.namehash(labels);
+
+      const transferMetaParams = await buildExecuteParams(
+        'setOwner(address,uint256)',
+        [receiver.address, tokenId],
+        owner,
+        tokenId,
+        BigNumber.from(0),
+      );
+
+      await unsRegistry.multicall([
+        unsRegistry.interface.encodeFunctionData('mintWithRecords', [owner.address, labels, [], [], false]),
+        unsRegistry.interface.encodeFunctionData('execute', [transferMetaParams.req, transferMetaParams.signature]),
+      ]);
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
   });
 });

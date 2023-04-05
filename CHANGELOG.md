@@ -1,3 +1,7 @@
+## v0.8.0
+
+- Add `multicall` function to UNSRegistry. The function executes a batch of function calls. It can be used in meta-transactions.
+
 ## v0.7.10
 
 - UNSRegistry@0.7.3 cleanup, remove temporary `cleanReverseFromUDContracts` function.
