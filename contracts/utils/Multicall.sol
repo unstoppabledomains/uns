@@ -13,7 +13,7 @@ abstract contract Multicall {
     /**
      * @dev Receives and executes a batch of function calls on this contract.
      */
-    function multicall(bytes[] memory data) public virtual returns (bytes[] memory results) {
+    function _multicall(bytes[] memory data) internal returns (bytes[] memory results) {
         results = new bytes[](data.length);
         for (uint256 i = 0; i < data.length; i++) {
             // solhint-disable-next-line avoid-low-level-calls
