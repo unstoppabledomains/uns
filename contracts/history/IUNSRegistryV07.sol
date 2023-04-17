@@ -6,13 +6,13 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol';
 
-import './IERC1967.sol';
-import './IRecordStorage.sol';
-import './IReverseRegistry.sol';
-import './IRootRegistry.sol';
-import './@maticnetwork/IChildToken.sol';
+import '../IERC1967.sol';
+import '../IRecordStorage.sol';
+import '../IReverseRegistry.sol';
+import '../IRootRegistry.sol';
+import '../@maticnetwork/IChildToken.sol';
 
-interface IUNSRegistry is
+interface IUNSRegistryV07 is
     IERC1967,
     IERC721MetadataUpgradeable,
     IERC721ReceiverUpgradeable,
@@ -119,10 +119,4 @@ interface IUNSRegistry is
      * @param addr address of ProxyReader
      */
     function addProxyReader(address addr) external;
-
-    /**
-     * @dev Marks tokens as upgraded.
-     * @param tokenIds[] list of tokenIds to mark upgraded
-     */
-    function upgradeAll(uint256[] calldata tokenIds) external;
 }

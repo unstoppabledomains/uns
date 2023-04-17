@@ -9,6 +9,12 @@ interface IMintingManager is IERC1967 {
     event NewTld(uint256 indexed tokenId, string tld);
     event RemoveTld(uint256 indexed tokenId);
 
+    struct BulkSLDIssueRequest {
+        address to;
+        string label;
+        uint256 tld;
+    }
+
     /**
      * @dev Adds new TLD
      */
@@ -34,6 +40,12 @@ interface IMintingManager is IERC1967 {
         string[] calldata values,
         bool withReverse
     ) external;
+
+    /**
+     * @dev Issues a SLD in bulk
+     * @param requests List of requests for domains to issue
+     */
+    function bulkIssue(BulkSLDIssueRequest[] calldata requests) external;
 
     /**
      * @dev Claims free domain. The fuction adds prefix to label.

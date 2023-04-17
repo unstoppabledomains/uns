@@ -104,8 +104,8 @@ contract UNSRegistry is
         return 0;
     }
 
-    function namehash(string[] calldata labels) external pure override returns (uint256) {
-        return _namehash(labels);
+    function namehash(string[] calldata labels) external pure override returns (uint256 hash) {
+        (hash, ) = _namehash(labels);
     }
 
     function exists(uint256 tokenId) external view override(IUNSRegistry, IMintableERC721) returns (bool) {
@@ -126,7 +126,8 @@ contract UNSRegistry is
         string[] calldata values,
         bool withReverse
     ) external override onlyMintingManager {
-        uint256 tokenId = _namehash(labels);
+        (uint256 tokenId, ) = _namehash(labels);
+
         _reset(tokenId);
         _transfer(ownerOf(tokenId), to, tokenId);
         _setMany(keys, values, tokenId);
@@ -142,7 +143,9 @@ contract UNSRegistry is
         string[] calldata values,
         bool withReverse
     ) external override onlyMintingManager {
-        uint256 tokenId = _namehash(labels);
+        (uint256 tokenId, uint256 parentTokenId) = _namehash(labels);
+
+        _ensureNotUpgraded(parentTokenId);
 
         _mint(to, tokenId, _uri(labels), withReverse);
         _setMany(keys, values, tokenId);
@@ -312,7 +315,7 @@ contract UNSRegistry is
      * @dev See {IReverseRegistry-setReverse}.
      */
     function setReverse(string[] memory labels) external override {
-        uint256 tokenId = _namehash(labels);
+        (uint256 tokenId, ) = _namehash(labels);
         _onlyOwner(tokenId);
         _protectTokenOperation(tokenId);
         _setReverse(_msgSender(), tokenId, _uri(labels));
@@ -353,6 +356,15 @@ contract UNSRegistry is
         _proxyReaders[addr] = true;
     }
 
+    /**
+     * @dev See {IUNSRegistry-upgradeAll(address)}.
+     */
+    function upgradeAll(uint256[] calldata tokenIds) external override onlyMintingManager {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            _upgradedTokens[tokenIds[i]] = true;
+        }
+    }
+
     function multicall(bytes[] calldata data) public override returns (bytes[] memory results) {
         bytes[] memory _data = data;
         if (isTrustedForwarder(msg.sender)) {
@@ -373,12 +385,11 @@ contract UNSRegistry is
         return string(uri);
     }
 
-    function _namehash(string[] memory labels) internal pure returns (uint256) {
-        uint256 node = 0x0;
+    function _namehash(string[] memory labels) internal pure returns (uint256 tokenId, uint256 parentId) {
         for (uint256 i = labels.length; i > 0; i--) {
-            node = _namehash(node, labels[i - 1]);
+            parentId = tokenId;
+            tokenId = _namehash(parentId, labels[i - 1]);
         }
-        return node;
     }
 
     function _namehash(uint256 tokenId, string memory label) internal pure returns (uint256) {
@@ -421,7 +432,9 @@ contract UNSRegistry is
         super._beforeTokenTransfer(from, to, tokenId);
 
         // This prevents the upgraded token from being burned or withdrawn from L2
-        require(!_upgradedTokens[tokenId] || to != address(0), 'Registry: TOKEN_UPGRADED');
+        if (to == address(0)) {
+            _ensureNotUpgraded(tokenId);
+        }
 
         if (_reverses[from] == tokenId) {
             _removeReverse(from);
@@ -469,6 +482,10 @@ contract UNSRegistry is
 
     function _onlyOwner(uint256 tokenId) internal view {
         require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
+    }
+
+    function _ensureNotUpgraded(uint256 tokenId) internal view {
+        require(!_upgradedTokens[tokenId], 'Registry: TOKEN_UPGRADED');
     }
 
     // Reserved storage space to allow for layout changes in the future.
