@@ -144,7 +144,10 @@ const deployUNSTask = {
     let unsOperatorImpl: string;
 
     if (ctx.options.proxy) {
-      unsRegistry = await upgrades.deployProxy(ctx.artifacts.UNSRegistry.connect(owner), [], { initializer: false });
+      unsRegistry = await upgrades.deployProxy(ctx.artifacts.UNSRegistry.connect(owner), [], {
+        initializer: false,
+        unsafeAllow: ['delegatecall'],
+      });
       await unsRegistry.deployTransaction.wait();
 
       mintingManager = await upgrades.deployProxy(ctx.artifacts.MintingManager.connect(owner), [], {
