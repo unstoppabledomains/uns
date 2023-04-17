@@ -1,3 +1,10 @@
+## v0.8.2
+
+- Re-introduced `MintingManager#bulkIssue` functionality
+- Re-introduced `MintingManager#upgradeAll` functionality, ensuring it ignores label validation
+- Ensured that upgraded tokens could not be used to issue subdomains
+- Fixed `multicall` signature override warning
+
 ## v0.8.1
 
 - Add `.anime`, `.manga` TLDs
