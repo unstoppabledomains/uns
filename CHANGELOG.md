@@ -1,3 +1,7 @@
+## v0.8.1
+
+- Add `.anime`, `.manga` TLDs
+
 ## v0.8.0
 
 - Add `multicall` function to UNSRegistry. The function executes a batch of function calls. It can be used in meta-transactions.
