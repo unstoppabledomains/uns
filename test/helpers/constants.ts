@@ -23,4 +23,6 @@ export const TLD = {
   KLEVER: BigNumber.from('0xa18784bb78ee0f577251fb21ad5cac7a140ab47e9414e3c7af5125e3e1d28923'),
   HI: BigNumber.from('0xfdb51f7f56d9b1149db5ce99afcf60dda4416fd6fb8dc0649fec13cd03e1803e'),
   KRESUS: BigNumber.from('0x2acf53593112265ba651274f0e33a6b3fe86f92bbee4d39211540592fde6b0f3'),
+  ANIME: BigNumber.from('0xaf4d61a6acdda7379d6f90207923aeb080994d0f1aaba4b8b24a14f965b2bb7c'),
+  MANGA: BigNumber.from('0x57ea207b3238a69d8a9a53252de172f2ceae1d856008b13208a203867a707c78'),
 };
