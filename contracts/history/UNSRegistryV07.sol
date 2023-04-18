@@ -8,7 +8,7 @@ import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
 import './../ChildRegistry.sol';
 import './../cns/ICNSRegistry.sol';
-import './../IUNSRegistry.sol';
+import './IUNSRegistryV07.sol';
 import './../RecordStorage.sol';
 import './../RootRegistry.sol';
 import './../metatx/ERC2771RegistryContext.sol';
@@ -26,7 +26,7 @@ contract UNSRegistryV07 is
     UNSRegistryForwarder,
     RootRegistry,
     ChildRegistry,
-    IUNSRegistry
+    IUNSRegistryV07
 {
     string public constant NAME = 'UNS: Registry';
     string public constant VERSION = '0.7.3';
@@ -106,7 +106,7 @@ contract UNSRegistryV07 is
         return _namehash(labels);
     }
 
-    function exists(uint256 tokenId) external view override(IUNSRegistry, IMintableERC721) returns (bool) {
+    function exists(uint256 tokenId) external view override(IUNSRegistryV07, IMintableERC721) returns (bool) {
         return _exists(tokenId);
     }
 
