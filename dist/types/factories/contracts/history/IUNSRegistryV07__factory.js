@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.IUNSRegistry__factory = void 0;
+exports.IUNSRegistryV07__factory = void 0;
 const ethers_1 = require("ethers");
 const _abi = [
     {
@@ -1127,19 +1127,6 @@ const _abi = [
     {
         inputs: [
             {
-                internalType: "uint256[]",
-                name: "tokenIds",
-                type: "uint256[]",
-            },
-        ],
-        name: "upgradeAll",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-    },
-    {
-        inputs: [
-            {
                 internalType: "bytes",
                 name: "inputData",
                 type: "bytes",
@@ -1166,7 +1153,7 @@ const _abi = [
         type: "function",
     },
 ];
-class IUNSRegistry__factory {
+class IUNSRegistryV07__factory {
     static createInterface() {
         return new ethers_1.utils.Interface(_abi);
     }
@@ -1174,5 +1161,5 @@ class IUNSRegistry__factory {
         return new ethers_1.Contract(address, _abi, signerOrProvider);
     }
 }
-exports.IUNSRegistry__factory = IUNSRegistry__factory;
-IUNSRegistry__factory.abi = _abi;
+exports.IUNSRegistryV07__factory = IUNSRegistryV07__factory;
+IUNSRegistryV07__factory.abi = _abi;

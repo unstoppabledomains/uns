@@ -1,13 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Pausable__factory = exports.Multicall__factory = exports.MultiSend__factory = exports.ERC1271SimpleWallet__factory = exports.Blocklist__factory = void 0;
+exports.Pausable__factory = exports.MultiSend__factory = exports.ERC1271SimpleWallet__factory = exports.Blocklist__factory = void 0;
 var Blocklist__factory_1 = require("./Blocklist__factory");
 Object.defineProperty(exports, "Blocklist__factory", { enumerable: true, get: function () { return Blocklist__factory_1.Blocklist__factory; } });
 var ERC1271SimpleWallet__factory_1 = require("./ERC1271SimpleWallet__factory");
 Object.defineProperty(exports, "ERC1271SimpleWallet__factory", { enumerable: true, get: function () { return ERC1271SimpleWallet__factory_1.ERC1271SimpleWallet__factory; } });
 var MultiSend__factory_1 = require("./MultiSend__factory");
 Object.defineProperty(exports, "MultiSend__factory", { enumerable: true, get: function () { return MultiSend__factory_1.MultiSend__factory; } });
-var Multicall__factory_1 = require("./Multicall__factory");
-Object.defineProperty(exports, "Multicall__factory", { enumerable: true, get: function () { return Multicall__factory_1.Multicall__factory; } });
 var Pausable__factory_1 = require("./Pausable__factory");
 Object.defineProperty(exports, "Pausable__factory", { enumerable: true, get: function () { return Pausable__factory_1.Pausable__factory; } });

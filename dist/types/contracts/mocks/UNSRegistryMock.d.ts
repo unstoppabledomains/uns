@@ -488,7 +488,9 @@ export interface UNSRegistryMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         name(overrides?: CallOverrides): Promise<[string]>;
-        namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<[BigNumber]>;
+        namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<[BigNumber] & {
+            hash: BigNumber;
+        }>;
         nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
         onERC721Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;

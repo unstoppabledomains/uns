@@ -2,9 +2,22 @@ import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, C
 import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../common";
+export declare namespace IMintingManager {
+    type BulkSLDIssueRequestStruct = {
+        to: PromiseOrValue<string>;
+        label: PromiseOrValue<string>;
+        tld: PromiseOrValue<BigNumberish>;
+    };
+    type BulkSLDIssueRequestStructOutput = [string, string, BigNumber] & {
+        to: string;
+        label: string;
+        tld: BigNumber;
+    };
+}
 export interface IMintingManagerInterface extends utils.Interface {
     functions: {
         "addTld(string)": FunctionFragment;
+        "bulkIssue((address,string,uint256)[])": FunctionFragment;
         "claim(uint256,string)": FunctionFragment;
         "claimTo(address,uint256,string)": FunctionFragment;
         "claimToWithRecords(address,uint256,string,string[],string[])": FunctionFragment;
@@ -12,8 +25,9 @@ export interface IMintingManagerInterface extends utils.Interface {
         "removeTld(uint256)": FunctionFragment;
         "setTokenURIPrefix(string)": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "addTld" | "claim" | "claimTo" | "claimToWithRecords" | "issueWithRecords" | "removeTld" | "setTokenURIPrefix"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "addTld" | "bulkIssue" | "claim" | "claimTo" | "claimToWithRecords" | "issueWithRecords" | "removeTld" | "setTokenURIPrefix"): FunctionFragment;
     encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "bulkIssue", values: [IMintingManager.BulkSLDIssueRequestStruct[]]): string;
     encodeFunctionData(functionFragment: "claim", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "claimTo", values: [
         PromiseOrValue<string>,
@@ -37,6 +51,7 @@ export interface IMintingManagerInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "removeTld", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "setTokenURIPrefix", values: [PromiseOrValue<string>]): string;
     decodeFunctionResult(functionFragment: "addTld", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "bulkIssue", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimTo", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimToWithRecords", data: BytesLike): Result;
@@ -97,6 +112,9 @@ export interface IMintingManager extends BaseContract {
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -119,6 +137,9 @@ export interface IMintingManager extends BaseContract {
     addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
+    bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -139,6 +160,7 @@ export interface IMintingManager extends BaseContract {
     }): Promise<ContractTransaction>;
     callStatic: {
         addTld(tld: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
+        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: CallOverrides): Promise<void>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
@@ -158,6 +180,9 @@ export interface IMintingManager extends BaseContract {
     };
     estimateGas: {
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
@@ -181,6 +206,9 @@ export interface IMintingManager extends BaseContract {
     };
     populateTransaction: {
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {

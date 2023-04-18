@@ -1,7 +1,7 @@
 import { Signer } from "ethers";
 import type { Provider } from "@ethersproject/providers";
-import type { IMintingManager, IMintingManagerInterface } from "../../contracts/IMintingManager";
-export declare class IMintingManager__factory {
+import type { IUNSRegistryV07, IUNSRegistryV07Interface } from "../../../contracts/history/IUNSRegistryV07";
+export declare class IUNSRegistryV07__factory {
     static readonly abi: ({
         anonymous: boolean;
         inputs: {
@@ -21,28 +21,16 @@ export declare class IMintingManager__factory {
             type: string;
         }[];
         name: string;
-        outputs: never[];
-        stateMutability: string;
-        type: string;
-        anonymous?: undefined;
-    } | {
-        inputs: {
-            components: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
+        outputs: {
             internalType: string;
             name: string;
             type: string;
         }[];
-        name: string;
-        outputs: never[];
         stateMutability: string;
         type: string;
         anonymous?: undefined;
     })[];
-    static createInterface(): IMintingManagerInterface;
-    static connect(address: string, signerOrProvider: Signer | Provider): IMintingManager;
+    static createInterface(): IUNSRegistryV07Interface;
+    static connect(address: string, signerOrProvider: Signer | Provider): IUNSRegistryV07;
 }
-//# sourceMappingURL=IMintingManager__factory.d.ts.map
+//# sourceMappingURL=IUNSRegistryV07__factory.d.ts.map

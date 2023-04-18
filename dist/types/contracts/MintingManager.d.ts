@@ -2,6 +2,18 @@ import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, C
 import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../common";
+export declare namespace IMintingManager {
+    type BulkSLDIssueRequestStruct = {
+        to: PromiseOrValue<string>;
+        label: PromiseOrValue<string>;
+        tld: PromiseOrValue<BigNumberish>;
+    };
+    type BulkSLDIssueRequestStructOutput = [string, string, BigNumber] & {
+        to: string;
+        label: string;
+        tld: BigNumber;
+    };
+}
 export interface MintingManagerInterface extends utils.Interface {
     functions: {
         "DEFAULT_ADMIN_ROLE()": FunctionFragment;
@@ -12,6 +24,7 @@ export interface MintingManagerInterface extends utils.Interface {
         "addMinters(address[])": FunctionFragment;
         "addProxyReaders(address[])": FunctionFragment;
         "addTld(string)": FunctionFragment;
+        "bulkIssue((address,string,uint256)[])": FunctionFragment;
         "claim(uint256,string)": FunctionFragment;
         "claimTo(address,uint256,string)": FunctionFragment;
         "claimToWithRecords(address,uint256,string,string[],string[])": FunctionFragment;
@@ -46,8 +59,9 @@ export interface MintingManagerInterface extends utils.Interface {
         "unpause()": FunctionFragment;
         "unsOperator()": FunctionFragment;
         "unsRegistry()": FunctionFragment;
+        "upgradeAll(uint256[])": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "bulkIssue" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry" | "upgradeAll"): FunctionFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
@@ -56,6 +70,7 @@ export interface MintingManagerInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "addMinters", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "addProxyReaders", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "bulkIssue", values: [IMintingManager.BulkSLDIssueRequestStruct[]]): string;
     encodeFunctionData(functionFragment: "claim", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "claimTo", values: [
         PromiseOrValue<string>,
@@ -113,6 +128,7 @@ export interface MintingManagerInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
     encodeFunctionData(functionFragment: "unsOperator", values?: undefined): string;
     encodeFunctionData(functionFragment: "unsRegistry", values?: undefined): string;
+    encodeFunctionData(functionFragment: "upgradeAll", values: [PromiseOrValue<BigNumberish>[]]): string;
     decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "MINTER_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "NAME", data: BytesLike): Result;
@@ -121,6 +137,7 @@ export interface MintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "addMinters", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addProxyReaders", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addTld", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "bulkIssue", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimTo", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimToWithRecords", data: BytesLike): Result;
@@ -155,6 +172,7 @@ export interface MintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unsOperator", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unsRegistry", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "upgradeAll", data: BytesLike): Result;
     events: {
         "AdminChanged(address,address)": EventFragment;
         "Blocked(uint256)": EventFragment;
@@ -318,6 +336,9 @@ export interface MintingManager extends BaseContract {
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -394,6 +415,9 @@ export interface MintingManager extends BaseContract {
         }): Promise<ContractTransaction>;
         unsOperator(overrides?: CallOverrides): Promise<[string]>;
         unsRegistry(overrides?: CallOverrides): Promise<[string]>;
+        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
     };
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -409,6 +433,9 @@ export interface MintingManager extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
@@ -487,6 +514,9 @@ export interface MintingManager extends BaseContract {
     }): Promise<ContractTransaction>;
     unsOperator(overrides?: CallOverrides): Promise<string>;
     unsRegistry(overrides?: CallOverrides): Promise<string>;
+    upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     callStatic: {
         DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
         MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -496,6 +526,7 @@ export interface MintingManager extends BaseContract {
         addMinters(accounts: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         addTld(tld: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
+        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: CallOverrides): Promise<void>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
@@ -530,6 +561,7 @@ export interface MintingManager extends BaseContract {
         unpause(overrides?: CallOverrides): Promise<void>;
         unsOperator(overrides?: CallOverrides): Promise<string>;
         unsRegistry(overrides?: CallOverrides): Promise<string>;
+        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<void>;
     };
     filters: {
         "AdminChanged(address,address)"(previousAdmin?: null, newAdmin?: null): AdminChangedEventFilter;
@@ -576,6 +608,9 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
@@ -654,6 +689,9 @@ export interface MintingManager extends BaseContract {
         }): Promise<BigNumber>;
         unsOperator(overrides?: CallOverrides): Promise<BigNumber>;
         unsRegistry(overrides?: CallOverrides): Promise<BigNumber>;
+        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
     };
     populateTransaction: {
         DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -670,6 +708,9 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        bulkIssue(requests: IMintingManager.BulkSLDIssueRequestStruct[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
@@ -748,6 +789,9 @@ export interface MintingManager extends BaseContract {
         }): Promise<PopulatedTransaction>;
         unsOperator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         unsRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
     };
 }
 //# sourceMappingURL=MintingManager.d.ts.map
