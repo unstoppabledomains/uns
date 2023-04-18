@@ -564,6 +564,7 @@ const proposeUNSRegistryTask: Task = {
     const proposal = await defender.proposeUpgrade(UNSRegistry.address, ctx.artifacts.UNSRegistry, {
       title: `Propose UNSRegistry to v${version}`,
       multisig: ctx.multisig,
+      unsafeAllow: ['delegatecall'],
     });
     if (proposal.metadata?.newImplementationAddress) {
       await ctx.saveContractConfig(
