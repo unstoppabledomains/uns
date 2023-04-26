@@ -25,4 +25,5 @@ export const TLD = {
   KRESUS: BigNumber.from('0x2acf53593112265ba651274f0e33a6b3fe86f92bbee4d39211540592fde6b0f3'),
   ANIME: BigNumber.from('0xaf4d61a6acdda7379d6f90207923aeb080994d0f1aaba4b8b24a14f965b2bb7c'),
   MANGA: BigNumber.from('0x57ea207b3238a69d8a9a53252de172f2ceae1d856008b13208a203867a707c78'),
+  BINANCEUS: BigNumber.from('0x2a91107027b89ab420a4d8ec457493cfca12ab17615ec8c876695f1343f3f0fd'),
 };

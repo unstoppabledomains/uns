@@ -1,3 +1,7 @@
+## v0.8.5
+
+- Add `.binanceus` TLD
+
 ## v0.8.4
 
 - Upgrade MintingManager@0.4.14 and UNSRegistry@0.8.1 on Polygon
