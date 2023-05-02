@@ -1,3 +1,8 @@
+## v0.8.6
+
+- Removed `MintingManager#bulkIssue` functionality
+- Removed `MintingManager#upgradeAll` functionality
+
 ## v0.8.5
 
 - Add `.binanceus` TLD

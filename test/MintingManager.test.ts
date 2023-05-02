@@ -2,9 +2,8 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import namehash from 'eth-ens-namehash';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber } from 'ethers';
 import { MintingManager, ProxyReader, UNSOperator, UNSRegistry } from '../types/contracts';
-import { UNSRegistryMock } from '../types/contracts/mocks';
+import { MintingManagerMock, UNSRegistryMock } from '../types/contracts/mocks';
 import { CNSRegistry, Resolver } from '../types/dot-crypto/contracts';
 import { MintingController, URIPrefixController } from '../types/dot-crypto/contracts/controllers';
 import {
@@ -13,7 +12,7 @@ import {
   UNSOperator__factory,
   UNSRegistry__factory,
 } from '../types/factories/contracts';
-import { UNSRegistryMock__factory } from '../types/factories/contracts/mocks';
+import { MintingManagerMock__factory, UNSRegistryMock__factory } from '../types/factories/contracts/mocks';
 import { CNSRegistry__factory, Resolver__factory } from '../types/factories/dot-crypto/contracts';
 import {
   MintingController__factory,
@@ -32,6 +31,7 @@ describe('MintingManager', () => {
     mintingController: MintingController,
     uriPrefixController: URIPrefixController,
     mintingManager: MintingManager,
+    mintingManagerMock: MintingManagerMock,
     proxyReader: ProxyReader;
 
   let signers: SignerWithAddress[], domainSuffix: string;
@@ -84,10 +84,11 @@ describe('MintingManager', () => {
       mintingManager = await new MintingManager__factory(coinbase).deploy();
       cnsRegistry = await new CNSRegistry__factory(coinbase).deploy();
       unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
+      mintingManagerMock = await new MintingManagerMock__factory(coinbase).deploy();
 
-      await unsRegistryMock.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await unsRegistryMock.initialize(mintingManagerMock.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-      await mintingManager.initialize(
+      await mintingManagerMock.initialize(
         unsRegistryMock.address,
         ZERO_ADDRESS,
         ZERO_ADDRESS,
@@ -95,7 +96,7 @@ describe('MintingManager', () => {
         ZERO_ADDRESS,
         ZERO_ADDRESS,
       );
-      await mintingManager.addMinter(coinbase.address);
+      await mintingManagerMock.addMinter(coinbase.address);
 
       proxyReader = await new ProxyReader__factory(coinbase).deploy();
       await proxyReader.initialize(unsRegistryMock.address, cnsRegistry.address);
@@ -107,13 +108,13 @@ describe('MintingManager', () => {
     it('adds ProxyReader addresses', async () => {
       const labels = ['add-proxy-readers-test', 'crypto'];
 
-      await mintingManager.issueWithRecords(receiver.address, labels, [], [], true);
+      await mintingManagerMock.issueWithRecords(receiver.address, labels, [], [], true);
 
       const tokenId = await unsRegistryMock.namehash(labels);
 
-      await mintingManager.addProxyReaders([proxyReader.address, proxyReader2.address]);
+      await mintingManagerMock.addProxyReaders([proxyReader.address, proxyReader2.address]);
 
-      await mintingManager.upgradeAll([tokenId]);
+      await mintingManagerMock.upgradeAll([tokenId]);
 
       await unsRegistryMock.connect(receiver).set('key', 'value', tokenId);
 
@@ -378,6 +379,21 @@ describe('MintingManager', () => {
       );
       await mintingManager.addMinter(coinbase.address);
       await mintingManager.setTokenURIPrefix('/');
+
+      mintingManagerMock = await new MintingManagerMock__factory(coinbase).deploy();
+      unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
+
+      await unsRegistryMock.initialize(mintingManagerMock.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManagerMock.initialize(
+        unsRegistryMock.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
+
+      await mintingManagerMock.addMinter(coinbase.address);
     });
 
     describe('mint second level domain', () => {
@@ -536,6 +552,21 @@ describe('MintingManager', () => {
         ).to.be.revertedWith('MintingManager: REVERSE_RECORD_NOT_ALLOWED');
       });
 
+      it('reverts minting subdomain if parent is upgraded', async () => {
+        const labels = ['test-222x', 'wallet'];
+        await mintingManagerMock.connect(coinbase).issueWithRecords(receiver.address, labels, [], [], false);
+
+        await mintingManagerMock.connect(coinbase).upgradeAll([
+          await unsRegistry.namehash(labels),
+        ]);
+
+        labels.unshift('sub');
+
+        await expect(
+          mintingManagerMock.connect(receiver).issueWithRecords(receiver.address, labels, [], [], true),
+        ).to.be.revertedWith('Registry: TOKEN_UPGRADED');
+      });
+
       it('should mint subdomain with reverse record', async () => {
         const labels = ['test-222', 'wallet'];
         await mintingManager.connect(coinbase).issueWithRecords(spender.address, labels, [], [], false);
@@ -545,21 +576,6 @@ describe('MintingManager', () => {
 
         const tokenId = await unsRegistry.namehash(labels);
         expect(await unsRegistry.reverseOf(spender.address)).to.be.equal(tokenId);
-      });
-
-      it('should revert minting subdomain if parent is upgraded', async () => {
-        const labels = ['test-222x', 'wallet'];
-        await mintingManager.connect(coinbase).issueWithRecords(spender.address, labels, [], [], false);
-
-        await mintingManager.connect(coinbase).upgradeAll([
-          await unsRegistry.namehash(labels),
-        ]);
-
-        labels.unshift('sub');
-
-        await expect(
-          mintingManager.connect(spender).issueWithRecords(spender.address, labels, [], [], true),
-        ).to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
     });
 
@@ -619,47 +635,6 @@ describe('MintingManager', () => {
           expect(await unsRegistry.ownerOf(subdomainTkenId)).to.be.equal(coinbase.address);
         }
       });
-    });
-  });
-
-  describe('upgradeAll', () => {
-    before(async () => {
-      [, , receiver] = signers;
-
-      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-      mintingManager = await new MintingManager__factory(coinbase).deploy();
-
-      await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-
-      await mintingManager.initialize(
-        unsRegistry.address,
-        ZERO_ADDRESS,
-        ZERO_ADDRESS,
-        ZERO_ADDRESS,
-        ZERO_ADDRESS,
-        ZERO_ADDRESS,
-      );
-      await mintingManager.addMinter(coinbase.address);
-    });
-
-    it('should successfully mark tokens as upgraded', async () => {
-      const labels = ['upgrade-tokens-test', 'crypto'];
-      await mintingManager.issueWithRecords(receiver.address, labels, [], [], true);
-      const tokenId = await unsRegistry.namehash(labels);
-
-      await mintingManager.upgradeAll([tokenId]);
-
-      expect(unsRegistry.connect(receiver).burn(tokenId)).to.be.revertedWith('Registry: TOKEN_UPGRADED');
-    });
-
-    it('should revert if not minter', async () => {
-      const labels = ['upgrade-tokens-test-2', 'crypto'];
-      await mintingManager.issueWithRecords(receiver.address, labels, [], [], true);
-      const tokenId = await unsRegistry.namehash(labels);
-
-      await expect(mintingManager.connect(signers[1]).upgradeAll([tokenId])).to.be.revertedWith(
-        'MinterRole: CALLER_IS_NOT_MINTER',
-      );
     });
   });
 
@@ -862,95 +837,6 @@ describe('MintingManager', () => {
         await expect(
           mintingManager.issueWithRecords(coinbase.address, ['udtestdev-t8', 'crypto'], ['key1'], ['value1'], true),
         ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
-      });
-    });
-
-    describe('bulkIssue(BulkSLDIssueRequest[])', () => {
-      it('should issue domains without records in bulk', async () => {
-        const [, , receiver1, receiver2, receiver3] = signers;
-
-        const issueRequests = [
-          { to: receiver1.address, label: 'bulk-issue-1', tld: TLD.WALLET },
-          { to: receiver1.address, label: 'bulk-issue-1', tld: TLD.X },
-          { to: receiver2.address, label: 'bulk-issue-2', tld: TLD.WALLET },
-          { to: receiver2.address, label: 'bulk-issue-2', tld: TLD.NFT },
-          { to: receiver3.address, label: 'bulk-issue-3', tld: TLD.WALLET },
-          { to: receiver3.address, label: 'bulk-issue-3', tld: TLD.NFT },
-        ];
-
-        expect(await unsRegistry.balanceOf(receiver1.address)).to.be.equal(0);
-        expect(await unsRegistry.balanceOf(receiver2.address)).to.be.equal(0);
-        expect(await unsRegistry.balanceOf(receiver3.address)).to.be.equal(0);
-
-        await mintingManager.bulkIssue(issueRequests);
-
-        expect(await unsRegistry.balanceOf(receiver1.address)).to.be.equal(2);
-        expect(await unsRegistry.reverseOf(receiver1.address)).to.be.equal(0);
-
-        expect(await unsRegistry.balanceOf(receiver2.address)).to.be.equal(2);
-        expect(await unsRegistry.reverseOf(receiver2.address)).to.be.equal(0);
-
-        expect(await unsRegistry.balanceOf(receiver3.address)).to.be.equal(2);
-        expect(await unsRegistry.reverseOf(receiver3.address)).to.be.equal(0);
-      });
-
-      it('should skip already minted domains', async () => {
-        receiver = signers[5];
-
-        await mintingManager['issueWithRecords(address,string[],string[],string[],bool)'](
-          receiver.address,
-          ['bulk-issue-skip-test', 'x'],
-          [],
-          [],
-          true,
-        );
-
-        expect(await unsRegistry.balanceOf(receiver.address)).to.be.equal(1);
-
-        await mintingManager.bulkIssue([
-          { to: receiver.address, label: 'bulk-issue-skip-test', tld: TLD.X },
-          { to: receiver.address, label: 'bulk-issue-skip-test', tld: TLD.NFT },
-        ]);
-
-        expect(await unsRegistry.balanceOf(receiver.address)).to.be.equal(2);
-      });
-
-      it('should be able to mint domains with invalid labels', async () => {
-        const receiver = signers[6];
-
-        const issueRequests = [
-          { to: receiver.address, label: '-bulk-issue-invalid-label', tld: TLD.WALLET },
-        ];
-
-        await mintingManager.bulkIssue(issueRequests);
-
-        expect(await unsRegistry.balanceOf(receiver.address)).to.be.equal(1);
-        expect(await unsRegistry.reverseOf(receiver.address)).to.be.equal(0);
-      });
-
-      it('should revert if not minter', async () => {
-        await expect(
-          mintingManager
-            .connect(signers[1])
-            .bulkIssue([{ to: coinbase.address, label: 'belk-issue-not-minter-test', tld: TLD.X }]),
-        ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-      });
-
-      it('should revert minting legacy CNS free domains', async () => {
-        await expect(
-          mintingManager.connect(coinbase).bulkIssue([
-            { tld: TLD.WALLET, label: 'bulk-issue-cns-free', to: coinbase.address },
-            { tld: TLD.WALLET, label: 'udtestdev-t1', to: coinbase.address },
-          ]),
-        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
-      });
-
-      it('should revert minting domains not existing tlds', async () => {
-        await expect(
-          mintingManager.connect(coinbase).bulkIssue([
-            { tld: BigNumber.from(0x42), label: 'bulk-issue-invalid-tld', to: coinbase.address },
-          ]),
-        ).to.be.revertedWith('MintingManager: TLD_NOT_REGISTERED');
       });
     });
   });

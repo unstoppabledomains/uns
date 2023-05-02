@@ -31,7 +31,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.8.1';
+    string public constant VERSION = '0.8.2';
 
     string internal _prefix;
 
@@ -354,15 +354,6 @@ contract UNSRegistry is
      */
     function addProxyReader(address addr) external override onlyMintingManager {
         _proxyReaders[addr] = true;
-    }
-
-    /**
-     * @dev See {IUNSRegistry-upgradeAll(address)}.
-     */
-    function upgradeAll(uint256[] calldata tokenIds) external override onlyMintingManager {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            _upgradedTokens[tokenIds[i]] = true;
-        }
     }
 
     function multicall(bytes[] calldata data) public returns (bytes[] memory results) {

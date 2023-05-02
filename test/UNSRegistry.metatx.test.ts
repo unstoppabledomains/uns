@@ -377,7 +377,6 @@ describe('UNSRegistry (metatx)', () => {
         'setReverse', // covered in separate test case
         'unlockWithRecords', // covered in separate test case
         'multicall',
-        'upgradeAll',
       ];
 
       before(async () => {
