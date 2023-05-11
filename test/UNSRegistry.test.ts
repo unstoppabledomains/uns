@@ -171,32 +171,6 @@ describe('UNSRegistry', () => {
         await expect(unsRegistryMock.burn(tokenId)).to.be.revertedWith('Registry: TOKEN_UPGRADED');
       });
     });
-
-    describe('upgradeAll', async () => {
-      it('should mark tokens as upgraded', async () => {
-        const tokenId = await mintRandomDomain(unsRegistry, coinbase.address, 'crypto');
-        const tokenId2 = await mintRandomDomain(unsRegistry, coinbase.address, 'crypto');
-        const tokenId3 = await mintRandomDomain(unsRegistry, owner.address, 'crypto');
-
-        const notMintedTokenId = await unsRegistry.namehash(['not-existing-domain-upgrade-test', 'crypto']);
-
-        await unsRegistry.connect(coinbase).upgradeAll([tokenId, tokenId2, tokenId3, notMintedTokenId]);
-
-        await expect(unsRegistry.burn(tokenId)).to.be.revertedWith('Registry: TOKEN_UPGRADED');
-
-        await expect(unsRegistry.burn(tokenId2)).to.be.revertedWith('Registry: TOKEN_UPGRADED');
-
-        await expect(unsRegistry.connect(owner).burn(tokenId3)).to.be.revertedWith('Registry: TOKEN_UPGRADED');
-      });
-
-      it('should not allow upgrading tokens if not minting manager', async () => {
-        const tokenId = await mintRandomDomain(unsRegistry, coinbase.address, 'crypto');
-
-        await expect(unsRegistry.connect(signers[1]).upgradeAll([tokenId])).to.be.revertedWith(
-          'Registry: SENDER_IS_NOT_MINTING_MANAGER',
-        );
-      });
-    });
   });
 
   describe('Registry (minting)', () => {
@@ -254,13 +228,13 @@ describe('UNSRegistry', () => {
 
       it('should not allow minting subdomain if parent token is upgraded', async () => {
         const labels = ['label_38qwex', 'crypto'];
-        const parentTokenId = await mintDomain(unsRegistry, owner, labels);
+        const parentTokenId = await mintDomain(unsRegistryMock, owner, labels);
 
-        await unsRegistry.connect(coinbase).upgradeAll([ parentTokenId ]);
+        await unsRegistryMock.connect(coinbase).upgradeAll([ parentTokenId ]);
 
         labels.unshift('sub');
 
-        await expect(mintDomain(unsRegistry, owner, labels)).to.be.revertedWith(
+        await expect(mintDomain(unsRegistryMock, owner, labels)).to.be.revertedWith(
           'Registry: TOKEN_UPGRADED',
         );
       });
