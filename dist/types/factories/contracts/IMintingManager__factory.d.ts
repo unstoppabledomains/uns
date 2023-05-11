@@ -25,22 +25,6 @@ export declare class IMintingManager__factory {
         stateMutability: string;
         type: string;
         anonymous?: undefined;
-    } | {
-        inputs: {
-            components: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        name: string;
-        outputs: never[];
-        stateMutability: string;
-        type: string;
-        anonymous?: undefined;
     })[];
     static createInterface(): IMintingManagerInterface;
     static connect(address: string, signerOrProvider: Signer | Provider): IMintingManager;

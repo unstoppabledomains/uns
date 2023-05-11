@@ -1,8 +1,8 @@
 import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PayableOverrides, PopulatedTransaction, Signer, utils } from "ethers";
 import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../common";
-export interface MintingManagerInterface extends utils.Interface {
+import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
+export interface MintingManagerMockInterface extends utils.Interface {
     functions: {
         "DEFAULT_ADMIN_ROLE()": FunctionFragment;
         "MINTER_ROLE()": FunctionFragment;
@@ -46,8 +46,9 @@ export interface MintingManagerInterface extends utils.Interface {
         "unpause()": FunctionFragment;
         "unsOperator()": FunctionFragment;
         "unsRegistry()": FunctionFragment;
+        "upgradeAll(uint256[])": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry" | "upgradeAll"): FunctionFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
@@ -113,6 +114,7 @@ export interface MintingManagerInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
     encodeFunctionData(functionFragment: "unsOperator", values?: undefined): string;
     encodeFunctionData(functionFragment: "unsRegistry", values?: undefined): string;
+    encodeFunctionData(functionFragment: "upgradeAll", values: [PromiseOrValue<BigNumberish>[]]): string;
     decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "MINTER_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "NAME", data: BytesLike): Result;
@@ -155,6 +157,7 @@ export interface MintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unsOperator", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unsRegistry", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "upgradeAll", data: BytesLike): Result;
     events: {
         "AdminChanged(address,address)": EventFragment;
         "Blocked(uint256)": EventFragment;
@@ -287,11 +290,11 @@ export interface UpgradedEventObject {
 }
 export declare type UpgradedEvent = TypedEvent<[string], UpgradedEventObject>;
 export declare type UpgradedEventFilter = TypedEventFilter<UpgradedEvent>;
-export interface MintingManager extends BaseContract {
+export interface MintingManagerMock extends BaseContract {
     connect(signerOrProvider: Signer | Provider | string): this;
     attach(addressOrName: string): this;
     deployed(): Promise<this>;
-    interface: MintingManagerInterface;
+    interface: MintingManagerMockInterface;
     queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
     listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
     listeners(eventName?: string): Array<Listener>;
@@ -394,6 +397,9 @@ export interface MintingManager extends BaseContract {
         }): Promise<ContractTransaction>;
         unsOperator(overrides?: CallOverrides): Promise<[string]>;
         unsRegistry(overrides?: CallOverrides): Promise<[string]>;
+        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
     };
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -487,6 +493,9 @@ export interface MintingManager extends BaseContract {
     }): Promise<ContractTransaction>;
     unsOperator(overrides?: CallOverrides): Promise<string>;
     unsRegistry(overrides?: CallOverrides): Promise<string>;
+    upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     callStatic: {
         DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
         MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -530,6 +539,7 @@ export interface MintingManager extends BaseContract {
         unpause(overrides?: CallOverrides): Promise<void>;
         unsOperator(overrides?: CallOverrides): Promise<string>;
         unsRegistry(overrides?: CallOverrides): Promise<string>;
+        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<void>;
     };
     filters: {
         "AdminChanged(address,address)"(previousAdmin?: null, newAdmin?: null): AdminChangedEventFilter;
@@ -654,6 +664,9 @@ export interface MintingManager extends BaseContract {
         }): Promise<BigNumber>;
         unsOperator(overrides?: CallOverrides): Promise<BigNumber>;
         unsRegistry(overrides?: CallOverrides): Promise<BigNumber>;
+        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
     };
     populateTransaction: {
         DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -748,6 +761,9 @@ export interface MintingManager extends BaseContract {
         }): Promise<PopulatedTransaction>;
         unsOperator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         unsRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
     };
 }
-//# sourceMappingURL=MintingManager.d.ts.map
+//# sourceMappingURL=MintingManagerMock.d.ts.map

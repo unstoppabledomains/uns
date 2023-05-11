@@ -151,6 +151,8 @@ export type { ERC721ReceiverMock } from "./contracts/mocks/ERC721ReceiverMock";
 export { ERC721ReceiverMock__factory } from "./factories/contracts/mocks/ERC721ReceiverMock__factory";
 export type { MinterRoleMock } from "./contracts/mocks/MinterRoleMock";
 export { MinterRoleMock__factory } from "./factories/contracts/mocks/MinterRoleMock__factory";
+export type { MintingManagerMock } from "./contracts/mocks/MintingManagerMock";
+export { MintingManagerMock__factory } from "./factories/contracts/mocks/MintingManagerMock__factory";
 export type { UNSRegistryForwarderMock } from "./contracts/mocks/UNSRegistryForwarderMock";
 export { UNSRegistryForwarderMock__factory } from "./factories/contracts/mocks/UNSRegistryForwarderMock__factory";
 export type { UNSRegistryMock } from "./contracts/mocks/UNSRegistryMock";

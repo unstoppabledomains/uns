@@ -47,10 +47,9 @@ export interface IUNSRegistryInterface extends utils.Interface {
         "tokenURI(uint256)": FunctionFragment;
         "transferFrom(address,address,uint256)": FunctionFragment;
         "unlockWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
-        "upgradeAll(uint256[])": FunctionFragment;
         "withdrawFromPolygon(bytes,uint256,string[],string[])": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "exists" | "get" | "getApproved" | "getByHash" | "getMany" | "getManyByHash" | "isApprovedForAll" | "isApprovedOrOwner" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "name" | "namehash" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseNameOf" | "reverseOf" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "upgradeAll" | "withdrawFromPolygon"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "exists" | "get" | "getApproved" | "getByHash" | "getMany" | "getManyByHash" | "isApprovedForAll" | "isApprovedOrOwner" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "name" | "namehash" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseNameOf" | "reverseOf" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "withdrawFromPolygon"): FunctionFragment;
     encodeFunctionData(functionFragment: "addProxyReader", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "approve", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>]): string;
@@ -148,7 +147,6 @@ export interface IUNSRegistryInterface extends utils.Interface {
         PromiseOrValue<string>[],
         PromiseOrValue<boolean>
     ]): string;
-    encodeFunctionData(functionFragment: "upgradeAll", values: [PromiseOrValue<BigNumberish>[]]): string;
     encodeFunctionData(functionFragment: "withdrawFromPolygon", values: [
         PromiseOrValue<BytesLike>,
         PromiseOrValue<BigNumberish>,
@@ -198,7 +196,6 @@ export interface IUNSRegistryInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferFrom", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unlockWithRecords", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "upgradeAll", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdrawFromPolygon", data: BytesLike): Result;
     events: {
         "AdminChanged(address,address)": EventFragment;
@@ -452,9 +449,6 @@ export interface IUNSRegistry extends BaseContract {
         unlockWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
         withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -558,9 +552,6 @@ export interface IUNSRegistry extends BaseContract {
     unlockWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
-    upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
     withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -614,7 +605,6 @@ export interface IUNSRegistry extends BaseContract {
         tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         unlockWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<void>;
         withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
     };
     filters: {
@@ -737,9 +727,6 @@ export interface IUNSRegistry extends BaseContract {
         unlockWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
         withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
@@ -836,9 +823,6 @@ export interface IUNSRegistry extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         unlockWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         withdrawFromPolygon(inputData: PromiseOrValue<BytesLike>, tokenId: PromiseOrValue<BigNumberish>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
