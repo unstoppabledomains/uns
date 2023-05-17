@@ -1,3 +1,7 @@
+## v0.8.7
+
+- Un-deprecate Railgun currencies 
+
 ## v0.8.6
 
 - Removed `MintingManager#bulkIssue` functionality
