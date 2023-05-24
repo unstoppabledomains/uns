@@ -1,3 +1,7 @@
+## v0.8.8
+
+- Add `.realm` TLD
+
 ## v0.8.7
 
 - Un-deprecate Railgun currencies 

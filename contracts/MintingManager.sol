@@ -22,7 +22,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using Strings for *;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.15';
+    string public constant VERSION = '0.4.16';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -96,7 +96,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         __ERC2771Context_init_unchained(forwarder);
         __Pausable_init_unchained();
 
-        string[17] memory tlds = [
+        string[18] memory tlds = [
             'crypto',
             'wallet',
             'x',
@@ -113,7 +113,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             'kresus',
             'anime',
             'manga',
-            'binanceus'
+            'binanceus',
+            'realm'
         ];
         for (uint256 i = 0; i < tlds.length; i++) {
             _addTld(tlds[i]);
