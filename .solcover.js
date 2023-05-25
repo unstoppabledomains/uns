@@ -16,5 +16,6 @@ module.exports = {
     'utils/MultiSend.sol',
     'utils/ERC1271SimpleWallet.sol',
     'history/UNSRegistryV07.sol',
+    'history/ProxyReaderV04.sol',
   ],
 };

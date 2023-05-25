@@ -6,18 +6,19 @@ import { ProxyReader, UNSRegistry } from '../types/contracts';
 import { CNSRegistry } from '../types/dot-crypto/contracts';
 import { ProxyReader__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { CNSRegistry__factory } from '../types/factories/dot-crypto/contracts';
+import { ProxyReaderV04__factory } from '../types/factories/contracts/history';
 import { mintDomain } from './helpers/registry';
 import { TLD, ZERO_ADDRESS } from './helpers/constants';
 
 describe('ProxyReader (proxy)', () => {
   let unsRegistry: UNSRegistry, cnsRegistry: CNSRegistry, proxyReader: ProxyReader;
-  let signers: SignerWithAddress[], coinbase: SignerWithAddress;
+  let signers: SignerWithAddress[], coinbase: SignerWithAddress, receiver: SignerWithAddress;
 
   let walletTokenId: BigNumber;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [coinbase] = signers;
+    [coinbase, receiver] = signers;
   });
 
   beforeEach(async () => {
@@ -46,5 +47,36 @@ describe('ProxyReader (proxy)', () => {
   it('should be able to read via Proxy', async () => {
     expect(await proxyReader.exists(walletTokenId)).to.be.equal(true);
     expect(await proxyReader.ownerOf(walletTokenId)).to.be.equal(coinbase.address);
+  });
+
+  it('should keep forwarding with storage layout consistent after upgrade', async () => {
+    proxyReader = await upgrades.deployProxy(
+      new ProxyReaderV04__factory(coinbase),
+      [ unsRegistry.address, cnsRegistry.address ],
+      { unsafeAllow: ['delegatecall'] },
+    ) as ProxyReader;
+
+    expect(await proxyReader.exists(walletTokenId)).to.be.equal(true);
+    expect(await proxyReader.ownerOf(walletTokenId)).to.be.equal(coinbase.address);
+
+    const upgradedProxyReader = await upgrades.upgradeProxy(
+      proxyReader.address,
+      new ProxyReader__factory(coinbase),
+      {
+        unsafeAllow: ['delegatecall'],
+        call: {
+          fn: 'setOwner(address)',
+          args: [coinbase.address],
+        },
+      },
+    );
+
+    expect(await upgradedProxyReader.owner()).to.equal(coinbase.address);
+    expect(await proxyReader.exists(walletTokenId)).to.be.equal(true);
+    expect(await proxyReader.ownerOf(walletTokenId)).to.be.equal(coinbase.address);
+
+    await expect(
+      upgradedProxyReader.setOwner(receiver.address),
+    ).to.be.revertedWith('ProxyReader: OWNER_ALREADY_SET');
   });
 });

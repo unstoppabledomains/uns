@@ -784,6 +784,42 @@ const deployDotCoinBurnerTask: Task = {
   },
 };
 
+const prepareProxyReaderUpgradeTask: Task = {
+  tags: ['prepare_proxy_reader_upgrade'],
+  priority: 210,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const ProxyReader = unwrap(dependencies, ArtifactName.ProxyReader);
+
+    const deployTx = await upgrades.prepareUpgrade(ProxyReader.address, ctx.artifacts.ProxyReader, {
+      unsafeAllow: ['delegatecall'],
+    });
+
+    ctx.log('Deployed ProxyReader implementation: ', deployTx);
+
+    const { owner } = ctx.accounts;
+    const callData = ctx.artifacts.ProxyReader.interface.encodeFunctionData('setOwner(address)', [owner.address]);
+
+    console.log(`setOwner encoded data(owner ${owner}): ${callData}`);
+  },
+  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { ProxyReader, ProxyAdmin } = config.contracts || {};
+    if (!ProxyAdmin || !ProxyAdmin.address) {
+      throw new Error('Current network configuration does not support upgrading');
+    }
+
+    const dependencies = { ProxyReader };
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    }
+
+    return dependencies;
+  },
+};
+
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -802,4 +838,5 @@ export const tasks: Task[] = [
   deployDotCoinBurnerTask,
   deployUNSOperatorTask,
   upgradeUNSOperatorTask,
+  prepareProxyReaderUpgradeTask,
 ];

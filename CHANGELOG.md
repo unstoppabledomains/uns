@@ -1,3 +1,8 @@
+## v0.8.9
+
+- ProxyReader@0.5.0 receives new blockchain family keys resolution interface
+- Solidity version bumped to 0.8.12 across the project
+
 ## v0.8.8
 
 - Add `.realm` TLD
