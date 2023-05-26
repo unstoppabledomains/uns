@@ -784,8 +784,8 @@ const deployDotCoinBurnerTask: Task = {
   },
 };
 
-const prepareProxyReaderUpgradeTask: Task = {
-  tags: ['prepare_proxy_reader_upgrade'],
+const prepareProxyReaderTask: Task = {
+  tags: ['prepare_proxy_reader'],
   priority: 210,
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const ProxyReader = unwrap(dependencies, ArtifactName.ProxyReader);
@@ -838,5 +838,5 @@ export const tasks: Task[] = [
   deployDotCoinBurnerTask,
   deployUNSOperatorTask,
   upgradeUNSOperatorTask,
-  prepareProxyReaderUpgradeTask,
+  prepareProxyReaderTask,
 ];

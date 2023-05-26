@@ -17,6 +17,9 @@ import './utils/Ownable.sol';
 contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegistryReader, IRecordReader, IDataReader, IAddressReader {
     using AddressUpgradeable for address;
 
+    event SetNetworkFamily(string network);
+    event SetLegacyRecords(string tokenKey);
+
     string public constant NAME = 'UNS: Proxy Reader';
     string public constant VERSION = '0.5.0';
 
@@ -251,7 +254,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         string memory separator = '.';
 
         // Token key
-        string memory tokenKey = string.concat(prefix, family, separator, network, separator, token, suffix);
+        string memory tokenKey = string(abi.encodePacked(prefix, family, separator, network, separator, token, suffix));
 
         // Legacy token keys
         string[] memory legacyKeys = _legacyKeys[tokenKey];
@@ -265,10 +268,10 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         }
 
         // Network key
-        keys[legacyKeys.length + 1] = string.concat(prefix, family, separator, network, suffix);
+        keys[legacyKeys.length + 1] = string(abi.encodePacked(prefix, family, separator, network, suffix));
 
         // Family key
-        keys[legacyKeys.length + 2] = string.concat(prefix, family, suffix);
+        keys[legacyKeys.length + 2] = string(abi.encodePacked(prefix, family, suffix));
     }
 
     function getAddress(
@@ -300,28 +303,32 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
     }
 
     function addBlockchainNetworksV1(string[] calldata networks, string[] calldata families) external onlyOwner {
-        _ensureSameLength(networks.length, families.length);
+        require(networks.length == families.length, 'ProxyReader: LENGTH_NOT_EQUAL');
 
         for (uint256 i = 0; i < networks.length; i++) {
-            _families[networks[i]] = families[i];
+            _setNetworkfamily(networks[i], families[i]);
         }
     }
 
     function addBlockchainNetworksV2(string[] calldata networks, string calldata family) external onlyOwner {
         for (uint256 i = 0; i < networks.length; i++) {
-            _families[networks[i]] = family;
+            _setNetworkfamily(networks[i], family);
         }
     }
 
     function addLegacyRecords(string[] calldata keys, string[][] calldata legacyKeys) external onlyOwner {
-        _ensureSameLength(keys.length, legacyKeys.length);
+        require(keys.length == legacyKeys.length, 'ProxyReader: LENGTH_NOT_EQUAL');
 
         for (uint256 i = 0; i < keys.length; i++) {
-            delete _legacyKeys[keys[i]];
+            if (_legacyKeys[keys[i]].length > 0) {
+                delete _legacyKeys[keys[i]];
+            }
 
             for (uint256 j = 0; j < legacyKeys[i].length; j++) {
                 _legacyKeys[keys[i]].push(legacyKeys[i][j]);
             }
+
+            emit SetLegacyRecords(keys[i]);
         }
     }
 
@@ -427,10 +434,6 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         }
     }
 
-    function _ensureSameLength(uint256 length1, uint256 length2) private pure {
-        require(length1 == length2, 'ProxyReader: LENGTH_NOT_EQUAL');
-    }
-
     function _getAddressAndKey(
         string calldata network,
         string calldata token,
@@ -446,6 +449,11 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
                 break;
             }
         }
+    }
+
+    function _setNetworkfamily(string calldata network, string calldata family) private {
+        _families[network] = family;
+        emit SetNetworkFamily(network);
     }
 
     // Reserved storage space to allow for layout changes in the future.

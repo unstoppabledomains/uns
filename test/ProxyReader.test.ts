@@ -1390,6 +1390,20 @@ describe('ProxyReader', () => {
         expect(key3).to.equal('token.ANOTHER_FAMILY.NETWORK.TOKEN.address');
       });
 
+      it('should emit SetNetworkFamily event', async () => {
+        await expect(
+          proxyReader.connect(coinbase).addBlockchainNetworksV1(
+            ['MATIC'], ['ETH'],
+          ),
+        ).to.emit(proxyReader, 'SetNetworkFamily').withArgs('MATIC');
+
+        await expect(
+          proxyReader.connect(coinbase).addBlockchainNetworksV1(
+            ['MATIC', 'BSC'], ['ETH', 'ETH'],
+          ),
+        ).to.emit(proxyReader, 'SetNetworkFamily').withArgs('BSC');
+      });
+
       it('should revert if not owner', async () => {
         await expect(
           proxyReader.connect(reader).addBlockchainNetworksV1([], []),
@@ -1421,6 +1435,20 @@ describe('ProxyReader', () => {
 
         const [key3 ] = await proxyReader.getAddressKeys('NETWORK2', 'TOKEN');
         expect(key3).to.equal('token.ANOTHER_FAMILY.NETWORK2.TOKEN.address');
+      });
+
+      it('should emit SetNetworkFamily event', async () => {
+        await expect(
+          proxyReader.connect(coinbase).addBlockchainNetworksV2(
+            ['MATIC'], 'ETH',
+          ),
+        ).to.emit(proxyReader, 'SetNetworkFamily').withArgs('MATIC');
+
+        await expect(
+          proxyReader.connect(coinbase).addBlockchainNetworksV2(
+            ['MATIC', 'BSC'], 'ETH',
+          ),
+        ).to.emit(proxyReader, 'SetNetworkFamily').withArgs('BSC');
       });
 
       it('should revert if not owner', async () => {
@@ -1484,6 +1512,27 @@ describe('ProxyReader', () => {
         expect(keys4.length).to.equal(3);
       });
 
+      it('should emit SetLegacyRecords event', async () => {
+        const tokenKey1 = 'token.FAMILY.NETWORK.TOKEN.address';
+        const tokenKey2 = 'token.FAMILY2.NETWORK.TOKEN.address';
+
+        await expect(
+          proxyReader.connect(coinbase).addLegacyRecords(
+            [tokenKey1],
+            [[]],
+          ),
+        ).to.emit(proxyReader, 'SetLegacyRecords')
+          .withArgs(tokenKey1);
+
+        await expect(
+          proxyReader.connect(coinbase).addLegacyRecords(
+            [tokenKey1, tokenKey2],
+            [[], []],
+          ),
+        ).to.emit(proxyReader, 'SetLegacyRecords')
+          .withArgs(tokenKey2);
+      });
+
       it('should revert if args arrays have different lengths', async () => {
         await expect(
           proxyReader.connect(coinbase).addLegacyRecords(['RECORD_KEY'], []),
@@ -1493,6 +1542,58 @@ describe('ProxyReader', () => {
       it('should revert if not owner', async () => {
         await expect(
           proxyReader.connect(reader).addLegacyRecords([], []),
+        ).to.be.revertedWith('Ownable: caller is not the owner');
+      });
+    });
+  });
+
+  describe('Ownable', () => {
+    let newOwner: SignerWithAddress;
+
+    before(() => {
+      [, newOwner] = signers;
+    });
+
+    it('has an owner', async () => {
+      expect(
+        await proxyReader.owner(),
+      ).to.equal(coinbase.address);
+    });
+
+    describe('transferOwnership', () => {
+      it('changes owner after transfer', async () => {
+        await expect(proxyReader.transferOwnership(newOwner.address))
+          .to.emit(proxyReader, 'OwnershipTransferred')
+          .withArgs(coinbase.address, newOwner.address);
+
+        expect(await proxyReader.owner()).to.equal(newOwner.address);
+      });
+
+      it('reverts if non-owner', async () => {
+        await expect(
+          proxyReader.transferOwnership(newOwner.address),
+        ).to.be.revertedWith('Ownable: caller is not the owner');
+      });
+
+      it('guards ownership against stuck state', async function () {
+        await expect(
+          proxyReader.connect(newOwner).transferOwnership(ZERO_ADDRESS),
+        ).to.be.revertedWith('Ownable: new owner is the zero address');
+      });
+    });
+
+    describe('renounceOwnership', () => {
+      it('loses ownership after renouncement', async function () {
+        await expect(proxyReader.connect(newOwner).renounceOwnership())
+          .to.emit(proxyReader, 'OwnershipTransferred')
+          .withArgs(newOwner.address, ZERO_ADDRESS);
+
+        expect(await proxyReader.owner()).to.equal(ZERO_ADDRESS);
+      });
+
+      it('prevents non-owners from renouncement', async function () {
+        await expect(
+          proxyReader.renounceOwnership(),
         ).to.be.revertedWith('Ownable: caller is not the owner');
       });
     });

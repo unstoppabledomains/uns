@@ -13,7 +13,7 @@ async function main () {
   }
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['prepare_proxy_reader_upgrade'], config);
+  const deployConfig = await deployer.execute(['prepare_proxy_reader'], config);
   mergeNetworkConfig(deployConfig);
 }
 
