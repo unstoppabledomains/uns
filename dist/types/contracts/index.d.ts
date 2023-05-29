@@ -14,6 +14,7 @@ import type * as utils from "./utils";
 export type { utils };
 export type { ChildRegistry } from "./ChildRegistry";
 export type { DotCoinBurner } from "./DotCoinBurner";
+export type { IAddressReader } from "./IAddressReader";
 export type { IDataReader } from "./IDataReader";
 export type { IERC1967 } from "./IERC1967";
 export type { IMintingManager } from "./IMintingManager";

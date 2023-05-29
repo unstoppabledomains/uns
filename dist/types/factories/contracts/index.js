@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UNSRegistry__factory = exports.UNSOperator__factory = exports.RootRegistry__factory = exports.RecordStorage__factory = exports.ProxyReader__factory = exports.MintingManager__factory = exports.KeyStorage__factory = exports.IUNSRegistry__factory = exports.IRootRegistry__factory = exports.IReverseRegistry__factory = exports.IRegistryReader__factory = exports.IRecordStorage__factory = exports.IRecordReader__factory = exports.IMintingManager__factory = exports.IERC1967__factory = exports.IDataReader__factory = exports.DotCoinBurner__factory = exports.ChildRegistry__factory = exports.utils = exports.roles = exports.mocks = exports.metatx = exports.history = exports.cns = exports.maticnetwork = void 0;
+exports.UNSRegistry__factory = exports.UNSOperator__factory = exports.RootRegistry__factory = exports.RecordStorage__factory = exports.ProxyReader__factory = exports.MintingManager__factory = exports.KeyStorage__factory = exports.IUNSRegistry__factory = exports.IRootRegistry__factory = exports.IReverseRegistry__factory = exports.IRegistryReader__factory = exports.IRecordStorage__factory = exports.IRecordReader__factory = exports.IMintingManager__factory = exports.IERC1967__factory = exports.IDataReader__factory = exports.IAddressReader__factory = exports.DotCoinBurner__factory = exports.ChildRegistry__factory = exports.utils = exports.roles = exports.mocks = exports.metatx = exports.history = exports.cns = exports.maticnetwork = void 0;
 exports.maticnetwork = __importStar(require("./@maticnetwork"));
 exports.cns = __importStar(require("./cns"));
 exports.history = __importStar(require("./history"));
@@ -35,6 +35,8 @@ var ChildRegistry__factory_1 = require("./ChildRegistry__factory");
 Object.defineProperty(exports, "ChildRegistry__factory", { enumerable: true, get: function () { return ChildRegistry__factory_1.ChildRegistry__factory; } });
 var DotCoinBurner__factory_1 = require("./DotCoinBurner__factory");
 Object.defineProperty(exports, "DotCoinBurner__factory", { enumerable: true, get: function () { return DotCoinBurner__factory_1.DotCoinBurner__factory; } });
+var IAddressReader__factory_1 = require("./IAddressReader__factory");
+Object.defineProperty(exports, "IAddressReader__factory", { enumerable: true, get: function () { return IAddressReader__factory_1.IAddressReader__factory; } });
 var IDataReader__factory_1 = require("./IDataReader__factory");
 Object.defineProperty(exports, "IDataReader__factory", { enumerable: true, get: function () { return IDataReader__factory_1.IDataReader__factory; } });
 var IERC1967__factory_1 = require("./IERC1967__factory");

@@ -7,6 +7,7 @@ export * as roles from "./roles";
 export * as utils from "./utils";
 export { ChildRegistry__factory } from "./ChildRegistry__factory";
 export { DotCoinBurner__factory } from "./DotCoinBurner__factory";
+export { IAddressReader__factory } from "./IAddressReader__factory";
 export { IDataReader__factory } from "./IDataReader__factory";
 export { IERC1967__factory } from "./IERC1967__factory";
 export { IMintingManager__factory } from "./IMintingManager__factory";
