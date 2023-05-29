@@ -1,3 +1,7 @@
+## v0.8.10
+
+- Upgrade ProxyReader on `goerli` and `mumbai`
+
 ## v0.8.9
 
 - ProxyReader@0.5.0 receives new blockchain family keys resolution interface
