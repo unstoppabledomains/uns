@@ -1,3 +1,7 @@
+## v0.8.9
+
+- ProxyReader@0.5.0 receives new blockchain family keys resolution interface
+
 ## v0.8.8
 
 - Add `.realm` TLD

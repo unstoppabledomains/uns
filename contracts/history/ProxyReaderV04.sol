@@ -1,35 +1,25 @@
 // @author Unstoppable Domains, Inc.
-// @date June 16th, 2021
+// @date May 23th, 2023
 
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol';
-import './cns/ICNSRegistry.sol';
-import './cns/IResolver.sol';
-import './IUNSRegistry.sol';
-import './IDataReader.sol';
-import './IAddressReader.sol';
-import './IRecordReader.sol';
-import './IRegistryReader.sol';
-import './utils/Ownable.sol';
+import '../cns/ICNSRegistry.sol';
+import '../cns/IResolver.sol';
+import '../IUNSRegistry.sol';
+import '../IDataReader.sol';
+import '../IRecordReader.sol';
+import '../IRegistryReader.sol';
 
-contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegistryReader, IRecordReader, IDataReader, IAddressReader {
+contract ProxyReaderV04 is ERC165Upgradeable, MulticallUpgradeable, IRegistryReader, IRecordReader, IDataReader {
     using AddressUpgradeable for address;
 
-    event SetNetworkFamily(string network);
-    event SetLegacyRecords(string tokenKey);
-
     string public constant NAME = 'UNS: Proxy Reader';
-    string public constant VERSION = '0.5.0';
+    string public constant VERSION = '0.4.1';
 
     IUNSRegistry private _unsRegistry;
     ICNSRegistry private _cnsRegistry;
-
-    /// @dev Mapping networks to families
-    mapping(string => string) internal _families;
-    /// @dev Mapping of token keys to legacy prioritised token keys
-    mapping(string => string[]) internal _legacyKeys;
 
     function initialize(IUNSRegistry unsRegistry, ICNSRegistry cnsRegistry) public initializer {
         _unsRegistry = unsRegistry;
@@ -37,13 +27,6 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
 
         __ERC165_init_unchained();
         __Multicall_init_unchained();
-        __Ownable_init_unchained();
-    }
-
-    // One time function for Ownable deployment
-    function setOwner(address addr) public {
-        require(owner() == address(0), 'ProxyReader: OWNER_ALREADY_SET');
-        _transferOwnership(addr);
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
@@ -51,7 +34,6 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
             interfaceId == type(IRegistryReader).interfaceId ||
             interfaceId == type(IRecordReader).interfaceId ||
             interfaceId == type(IDataReader).interfaceId ||
-            interfaceId == type(IAddressReader).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
@@ -242,54 +224,6 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         }
     }
 
-    function getAddressKeys(string calldata network, string calldata token) public view override returns (string[] memory keys) {
-        string memory family = _families[network];
-
-        if (bytes(family).length == 0) {
-            return keys;
-        }
-
-        string memory prefix = 'token.';
-        string memory suffix = '.address';
-        string memory separator = '.';
-
-        // Token key
-        string memory tokenKey = string(abi.encodePacked(prefix, family, separator, network, separator, token, suffix));
-
-        // Legacy token keys
-        string[] memory legacyKeys = _legacyKeys[tokenKey];
-        // legacyKeys.length + 3 level keys
-        keys = new string[](legacyKeys.length + 3);
-
-        keys[0] = tokenKey;
-
-        for (uint256 i = 0; i < legacyKeys.length; i++) {
-            keys[i + 1] = legacyKeys[i];
-        }
-
-        // Network key
-        keys[legacyKeys.length + 1] = string(abi.encodePacked(prefix, family, separator, network, suffix));
-
-        // Family key
-        keys[legacyKeys.length + 2] = string(abi.encodePacked(prefix, family, suffix));
-    }
-
-    function getAddress(
-        string calldata network,
-        string calldata token,
-        uint256 tokenId
-    ) external view override returns (string memory addr) {
-        (addr, ) = _getAddressAndKey(network, token, tokenId);
-    }
-
-    function getAddressKey(
-        string calldata network,
-        string calldata token,
-        uint256 tokenId
-    ) external view override returns (string memory key) {
-        (, key) = _getAddressAndKey(network, token, tokenId);
-    }
-
     /**
      * @dev Returns registry address for specified token or zero address if token does not exist.
      */
@@ -300,36 +234,6 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
             return address(_cnsRegistry);
         }
         return address(0);
-    }
-
-    function addBlockchainNetworks(string[] calldata networks, string[] calldata families) external onlyOwner {
-        require(networks.length == families.length, 'ProxyReader: LENGTH_NOT_EQUAL');
-
-        for (uint256 i = 0; i < networks.length; i++) {
-            _setNetworkFamily(networks[i], families[i]);
-        }
-    }
-
-    function addBlockchainNetworks(string[] calldata networks, string calldata family) external onlyOwner {
-        for (uint256 i = 0; i < networks.length; i++) {
-            _setNetworkFamily(networks[i], family);
-        }
-    }
-
-    function addLegacyRecords(string[] calldata keys, string[][] calldata legacyKeys) external onlyOwner {
-        require(keys.length == legacyKeys.length, 'ProxyReader: LENGTH_NOT_EQUAL');
-
-        for (uint256 i = 0; i < keys.length; i++) {
-            if (_legacyKeys[keys[i]].length > 0) {
-                delete _legacyKeys[keys[i]];
-            }
-
-            for (uint256 j = 0; j < legacyKeys[i].length; j++) {
-                _legacyKeys[keys[i]].push(legacyKeys[i][j]);
-            }
-
-            emit SetLegacyRecords(keys[i]);
-        }
     }
 
     function _exists(uint256 tokenId) private view returns (bool) {
@@ -434,28 +338,6 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         }
     }
 
-    function _getAddressAndKey(
-        string calldata network,
-        string calldata token,
-        uint256 tokenId
-    ) private view returns (string memory addr, string memory key) {
-        string[] memory keys = getAddressKeys(network, token);
-        string[] memory records = _getMany(keys, tokenId);
-
-        for (uint256 i = 0; i < records.length; i++) {
-            if (bytes(records[i]).length > 0) {
-                key = keys[i];
-                addr = records[i];
-                break;
-            }
-        }
-    }
-
-    function _setNetworkFamily(string calldata network, string calldata family) private {
-        _families[network] = family;
-        emit SetNetworkFamily(network);
-    }
-
     // Reserved storage space to allow for layout changes in the future.
-    uint256[48] __gap;
+    uint256[50] __gap;
 }
