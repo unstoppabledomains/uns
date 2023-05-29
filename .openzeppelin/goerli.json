@@ -5609,6 +5609,137 @@
           }
         }
       }
+    },
+    "795542dc3fb150b34969ed36893299a02f3c37aff08786afee12caa10465ce83": {
+      "address": "0xAa61dBf197646Bd01747f0AFf4Fa24135B4568Fb",
+      "txHash": "0xf929e7f51e704cb4a4d3b4e031d8c8c77194de49404180c1773b5fd32c2897ce",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC165Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:41"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "MulticallUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol:50"
+          },
+          {
+            "label": "_unsRegistry",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_contract(IUNSRegistry)1413",
+            "contract": "ProxyReader",
+            "src": "contracts/ProxyReader.sol:26"
+          },
+          {
+            "label": "_cnsRegistry",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_contract(ICNSRegistry)3256",
+            "contract": "ProxyReader",
+            "src": "contracts/ProxyReader.sol:27"
+          },
+          {
+            "label": "_families",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_mapping(t_string_memory_ptr,t_string_storage)",
+            "contract": "ProxyReader",
+            "src": "contracts/ProxyReader.sol:30"
+          },
+          {
+            "label": "_legacyKeys",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_mapping(t_string_memory_ptr,t_array(t_string_storage)dyn_storage)",
+            "contract": "ProxyReader",
+            "src": "contracts/ProxyReader.sol:32"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "105",
+            "type": "t_array(t_uint256)48_storage",
+            "contract": "ProxyReader",
+            "src": "contracts/ProxyReader.sol:460"
+          }
+        ],
+        "types": {
+          "t_array(t_string_storage)dyn_storage": {
+            "label": "string[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)48_storage": {
+            "label": "uint256[48]",
+            "numberOfBytes": "1536"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(ICNSRegistry)3256": {
+            "label": "contract ICNSRegistry",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IUNSRegistry)1413": {
+            "label": "contract IUNSRegistry",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_string_memory_ptr,t_array(t_string_storage)dyn_storage)": {
+            "label": "mapping(string => string[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_string_storage)": {
+            "label": "mapping(string => string)",
+            "numberOfBytes": "32"
+          },
+          "t_string_memory_ptr": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
     }
   }
 }

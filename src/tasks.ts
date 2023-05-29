@@ -790,16 +790,25 @@ const prepareProxyReaderTask: Task = {
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const ProxyReader = unwrap(dependencies, ArtifactName.ProxyReader);
 
-    const deployTx = await upgrades.prepareUpgrade(ProxyReader.address, ctx.artifacts.ProxyReader, {
+    const newImplementationAddr = await upgrades.prepareUpgrade(ProxyReader.address, ctx.artifacts.ProxyReader, {
       unsafeAllow: ['delegatecall'],
-    });
+    }) as string;
 
-    ctx.log('Deployed ProxyReader implementation: ', deployTx);
+    ctx.log('Deployed ProxyReader implementation: ', newImplementationAddr);
+
+    if (newImplementationAddr) {
+      await ctx.saveContractConfig(
+        UnsContractName.ProxyReader,
+        ctx.artifacts.ProxyReader.attach(ProxyReader.address),
+        newImplementationAddr,
+      );
+      await verify(ctx, newImplementationAddr, []);
+    }
 
     const { owner } = ctx.accounts;
     const callData = ctx.artifacts.ProxyReader.interface.encodeFunctionData('setOwner(address)', [owner.address]);
 
-    console.log(`setOwner encoded data(owner ${owner}): ${callData}`);
+    console.log(`setOwner encoded data(owner ${newImplementationAddr}): ${callData}`);
   },
   ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
