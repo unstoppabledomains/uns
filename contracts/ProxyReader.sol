@@ -302,17 +302,17 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         return address(0);
     }
 
-    function addBlockchainNetworksV1(string[] calldata networks, string[] calldata families) external onlyOwner {
+    function addBlockchainNetworks(string[] calldata networks, string[] calldata families) external onlyOwner {
         require(networks.length == families.length, 'ProxyReader: LENGTH_NOT_EQUAL');
 
         for (uint256 i = 0; i < networks.length; i++) {
-            _setNetworkfamily(networks[i], families[i]);
+            _setNetworkFamily(networks[i], families[i]);
         }
     }
 
-    function addBlockchainNetworksV2(string[] calldata networks, string calldata family) external onlyOwner {
+    function addBlockchainNetworks(string[] calldata networks, string calldata family) external onlyOwner {
         for (uint256 i = 0; i < networks.length; i++) {
-            _setNetworkfamily(networks[i], family);
+            _setNetworkFamily(networks[i], family);
         }
     }
 
@@ -451,7 +451,7 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         }
     }
 
-    function _setNetworkfamily(string calldata network, string calldata family) private {
+    function _setNetworkFamily(string calldata network, string calldata family) private {
         _families[network] = family;
         emit SetNetworkFamily(network);
     }

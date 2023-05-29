@@ -993,7 +993,7 @@ describe('ProxyReader', () => {
     const ethLegacyKey = 'crypto.ETH.address';
 
     beforeEach(async () => {
-      await proxyReader.addBlockchainNetworksV1(
+      await proxyReader.functions['addBlockchainNetworks(string[],string[])'](
         ['MATIC', 'ETH'],
         ['ETH', 'ETH'],
       );
@@ -1118,6 +1118,37 @@ describe('ProxyReader', () => {
         ).to.equal('token-level-record');
       });
 
+      it('should return most specific record by address keys for UNS domains with skipped levels', async () => {
+        const [
+          tokenKey,
+          legacyTokenKey,
+          ,
+          ,
+          familyKey,
+        ] = await proxyReader.getAddressKeys('ETH', 'USDC');
+
+        await unsRegistry.set(tokenKey, 'token-level-record', walletTokenId);
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
+        ).to.equal('token-level-record');
+
+        await unsRegistry.set(familyKey, 'family-level-record', walletTokenId);
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
+        ).to.equal('token-level-record');
+
+        await unsRegistry.set(tokenKey, '', walletTokenId);
+
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
+        ).to.equal('family-level-record');
+
+        await unsRegistry.set(legacyTokenKey, 'legacy-key-1-record', walletTokenId);
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
+        ).to.equal('legacy-key-1-record');
+      });
+
       it('should return most specific record by address keys for CNS domains', async () => {
         const [
           tokenKey,
@@ -1151,6 +1182,37 @@ describe('ProxyReader', () => {
         expect(
           await proxyReader.getAddress('ETH', 'USDC', cryptoTokenId),
         ).to.equal('token-level-record');
+      });
+
+      it('should return most specific record by address keys for CNS domains with skipped levels', async () => {
+        const [
+          tokenKey,
+          legacyTokenKey,
+          ,
+          ,
+          familyKey,
+        ] = await proxyReader.getAddressKeys('ETH', 'USDC');
+
+        await resolver.set(tokenKey, 'token-level-record', cryptoTokenId);
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', cryptoTokenId),
+        ).to.equal('token-level-record');
+
+        await resolver.set(familyKey, 'family-level-record', cryptoTokenId);
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', cryptoTokenId),
+        ).to.equal('token-level-record');
+
+        await resolver.set(tokenKey, '', cryptoTokenId);
+
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', cryptoTokenId),
+        ).to.equal('family-level-record');
+
+        await resolver.set(legacyTokenKey, 'legacy-key-1-record', cryptoTokenId);
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', cryptoTokenId),
+        ).to.equal('legacy-key-1-record');
       });
 
       it('should return empty string if family is not defined', async () => {
@@ -1196,6 +1258,37 @@ describe('ProxyReader', () => {
         ).to.equal(tokenKey);
       });
 
+      it('should return most specific record key by address keys for UNS domains with skipped levels', async () => {
+        const [
+          tokenKey,
+          legacyTokenKey,
+          ,
+          ,
+          familyKey,
+        ] = await proxyReader.getAddressKeys('ETH', 'USDC');
+
+        await unsRegistry.set(tokenKey, '42', walletTokenId);
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
+        ).to.equal(tokenKey);
+
+        await unsRegistry.set(familyKey, '42', walletTokenId);
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
+        ).to.equal(tokenKey);
+
+        await unsRegistry.set(tokenKey, '', walletTokenId);
+
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
+        ).to.equal(familyKey);
+
+        await unsRegistry.set(legacyTokenKey, '42', walletTokenId);
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
+        ).to.equal(legacyTokenKey);
+      });
+
       it('should return most specific record key by address keys for CNS domains', async () => {
         const [
           tokenKey,
@@ -1223,6 +1316,37 @@ describe('ProxyReader', () => {
         expect(
           await proxyReader.getAddressKey('ETH', 'USDC', cryptoTokenId),
         ).to.equal(tokenKey);
+      });
+
+      it('should return most specific record key by address keys for CNS domains with skipped levels', async () => {
+        const [
+          tokenKey,
+          legacyTokenKey,
+          ,
+          ,
+          familyKey,
+        ] = await proxyReader.getAddressKeys('ETH', 'USDC');
+
+        await resolver.set(tokenKey, '42', cryptoTokenId);
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', cryptoTokenId),
+        ).to.equal(tokenKey);
+
+        await resolver.set(familyKey, '42', cryptoTokenId);
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', cryptoTokenId),
+        ).to.equal(tokenKey);
+
+        await resolver.set(tokenKey, '', cryptoTokenId);
+
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', cryptoTokenId),
+        ).to.equal(familyKey);
+
+        await resolver.set(legacyTokenKey, 'legacy-key-1-record', cryptoTokenId);
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', cryptoTokenId),
+        ).to.equal(legacyTokenKey);
       });
 
       it('should return empty string if token does not exist', async () => {
@@ -1370,9 +1494,11 @@ describe('ProxyReader', () => {
       [, reader] = signers;
     });
 
-    describe('addBlockchainNetworksV1', () => {
+    describe('addBlockchainNetworks(string[],string[])', () => {
+      const selector = 'addBlockchainNetworks(string[],string[])';
+
       it('should save blockchain networks to families mapping', async () => {
-        await proxyReader.connect(coinbase).addBlockchainNetworksV1(
+        await proxyReader.connect(coinbase)[selector](
           ['NETWORK', 'NETWORK2'], ['FAMILY', 'FAMILY2'],
         );
 
@@ -1382,7 +1508,7 @@ describe('ProxyReader', () => {
         expect(key1).to.equal('token.FAMILY.NETWORK.TOKEN.address');
         expect(key2).to.equal('token.FAMILY2.NETWORK2.TOKEN2.address');
 
-        await proxyReader.connect(coinbase).addBlockchainNetworksV1(
+        await proxyReader.connect(coinbase)[selector](
           ['NETWORK'], ['ANOTHER_FAMILY'],
         );
 
@@ -1392,13 +1518,13 @@ describe('ProxyReader', () => {
 
       it('should emit SetNetworkFamily event', async () => {
         await expect(
-          proxyReader.connect(coinbase).addBlockchainNetworksV1(
+          proxyReader.connect(coinbase)[selector](
             ['MATIC'], ['ETH'],
           ),
         ).to.emit(proxyReader, 'SetNetworkFamily').withArgs('MATIC');
 
         await expect(
-          proxyReader.connect(coinbase).addBlockchainNetworksV1(
+          proxyReader.connect(coinbase)[selector](
             ['MATIC', 'BSC'], ['ETH', 'ETH'],
           ),
         ).to.emit(proxyReader, 'SetNetworkFamily').withArgs('BSC');
@@ -1406,20 +1532,22 @@ describe('ProxyReader', () => {
 
       it('should revert if not owner', async () => {
         await expect(
-          proxyReader.connect(reader).addBlockchainNetworksV1([], []),
+          proxyReader.connect(reader)[selector]([], []),
         ).to.be.revertedWith('Ownable: caller is not the owner');
       });
 
       it('should revert if args arrays have different lengths', async () => {
         await expect(
-          proxyReader.connect(coinbase).addBlockchainNetworksV1(['NETWORK'], []),
+          proxyReader.connect(coinbase)[selector](['NETWORK'], []),
         ).to.be.revertedWith('ProxyReader: LENGTH_NOT_EQUAL');
       });
     });
 
-    describe('addBlockchainNetworksV2', () => {
+    describe('addBlockchainNetworks(string[],string)', () => {
+      const selector = 'addBlockchainNetworks(string[],string)';
+
       it('should save blockchain networks to families mapping', async () => {
-        await proxyReader.connect(coinbase).addBlockchainNetworksV2(
+        await proxyReader.connect(coinbase)[selector](
           ['NETWORK', 'NETWORK2'], 'FAMILY',
         );
 
@@ -1429,7 +1557,7 @@ describe('ProxyReader', () => {
         expect(key1).to.equal('token.FAMILY.NETWORK.TOKEN.address');
         expect(key2).to.equal('token.FAMILY.NETWORK2.TOKEN2.address');
 
-        await proxyReader.connect(coinbase).addBlockchainNetworksV2(
+        await proxyReader.connect(coinbase)[selector](
           ['NETWORK2'], 'ANOTHER_FAMILY',
         );
 
@@ -1439,13 +1567,13 @@ describe('ProxyReader', () => {
 
       it('should emit SetNetworkFamily event', async () => {
         await expect(
-          proxyReader.connect(coinbase).addBlockchainNetworksV2(
+          proxyReader.connect(coinbase)[selector](
             ['MATIC'], 'ETH',
           ),
         ).to.emit(proxyReader, 'SetNetworkFamily').withArgs('MATIC');
 
         await expect(
-          proxyReader.connect(coinbase).addBlockchainNetworksV2(
+          proxyReader.connect(coinbase)[selector](
             ['MATIC', 'BSC'], 'ETH',
           ),
         ).to.emit(proxyReader, 'SetNetworkFamily').withArgs('BSC');
@@ -1453,14 +1581,14 @@ describe('ProxyReader', () => {
 
       it('should revert if not owner', async () => {
         await expect(
-          proxyReader.connect(reader).addBlockchainNetworksV2(['NETWORK'], 'TOKEN'),
+          proxyReader.connect(reader)[selector](['NETWORK'], 'TOKEN'),
         ).to.be.revertedWith('Ownable: caller is not the owner');
       });
     });
 
-    describe('addLegacyRecords', () => {
+    describe('addLegacyRecords(string[],string[][])', () => {
       it('should save legacy keys and overwrite existing', async () => {
-        await proxyReader.connect(coinbase).addBlockchainNetworksV2(
+        await proxyReader.connect(coinbase)['addBlockchainNetworks(string[],string)'](
           ['SOME_NETWORK', 'SOME_OTHER_NETWORK'], 'SOME_FAMILY',
         );
 

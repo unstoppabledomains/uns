@@ -747,7 +747,7 @@ describe('ProxyReader (UNS only)', () => {
     const ethLegacyKey = 'crypto.ETH.address';
 
     beforeEach(async () => {
-      await proxyReader.addBlockchainNetworksV1(
+      await proxyReader['addBlockchainNetworks(string[],string[])'](
         ['MATIC', 'ETH'],
         ['ETH', 'ETH'],
       );
@@ -871,6 +871,37 @@ describe('ProxyReader (UNS only)', () => {
         ).to.equal('token-level-record');
       });
 
+      it('should return most specific record by address keys with skipped levels', async () => {
+        const [
+          tokenKey,
+          legacyTokenKey,
+          ,
+          ,
+          familyKey,
+        ] = await proxyReader.getAddressKeys('ETH', 'USDC');
+
+        await unsRegistry.set(tokenKey, 'token-level-record', walletTokenId);
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
+        ).to.equal('token-level-record');
+
+        await unsRegistry.set(familyKey, 'family-level-record', walletTokenId);
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
+        ).to.equal('token-level-record');
+
+        await unsRegistry.set(tokenKey, '', walletTokenId);
+
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
+        ).to.equal('family-level-record');
+
+        await unsRegistry.set(legacyTokenKey, 'legacy-key-1-record', walletTokenId);
+        expect(
+          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
+        ).to.equal('legacy-key-1-record');
+      });
+
       it('should return empty string if family is not defined', async () => {
         expect(
           await proxyReader.getAddress('UDTOKEN', 'UDTOKEN', walletTokenId),
@@ -912,6 +943,37 @@ describe('ProxyReader (UNS only)', () => {
         expect(
           await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
         ).to.equal(tokenKey);
+      });
+
+      it('should return most specific record key by address keys with skipped levels', async () => {
+        const [
+          tokenKey,
+          legacyTokenKey,
+          ,
+          ,
+          familyKey,
+        ] = await proxyReader.getAddressKeys('ETH', 'USDC');
+
+        await unsRegistry.set(tokenKey, '42', walletTokenId);
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
+        ).to.equal(tokenKey);
+
+        await unsRegistry.set(familyKey, '42', walletTokenId);
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
+        ).to.equal(tokenKey);
+
+        await unsRegistry.set(tokenKey, '', walletTokenId);
+
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
+        ).to.equal(familyKey);
+
+        await unsRegistry.set(legacyTokenKey, '42', walletTokenId);
+        expect(
+          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
+        ).to.equal(legacyTokenKey);
       });
 
       it('should return empty string if token does not exist', async () => {
