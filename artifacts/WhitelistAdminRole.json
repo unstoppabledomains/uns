@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "WhitelistAdminRole",
-  "sourceName": "@openzeppelin/contracts/access/roles/WhitelistAdminRole.sol",
+  "sourceName": "@openzeppelin/contracts-2.3/access/roles/WhitelistAdminRole.sol",
   "abi": [
     {
       "inputs": [],
