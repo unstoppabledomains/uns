@@ -1,0 +1,1 @@
+[{"inputs":[{"internalType":"contract IETHRegistrarController","name":"controller","type":"address"}],"stateMutability":"nonpayable","type":"constructor"}]

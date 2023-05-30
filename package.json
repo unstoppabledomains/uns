@@ -37,6 +37,7 @@
     "postinstall": "[ ! -d ./.git ] || yarn husky install"
   },
   "devDependencies": {
+    "@ensdomains/ens-contracts": "^0.0.21",
     "@ethereumjs/tx": "^4.0.1",
     "@nomiclabs/hardhat-ethers": "^2.2.1",
     "@nomiclabs/hardhat-etherscan": "^3.1.0",
@@ -75,6 +76,7 @@
     "hardhat-abi-exporter": "^2.2.1",
     "hardhat-contract-sizer": "^2.6.1",
     "hardhat-gas-reporter": "^1.0.9",
+    "hardhat-tracer": "^2.3.2",
     "hdkey": "^2.0.1",
     "husky": "^8.0.1",
     "lodash.merge": "^4.6.2",

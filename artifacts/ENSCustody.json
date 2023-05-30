@@ -1,0 +1,22 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ENSCustody",
+  "sourceName": "contracts/custody/ENSCustody.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IETHRegistrarController",
+          "name": "controller",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b50604051609f380380609f833981016040819052602a91604e565b600080546001600160a01b0319166001600160a01b0392909216919091179055607c565b600060208284031215605f57600080fd5b81516001600160a01b0381168114607557600080fd5b9392505050565b60168060896000396000f3fe6080604052600080fdfea164736f6c6343000811000a",
+  "deployedBytecode": "0x6080604052600080fdfea164736f6c6343000811000a",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
