@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "IERC721Metadata",
-  "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol",
+  "sourceName": "@openzeppelin/contracts-2.3/token/ERC721/IERC721Metadata.sol",
   "abi": [
     {
       "anonymous": false,
