@@ -13,7 +13,7 @@ import {ReentrancyGuardUpgradeable} from '@openzeppelin/contracts-upgradeable/se
 import {IERC165Upgradeable} from '@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol';
 import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 
-import {IENSCustody, Unauthorised, InvalidToken, UnknownToken, OperationProhibited} from './IENSCustody.sol';
+import {IENSCustody, Unauthorised, InvalidToken, UnknownToken, OperationProhibited, InvalidForwardedToken} from './IENSCustody.sol';
 import {ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
 import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
@@ -41,11 +41,6 @@ contract ENSCustody is
     IETHRegistrarController private _controller;
     INameWrapper private _wrapper;
 
-    // modifier protectTokenOperation(uint256 tokenId) {
-    //     _protectTokenOperation(tokenId);
-    //     _;
-    // }
-
     modifier onlyTokenOwner(uint256 tokenId) {
         if (_ownerOf(tokenId) != _msgSender()) {
             revert Unauthorised(tokenId, _msgSender());
@@ -53,8 +48,9 @@ contract ENSCustody is
         _;
     }
 
-    constructor(IETHRegistrarController controller, INameWrapper wrapper) {
-        initialize(controller, wrapper);
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
     }
 
     function initialize(IETHRegistrarController controller, INameWrapper wrapper) public initializer {
@@ -128,7 +124,6 @@ contract ENSCustody is
             );
     }
 
-    // TODO: protect
     function register(
         string calldata name,
         address owner,
@@ -140,6 +135,9 @@ contract ENSCustody is
         uint16 ownerControlledFuses,
         bool selfCustody
     ) external onlyMinter nonReentrant {
+        uint256 tokenId = _namehash(name);
+        _protectTokenOperation(tokenId);
+
         IPriceOracle.Price memory price = _controller.rentPrice(name, duration);
         _controller.register{value: price.base + price.premium}(
             name,
@@ -153,7 +151,6 @@ contract ENSCustody is
         );
 
         if (!selfCustody) {
-            uint256 tokenId = _namehash(name);
             _owners[tokenId] = owner;
             emit Parked(tokenId, owner);
         }
@@ -163,8 +160,8 @@ contract ENSCustody is
         return _ownerOf(tokenId);
     }
 
-    // TODO: protect
     function safeTransfer(address to, uint256 tokenId) external onlyTokenOwner(tokenId) {
+        _protectTokenOperation(tokenId);
         delete _owners[tokenId];
         _wrapper.safeTransferFrom(address(this), to, tokenId, 1, '');
     }
@@ -195,5 +192,15 @@ contract ENSCustody is
 
     function _namehash(string memory label) internal pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(_ETH_NODE, keccak256(abi.encodePacked(label)))));
+    }
+
+    function _protectTokenOperation(uint256 tokenId) internal {
+        if (isTrustedForwarder(msg.sender)) {
+            if (tokenId != _msgToken()) {
+                revert InvalidForwardedToken(tokenId);
+            }
+        } else {
+            _invalidateNonce(tokenId);
+        }
     }
 }

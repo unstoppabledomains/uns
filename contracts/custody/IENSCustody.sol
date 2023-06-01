@@ -9,6 +9,7 @@ error Unauthorised(uint256 tokenId, address addr);
 error InvalidToken(uint256 tokenId);
 error UnknownToken(uint256 tokenId);
 error OperationProhibited();
+error InvalidForwardedToken(uint256 tokenId);
 
 interface IENSCustody is IERC1155ReceiverUpgradeable {
     event Parked(uint256 indexed tokenId, address indexed owner);
