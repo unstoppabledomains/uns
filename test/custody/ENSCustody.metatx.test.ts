@@ -222,4 +222,22 @@ describe('ENSCustody (metatx)', function () {
     );
     await expect(custody.connect(spender).execute(req, signature)).to.be.revertedWith('Unauthorised');
   });
+
+  it('should revert with invalid token error when forwarded token incorrect', async () => {
+    const name = 'mts-cw12';
+    const tokenId = namehash(`${name}.eth`);
+    await topupCustody(name);
+
+    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await assertOwnership(name, registrantAddress);
+
+    const { req, signature } = await buildExecuteParams(
+      'safeTransfer(address,uint256)',
+      [registrantAddress, tokenId],
+      registrant,
+      1,
+      await custody.nonceOf(1),
+    );
+    await expect(custody.connect(spender).execute(req, signature)).to.be.revertedWith('InvalidForwardedToken');
+  });
 });

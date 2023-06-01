@@ -253,4 +253,10 @@ describe('ENSCustody', function () {
       'ERC1155: transfer to non ERC1155Receiver implementer',
     );
   });
+
+  it('should revert when token is invalid', async () => {
+    await expect(custody.ownerOf(56786756)).to.be.revertedWith(
+      'InvalidToken',
+    );
+  });
 });
