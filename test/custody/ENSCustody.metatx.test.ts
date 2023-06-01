@@ -10,62 +10,28 @@ import {
   ENSRegistry__factory,
   ETHRegistrarController__factory,
   NameWrapper__factory,
-  PublicResolver__factory,
   ReverseRegistrar__factory,
   StablePriceOracle__factory,
-  ERC1155Mock__factory,
 } from '../../types';
-import { BUFFERED_REGISTRATION_COST, REGISTRATION_TIME, ZERO_ADDRESS, ZERO_WORD } from '../helpers/constants';
+import { REGISTRATION_TIME, ZERO_ADDRESS, ZERO_WORD } from '../helpers/constants';
+import { ExecuteFunc, buildExecuteFunc } from '../helpers/metatx';
 
-describe('ENSCustody', function () {
+describe('ENSCustody (metatx)', function () {
   let provider;
   let ens;
-  let resolver;
   let baseRegistrar;
   let controller;
   let priceOracle;
   let reverseRegistrar;
   let nameWrapper;
   let custody;
-  let erc1155;
 
   const secret = '0x0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF';
 
-  let signers, owner, registrant, minter;
+  let buildExecuteParams: ExecuteFunc;
+  let signers, owner, registrant, minter, spender;
   let ownerAddress, registrantAddress;
   let result;
-
-  async function registerName (name, txOptions = { value: BUFFERED_REGISTRATION_COST }) {
-    const commitment = await controller.makeCommitment(
-      name,
-      registrantAddress,
-      REGISTRATION_TIME,
-      secret,
-      ZERO_ADDRESS,
-      [],
-      false,
-      0,
-    );
-    let tx = await controller.commit(commitment);
-    const { timestamp } = await provider.getBlock(tx.blockNumber);
-    expect(await controller.commitments(commitment)).to.equal(timestamp);
-
-    await provider.send('evm_increaseTime', [(await controller.minCommitmentAge()).toNumber()]);
-
-    tx = await controller.register(
-      name,
-      registrantAddress,
-      REGISTRATION_TIME,
-      secret,
-      ZERO_ADDRESS,
-      [],
-      false,
-      0,
-      txOptions,
-    );
-
-    return tx;
-  }
 
   async function registerAndParkName (name, minter, resolver = ZERO_ADDRESS, selfCustody = false, txOptions = {}) {
     // make commitment
@@ -80,16 +46,22 @@ describe('ENSCustody', function () {
       0,
       selfCustody,
     );
-    const commitTx = await controller.connect(minter).commit(commitment);
+    const commitTx = await controller.commit(commitment);
     const { timestamp } = await provider.getBlock(commitTx.blockNumber);
     expect(await controller.commitments(commitment)).to.equal(timestamp);
 
     await provider.send('evm_increaseTime', [(await controller.minCommitmentAge()).toNumber()]);
 
     // register
-    const registerTx = await custody
-      .connect(minter)
-      .register(name, registrantAddress, REGISTRATION_TIME, secret, resolver, [], false, 0, selfCustody, txOptions);
+    const tokenId = namehash(`${name}.eth`);
+    const { req, signature } = await buildExecuteParams(
+      'register(string,address,uint256,bytes32,address,bytes[],bool,uint16,bool)',
+      [name, registrantAddress, REGISTRATION_TIME, secret, resolver, [], false, 0, selfCustody],
+      minter,
+      tokenId,
+      BigNumber.from(0),
+    );
+    const registerTx = await custody.connect(spender).execute(req, signature, txOptions);
     return [commitTx, registerTx];
   }
 
@@ -98,16 +70,6 @@ describe('ENSCustody', function () {
     const price = base.add(premium);
     await owner.sendTransaction({ to: custody.address, value: price });
     return price;
-  }
-
-  async function assertGasSpent (address, prevBalance, txs) {
-    let spent = BigNumber.from(0);
-    for (const tx of txs) {
-      const receipt = await provider.getTransactionReceipt(tx.hash);
-      const gasFee = receipt.gasUsed.mul(tx.gasPrice);
-      spent = spent.add(gasFee);
-    }
-    expect(await provider.getBalance(address)).to.equal(prevBalance.sub(spent));
   }
 
   async function assertOwnership (name, owner, selfCustody = false) {
@@ -129,9 +91,10 @@ describe('ENSCustody', function () {
   before(async () => {
     provider = ethers.provider;
     signers = await ethers.getSigners();
-    [owner, registrant, minter] = signers;
+    [owner, registrant, spender] = signers;
     ownerAddress = await owner.getAddress();
     registrantAddress = await registrant.getAddress();
+    minter = new ethers.Wallet('0x' + '1'.repeat(64), provider);
 
     ens = await new ENSRegistry__factory(owner).deploy();
     baseRegistrar = await new BaseRegistrarImplementation__factory(owner).deploy(ens.address, namehash('eth'));
@@ -159,17 +122,10 @@ describe('ENSCustody', function () {
     await baseRegistrar.addController(nameWrapper.address);
     await reverseRegistrar.setController(controller.address, true);
 
-    resolver = await new PublicResolver__factory(owner).deploy(
-      ens.address,
-      nameWrapper.address,
-      controller.address,
-      reverseRegistrar.address,
-    );
-
     custody = await upgrades.deployProxy(new ENSCustody__factory(owner), [controller.address, nameWrapper.address]);
     await custody.addMinter(minter.address);
 
-    erc1155 = await new ERC1155Mock__factory(owner).deploy('');
+    buildExecuteParams = buildExecuteFunc(custody.interface, custody.address, custody);
   });
 
   beforeEach(async () => {
@@ -179,78 +135,91 @@ describe('ENSCustody', function () {
     await provider.send('evm_revert', [result]);
   });
 
-  it('should register name', async () => {
-    const name = 'newname';
-    const tokenId = sha3(name);
-    const node = namehash(`${name}.eth`);
-
-    await registerName(name);
-
-    expect(await controller.available(name)).to.equal(false);
-    expect(await ens.owner(node)).to.equal(nameWrapper.address);
-    expect(await baseRegistrar.ownerOf(tokenId)).to.equal(nameWrapper.address);
-    expect(await nameWrapper.ownerOf(node)).to.equal(registrantAddress);
-  });
-
   it('should register and park name', async () => {
-    const name = 'ts-ld91';
-    const price = await topupCustody(name);
-    const custodyBalance = await provider.getBalance(custody.address);
-    const minterBalance = await provider.getBalance(minter.address);
+    const name = 'mts-lc2';
+    const tokenId = namehash(`${name}.eth`);
+    await topupCustody(name);
+    expect(await custody.nonceOf(tokenId)).to.be.equal(0);
 
-    const txs = await registerAndParkName(name, minter, ZERO_ADDRESS, false);
-
-    await assertOwnership(name, registrantAddress);
-    expect(await provider.getBalance(custody.address)).to.equal(custodyBalance.sub(price));
-    await assertGasSpent(minter.address, minterBalance, txs);
-  });
-
-  it('should register and park name with resolver', async () => {
-    const name = 'ts-tw14';
-    const price = await topupCustody(name);
-
-    const balance = await provider.getBalance(custody.address);
-    await registerAndParkName(name, minter, resolver.address, false);
+    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
 
     await assertOwnership(name, registrantAddress);
-    expect(await provider.getBalance(custody.address)).to.equal(balance.sub(price));
+    expect(await custody.nonceOf(tokenId)).to.be.equal(1);
   });
 
   it('should transfer parked domain', async () => {
-    const name = 'ts-we02';
-    const node = namehash(`${name}.eth`);
+    const name = 'mts-ck41';
+    const tokenId = namehash(`${name}.eth`);
     await topupCustody(name);
 
     await registerAndParkName(name, minter, ZERO_ADDRESS, false);
     await assertOwnership(name, registrantAddress);
+    expect(await custody.nonceOf(tokenId)).to.be.equal(1);
 
-    await custody.connect(registrant).safeTransfer(registrantAddress, node);
+    const { req, signature } = await buildExecuteParams(
+      'safeTransfer(address,uint256)',
+      [registrantAddress, tokenId],
+      registrant,
+      tokenId,
+      await custody.nonceOf(tokenId),
+    );
+    await custody.connect(spender).execute(req, signature);
 
     await assertOwnership(name, registrantAddress, true);
+    expect(await custody.nonceOf(tokenId)).to.be.equal(2);
   });
 
   it('should allow transfer parked domain by owner only', async () => {
-    const name = 'ts-wt52';
-    const node = namehash(`${name}.eth`);
+    const name = 'mts-cwe2';
+    const tokenId = namehash(`${name}.eth`);
     await topupCustody(name);
 
     await registerAndParkName(name, minter, ZERO_ADDRESS, false);
     await assertOwnership(name, registrantAddress);
 
-    await expect(custody.safeTransfer(registrantAddress, node)).to.be.revertedWith('Unauthorised');
+    const { req, signature } = await buildExecuteParams(
+      'safeTransfer(address,uint256)',
+      [registrantAddress, tokenId],
+      spender,
+      tokenId,
+      await custody.nonceOf(tokenId),
+    );
+    await expect(custody.connect(spender).execute(req, signature)).to.be.revertedWith('Unauthorised');
   });
 
-  it('should receive ERC1155 tokens only from ENS wrapper', async () => {
-    const name = 'ts-ww12';
-    const node = namehash(`${name}.eth`);
+  it('should revert with invalid signature error when invalid nonce', async () => {
+    const name = 'mts-cw12';
+    const tokenId = namehash(`${name}.eth`);
+    await topupCustody(name);
 
-    await registerName(name);
-    await nameWrapper.connect(registrant).safeTransferFrom(registrantAddress, custody.address, node, 1, '0x');
+    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await assertOwnership(name, registrantAddress);
 
-    const erc1155TokenId = 1;
-    await erc1155.mint(owner.address, erc1155TokenId, 1, '0x');
-    await expect(erc1155.safeTransferFrom(owner.address, custody.address, erc1155TokenId, 1, '0x')).to.be.revertedWith(
-      'ERC1155: transfer to non ERC1155Receiver implementer',
+    const { req, signature } = await buildExecuteParams(
+      'safeTransfer(address,uint256)',
+      [registrantAddress, tokenId],
+      minter,
+      tokenId,
+      BigNumber.from(0),
     );
+    await expect(custody.connect(spender).execute(req, signature)).to.be.revertedWith('InvalidSignature');
+  });
+
+  it('should revert with unauthorised error when invalid signer', async () => {
+    const name = 'mts-cw12';
+    const tokenId = namehash(`${name}.eth`);
+    await topupCustody(name);
+
+    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await assertOwnership(name, registrantAddress);
+
+    const { req, signature } = await buildExecuteParams(
+      'safeTransfer(address,uint256)',
+      [registrantAddress, tokenId],
+      spender,
+      tokenId,
+      await custody.nonceOf(tokenId),
+    );
+    await expect(custody.connect(spender).execute(req, signature)).to.be.revertedWith('Unauthorised');
   });
 });

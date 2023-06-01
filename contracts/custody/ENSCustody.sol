@@ -18,6 +18,7 @@ import {ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
 import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
 
+// TODO: do we need commit function here? (guarded onlyMinter?)
 contract ENSCustody is
     Initializable,
     ContextUpgradeable,
@@ -110,7 +111,7 @@ contract ENSCustody is
         bool reverseRecord,
         uint16 ownerControlledFuses,
         bool selfCustody
-    ) external view onlyMinter returns (bytes32) {
+    ) external view returns (bytes32) {
         return
             _controller.makeCommitment(
                 name,

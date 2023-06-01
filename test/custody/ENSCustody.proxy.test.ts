@@ -33,20 +33,28 @@ describe('ENSCustody (proxy)', function () {
 
   async function registerAndParkName (name, minter, resolver = ZERO_ADDRESS, selfCustody = false, txOptions = {}) {
     // make commitment
-    const commitment = await custody
-      .connect(minter)
-      .makeCommitment(name, registrantAddress, REGISTRATION_TIME, secret, resolver, [], false, 0, selfCustody);
-    let tx = await controller.commit(commitment);
-    const { timestamp } = await provider.getBlock(tx.blockNumber);
+    const commitment = await custody.makeCommitment(
+      name,
+      registrantAddress,
+      REGISTRATION_TIME,
+      secret,
+      resolver,
+      [],
+      false,
+      0,
+      selfCustody,
+    );
+    const commitTx = await controller.commit(commitment);
+    const { timestamp } = await provider.getBlock(commitTx.blockNumber);
     expect(await controller.commitments(commitment)).to.equal(timestamp);
 
     await provider.send('evm_increaseTime', [(await controller.minCommitmentAge()).toNumber()]);
 
     // register
-    tx = await custody
+    const registerTx = await custody
       .connect(minter)
       .register(name, registrantAddress, REGISTRATION_TIME, secret, resolver, [], false, 0, selfCustody, txOptions);
-    return tx;
+    return [commitTx, registerTx];
   }
 
   async function topupCustody (name) {
@@ -165,7 +173,7 @@ describe('ENSCustody (proxy)', function () {
     await registerAndParkName(name, minter, ZERO_ADDRESS, false);
     await assertOwnership(name, registrantAddress);
 
-    custody = (await upgrades.upgradeProxy(custody.address, custodyFactory));
+    custody = await upgrades.upgradeProxy(custody.address, custodyFactory);
 
     await assertOwnership(name, registrantAddress);
     expect(await custody.nonceOf(node)).to.be.equal(1);
