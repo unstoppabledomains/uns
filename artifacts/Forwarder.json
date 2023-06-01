@@ -4,6 +4,11 @@
   "sourceName": "contracts/metatx/Forwarder.sol",
   "abi": [
     {
+      "inputs": [],
+      "name": "InvalidSignature",
+      "type": "error"
+    },
+    {
       "anonymous": false,
       "inputs": [
         {

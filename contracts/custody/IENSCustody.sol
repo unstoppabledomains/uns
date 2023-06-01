@@ -5,6 +5,11 @@ pragma solidity ^0.8.0;
 
 import {IERC1155ReceiverUpgradeable} from '@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol';
 
+error Unauthorised(uint256 tokenId, address addr);
+error InvalidToken(uint256 tokenId);
+error UnknownToken(uint256 tokenId);
+error OperationProhibited();
+
 interface IENSCustody is IERC1155ReceiverUpgradeable {
     event Parked(uint256 indexed tokenId, address indexed owner);
 

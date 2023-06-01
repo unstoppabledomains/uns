@@ -8,6 +8,8 @@ import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
 import './BaseForwarder.sol';
 
+error InvalidSignature();
+
 /**
  * @dev https://eips.ethereum.org/EIPS/eip-2771[EIP 2771] is a standard for native meta transactions.
  *
@@ -35,7 +37,9 @@ abstract contract Forwarder is Initializable, BaseForwarder {
 
     function execute(ForwardRequest calldata req, bytes calldata signature) public override returns (bytes memory) {
         uint256 gas = gasleft();
-        require(verify(req, signature), 'Forwarder: SIGNATURE_INVALID');
+        if (!verify(req, signature)) {
+            revert InvalidSignature();
+        }
         return _execute(req.from, address(this), req.tokenId, gas, req.data, signature);
     }
 

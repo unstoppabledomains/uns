@@ -13,7 +13,7 @@ import {ReentrancyGuardUpgradeable} from '@openzeppelin/contracts-upgradeable/se
 import {IERC165Upgradeable} from '@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol';
 import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 
-import {IENSCustody} from './IENSCustody.sol';
+import {IENSCustody, Unauthorised, InvalidToken, UnknownToken, OperationProhibited} from './IENSCustody.sol';
 import {ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
 import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
@@ -47,7 +47,9 @@ contract ENSCustody is
     // }
 
     modifier onlyTokenOwner(uint256 tokenId) {
-        require(_ownerOf(tokenId) == _msgSender(), 'ENSCustody: SENDER_IS_NOT_OWNER');
+        if (_ownerOf(tokenId) != _msgSender()) {
+            revert Unauthorised(tokenId, _msgSender());
+        }
         _;
     }
 
@@ -82,8 +84,11 @@ contract ENSCustody is
         uint256,
         uint256,
         bytes calldata
-    ) public pure override returns (bytes4) {
-        return this.onERC1155Received.selector;
+    ) public view override returns (bytes4) {
+        if (_msgSender() == address(_wrapper)) {
+            return this.onERC1155Received.selector;
+        }
+        revert OperationProhibited();
     }
 
     function onERC1155BatchReceived(
@@ -92,8 +97,11 @@ contract ENSCustody is
         uint256[] memory,
         uint256[] memory,
         bytes memory
-    ) public pure override returns (bytes4) {
-        return this.onERC1155BatchReceived.selector;
+    ) public view override returns (bytes4) {
+        if (_msgSender() == address(_wrapper)) {
+            return this.onERC1155BatchReceived.selector;
+        }
+        revert OperationProhibited();
     }
 
     function makeCommitment(
@@ -157,18 +165,22 @@ contract ENSCustody is
 
     // TODO: protect
     function safeTransfer(address to, uint256 tokenId) external onlyTokenOwner(tokenId) {
+        delete _owners[tokenId];
         _wrapper.safeTransferFrom(address(this), to, tokenId, 1, '');
     }
 
     receive() external payable {}
 
-    // TODO: convert to typed errors
     function _ownerOf(uint256 tokenId) internal view returns (address) {
         address owner = _owners[tokenId];
-        require(owner != address(0), 'ENSCustody: invalid token ID');
+        if (owner == address(0)) {
+            revert InvalidToken(tokenId);
+        }
 
         address baseOwner = _wrapper.ownerOf(tokenId);
-        require(baseOwner == address(this), 'ENSCustody: unknown token ID');
+        if (baseOwner != address(this)) {
+            revert UnknownToken(tokenId);
+        }
 
         return owner;
     }
