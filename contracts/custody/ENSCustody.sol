@@ -13,7 +13,7 @@ import {ReentrancyGuardUpgradeable} from '@openzeppelin/contracts-upgradeable/se
 import {IERC165Upgradeable} from '@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol';
 import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 
-import {IENSCustody, Unauthorised, InvalidToken, UnknownToken, OperationProhibited, InvalidForwardedToken} from './IENSCustody.sol';
+import {IENSCustody, Unauthorised, InvalidToken, CustodyNotEnoughBalance, OperationProhibited, InvalidForwardedToken} from './IENSCustody.sol';
 import {ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
 import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
@@ -72,7 +72,7 @@ contract ENSCustody is
         override(AccessControlUpgradeable, IERC165Upgradeable)
         returns (bool)
     {
-        return interfaceId == type(IERC1155ReceiverUpgradeable).interfaceId;
+        return interfaceId == type(IERC1155ReceiverUpgradeable).interfaceId || super.supportsInterface(interfaceId);
     }
 
     function onERC1155Received(
@@ -140,6 +140,10 @@ contract ENSCustody is
         _protectTokenOperation(tokenId);
 
         IPriceOracle.Price memory price = _controller.rentPrice(name, duration);
+        if (address(this).balance < price.base + price.premium) {
+            revert CustodyNotEnoughBalance();
+        }
+
         _controller.register{value: price.base + price.premium}(
             name,
             selfCustody ? owner : address(this),
@@ -175,10 +179,11 @@ contract ENSCustody is
             revert InvalidToken(tokenId);
         }
 
-        address baseOwner = _wrapper.ownerOf(tokenId);
-        if (baseOwner != address(this)) {
-            revert UnknownToken(tokenId);
-        }
+        // dead code
+        // address baseOwner = _wrapper.ownerOf(tokenId);
+        // if (baseOwner != address(this)) {
+        //     revert UnknownToken(tokenId);
+        // }
 
         return owner;
     }

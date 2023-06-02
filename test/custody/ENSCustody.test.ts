@@ -16,6 +16,7 @@ import {
   ERC1155Mock__factory,
 } from '../../types';
 import { BUFFERED_REGISTRATION_COST, REGISTRATION_TIME, ZERO_ADDRESS, ZERO_WORD } from '../helpers/constants';
+import { makeInterfaceId } from '../helpers/makeInterfaceId';
 
 describe('ENSCustody', function () {
   let provider;
@@ -205,6 +206,12 @@ describe('ENSCustody', function () {
     await assertGasSpent(minter.address, minterBalance, txs);
   });
 
+  it('should revert when custody has not enough balance', async () => {
+    const name = 'ts-tw75';
+
+    await expect(registerAndParkName(name, minter, ZERO_ADDRESS, false)).to.be.revertedWith('CustodyNotEnoughBalance');
+  });
+
   it('should register and park name with resolver', async () => {
     const name = 'ts-tw14';
     const price = await topupCustody(name);
@@ -254,9 +261,68 @@ describe('ENSCustody', function () {
     );
   });
 
+  it('should batch receive ERC1155 tokens only from ENS wrapper', async () => {
+    const name1 = 'ts-bb12';
+    const node1 = namehash(`${name1}.eth`);
+    const name2 = 'ts-bb21';
+    const node2 = namehash(`${name2}.eth`);
+
+    await registerName(name1);
+    await registerName(name2);
+    await nameWrapper
+      .connect(registrant)
+      .safeBatchTransferFrom(registrantAddress, custody.address, [node1, node2], [1, 1], '0x');
+
+    const erc1155TokenId1 = 1;
+    const erc1155TokenId2 = 2;
+    await erc1155.mint(owner.address, erc1155TokenId1, 1, '0x');
+    await erc1155.mint(owner.address, erc1155TokenId2, 1, '0x');
+    await expect(
+      erc1155.safeBatchTransferFrom(owner.address, custody.address, [erc1155TokenId1, erc1155TokenId2], [1, 1], '0x'),
+    ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
+  });
+
   it('should revert when token is invalid', async () => {
-    await expect(custody.ownerOf(56786756)).to.be.revertedWith(
-      'InvalidToken',
-    );
+    await expect(custody.ownerOf(56786756)).to.be.revertedWith('InvalidToken');
+  });
+
+  describe('ERC165', function () {
+    const INTERFACES = {
+      ERC165: ['supportsInterface(bytes4)'],
+      ERC1155Receiver: [
+        'onERC1155Received(address,address,uint256,uint256,bytes)',
+        'onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)',
+      ],
+    };
+
+    const INTERFACE_IDS = {};
+    const FN_SIGNATURES = {};
+    for (const k of Object.getOwnPropertyNames(INTERFACES)) {
+      INTERFACE_IDS[k] = makeInterfaceId(INTERFACES[k]);
+      for (const fnName of INTERFACES[k]) {
+        // the interface id of a single function is equivalent to its function signature
+        FN_SIGNATURES[fnName] = makeInterfaceId([fnName]);
+      }
+    }
+
+    it('all interfaces are reported as supported', async function () {
+      for (const k of ['ERC165', 'ERC1155Receiver']) {
+        const interfaceId = INTERFACE_IDS[k] ?? k;
+        expect(await custody.supportsInterface(interfaceId)).to.equal(true, `does not support ${k}`);
+      }
+    });
+
+    it('all interface functions are in ABI', async function () {
+      for (const k of ['ERC165', 'ERC1155Receiver']) {
+        // skip interfaces for which we don't have a function list
+        if (INTERFACES[k] === undefined) continue;
+        for (const fnName of INTERFACES[k]) {
+          expect(Object.keys(custody.interface.functions).filter((fn) => fn === fnName).length).to.equal(
+            1,
+            `did not find ${fnName}`,
+          );
+        }
+      }
+    });
   });
 });
