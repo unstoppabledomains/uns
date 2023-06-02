@@ -46,7 +46,7 @@ describe('ENSCustody (metatx)', function () {
       0,
       selfCustody,
     );
-    const commitTx = await controller.commit(commitment);
+    const commitTx = await custody.commit(commitment);
     const { timestamp } = await provider.getBlock(commitTx.blockNumber);
     expect(await controller.commitments(commitment)).to.equal(timestamp);
 

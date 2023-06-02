@@ -39,6 +39,12 @@ interface IENSCustody is IERC1155ReceiverUpgradeable {
     ) external returns (bytes32);
 
     /**
+     * @dev Add commitment.
+     * @param commitment The commitment.
+     */
+    function commit(bytes32 commitment) external;
+
+    /**
      * @dev Register a name.
      * @param name The token ID (keccak256 of the label).
      * @param owner The address of the new owner.

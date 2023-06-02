@@ -81,7 +81,7 @@ describe('ENSCustody', function () {
       0,
       selfCustody,
     );
-    const commitTx = await controller.connect(minter).commit(commitment);
+    const commitTx = await custody.connect(minter).commit(commitment);
     const { timestamp } = await provider.getBlock(commitTx.blockNumber);
     expect(await controller.commitments(commitment)).to.equal(timestamp);
 

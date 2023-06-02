@@ -12,13 +12,13 @@ import {IERC1155ReceiverUpgradeable} from '@openzeppelin/contracts-upgradeable/t
 import {ReentrancyGuardUpgradeable} from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 import {IERC165Upgradeable} from '@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol';
 import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
+import {StorageSlotUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
 import {IENSCustody, Unauthorised, InvalidToken, CustodyNotEnoughBalance, OperationProhibited, InvalidForwardedToken} from './IENSCustody.sol';
 import {ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
 import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
 
-// TODO: do we need commit function here? (guarded onlyMinter?)
 contract ENSCustody is
     Initializable,
     ContextUpgradeable,
@@ -32,15 +32,12 @@ contract ENSCustody is
     string public constant VERSION = '0.0.1';
 
     bytes32 private constant _ETH_NODE = 0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
-    // // This is the keccak-256 hash of "uns.ens_controller" subtracted by 1
-    // bytes32 internal constant _ENS_CONTROLLER_SLOT = 0x00;
-    // // This is the keccak-256 hash of "uns.ens_wrapper" subtracted by 1
-    // bytes32 internal constant _ENS_WRAPPER_SLOT = 0x00;
-
-    // TODO: convert to slots
-    mapping(uint256 => address) private _owners;
-    IETHRegistrarController private _controller;
-    INameWrapper private _wrapper;
+    // This is the keccak-256 hash of "ens.owner." subtracted by 1
+    bytes32 internal constant _OWNER_PREFIX_SLOT = 0x0a8885dd093a12d378a27df09bde33e3caca641a3d6970e06805fde8e847cb46;
+    // This is the keccak-256 hash of "uns.ens_controller" subtracted by 1
+    bytes32 internal constant _ENS_CONTROLLER_SLOT = 0x412386de53449251cbf7ce1f4c6a038bf9c0746e62d331b08ef0c3fa7d0ab672;
+    // This is the keccak-256 hash of "uns.ens_wrapper" subtracted by 1
+    bytes32 internal constant _ENS_WRAPPER_SLOT = 0x60793a5062d506d35cc8f1beda67ee5028c16bfcd9c923d5bfc439c04bd929b1;
 
     modifier onlyTokenOwner(uint256 tokenId) {
         if (_ownerOf(tokenId) != _msgSender()) {
@@ -54,9 +51,9 @@ contract ENSCustody is
         _disableInitializers();
     }
 
-    function initialize(IETHRegistrarController controller, INameWrapper wrapper) public initializer {
-        _controller = controller;
-        _wrapper = wrapper;
+    function initialize(address controller, address wrapper) public initializer {
+        StorageSlotUpgradeable.getAddressSlot(_ENS_CONTROLLER_SLOT).value = controller;
+        StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value = wrapper;
 
         __ReentrancyGuard_init_unchained();
         __ERC2771RegistryContext_init_unchained();
@@ -82,7 +79,7 @@ contract ENSCustody is
         uint256,
         bytes calldata
     ) public view override returns (bytes4) {
-        if (_msgSender() == address(_wrapper)) {
+        if (_msgSender() == StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value) {
             return this.onERC1155Received.selector;
         }
         revert OperationProhibited();
@@ -95,7 +92,7 @@ contract ENSCustody is
         uint256[] memory,
         bytes memory
     ) public view override returns (bytes4) {
-        if (_msgSender() == address(_wrapper)) {
+        if (_msgSender() == StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value) {
             return this.onERC1155BatchReceived.selector;
         }
         revert OperationProhibited();
@@ -112,6 +109,7 @@ contract ENSCustody is
         uint16 ownerControlledFuses,
         bool selfCustody
     ) external view returns (bytes32) {
+        IETHRegistrarController _controller = IETHRegistrarController(StorageSlotUpgradeable.getAddressSlot(_ENS_CONTROLLER_SLOT).value);
         return
             _controller.makeCommitment(
                 name,
@@ -123,6 +121,11 @@ contract ENSCustody is
                 reverseRecord,
                 ownerControlledFuses
             );
+    }
+
+    function commit(bytes32 commitment) external override {
+        IETHRegistrarController _controller = IETHRegistrarController(StorageSlotUpgradeable.getAddressSlot(_ENS_CONTROLLER_SLOT).value);
+        _controller.commit(commitment);
     }
 
     function register(
@@ -139,24 +142,10 @@ contract ENSCustody is
         uint256 tokenId = _namehash(name);
         _protectTokenOperation(tokenId);
 
-        IPriceOracle.Price memory price = _controller.rentPrice(name, duration);
-        if (address(this).balance < price.base + price.premium) {
-            revert CustodyNotEnoughBalance();
-        }
-
-        _controller.register{value: price.base + price.premium}(
-            name,
-            selfCustody ? owner : address(this),
-            duration,
-            secret,
-            resolver,
-            data,
-            reverseRecord,
-            ownerControlledFuses
-        );
+        _register(name, selfCustody ? owner : address(this), duration, secret, resolver, data, reverseRecord, ownerControlledFuses);
 
         if (!selfCustody) {
-            _owners[tokenId] = owner;
+            StorageSlotUpgradeable.getAddressSlot(keccak256(abi.encodePacked(_OWNER_PREFIX_SLOT, tokenId))).value = owner;
             emit Parked(tokenId, owner);
         }
     }
@@ -167,23 +156,47 @@ contract ENSCustody is
 
     function safeTransfer(address to, uint256 tokenId) external onlyTokenOwner(tokenId) {
         _protectTokenOperation(tokenId);
-        delete _owners[tokenId];
+        StorageSlotUpgradeable.getAddressSlot(keccak256(abi.encodePacked(_OWNER_PREFIX_SLOT, tokenId))).value = address(0);
+
+        INameWrapper _wrapper = INameWrapper(StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value);
         _wrapper.safeTransferFrom(address(this), to, tokenId, 1, '');
     }
 
     receive() external payable {}
 
+    function _register(
+        string calldata name,
+        address owner,
+        uint256 duration,
+        bytes32 secret,
+        address resolver,
+        bytes[] calldata data,
+        bool reverseRecord,
+        uint16 ownerControlledFuses
+    ) internal {
+        IETHRegistrarController _controller = IETHRegistrarController(StorageSlotUpgradeable.getAddressSlot(_ENS_CONTROLLER_SLOT).value);
+        IPriceOracle.Price memory price = _controller.rentPrice(name, duration);
+        if (address(this).balance < price.base + price.premium) {
+            revert CustodyNotEnoughBalance();
+        }
+
+        _controller.register{value: price.base + price.premium}(
+            name,
+            owner,
+            duration,
+            secret,
+            resolver,
+            data,
+            reverseRecord,
+            ownerControlledFuses
+        );
+    }
+
     function _ownerOf(uint256 tokenId) internal view returns (address) {
-        address owner = _owners[tokenId];
+        address owner = StorageSlotUpgradeable.getAddressSlot(keccak256(abi.encodePacked(_OWNER_PREFIX_SLOT, tokenId))).value;
         if (owner == address(0)) {
             revert InvalidToken(tokenId);
         }
-
-        // dead code
-        // address baseOwner = _wrapper.ownerOf(tokenId);
-        // if (baseOwner != address(this)) {
-        //     revert UnknownToken(tokenId);
-        // }
 
         return owner;
     }
