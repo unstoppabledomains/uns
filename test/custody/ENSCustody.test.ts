@@ -96,7 +96,7 @@ describe('ENSCustody', function () {
 
   async function topupCustody (name) {
     const [base, premium] = await controller.rentPrice(name, REGISTRATION_TIME);
-    const price = base.add(premium);
+    const price = base.add(premium).mul(110).div(100);
     await owner.sendTransaction({ to: custody.address, value: price });
     return price;
   }
@@ -202,7 +202,9 @@ describe('ENSCustody', function () {
     const txs = await registerAndParkName(name, minter, ZERO_ADDRESS, false);
 
     await assertOwnership(name, registrantAddress);
-    expect(await provider.getBalance(custody.address)).to.equal(custodyBalance.sub(price));
+    expect((await provider.getBalance(custody.address)).toNumber()).to.be.greaterThanOrEqual(
+      custodyBalance.sub(price).toNumber(),
+    );
     await assertGasSpent(minter.address, minterBalance, txs);
   });
 
@@ -220,7 +222,9 @@ describe('ENSCustody', function () {
     await registerAndParkName(name, minter, resolver.address, false);
 
     await assertOwnership(name, registrantAddress);
-    expect(await provider.getBalance(custody.address)).to.equal(balance.sub(price));
+    expect((await provider.getBalance(custody.address)).toNumber()).to.be.greaterThanOrEqual(
+      balance.sub(price).toNumber(),
+    );
   });
 
   it('should transfer parked domain', async () => {

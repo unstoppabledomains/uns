@@ -67,7 +67,7 @@ describe('ENSCustody (metatx)', function () {
 
   async function topupCustody (name) {
     const [base, premium] = await controller.rentPrice(name, REGISTRATION_TIME);
-    const price = base.add(premium);
+    const price = base.add(premium).mul(110).div(100);
     await owner.sendTransaction({ to: custody.address, value: price });
     return price;
   }
