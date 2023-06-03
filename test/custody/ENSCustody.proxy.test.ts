@@ -59,7 +59,7 @@ describe('ENSCustody (proxy)', function () {
 
   async function topupCustody (name) {
     const [base, premium] = await controller.rentPrice(name, REGISTRATION_TIME);
-    const price = base.add(premium).mul(110).div(100);
+    const price = base.add(premium);
     await owner.sendTransaction({ to: custody.address, value: price });
     return price;
   }

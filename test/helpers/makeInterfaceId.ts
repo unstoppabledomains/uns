@@ -6,7 +6,6 @@ export function makeInterfaceId (functionSignatures: string[] = []) {
   const interfaceIdBuffer = functionSignatures
     .map((signature) => soliditySha3(signature)) // keccak256
     .map(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       (h) => Buffer.from(h!.substring(2), 'hex').slice(0, 4), // bytes4()
     )
     .reduce((memo, bytes) => {

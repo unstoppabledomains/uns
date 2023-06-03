@@ -176,13 +176,20 @@ contract ENSCustody is
     ) internal {
         IETHRegistrarController _controller = IETHRegistrarController(StorageSlotUpgradeable.getAddressSlot(_ENS_CONTROLLER_SLOT).value);
         IPriceOracle.Price memory price = _controller.rentPrice(name, duration);
-        // adds 10% to price, to avoid rate slippage
-        uint256 amount = ((price.base + price.premium) * 110) / 100;
-        if (address(this).balance < amount) {
+        if (address(this).balance < price.base + price.premium) {
             revert CustodyNotEnoughBalance();
         }
 
-        _controller.register{value: amount}(name, owner, duration, secret, resolver, data, reverseRecord, ownerControlledFuses);
+        _controller.register{value: price.base + price.premium}(
+            name,
+            owner,
+            duration,
+            secret,
+            resolver,
+            data,
+            reverseRecord,
+            ownerControlledFuses
+        );
     }
 
     function _ownerOf(uint256 tokenId) internal view returns (address) {
