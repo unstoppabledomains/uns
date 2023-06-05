@@ -15,6 +15,13 @@ interface IENSCustody is IERC1155ReceiverUpgradeable {
     event Parked(uint256 indexed tokenId, address indexed owner);
 
     /**
+     * @dev Return rent price for the given name and duration.
+     * @param name The name of a domain.
+     * @param duration The duration of a registration.
+     */
+    function rentPrice(string calldata name, uint256 duration) external view returns (uint256);
+
+    /**
      * @dev Make commitment.
      * @param name The token ID (keccak256 of the label).
      * @param owner The address of the new owner.
@@ -67,6 +74,13 @@ interface IENSCustody is IERC1155ReceiverUpgradeable {
         uint16 ownerControlledFuses,
         bool selfCustody
     ) external;
+
+    /**
+     * @dev Renew a name.
+     * @param name The name of a domain.
+     * @param duration The duration to renew.
+     */
+    function renew(string calldata name, uint256 duration) external;
 
     /**
      * @dev Gets the owner of the specified token ID parken in the custody.

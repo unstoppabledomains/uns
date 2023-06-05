@@ -15,7 +15,7 @@ import {
   StablePriceOracle__factory,
   ERC1155Mock__factory,
 } from '../../types';
-import { BUFFERED_REGISTRATION_COST, REGISTRATION_TIME, ZERO_ADDRESS, ZERO_WORD } from '../helpers/constants';
+import { BUFFERED_REGISTRATION_COST, DAY, REGISTRATION_TIME, ZERO_ADDRESS, ZERO_WORD } from '../helpers/constants';
 import { makeInterfaceId } from '../helpers/makeInterfaceId';
 
 describe('ENSCustody', function () {
@@ -94,8 +94,8 @@ describe('ENSCustody', function () {
     return [commitTx, registerTx];
   }
 
-  async function topupCustody (name) {
-    const [base, premium] = await controller.rentPrice(name, REGISTRATION_TIME);
+  async function topupCustody (name, registrationTime = REGISTRATION_TIME) {
+    const [base, premium] = await controller.rentPrice(name, registrationTime);
     const price = base.add(premium);
     await owner.sendTransaction({ to: custody.address, value: price });
     return price;
@@ -193,60 +193,6 @@ describe('ENSCustody', function () {
     expect(await nameWrapper.ownerOf(node)).to.equal(registrantAddress);
   });
 
-  it('should register and park name', async () => {
-    const name = 'ts-ld91';
-    const price = await topupCustody(name);
-    const custodyBalance = await provider.getBalance(custody.address);
-    const minterBalance = await provider.getBalance(minter.address);
-
-    const txs = await registerAndParkName(name, minter, ZERO_ADDRESS, false);
-
-    await assertOwnership(name, registrantAddress);
-    expect(await provider.getBalance(custody.address)).to.equal(custodyBalance.sub(price));
-    await assertGasSpent(minter.address, minterBalance, txs);
-  });
-
-  it('should revert when custody has not enough balance', async () => {
-    const name = 'ts-tw75';
-
-    await expect(registerAndParkName(name, minter, ZERO_ADDRESS, false)).to.be.revertedWith('CustodyNotEnoughBalance');
-  });
-
-  it('should register and park name with resolver', async () => {
-    const name = 'ts-tw14';
-    const price = await topupCustody(name);
-
-    const balance = await provider.getBalance(custody.address);
-    await registerAndParkName(name, minter, resolver.address, false);
-
-    await assertOwnership(name, registrantAddress);
-    expect(await provider.getBalance(custody.address)).to.equal(balance.sub(price));
-  });
-
-  it('should transfer parked domain', async () => {
-    const name = 'ts-we02';
-    const node = namehash(`${name}.eth`);
-    await topupCustody(name);
-
-    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
-    await assertOwnership(name, registrantAddress);
-
-    await custody.connect(registrant).safeTransfer(registrantAddress, node);
-
-    await assertOwnership(name, registrantAddress, true);
-  });
-
-  it('should allow transfer parked domain by owner only', async () => {
-    const name = 'ts-wt52';
-    const node = namehash(`${name}.eth`);
-    await topupCustody(name);
-
-    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
-    await assertOwnership(name, registrantAddress);
-
-    await expect(custody.safeTransfer(registrantAddress, node)).to.be.revertedWith('Unauthorised');
-  });
-
   it('should receive ERC1155 tokens only from ENS wrapper', async () => {
     const name = 'ts-ww12';
     const node = namehash(`${name}.eth`);
@@ -284,6 +230,136 @@ describe('ENSCustody', function () {
 
   it('should revert when token is invalid', async () => {
     await expect(custody.ownerOf(56786756)).to.be.revertedWith('InvalidToken');
+  });
+
+  it('should return correct rent price', async () => {
+    const name = 'ts-pa92';
+    const [base, premium] = await controller.rentPrice(name, REGISTRATION_TIME);
+    const price = base.add(premium);
+
+    await expect(await custody.rentPrice(name, REGISTRATION_TIME)).to.equal(price);
+  });
+
+  describe('register', () => {
+    it('should register and park name', async () => {
+      const name = 'ts-ld91';
+      const price = await topupCustody(name);
+      const custodyBalance = await provider.getBalance(custody.address);
+      const minterBalance = await provider.getBalance(minter.address);
+
+      const txs = await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+
+      await assertOwnership(name, registrantAddress);
+      expect(await provider.getBalance(custody.address)).to.equal(custodyBalance.sub(price));
+      await assertGasSpent(minter.address, minterBalance, txs);
+    });
+
+    it('should revert when custody has not enough balance', async () => {
+      const name = 'ts-tw75';
+
+      await expect(registerAndParkName(name, minter, ZERO_ADDRESS, false)).to.be.revertedWith(
+        'CustodyNotEnoughBalance',
+      );
+    });
+
+    it('should register and park name with resolver', async () => {
+      const name = 'ts-tw14';
+      const price = await topupCustody(name);
+
+      const balance = await provider.getBalance(custody.address);
+      await registerAndParkName(name, minter, resolver.address, false);
+
+      await assertOwnership(name, registrantAddress);
+      expect(await provider.getBalance(custody.address)).to.equal(balance.sub(price));
+    });
+
+    it('should transfer parked domain', async () => {
+      const name = 'ts-we02';
+      const node = namehash(`${name}.eth`);
+      await topupCustody(name);
+
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+      await assertOwnership(name, registrantAddress);
+
+      await custody.connect(registrant).safeTransfer(registrantAddress, node);
+
+      await assertOwnership(name, registrantAddress, true);
+    });
+
+    it('should allow transfer parked domain by owner only', async () => {
+      const name = 'ts-wt52';
+      const node = namehash(`${name}.eth`);
+      await topupCustody(name);
+
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+      await assertOwnership(name, registrantAddress);
+
+      await expect(custody.safeTransfer(registrantAddress, node)).to.be.revertedWith('Unauthorised');
+    });
+
+    it('should revert registration by non-minter', async () => {
+      const name = 'ts-nb22';
+      await topupCustody(name);
+
+      await expect(registerAndParkName(name, owner, ZERO_ADDRESS, false)).to.be.revertedWith(
+        'MinterRole: CALLER_IS_NOT_MINTER',
+      );
+    });
+  });
+
+  describe('renew', () => {
+    it('should renew parked name', async () => {
+      const name = 'ts-na91';
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+      const price = await topupCustody(name, REGISTRATION_TIME);
+      const custodyBalance = await provider.getBalance(custody.address);
+      const minterBalance = await provider.getBalance(minter.address);
+
+      const tx = await custody.connect(minter).renew(name, REGISTRATION_TIME);
+
+      await assertOwnership(name, registrantAddress);
+      expect(await provider.getBalance(custody.address)).to.equal(custodyBalance.sub(price));
+      await assertGasSpent(minter.address, minterBalance, [tx]);
+    });
+
+    it('should revert renewing when custody has not enough balance', async () => {
+      const name = 'ts-qv45';
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+
+      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith(
+        'CustodyNotEnoughBalance',
+      );
+    });
+
+    it('should revert renewing by non-minter', async () => {
+      const name = 'ts-nb22';
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+
+      await expect(custody.renew(name, REGISTRATION_TIME)).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+    });
+
+    it('should revert renewing of unknown domain', async () => {
+      const name = 'ts-np12';
+      await topupCustody(name);
+      await registerName(name);
+
+      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('InvalidToken');
+    });
+
+    it('should revert renewing of expired domain', async () => {
+      const name = 'ts-np12';
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+
+      const gracePeriod = 90 * DAY;
+      await provider.send('evm_increaseTime', [REGISTRATION_TIME + gracePeriod + 1]);
+
+      await topupCustody(name);
+      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('InvalidToken');
+    });
   });
 
   describe('ERC165', function () {
