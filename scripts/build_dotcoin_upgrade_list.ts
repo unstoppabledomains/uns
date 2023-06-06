@@ -3,7 +3,7 @@ import fs from 'fs';
 import { network } from 'hardhat';
 import { utils, BigNumber, Contract } from 'ethers';
 import { Log } from '@ethersproject/abstract-provider';
-import { getNetworkConfig } from '../src/config';
+import { getUnsNetworkConfig } from '../src/config';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { unwrap } from '../src/helpers';
 
@@ -54,7 +54,7 @@ const SCOPED_NETWORK_CONFIG = {
 
 function getContractsConfig (chainId: number) {
   return {
-    ...getNetworkConfig(chainId).contracts,
+    ...getUnsNetworkConfig(chainId).contracts,
     additionalConfiguration: SCOPED_NETWORK_CONFIG[chainId],
   };
 }

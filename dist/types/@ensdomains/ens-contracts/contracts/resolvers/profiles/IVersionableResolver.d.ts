@@ -1,0 +1,58 @@
+import type { BaseContract, BigNumber, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
+import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import type { Listener, Provider } from "@ethersproject/providers";
+import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
+export interface IVersionableResolverInterface extends utils.Interface {
+    functions: {
+        "recordVersions(bytes32)": FunctionFragment;
+    };
+    getFunction(nameOrSignatureOrTopic: "recordVersions"): FunctionFragment;
+    encodeFunctionData(functionFragment: "recordVersions", values: [PromiseOrValue<BytesLike>]): string;
+    decodeFunctionResult(functionFragment: "recordVersions", data: BytesLike): Result;
+    events: {
+        "VersionChanged(bytes32,uint64)": EventFragment;
+    };
+    getEvent(nameOrSignatureOrTopic: "VersionChanged"): EventFragment;
+}
+export interface VersionChangedEventObject {
+    node: string;
+    newVersion: BigNumber;
+}
+export declare type VersionChangedEvent = TypedEvent<[
+    string,
+    BigNumber
+], VersionChangedEventObject>;
+export declare type VersionChangedEventFilter = TypedEventFilter<VersionChangedEvent>;
+export interface IVersionableResolver extends BaseContract {
+    connect(signerOrProvider: Signer | Provider | string): this;
+    attach(addressOrName: string): this;
+    deployed(): Promise<this>;
+    interface: IVersionableResolverInterface;
+    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
+    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
+    listeners(eventName?: string): Array<Listener>;
+    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
+    removeAllListeners(eventName?: string): this;
+    off: OnEvent<this>;
+    on: OnEvent<this>;
+    once: OnEvent<this>;
+    removeListener: OnEvent<this>;
+    functions: {
+        recordVersions(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[BigNumber]>;
+    };
+    recordVersions(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
+    callStatic: {
+        recordVersions(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
+    };
+    filters: {
+        "VersionChanged(bytes32,uint64)"(node?: PromiseOrValue<BytesLike> | null, newVersion?: null): VersionChangedEventFilter;
+        VersionChanged(node?: PromiseOrValue<BytesLike> | null, newVersion?: null): VersionChangedEventFilter;
+    };
+    estimateGas: {
+        recordVersions(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
+    };
+    populateTransaction: {
+        recordVersions(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    };
+}
+//# sourceMappingURL=IVersionableResolver.d.ts.map

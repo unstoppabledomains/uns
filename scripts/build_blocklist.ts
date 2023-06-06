@@ -3,7 +3,7 @@ import fs from 'fs';
 import { network } from 'hardhat';
 import { Contract } from 'ethers';
 import { Event } from '@ethersproject/contracts';
-import { getNetworkConfig } from '../src/config';
+import { getUnsNetworkConfig } from '../src/config';
 import { unwrap } from '../src/helpers';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { CNSRegistry__factory } from '../types/factories/dot-crypto/contracts';
@@ -12,7 +12,7 @@ async function main () {
   console.log('Network:', network.name);
 
   const chainId: number = unwrap(network.config, 'chainId');
-  const config = getNetworkConfig(chainId);
+  const config = getUnsNetworkConfig(chainId);
   if (!config) {
     throw new Error(`Config not found for network ${network.config.chainId}`);
   }

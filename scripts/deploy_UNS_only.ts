@@ -1,6 +1,6 @@
 import { network } from 'hardhat';
 import merge from 'lodash.merge';
-import { getNetworkConfig, mergeNetworkConfig } from '../src/config';
+import { getUnsNetworkConfig, mergeUnsNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
 import { unwrap } from '../src/helpers';
 
@@ -8,7 +8,7 @@ async function main () {
   console.log('Network:', network.name);
 
   const chainId: number = unwrap(network.config, 'chainId');
-  const config = merge(getNetworkConfig(chainId), {
+  const config = merge(getUnsNetworkConfig(chainId), {
     contracts: {
       CNSRegistry: { address: '0x0000000000000000000000000000000000000000' },
       MintingController: { address: '0x0000000000000000000000000000000000000000' },
@@ -23,7 +23,7 @@ async function main () {
 
   const deployer = await Deployer.create();
   const deployConfig = await deployer.execute(['uns'], config);
-  mergeNetworkConfig(deployConfig);
+  mergeUnsNetworkConfig(deployConfig);
 
   console.log('Deployed!');
 }

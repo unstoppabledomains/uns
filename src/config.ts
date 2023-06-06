@@ -1,20 +1,37 @@
 import fs from 'fs';
 import { merge } from 'lodash';
-import { UnsConfig, UnsNetworkConfig } from './types';
+import { UnsConfig, NsNetworkConfig } from './types';
 
-const configPath = './uns-config.json';
+const unsConfigPath = './uns-config.json';
+const ensConfigPath = './ens-config.json';
 
-export function getConfig (): UnsConfig {
-  const file = fs.existsSync(configPath) ? fs.readFileSync(configPath).toString() : '{}';
+export function getUnsConfig (): UnsConfig {
+  const file = fs.existsSync(unsConfigPath) ? fs.readFileSync(unsConfigPath).toString() : '{}';
   return JSON.parse(file.length ? file : '{}');
 }
 
-export function getNetworkConfig (chainId: number): UnsNetworkConfig {
-  const { networks } = getConfig();
+export function getUnsNetworkConfig (chainId: number): NsNetworkConfig {
+  const { networks } = getUnsConfig();
   return networks[chainId];
 }
 
-export function mergeNetworkConfig (config: UnsConfig) {
-  const _config = merge(getConfig(), config);
-  fs.writeFileSync(configPath, `${JSON.stringify(_config, null, 4)}\n`);
+export function getEnsNetworkConfig (chainId: number): NsNetworkConfig {
+  const { networks } = getEnsConfig();
+  return networks[chainId];
 }
+
+export function mergeUnsNetworkConfig (config: UnsConfig) {
+  const _config = merge(getUnsConfig(), config);
+  fs.writeFileSync(unsConfigPath, `${JSON.stringify(_config, null, 4)}\n`);
+}
+
+export function getEnsConfig (): UnsConfig {
+  const file = fs.existsSync(ensConfigPath) ? fs.readFileSync(ensConfigPath).toString() : '{}';
+  return JSON.parse(file.length ? file : '{}');
+}
+
+export function mergeEnsNetworkConfig (config: UnsConfig) {
+  const _config = merge(getEnsConfig(), config);
+  fs.writeFileSync(ensConfigPath, `${JSON.stringify(_config, null, 4)}\n`);
+}
+

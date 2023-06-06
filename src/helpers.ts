@@ -1,4 +1,4 @@
-import { ArtifactName, DependenciesMap, UnsContractConfig } from './types';
+import { ArtifactName, DependenciesMap, ContractConfig } from './types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function unwrap (object: object, key: string): any {
@@ -9,6 +9,6 @@ export function unwrap (object: object, key: string): any {
   return object[key];
 }
 
-export function unwrapDependencies (dependencies: DependenciesMap, keys: ArtifactName[]): UnsContractConfig[] {
+export function unwrapDependencies (dependencies: DependenciesMap, keys: ArtifactName[]): ContractConfig[] {
   return keys.map((key) => unwrap(dependencies, key));
 }

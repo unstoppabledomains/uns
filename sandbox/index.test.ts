@@ -3,13 +3,21 @@ import { assert, expect } from 'chai';
 import { ethers, network } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { utils } from 'ethers';
-import { getNetworkConfig } from '../src/config';
+import { getEnsNetworkConfig, getUnsNetworkConfig } from '../src/config';
 import { MintingManager__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { CNSRegistry__factory } from '../types/factories/dot-crypto/contracts';
 import { MintingManager, UNSRegistry } from '../types/contracts';
 import { CNSRegistry } from '../types/dot-crypto/contracts';
 import { unwrap } from '../src/helpers';
-import { TLD } from '../test/helpers/constants';
+import { BUFFERED_REGISTRATION_COST, REGISTRATION_TIME, TLD, ZERO_ADDRESS } from '../test/helpers/constants';
+import {
+  BaseRegistrarImplementation,
+  BaseRegistrarImplementation__factory,
+  ENSRegistry,
+  ENSRegistry__factory,
+  ETHRegistrarController,
+  ETHRegistrarController__factory,
+} from '../types';
 import { Sandbox } from '.';
 
 describe('Sandbox', async () => {
@@ -18,6 +26,11 @@ describe('Sandbox', async () => {
   let unsRegistry: UNSRegistry, cnsRegistry: CNSRegistry, mintingManager: MintingManager;
   let signers: SignerWithAddress[], owner: SignerWithAddress, minter: SignerWithAddress;
   let predicateAddress: string;
+
+  let ensRegistry: ENSRegistry,
+    ensBaseRegistrar: BaseRegistrarImplementation,
+    ethRegistrarController: ETHRegistrarController;
+  let registrantAccount: string;
 
   let sandbox: Sandbox;
 
@@ -30,13 +43,25 @@ describe('Sandbox', async () => {
     [owner, minter] = signers;
 
     const chainId: number = unwrap(network.config, 'chainId');
-    const { contracts } = getNetworkConfig(chainId);
+    const { contracts: unsContracts } = getUnsNetworkConfig(chainId);
+    const { contracts: ensContracts } = getEnsNetworkConfig(chainId);
 
-    unsRegistry = new UNSRegistry__factory(owner).attach(contracts.UNSRegistry.address);
-    cnsRegistry = new CNSRegistry__factory(owner).attach(contracts.CNSRegistry.address);
-    mintingManager = new MintingManager__factory(owner).attach(contracts.MintingManager.address);
+    unsRegistry = new UNSRegistry__factory(owner).attach(unsContracts.UNSRegistry.address);
+    cnsRegistry = new CNSRegistry__factory(owner).attach(unsContracts.CNSRegistry.address);
+    mintingManager = new MintingManager__factory(owner).attach(unsContracts.MintingManager.address);
 
-    predicateAddress = contracts.MintableERC721Predicate.address;
+    predicateAddress = unsContracts.MintableERC721Predicate.address;
+
+    console.log('address', ensContracts.ENSRegistry.address);
+    console.log('addressReg', ensRegistry = new ENSRegistry__factory(owner)
+      .attach(ensContracts.ENSRegistry.address));
+    ensRegistry = new ENSRegistry__factory(owner)
+      .attach(ensContracts.ENSRegistry.address);
+    ensBaseRegistrar = new BaseRegistrarImplementation__factory(owner)
+      .attach(ensContracts.BaseRegistrarImplementation.address);
+    ethRegistrarController = new ETHRegistrarController__factory(owner)
+      .attach(ensContracts.ETHRegistrarController.address);
+    registrantAccount = await signers[1].getAddress();
   });
 
   beforeEach(async () => {
@@ -45,6 +70,52 @@ describe('Sandbox', async () => {
 
   after(async () => {
     await sandbox.stop();
+  });
+
+  describe('ENS', () => {
+    async function registerName (name, txOptions = { value: BUFFERED_REGISTRATION_COST }) {
+      const secret = '0x0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF';
+
+      const commitment = await ethRegistrarController.makeCommitment(
+        name,
+        registrantAccount,
+        REGISTRATION_TIME,
+        secret,
+        ZERO_ADDRESS,
+        [],
+        false,
+        0,
+      );
+
+      let tx = await ethRegistrarController.commit(commitment);
+
+      expect(await ethRegistrarController.commitments(commitment)).to
+        .equal((await ethers.provider.getBlock(tx.blockNumber!)).timestamp);
+
+      await ethers.provider.send('evm_increaseTime', [(await ethRegistrarController.minCommitmentAge()).toNumber()]);
+      await ethers.provider.send('evm_mine', []);
+
+      tx = await ethRegistrarController.register(
+        name,
+        registrantAccount,
+        REGISTRATION_TIME,
+        secret,
+        ZERO_ADDRESS,
+        [],
+        false,
+        0,
+        txOptions,
+      );
+
+      return tx;
+    }
+
+    it('should be able to mint ENS token', async () => {
+      const name = 'newname';
+      const tx = await registerName(name);
+      console.log(tx);
+      expect(await ethRegistrarController.available(name)).to.equal(false);
+    });
   });
 
   it('should mint a token', async () => {
@@ -96,7 +167,8 @@ describe('Sandbox', async () => {
     try {
       await cnsRegistry.callStatic.ownerOf(tokenId);
       assert.fail('Error is ecpected');
-    } catch (error) {}
+    } catch (error) {
+    }
   });
 
   it('should migrate token from CNS to UNS L2', async () => {
@@ -118,7 +190,8 @@ describe('Sandbox', async () => {
     try {
       await cnsRegistry.callStatic.ownerOf(tokenId);
       assert.fail('Error is ecpected');
-    } catch (error) {}
+    } catch (error) {
+    }
   });
 });
 

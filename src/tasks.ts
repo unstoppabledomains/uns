@@ -1,9 +1,21 @@
-import { network, upgrades, defender } from 'hardhat';
+import { defender, network, upgrades } from 'hardhat';
 import { Contract, utils } from 'ethers';
 import { merge } from 'lodash';
-import { ZERO_ADDRESS } from '../test/helpers/constants';
+import { namehash } from 'ethers/lib/utils';
+import { sha3 } from 'web3-utils';
+import { ZERO_ADDRESS, ZERO_WORD } from '../test/helpers/constants';
+import {
+  BaseRegistrarImplementation__factory,
+  DummyOracle__factory,
+  ENSRegistry__factory,
+  ETHRegistrarController__factory,
+  NameWrapper__factory,
+  PublicResolver__factory,
+  ReverseRegistrar__factory,
+  StablePriceOracle__factory,
+} from '../types';
 import { Deployer } from './deployer';
-import { ArtifactName, DependenciesMap, UnsContractName, UnsNetworkConfig } from './types';
+import { ArtifactName, DependenciesMap, EnsContractName, UnsContractName, NsNetworkConfig } from './types';
 import verify from './verify';
 import { unwrap, unwrapDependencies } from './helpers';
 
@@ -11,7 +23,7 @@ export type Task = {
   tags: string[];
   priority: number;
   run: (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => Promise<void>;
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => DependenciesMap;
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => DependenciesMap;
 };
 
 export const deployCNSTask: Task = {
@@ -98,7 +110,7 @@ export const deployCNSForwardersTask: Task = {
     await resolverForwarder.deployTransaction.wait();
     await verify(ctx, resolverForwarder.address, [CNSRegistry.address, Resolver.address]);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig): DependenciesMap => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { CNSRegistry, SignatureController, Resolver } = config.contracts;
@@ -223,7 +235,7 @@ const deployUNSTask = {
       }
     }
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig): DependenciesMap => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { CNSRegistry, MintingController, URIPrefixController, Resolver, RootChainManager } = config.contracts || {};
@@ -276,7 +288,7 @@ const deployUNSProxyReaderTask: Task = {
 
     await mintingManager.connect(owner).addProxyReaders([proxyReader.address]);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig): DependenciesMap => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { CNSRegistry, UNSRegistry, MintingManager } = config.contracts || {};
@@ -327,7 +339,7 @@ const configureCNSTask = {
       await mintingManager.setTokenURIPrefix('https://example.com/');
     }
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig): DependenciesMap => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { MintingController, URIPrefixController, MintingManager } = config.contracts || {};
@@ -362,7 +374,7 @@ const deployMMForwarderTask = {
     await forwarder.deployTransaction.wait();
     await verify(ctx, forwarder.address, [MintingManager.address]);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig): DependenciesMap => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { MintingManager } = config.contracts || {};
@@ -393,7 +405,7 @@ const deployUNSOperatorTask: Task = {
     await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);
     await verify(ctx, unsOperatorImpl, []);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { ProxyAdmin } = config.contracts || {};
@@ -421,7 +433,7 @@ const upgradeUNSRegistryTask: Task = {
     await ctx.saveContractConfig(UnsContractName.UNSRegistry, unsRegistry, unsRegistryImpl, unsRegistry);
     await verify(ctx, unsRegistryImpl, []);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { UNSRegistry, ProxyAdmin } = config.contracts || {};
@@ -455,7 +467,7 @@ const upgradeMintingManagerTask: Task = {
     await ctx.saveContractConfig(UnsContractName.MintingManager, mintingManager, mintingManagerImpl);
     await verify(ctx, mintingManagerImpl, []);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { MintingManager, ProxyAdmin } = config.contracts || {};
@@ -493,7 +505,7 @@ const upgradeProxyReaderTask: Task = {
     await ctx.saveContractConfig(UnsContractName.ProxyReader, proxyReader, proxyReaderImpl);
     await verify(ctx, proxyReaderImpl, []);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { ProxyReader, ProxyAdmin } = config.contracts || {};
@@ -529,7 +541,7 @@ const upgradeUNSOperatorTask: Task = {
     await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);
     await verify(ctx, unsOperatorImpl, []);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { UNSOperator, ProxyAdmin } = config.contracts || {};
@@ -576,7 +588,7 @@ const proposeUNSRegistryTask: Task = {
     }
     ctx.log('Upgrade proposal created at:', proposal.url);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { UNSRegistry, ProxyAdmin } = config.contracts || {};
@@ -620,7 +632,7 @@ const proposeMintingManagerTask: Task = {
     }
     ctx.log('Upgrade proposal created at:', proposal.url);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { MintingManager, ProxyAdmin } = config.contracts || {};
@@ -666,7 +678,7 @@ const proposeProxyReaderTask: Task = {
     }
     ctx.log('Upgrade proposal created at:', proposal.url);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { ProxyReader, ProxyAdmin } = config.contracts || {};
@@ -734,7 +746,7 @@ const configurePolygonPosBridgeTask: Task = {
     const predicate = ctx.artifacts.MintableERC721Predicate.attach(MintableERC721Predicate.address).connect(owner);
     await predicate.grantRole(await predicate.MANAGER_ROLE(), rootChainManager.address);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { UNSRegistry, MintableERC721Predicate, RootChainManager } = config.contracts || {};
@@ -766,7 +778,7 @@ const deployDotCoinBurnerTask: Task = {
     await dotCoinBurner.deployTransaction.wait();
     await verify(ctx, dotCoinBurner.address, [UNSRegistry.address]);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { UNSRegistry } = config.contracts || {};
@@ -810,7 +822,7 @@ const prepareProxyReaderTask: Task = {
 
     console.log(`setOwner encoded data(owner ${newImplementationAddr}): ${callData}`);
   },
-  ensureDependencies: (ctx: Deployer, config?: UnsNetworkConfig) => {
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     const { ProxyReader, ProxyAdmin } = config.contracts || {};
@@ -827,6 +839,63 @@ const prepareProxyReaderTask: Task = {
 
     return dependencies;
   },
+};
+
+
+const deployENSTask = {
+  tags: ['ens'],
+  priority: 10,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const { owner } = ctx.accounts;
+
+    const ens = await new ENSRegistry__factory(owner).deploy();
+    await ctx.saveContractConfig(EnsContractName.ENSRegistry, ens);
+
+    const baseRegistrar = await new BaseRegistrarImplementation__factory(owner).deploy(ens.address, namehash('eth'));
+    await ctx.saveContractConfig(EnsContractName.BaseRegistrarImplementation, baseRegistrar);
+
+    const reverseRegistrar = await new ReverseRegistrar__factory(owner).deploy(ens.address);
+    await ctx.saveContractConfig(EnsContractName.ReverseRegistrar, reverseRegistrar);
+
+    await ens.setSubnodeOwner(ZERO_WORD, sha3('reverse')!, await owner.getAddress());
+    await ens.setSubnodeOwner(namehash('reverse'), sha3('addr')!, reverseRegistrar.address);
+
+    const nameWrapper = await new NameWrapper__factory(owner)
+      .deploy(ens.address, baseRegistrar.address, await owner.getAddress());
+    await ctx.saveContractConfig(EnsContractName.NameWrapper, nameWrapper);
+
+    await ens.setSubnodeOwner(ZERO_WORD, sha3('eth')!, baseRegistrar.address);
+
+    const dummyOracle = await new DummyOracle__factory(owner).deploy('100000000');
+    await ctx.saveContractConfig(EnsContractName.DummyOracle, dummyOracle);
+
+    const priceOracle = await new StablePriceOracle__factory(owner).deploy(dummyOracle.address, [0, 0, 4, 2, 1]);
+    await ctx.saveContractConfig(EnsContractName.StablePriceOracle, priceOracle);
+
+    const controller = await new ETHRegistrarController__factory(owner).deploy(
+      baseRegistrar.address,
+      priceOracle.address,
+      600,
+      86400,
+      reverseRegistrar.address,
+      nameWrapper.address,
+      ens.address,
+    );
+    await ctx.saveContractConfig(EnsContractName.ETHRegistrarController, controller);
+
+    await nameWrapper.setController(controller.address, true);
+    await baseRegistrar.addController(nameWrapper.address);
+    await reverseRegistrar.setController(controller.address, true);
+
+    const resolver = await new PublicResolver__factory(owner).deploy(
+      ens.address,
+      nameWrapper.address,
+      controller.address,
+      reverseRegistrar.address,
+    );
+    await ctx.saveContractConfig(EnsContractName.PublicResolver, resolver);
+  },
+  ensureDependencies: () => ({}),
 };
 
 export const tasks: Task[] = [
@@ -848,4 +917,5 @@ export const tasks: Task[] = [
   deployUNSOperatorTask,
   upgradeUNSOperatorTask,
   prepareProxyReaderTask,
+  deployENSTask,
 ];
