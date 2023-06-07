@@ -2,28 +2,28 @@ import fs from 'fs';
 import { merge } from 'lodash';
 import { NsConfig, NsNetworkConfig } from './types';
 
-export enum NsConfigPath{
-  UNS = './uns-config.json',
-  ENS = './ens-config.json'
+export enum NameService {
+  UNS = 'UNS',
+  ENS = 'ENS',
 }
 
-export function getNsConfig (nsConfigPath: NsConfigPath): NsConfig {
-  const file = fs.existsSync(nsConfigPath) ? fs.readFileSync(nsConfigPath).toString() : '{}';
+const configPathMap: Record<NameService, string> = {
+  UNS: './uns-config.json',
+  ENS: './ens-config.json',
+};
+
+export function getConfig (nameService = NameService.UNS): NsConfig {
+  const path = configPathMap[nameService];
+  const file = fs.existsSync(path) ? fs.readFileSync(path).toString() : '{}';
   return JSON.parse(file.length ? file : '{}');
 }
 
-export function getUnsNetworkConfig (chainId: number): NsNetworkConfig {
-  const { networks } = getNsConfig(NsConfigPath.UNS);
+export function getNetworkConfig (chainId: number, nameService = NameService.UNS): NsNetworkConfig {
+  const { networks } = getConfig(nameService);
   return networks[chainId];
 }
 
-export function getEnsNetworkConfig (chainId: number): NsNetworkConfig {
-  const { networks } = getNsConfig(NsConfigPath.UNS);
-  return networks[chainId];
+export function mergeNetworkConfig (config: NsConfig, nameService = NameService.UNS) {
+  const _config = merge(getConfig(nameService), config);
+  fs.writeFileSync(configPathMap[nameService], `${JSON.stringify(_config, null, 4)}\n`);
 }
-
-export function mergeNsNetworkConfig (config: NsConfig, configPath: NsConfigPath) {
-  const _config = merge(getNsConfig(configPath), config);
-  fs.writeFileSync(configPath, `${JSON.stringify(_config, null, 4)}\n`);
-}
-

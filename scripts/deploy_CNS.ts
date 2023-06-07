@@ -1,5 +1,5 @@
 import { network } from 'hardhat';
-import { mergeNsNetworkConfig } from '../src/config';
+import { mergeNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
 
 async function main () {
@@ -7,7 +7,7 @@ async function main () {
 
   const deployer = await Deployer.create();
   const deployConfig = await deployer.execute(['cns', 'cns_forwarders']);
-  mergeNsNetworkConfig(deployConfig);
+  mergeNetworkConfig(deployConfig);
 
   console.log('Deployed!');
 }

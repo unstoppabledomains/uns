@@ -14,9 +14,9 @@ export function unwrapDependencies (dependencies: DependenciesMap, keys: Artifac
   return keys.map((key) => unwrap(dependencies, key));
 }
 
-export function notNullSha ( value: string){
+export function notNullSha (value: string) {
   const res = sha3(value);
-  if(!res){
+  if (!res) {
     throw new Error('notNullSha: SHA returns null');
   }
 

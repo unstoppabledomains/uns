@@ -3,7 +3,7 @@ import { assert, expect } from 'chai';
 import { ethers, network } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { utils } from 'ethers';
-import { getEnsNetworkConfig, getUnsNetworkConfig } from '../src/config';
+import { NameService, getNetworkConfig } from '../src/config';
 import { MintingManager__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { CNSRegistry__factory } from '../types/factories/dot-crypto/contracts';
 import { MintingManager, UNSRegistry } from '../types/contracts';
@@ -37,8 +37,8 @@ describe('Sandbox', async () => {
     [owner, minter] = signers;
 
     const chainId: number = unwrap(network.config, 'chainId');
-    const { contracts: unsContracts } = getUnsNetworkConfig(chainId);
-    const { contracts: ensContracts } = getEnsNetworkConfig(chainId);
+    const { contracts: unsContracts } = getNetworkConfig(chainId, NameService.UNS);
+    const { contracts: ensContracts } = getNetworkConfig(chainId, NameService.ENS);
 
     unsRegistry = new UNSRegistry__factory(owner).attach(unsContracts.UNSRegistry.address);
     cnsRegistry = new CNSRegistry__factory(owner).attach(unsContracts.CNSRegistry.address);

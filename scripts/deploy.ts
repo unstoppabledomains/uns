@@ -1,5 +1,5 @@
 import { network } from 'hardhat';
-import { getUnsNetworkConfig, mergeNsNetworkConfig } from '../src/config';
+import { getNetworkConfig, mergeNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
 import { unwrap } from '../src/helpers';
 
@@ -7,14 +7,14 @@ async function main () {
   console.log('Network:', network.name);
 
   const chainId: number = unwrap(network.config, 'chainId');
-  const config = getUnsNetworkConfig(chainId);
+  const config = getNetworkConfig(chainId);
   if (!config) {
     throw new Error(`Config not found for network ${chainId}`);
   }
 
   const deployer = await Deployer.create();
   const deployConfig = await deployer.execute(['uns', 'uns_config_cns'], config);
-  mergeNsNetworkConfig(deployConfig);
+  mergeNetworkConfig(deployConfig);
 
   console.log('Deployed!');
 }
