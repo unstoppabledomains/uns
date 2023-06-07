@@ -33,11 +33,11 @@ contract ENSCustody is
 
     bytes32 private constant _ETH_NODE = 0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
     // This is the keccak-256 hash of "ens.owner." subtracted by 1
-    bytes32 internal constant _OWNER_PREFIX_SLOT = 0x0a8885dd093a12d378a27df09bde33e3caca641a3d6970e06805fde8e847cb46;
+    bytes32 private constant _OWNER_PREFIX_SLOT = 0x0a8885dd093a12d378a27df09bde33e3caca641a3d6970e06805fde8e847cb46;
     // This is the keccak-256 hash of "uns.ens_controller" subtracted by 1
-    bytes32 internal constant _ENS_CONTROLLER_SLOT = 0x412386de53449251cbf7ce1f4c6a038bf9c0746e62d331b08ef0c3fa7d0ab672;
+    bytes32 private constant _ENS_CONTROLLER_SLOT = 0x412386de53449251cbf7ce1f4c6a038bf9c0746e62d331b08ef0c3fa7d0ab672;
     // This is the keccak-256 hash of "uns.ens_wrapper" subtracted by 1
-    bytes32 internal constant _ENS_WRAPPER_SLOT = 0x60793a5062d506d35cc8f1beda67ee5028c16bfcd9c923d5bfc439c04bd929b1;
+    bytes32 private constant _ENS_WRAPPER_SLOT = 0x60793a5062d506d35cc8f1beda67ee5028c16bfcd9c923d5bfc439c04bd929b1;
 
     modifier onlyTokenOwner(uint256 tokenId) {
         if (_ownerOf(tokenId) != _msgSender()) {

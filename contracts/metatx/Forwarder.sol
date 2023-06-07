@@ -17,7 +17,7 @@ error InvalidSignature();
  */
 abstract contract Forwarder is Initializable, BaseForwarder {
     // This is the keccak-256 hash of "uns.forwarder.nonce." subtracted by 1
-    bytes32 internal constant _NONCE_PREFIX_SLOT = 0x1ee5d87a048b728f67073f282321992c260e5be4fa651d08665c5b4ee7a83815;
+    bytes32 private constant _NONCE_PREFIX_SLOT = 0x1ee5d87a048b728f67073f282321992c260e5be4fa651d08665c5b4ee7a83815;
 
     // solhint-disable-next-line func-name-mixedcase
     function __Forwarder_init() internal onlyInitializing {
