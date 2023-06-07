@@ -14,7 +14,7 @@ import {IERC165Upgradeable} from '@openzeppelin/contracts-upgradeable/utils/intr
 import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import {StorageSlotUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
-import {IENSCustody, Unauthorised, InvalidToken, CustodyNotEnoughBalance, OperationProhibited, InvalidForwardedToken} from './IENSCustody.sol';
+import {IENSCustody, Unauthorised, InvalidToken, UnknownToken, CustodyNotEnoughBalance, OperationProhibited, InvalidForwardedToken} from './IENSCustody.sol';
 import {ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
 import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
@@ -160,7 +160,7 @@ contract ENSCustody is
         INameWrapper _wrapper = INameWrapper(StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value);
         uint256 tokenId = _namehash(name);
         if (_wrapper.ownerOf(tokenId) != address(this)) {
-            revert InvalidToken(tokenId);
+            revert UnknownToken(tokenId);
         }
 
         IETHRegistrarController _controller = IETHRegistrarController(StorageSlotUpgradeable.getAddressSlot(_ENS_CONTROLLER_SLOT).value);

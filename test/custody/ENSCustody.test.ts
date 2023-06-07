@@ -68,7 +68,14 @@ describe('ENSCustody', function () {
     return tx;
   }
 
-  async function registerAndParkName (name, minter, resolver = ZERO_ADDRESS, selfCustody = false, txOptions = {}) {
+  async function registerAndParkName (
+    name,
+    minter,
+    resolver = ZERO_ADDRESS,
+    selfCustody = false,
+    callData: string[] = [],
+    txOptions = {},
+  ) {
     // make commitment
     const commitment = await custody.makeCommitment(
       name,
@@ -76,7 +83,7 @@ describe('ENSCustody', function () {
       REGISTRATION_TIME,
       secret,
       resolver,
-      [],
+      callData,
       false,
       0,
       selfCustody,
@@ -90,7 +97,18 @@ describe('ENSCustody', function () {
     // register
     const registerTx = await custody
       .connect(minter)
-      .register(name, registrantAddress, REGISTRATION_TIME, secret, resolver, [], false, 0, selfCustody, txOptions);
+      .register(
+        name,
+        registrantAddress,
+        REGISTRATION_TIME,
+        secret,
+        resolver,
+        callData,
+        false,
+        0,
+        selfCustody,
+        txOptions,
+      );
     return [commitTx, registerTx];
   }
 
@@ -273,6 +291,18 @@ describe('ENSCustody', function () {
       expect(await provider.getBalance(custody.address)).to.equal(balance.sub(price));
     });
 
+    it('should register and park name with resolver and initial records', async () => {
+      const name = 'ts-ll84';
+      const node = namehash(`${name}.eth`);
+      const callData = [resolver.interface.encodeFunctionData('setAddr(bytes32,address)', [node, registrantAddress])];
+      await topupCustody(name);
+
+      await registerAndParkName(name, minter, resolver.address, false, callData);
+
+      await assertOwnership(name, registrantAddress);
+      expect(await resolver['addr(bytes32)'](node)).to.equal(registrantAddress);
+    });
+
     it('should transfer parked domain', async () => {
       const name = 'ts-we02';
       const node = namehash(`${name}.eth`);
@@ -346,7 +376,7 @@ describe('ENSCustody', function () {
       await topupCustody(name);
       await registerName(name);
 
-      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('InvalidToken');
+      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('UnknownToken');
     });
 
     it('should revert renewing of expired domain', async () => {
@@ -358,7 +388,7 @@ describe('ENSCustody', function () {
       await provider.send('evm_increaseTime', [REGISTRATION_TIME + gracePeriod + 1]);
 
       await topupCustody(name);
-      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('InvalidToken');
+      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('UnknownToken');
     });
   });
 
