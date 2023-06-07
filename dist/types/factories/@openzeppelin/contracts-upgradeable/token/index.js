@@ -23,5 +23,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.erc721 = void 0;
+exports.erc721 = exports.erc1155 = void 0;
+exports.erc1155 = __importStar(require("./ERC1155"));
 exports.erc721 = __importStar(require("./ERC721"));

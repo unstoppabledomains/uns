@@ -12,12 +12,9 @@ export declare class IERC721__factory {
         }[];
         name: string;
         type: string;
-        constant?: undefined;
         outputs?: undefined;
-        payable?: undefined;
         stateMutability?: undefined;
     } | {
-        constant: boolean;
         inputs: {
             internalType: string;
             name: string;
@@ -29,7 +26,6 @@ export declare class IERC721__factory {
             name: string;
             type: string;
         }[];
-        payable: boolean;
         stateMutability: string;
         type: string;
         anonymous?: undefined;

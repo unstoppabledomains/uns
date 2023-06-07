@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UNSRegistryForwarder__factory = exports.ResolverForwarder__factory = exports.MintingManagerForwarder__factory = exports.IForwarder__factory = exports.ERC2771RegistryContext__factory = exports.ERC2771Context__factory = exports.CNSRegistryForwarder__factory = exports.BaseRoutingForwarder__factory = exports.BaseForwarder__factory = void 0;
+exports.UNSRegistryForwarder__factory = exports.ResolverForwarder__factory = exports.MintingManagerForwarder__factory = exports.IForwarder__factory = exports.Forwarder__factory = exports.ERC2771RegistryContext__factory = exports.ERC2771Context__factory = exports.CNSRegistryForwarder__factory = exports.BaseRoutingForwarder__factory = exports.BaseForwarder__factory = void 0;
 var BaseForwarder__factory_1 = require("./BaseForwarder__factory");
 Object.defineProperty(exports, "BaseForwarder__factory", { enumerable: true, get: function () { return BaseForwarder__factory_1.BaseForwarder__factory; } });
 var BaseRoutingForwarder__factory_1 = require("./BaseRoutingForwarder__factory");
@@ -11,6 +11,8 @@ var ERC2771Context__factory_1 = require("./ERC2771Context__factory");
 Object.defineProperty(exports, "ERC2771Context__factory", { enumerable: true, get: function () { return ERC2771Context__factory_1.ERC2771Context__factory; } });
 var ERC2771RegistryContext__factory_1 = require("./ERC2771RegistryContext__factory");
 Object.defineProperty(exports, "ERC2771RegistryContext__factory", { enumerable: true, get: function () { return ERC2771RegistryContext__factory_1.ERC2771RegistryContext__factory; } });
+var Forwarder__factory_1 = require("./Forwarder__factory");
+Object.defineProperty(exports, "Forwarder__factory", { enumerable: true, get: function () { return Forwarder__factory_1.Forwarder__factory; } });
 var IForwarder__factory_1 = require("./IForwarder__factory");
 Object.defineProperty(exports, "IForwarder__factory", { enumerable: true, get: function () { return IForwarder__factory_1.IForwarder__factory; } });
 var MintingManagerForwarder__factory_1 = require("./MintingManagerForwarder__factory");

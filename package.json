@@ -1,6 +1,6 @@
 {
   "name": "uns",
-  "version": "0.8.10",
+  "version": "0.8.11",
   "description": "UNS contracts and tools",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "main": "./dist/index.js",
@@ -15,7 +15,7 @@
     "coverage": "hardhat coverage",
     "test": "yarn test:sol && yarn test:sandbox",
     "test:sol": "hardhat test --typecheck",
-    "test:sandbox": "env HARDHAT_NETWORK=sandbox mocha --require ts-node/register ./sandbox/**/*.test.ts",
+    "test:sandbox": "env HARDHAT_NETWORK=sandbox mocha --require ts-node/register --exit ./sandbox/**/*.test.ts",
     "rebuild:sandbox": "env HARDHAT_NETWORK=sandbox DEBUG='UNS:*' ts-node ./sandbox/rebuild.ts",
     "lint": "yarn lint:ts && yarn lint:sol",
     "lint:fix": "yarn lint:ts:fix && yarn lint:sol:fix",

@@ -79,7 +79,6 @@ const _abi = [
         type: "event",
     },
     {
-        constant: false,
         inputs: [
             {
                 internalType: "address",
@@ -94,12 +93,10 @@ const _abi = [
         ],
         name: "approve",
         outputs: [],
-        payable: false,
         stateMutability: "nonpayable",
         type: "function",
     },
     {
-        constant: true,
         inputs: [
             {
                 internalType: "address",
@@ -115,12 +112,10 @@ const _abi = [
                 type: "uint256",
             },
         ],
-        payable: false,
         stateMutability: "view",
         type: "function",
     },
     {
-        constant: true,
         inputs: [
             {
                 internalType: "uint256",
@@ -136,12 +131,10 @@ const _abi = [
                 type: "address",
             },
         ],
-        payable: false,
         stateMutability: "view",
         type: "function",
     },
     {
-        constant: true,
         inputs: [
             {
                 internalType: "address",
@@ -162,12 +155,10 @@ const _abi = [
                 type: "bool",
             },
         ],
-        payable: false,
         stateMutability: "view",
         type: "function",
     },
     {
-        constant: true,
         inputs: [
             {
                 internalType: "uint256",
@@ -183,12 +174,10 @@ const _abi = [
                 type: "address",
             },
         ],
-        payable: false,
         stateMutability: "view",
         type: "function",
     },
     {
-        constant: false,
         inputs: [
             {
                 internalType: "address",
@@ -208,12 +197,10 @@ const _abi = [
         ],
         name: "safeTransferFrom",
         outputs: [],
-        payable: false,
         stateMutability: "nonpayable",
         type: "function",
     },
     {
-        constant: false,
         inputs: [
             {
                 internalType: "address",
@@ -238,12 +225,10 @@ const _abi = [
         ],
         name: "safeTransferFrom",
         outputs: [],
-        payable: false,
         stateMutability: "nonpayable",
         type: "function",
     },
     {
-        constant: false,
         inputs: [
             {
                 internalType: "address",
@@ -252,18 +237,16 @@ const _abi = [
             },
             {
                 internalType: "bool",
-                name: "_approved",
+                name: "approved",
                 type: "bool",
             },
         ],
         name: "setApprovalForAll",
         outputs: [],
-        payable: false,
         stateMutability: "nonpayable",
         type: "function",
     },
     {
-        constant: true,
         inputs: [
             {
                 internalType: "bytes4",
@@ -279,12 +262,10 @@ const _abi = [
                 type: "bool",
             },
         ],
-        payable: false,
         stateMutability: "view",
         type: "function",
     },
     {
-        constant: false,
         inputs: [
             {
                 internalType: "address",
@@ -304,7 +285,6 @@ const _abi = [
         ],
         name: "transferFrom",
         outputs: [],
-        payable: false,
         stateMutability: "nonpayable",
         type: "function",
     },

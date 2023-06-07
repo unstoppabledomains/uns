@@ -1,1 +1,1 @@
-{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../../../../types/@openzeppelin/contracts-upgradeable/token/index.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,KAAK,MAAM,MAAM,UAAU,CAAC;AACxC,YAAY,EAAE,MAAM,EAAE,CAAC"}
+{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../../../../types/@openzeppelin/contracts-upgradeable/token/index.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,KAAK,OAAO,MAAM,WAAW,CAAC;AAC1C,YAAY,EAAE,OAAO,EAAE,CAAC;AACxB,OAAO,KAAK,KAAK,MAAM,MAAM,UAAU,CAAC;AACxC,YAAY,EAAE,MAAM,EAAE,CAAC"}

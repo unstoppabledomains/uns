@@ -22,6 +22,7 @@ require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-solhint");
 require("@nomiclabs/hardhat-etherscan");
+require("hardhat-tracer");
 require("@openzeppelin/hardhat-upgrades");
 require("@openzeppelin/hardhat-defender");
 require('solidity-coverage');
@@ -68,7 +69,7 @@ const config = {
                     } }),
             },
             {
-                version: '0.8.4',
+                version: '0.8.17',
                 settings: Object.assign(Object.assign({}, settings), { metadata: {
                         bytecodeHash: 'none',
                     } }),

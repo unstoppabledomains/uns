@@ -23,7 +23,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dotCrypto = exports.contracts = exports.openzeppelin = void 0;
+exports.dotCrypto = exports.contracts = exports.openzeppelin = exports.ensdomains = void 0;
+exports.ensdomains = __importStar(require("./@ensdomains"));
 exports.openzeppelin = __importStar(require("./@openzeppelin"));
 exports.contracts = __importStar(require("./contracts"));
 exports.dotCrypto = __importStar(require("./dot-crypto"));

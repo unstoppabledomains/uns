@@ -23,6 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.contractsUpgradeable = exports.contracts = void 0;
+exports.contractsUpgradeable = exports.contracts23 = exports.contracts = void 0;
 exports.contracts = __importStar(require("./contracts"));
+exports.contracts23 = __importStar(require("./contracts-2.3"));
 exports.contractsUpgradeable = __importStar(require("./contracts-upgradeable"));

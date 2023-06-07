@@ -25,6 +25,7 @@ import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-solhint';
 import '@nomiclabs/hardhat-etherscan';
+import 'hardhat-tracer';
 import '@openzeppelin/hardhat-upgrades';
 import '@openzeppelin/hardhat-defender';
 import 'hardhat-gas-reporter';
