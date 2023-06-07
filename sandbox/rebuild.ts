@@ -12,13 +12,13 @@ if (require.main === module) {
       const sandbox = await Sandbox.create({ extract: false });
       await sandbox.start({ noSnapshot: true });
 
-      const deployer = await Deployer.create();
+      const unsDeployer = await Deployer.create();
       const ensDeployer = await Deployer.create({
         basePath: './.ensDeployer',
         proxy: true,
       });
 
-      const unsConfig = await deployer.execute(['full', 'config_polygon_pos_bridge']);
+      const unsConfig = await unsDeployer.execute(['full', 'config_polygon_pos_bridge']);
       const ensConfig = await ensDeployer.execute(['ens']);
       await sandbox.stop();
 
