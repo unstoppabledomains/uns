@@ -14,7 +14,7 @@ if (require.main === module) {
 
       const unsDeployer = await Deployer.create();
       const ensDeployer = await Deployer.create({
-        basePath: './.ensDeployer',
+        basePath: './.deployer/ens',
         proxy: true,
       });
 
