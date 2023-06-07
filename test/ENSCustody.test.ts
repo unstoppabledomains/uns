@@ -18,7 +18,6 @@ const provider = ethers.provider;
 
 describe('ENSCustody', function () {
   let ens;
-  let resolver;
   let baseRegistrar;
   let controller;
   let priceOracle;
@@ -94,7 +93,7 @@ describe('ENSCustody', function () {
     await baseRegistrar.addController(nameWrapper.address);
     await reverseRegistrar.setController(controller.address, true);
 
-    resolver = await new PublicResolver__factory(owner).deploy(
+    await new PublicResolver__factory(owner).deploy(
       ens.address,
       nameWrapper.address,
       controller.address,

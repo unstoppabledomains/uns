@@ -1,5 +1,5 @@
 import { network } from 'hardhat';
-import { getUnsNetworkConfig, mergeUnsNetworkConfig } from '../src/config';
+import { getUnsNetworkConfig, mergeNsNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
 import { unwrap } from '../src/helpers';
 
@@ -14,7 +14,7 @@ async function main () {
 
   const deployer = await Deployer.create();
   const deployConfig = await deployer.execute(['propose_registry'], config, { version: '' });
-  mergeUnsNetworkConfig(deployConfig);
+  mergeNsNetworkConfig(deployConfig);
 }
 
 main()

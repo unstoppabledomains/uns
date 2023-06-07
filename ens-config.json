@@ -60,42 +60,34 @@
             "contracts": {
                 "ENSRegistry": {
                     "address": "0x24F45688D421f46cca60734BdC648ad192dB0f2E",
-                    "legacyAddresses": [],
                     "deploymentBlock": "0x28"
                 },
                 "BaseRegistrarImplementation": {
                     "address": "0x7e76aE49D6F4c6158757693b050BF88f039DeA21",
-                    "legacyAddresses": [],
                     "deploymentBlock": "0x29"
                 },
                 "ReverseRegistrar": {
                     "address": "0xEE9A59532B50514d4Cb2440b19E9539b6380CEcf",
-                    "legacyAddresses": [],
                     "deploymentBlock": "0x2a"
                 },
                 "NameWrapper": {
                     "address": "0xf6b7c221342BC966f4396790895530bF4E9799eB",
-                    "legacyAddresses": [],
                     "deploymentBlock": "0x2d"
                 },
                 "DummyOracle": {
                     "address": "0x38Dae41aEed12884D39dabD8F8a81Bb5B4562756",
-                    "legacyAddresses": [],
                     "deploymentBlock": "0x2f"
                 },
                 "StablePriceOracle": {
                     "address": "0xf7c9FD8E37863CF3f2da6A3ea0B1D1E3FaadeAD4",
-                    "legacyAddresses": [],
                     "deploymentBlock": "0x30"
                 },
                 "ETHRegistrarController": {
                     "address": "0x4Eb9dE1Fc0d800e941F326d6699E9E11969557ea",
-                    "legacyAddresses": [],
                     "deploymentBlock": "0x31"
                 },
                 "PublicResolver": {
                     "address": "0x72FA6D0C2F56b802D762a14F1a71f9A56221cabe",
-                    "legacyAddresses": [],
                     "deploymentBlock": "0x35"
                 }
             }

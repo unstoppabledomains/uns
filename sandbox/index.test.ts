@@ -11,10 +11,6 @@ import { CNSRegistry } from '../types/dot-crypto/contracts';
 import { unwrap } from '../src/helpers';
 import { BUFFERED_REGISTRATION_COST, REGISTRATION_TIME, TLD, ZERO_ADDRESS } from '../test/helpers/constants';
 import {
-  BaseRegistrarImplementation,
-  BaseRegistrarImplementation__factory,
-  ENSRegistry,
-  ENSRegistry__factory,
   ETHRegistrarController,
   ETHRegistrarController__factory,
 } from '../types';
@@ -27,9 +23,7 @@ describe('Sandbox', async () => {
   let signers: SignerWithAddress[], owner: SignerWithAddress, minter: SignerWithAddress;
   let predicateAddress: string;
 
-  let ensRegistry: ENSRegistry,
-    ensBaseRegistrar: BaseRegistrarImplementation,
-    ethRegistrarController: ETHRegistrarController;
+  let ethRegistrarController: ETHRegistrarController;
   let registrantAccount: string;
 
   let sandbox: Sandbox;
@@ -51,14 +45,6 @@ describe('Sandbox', async () => {
     mintingManager = new MintingManager__factory(owner).attach(unsContracts.MintingManager.address);
 
     predicateAddress = unsContracts.MintableERC721Predicate.address;
-
-    console.log('address', ensContracts.ENSRegistry.address);
-    console.log('addressReg', ensRegistry = new ENSRegistry__factory(owner)
-      .attach(ensContracts.ENSRegistry.address));
-    ensRegistry = new ENSRegistry__factory(owner)
-      .attach(ensContracts.ENSRegistry.address);
-    ensBaseRegistrar = new BaseRegistrarImplementation__factory(owner)
-      .attach(ensContracts.BaseRegistrarImplementation.address);
     ethRegistrarController = new ETHRegistrarController__factory(owner)
       .attach(ensContracts.ETHRegistrarController.address);
     registrantAccount = await signers[1].getAddress();
@@ -90,7 +76,7 @@ describe('Sandbox', async () => {
       let tx = await ethRegistrarController.commit(commitment);
 
       expect(await ethRegistrarController.commitments(commitment)).to
-        .equal((await ethers.provider.getBlock(tx.blockNumber!)).timestamp);
+        .equal((await ethers.provider.getBlock(unwrap(tx, 'blockNumber'))).timestamp);
 
       await ethers.provider.send('evm_increaseTime', [(await ethRegistrarController.minCommitmentAge()).toNumber()]);
       await ethers.provider.send('evm_mine', []);
@@ -112,8 +98,7 @@ describe('Sandbox', async () => {
 
     it('should be able to mint ENS token', async () => {
       const name = 'newname';
-      const tx = await registerName(name);
-      console.log(tx);
+      await registerName(name);
       expect(await ethRegistrarController.available(name)).to.equal(false);
     });
   });

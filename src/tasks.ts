@@ -2,22 +2,11 @@ import { defender, network, upgrades } from 'hardhat';
 import { Contract, utils } from 'ethers';
 import { merge } from 'lodash';
 import { namehash } from 'ethers/lib/utils';
-import { sha3 } from 'web3-utils';
 import { ZERO_ADDRESS, ZERO_WORD } from '../test/helpers/constants';
-import {
-  BaseRegistrarImplementation__factory,
-  DummyOracle__factory,
-  ENSRegistry__factory,
-  ETHRegistrarController__factory,
-  NameWrapper__factory,
-  PublicResolver__factory,
-  ReverseRegistrar__factory,
-  StablePriceOracle__factory,
-} from '../types';
 import { Deployer } from './deployer';
 import { ArtifactName, DependenciesMap, EnsContractName, UnsContractName, NsNetworkConfig } from './types';
 import verify from './verify';
-import { unwrap, unwrapDependencies } from './helpers';
+import { notNullSha, unwrap, unwrapDependencies } from './helpers';
 
 export type Task = {
   tags: string[];
@@ -845,34 +834,36 @@ const prepareProxyReaderTask: Task = {
 const deployENSTask = {
   tags: ['ens'],
   priority: 10,
-  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+  run: async (ctx: Deployer) => {
     const { owner } = ctx.accounts;
 
-    const ens = await new ENSRegistry__factory(owner).deploy();
+    const ens = await ctx.artifacts[ArtifactName.ENSRegistry].connect(owner).deploy();
     await ctx.saveContractConfig(EnsContractName.ENSRegistry, ens);
 
-    const baseRegistrar = await new BaseRegistrarImplementation__factory(owner).deploy(ens.address, namehash('eth'));
+    const baseRegistrar = await ctx.artifacts[ArtifactName.BaseRegistrarImplementation].connect(owner)
+      .deploy(ens.address, namehash('eth'));
     await ctx.saveContractConfig(EnsContractName.BaseRegistrarImplementation, baseRegistrar);
 
-    const reverseRegistrar = await new ReverseRegistrar__factory(owner).deploy(ens.address);
+    const reverseRegistrar = await ctx.artifacts[ArtifactName.ReverseRegistrar].connect(owner).deploy(ens.address);
     await ctx.saveContractConfig(EnsContractName.ReverseRegistrar, reverseRegistrar);
 
-    await ens.setSubnodeOwner(ZERO_WORD, sha3('reverse')!, await owner.getAddress());
-    await ens.setSubnodeOwner(namehash('reverse'), sha3('addr')!, reverseRegistrar.address);
+    await ens.setSubnodeOwner(ZERO_WORD, notNullSha('reverse'), await owner.getAddress());
+    await ens.setSubnodeOwner(namehash('reverse'), notNullSha('addr'), reverseRegistrar.address);
 
-    const nameWrapper = await new NameWrapper__factory(owner)
+    const nameWrapper = await ctx.artifacts[ArtifactName.NameWrapper].connect(owner)
       .deploy(ens.address, baseRegistrar.address, await owner.getAddress());
     await ctx.saveContractConfig(EnsContractName.NameWrapper, nameWrapper);
 
-    await ens.setSubnodeOwner(ZERO_WORD, sha3('eth')!, baseRegistrar.address);
+    await ens.setSubnodeOwner(ZERO_WORD, notNullSha('eth'), baseRegistrar.address);
 
-    const dummyOracle = await new DummyOracle__factory(owner).deploy('100000000');
+    const dummyOracle = await ctx.artifacts[ArtifactName.DummyOracle].connect(owner).deploy('100000000');
     await ctx.saveContractConfig(EnsContractName.DummyOracle, dummyOracle);
 
-    const priceOracle = await new StablePriceOracle__factory(owner).deploy(dummyOracle.address, [0, 0, 4, 2, 1]);
+    const priceOracle = await ctx.artifacts[ArtifactName.StablePriceOracle].connect(owner)
+      .deploy(dummyOracle.address, [0, 0, 4, 2, 1]);
     await ctx.saveContractConfig(EnsContractName.StablePriceOracle, priceOracle);
 
-    const controller = await new ETHRegistrarController__factory(owner).deploy(
+    const controller = await ctx.artifacts[ArtifactName.ETHRegistrarController].connect(owner).deploy(
       baseRegistrar.address,
       priceOracle.address,
       600,
@@ -887,7 +878,7 @@ const deployENSTask = {
     await baseRegistrar.addController(nameWrapper.address);
     await reverseRegistrar.setController(controller.address, true);
 
-    const resolver = await new PublicResolver__factory(owner).deploy(
+    const resolver = await ctx.artifacts[ArtifactName.PublicResolver].connect(owner).deploy(
       ens.address,
       nameWrapper.address,
       controller.address,

@@ -1,5 +1,5 @@
 import { network } from 'hardhat';
-import { mergeUnsNetworkConfig, getUnsNetworkConfig } from '../src/config';
+import { mergeNsNetworkConfig, getUnsNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
 import { unwrap } from '../src/helpers';
 
@@ -14,7 +14,7 @@ async function main () {
 
   const deployer = await Deployer.create();
   const deployConfig = await deployer.execute(['upgrade_uns_operator'], config);
-  mergeUnsNetworkConfig(deployConfig);
+  mergeNsNetworkConfig(deployConfig);
 
   console.log('Upgraded!');
 }

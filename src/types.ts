@@ -77,7 +77,7 @@ export type ContractConfigMap = {
   [k in ContractName]: ContractConfig
 }
 
-export type UnsConfig = {
+export type NsConfig = {
   version?: string;
   networks: {
     [chainId: number]: NsNetworkConfig

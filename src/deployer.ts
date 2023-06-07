@@ -7,7 +7,7 @@ import { Contract, ContractFactory } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { NetworkConfig } from 'hardhat/types';
 import { TransactionResponse } from '@ethersproject/abstract-provider';
-import { ArtifactName, UnsConfig, NsNetworkConfig, ContractConfigMap, UnsContractName, ContractName } from './types';
+import { ArtifactName, NsConfig, NsNetworkConfig, ContractConfigMap, UnsContractName, ContractName } from './types';
 import { Task, tasks } from './tasks';
 import { unwrap } from './helpers';
 
@@ -136,7 +136,7 @@ export class Deployer {
     });
   }
 
-  async execute (tags: string[], config?: NsNetworkConfig, params?: Record<string, string>): Promise<UnsConfig> {
+  async execute (tags: string[], config?: NsNetworkConfig, params?: Record<string, string>): Promise<NsConfig> {
     tags = tags || [];
 
     this.log('Execution started');
@@ -156,12 +156,11 @@ export class Deployer {
     return _config;
   }
 
-  getNetworkConfig (): UnsConfig {
+  getNetworkConfig (): NsConfig {
     const config = this.getDeployConfig();
 
     const emptyConfig = {
       address: '0x0000000000000000000000000000000000000000',
-      legacyAddresses: [],
       deploymentBlock: '0x0',
     };
 
