@@ -23,9 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.utils = exports.token = exports.proxy = exports.interfaces = exports.access = void 0;
+exports.utils = exports.token = exports.security = exports.proxy = exports.interfaces = exports.access = void 0;
 exports.access = __importStar(require("./access"));
 exports.interfaces = __importStar(require("./interfaces"));
 exports.proxy = __importStar(require("./proxy"));
+exports.security = __importStar(require("./security"));
 exports.token = __importStar(require("./token"));
 exports.utils = __importStar(require("./utils"));

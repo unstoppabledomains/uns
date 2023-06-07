@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UNSRegistryMock__factory = exports.UNSRegistryForwarderMock__factory = exports.MintingManagerMock__factory = exports.MinterRoleMock__factory = exports.ERC721ReceiverMock__factory = exports.ERC2771RegistryContextMock__factory = exports.ERC2771ContextMock__factory = exports.BaseRoutingForwarderMock__factory = exports.BaseForwarderMock__factory = void 0;
+exports.UNSRegistryMock__factory = exports.UNSRegistryForwarderMock__factory = exports.MintingManagerMock__factory = exports.MinterRoleMock__factory = exports.ERC721ReceiverMock__factory = exports.ERC2771RegistryContextMock__factory = exports.ERC2771ContextMock__factory = exports.ERC1155Mock__factory = exports.BaseRoutingForwarderMock__factory = exports.BaseForwarderMock__factory = void 0;
 var BaseForwarderMock__factory_1 = require("./BaseForwarderMock__factory");
 Object.defineProperty(exports, "BaseForwarderMock__factory", { enumerable: true, get: function () { return BaseForwarderMock__factory_1.BaseForwarderMock__factory; } });
 var BaseRoutingForwarderMock__factory_1 = require("./BaseRoutingForwarderMock__factory");
 Object.defineProperty(exports, "BaseRoutingForwarderMock__factory", { enumerable: true, get: function () { return BaseRoutingForwarderMock__factory_1.BaseRoutingForwarderMock__factory; } });
+var ERC1155Mock__factory_1 = require("./ERC1155Mock__factory");
+Object.defineProperty(exports, "ERC1155Mock__factory", { enumerable: true, get: function () { return ERC1155Mock__factory_1.ERC1155Mock__factory; } });
 var ERC2771ContextMock__factory_1 = require("./ERC2771ContextMock__factory");
 Object.defineProperty(exports, "ERC2771ContextMock__factory", { enumerable: true, get: function () { return ERC2771ContextMock__factory_1.ERC2771ContextMock__factory; } });
 var ERC2771RegistryContextMock__factory_1 = require("./ERC2771RegistryContextMock__factory");

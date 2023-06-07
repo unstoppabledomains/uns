@@ -1,3 +1,2 @@
-import type * as roles from "./roles";
-export type { roles };
+export type { Ownable } from "./Ownable";
 //# sourceMappingURL=index.d.ts.map

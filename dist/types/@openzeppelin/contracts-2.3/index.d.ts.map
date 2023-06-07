@@ -1,0 +1,1 @@
+{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../../../types/@openzeppelin/contracts-2.3/index.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,KAAK,MAAM,MAAM,UAAU,CAAC;AACxC,YAAY,EAAE,MAAM,EAAE,CAAC;AACvB,OAAO,KAAK,KAAK,aAAa,MAAM,iBAAiB,CAAC;AACtD,YAAY,EAAE,aAAa,EAAE,CAAC;AAC9B,OAAO,KAAK,KAAK,KAAK,MAAM,SAAS,CAAC;AACtC,YAAY,EAAE,KAAK,EAAE,CAAC"}

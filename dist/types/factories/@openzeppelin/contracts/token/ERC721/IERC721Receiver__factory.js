@@ -4,7 +4,6 @@ exports.IERC721Receiver__factory = void 0;
 const ethers_1 = require("ethers");
 const _abi = [
     {
-        constant: false,
         inputs: [
             {
                 internalType: "address",
@@ -35,7 +34,6 @@ const _abi = [
                 type: "bytes4",
             },
         ],
-        payable: false,
         stateMutability: "nonpayable",
         type: "function",
     },
