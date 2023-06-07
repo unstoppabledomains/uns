@@ -1,3 +1,7 @@
+## v0.8.11
+
+- Add ENSCustody contract to support ENS domains custody
+
 ## v0.8.10
 
 - Upgrade ProxyReader on `goerli` and `mumbai`

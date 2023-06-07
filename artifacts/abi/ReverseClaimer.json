@@ -1,0 +1,1 @@
+[{"inputs":[{"internalType":"contract ENS","name":"ens","type":"address"},{"internalType":"address","name":"claimant","type":"address"}],"stateMutability":"nonpayable","type":"constructor"}]

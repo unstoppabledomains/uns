@@ -38,6 +38,7 @@ import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-solhint';
 import '@nomiclabs/hardhat-etherscan';
+import 'hardhat-tracer';
 
 import '@openzeppelin/hardhat-upgrades';
 import '@openzeppelin/hardhat-defender';
@@ -109,7 +110,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        version: '0.8.4',
+        version: '0.8.17',
         settings: {
           ...settings,
           metadata: {
