@@ -1,4 +1,5 @@
 {
+    "version": "0.1.0",
     "networks": {
         "1": {
             "contracts": {
@@ -79,12 +80,13 @@
                     "deploymentBlock": "0x83fa9e"
                 },
                 "ProxyAdmin": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "deploymentBlock": "0x0"
+                    "address": "0xf4906E210523F9dA79E33811A44EE000441F4E04",
+                    "deploymentBlock": "0x5b57e8"
                 },
                 "ENSCustody": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "deploymentBlock": "0x0"
+                    "address": "0x74d1fA29295028e58573b894A4bF2cE8541036d4",
+                    "deploymentBlock": "0x8b85b3",
+                    "implementation": "0x878b05afd2aA3b854589477706a9e32b0B31eA76"
                 }
             }
         },
