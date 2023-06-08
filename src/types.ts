@@ -25,6 +25,7 @@ export enum ArtifactName {
   StablePriceOracle = 'StablePriceOracle',
   ETHRegistrarController = 'ETHRegistrarController',
   PublicResolver = 'PublicResolver',
+  ENSCustody = 'ENSCustody',
 }
 
 export enum UnsContractName {
@@ -56,6 +57,7 @@ export enum EnsContractName {
   StablePriceOracle = 'StablePriceOracle',
   ETHRegistrarController = 'ETHRegistrarController',
   PublicResolver = 'PublicResolver',
+  ENSCustody = 'ENSCustody',
 }
 
 export type ContractName = EnsContractName | UnsContractName;

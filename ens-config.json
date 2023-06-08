@@ -33,6 +33,14 @@
                 "PublicResolver": {
                     "address": "0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63",
                     "deploymentBlock": "0x10243b3"
+                },
+                "ProxyAdmin": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "deploymentBlock": "0x0"
+                },
+                "ENSCustody": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -69,6 +77,14 @@
                 "PublicResolver": {
                     "address": "0xd7a4F6473f32aC2Af804B3686AE8F1932bC35750",
                     "deploymentBlock": "0x83fa9e"
+                },
+                "ProxyAdmin": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "deploymentBlock": "0x0"
+                },
+                "ENSCustody": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -105,6 +121,15 @@
                 "PublicResolver": {
                     "address": "0x72FA6D0C2F56b802D762a14F1a71f9A56221cabe",
                     "deploymentBlock": "0x35"
+                },
+                "ProxyAdmin": {
+                    "address": "0x4e44E79e0cEc05D9e62e952B2088c02A3C450aeC",
+                    "deploymentBlock": "0x36"
+                },
+                "ENSCustody": {
+                    "address": "0x6aC8F19d1E0F81147cdF2a1e53cb1f4E18417204",
+                    "deploymentBlock": "0x37",
+                    "implementation": "0xB3106671C1BCBBa687F15520c6ebf985663Cea96"
                 }
             }
         }

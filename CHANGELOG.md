@@ -1,3 +1,7 @@
+## v0.8.13
+
+- Deploy ENSCustody@0.1.0 to sandbox
+
 ## v0.8.12
 
 - Add ENS config
