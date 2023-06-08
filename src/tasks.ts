@@ -901,10 +901,10 @@ const deployENSCustodyTask: Task = {
       ArtifactName.NameWrapper,
     ]);
 
-    const custody = await upgrades.deployProxy(
-      ctx.artifacts.ENSCustody.connect(owner),
-      [ETHRegistrarController.address, NameWrapper.address],
-    );
+    const custody = await upgrades.deployProxy(ctx.artifacts.ENSCustody.connect(owner), [
+      ETHRegistrarController.address,
+      NameWrapper.address,
+    ]);
     await custody.deployTransaction.wait();
 
     const proxyAdmin = await upgrades.admin.getInstance();
@@ -946,6 +946,40 @@ const deployENSCustodyTask: Task = {
   },
 };
 
+const fundENSCustodyTask: Task = {
+  tags: ['fund_ens_custody'],
+  priority: 25,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const { owner } = ctx.accounts;
+
+    if (network.config.chainId !== 1337) {
+      throw new Error('This task is only available for sandbox');
+    }
+
+    const [ENSCustody] = unwrapDependencies(dependencies, [ArtifactName.ENSCustody]);
+    const custody = ctx.artifacts.MintingManager.attach(ENSCustody.address);
+
+    await owner.sendTransaction({ to: custody.address, value: utils.parseEther('10') });
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { ENSCustody } = config.contracts || {};
+
+    const dependencies = {
+      ENSCustody,
+    };
+
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    }
+
+    return dependencies;
+  },
+};
+
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -967,4 +1001,5 @@ export const tasks: Task[] = [
   prepareProxyReaderTask,
   deployENSTask,
   deployENSCustodyTask,
+  fundENSCustodyTask,
 ];

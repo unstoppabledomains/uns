@@ -226,10 +226,6 @@ describe('Sandbox', async () => {
 
     it('should register and park ENS domain', async () => {
       const name = 'newname2';
-      const [base, premium] = await ethRegistrarController.rentPrice(name, REGISTRATION_TIME);
-      const price = base.add(premium);
-      await owner.sendTransaction({ to: custody.address, value: price });
-
       await registerAndParkName(name, minter);
       expect(await ethRegistrarController.available(name)).to.equal(false);
     });

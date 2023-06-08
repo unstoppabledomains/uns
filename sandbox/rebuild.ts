@@ -19,7 +19,7 @@ if (require.main === module) {
       });
 
       const unsConfig = await unsDeployer.execute(['full', 'config_polygon_pos_bridge']);
-      const ensConfig = await ensDeployer.execute(['ens', 'ens_custody']);
+      const ensConfig = await ensDeployer.execute(['ens', 'ens_custody', 'fund_ens_custody']);
       await sandbox.stop();
 
       mergeNetworkConfig(unsConfig, NameService.UNS);
