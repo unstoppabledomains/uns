@@ -28,6 +28,7 @@ var ArtifactName;
     ArtifactName["StablePriceOracle"] = "StablePriceOracle";
     ArtifactName["ETHRegistrarController"] = "ETHRegistrarController";
     ArtifactName["PublicResolver"] = "PublicResolver";
+    ArtifactName["ENSCustody"] = "ENSCustody";
 })(ArtifactName = exports.ArtifactName || (exports.ArtifactName = {}));
 var UnsContractName;
 (function (UnsContractName) {
@@ -59,4 +60,5 @@ var EnsContractName;
     EnsContractName["StablePriceOracle"] = "StablePriceOracle";
     EnsContractName["ETHRegistrarController"] = "ETHRegistrarController";
     EnsContractName["PublicResolver"] = "PublicResolver";
+    EnsContractName["ENSCustody"] = "ENSCustody";
 })(EnsContractName = exports.EnsContractName || (exports.EnsContractName = {}));
