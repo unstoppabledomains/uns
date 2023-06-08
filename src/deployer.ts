@@ -7,7 +7,7 @@ import { Contract, ContractFactory } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { NetworkConfig } from 'hardhat/types';
 import { TransactionResponse } from '@ethersproject/abstract-provider';
-import { ArtifactName, UnsConfig, UnsNetworkConfig, UnsContractConfigMap, UnsContractName } from './types';
+import { ArtifactName, NsConfig, NsNetworkConfig, ContractConfigMap, UnsContractName, ContractName } from './types';
 import { Task, tasks } from './tasks';
 import { unwrap } from './helpers';
 
@@ -49,7 +49,7 @@ async function getArtifacts (): Promise<ArtifactsMap> {
     SignatureController: await ethers.getContractFactory('SignatureController'),
     MintingController: await ethers.getContractFactory('MintingController'),
     URIPrefixController: await ethers.getContractFactory('URIPrefixController'),
-    Resolver: await ethers.getContractFactory('Resolver'),
+    Resolver: await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver'),
     ResolverForwarder: await ethers.getContractFactory('ResolverForwarder'),
     UNSRegistry: await ethers.getContractFactory('UNSRegistry'),
     MintingManager: await ethers.getContractFactory('MintingManager'),
@@ -61,6 +61,15 @@ async function getArtifacts (): Promise<ArtifactsMap> {
     MintableERC721Predicate: await ethers.getContractFactory('MintableERC721Predicate'),
     RootChainManager: await ethers.getContractFactory('RootChainManager'),
     DotCoinBurner: await ethers.getContractFactory('DotCoinBurner'),
+
+    ENSRegistry: await ethers.getContractFactory('ENSRegistry'),
+    BaseRegistrarImplementation: await ethers.getContractFactory('BaseRegistrarImplementation'),
+    ReverseRegistrar: await ethers.getContractFactory('ReverseRegistrar'),
+    NameWrapper: await ethers.getContractFactory('NameWrapper'),
+    DummyOracle: await ethers.getContractFactory('DummyOracle'),
+    StablePriceOracle: await ethers.getContractFactory('StablePriceOracle'),
+    ETHRegistrarController: await ethers.getContractFactory('ETHRegistrarController'),
+    PublicResolver: await ethers.getContractFactory('PublicResolver'),
   };
 }
 
@@ -127,7 +136,7 @@ export class Deployer {
     });
   }
 
-  async execute (tags: string[], config?: UnsNetworkConfig, params?: Record<string, string>): Promise<UnsConfig> {
+  async execute (tags: string[], config?: NsNetworkConfig, params?: Record<string, string>): Promise<NsConfig> {
     tags = tags || [];
 
     this.log('Execution started');
@@ -147,12 +156,11 @@ export class Deployer {
     return _config;
   }
 
-  getNetworkConfig (): UnsConfig {
+  getNetworkConfig (): NsConfig {
     const config = this.getDeployConfig();
 
     const emptyConfig = {
       address: '0x0000000000000000000000000000000000000000',
-      legacyAddresses: [],
       deploymentBlock: '0x0',
     };
 
@@ -171,7 +179,7 @@ export class Deployer {
     return {
       networks: {
         [unwrap(this.network, 'chainId')]: {
-          contracts: contracts as UnsContractConfigMap,
+          contracts: contracts as ContractConfigMap,
         },
       },
     };
@@ -184,7 +192,7 @@ export class Deployer {
   }
 
   async saveContractConfig (
-    name: UnsContractName,
+    name: ContractName,
     contract: Contract,
     implAddress?: string,
     forwarder?: Contract,

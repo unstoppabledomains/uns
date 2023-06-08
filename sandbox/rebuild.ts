@@ -1,6 +1,6 @@
 import fs from 'fs';
 import tar from 'tar';
-import { mergeNetworkConfig } from '../src/config';
+import { NameService, mergeNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
 import { unwrap } from '../src/helpers';
 import { Sandbox } from '.';
@@ -12,12 +12,18 @@ if (require.main === module) {
       const sandbox = await Sandbox.create({ extract: false });
       await sandbox.start({ noSnapshot: true });
 
-      const deployer = await Deployer.create();
+      const unsDeployer = await Deployer.create();
+      const ensDeployer = await Deployer.create({
+        basePath: './.deployer/ens',
+        proxy: true,
+      });
 
-      const config = await deployer.execute(['full', 'config_polygon_pos_bridge']);
+      const unsConfig = await unsDeployer.execute(['full', 'config_polygon_pos_bridge']);
+      const ensConfig = await ensDeployer.execute(['ens']);
       await sandbox.stop();
 
-      mergeNetworkConfig(config);
+      mergeNetworkConfig(unsConfig, NameService.UNS);
+      mergeNetworkConfig(ensConfig, NameService.ENS);
 
       const { dbPath, snapshotPath } = unwrap(sandbox.options, 'network');
       await tar.create(

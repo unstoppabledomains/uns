@@ -16,6 +16,15 @@ export enum ArtifactName {
   MintableERC721Predicate = 'MintableERC721Predicate',
   RootChainManager = 'RootChainManager',
   DotCoinBurner = 'DotCoinBurner',
+  // ENS
+  ENSRegistry = 'ENSRegistry',
+  BaseRegistrarImplementation = 'BaseRegistrarImplementation',
+  ReverseRegistrar = 'ReverseRegistrar',
+  NameWrapper = 'NameWrapper',
+  DummyOracle = 'DummyOracle',
+  StablePriceOracle = 'StablePriceOracle',
+  ETHRegistrarController = 'ETHRegistrarController',
+  PublicResolver = 'PublicResolver',
 }
 
 export enum UnsContractName {
@@ -38,7 +47,20 @@ export enum UnsContractName {
   DotCoinBurner = 'DotCoinBurner',
 }
 
-export type UnsContractConfig = {
+export enum EnsContractName {
+  ENSRegistry = 'ENSRegistry',
+  BaseRegistrarImplementation = 'BaseRegistrarImplementation',
+  ReverseRegistrar = 'ReverseRegistrar',
+  NameWrapper = 'NameWrapper',
+  DummyOracle = 'DummyOracle',
+  StablePriceOracle = 'StablePriceOracle',
+  ETHRegistrarController = 'ETHRegistrarController',
+  PublicResolver = 'PublicResolver',
+}
+
+export type ContractName = EnsContractName | UnsContractName;
+
+export type ContractConfig = {
   address: string,
   legacyAddresses: string[],
   deploymentBlock: string,
@@ -47,21 +69,21 @@ export type UnsContractConfig = {
   deprecated?: boolean;
 }
 
-export type UnsNetworkConfig = {
-  contracts: UnsContractConfigMap
+export type NsNetworkConfig = {
+  contracts: ContractConfigMap
 }
 
-export type UnsContractConfigMap = {
-  [k in UnsContractName]: UnsContractConfig
+export type ContractConfigMap = {
+  [k in ContractName]: ContractConfig
 }
 
-export type UnsConfig = {
+export type NsConfig = {
   version?: string;
   networks: {
-    [chainId: number]: UnsNetworkConfig
+    [chainId: number]: NsNetworkConfig
   };
 }
 
 export type DependenciesMap = {
-  [k in ArtifactName]?: UnsContractConfig
+  [k in ArtifactName]?: ContractConfig
 }

@@ -1,3 +1,8 @@
+## v0.8.12
+
+- Add ENS config
+- Deploy ENS to sandbox
+
 ## v0.8.11
 
 - Add ENSCustody contract to support ENS domains custody
