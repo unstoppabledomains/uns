@@ -267,7 +267,7 @@ const deployUNSProxyReaderTask: Task = {
     await proxyReader.deployTransaction.wait();
 
     const proxyAdmin = await upgrades.admin.getInstance();
-    await ctx.saveContractConfig(UnsContractName.ProxyReader, proxyAdmin);
+    await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
 
     const proxyReaderImpl = await proxyAdmin.callStatic.getProxyImplementation(proxyReader.address);
     await ctx.saveContractConfig(UnsContractName.ProxyReader, proxyReader, proxyReaderImpl);
@@ -791,9 +791,9 @@ const prepareProxyReaderTask: Task = {
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const ProxyReader = unwrap(dependencies, ArtifactName.ProxyReader);
 
-    const newImplementationAddr = await upgrades.prepareUpgrade(ProxyReader.address, ctx.artifacts.ProxyReader, {
+    const newImplementationAddr = (await upgrades.prepareUpgrade(ProxyReader.address, ctx.artifacts.ProxyReader, {
       unsafeAllow: ['delegatecall'],
-    }) as string;
+    })) as string;
 
     ctx.log('Deployed ProxyReader implementation: ', newImplementationAddr);
 
@@ -830,7 +830,6 @@ const prepareProxyReaderTask: Task = {
   },
 };
 
-
 const deployENSTask = {
   tags: ['ens'],
   priority: 10,
@@ -840,7 +839,8 @@ const deployENSTask = {
     const ens = await ctx.artifacts[ArtifactName.ENSRegistry].connect(owner).deploy();
     await ctx.saveContractConfig(EnsContractName.ENSRegistry, ens);
 
-    const baseRegistrar = await ctx.artifacts[ArtifactName.BaseRegistrarImplementation].connect(owner)
+    const baseRegistrar = await ctx.artifacts[ArtifactName.BaseRegistrarImplementation]
+      .connect(owner)
       .deploy(ens.address, namehash('eth'));
     await ctx.saveContractConfig(EnsContractName.BaseRegistrarImplementation, baseRegistrar);
 
@@ -850,7 +850,8 @@ const deployENSTask = {
     await ens.setSubnodeOwner(ZERO_WORD, notNullSha('reverse'), await owner.getAddress());
     await ens.setSubnodeOwner(namehash('reverse'), notNullSha('addr'), reverseRegistrar.address);
 
-    const nameWrapper = await ctx.artifacts[ArtifactName.NameWrapper].connect(owner)
+    const nameWrapper = await ctx.artifacts[ArtifactName.NameWrapper]
+      .connect(owner)
       .deploy(ens.address, baseRegistrar.address, await owner.getAddress());
     await ctx.saveContractConfig(EnsContractName.NameWrapper, nameWrapper);
 
@@ -859,34 +860,90 @@ const deployENSTask = {
     const dummyOracle = await ctx.artifacts[ArtifactName.DummyOracle].connect(owner).deploy('100000000');
     await ctx.saveContractConfig(EnsContractName.DummyOracle, dummyOracle);
 
-    const priceOracle = await ctx.artifacts[ArtifactName.StablePriceOracle].connect(owner)
+    const priceOracle = await ctx.artifacts[ArtifactName.StablePriceOracle]
+      .connect(owner)
       .deploy(dummyOracle.address, [0, 0, 4, 2, 1]);
     await ctx.saveContractConfig(EnsContractName.StablePriceOracle, priceOracle);
 
-    const controller = await ctx.artifacts[ArtifactName.ETHRegistrarController].connect(owner).deploy(
-      baseRegistrar.address,
-      priceOracle.address,
-      600,
-      86400,
-      reverseRegistrar.address,
-      nameWrapper.address,
-      ens.address,
-    );
+    const controller = await ctx.artifacts[ArtifactName.ETHRegistrarController]
+      .connect(owner)
+      .deploy(
+        baseRegistrar.address,
+        priceOracle.address,
+        600,
+        86400,
+        reverseRegistrar.address,
+        nameWrapper.address,
+        ens.address,
+      );
     await ctx.saveContractConfig(EnsContractName.ETHRegistrarController, controller);
 
     await nameWrapper.setController(controller.address, true);
     await baseRegistrar.addController(nameWrapper.address);
     await reverseRegistrar.setController(controller.address, true);
 
-    const resolver = await ctx.artifacts[ArtifactName.PublicResolver].connect(owner).deploy(
-      ens.address,
-      nameWrapper.address,
-      controller.address,
-      reverseRegistrar.address,
-    );
+    const resolver = await ctx.artifacts[ArtifactName.PublicResolver]
+      .connect(owner)
+      .deploy(ens.address, nameWrapper.address, controller.address, reverseRegistrar.address);
     await ctx.saveContractConfig(EnsContractName.PublicResolver, resolver);
   },
   ensureDependencies: () => ({}),
+};
+
+const deployENSCustodyTask: Task = {
+  tags: ['ens_custody'],
+  priority: 20,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const { owner } = ctx.accounts;
+
+    const [ETHRegistrarController, NameWrapper] = unwrapDependencies(dependencies, [
+      ArtifactName.ETHRegistrarController,
+      ArtifactName.NameWrapper,
+    ]);
+
+    const custody = await upgrades.deployProxy(
+      ctx.artifacts.ENSCustody.connect(owner),
+      [ETHRegistrarController.address, NameWrapper.address],
+    );
+    await custody.deployTransaction.wait();
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+    await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
+
+    const custodyImpl = await proxyAdmin.callStatic.getProxyImplementation(custody.address);
+    await ctx.saveContractConfig(EnsContractName.ENSCustody, custody, custodyImpl);
+    await verify(ctx, custodyImpl, []);
+
+    if (ctx.minters.length) {
+      const chunkSize = 100;
+      for (let i = 0, j = ctx.minters.length; i < j; i += chunkSize) {
+        const array = ctx.minters.slice(i, i + chunkSize);
+
+        ctx.log('Adding minters...', array);
+        const addMintersTx = await custody.connect(owner).addMinters(array);
+        await addMintersTx.wait();
+        ctx.log(`Added ${array.length} minters`);
+      }
+    }
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { ETHRegistrarController, NameWrapper } = config.contracts || {};
+
+    const dependencies = {
+      ETHRegistrarController,
+      NameWrapper,
+    };
+
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    }
+
+    return dependencies;
+  },
 };
 
 export const tasks: Task[] = [
@@ -909,4 +966,5 @@ export const tasks: Task[] = [
   upgradeUNSOperatorTask,
   prepareProxyReaderTask,
   deployENSTask,
+  deployENSCustodyTask,
 ];

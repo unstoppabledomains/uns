@@ -70,6 +70,7 @@ async function getArtifacts (): Promise<ArtifactsMap> {
     StablePriceOracle: await ethers.getContractFactory('StablePriceOracle'),
     ETHRegistrarController: await ethers.getContractFactory('ETHRegistrarController'),
     PublicResolver: await ethers.getContractFactory('PublicResolver'),
+    ENSCustody: await ethers.getContractFactory('ENSCustody'),
   };
 }
 
