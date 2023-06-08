@@ -1,5 +1,5 @@
 import { network } from 'hardhat';
-import { getNetworkConfig, mergeNetworkConfig } from '../src/config';
+import { NameService, getNetworkConfig, mergeNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
 import { unwrap } from '../src/helpers';
 
@@ -11,14 +11,14 @@ async function main () {
     throw new Error(`Unsupported network ${chainId}`);
   }
 
-  const config = getNetworkConfig(chainId);
+  const config = getNetworkConfig(chainId, NameService.ENS);
   if (!config) {
     throw new Error(`Config not found for network ${chainId}`);
   }
 
   const deployer = await Deployer.create();
   const deployConfig = await deployer.execute(['ens_custody'], config);
-  mergeNetworkConfig(deployConfig);
+  mergeNetworkConfig(deployConfig, NameService.ENS);
 
   console.log('Deployed!');
 }
