@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UnsContractName = exports.ArtifactName = void 0;
+exports.EnsContractName = exports.UnsContractName = exports.ArtifactName = void 0;
 var ArtifactName;
 (function (ArtifactName) {
     ArtifactName["CNSRegistry"] = "CNSRegistry";
@@ -20,6 +20,14 @@ var ArtifactName;
     ArtifactName["MintableERC721Predicate"] = "MintableERC721Predicate";
     ArtifactName["RootChainManager"] = "RootChainManager";
     ArtifactName["DotCoinBurner"] = "DotCoinBurner";
+    ArtifactName["ENSRegistry"] = "ENSRegistry";
+    ArtifactName["BaseRegistrarImplementation"] = "BaseRegistrarImplementation";
+    ArtifactName["ReverseRegistrar"] = "ReverseRegistrar";
+    ArtifactName["NameWrapper"] = "NameWrapper";
+    ArtifactName["DummyOracle"] = "DummyOracle";
+    ArtifactName["StablePriceOracle"] = "StablePriceOracle";
+    ArtifactName["ETHRegistrarController"] = "ETHRegistrarController";
+    ArtifactName["PublicResolver"] = "PublicResolver";
 })(ArtifactName = exports.ArtifactName || (exports.ArtifactName = {}));
 var UnsContractName;
 (function (UnsContractName) {
@@ -41,3 +49,14 @@ var UnsContractName;
     UnsContractName["RootChainManager"] = "RootChainManager";
     UnsContractName["DotCoinBurner"] = "DotCoinBurner";
 })(UnsContractName = exports.UnsContractName || (exports.UnsContractName = {}));
+var EnsContractName;
+(function (EnsContractName) {
+    EnsContractName["ENSRegistry"] = "ENSRegistry";
+    EnsContractName["BaseRegistrarImplementation"] = "BaseRegistrarImplementation";
+    EnsContractName["ReverseRegistrar"] = "ReverseRegistrar";
+    EnsContractName["NameWrapper"] = "NameWrapper";
+    EnsContractName["DummyOracle"] = "DummyOracle";
+    EnsContractName["StablePriceOracle"] = "StablePriceOracle";
+    EnsContractName["ETHRegistrarController"] = "ETHRegistrarController";
+    EnsContractName["PublicResolver"] = "PublicResolver";
+})(EnsContractName = exports.EnsContractName || (exports.EnsContractName = {}));

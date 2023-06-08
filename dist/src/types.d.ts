@@ -15,7 +15,15 @@ export declare enum ArtifactName {
     CheckpointManager = "SimpleCheckpointManager",
     MintableERC721Predicate = "MintableERC721Predicate",
     RootChainManager = "RootChainManager",
-    DotCoinBurner = "DotCoinBurner"
+    DotCoinBurner = "DotCoinBurner",
+    ENSRegistry = "ENSRegistry",
+    BaseRegistrarImplementation = "BaseRegistrarImplementation",
+    ReverseRegistrar = "ReverseRegistrar",
+    NameWrapper = "NameWrapper",
+    DummyOracle = "DummyOracle",
+    StablePriceOracle = "StablePriceOracle",
+    ETHRegistrarController = "ETHRegistrarController",
+    PublicResolver = "PublicResolver"
 }
 export declare enum UnsContractName {
     UNSRegistry = "UNSRegistry",
@@ -36,7 +44,18 @@ export declare enum UnsContractName {
     RootChainManager = "RootChainManager",
     DotCoinBurner = "DotCoinBurner"
 }
-export declare type UnsContractConfig = {
+export declare enum EnsContractName {
+    ENSRegistry = "ENSRegistry",
+    BaseRegistrarImplementation = "BaseRegistrarImplementation",
+    ReverseRegistrar = "ReverseRegistrar",
+    NameWrapper = "NameWrapper",
+    DummyOracle = "DummyOracle",
+    StablePriceOracle = "StablePriceOracle",
+    ETHRegistrarController = "ETHRegistrarController",
+    PublicResolver = "PublicResolver"
+}
+export declare type ContractName = EnsContractName | UnsContractName;
+export declare type ContractConfig = {
     address: string;
     legacyAddresses: string[];
     deploymentBlock: string;
@@ -44,19 +63,19 @@ export declare type UnsContractConfig = {
     forwarder?: string;
     deprecated?: boolean;
 };
-export declare type UnsNetworkConfig = {
-    contracts: UnsContractConfigMap;
+export declare type NsNetworkConfig = {
+    contracts: ContractConfigMap;
 };
-export declare type UnsContractConfigMap = {
-    [k in UnsContractName]: UnsContractConfig;
+export declare type ContractConfigMap = {
+    [k in ContractName]: ContractConfig;
 };
-export declare type UnsConfig = {
+export declare type NsConfig = {
     version?: string;
     networks: {
-        [chainId: number]: UnsNetworkConfig;
+        [chainId: number]: NsNetworkConfig;
     };
 };
 export declare type DependenciesMap = {
-    [k in ArtifactName]?: UnsContractConfig;
+    [k in ArtifactName]?: ContractConfig;
 };
 //# sourceMappingURL=types.d.ts.map
