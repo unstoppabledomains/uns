@@ -1,3 +1,7 @@
+## v0.8.14
+
+- Deploy ENSCustody@0.1.0 to Goerli
+
 ## v0.8.13
 
 - Deploy ENSCustody@0.1.0 to sandbox
@@ -13,7 +17,7 @@
 
 ## v0.8.10
 
-- Upgrade ProxyReader on `goerli` and `mumbai`
+- Upgrade ProxyReader@0.5.0 on Goerli and Mumbai
 
 ## v0.8.9
 
