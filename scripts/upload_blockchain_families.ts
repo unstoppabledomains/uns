@@ -25,7 +25,7 @@ function getNetworkFamiles (csv: string[][]) {
       result[network] = family;
     } else {
       if(result[network] !== family) {
-        throw new Error(`Network ${network} can only have one family: ${result[network]} or ${network}`);
+        throw new Error(`Network ${network} can only have one family: ${result[network]} or ${family}`);
       }
     }
   }
