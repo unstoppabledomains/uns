@@ -185,6 +185,7 @@ crypto.HOT.version.ERC20.address,EVM,ETH,HOT
 crypto.HOT.version.HRC20.address,EVM,HRC,HOT
 crypto.NEAR.address,NEAR,NEAR,NEAR
 crypto.HNT.address,HNT,HNT,HNT
+crypto.STETH.address,EVM,ETH,STETH
 crypto.NEXO.version.ERC20.address,EVM,ETH,NEXO
 crypto.NEXO.version.FANTOM.address,EVM,FTM,NEXO
 crypto.PAX.address,EVM,ETH,PAX
@@ -256,6 +257,7 @@ crypto.ERG.address,ERG,ERG,ERG
 crypto.WIN.address,EVM,ETH,WIN
 crypto.NPXS.address,EVM,ETH,NPXS
 crypto.TRIBE.address,EVM,ETH,TRIBE
+crypto.MAID.address,MAID,MAID,MAID
 crypto.ASD.address,EVM,ETH,ASD
 crypto.CUNI.address,EVM,ETH,CUNI
 crypto.CELO.address,EVM,CELO,CELO
@@ -291,6 +293,7 @@ crypto.BAND.version.FANTOM.address,EVM,FTM,BAND
 crypto.NMR.address,EVM,ETH,NMR
 crypto.INJ.version.ERC20.address,EVM,ETH,INJ
 crypto.INJ.version.BEP20.address,EVM,BSC,INJ
+crypto.WAXP.address,WAXP,WAXP,WAXP
 crypto.UQC.address,EVM,ETH,UQC
 crypto.IOTX.address,EVM,IOTX,IOTX
 crypto.FUN.address,EVM,ETH,FUN
