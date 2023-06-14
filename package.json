@@ -62,6 +62,7 @@
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
     "chai": "^4.3.6",
+    "csv-parse": "^5.4.0",
     "debug": "^4.3.1",
     "dot-crypto": "https://github.com/unstoppabledomains/dot-crypto.git#v2.0.1",
     "eslint": "^8.26.0",
