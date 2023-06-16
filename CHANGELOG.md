@@ -1,3 +1,7 @@
+## v0.8.15
+
+- Deploy ENSCustody@0.1.0 on Mainnet
+
 ## v0.8.14
 
 - Deploy ENSCustody@0.1.0 to Goerli

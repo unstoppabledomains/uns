@@ -213,9 +213,9 @@ const config: HardhatUserConfig = {
         '0xB83180632b72f988585AF02FC27229bF2Eabd139',
         '0x1daf08a27304a78434e22ab79bea508e341f910d',
       ],
-      mainnet: [],
-      mumbai: ['0xc152ba5caa9db5883f2cfefb984610fd3bd7914a'],
-      polygon: ['0xd8263053a6d08ef3acbf2381f144b90841726233'],
+      mainnet: ['0x5465c72ce00196550d6f89c40830f6bc81599f4f'],
+      mumbai: ['0x31df70766e92c0a69ada7ecb6dc1634d64748be2'],
+      polygon: ['0x58cb2542a5b3b0999d41de59ad03331bbfb4dda3'],
     },
     multisig: {
       mainnet: '0x6bEca92600be24179ae70A430AEF4aE632fddDc8',
