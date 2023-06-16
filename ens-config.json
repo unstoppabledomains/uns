@@ -1,5 +1,5 @@
 {
-    "version": "0.1.0",
+    "version": "0.1.1",
     "networks": {
         "1": {
             "contracts": {
@@ -36,12 +36,14 @@
                     "deploymentBlock": "0x10243b3"
                 },
                 "ProxyAdmin": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "deploymentBlock": "0x0"
+                    "address": "0xAA16DA78110D9A9742c760a1a064F28654Ab93de",
+                    "deploymentBlock": "0xc2fedc"
                 },
                 "ENSCustody": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "deploymentBlock": "0x0"
+                    "address": "0x27c9B34eB43523447d3e1bcf26f009D814522687",
+                    "deploymentBlock": "0x010ae8a9",
+                    "implementation": "0x267e2282FE553B1472195cbD59fF886CCE14dAd8",
+                    "forwarder": "0x27c9B34eB43523447d3e1bcf26f009D814522687"
                 }
             }
         },
@@ -86,7 +88,8 @@
                 "ENSCustody": {
                     "address": "0x74d1fA29295028e58573b894A4bF2cE8541036d4",
                     "deploymentBlock": "0x8b85b3",
-                    "implementation": "0x878b05afd2aA3b854589477706a9e32b0B31eA76"
+                    "implementation": "0x878b05afd2aA3b854589477706a9e32b0B31eA76",
+                    "forwarder": "0x74d1fA29295028e58573b894A4bF2cE8541036d4"
                 }
             }
         },
@@ -131,7 +134,8 @@
                 "ENSCustody": {
                     "address": "0x6aC8F19d1E0F81147cdF2a1e53cb1f4E18417204",
                     "deploymentBlock": "0x37",
-                    "implementation": "0xB3106671C1BCBBa687F15520c6ebf985663Cea96"
+                    "implementation": "0xB3106671C1BCBBa687F15520c6ebf985663Cea96",
+                    "forwarder": "0x6aC8F19d1E0F81147cdF2a1e53cb1f4E18417204"
                 }
             }
         }
