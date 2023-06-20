@@ -1,5 +1,5 @@
 {
-  "version": "2.1.27",
+  "version": "2.1.28",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2593,7 +2593,7 @@
     },
     "crypto.SUI.address": {
       "deprecatedKeyName": "SUI",
-      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "validationRegex": "^0x[0-9a-fA-F]{64}$",
       "deprecated": false
     },
     "crypto.MOON.address": {

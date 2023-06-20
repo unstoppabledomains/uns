@@ -1,3 +1,6 @@
+## v0.8.19
+- Update `SUI` token regex
+
 ## v0.8.18
 
 - Upgrade ENSCustody@0.1.1 on Goerli and Mainnet
@@ -45,7 +48,7 @@
 
 ## v0.8.7
 
-- Un-deprecate Railgun currencies 
+- Un-deprecate Railgun currencies
 
 ## v0.8.6
 
