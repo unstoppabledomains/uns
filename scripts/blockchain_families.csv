@@ -13,7 +13,7 @@ crypto.USDC.version.ERC20.address,EVM,ETH,USDC
 crypto.USDC.version.OKT.address,EVM,OKT,USDC
 crypto.USDC.version.MATIC.address,EVM,MATIC,USDC
 crypto.USDC.version.SOL.address,SOL,SOL,USDC
-crypto.USDC.version.AVAX.address,EVM,AVAXC,USDC
+crypto.USDC.version.AVAX.address,EVM,AVAX,USDC
 crypto.BAT.address,EVM,ETH,BAT
 crypto.REP.address,EVM,ETH,REP
 crypto.ZRX.address,EVM,ETH,ZRX
@@ -48,8 +48,7 @@ crypto.QTUM.address,QTUM,QTUM,QTUM
 crypto.ICX.address,EVM,ICX,ICX
 crypto.DGB.address,DGB,DGB,DGB
 crypto.XZC.address,XZC,XZC,XZC
-crypto.FIRO.address,EVM,BSC,FIRO
-crypto.BURST.address,BURST,BURST,BURST
+crypto.FIRO.address,FIRO,FIRO,FIRO
 crypto.DCR.address,DCR,DCR,DCR
 crypto.XEM.address,XEM,XEM,XEM
 crypto.LSK.address,LSK,LSK,LSK
@@ -64,7 +63,6 @@ crypto.GAS.address,NEO,NEO,GAS
 crypto.TRX.address,TRX,TRX,TRX
 crypto.VTHO.address,EVM,VET,VTHO
 crypto.BCD.address,BTC,BCD,BCD
-crypto.BTT.address,EVM,ETH,BTT
 crypto.KIN.address,SOL,SOL,KIN
 crypto.RVN.address,RVN,RVN,RVN
 crypto.ARK.address,ARK,ARK,ARK
@@ -92,11 +90,12 @@ crypto.XDC.address,XDC,XDC,XDC
 crypto.XST.address,XST,XST,XST
 crypto.STRAX.address,EVM,ETH,STRAX
 crypto.SIGNA.address,EVM,BSC,SIGNA
-crypto.NIM.address,NIMQ,NIMQ,NIMQ
+crypto.NIM.address,NIMQ,NIMQ,NIM
 crypto.GUAP.address,GUAP,GUAP,GUAP
 crypto.YLD.address,EVM,ETH,YLD
 crypto.OKT.address,EVM,OKT,OKT
-crypto.ELA.version.ELA.address,ELA,ELA,ELA
+crypto.ELA.version.ELA.address,EVM,ESC,ELA
+crypto.ELA.version.ESC.address,EVM,ESC,ELA
 crypto.USDT.version.ERC20.address,EVM,ETH,USDT
 crypto.USDT.version.TRON.address,TRX,TRX,USDT
 crypto.USDT.version.EOS.address,EOSIO,EOSIO,USDT
@@ -126,7 +125,7 @@ crypto.WBTC.version.MATIC.address,EVM,MATIC,WBTC
 crypto.WBTC.version.FANTOM.address,EVM,FTM,WBTC
 crypto.WBTC.version.HRC20.address,EVM,ONE,WBTC
 crypto.WBTC.version.XDAI.address,EVM,XDAI,WBTC
-crypto.FIL.address,EVM,FIL,FIL
+crypto.FIL.address,FIL,FIL,FIL
 crypto.CDAI.address,EVM,ETH,CDAI
 crypto.KSM.address,KSM,KSM,KSM
 crypto.OKB.address,EVM,OKB,OKB
@@ -153,7 +152,7 @@ crypto.MKR.address,EVM,ETH,MKR
 crypto.TFUEL.address,EVM,THETA,TFUEL
 crypto.KLAY.address,EVM,KLAY,KLAY
 crypto.LUNA.address,LUNA,LUNA,LUNA
-crypto.AVAX.address,EVM,AVAXC,AVAX
+crypto.AVAX.address,EVM,AVAX,AVAX
 crypto.LEO.address,EVM,ETH,LEO
 crypto.SAFEMOON.version.BEP20.address,EVM,BSC,SAFEMOON
 crypto.SAFEMOON.version.HRC20.address,EVM,ONE,SAFEMOON
@@ -162,7 +161,7 @@ crypto.RUNE.address,BNB,BNB,RUNE
 crypto.HBAR.address,HBAR,HBAR,HBAR
 crypto.TEL.version.ERC20.address,EVM,ETH,TEL
 crypto.TEL.version.MATIC.address,EVM,MATIC,TEL
-crypto.CHZ.address,EVM,CHZ,CHZ
+crypto.CHZ.address,EVM,ETH,CHZ
 crypto.SUSHI.version.ERC20.address,EVM,ETH,SUSHI
 crypto.SUSHI.version.BEP20.address,EVM,BSC,SUSHI
 crypto.SUSHI.version.MATIC.address,EVM,MATIC,SUSHI
@@ -171,7 +170,7 @@ crypto.SUSHI.version.HRC20.address,EVM,ONE,SUSHI
 crypto.EGLD.address,EGLD,EGLD,EGLD
 crypto.TUSD.version.ERC20.address,EVM,ETH,TUSD
 crypto.TUSD.version.BEP20.address,EVM,BSC,TUSD
-crypto.TUSD.version.AVAX.address,EVM,AVAXC,TUSD
+crypto.TUSD.version.AVAX.address,EVM,AVAX,TUSD
 crypto.TUSD.version.HRC20.address,EVM,ONE,TUSD
 crypto.TUSD.version.BEP2.address,BNB,BNB,TUSD
 crypto.TUSD.version.TRON.address,TRX,TRX,TUSD
@@ -287,7 +286,7 @@ crypto.TON.address,TON,TON,TON
 crypto.RLC.address,EVM,ETH,RLC
 crypto.AXS.address,EVM,ETH,AXS
 crypto.AUDIO.address,EVM,ETH,AUDIO
-crypto.XVS.address,BNB,BNB,XVS
+crypto.XVS.address,EVM,BSC,XVS
 crypto.BAND.version.ERC20.address,EVM,ETH,BAND
 crypto.BAND.version.FANTOM.address,EVM,FTM,BAND
 crypto.NMR.address,EVM,ETH,NMR
@@ -371,7 +370,7 @@ crypto.NU.address,EVM,ETH,NU
 crypto.ZMT.address,EVM,ETH,ZMT
 crypto.LOC.address,EVM,ETH,LOC
 crypto.TKO.address,EVM,BSC,TKO
-crypto.ETN.address,EVM,ETN,ETN
+crypto.ETN.address,ETN,ETN,ETN
 crypto.UBT.version.ERC20.address,EVM,ETH,UBT
 crypto.UBT.version.MATIC.address,EVM,MATIC,UBT
 crypto.EXRD.address,EVM,ETH,EXRD
@@ -400,7 +399,6 @@ crypto.0ZK.version.BEP20.address,EVM,BSC,0ZK
 crypto.0ZK.version.MATIC.address,EVM,MATIC,0ZK
 crypto.0ZK.version.0ZK.address,0ZK,0ZK,0ZK
 crypto.SUI.address,SUI,SUI,SUI
-crypto.MOON.address,EVM,NOVA,MOON
 crypto.SWEAT.version.ERC20.address,EVM,ETH,SWEAT
 crypto.SWEAT.version.NEP-141.address,NEAR,NEAR,SWEAT
 crypto.POKT.address,POKT,POKT,POKT
