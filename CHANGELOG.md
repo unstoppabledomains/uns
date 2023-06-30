@@ -1,3 +1,7 @@
+## v0.8.16
+
+- Upgrade ProxyReader@0.5.0 on Mainnet and Polygon
+
 ## v0.8.15
 
 - Deploy ENSCustody@0.1.0 on Mainnet
