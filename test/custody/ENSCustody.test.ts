@@ -401,7 +401,6 @@ describe('ENSCustody', function () {
       const name = 'ts-nb22';
       await topupCustody(name);
       await registerAndParkName(name, minter, ZERO_ADDRESS, false);
-      await topupCustody(name, REGISTRATION_TIME);
 
       await expect(custody.renew(name, REGISTRATION_TIME)).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
     });
@@ -410,7 +409,6 @@ describe('ENSCustody', function () {
       const name = 'ts-np12';
       await topupCustody(name);
       await registerAndParkName(name, minter, ZERO_ADDRESS, false);
-      await topupCustody(name, REGISTRATION_TIME);
 
       const gracePeriod = 90 * DAY;
       await provider.send('evm_increaseTime', [REGISTRATION_TIME + gracePeriod + 1]);
