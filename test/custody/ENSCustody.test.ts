@@ -418,6 +418,13 @@ describe('ENSCustody', function () {
       await topupCustody(name);
       await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('');
     });
+
+    it('should revert renewing if domain does not exist', async () => {
+      const name = 'dm-not-exist-1';
+      await topupCustody(name, REGISTRATION_TIME);
+      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('');
+      expect(await controller.available(name)).to.equal(true);
+    });
   });
 
   describe('ERC165', function () {
