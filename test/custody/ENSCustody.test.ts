@@ -353,6 +353,40 @@ describe('ENSCustody', function () {
       await assertGasSpent(minter.address, minterBalance, [tx]);
     });
 
+    it('should renew non-parked name paid by custody contract', async () => {
+      const name = 'tx-nn14';
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, true);
+      const price = await topupCustody(name, REGISTRATION_TIME);
+
+      const custodyBalance = await provider.getBalance(custody.address);
+      const minterBalance = await provider.getBalance(minter.address);
+      const tx = await custody.connect(minter).renew(name, REGISTRATION_TIME);
+      await assertOwnership(name, registrantAddress, true);
+      expect(await provider.getBalance(custody.address)).to.equal(custodyBalance.sub(price));
+      await assertGasSpent(minter.address, minterBalance, [tx]);
+    });
+
+    it('should emit NameRenewed event when parked name is renewed', async () => {
+      const name = 'tx-s62';
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+      await topupCustody(name, REGISTRATION_TIME);
+      await expect(custody.connect(minter)
+        .renew(name, REGISTRATION_TIME))
+        .to.emit(controller, 'NameRenewed');
+    });
+
+    it('should emit NameRenewed event when non-parked name is renewed', async () => {
+      const name = 'ttmf-s12';
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, true);
+      await topupCustody(name, REGISTRATION_TIME);
+      await expect(custody.connect(minter)
+        .renew(name, REGISTRATION_TIME))
+        .to.emit(controller, 'NameRenewed');
+    });
+
     it('should revert renewing when custody has not enough balance', async () => {
       const name = 'ts-qv45';
       await topupCustody(name);
@@ -367,28 +401,22 @@ describe('ENSCustody', function () {
       const name = 'ts-nb22';
       await topupCustody(name);
       await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+      await topupCustody(name, REGISTRATION_TIME);
 
       await expect(custody.renew(name, REGISTRATION_TIME)).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-    });
-
-    it('should revert renewing of unknown domain', async () => {
-      const name = 'ts-np12';
-      await topupCustody(name);
-      await registerName(name);
-
-      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('UnknownToken');
     });
 
     it('should revert renewing of expired domain', async () => {
       const name = 'ts-np12';
       await topupCustody(name);
       await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+      await topupCustody(name, REGISTRATION_TIME);
 
       const gracePeriod = 90 * DAY;
       await provider.send('evm_increaseTime', [REGISTRATION_TIME + gracePeriod + 1]);
 
       await topupCustody(name);
-      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('UnknownToken');
+      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('');
     });
   });
 

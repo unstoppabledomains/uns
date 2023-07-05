@@ -7,7 +7,6 @@ import {IERC1155ReceiverUpgradeable} from '@openzeppelin/contracts-upgradeable/t
 
 error Unauthorised(uint256 tokenId, address addr);
 error InvalidToken(uint256 tokenId);
-error UnknownToken(uint256 tokenId);
 error CustodyNotEnoughBalance();
 error OperationProhibited();
 error InvalidForwardedToken(uint256 tokenId);
