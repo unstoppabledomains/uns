@@ -14,7 +14,7 @@ import {IERC165Upgradeable} from '@openzeppelin/contracts-upgradeable/utils/intr
 import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import {StorageSlotUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
-import {IENSCustody, Unauthorised, InvalidToken, UnknownToken, CustodyNotEnoughBalance, OperationProhibited, InvalidForwardedToken} from './IENSCustody.sol';
+import {IENSCustody, Unauthorised, InvalidToken, CustodyNotEnoughBalance, OperationProhibited, InvalidForwardedToken} from './IENSCustody.sol';
 import {ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
 import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
@@ -29,7 +29,7 @@ contract ENSCustody is
     IENSCustody
 {
     string public constant NAME = 'ENS Custody';
-    string public constant VERSION = '0.1.0';
+    string public constant VERSION = '0.1.1';
 
     bytes32 private constant _ETH_NODE = 0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
     // This is the keccak-256 hash of "ens.owner." subtracted by 1
@@ -157,12 +157,6 @@ contract ENSCustody is
     }
 
     function renew(string calldata name, uint256 duration) external onlyMinter nonReentrant {
-        INameWrapper _wrapper = INameWrapper(StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value);
-        uint256 tokenId = _namehash(name);
-        if (_wrapper.ownerOf(tokenId) != address(this)) {
-            revert UnknownToken(tokenId);
-        }
-
         IETHRegistrarController _controller = IETHRegistrarController(StorageSlotUpgradeable.getAddressSlot(_ENS_CONTROLLER_SLOT).value);
         IPriceOracle.Price memory price = _controller.rentPrice(name, duration);
         if (address(this).balance < price.base + price.premium) {

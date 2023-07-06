@@ -1,3 +1,6 @@
+## v0.8.17
+- Allow ENS domains renewal for non-parked domains
+
 ## v0.8.16
 
 - Upgrade ProxyReader@0.5.0 on Mainnet and Polygon
