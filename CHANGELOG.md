@@ -1,4 +1,9 @@
+## v0.8.18
+
+- Upgrade ENSCustody@0.1.1 on Goerli and Mainnet
+
 ## v0.8.17
+
 - Allow ENS domains renewal for non-parked domains
 
 ## v0.8.16

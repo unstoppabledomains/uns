@@ -946,6 +946,50 @@ const deployENSCustodyTask: Task = {
   },
 };
 
+const proposeENSCustodyTask: Task = {
+  tags: ['propose_ens_custody'],
+  priority: 30,
+  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
+    const ENSCustody = unwrap(dependencies, ArtifactName.ENSCustody);
+
+    const version = params?.version;
+    if (!version) {
+      throw new Error('Version parameter is not provided');
+    }
+
+    ctx.log('Preparing proposal...');
+    const proposal = await defender.proposeUpgrade(ENSCustody.address, ctx.artifacts.ENSCustody, {
+      title: `Propose ENSCustody to v${version}`,
+      multisig: ctx.multisig,
+    });
+    if (proposal.metadata?.newImplementationAddress) {
+      await ctx.saveContractConfig(
+        EnsContractName.ENSCustody,
+        ctx.artifacts.ENSCustody.attach(ENSCustody.address),
+        proposal.metadata.newImplementationAddress,
+      );
+      await verify(ctx, proposal.metadata.newImplementationAddress, []);
+    }
+    ctx.log('Upgrade proposal created at:', proposal.url);
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    const { ENSCustody, ProxyAdmin } = config.contracts || {};
+    if (!ProxyAdmin || !ProxyAdmin.address) {
+      throw new Error('Current network configuration does not support upgrading');
+    }
+    const dependencies = { ENSCustody };
+    for (const [key, value] of Object.entries(dependencies)) {
+      if (!value || !value.address) {
+        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
+      }
+    }
+
+    return dependencies;
+  },
+};
+
 const fundENSCustodyTask: Task = {
   tags: ['fund_ens_custody'],
   priority: 25,
@@ -1001,5 +1045,6 @@ export const tasks: Task[] = [
   prepareProxyReaderTask,
   deployENSTask,
   deployENSCustodyTask,
+  proposeENSCustodyTask,
   fundENSCustodyTask,
 ];
