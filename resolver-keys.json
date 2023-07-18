@@ -2593,7 +2593,7 @@
     },
     "crypto.SUI.address": {
       "deprecatedKeyName": "SUI",
-      "validationRegex": "^0x[0-9a-fA-F]{64}$",
+      "validationRegex": "^0x([0-9a-fA-F]{64}|[a-fA-F0-9]{40})$",
       "deprecated": false
     },
     "crypto.MOON.address": {
