@@ -115,7 +115,7 @@ describe('ENSCustody (proxy)', function () {
 
     custodyFactory = new ENSCustody__factory(owner);
     custody = await upgrades.deployProxy(custodyFactory, [], { initializer: false });
-    await custody.initialize(controller.address, nameWrapper.address);
+    await custody.initialize(controller.address, nameWrapper.address, baseRegistrar.address);
     await custody.addMinter(minter.address);
   });
 
@@ -127,7 +127,13 @@ describe('ENSCustody (proxy)', function () {
   });
 
   it('should not allow initialize twice', async () => {
-    await expect(custody.initialize(controller.address, nameWrapper.address)).to.be.revertedWith(
+    await expect(
+      custody.initialize(
+        controller.address,
+        nameWrapper.address,
+        baseRegistrar.address,
+      ),
+    ).to.be.revertedWith(
       'Initializable: contract is already initialized',
     );
   });
