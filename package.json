@@ -37,7 +37,7 @@
     "postinstall": "[ ! -d ./.git ] || yarn husky install"
   },
   "devDependencies": {
-    "@ensdomains/ens-contracts": "^0.0.21",
+    "@ensdomains/ens-contracts": "^0.0.22",
     "@ethereumjs/tx": "^4.0.1",
     "@nomiclabs/hardhat-ethers": "^2.2.1",
     "@nomiclabs/hardhat-etherscan": "^3.1.0",

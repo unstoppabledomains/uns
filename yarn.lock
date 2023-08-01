@@ -48,15 +48,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ensdomains/ens-contracts@npm:^0.0.21":
-  version: 0.0.21
-  resolution: "@ensdomains/ens-contracts@npm:0.0.21"
+"@ensdomains/ens-contracts@npm:^0.0.22":
+  version: 0.0.22
+  resolution: "@ensdomains/ens-contracts@npm:0.0.22"
   dependencies:
     "@ensdomains/buffer": ^0.1.1
     "@ensdomains/solsha1": 0.0.3
     "@openzeppelin/contracts": ^4.1.0
     dns-packet: ^5.3.0
-  checksum: 2f247a5e590aa4a42e76dbb80cf103eaddb2c22d0ff5fd9c5079159a4585211dbdbdb0f75f37f975801551671b3eb98ac9b8e3bb60a977f1a893c1ebc379d0cb
+  checksum: ff91f09ad714647f670306630d194a6ee629c29909f5a71f228e1248f2604d4fe2616f62b87ecd3bc61c6c3ec104eda848fd5297592657f6f58936ddee117086
   languageName: node
   linkType: hard
 
@@ -14157,7 +14157,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "uns@workspace:."
   dependencies:
-    "@ensdomains/ens-contracts": ^0.0.21
+    "@ensdomains/ens-contracts": ^0.0.22
     "@ethereumjs/tx": ^4.0.1
     "@nomiclabs/hardhat-ethers": ^2.2.1
     "@nomiclabs/hardhat-etherscan": ^3.1.0
