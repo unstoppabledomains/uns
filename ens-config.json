@@ -1,5 +1,5 @@
 {
-    "version": "0.1.2",
+    "version": "0.1.3",
     "networks": {
         "1": {
             "contracts": {
@@ -44,6 +44,10 @@
                     "deploymentBlock": "0x010ae8a9",
                     "implementation": "0x17F9947C94D1AdB406d5dB1F1a6540B8f5733940",
                     "forwarder": "0x27c9B34eB43523447d3e1bcf26f009D814522687"
+                },
+                "LegacyEnsRegistry": {
+                    "address": "0x314159265dD8dbb310642f98f50C066173C1259b",
+                    "deploymentBlock": "0x32c5b9"
                 }
             }
         },
@@ -90,6 +94,10 @@
                     "deploymentBlock": "0x8b85b3",
                     "implementation": "0x35b5f5CBFbfc97700620E31BD250d870723B1392",
                     "forwarder": "0x74d1fA29295028e58573b894A4bF2cE8541036d4"
+                },
+                "LegacyEnsRegistry": {
+                    "address": "0x112234455C3a32FD11230C42E7Bccd4A84e02010",
+                    "deploymentBlock": "0xa890"
                 }
             }
         },

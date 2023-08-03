@@ -1,3 +1,6 @@
+## v0.8.20
+- Add legacy ENS registries to `ens-config.json`
+
 ## v0.8.19
 - Update `SUI` token regex
 
