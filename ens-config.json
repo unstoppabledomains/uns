@@ -144,6 +144,10 @@
                     "deploymentBlock": "0x37",
                     "implementation": "0xB3106671C1BCBBa687F15520c6ebf985663Cea96",
                     "forwarder": "0x6aC8F19d1E0F81147cdF2a1e53cb1f4E18417204"
+                },
+                "LegacyEnsRegistry": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "deploymentBlock": "0x0"
                 }
             }
         }
