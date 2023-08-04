@@ -35,13 +35,14 @@ export interface ENSCustodyInterface extends utils.Interface {
         "getRoleAdmin(bytes32)": FunctionFragment;
         "grantRole(bytes32,address)": FunctionFragment;
         "hasRole(bytes32,address)": FunctionFragment;
-        "initialize(address,address)": FunctionFragment;
+        "initialize(address,address,address)": FunctionFragment;
         "isMinter(address)": FunctionFragment;
         "isTrustedForwarder(address)": FunctionFragment;
         "makeCommitment(string,address,uint256,bytes32,address,bytes[],bool,uint16,bool)": FunctionFragment;
         "nonceOf(uint256)": FunctionFragment;
         "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
         "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
+        "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
         "owner()": FunctionFragment;
         "ownerOf(uint256)": FunctionFragment;
         "register(string,address,uint256,bytes32,address,bytes[],bool,uint16,bool)": FunctionFragment;
@@ -55,11 +56,12 @@ export interface ENSCustodyInterface extends utils.Interface {
         "revokeRole(bytes32,address)": FunctionFragment;
         "rotateMinter(address)": FunctionFragment;
         "safeTransfer(address,uint256)": FunctionFragment;
+        "setBaseRegistrar(address)": FunctionFragment;
         "supportsInterface(bytes4)": FunctionFragment;
         "transferOwnership(address)": FunctionFragment;
         "verify((address,uint256,uint256,bytes),bytes)": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "closeMinter" | "commit" | "execute" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isMinter" | "isTrustedForwarder" | "makeCommitment" | "nonceOf" | "onERC1155BatchReceived" | "onERC1155Received" | "owner" | "ownerOf" | "register" | "removeMinter" | "removeMinters" | "renew" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "rentPrice" | "revokeRole" | "rotateMinter" | "safeTransfer" | "supportsInterface" | "transferOwnership" | "verify"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "closeMinter" | "commit" | "execute" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isMinter" | "isTrustedForwarder" | "makeCommitment" | "nonceOf" | "onERC1155BatchReceived" | "onERC1155Received" | "onERC721Received" | "owner" | "ownerOf" | "register" | "removeMinter" | "removeMinters" | "renew" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "rentPrice" | "revokeRole" | "rotateMinter" | "safeTransfer" | "setBaseRegistrar" | "supportsInterface" | "transferOwnership" | "verify"): FunctionFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
@@ -72,7 +74,11 @@ export interface ENSCustodyInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "getRoleAdmin", values: [PromiseOrValue<BytesLike>]): string;
     encodeFunctionData(functionFragment: "grantRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "hasRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "initialize", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "initialize", values: [
+        PromiseOrValue<string>,
+        PromiseOrValue<string>,
+        PromiseOrValue<string>
+    ]): string;
     encodeFunctionData(functionFragment: "isMinter", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "isTrustedForwarder", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "makeCommitment", values: [
@@ -101,6 +107,12 @@ export interface ENSCustodyInterface extends utils.Interface {
         PromiseOrValue<BigNumberish>,
         PromiseOrValue<BytesLike>
     ]): string;
+    encodeFunctionData(functionFragment: "onERC721Received", values: [
+        PromiseOrValue<string>,
+        PromiseOrValue<string>,
+        PromiseOrValue<BigNumberish>,
+        PromiseOrValue<BytesLike>
+    ]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "ownerOf", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "register", values: [
@@ -124,6 +136,7 @@ export interface ENSCustodyInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "revokeRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "rotateMinter", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "safeTransfer", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "setBaseRegistrar", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
     encodeFunctionData(functionFragment: "transferOwnership", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "verify", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
@@ -146,6 +159,7 @@ export interface ENSCustodyInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "nonceOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "onERC1155BatchReceived", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "onERC1155Received", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "onERC721Received", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
@@ -159,6 +173,7 @@ export interface ENSCustodyInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "rotateMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "safeTransfer", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setBaseRegistrar", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "verify", data: BytesLike): Result;
@@ -269,15 +284,22 @@ export interface ENSCustody extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        initialize(controller: PromiseOrValue<string>, wrapper: PromiseOrValue<string>, overrides?: Overrides & {
+        initialize(controller: PromiseOrValue<string>, wrapper: PromiseOrValue<string>, registrar: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
         makeCommitment(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, data: PromiseOrValue<BytesLike>[], reverseRecord: PromiseOrValue<boolean>, ownerControlledFuses: PromiseOrValue<BigNumberish>, selfCustody: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<[string]>;
         nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        onERC1155BatchReceived(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, arg2: PromiseOrValue<BigNumberish>[], arg3: PromiseOrValue<BigNumberish>[], arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        onERC1155Received(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, arg2: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BigNumberish>, arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
+        onERC1155BatchReceived(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenIds: PromiseOrValue<BigNumberish>[], arg3: PromiseOrValue<BigNumberish>[], arg4: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        onERC1155Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BigNumberish>, arg4: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        onERC721Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         owner(overrides?: CallOverrides): Promise<[string]>;
         ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
         register(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, data: PromiseOrValue<BytesLike>[], reverseRecord: PromiseOrValue<boolean>, ownerControlledFuses: PromiseOrValue<BigNumberish>, selfCustody: PromiseOrValue<boolean>, overrides?: Overrides & {
@@ -311,6 +333,9 @@ export interface ENSCustody extends BaseContract {
         safeTransfer(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        setBaseRegistrar(baseRegistrar: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
         transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
@@ -341,15 +366,22 @@ export interface ENSCustody extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    initialize(controller: PromiseOrValue<string>, wrapper: PromiseOrValue<string>, overrides?: Overrides & {
+    initialize(controller: PromiseOrValue<string>, wrapper: PromiseOrValue<string>, registrar: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
     isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
     makeCommitment(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, data: PromiseOrValue<BytesLike>[], reverseRecord: PromiseOrValue<boolean>, ownerControlledFuses: PromiseOrValue<BigNumberish>, selfCustody: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<string>;
     nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    onERC1155BatchReceived(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, arg2: PromiseOrValue<BigNumberish>[], arg3: PromiseOrValue<BigNumberish>[], arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    onERC1155Received(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, arg2: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BigNumberish>, arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
+    onERC1155BatchReceived(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenIds: PromiseOrValue<BigNumberish>[], arg3: PromiseOrValue<BigNumberish>[], arg4: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    onERC1155Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BigNumberish>, arg4: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    onERC721Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     owner(overrides?: CallOverrides): Promise<string>;
     ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
     register(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, data: PromiseOrValue<BytesLike>[], reverseRecord: PromiseOrValue<boolean>, ownerControlledFuses: PromiseOrValue<BigNumberish>, selfCustody: PromiseOrValue<boolean>, overrides?: Overrides & {
@@ -383,6 +415,9 @@ export interface ENSCustody extends BaseContract {
     safeTransfer(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
+    setBaseRegistrar(baseRegistrar: PromiseOrValue<string>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
     transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
@@ -401,13 +436,14 @@ export interface ENSCustody extends BaseContract {
         getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
         grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        initialize(controller: PromiseOrValue<string>, wrapper: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
+        initialize(controller: PromiseOrValue<string>, wrapper: PromiseOrValue<string>, registrar: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         makeCommitment(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, data: PromiseOrValue<BytesLike>[], reverseRecord: PromiseOrValue<boolean>, ownerControlledFuses: PromiseOrValue<BigNumberish>, selfCustody: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<string>;
         nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        onERC1155BatchReceived(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, arg2: PromiseOrValue<BigNumberish>[], arg3: PromiseOrValue<BigNumberish>[], arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        onERC1155Received(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, arg2: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BigNumberish>, arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
+        onERC1155BatchReceived(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenIds: PromiseOrValue<BigNumberish>[], arg3: PromiseOrValue<BigNumberish>[], arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
+        onERC1155Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BigNumberish>, arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
+        onERC721Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
         owner(overrides?: CallOverrides): Promise<string>;
         ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         register(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, data: PromiseOrValue<BytesLike>[], reverseRecord: PromiseOrValue<boolean>, ownerControlledFuses: PromiseOrValue<BigNumberish>, selfCustody: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
@@ -421,6 +457,7 @@ export interface ENSCustody extends BaseContract {
         revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         rotateMinter(receiver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         safeTransfer(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
+        setBaseRegistrar(baseRegistrar: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
         transferOwnership(newOwner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
@@ -464,15 +501,22 @@ export interface ENSCustody extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        initialize(controller: PromiseOrValue<string>, wrapper: PromiseOrValue<string>, overrides?: Overrides & {
+        initialize(controller: PromiseOrValue<string>, wrapper: PromiseOrValue<string>, registrar: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         makeCommitment(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, data: PromiseOrValue<BytesLike>[], reverseRecord: PromiseOrValue<boolean>, ownerControlledFuses: PromiseOrValue<BigNumberish>, selfCustody: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<BigNumber>;
         nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        onERC1155BatchReceived(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, arg2: PromiseOrValue<BigNumberish>[], arg3: PromiseOrValue<BigNumberish>[], arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        onERC1155Received(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, arg2: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BigNumberish>, arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
+        onERC1155BatchReceived(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenIds: PromiseOrValue<BigNumberish>[], arg3: PromiseOrValue<BigNumberish>[], arg4: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        onERC1155Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BigNumberish>, arg4: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        onERC721Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
         owner(overrides?: CallOverrides): Promise<BigNumber>;
         ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         register(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, data: PromiseOrValue<BytesLike>[], reverseRecord: PromiseOrValue<boolean>, ownerControlledFuses: PromiseOrValue<BigNumberish>, selfCustody: PromiseOrValue<boolean>, overrides?: Overrides & {
@@ -506,6 +550,9 @@ export interface ENSCustody extends BaseContract {
         safeTransfer(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
+        setBaseRegistrar(baseRegistrar: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
         supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
         transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
@@ -537,15 +584,22 @@ export interface ENSCustody extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        initialize(controller: PromiseOrValue<string>, wrapper: PromiseOrValue<string>, overrides?: Overrides & {
+        initialize(controller: PromiseOrValue<string>, wrapper: PromiseOrValue<string>, registrar: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         makeCommitment(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, data: PromiseOrValue<BytesLike>[], reverseRecord: PromiseOrValue<boolean>, ownerControlledFuses: PromiseOrValue<BigNumberish>, selfCustody: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        onERC1155BatchReceived(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, arg2: PromiseOrValue<BigNumberish>[], arg3: PromiseOrValue<BigNumberish>[], arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        onERC1155Received(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, arg2: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BigNumberish>, arg4: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        onERC1155BatchReceived(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenIds: PromiseOrValue<BigNumberish>[], arg3: PromiseOrValue<BigNumberish>[], arg4: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        onERC1155Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BigNumberish>, arg4: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        onERC721Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
         owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         register(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, data: PromiseOrValue<BytesLike>[], reverseRecord: PromiseOrValue<boolean>, ownerControlledFuses: PromiseOrValue<BigNumberish>, selfCustody: PromiseOrValue<boolean>, overrides?: Overrides & {
@@ -577,6 +631,9 @@ export interface ENSCustody extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         safeTransfer(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        setBaseRegistrar(baseRegistrar: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
