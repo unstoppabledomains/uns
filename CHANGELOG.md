@@ -1,5 +1,8 @@
-## v0.8.20
+## v0.8.21
 - Add legacy ENS registries to `ens-config.json`
+
+## v0.8.20
+- ENSCustody@0.1.2 - Added ability to custody ERC1155 & ERC721 ENS tokens
 
 ## v0.8.19
 - Update `SUI` token regex

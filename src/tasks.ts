@@ -896,14 +896,16 @@ const deployENSCustodyTask: Task = {
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const { owner } = ctx.accounts;
 
-    const [ETHRegistrarController, NameWrapper] = unwrapDependencies(dependencies, [
+    const [ETHRegistrarController, NameWrapper, BaseRegistrarImplementation] = unwrapDependencies(dependencies, [
       ArtifactName.ETHRegistrarController,
       ArtifactName.NameWrapper,
+      ArtifactName.BaseRegistrarImplementation,
     ]);
 
     const custody = await upgrades.deployProxy(ctx.artifacts.ENSCustody.connect(owner), [
       ETHRegistrarController.address,
       NameWrapper.address,
+      BaseRegistrarImplementation.address,
     ]);
     await custody.deployTransaction.wait();
 
@@ -929,11 +931,12 @@ const deployENSCustodyTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { ETHRegistrarController, NameWrapper } = config.contracts || {};
+    const { ETHRegistrarController, NameWrapper, BaseRegistrarImplementation } = config.contracts || {};
 
     const dependencies = {
       ETHRegistrarController,
       NameWrapper,
+      BaseRegistrarImplementation,
     };
 
     for (const [key, value] of Object.entries(dependencies)) {

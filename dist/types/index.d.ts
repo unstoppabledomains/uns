@@ -285,6 +285,8 @@ export type { ERC2771ContextMock } from "./contracts/mocks/ERC2771ContextMock";
 export { ERC2771ContextMock__factory } from "./factories/contracts/mocks/ERC2771ContextMock__factory";
 export type { ERC2771RegistryContextMock } from "./contracts/mocks/ERC2771RegistryContextMock";
 export { ERC2771RegistryContextMock__factory } from "./factories/contracts/mocks/ERC2771RegistryContextMock__factory";
+export type { ERC721Mock } from "./contracts/mocks/ERC721Mock";
+export { ERC721Mock__factory } from "./factories/contracts/mocks/ERC721Mock__factory";
 export type { ERC721ReceiverMock } from "./contracts/mocks/ERC721ReceiverMock";
 export { ERC721ReceiverMock__factory } from "./factories/contracts/mocks/ERC721ReceiverMock__factory";
 export type { MinterRoleMock } from "./contracts/mocks/MinterRoleMock";

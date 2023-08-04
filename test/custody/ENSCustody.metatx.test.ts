@@ -122,7 +122,14 @@ describe('ENSCustody (metatx)', function () {
     await baseRegistrar.addController(nameWrapper.address);
     await reverseRegistrar.setController(controller.address, true);
 
-    custody = await upgrades.deployProxy(new ENSCustody__factory(owner), [controller.address, nameWrapper.address]);
+    custody = await upgrades.deployProxy(
+      new ENSCustody__factory(owner),
+      [
+        controller.address,
+        nameWrapper.address,
+        baseRegistrar.address,
+      ],
+    );
     await custody.addMinter(minter.address);
 
     buildExecuteParams = buildExecuteFunc(custody.interface, custody.address, custody);
