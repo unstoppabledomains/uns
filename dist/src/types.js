@@ -29,6 +29,7 @@ var ArtifactName;
     ArtifactName["ETHRegistrarController"] = "ETHRegistrarController";
     ArtifactName["PublicResolver"] = "PublicResolver";
     ArtifactName["ENSCustody"] = "ENSCustody";
+    ArtifactName["LegacyENSRegistry"] = "LegacyENSRegistry";
 })(ArtifactName = exports.ArtifactName || (exports.ArtifactName = {}));
 var UnsContractName;
 (function (UnsContractName) {
@@ -61,4 +62,5 @@ var EnsContractName;
     EnsContractName["ETHRegistrarController"] = "ETHRegistrarController";
     EnsContractName["PublicResolver"] = "PublicResolver";
     EnsContractName["ENSCustody"] = "ENSCustody";
+    EnsContractName["LegacyENSRegistry"] = "LegacyENSRegistry";
 })(EnsContractName = exports.EnsContractName || (exports.EnsContractName = {}));

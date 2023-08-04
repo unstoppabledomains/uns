@@ -1,3 +1,4 @@
+export * as ens from "./@ens";
 export * as maticnetwork from "./@maticnetwork";
 export * as cns from "./cns";
 export * as custody from "./custody";

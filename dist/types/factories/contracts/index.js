@@ -23,7 +23,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UNSRegistry__factory = exports.UNSOperator__factory = exports.RootRegistry__factory = exports.RecordStorage__factory = exports.ProxyReader__factory = exports.MintingManager__factory = exports.KeyStorage__factory = exports.IUNSRegistry__factory = exports.IRootRegistry__factory = exports.IReverseRegistry__factory = exports.IRegistryReader__factory = exports.IRecordStorage__factory = exports.IRecordReader__factory = exports.IMintingManager__factory = exports.IERC1967__factory = exports.IDataReader__factory = exports.IAddressReader__factory = exports.DotCoinBurner__factory = exports.ChildRegistry__factory = exports.utils = exports.roles = exports.mocks = exports.metatx = exports.history = exports.custody = exports.cns = exports.maticnetwork = void 0;
+exports.UNSRegistry__factory = exports.UNSOperator__factory = exports.RootRegistry__factory = exports.RecordStorage__factory = exports.ProxyReader__factory = exports.MintingManager__factory = exports.KeyStorage__factory = exports.IUNSRegistry__factory = exports.IRootRegistry__factory = exports.IReverseRegistry__factory = exports.IRegistryReader__factory = exports.IRecordStorage__factory = exports.IRecordReader__factory = exports.IMintingManager__factory = exports.IERC1967__factory = exports.IDataReader__factory = exports.IAddressReader__factory = exports.DotCoinBurner__factory = exports.ChildRegistry__factory = exports.utils = exports.roles = exports.mocks = exports.metatx = exports.history = exports.custody = exports.cns = exports.maticnetwork = exports.ens = void 0;
+exports.ens = __importStar(require("./@ens"));
 exports.maticnetwork = __importStar(require("./@maticnetwork"));
 exports.cns = __importStar(require("./cns"));
 exports.custody = __importStar(require("./custody"));

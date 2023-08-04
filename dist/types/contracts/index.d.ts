@@ -1,3 +1,5 @@
+import type * as ens from "./@ens";
+export type { ens };
 import type * as maticnetwork from "./@maticnetwork";
 export type { maticnetwork };
 import type * as cns from "./cns";

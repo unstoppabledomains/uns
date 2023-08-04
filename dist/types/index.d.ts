@@ -177,6 +177,10 @@ export type { IERC1155Receiver } from "./@openzeppelin/contracts/token/ERC1155/I
 export { IERC1155Receiver__factory } from "./factories/@openzeppelin/contracts/token/ERC1155/IERC1155Receiver__factory";
 export type { IERC20 } from "./@openzeppelin/contracts/token/ERC20/IERC20";
 export { IERC20__factory } from "./factories/@openzeppelin/contracts/token/ERC20/IERC20__factory";
+export type { LegacyENS } from "./contracts/@ens/LegacyENSRegistry.sol/LegacyENS";
+export { LegacyENS__factory } from "./factories/contracts/@ens/LegacyENSRegistry.sol/LegacyENS__factory";
+export type { LegacyENSRegistry } from "./contracts/@ens/LegacyENSRegistry.sol/LegacyENSRegistry";
+export { LegacyENSRegistry__factory } from "./factories/contracts/@ens/LegacyENSRegistry.sol/LegacyENSRegistry__factory";
 export type { IChildToken } from "./contracts/@maticnetwork/IChildToken";
 export { IChildToken__factory } from "./factories/contracts/@maticnetwork/IChildToken__factory";
 export type { IMintableERC721 } from "./contracts/@maticnetwork/IMintableERC721";
