@@ -1,3 +1,6 @@
+## v0.8.22
+- Add Legacy ENS registry to artifacts and to sandbox
+
 ## v0.8.21
 - Add legacy ENS registries to `ens-config.json`
 

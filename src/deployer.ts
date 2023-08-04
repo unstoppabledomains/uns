@@ -71,6 +71,7 @@ async function getArtifacts (): Promise<ArtifactsMap> {
     ETHRegistrarController: await ethers.getContractFactory('ETHRegistrarController'),
     PublicResolver: await ethers.getContractFactory('PublicResolver'),
     ENSCustody: await ethers.getContractFactory('ENSCustody'),
+    LegacyENSRegistry: await ethers.getContractFactory('LegacyENSRegistry'),
   };
 }
 

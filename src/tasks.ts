@@ -886,6 +886,10 @@ const deployENSTask = {
       .connect(owner)
       .deploy(ens.address, nameWrapper.address, controller.address, reverseRegistrar.address);
     await ctx.saveContractConfig(EnsContractName.PublicResolver, resolver);
+
+    const legacyEnsRegistry = await ctx.artifacts[ArtifactName.LegacyENSRegistry].connect(owner).deploy();
+    await legacyEnsRegistry.setSubnodeOwner(ZERO_WORD, notNullSha('eth'), await owner.getAddress());
+    await ctx.saveContractConfig(EnsContractName.LegacyENSRegistry, legacyEnsRegistry);
   },
   ensureDependencies: () => ({}),
 };
