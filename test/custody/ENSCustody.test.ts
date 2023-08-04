@@ -1,8 +1,9 @@
 import { ethers, upgrades } from 'hardhat';
 import { expect } from 'chai';
 import { namehash } from 'ethers/lib/utils';
-import { sha3 } from 'web3-utils';
-import { BigNumber } from 'ethers';
+import { sha3Raw as sha3 } from 'web3-utils';
+import { BigNumber, ContractTransaction } from 'ethers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
   BaseRegistrarImplementation__factory,
   DummyOracle__factory,
@@ -14,29 +15,43 @@ import {
   ReverseRegistrar__factory,
   StablePriceOracle__factory,
   ERC1155Mock__factory,
+  ETHRegistrarController,
+  ENSRegistry,
+  PublicResolver,
+  BaseRegistrarImplementation,
+  StablePriceOracle,
+  ReverseRegistrar,
+  NameWrapper,
+  ENSCustody,
+  ERC1155Mock,
+  ERC721Mock__factory,
 } from '../../types';
 import { BUFFERED_REGISTRATION_COST, DAY, REGISTRATION_TIME, ZERO_ADDRESS, ZERO_WORD } from '../helpers/constants';
 import { makeInterfaceId } from '../helpers/makeInterfaceId';
 
 describe('ENSCustody', function () {
   let provider;
-  let ens;
-  let resolver;
-  let baseRegistrar;
-  let controller;
-  let priceOracle;
-  let reverseRegistrar;
-  let nameWrapper;
-  let custody;
-  let erc1155;
+  let result;
+
+  let ensRegistry: ENSRegistry;
+  let resolver: PublicResolver;
+  let baseRegistrar: BaseRegistrarImplementation;
+
+  let controller: ETHRegistrarController;
+
+  let priceOracle: StablePriceOracle;
+  let reverseRegistrar: ReverseRegistrar;
+  let nameWrapper: NameWrapper;
+
+  let custody: ENSCustody;
+  let erc1155: ERC1155Mock;
 
   const secret = '0x0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF';
 
-  let signers, owner, registrant, minter;
-  let ownerAddress, registrantAddress;
-  let result;
+  let signers: SignerWithAddress[], owner: SignerWithAddress, registrant: SignerWithAddress, minter: SignerWithAddress;
+  let ownerAddress: string, registrantAddress: string;
 
-  async function registerName (name, txOptions = { value: BUFFERED_REGISTRATION_COST }) {
+  async function registerName (name: string, txOptions = { value: BUFFERED_REGISTRATION_COST }) {
     const commitment = await controller.makeCommitment(
       name,
       registrantAddress,
@@ -69,8 +84,8 @@ describe('ENSCustody', function () {
   }
 
   async function registerAndParkName (
-    name,
-    minter,
+    name: string,
+    minter: SignerWithAddress,
     resolver = ZERO_ADDRESS,
     selfCustody = false,
     callData: string[] = [],
@@ -112,14 +127,31 @@ describe('ENSCustody', function () {
     return [commitTx, registerTx];
   }
 
-  async function topupCustody (name, registrationTime = REGISTRATION_TIME) {
+  async function registerAndUnwrapName (name: string) {
+    await registerName(name);
+
+    await assertOwnership(name, registrantAddress, true);
+
+    const labelHash = sha3(name);
+
+    const unwrapTx = await nameWrapper.connect(registrant).unwrapETH2LD(
+      labelHash,
+      await registrant.getAddress(),
+      await registrant.getAddress(),
+    );
+    await unwrapTx.wait();
+
+    return unwrapTx;
+  }
+
+  async function topupCustody (name: string, registrationTime = REGISTRATION_TIME) {
     const [base, premium] = await controller.rentPrice(name, registrationTime);
     const price = base.add(premium);
     await owner.sendTransaction({ to: custody.address, value: price });
     return price;
   }
 
-  async function assertGasSpent (address, prevBalance, txs) {
+  async function assertGasSpent (address: string, prevBalance: BigNumber, txs: ContractTransaction[]) {
     let spent = BigNumber.from(0);
     for (const tx of txs) {
       const receipt = await provider.getTransactionReceipt(tx.hash);
@@ -129,13 +161,17 @@ describe('ENSCustody', function () {
     expect(await provider.getBalance(address)).to.equal(prevBalance.sub(spent));
   }
 
-  async function assertOwnership (name, owner, selfCustody = false) {
+  async function assertOwnership (name: string, owner: string, selfCustody = false) {
     const tokenId = sha3(name);
     const node = namehash(`${name}.eth`);
 
-    expect(await controller.available(name)).to.equal(false);
-    expect(await ens.owner(node)).to.equal(nameWrapper.address);
-    expect(await baseRegistrar.ownerOf(tokenId)).to.equal(nameWrapper.address);
+    // if 2LD
+    if(name.split('.').length === 1) {
+      expect(await controller.available(name)).to.equal(false);
+      expect(await baseRegistrar.ownerOf(tokenId)).to.equal(nameWrapper.address);
+    }
+
+    expect(await ensRegistry.owner(node)).to.equal(nameWrapper.address);
 
     if (selfCustody) {
       expect(await nameWrapper.ownerOf(node)).to.equal(owner);
@@ -145,6 +181,14 @@ describe('ENSCustody', function () {
     }
   }
 
+  async function assertWrapped (name: string, isWrapped = true) {
+    const nameHash = namehash(`${name}.eth`);
+
+    expect(
+      await nameWrapper['isWrapped(bytes32)'](nameHash),
+    ).to.be.eq(isWrapped);
+  }
+
   before(async () => {
     provider = ethers.provider;
     signers = await ethers.getSigners();
@@ -152,16 +196,20 @@ describe('ENSCustody', function () {
     ownerAddress = await owner.getAddress();
     registrantAddress = await registrant.getAddress();
 
-    ens = await new ENSRegistry__factory(owner).deploy();
-    baseRegistrar = await new BaseRegistrarImplementation__factory(owner).deploy(ens.address, namehash('eth'));
-    reverseRegistrar = await new ReverseRegistrar__factory(owner).deploy(ens.address);
+    ensRegistry = await new ENSRegistry__factory(owner).deploy();
+    baseRegistrar = await new BaseRegistrarImplementation__factory(owner).deploy(ensRegistry.address, namehash('eth'));
+    reverseRegistrar = await new ReverseRegistrar__factory(owner).deploy(ensRegistry.address);
 
-    await ens.setSubnodeOwner(ZERO_WORD, sha3('reverse'), ownerAddress);
-    await ens.setSubnodeOwner(namehash('reverse'), sha3('addr'), reverseRegistrar.address);
+    await ensRegistry.setSubnodeOwner(ZERO_WORD, sha3('reverse'), ownerAddress);
+    await ensRegistry.setSubnodeOwner(namehash('reverse'), sha3('addr'), reverseRegistrar.address);
 
-    nameWrapper = await new NameWrapper__factory(owner).deploy(ens.address, baseRegistrar.address, ownerAddress);
+    nameWrapper = await new NameWrapper__factory(owner).deploy(
+      ensRegistry.address,
+      baseRegistrar.address,
+      ownerAddress,
+    );
 
-    await ens.setSubnodeOwner(ZERO_WORD, sha3('eth'), baseRegistrar.address);
+    await ensRegistry.setSubnodeOwner(ZERO_WORD, sha3('eth'), baseRegistrar.address);
 
     const dummyOracle = await new DummyOracle__factory(owner).deploy('100000000');
     priceOracle = await new StablePriceOracle__factory(owner).deploy(dummyOracle.address, [0, 0, 4, 2, 1]);
@@ -172,20 +220,24 @@ describe('ENSCustody', function () {
       86400,
       reverseRegistrar.address,
       nameWrapper.address,
-      ens.address,
+      ensRegistry.address,
     );
     await nameWrapper.setController(controller.address, true);
     await baseRegistrar.addController(nameWrapper.address);
     await reverseRegistrar.setController(controller.address, true);
 
     resolver = await new PublicResolver__factory(owner).deploy(
-      ens.address,
+      ensRegistry.address,
       nameWrapper.address,
       controller.address,
       reverseRegistrar.address,
     );
 
-    custody = await upgrades.deployProxy(new ENSCustody__factory(owner), [controller.address, nameWrapper.address]);
+    custody = await upgrades.deployProxy(new ENSCustody__factory(owner), [
+      controller.address,
+      nameWrapper.address,
+      baseRegistrar.address,
+    ]) as ENSCustody;
     await custody.addMinter(minter.address);
 
     erc1155 = await new ERC1155Mock__factory(owner).deploy('');
@@ -206,48 +258,9 @@ describe('ENSCustody', function () {
     await registerName(name);
 
     expect(await controller.available(name)).to.equal(false);
-    expect(await ens.owner(node)).to.equal(nameWrapper.address);
+    expect(await ensRegistry.owner(node)).to.equal(nameWrapper.address);
     expect(await baseRegistrar.ownerOf(tokenId)).to.equal(nameWrapper.address);
     expect(await nameWrapper.ownerOf(node)).to.equal(registrantAddress);
-  });
-
-  it('should receive ERC1155 tokens only from ENS wrapper', async () => {
-    const name = 'ts-ww12';
-    const node = namehash(`${name}.eth`);
-
-    await registerName(name);
-    await nameWrapper.connect(registrant).safeTransferFrom(registrantAddress, custody.address, node, 1, '0x');
-
-    const erc1155TokenId = 1;
-    await erc1155.mint(owner.address, erc1155TokenId, 1, '0x');
-    await expect(erc1155.safeTransferFrom(owner.address, custody.address, erc1155TokenId, 1, '0x')).to.be.revertedWith(
-      'ERC1155: transfer to non ERC1155Receiver implementer',
-    );
-  });
-
-  it('should batch receive ERC1155 tokens only from ENS wrapper', async () => {
-    const name1 = 'ts-bb12';
-    const node1 = namehash(`${name1}.eth`);
-    const name2 = 'ts-bb21';
-    const node2 = namehash(`${name2}.eth`);
-
-    await registerName(name1);
-    await registerName(name2);
-    await nameWrapper
-      .connect(registrant)
-      .safeBatchTransferFrom(registrantAddress, custody.address, [node1, node2], [1, 1], '0x');
-
-    const erc1155TokenId1 = 1;
-    const erc1155TokenId2 = 2;
-    await erc1155.mint(owner.address, erc1155TokenId1, 1, '0x');
-    await erc1155.mint(owner.address, erc1155TokenId2, 1, '0x');
-    await expect(
-      erc1155.safeBatchTransferFrom(owner.address, custody.address, [erc1155TokenId1, erc1155TokenId2], [1, 1], '0x'),
-    ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
-  });
-
-  it('should revert when token is invalid', async () => {
-    await expect(custody.ownerOf(56786756)).to.be.revertedWith('InvalidToken');
   });
 
   it('should return correct rent price', async () => {
@@ -255,7 +268,260 @@ describe('ENSCustody', function () {
     const [base, premium] = await controller.rentPrice(name, REGISTRATION_TIME);
     const price = base.add(premium);
 
-    await expect(await custody.rentPrice(name, REGISTRATION_TIME)).to.equal(price);
+    expect(
+      await custody.rentPrice(name, REGISTRATION_TIME),
+    ).to.equal(price);
+  });
+
+  describe('wrapped ERC1155 parking', async () => {
+    it('should receive and park a ERC1155 ENS domain', async () => {
+      const name = 'ts-ww12';
+      const node = namehash(`${name}.eth`);
+
+      await registerName(name);
+
+      await expect(
+        nameWrapper.connect(registrant).safeTransferFrom(registrantAddress, custody.address, node, 1, '0x'),
+      ).to.emit(custody, 'Parked');
+
+      await assertOwnership(name, registrantAddress, false);
+    });
+
+    it('should allow ERC1155 tokens only from ENS wrapper', async () => {
+      const erc1155TokenId1 = 1;
+
+      await erc1155.mint(owner.address, erc1155TokenId1, 1, '0x');
+
+      await expect(
+        erc1155.safeTransferFrom(owner.address, custody.address, erc1155TokenId1, 1, '0x'),
+      ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
+    });
+
+    it('should batch receive ERC1155 tokens only from ENS wrapper', async () => {
+      const name1 = 'ts-bb12';
+      const node1 = namehash(`${name1}.eth`);
+      const name2 = 'ts-bb21';
+      const node2 = namehash(`${name2}.eth`);
+
+      await registerName(name1);
+      await registerName(name2);
+
+      await expect(
+        nameWrapper.connect(registrant).safeBatchTransferFrom(
+          registrantAddress,
+          custody.address,
+          [node1, node2],
+          [1, 1],
+          '0x',
+        ),
+      ).to.emit(custody, 'Parked');
+
+      await assertOwnership(name1, registrantAddress);
+      await assertOwnership(name2, registrantAddress);
+    });
+
+    it('should allow ERC1155 tokens only from ENS wrapper for batch transfers', async () => {
+      const erc1155TokenId1 = 1;
+      const erc1155TokenId2 = 2;
+
+      await erc1155.mint(owner.address, erc1155TokenId1, 1, '0x');
+      await erc1155.mint(owner.address, erc1155TokenId2, 1, '0x');
+
+      await expect(
+        erc1155.safeBatchTransferFrom(owner.address, custody.address, [erc1155TokenId1, erc1155TokenId2], [1, 1], '0x'),
+      ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
+    });
+
+    it('should allow parking a ERC1155 ENS subdomain', async () => {
+      const name = 'ts-bb12-sub-test';
+      const subName = `sub.${name}`;
+
+      const node = namehash(`${name}.eth`);
+      const subNode = namehash(`${subName}.eth`);
+
+      const { timestamp } = await provider.getBlock('latest');
+      await registerName(name);
+
+      const expiry = timestamp + (await controller.minCommitmentAge()).toNumber();
+      await nameWrapper.connect(registrant).setSubnodeOwner(
+        node,
+        'sub',
+        registrantAddress,
+        0,
+        expiry,
+      );
+      await assertOwnership(subName, registrantAddress, true);
+
+      await expect(
+        nameWrapper.connect(registrant).safeTransferFrom(
+          registrantAddress,
+          custody.address,
+          subNode,
+          1,
+          '0x',
+        ),
+      ).to.emit(custody, 'Parked');
+      await assertOwnership(subName, registrantAddress, false);
+    });
+
+    it('should allow parking a ERC1155 ENS subdomain with batch transfer', async () => {
+      const name = 'ts-bb42-sub-test2';
+      const subName = `sub.${name}`;
+
+      const node = namehash(`${name}.eth`);
+      const subNode = namehash(`${subName}.eth`);
+
+      const { timestamp } = await provider.getBlock('latest');
+      await registerName(name);
+
+      const expiry = timestamp + (await controller.minCommitmentAge()).toNumber();
+      await nameWrapper.connect(registrant).setSubnodeOwner(
+        node,
+        'sub',
+        registrantAddress,
+        0,
+        expiry,
+      );
+      await assertOwnership(subName, registrantAddress, true);
+
+      await expect(
+        nameWrapper.connect(registrant).safeBatchTransferFrom(
+          registrantAddress,
+          custody.address,
+          [subNode],
+          [1],
+          '0x',
+        ),
+      ).to.emit(custody, 'Parked');
+
+      await assertOwnership(subName, registrantAddress, false);
+    });
+  });
+
+  describe('unwrapped ERC721 parking', async () => {
+    it('should wrap and park an unwrapped ERC721 ENS domain', async () => {
+      const name = 'auto-wrap-parking-test1';
+      const labelHash = sha3(name);
+
+      await registerAndUnwrapName(name);
+      await assertWrapped(name, false);
+
+      const abiCoder = new ethers.utils.AbiCoder();
+      const wrapTx = await baseRegistrar.connect(registrant)['safeTransferFrom(address,address,uint256,bytes)'](
+        registrant.address,
+        custody.address,
+        labelHash,
+        abiCoder.encode(['string', 'address'], [
+          name,
+          resolver.address,
+        ]),
+      );
+      await wrapTx.wait();
+
+      await assertWrapped(name, true);
+      await assertOwnership(name, registrantAddress);
+    });
+
+    it('should emit Parked event when parking an unwrapped ERC721 ENS domain', async () => {
+      const name = 'auto-wrap-parking-test-event';
+      const labelHash = sha3(name);
+
+      await registerAndUnwrapName(name);
+      await assertWrapped(name, false);
+
+      const abiCoder = new ethers.utils.AbiCoder();
+
+      await expect(
+        baseRegistrar.connect(registrant)['safeTransferFrom(address,address,uint256,bytes)'](
+          registrant.address,
+          custody.address,
+          labelHash,
+          abiCoder.encode(['string', 'address'], [
+            name,
+            resolver.address,
+          ]),
+        ),
+      ).to.emit(
+        custody, 'Parked',
+      );
+
+      await assertWrapped(name, true);
+      await assertOwnership(name, registrantAddress);
+    });
+
+    it('should reject if labelHash does\'t match submitted name', async () => {
+      const name = 'auto-wrap-parking-test2';
+      const invalidName = 'auto-wrap-parking-test2-invalid';
+
+      const labelHash = sha3(name);
+      const invalidLabelHash = sha3(invalidName);
+
+      await registerAndUnwrapName(name);
+      await assertWrapped(name, false);
+
+      const abiCoder = new ethers.utils.AbiCoder();
+      await expect(
+        baseRegistrar.connect(registrant)['safeTransferFrom(address,address,uint256,bytes)'](
+          registrant.address,
+          custody.address,
+          labelHash,
+          abiCoder.encode(['string', 'address'], [
+            invalidName,
+            resolver.address,
+          ]),
+        ),
+      ).to.be.revertedWith(`LabelMismatch("${invalidLabelHash}", "${labelHash}")`);
+    });
+
+    it('should reject if no data is passed', async () => {
+      const name = 'auto-wrap-parking-test3';
+      const labelHash = sha3(name);
+
+      await registerAndUnwrapName(name);
+      await assertWrapped(name, false);
+
+      await expect(
+        baseRegistrar.connect(registrant)['safeTransferFrom(address,address,uint256)'](
+          registrant.address,
+          custody.address,
+          labelHash,
+        ),
+      ).to.be.reverted;
+    });
+
+    it('should reject transferring if called not from regisrar', async () => {
+      const erc721Mock = await new ERC721Mock__factory(owner).deploy();
+
+      await expect(
+        erc721Mock.mint(custody.address, 1),
+      ).to.be.revertedWith('OperationProhibited()');
+    });
+
+    it('unwrapped subdomains should not be a ERC721 token', async () => {
+      const name = 'awesome-parent42';
+
+      await registerAndUnwrapName(name);
+
+      await ensRegistry.connect(registrant).setSubnodeOwner(
+        namehash(`${name}.eth`),
+        sha3('sub'),
+        registrantAddress,
+      );
+
+      expect(
+        await ensRegistry.owner(
+          namehash(`sub.${name}.eth`),
+        ),
+      ).to.equal(registrantAddress);
+
+      await expect(
+        baseRegistrar.connect(registrant)['safeTransferFrom(address,address,uint256)'](
+          registrant.address,
+          custody.address,
+          sha3(`sub.${name}`),
+        ),
+      ).to.be.reverted;
+    });
   });
 
   describe('register', () => {
@@ -270,6 +536,18 @@ describe('ENSCustody', function () {
       await assertOwnership(name, registrantAddress);
       expect(await provider.getBalance(custody.address)).to.equal(custodyBalance.sub(price));
       await assertGasSpent(minter.address, minterBalance, txs);
+    });
+
+    it('should register and emit just one Parked event', async () => {
+      const name = 'ts-ld92';
+      await topupCustody(name);
+
+      const [, registerTx] = await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+      await assertOwnership(name, registrantAddress);
+
+      const receipt = await registerTx.wait();
+
+      expect(receipt.events?.filter(({ event }) => event === 'Parked').length).to.be.equal(1);
     });
 
     it('should revert when custody has not enough balance', async () => {
@@ -425,9 +703,91 @@ describe('ENSCustody', function () {
     });
   });
 
+  describe('ownerOf', () => {
+    it('returns the owner of parked domain', async () => {
+      const name = 'tb-45g';
+      const node = namehash(`${name}.eth`);
+
+      await topupCustody(name);
+
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+
+      expect(
+        await custody.ownerOf(node),
+      ).to.equal(registrantAddress);
+    });
+
+    it('reverts with InvalidToken error if token not known', async () => {
+      const node = namehash('not-existent.eth');
+
+      await expect(
+        custody.ownerOf(node),
+      ).to.be.revertedWith('InvalidToken');
+    });
+
+    it('reverts with UnknownToken if subdomain was externally claimed from custody', async () => {
+      const name = 'ts-bb12-sub-owner-test';
+      const subName = `sub.${name}`;
+
+      const node = namehash(`${name}.eth`);
+      const subNode = namehash(`${subName}.eth`);
+
+      const { timestamp } = await provider.getBlock('latest');
+      await registerName(name);
+
+      const expiry = timestamp + (await controller.minCommitmentAge()).toNumber();
+      await nameWrapper.connect(registrant).setSubnodeOwner(
+        node,
+        'sub',
+        registrantAddress,
+        0,
+        expiry,
+      );
+      await assertOwnership(subName, registrantAddress, true);
+
+      await expect(
+        nameWrapper.connect(registrant).safeTransferFrom(
+          registrantAddress,
+          custody.address,
+          subNode,
+          1,
+          '0x',
+        ),
+      ).to.emit(custody, 'Parked');
+      await assertOwnership(subName, registrantAddress, false);
+
+      await nameWrapper.connect(registrant).setSubnodeOwner(
+        node,
+        'sub',
+        registrantAddress,
+        0,
+        expiry,
+      );
+
+      expect(
+        await nameWrapper.ownerOf(subNode),
+      ).to.equal(registrantAddress);
+
+      await expect(
+        custody.ownerOf(subNode),
+      ).to.be.revertedWith('UnknownToken');
+    });
+  });
+
+  describe('setBaseRegistrar', async () => {
+    it('sets the registrar only if owner is calling', async () => {
+      await custody.connect(owner).setBaseRegistrar(baseRegistrar.address);
+
+      await expect(
+        custody.connect(registrant).setBaseRegistrar(ZERO_ADDRESS),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
   describe('ERC165', function () {
     const INTERFACES = {
       ERC165: ['supportsInterface(bytes4)'],
+      ERC721Receiver: ['onERC721Received(address,address,uint256,bytes)'],
       ERC1155Receiver: [
         'onERC1155Received(address,address,uint256,uint256,bytes)',
         'onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)',
@@ -445,14 +805,14 @@ describe('ENSCustody', function () {
     }
 
     it('all interfaces are reported as supported', async function () {
-      for (const k of ['ERC165', 'ERC1155Receiver']) {
+      for (const k of ['ERC165', 'ERC721Receiver', 'ERC1155Receiver']) {
         const interfaceId = INTERFACE_IDS[k] ?? k;
         expect(await custody.supportsInterface(interfaceId)).to.equal(true, `does not support ${k}`);
       }
     });
 
     it('all interface functions are in ABI', async function () {
-      for (const k of ['ERC165', 'ERC1155Receiver']) {
+      for (const k of ['ERC165', 'ERC721Receiver', 'ERC1155Receiver']) {
         // skip interfaces for which we don't have a function list
         if (INTERFACES[k] === undefined) continue;
         for (const fnName of INTERFACES[k]) {
