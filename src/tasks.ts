@@ -878,9 +878,26 @@ const deployENSTask = {
       );
     await ctx.saveContractConfig(EnsContractName.ETHRegistrarController, controller);
 
+    const legacyController = await ctx.artifacts[ArtifactName.LegacyETHRegistrarController]
+      .connect(owner)
+      .deploy(
+        baseRegistrar.address,
+        priceOracle.address,
+        600,
+        86400,
+        reverseRegistrar.address,
+        nameWrapper.address,
+        ens.address,
+      );
+    await ctx.saveContractConfig(EnsContractName.LegacyETHRegistrarController, legacyController);
+
     await nameWrapper.setController(controller.address, true);
+    await nameWrapper.setController(legacyController.address, true);
     await baseRegistrar.addController(nameWrapper.address);
+    await baseRegistrar.addController(controller.address);
+    await baseRegistrar.addController(legacyController.address);
     await reverseRegistrar.setController(controller.address, true);
+    await reverseRegistrar.setController(legacyController.address, true);
 
     const resolver = await ctx.artifacts[ArtifactName.PublicResolver]
       .connect(owner)

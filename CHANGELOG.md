@@ -1,3 +1,6 @@
+## v0.8.23
+- Add Legacy ETH registrar controller to ens-config.json, sandbox and artifacts
+
 ## v0.8.22
 - Add Legacy ENS registry to artifacts and to sandbox
 
