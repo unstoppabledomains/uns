@@ -96,7 +96,7 @@
                 "ENSCustody": {
                     "address": "0x74d1fA29295028e58573b894A4bF2cE8541036d4",
                     "deploymentBlock": "0x8b85b3",
-                    "implementation": "0x35b5f5CBFbfc97700620E31BD250d870723B1392",
+                    "implementation": "0xd2Bf816C7b23fF6e7d141ECC4c1e41DcC857aD45",
                     "forwarder": "0x74d1fA29295028e58573b894A4bF2cE8541036d4"
                 },
                 "LegacyENSRegistry": {
