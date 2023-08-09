@@ -25,7 +25,8 @@ export declare enum ArtifactName {
     ETHRegistrarController = "ETHRegistrarController",
     PublicResolver = "PublicResolver",
     ENSCustody = "ENSCustody",
-    LegacyENSRegistry = "LegacyENSRegistry"
+    LegacyENSRegistry = "LegacyENSRegistry",
+    LegacyETHRegistrarController = "LegacyETHRegistrarController"
 }
 export declare enum UnsContractName {
     UNSRegistry = "UNSRegistry",
@@ -56,7 +57,8 @@ export declare enum EnsContractName {
     ETHRegistrarController = "ETHRegistrarController",
     PublicResolver = "PublicResolver",
     ENSCustody = "ENSCustody",
-    LegacyENSRegistry = "LegacyENSRegistry"
+    LegacyENSRegistry = "LegacyENSRegistry",
+    LegacyETHRegistrarController = "LegacyETHRegistrarController"
 }
 export declare type ContractName = EnsContractName | UnsContractName;
 export declare type ContractConfig = {
