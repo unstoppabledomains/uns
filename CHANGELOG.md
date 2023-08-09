@@ -1,4 +1,9 @@
+## v0.8.23
+
+- Upgraded ENSCustody@0.1.2 on Goerli
+
 ## v0.8.22
+
 - Add Legacy ENS registry to artifacts and to sandbox
 
 ## v0.8.21
