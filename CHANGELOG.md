@@ -1,3 +1,7 @@
+## v0.8.24
+
+- Add Legacy ETH registrar controller to ens-config.json, sandbox and artifacts
+
 ## v0.8.23
 
 - Upgraded ENSCustody@0.1.2 on Goerli
@@ -7,12 +11,15 @@
 - Add Legacy ENS registry to artifacts and to sandbox
 
 ## v0.8.21
+
 - Add legacy ENS registries to `ens-config.json`
 
 ## v0.8.20
+
 - ENSCustody@0.1.2 - Added ability to custody ERC1155 & ERC721 ENS tokens
 
 ## v0.8.19
+
 - Update `SUI` token regex
 
 ## v0.8.18

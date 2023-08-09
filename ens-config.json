@@ -48,6 +48,10 @@
                 "LegacyENSRegistry": {
                     "address": "0x314159265dD8dbb310642f98f50C066173C1259b",
                     "deploymentBlock": "0x32c5b9"
+                },
+                "LegacyETHRegistrarController": {
+                    "address": "0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5",
+                    "deploymentBlock": "0x8f2277"
                 }
             }
         },
@@ -98,6 +102,10 @@
                 "LegacyENSRegistry": {
                     "address": "0x112234455C3a32FD11230C42E7Bccd4A84e02010",
                     "deploymentBlock": "0xa890"
+                },
+                "LegacyETHRegistrarController": {
+                    "address": "0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5",
+                    "deploymentBlock": "0x1fd6f0"
                 }
             }
         },
@@ -132,22 +140,26 @@
                     "deploymentBlock": "0x31"
                 },
                 "PublicResolver": {
-                    "address": "0x72FA6D0C2F56b802D762a14F1a71f9A56221cabe",
-                    "deploymentBlock": "0x35"
+                    "address": "0xeC71E4E674fe0f432693DC2b935C34bd2774C003",
+                    "deploymentBlock": "0x3a"
                 },
                 "ProxyAdmin": {
                     "address": "0x4e44E79e0cEc05D9e62e952B2088c02A3C450aeC",
                     "deploymentBlock": "0x36"
                 },
                 "ENSCustody": {
-                    "address": "0xf3810eB7d64D1C11AE12727d957c6202B24492F5",
-                    "deploymentBlock": "0x39",
-                    "implementation": "0xF97b1F8b7c2598AA59f404F65E32DfA68de16dcC",
+                    "address": "0x38b83990077ac5DA78Aa9e72f5747D3A0b2374D9",
+                    "deploymentBlock": "0x3e",
+                    "implementation": "0x653F5A2aF800684EcF2aAeAcE8dBE86afEaaEBC0",
                     "forwarder": "0x6aC8F19d1E0F81147cdF2a1e53cb1f4E18417204"
                 },
                 "LegacyENSRegistry": {
-                    "address": "0xB3106671C1BCBBa687F15520c6ebf985663Cea96",
-                    "deploymentBlock": "0x36"
+                    "address": "0x4fbf7B2f171336958BE5D15FF762a5CfF5363568",
+                    "deploymentBlock": "0x3b"
+                },
+                "LegacyETHRegistrarController": {
+                    "address": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
+                    "deploymentBlock": "0x32"
                 }
             }
         }
