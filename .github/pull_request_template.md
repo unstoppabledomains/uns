@@ -14,6 +14,7 @@
 - [ ] Make sure that the coverage of contracts has not decreased and strive **100%**
 ### 4. Configs versioning
 - [ ] Make sure that the version of `uns-config.json` is increased if changes have been made to the config.
+- [ ] Make sure that the version of `ens-config.json` is increased if changes have been made to the config.
 - [ ] Make sure that the version of `resolver-keys.json` is increased if changes have been made to the config.
 ### 5. Package versioning
 - [ ] Make sure that the `patch` version of package is increased if valuable changes have been made to the package. It includes contracts update, configs update, etc.
