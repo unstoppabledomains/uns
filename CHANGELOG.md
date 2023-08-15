@@ -1,3 +1,7 @@
+## v0.8.25
+
+- Add `.go` TLD
+
 ## v0.8.24
 
 - Add Legacy ETH registrar controller to ens-config.json, sandbox and artifacts
