@@ -1,3 +1,7 @@
+## v0.8.26
+
+- Fix ENS custody deployment task
+
 ## v0.8.25
 
 - Add `.go` TLD
