@@ -934,7 +934,7 @@ const deployENSCustodyTask: Task = {
     await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
 
     const custodyImpl = await proxyAdmin.callStatic.getProxyImplementation(custody.address);
-    await ctx.saveContractConfig(EnsContractName.ENSCustody, custody, custodyImpl);
+    await ctx.saveContractConfig(EnsContractName.ENSCustody, custody, custodyImpl, custody);
     await verify(ctx, custodyImpl, []);
 
     if (ctx.minters.length) {
