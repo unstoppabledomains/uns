@@ -1,3 +1,7 @@
+## v0.8.27
+
+- Set default resolver in ReverseRegistrar
+
 ## v0.8.26
 
 - Fix ENS custody deployment task
