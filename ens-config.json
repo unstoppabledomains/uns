@@ -1,5 +1,5 @@
 {
-    "version": "0.1.6",
+    "version": "0.1.7",
     "networks": {
         "1": {
             "contracts": {
@@ -42,7 +42,7 @@
                 "ENSCustody": {
                     "address": "0x27c9B34eB43523447d3e1bcf26f009D814522687",
                     "deploymentBlock": "0x010ae8a9",
-                    "implementation": "0x17F9947C94D1AdB406d5dB1F1a6540B8f5733940",
+                    "implementation": "0x97eD948251a5741611d2a6b9D7136782911Ff807",
                     "forwarder": "0x27c9B34eB43523447d3e1bcf26f009D814522687"
                 },
                 "LegacyENSRegistry": {

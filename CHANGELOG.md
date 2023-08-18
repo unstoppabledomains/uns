@@ -1,3 +1,7 @@
+## v0.8.27
+
+- Upgraded ENSCustody@0.1.2 on Mainnet
+
 ## v0.8.26
 
 - Fix ENS custody deployment task
