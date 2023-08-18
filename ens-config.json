@@ -148,14 +148,14 @@
                     "deploymentBlock": "0x36"
                 },
                 "ENSCustody": {
-                    "address": "0x38b83990077ac5DA78Aa9e72f5747D3A0b2374D9",
-                    "deploymentBlock": "0x3e",
-                    "implementation": "0x653F5A2aF800684EcF2aAeAcE8dBE86afEaaEBC0",
-                    "forwarder": "0x38b83990077ac5DA78Aa9e72f5747D3A0b2374D9"
+                    "address": "0xf7313E5a57432B8A90233F7158D6dDE03572Dd9f",
+                    "deploymentBlock": "0x3f",
+                    "implementation": "0x38b83990077ac5DA78Aa9e72f5747D3A0b2374D9",
+                    "forwarder": "0xf7313E5a57432B8A90233F7158D6dDE03572Dd9f"
                 },
                 "LegacyENSRegistry": {
-                    "address": "0x4fbf7B2f171336958BE5D15FF762a5CfF5363568",
-                    "deploymentBlock": "0x3b"
+                    "address": "0xB17aAe5B3A7815433fC82Cfd67Ea245767894f03",
+                    "deploymentBlock": "0x3c"
                 },
                 "LegacyETHRegistrarController": {
                     "address": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
