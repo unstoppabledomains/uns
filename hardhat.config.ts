@@ -174,7 +174,7 @@ const config: HardhatUserConfig = {
     alphaSort: true,
     runOnCompile: argv.enableContractSizer,
     disambiguatePaths: false,
-    only: ['UNSRegistry.sol', 'ProxyReader.sol', 'MintingManager.sol'],
+    only: ['UNSRegistry.sol', 'ProxyReader.sol', 'MintingManager.sol', 'ENSCustody.sol'],
   },
   mocha: {
     timeout: 100000,

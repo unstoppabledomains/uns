@@ -48,8 +48,9 @@ describe('ENSCustody', function () {
 
   const secret = '0x0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF';
 
-  let signers: SignerWithAddress[], owner: SignerWithAddress, registrant: SignerWithAddress, minter: SignerWithAddress;
-  let ownerAddress: string, registrantAddress: string;
+  let signers: SignerWithAddress[];
+  let owner: SignerWithAddress, registrant: SignerWithAddress, minter: SignerWithAddress, newOwner: SignerWithAddress;
+  let ownerAddress: string, registrantAddress: string, newOwnerAddress: string;
 
   async function registerName (name: string, txOptions = { value: BUFFERED_REGISTRATION_COST }) {
     const commitment = await controller.makeCommitment(
@@ -188,9 +189,11 @@ describe('ENSCustody', function () {
   before(async () => {
     provider = ethers.provider;
     signers = await ethers.getSigners();
-    [owner, registrant, minter] = signers;
+    [owner, registrant, minter, newOwner] = signers;
+
     ownerAddress = await owner.getAddress();
     registrantAddress = await registrant.getAddress();
+    newOwnerAddress = await newOwner.getAddress();
 
     ensRegistry = await new ENSRegistry__factory(owner).deploy();
     baseRegistrar = await new BaseRegistrarImplementation__factory(owner).deploy(ensRegistry.address, namehash('eth'));
@@ -275,10 +278,67 @@ describe('ENSCustody', function () {
       await registerName(name);
 
       await expect(
-        nameWrapper.connect(registrant).safeTransferFrom(registrantAddress, custody.address, node, 1, '0x'),
+        nameWrapper.connect(registrant).safeTransferFrom(
+          registrantAddress,
+          custody.address,
+          node,
+          1,
+          new ethers.utils.AbiCoder().encode(['address'], [registrantAddress]),
+        ),
       ).to.emit(custody, 'Parked');
 
       await assertOwnership(name, registrantAddress, false);
+    });
+
+    it('should receive and park a ERC1155 ENS domain to data specified owner', async () => {
+      const name = 'ts-ww123';
+      const node = namehash(`${name}.eth`);
+
+      await registerName(name);
+
+      await nameWrapper.connect(registrant).safeTransferFrom(
+        registrantAddress,
+        custody.address,
+        node,
+        1,
+        new ethers.utils.AbiCoder().encode(['address'], [newOwnerAddress]),
+      );
+
+      await assertOwnership(name, newOwnerAddress, false);
+    });
+
+    it('should not allow to park a ERC1155 ENS domain if no data provided', async () => {
+      const name = 'ts-ww123-no-data';
+      const node = namehash(`${name}.eth`);
+
+      await registerName(name);
+
+      await expect(
+        nameWrapper.connect(registrant).safeTransferFrom(
+          registrantAddress,
+          custody.address,
+          node,
+          1,
+          '0x',
+        ),
+      ).to.be.reverted;
+    });
+
+    it('should not allow to park a ERC1155 ENS domain if owner is zero address', async () => {
+      const name = 'ts-ww123-zero-owner';
+      const node = namehash(`${name}.eth`);
+
+      await registerName(name);
+
+      await expect(
+        nameWrapper.connect(registrant).safeTransferFrom(
+          registrantAddress,
+          custody.address,
+          node,
+          1,
+          new ethers.utils.AbiCoder().encode(['address'], [ZERO_ADDRESS]),
+        ),
+      ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
     });
 
     it('should allow ERC1155 tokens only from ENS wrapper', async () => {
@@ -287,7 +347,13 @@ describe('ENSCustody', function () {
       await erc1155.mint(owner.address, erc1155TokenId1, 1, '0x');
 
       await expect(
-        erc1155.safeTransferFrom(owner.address, custody.address, erc1155TokenId1, 1, '0x'),
+        erc1155.safeTransferFrom(
+          owner.address,
+          custody.address,
+          erc1155TokenId1,
+          1,
+          new ethers.utils.AbiCoder().encode(['address'], [ownerAddress]),
+        ),
       ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
     });
 
@@ -303,11 +369,39 @@ describe('ENSCustody', function () {
       await expect(
         nameWrapper
           .connect(registrant)
-          .safeBatchTransferFrom(registrantAddress, custody.address, [node1, node2], [1, 1], '0x'),
+          .safeBatchTransferFrom(
+            registrantAddress,
+            custody.address,
+            [node1, node2],
+            [1, 1],
+            new ethers.utils.AbiCoder().encode(['address'], [registrantAddress]),
+          ),
       ).to.emit(custody, 'Parked');
 
       await assertOwnership(name1, registrantAddress);
       await assertOwnership(name2, registrantAddress);
+    });
+
+    it('should not allow batch receiving of ERC1155 if owner is zero address', async () => {
+      const name1 = 'ts-bb12-zero';
+      const node1 = namehash(`${name1}.eth`);
+      const name2 = 'ts-bb21-zero';
+      const node2 = namehash(`${name2}.eth`);
+
+      await registerName(name1);
+      await registerName(name2);
+
+      await expect(
+        nameWrapper
+          .connect(registrant)
+          .safeBatchTransferFrom(
+            registrantAddress,
+            custody.address,
+            [node1, node2],
+            [1, 1],
+            new ethers.utils.AbiCoder().encode(['address'], [ZERO_ADDRESS]),
+          ),
+      ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
     });
 
     it('should allow ERC1155 tokens only from ENS wrapper for batch transfers', async () => {
@@ -318,7 +412,16 @@ describe('ENSCustody', function () {
       await erc1155.mint(owner.address, erc1155TokenId2, 1, '0x');
 
       await expect(
-        erc1155.safeBatchTransferFrom(owner.address, custody.address, [erc1155TokenId1, erc1155TokenId2], [1, 1], '0x'),
+        erc1155.safeBatchTransferFrom(
+          owner.address,
+          custody.address,
+          [
+            erc1155TokenId1,
+            erc1155TokenId2,
+          ],
+          [1, 1],
+          new ethers.utils.AbiCoder().encode(['address'], [registrantAddress]),
+        ),
       ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
     });
 
@@ -337,8 +440,15 @@ describe('ENSCustody', function () {
       await assertOwnership(subName, registrantAddress, true);
 
       await expect(
-        nameWrapper.connect(registrant).safeTransferFrom(registrantAddress, custody.address, subNode, 1, '0x'),
+        nameWrapper.connect(registrant).safeTransferFrom(
+          registrantAddress,
+          custody.address,
+          subNode,
+          1,
+          new ethers.utils.AbiCoder().encode(['address'], [registrantAddress]),
+        ),
       ).to.emit(custody, 'Parked');
+
       await assertOwnership(subName, registrantAddress, false);
     });
 
@@ -357,10 +467,16 @@ describe('ENSCustody', function () {
       await assertOwnership(subName, registrantAddress, true);
 
       await expect(
-        nameWrapper.connect(registrant).safeBatchTransferFrom(registrantAddress, custody.address, [subNode], [1], '0x'),
+        nameWrapper.connect(registrant).safeBatchTransferFrom(
+          registrantAddress,
+          custody.address,
+          [subNode],
+          [1],
+          new ethers.utils.AbiCoder().encode(['address'], [newOwnerAddress]),
+        ),
       ).to.emit(custody, 'Parked');
 
-      await assertOwnership(subName, registrantAddress, false);
+      await assertOwnership(subName, newOwnerAddress, false);
     });
   });
 
@@ -373,18 +489,48 @@ describe('ENSCustody', function () {
       await assertWrapped(name, false);
 
       const abiCoder = new ethers.utils.AbiCoder();
+
       const wrapTx = await baseRegistrar
         .connect(registrant)
         ['safeTransferFrom(address,address,uint256,bytes)'](
           registrant.address,
           custody.address,
           labelHash,
-          abiCoder.encode(['string', 'address'], [name, resolver.address]),
+          abiCoder.encode(
+            ['address', 'address', 'string'],
+            [registrantAddress, resolver.address, name],
+          ),
         );
       await wrapTx.wait();
 
       await assertWrapped(name, true);
       await assertOwnership(name, registrantAddress);
+    });
+
+    it('should wrap and park an unwrapped ERC721 ENS domain to specified owner address', async () => {
+      const name = 'auto-wrap-parking-test-data';
+      const labelHash = sha3(name);
+
+      await registerAndUnwrapName(name);
+      await assertWrapped(name, false);
+
+      const abiCoder = new ethers.utils.AbiCoder();
+
+      const wrapTx = await baseRegistrar
+        .connect(registrant)
+        ['safeTransferFrom(address,address,uint256,bytes)'](
+          registrant.address,
+          custody.address,
+          labelHash,
+          abiCoder.encode(
+            ['address', 'address', 'string'],
+            [newOwnerAddress, resolver.address, name],
+          ),
+        );
+      await wrapTx.wait();
+
+      await assertWrapped(name, true);
+      await assertOwnership(name, newOwnerAddress);
     });
 
     it('should emit Parked event when parking an unwrapped ERC721 ENS domain', async () => {
@@ -403,7 +549,10 @@ describe('ENSCustody', function () {
             registrant.address,
             custody.address,
             labelHash,
-            abiCoder.encode(['string', 'address'], [name, resolver.address]),
+            abiCoder.encode(
+              ['address', 'address', 'string'],
+              [registrantAddress, resolver.address, name],
+            ),
           ),
       ).to.emit(custody, 'Parked');
 
@@ -429,7 +578,10 @@ describe('ENSCustody', function () {
             registrant.address,
             custody.address,
             labelHash,
-            abiCoder.encode(['string', 'address'], [invalidName, resolver.address]),
+            abiCoder.encode(
+              ['address', 'address', 'string'],
+              [newOwnerAddress, resolver.address, invalidName],
+            ),
           ),
       ).to.be.revertedWith(`LabelMismatch("${invalidLabelHash}", "${labelHash}")`);
     });
@@ -446,6 +598,75 @@ describe('ENSCustody', function () {
           .connect(registrant)
           ['safeTransferFrom(address,address,uint256)'](registrant.address, custody.address, labelHash),
       ).to.be.reverted;
+    });
+
+    it('should revert if no owner address is specified in data', async () => {
+      const name = 'auto-wrap-parking-test-data';
+      const labelHash = sha3(name);
+
+      await registerAndUnwrapName(name);
+      await assertWrapped(name, false);
+
+      const abiCoder = new ethers.utils.AbiCoder();
+
+      await expect(baseRegistrar
+        .connect(registrant)
+        ['safeTransferFrom(address,address,uint256,bytes)'](
+          registrant.address,
+          custody.address,
+          labelHash,
+          abiCoder.encode(
+            ['string', 'address'],
+            [name, resolver.address],
+          ),
+        ),
+      ).to.be.reverted;
+    });
+
+    it('should revert if no owner address is specified in data and it is in reverse order', async () => {
+      const name = 'auto-wrap-parking-test-data-reversed';
+      const labelHash = sha3(name);
+
+      await registerAndUnwrapName(name);
+      await assertWrapped(name, false);
+
+      const abiCoder = new ethers.utils.AbiCoder();
+
+      await expect(baseRegistrar
+        .connect(registrant)
+        ['safeTransferFrom(address,address,uint256,bytes)'](
+          registrant.address,
+          custody.address,
+          labelHash,
+          abiCoder.encode(
+            ['string', 'address'],
+            [name, resolver.address],
+          ),
+        ),
+      ).to.be.reverted;
+    });
+
+    it('should revert if owner address is zero address', async () => {
+      const name = 'auto-wrap-parking-test-zero-data';
+      const labelHash = sha3(name);
+
+      await registerAndUnwrapName(name);
+      await assertWrapped(name, false);
+
+      const abiCoder = new ethers.utils.AbiCoder();
+
+      await expect(baseRegistrar
+        .connect(registrant)
+        ['safeTransferFrom(address,address,uint256,bytes)'](
+          registrant.address,
+          custody.address,
+          labelHash,
+          abiCoder.encode(
+            ['address', 'address', 'string'],
+            [ZERO_ADDRESS, resolver.address, name],
+          ),
+        ),
+      ).to.be.revertedWith('InvalidOwner');
     });
 
     it('should reject transferring if called not from regisrar', async () => {
@@ -696,7 +917,13 @@ describe('ENSCustody', function () {
       await assertOwnership(subName, registrantAddress, true);
 
       await expect(
-        nameWrapper.connect(registrant).safeTransferFrom(registrantAddress, custody.address, subNode, 1, '0x'),
+        nameWrapper.connect(registrant).safeTransferFrom(
+          registrantAddress,
+          custody.address,
+          subNode,
+          1,
+          new ethers.utils.AbiCoder().encode(['address'], [registrantAddress]),
+        ),
       ).to.emit(custody, 'Parked');
       await assertOwnership(subName, registrantAddress, false);
 

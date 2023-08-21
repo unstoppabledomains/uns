@@ -10,6 +10,7 @@ error InvalidToken(uint256 tokenId);
 error UnknownToken(uint256 tokenId);
 error CustodyNotEnoughBalance();
 error OperationProhibited();
+error InvalidOwner(address addr);
 error InvalidForwardedToken(uint256 tokenId);
 
 interface IENSCustody is IERC1155ReceiverUpgradeable {

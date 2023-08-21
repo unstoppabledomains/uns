@@ -15,7 +15,7 @@ import {ReentrancyGuardUpgradeable} from '@openzeppelin/contracts-upgradeable/se
 import {IERC165Upgradeable} from '@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol';
 import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import {StorageSlotUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
-import {IENSCustody, Unauthorised, InvalidToken, UnknownToken, CustodyNotEnoughBalance, OperationProhibited, InvalidForwardedToken} from './IENSCustody.sol';
+import {IENSCustody, Unauthorised, InvalidToken, UnknownToken, CustodyNotEnoughBalance, OperationProhibited, InvalidForwardedToken, InvalidOwner} from './IENSCustody.sol';
 import {ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
 import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
@@ -30,7 +30,7 @@ contract ENSCustody is
     IENSCustody
 {
     string public constant NAME = 'ENS Custody';
-    string public constant VERSION = '0.1.2';
+    string public constant VERSION = '0.1.3';
 
     bytes32 private constant _ETH_NODE = 0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
     // This is the keccak-256 hash of "ens.owner." subtracted by 1
@@ -96,14 +96,15 @@ contract ENSCustody is
 
     function onERC721Received(
         address,
-        address from,
+        address,
         uint256 tokenId,
         bytes calldata data
     ) external returns (bytes4) {
         address registrar = StorageSlotUpgradeable.getAddressSlot(_ENS_BASE_REGISTRAR_SLOT).value;
 
         if (_msgSender() == registrar) {
-            (string memory label, address resolver) = abi.decode(data, (string, address));
+            (address owner, address resolver, string memory label) = abi.decode(data, (address, address, string));
+            _ensureOwner(owner);
 
             // This is effectively wrapping the ERC721 domain into ERC1155
             IBaseRegistrar(registrar).safeTransferFrom(
@@ -112,7 +113,7 @@ contract ENSCustody is
                 tokenId,
                 abi.encode(label, address(this), uint16(0), resolver)
             );
-            _park(_namehash(label), from);
+            _park(_namehash(label), owner);
 
             return this.onERC721Received.selector;
         }
@@ -125,11 +126,14 @@ contract ENSCustody is
         address from,
         uint256 tokenId,
         uint256,
-        bytes calldata
+        bytes calldata data
     ) public override onlyNameWrapper returns (bytes4) {
         // This handles the situation when minting a ERC1155 directly to custody, as well as when wrapping a ERC721 token
         if (from != address(0)) {
-            _park(tokenId, from);
+            address owner = abi.decode(data, (address));
+            _ensureOwner(owner);
+
+            _park(tokenId, owner);
         }
 
         return this.onERC1155Received.selector;
@@ -137,13 +141,16 @@ contract ENSCustody is
 
     function onERC1155BatchReceived(
         address,
-        address from,
+        address,
         uint256[] calldata tokenIds,
         uint256[] calldata,
-        bytes calldata
+        bytes calldata data
     ) public override onlyNameWrapper returns (bytes4) {
+        address owner = abi.decode(data, (address));
+        _ensureOwner(owner);
+
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            _park(tokenIds[i], from);
+            _park(tokenIds[i], owner);
         }
 
         return this.onERC1155BatchReceived.selector;
@@ -295,5 +302,11 @@ contract ENSCustody is
     function _park(uint256 tokenId, address owner) internal {
         StorageSlotUpgradeable.getAddressSlot(keccak256(abi.encodePacked(_OWNER_PREFIX_SLOT, tokenId))).value = owner;
         emit Parked(tokenId, owner);
+    }
+
+    function _ensureOwner(address owner) internal pure {
+        if (owner == address(0)) {
+            revert InvalidOwner(owner);
+        }
     }
 }
