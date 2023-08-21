@@ -898,12 +898,11 @@ const deployENSTask = {
     await baseRegistrar.addController(legacyController.address);
     await reverseRegistrar.setController(controller.address, true);
     await reverseRegistrar.setController(legacyController.address, true);
-
     const resolver = await ctx.artifacts[ArtifactName.PublicResolver]
       .connect(owner)
       .deploy(ens.address, nameWrapper.address, controller.address, reverseRegistrar.address);
     await ctx.saveContractConfig(EnsContractName.PublicResolver, resolver);
-
+    await reverseRegistrar.setDefaultResolver(resolver.address);
     const legacyEnsRegistry = await ctx.artifacts[ArtifactName.LegacyENSRegistry].connect(owner).deploy();
     await legacyEnsRegistry.setSubnodeOwner(ZERO_WORD, notNullSha('eth'), await owner.getAddress());
     await ctx.saveContractConfig(EnsContractName.LegacyENSRegistry, legacyEnsRegistry);
