@@ -1,5 +1,5 @@
 {
-    "version": "0.1.7",
+    "version": "0.1.8",
     "networks": {
         "1": {
             "contracts": {
@@ -42,7 +42,7 @@
                 "ENSCustody": {
                     "address": "0x27c9B34eB43523447d3e1bcf26f009D814522687",
                     "deploymentBlock": "0x010ae8a9",
-                    "implementation": "0x17F9947C94D1AdB406d5dB1F1a6540B8f5733940",
+                    "implementation": "0x1FF7fC4473E3CDA0428830a1bc96028A0C12244C",
                     "forwarder": "0x27c9B34eB43523447d3e1bcf26f009D814522687"
                 },
                 "LegacyENSRegistry": {
@@ -96,7 +96,7 @@
                 "ENSCustody": {
                     "address": "0x74d1fA29295028e58573b894A4bF2cE8541036d4",
                     "deploymentBlock": "0x8b85b3",
-                    "implementation": "0xd2Bf816C7b23fF6e7d141ECC4c1e41DcC857aD45",
+                    "implementation": "0x223350B4892300EA6E8adEF48C955dcf1C544D02",
                     "forwarder": "0x74d1fA29295028e58573b894A4bF2cE8541036d4"
                 },
                 "LegacyENSRegistry": {

@@ -1,3 +1,7 @@
+## v0.8.30
+
+- Upgraded ENSCustody@0.1.3 on Goerli and Mainnet
+
 ## v0.8.29
 
 - London hardfork enabled in Sandbox
