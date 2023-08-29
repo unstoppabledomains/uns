@@ -30,7 +30,7 @@ const DEFAULT_SERVER_CONFIG = {
     gasLimit: 6721975,
     defaultBalanceEther: 1000,
     totalAccounts: 10,
-    hardfork: 'istanbul',
+    hardfork: 'london',
     allowUnlimitedContractSize: false,
     locked: false,
     hdPath: 'm/44\'/60\'/0\'/0/',
