@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "ENS",
-  "sourceName": "@ensdomains/ens-contracts/contracts/registry/ENS.sol",
+  "sourceName": "contracts/@ens/LegacyETHRegistrarController.sol",
   "abi": [
     {
       "anonymous": false,
@@ -111,6 +111,7 @@
       "type": "event"
     },
     {
+      "constant": true,
       "inputs": [
         {
           "internalType": "address",
@@ -131,10 +132,12 @@
           "type": "bool"
         }
       ],
+      "payable": false,
       "stateMutability": "view",
       "type": "function"
     },
     {
+      "constant": true,
       "inputs": [
         {
           "internalType": "bytes32",
@@ -150,10 +153,12 @@
           "type": "address"
         }
       ],
+      "payable": false,
       "stateMutability": "view",
       "type": "function"
     },
     {
+      "constant": true,
       "inputs": [
         {
           "internalType": "bytes32",
@@ -169,10 +174,12 @@
           "type": "bool"
         }
       ],
+      "payable": false,
       "stateMutability": "view",
       "type": "function"
     },
     {
+      "constant": true,
       "inputs": [
         {
           "internalType": "bytes32",
@@ -188,10 +195,12 @@
           "type": "address"
         }
       ],
+      "payable": false,
       "stateMutability": "view",
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
           "internalType": "address",
@@ -206,10 +215,12 @@
       ],
       "name": "setApprovalForAll",
       "outputs": [],
+      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
           "internalType": "bytes32",
@@ -224,10 +235,12 @@
       ],
       "name": "setOwner",
       "outputs": [],
+      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
           "internalType": "bytes32",
@@ -252,10 +265,12 @@
       ],
       "name": "setRecord",
       "outputs": [],
+      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
           "internalType": "bytes32",
@@ -270,10 +285,12 @@
       ],
       "name": "setResolver",
       "outputs": [],
+      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
           "internalType": "bytes32",
@@ -299,10 +316,12 @@
           "type": "bytes32"
         }
       ],
+      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
           "internalType": "bytes32",
@@ -332,10 +351,12 @@
       ],
       "name": "setSubnodeRecord",
       "outputs": [],
+      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
           "internalType": "bytes32",
@@ -350,10 +371,12 @@
       ],
       "name": "setTTL",
       "outputs": [],
+      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
+      "constant": true,
       "inputs": [
         {
           "internalType": "bytes32",
@@ -369,6 +392,7 @@
           "type": "uint64"
         }
       ],
+      "payable": false,
       "stateMutability": "view",
       "type": "function"
     }
