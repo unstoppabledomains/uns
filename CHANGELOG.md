@@ -1,3 +1,7 @@
+## v0.8.31
+
+- Fix LegacyETHRegistrarController ABI
+
 ## v0.8.30
 
 - Upgraded ENSCustody@0.1.3 on Goerli and Mainnet

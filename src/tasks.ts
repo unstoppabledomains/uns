@@ -885,9 +885,6 @@ const deployENSTask = {
         priceOracle.address,
         600,
         86400,
-        reverseRegistrar.address,
-        nameWrapper.address,
-        ens.address,
       );
     await ctx.saveContractConfig(EnsContractName.LegacyETHRegistrarController, legacyController);
 
