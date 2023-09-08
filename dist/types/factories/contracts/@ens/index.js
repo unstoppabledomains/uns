@@ -23,7 +23,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LegacyETHRegistrarController__factory = exports.legacyEnsRegistrySol = void 0;
+exports.legacyEthRegistrarControllerSol = exports.legacyEnsRegistrySol = void 0;
 exports.legacyEnsRegistrySol = __importStar(require("./LegacyENSRegistry.sol"));
-var LegacyETHRegistrarController__factory_1 = require("./LegacyETHRegistrarController__factory");
-Object.defineProperty(exports, "LegacyETHRegistrarController__factory", { enumerable: true, get: function () { return LegacyETHRegistrarController__factory_1.LegacyETHRegistrarController__factory; } });
+exports.legacyEthRegistrarControllerSol = __importStar(require("./LegacyETHRegistrarController.sol"));

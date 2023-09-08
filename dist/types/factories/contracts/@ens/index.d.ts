@@ -1,3 +1,3 @@
 export * as legacyEnsRegistrySol from "./LegacyENSRegistry.sol";
-export { LegacyETHRegistrarController__factory } from "./LegacyETHRegistrarController__factory";
+export * as legacyEthRegistrarControllerSol from "./LegacyETHRegistrarController.sol";
 //# sourceMappingURL=index.d.ts.map

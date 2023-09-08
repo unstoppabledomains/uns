@@ -181,8 +181,12 @@ export type { LegacyENS } from "./contracts/@ens/LegacyENSRegistry.sol/LegacyENS
 export { LegacyENS__factory } from "./factories/contracts/@ens/LegacyENSRegistry.sol/LegacyENS__factory";
 export type { LegacyENSRegistry } from "./contracts/@ens/LegacyENSRegistry.sol/LegacyENSRegistry";
 export { LegacyENSRegistry__factory } from "./factories/contracts/@ens/LegacyENSRegistry.sol/LegacyENSRegistry__factory";
-export type { LegacyETHRegistrarController } from "./contracts/@ens/LegacyETHRegistrarController";
-export { LegacyETHRegistrarController__factory } from "./factories/contracts/@ens/LegacyETHRegistrarController__factory";
+export type { BaseRegistrar } from "./contracts/@ens/LegacyETHRegistrarController.sol/BaseRegistrar";
+export { BaseRegistrar__factory } from "./factories/contracts/@ens/LegacyETHRegistrarController.sol/BaseRegistrar__factory";
+export type { LegacyETHRegistrarController } from "./contracts/@ens/LegacyETHRegistrarController.sol/LegacyETHRegistrarController";
+export { LegacyETHRegistrarController__factory } from "./factories/contracts/@ens/LegacyETHRegistrarController.sol/LegacyETHRegistrarController__factory";
+export type { PriceOracle } from "./contracts/@ens/LegacyETHRegistrarController.sol/PriceOracle";
+export { PriceOracle__factory } from "./factories/contracts/@ens/LegacyETHRegistrarController.sol/PriceOracle__factory";
 export type { IChildToken } from "./contracts/@maticnetwork/IChildToken";
 export { IChildToken__factory } from "./factories/contracts/@maticnetwork/IChildToken__factory";
 export type { IMintableERC721 } from "./contracts/@maticnetwork/IMintableERC721";
