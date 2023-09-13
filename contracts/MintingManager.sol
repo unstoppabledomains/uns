@@ -13,6 +13,8 @@ import './roles/MinterRole.sol';
 import './utils/Blocklist.sol';
 import './utils/Pausable.sol';
 import './utils/Strings.sol';
+import '@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
 /**
  * @title MintingManager
@@ -20,9 +22,10 @@ import './utils/Strings.sol';
  */
 contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMintingManager {
     using Strings for *;
+    using ECDSAUpgradeable for bytes32;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.16';
+    string public constant VERSION = '0.4.17';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -167,6 +170,60 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), keys, values, true);
     }
 
+    /**
+     * @dev See {IMintingManager-buy(address,string[],string[],string[],uint64,uint256,bytes)}.
+     */
+    function buy(
+        address owner,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        uint64 expiry,
+        uint256 price,
+        bytes calldata signature
+    ) external payable onlyAllowed(labels) whenNotPaused {
+        require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
+
+        (uint256 tokenId, ) = _namehash(labels);
+
+        _verifyPurchaseSignature(owner, tokenId, expiry, price, address(0), signature);
+        require(msg.value >= price, 'MintingManager: NOT_ENOUGH_FUNDS');
+
+        _issueWithRecords(owner, labels, keys, values, true);
+
+        emit DomainPurchase(tokenId, price, address(0));
+
+        if (msg.value > price) {
+            payable(_msgSender()).transfer(msg.value - price);
+        }
+    }
+
+    /**
+     * @dev See {IMintingManager-buyForErc20(address,string[],string[],string[],uint64,address,uint256,bytes)}.
+     */
+    function buyForErc20(
+        address owner,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        uint64 expiry,
+        address token,
+        uint256 price,
+        bytes calldata signature
+    ) external onlyAllowed(labels) whenNotPaused {
+        require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
+
+        (uint256 tokenId, ) = _namehash(labels);
+
+        _verifyPurchaseSignature(owner, tokenId, expiry, price, token, signature);
+
+        require(IERC20Upgradeable(token).transferFrom(_msgSender(), address(this), price), 'ERC20: LOW_LEVEL_FAIL');
+
+        _issueWithRecords(owner, labels, keys, values, true);
+
+        emit DomainPurchase(tokenId, price, token);
+    }
+
     function setTokenURIPrefix(string calldata prefix) external override onlyOwner {
         unsRegistry.setTokenURIPrefix(prefix);
         if (address(cnsURIPrefixController) != address(0x0)) {
@@ -194,6 +251,14 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         for (uint256 i = 0; i < addrs.length; i++) {
             unsRegistry.addProxyReader(addrs[i]);
         }
+    }
+
+    function withdraw(address recepient) external onlyOwner {
+        payable(recepient).transfer(address(this).balance);
+    }
+
+    function withdraw(address token, address recepient) external onlyOwner {
+        require(IERC20Upgradeable(token).transfer(recepient, IERC20Upgradeable(token).balanceOf(address(this))), 'ERC20: LOW_LEVEL_FAIL');
     }
 
     function _buildLabels(uint256 tld, string memory label) private view returns (string[] memory) {
@@ -359,6 +424,20 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             ptrdata := mload(add(ptr, index))
         }
         return uint8(ptrdata);
+    }
+
+    function _verifyPurchaseSignature(
+        address owner,
+        uint256 tokenId,
+        uint64 expiry,
+        uint256 price,
+        address token,
+        bytes memory signature
+    ) internal view {
+        address signer = keccak256(abi.encodePacked(owner, tokenId, expiry, price, token)).toEthSignedMessageHash().recover(signature);
+
+        require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
+        require(expiry > block.timestamp, 'MintingManager: EXPIRED_SIGNATURE');
     }
 
     // Reserved storage space to allow for layout changes in the future.
