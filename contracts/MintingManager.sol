@@ -3,6 +3,8 @@
 
 pragma solidity ^0.8.0;
 
+import '@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 import './cns/IResolver.sol';
 import './cns/IMintingController.sol';
 import './cns/IURIPrefixController.sol';
@@ -20,9 +22,10 @@ import './utils/Strings.sol';
  */
 contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMintingManager {
     using Strings for *;
+    using ECDSAUpgradeable for bytes32;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.16';
+    string public constant VERSION = '0.4.17';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -167,6 +170,51 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), keys, values, true);
     }
 
+    /**
+     * @dev See {IMintingManager-buy(address,string[],string[],string[],uint64,uint256,bytes)}.
+     */
+    function buy(
+        address owner,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        uint64 expiry,
+        uint256 price,
+        bytes calldata signature
+    ) external payable onlyAllowed(labels) whenNotPaused {
+        require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
+
+        _verifyPurchaseSignature(owner, labels, expiry, price, address(0), signature);
+        require(msg.value >= price, 'MintingManager: NOT_ENOUGH_FUNDS');
+
+        _handlePurchase(owner, labels, keys, values, price, address(0));
+
+        if (msg.value > price) {
+            payable(_msgSender()).transfer(msg.value - price);
+        }
+    }
+
+    /**
+     * @dev See {IMintingManager-buyForErc20(address,string[],string[],string[],uint64,address,uint256,bytes)}.
+     */
+    function buyForErc20(
+        address owner,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        uint64 expiry,
+        address token,
+        uint256 price,
+        bytes calldata signature
+    ) external onlyAllowed(labels) whenNotPaused {
+        require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
+
+        _verifyPurchaseSignature(owner, labels, expiry, price, token, signature);
+        require(IERC20Upgradeable(token).transferFrom(_msgSender(), address(this), price), 'ERC20: LOW_LEVEL_FAIL');
+
+        _handlePurchase(owner, labels, keys, values, price, token);
+    }
+
     function setTokenURIPrefix(string calldata prefix) external override onlyOwner {
         unsRegistry.setTokenURIPrefix(prefix);
         if (address(cnsURIPrefixController) != address(0x0)) {
@@ -196,6 +244,23 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         }
     }
 
+    function withdraw(address recepient) external onlyOwner {
+        require(recepient != address(0));
+
+        uint256 value = address(this).balance;
+        payable(recepient).transfer(value);
+
+        emit Withdrawal(recepient, value, address(0));
+    }
+
+    function withdraw(address token, address recepient) external onlyOwner {
+        uint256 value = IERC20Upgradeable(token).balanceOf(address(this));
+
+        require(IERC20Upgradeable(token).transfer(recepient, value), 'ERC20: LOW_LEVEL_FAIL');
+
+        emit Withdrawal(recepient, value, token);
+    }
+
     function _buildLabels(uint256 tld, string memory label) private view returns (string[] memory) {
         string[] memory labels = new string[](2);
         labels[0] = label;
@@ -209,7 +274,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] memory keys,
         string[] memory values,
         bool withReverse
-    ) private {
+    ) private returns (uint256) {
         (uint256 tokenId, uint256 parentId) = _namehash(labels);
 
         // reverse record is limited for subdomains, it is possible to set a reverse record
@@ -232,6 +297,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
                 unsRegistry.mintWithRecords(to, labels, keys, values, withReverse);
             }
         }
+
+        return tokenId;
     }
 
     function _namehash(uint256 tokenId, string memory label) internal pure returns (uint256) {
@@ -359,6 +426,34 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             ptrdata := mload(add(ptr, index))
         }
         return uint8(ptrdata);
+    }
+
+    function _verifyPurchaseSignature(
+        address owner,
+        string[] calldata labels,
+        uint64 expiry,
+        uint256 price,
+        address token,
+        bytes memory signature
+    ) private view {
+        (uint256 tokenId, ) = _namehash(labels);
+        address signer = keccak256(abi.encodePacked(owner, tokenId, expiry, price, token)).toEthSignedMessageHash().recover(signature);
+
+        require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
+        require(expiry > block.timestamp, 'MintingManager: EXPIRED_SIGNATURE');
+    }
+
+    function _handlePurchase(
+        address owner,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        uint256 price,
+        address token
+    ) private {
+        uint256 tokenId = _issueWithRecords(owner, labels, keys, values, _msgSender() == owner);
+
+        emit DomainPurchase(tokenId, _msgSender(), owner, price, token);
     }
 
     // Reserved storage space to allow for layout changes in the future.

@@ -44,7 +44,7 @@ import '@openzeppelin/hardhat-upgrades';
 import '@openzeppelin/hardhat-defender';
 
 // There are no type declarations for
-require('solidity-coverage');
+import 'solidity-coverage';
 
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';

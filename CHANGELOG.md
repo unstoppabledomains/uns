@@ -1,3 +1,7 @@
+## v0.8.32
+
+- `MintingManager@0.4.17` receives support for on-chain purchases with native tokens and ERC20
+
 ## v0.8.31
 
 - Fix LegacyETHRegistrarController ABI

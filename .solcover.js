@@ -1,4 +1,5 @@
 module.exports = {
+  configureYulOptimizer: true,
   skipFiles: [
     'mocks/ERC721ReceiverMock.sol',
     'mocks/BaseForwarderMock.sol',
@@ -6,6 +7,8 @@ module.exports = {
     'mocks/MinterRoleMock.sol',
     'mocks/ERC1271Mock.sol',
     'mocks/ERC721Mock.sol',
+    'mocks/ERC20Mock.sol',
+    'mocks/ERC20UnsafeMock.sol',
     '@maticnetwork/pos-portal/DummyStateSender.sol',
     '@maticnetwork/pos-portal/MintableERC721Predicate.sol',
     '@maticnetwork/pos-portal/MockCheckpointManager.sol',

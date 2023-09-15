@@ -1,5 +1,6 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
+import { ERC20Mock, ERC20Mock__factory } from '../../types';
 import { MintingManager, UNSRegistry } from '../../types/contracts';
 import { MintingManagerForwarder } from '../../types/contracts/metatx';
 import { MintingManager__factory, UNSRegistry__factory } from '../../types/factories/contracts';
@@ -296,6 +297,106 @@ describe('MintingManager (consumption)', () => {
         await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId);
         await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId2);
       }
+      console.table(result);
+    });
+  });
+
+  describe('Purchases', () => {
+    let erc20Mock: ERC20Mock;
+
+    const buyDomain = async () => {
+      const latestBlock = await ethers.provider.getBlock('latest');
+      const expiry = latestBlock.timestamp + 24 * 60 * 60;
+      const price = ethers.utils.parseEther('1');
+
+      const labels = ['onchainpurchase-consumption', 'nft'];
+      const tokenId = await unsRegistry.namehash(labels);
+
+      const purchaseHash = ethers.utils.arrayify(
+        ethers.utils.solidityKeccak256(
+          ['address', 'uint256', 'uint64', 'uint256', 'address'],
+          [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+        ),
+      );
+      const signature = await coinbase.signMessage(purchaseHash);
+
+      const tx = await mintingManager.connect(spender).buy(
+        spender.address,
+        labels,
+        ['key'], ['value'],
+        expiry,
+        price,
+        signature,
+        { value: price },
+      );
+
+      return tx.wait();
+    };
+
+    const buyDomainForErc20 = async () => {
+      const latestBlock = await ethers.provider.getBlock('latest');
+      const expiry = latestBlock.timestamp + 24 * 60 * 60;
+      const price = ethers.utils.parseEther('1');
+
+      const labels = ['onchainpurchase-consumption-erc20', 'nft'];
+      const tokenId = await unsRegistry.namehash(labels);
+
+      const purchaseHash = ethers.utils.arrayify(
+        ethers.utils.solidityKeccak256(
+          ['address', 'uint256', 'uint64', 'uint256', 'address'],
+          [spender.address, tokenId, expiry, price, erc20Mock.address],
+        ),
+      );
+      const signature = await coinbase.signMessage(purchaseHash);
+
+      await erc20Mock.connect(spender).approve(mintingManager.address, price);
+
+      const tx = await mintingManager.connect(spender).buyForErc20(
+        spender.address,
+        labels,
+        ['key'], ['value'],
+        expiry,
+        erc20Mock.address,
+        price,
+        signature,
+      );
+
+      return tx.wait();
+    };
+
+    before(async () => {
+      erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
+
+      await erc20Mock.mint(spender.address, ethers.utils.parseEther('1'));
+    });
+
+    it('Consumption', async () => {
+      const result: unknown[] = [];
+
+      await mintingManager.connect(coinbase).issueWithRecords(
+        spender.address,
+        ['reverse', 'x'],
+        [], [],
+        true,
+      );
+
+      const buyDomainReceipt = await buyDomain();
+      const buyDomainErc20Receipt = await buyDomainForErc20();
+
+      result.push({
+        note: 'Domain Purchase (Native Tokens)',
+        selector: 'buy(address,string[],string[],string[],uint64,uint256,bytes)',
+        records: 1,
+        gasUsed: buyDomainReceipt.gasUsed.toString(),
+      });
+
+      result.push({
+        note: 'Domain Purchase (ERC20)',
+        selector: 'buy(address,string[],string[],string[],uint64,address,uint256,bytes)',
+        records: 1,
+        gasUsed: buyDomainErc20Receipt.gasUsed.toString(),
+      });
+
       console.table(result);
     });
   });
