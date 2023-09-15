@@ -151,6 +151,8 @@ export type { IERC1155Upgradeable } from "./@openzeppelin/contracts-upgradeable/
 export { IERC1155Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable__factory";
 export type { ERC1155PresetMinterPauserUpgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC1155/presets/ERC1155PresetMinterPauserUpgradeable";
 export { ERC1155PresetMinterPauserUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC1155/presets/ERC1155PresetMinterPauserUpgradeable__factory";
+export type { IERC20Upgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable";
+export { IERC20Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable__factory";
 export type { ERC721Upgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable";
 export { ERC721Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable__factory";
 export type { IERC721MetadataUpgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable";
@@ -175,6 +177,10 @@ export type { IERC1155 } from "./@openzeppelin/contracts/token/ERC1155/IERC1155"
 export { IERC1155__factory } from "./factories/@openzeppelin/contracts/token/ERC1155/IERC1155__factory";
 export type { IERC1155Receiver } from "./@openzeppelin/contracts/token/ERC1155/IERC1155Receiver";
 export { IERC1155Receiver__factory } from "./factories/@openzeppelin/contracts/token/ERC1155/IERC1155Receiver__factory";
+export type { ERC20 } from "./@openzeppelin/contracts/token/ERC20/ERC20";
+export { ERC20__factory } from "./factories/@openzeppelin/contracts/token/ERC20/ERC20__factory";
+export type { IERC20Metadata } from "./@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata";
+export { IERC20Metadata__factory } from "./factories/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata__factory";
 export type { IERC20 } from "./@openzeppelin/contracts/token/ERC20/IERC20";
 export { IERC20__factory } from "./factories/@openzeppelin/contracts/token/ERC20/IERC20__factory";
 export type { LegacyENS } from "./contracts/@ens/LegacyENSRegistry.sol/LegacyENS";
@@ -291,6 +297,10 @@ export type { BaseRoutingForwarderMock } from "./contracts/mocks/BaseRoutingForw
 export { BaseRoutingForwarderMock__factory } from "./factories/contracts/mocks/BaseRoutingForwarderMock__factory";
 export type { ERC1155Mock } from "./contracts/mocks/ERC1155Mock";
 export { ERC1155Mock__factory } from "./factories/contracts/mocks/ERC1155Mock__factory";
+export type { ERC20Mock } from "./contracts/mocks/ERC20Mock";
+export { ERC20Mock__factory } from "./factories/contracts/mocks/ERC20Mock__factory";
+export type { ERC20UnsafeMock } from "./contracts/mocks/ERC20UnsafeMock";
+export { ERC20UnsafeMock__factory } from "./factories/contracts/mocks/ERC20UnsafeMock__factory";
 export type { ERC2771ContextMock } from "./contracts/mocks/ERC2771ContextMock";
 export { ERC2771ContextMock__factory } from "./factories/contracts/mocks/ERC2771ContextMock__factory";
 export type { ERC2771RegistryContextMock } from "./contracts/mocks/ERC2771RegistryContextMock";

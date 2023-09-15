@@ -28,6 +28,7 @@ import '@nomiclabs/hardhat-etherscan';
 import 'hardhat-tracer';
 import '@openzeppelin/hardhat-upgrades';
 import '@openzeppelin/hardhat-defender';
+import 'solidity-coverage';
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
 import 'hardhat-abi-exporter';

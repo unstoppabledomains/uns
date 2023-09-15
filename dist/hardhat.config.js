@@ -25,7 +25,7 @@ require("@nomiclabs/hardhat-etherscan");
 require("hardhat-tracer");
 require("@openzeppelin/hardhat-upgrades");
 require("@openzeppelin/hardhat-defender");
-require('solidity-coverage');
+require("solidity-coverage");
 require("hardhat-gas-reporter");
 require("hardhat-contract-sizer");
 const yargs_1 = __importDefault(require("yargs/yargs"));

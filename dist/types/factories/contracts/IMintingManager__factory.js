@@ -32,6 +32,43 @@ const _abi = [
                 type: "uint256",
             },
             {
+                indexed: true,
+                internalType: "address",
+                name: "sender",
+                type: "address",
+            },
+            {
+                indexed: true,
+                internalType: "address",
+                name: "owner",
+                type: "address",
+            },
+            {
+                indexed: false,
+                internalType: "uint256",
+                name: "price",
+                type: "uint256",
+            },
+            {
+                indexed: false,
+                internalType: "address",
+                name: "token",
+                type: "address",
+            },
+        ],
+        name: "DomainPurchase",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            {
+                indexed: true,
+                internalType: "uint256",
+                name: "tokenId",
+                type: "uint256",
+            },
+            {
                 indexed: false,
                 internalType: "string",
                 name: "tld",
@@ -68,6 +105,31 @@ const _abi = [
         type: "event",
     },
     {
+        anonymous: false,
+        inputs: [
+            {
+                indexed: false,
+                internalType: "address",
+                name: "recepient",
+                type: "address",
+            },
+            {
+                indexed: false,
+                internalType: "uint256",
+                name: "value",
+                type: "uint256",
+            },
+            {
+                indexed: false,
+                internalType: "address",
+                name: "token",
+                type: "address",
+            },
+        ],
+        name: "Withdrawal",
+        type: "event",
+    },
+    {
         inputs: [
             {
                 internalType: "string",
@@ -76,6 +138,97 @@ const _abi = [
             },
         ],
         name: "addTld",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
+                name: "owner",
+                type: "address",
+            },
+            {
+                internalType: "string[]",
+                name: "labels",
+                type: "string[]",
+            },
+            {
+                internalType: "string[]",
+                name: "keys",
+                type: "string[]",
+            },
+            {
+                internalType: "string[]",
+                name: "values",
+                type: "string[]",
+            },
+            {
+                internalType: "uint64",
+                name: "expiry",
+                type: "uint64",
+            },
+            {
+                internalType: "uint256",
+                name: "price",
+                type: "uint256",
+            },
+            {
+                internalType: "bytes",
+                name: "signature",
+                type: "bytes",
+            },
+        ],
+        name: "buy",
+        outputs: [],
+        stateMutability: "payable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
+                name: "owner",
+                type: "address",
+            },
+            {
+                internalType: "string[]",
+                name: "labels",
+                type: "string[]",
+            },
+            {
+                internalType: "string[]",
+                name: "keys",
+                type: "string[]",
+            },
+            {
+                internalType: "string[]",
+                name: "values",
+                type: "string[]",
+            },
+            {
+                internalType: "uint64",
+                name: "expiry",
+                type: "uint64",
+            },
+            {
+                internalType: "address",
+                name: "token",
+                type: "address",
+            },
+            {
+                internalType: "uint256",
+                name: "price",
+                type: "uint256",
+            },
+            {
+                internalType: "bytes",
+                name: "signature",
+                type: "bytes",
+            },
+        ],
+        name: "buyForErc20",
         outputs: [],
         stateMutability: "nonpayable",
         type: "function",
@@ -209,6 +362,37 @@ const _abi = [
             },
         ],
         name: "setTokenURIPrefix",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
+                name: "recepient",
+                type: "address",
+            },
+        ],
+        name: "withdraw",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
+                name: "token",
+                type: "address",
+            },
+            {
+                internalType: "address",
+                name: "recepient",
+                type: "address",
+            },
+        ],
+        name: "withdraw",
         outputs: [],
         stateMutability: "nonpayable",
         type: "function",

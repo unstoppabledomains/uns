@@ -12,6 +12,8 @@ export interface MintingManagerInterface extends utils.Interface {
         "addMinters(address[])": FunctionFragment;
         "addProxyReaders(address[])": FunctionFragment;
         "addTld(string)": FunctionFragment;
+        "buy(address,string[],string[],string[],uint64,uint256,bytes)": FunctionFragment;
+        "buyForErc20(address,string[],string[],string[],uint64,address,uint256,bytes)": FunctionFragment;
         "claim(uint256,string)": FunctionFragment;
         "claimTo(address,uint256,string)": FunctionFragment;
         "claimToWithRecords(address,uint256,string,string[],string[])": FunctionFragment;
@@ -46,8 +48,10 @@ export interface MintingManagerInterface extends utils.Interface {
         "unpause()": FunctionFragment;
         "unsOperator()": FunctionFragment;
         "unsRegistry()": FunctionFragment;
+        "withdraw(address)": FunctionFragment;
+        "withdraw(address,address)": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
@@ -56,6 +60,25 @@ export interface MintingManagerInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "addMinters", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "addProxyReaders", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "buy", values: [
+        PromiseOrValue<string>,
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<BigNumberish>,
+        PromiseOrValue<BigNumberish>,
+        PromiseOrValue<BytesLike>
+    ]): string;
+    encodeFunctionData(functionFragment: "buyForErc20", values: [
+        PromiseOrValue<string>,
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<BigNumberish>,
+        PromiseOrValue<string>,
+        PromiseOrValue<BigNumberish>,
+        PromiseOrValue<BytesLike>
+    ]): string;
     encodeFunctionData(functionFragment: "claim", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "claimTo", values: [
         PromiseOrValue<string>,
@@ -113,6 +136,8 @@ export interface MintingManagerInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
     encodeFunctionData(functionFragment: "unsOperator", values?: undefined): string;
     encodeFunctionData(functionFragment: "unsRegistry", values?: undefined): string;
+    encodeFunctionData(functionFragment: "withdraw(address)", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "withdraw(address,address)", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
     decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "MINTER_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "NAME", data: BytesLike): Result;
@@ -121,6 +146,8 @@ export interface MintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "addMinters", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addProxyReaders", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addTld", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "buyForErc20", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimTo", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimToWithRecords", data: BytesLike): Result;
@@ -155,11 +182,14 @@ export interface MintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unsOperator", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unsRegistry", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "withdraw(address)", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "withdraw(address,address)", data: BytesLike): Result;
     events: {
         "AdminChanged(address,address)": EventFragment;
         "Blocked(uint256)": EventFragment;
         "BlocklistDisabled(address)": EventFragment;
         "BlocklistEnabled(address)": EventFragment;
+        "DomainPurchase(uint256,address,address,uint256,address)": EventFragment;
         "Initialized(uint8)": EventFragment;
         "NewTld(uint256,string)": EventFragment;
         "OwnershipTransferred(address,address)": EventFragment;
@@ -170,11 +200,13 @@ export interface MintingManagerInterface extends utils.Interface {
         "RoleRevoked(bytes32,address,address)": EventFragment;
         "Unpaused(address)": EventFragment;
         "Upgraded(address)": EventFragment;
+        "Withdrawal(address,uint256,address)": EventFragment;
     };
     getEvent(nameOrSignatureOrTopic: "AdminChanged"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "Blocked"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "BlocklistDisabled"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "BlocklistEnabled"): EventFragment;
+    getEvent(nameOrSignatureOrTopic: "DomainPurchase"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "NewTld"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
@@ -185,6 +217,7 @@ export interface MintingManagerInterface extends utils.Interface {
     getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
+    getEvent(nameOrSignatureOrTopic: "Withdrawal"): EventFragment;
 }
 export interface AdminChangedEventObject {
     previousAdmin: string;
@@ -214,6 +247,21 @@ export declare type BlocklistEnabledEvent = TypedEvent<[
     string
 ], BlocklistEnabledEventObject>;
 export declare type BlocklistEnabledEventFilter = TypedEventFilter<BlocklistEnabledEvent>;
+export interface DomainPurchaseEventObject {
+    tokenId: BigNumber;
+    sender: string;
+    owner: string;
+    price: BigNumber;
+    token: string;
+}
+export declare type DomainPurchaseEvent = TypedEvent<[
+    BigNumber,
+    string,
+    string,
+    BigNumber,
+    string
+], DomainPurchaseEventObject>;
+export declare type DomainPurchaseEventFilter = TypedEventFilter<DomainPurchaseEvent>;
 export interface InitializedEventObject {
     version: number;
 }
@@ -287,6 +335,17 @@ export interface UpgradedEventObject {
 }
 export declare type UpgradedEvent = TypedEvent<[string], UpgradedEventObject>;
 export declare type UpgradedEventFilter = TypedEventFilter<UpgradedEvent>;
+export interface WithdrawalEventObject {
+    recepient: string;
+    value: BigNumber;
+    token: string;
+}
+export declare type WithdrawalEvent = TypedEvent<[
+    string,
+    BigNumber,
+    string
+], WithdrawalEventObject>;
+export declare type WithdrawalEventFilter = TypedEventFilter<WithdrawalEvent>;
 export interface MintingManager extends BaseContract {
     connect(signerOrProvider: Signer | Provider | string): this;
     attach(addressOrName: string): this;
@@ -316,6 +375,12 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
@@ -394,6 +459,12 @@ export interface MintingManager extends BaseContract {
         }): Promise<ContractTransaction>;
         unsOperator(overrides?: CallOverrides): Promise<[string]>;
         unsRegistry(overrides?: CallOverrides): Promise<[string]>;
+        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
     };
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -409,6 +480,12 @@ export interface MintingManager extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
@@ -487,6 +564,12 @@ export interface MintingManager extends BaseContract {
     }): Promise<ContractTransaction>;
     unsOperator(overrides?: CallOverrides): Promise<string>;
     unsRegistry(overrides?: CallOverrides): Promise<string>;
+    "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     callStatic: {
         DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
         MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -496,6 +579,8 @@ export interface MintingManager extends BaseContract {
         addMinters(accounts: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         addTld(tld: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
+        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
+        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
@@ -530,6 +615,8 @@ export interface MintingManager extends BaseContract {
         unpause(overrides?: CallOverrides): Promise<void>;
         unsOperator(overrides?: CallOverrides): Promise<string>;
         unsRegistry(overrides?: CallOverrides): Promise<string>;
+        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
+        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
     };
     filters: {
         "AdminChanged(address,address)"(previousAdmin?: null, newAdmin?: null): AdminChangedEventFilter;
@@ -540,6 +627,8 @@ export interface MintingManager extends BaseContract {
         BlocklistDisabled(account?: null): BlocklistDisabledEventFilter;
         "BlocklistEnabled(address)"(account?: null): BlocklistEnabledEventFilter;
         BlocklistEnabled(account?: null): BlocklistEnabledEventFilter;
+        "DomainPurchase(uint256,address,address,uint256,address)"(tokenId?: PromiseOrValue<BigNumberish> | null, sender?: PromiseOrValue<string> | null, owner?: PromiseOrValue<string> | null, price?: null, token?: null): DomainPurchaseEventFilter;
+        DomainPurchase(tokenId?: PromiseOrValue<BigNumberish> | null, sender?: PromiseOrValue<string> | null, owner?: PromiseOrValue<string> | null, price?: null, token?: null): DomainPurchaseEventFilter;
         "Initialized(uint8)"(version?: null): InitializedEventFilter;
         Initialized(version?: null): InitializedEventFilter;
         "NewTld(uint256,string)"(tokenId?: PromiseOrValue<BigNumberish> | null, tld?: null): NewTldEventFilter;
@@ -560,6 +649,8 @@ export interface MintingManager extends BaseContract {
         Unpaused(account?: null): UnpausedEventFilter;
         "Upgraded(address)"(implementation?: PromiseOrValue<string> | null): UpgradedEventFilter;
         Upgraded(implementation?: PromiseOrValue<string> | null): UpgradedEventFilter;
+        "Withdrawal(address,uint256,address)"(recepient?: null, value?: null, token?: null): WithdrawalEventFilter;
+        Withdrawal(recepient?: null, value?: null, token?: null): WithdrawalEventFilter;
     };
     estimateGas: {
         DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
@@ -576,6 +667,12 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
@@ -654,6 +751,12 @@ export interface MintingManager extends BaseContract {
         }): Promise<BigNumber>;
         unsOperator(overrides?: CallOverrides): Promise<BigNumber>;
         unsRegistry(overrides?: CallOverrides): Promise<BigNumber>;
+        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
     };
     populateTransaction: {
         DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -670,6 +773,12 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
@@ -748,6 +857,12 @@ export interface MintingManager extends BaseContract {
         }): Promise<PopulatedTransaction>;
         unsOperator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         unsRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
     };
 }
 //# sourceMappingURL=MintingManager.d.ts.map

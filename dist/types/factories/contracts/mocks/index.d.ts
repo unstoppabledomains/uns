@@ -1,6 +1,8 @@
 export { BaseForwarderMock__factory } from "./BaseForwarderMock__factory";
 export { BaseRoutingForwarderMock__factory } from "./BaseRoutingForwarderMock__factory";
 export { ERC1155Mock__factory } from "./ERC1155Mock__factory";
+export { ERC20Mock__factory } from "./ERC20Mock__factory";
+export { ERC20UnsafeMock__factory } from "./ERC20UnsafeMock__factory";
 export { ERC2771ContextMock__factory } from "./ERC2771ContextMock__factory";
 export { ERC2771RegistryContextMock__factory } from "./ERC2771RegistryContextMock__factory";
 export { ERC721Mock__factory } from "./ERC721Mock__factory";
