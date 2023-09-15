@@ -677,14 +677,14 @@ describe('MintingManager', () => {
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
             ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+            [receiver.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
 
         await expect(
           mintingManager.connect(spender).buy(
-            spender.address,
+            receiver.address,
             labels,
             ['key'], ['value'],
             expiry,
@@ -692,12 +692,12 @@ describe('MintingManager', () => {
             signature,
             { value: price },
           ),
-        ).to.emit(mintingManager, 'DomainPurchase').withArgs(tokenId, price, ZERO_ADDRESS);
+        ).to.emit(mintingManager, 'DomainPurchase')
+          .withArgs(tokenId, spender.address, receiver.address, price, ZERO_ADDRESS);
 
-        expect(await unsRegistry.ownerOf(tokenId)).to.equal(spender.address);
-
+        expect(await unsRegistry.ownerOf(tokenId)).to.equal(receiver.address);
         expect(await unsRegistry.get('key', tokenId)).to.equal('value');
-        expect(await unsRegistry.reverseOf(spender.address)).to.equal(tokenId);
+        expect(await unsRegistry.reverseOf(receiver.address)).to.equal(0);
 
         expect(await ethers.provider.getBalance(mintingManager.address)).to.equal(price);
       });
@@ -777,6 +777,36 @@ describe('MintingManager', () => {
 
         expect(await unsRegistry.ownerOf(tokenId)).to.equal(spender.address);
         expect(await unsRegistry.reverseOf(spender.address)).to.equal(reverseTokenId);
+        expect(await ethers.provider.getBalance(mintingManager.address)).to.equal(price);
+      });
+
+      it('does not set reverse resolution if sender is not owner', async () => {
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
+        const price = ethers.utils.parseEther('1');
+
+        const labels = ['test-onchain-purchase-reverse-not-owner', 'wallet'];
+        const tokenId = await unsRegistry.namehash(labels);
+
+        const purchaseHash = ethers.utils.arrayify(
+          ethers.utils.solidityKeccak256(
+            ['address', 'uint256', 'uint64', 'uint256', 'address'],
+            [receiver.address, tokenId, expiry, price, ZERO_ADDRESS],
+          ),
+        );
+        const signature = await coinbase.signMessage(purchaseHash);
+
+        await mintingManager.connect(spender).buy(
+          receiver.address,
+          labels,
+          [], [],
+          expiry,
+          price,
+          signature,
+          { value: price },
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.equal(receiver.address);
+        expect(await unsRegistry.reverseOf(spender.address)).to.equal(0);
         expect(await ethers.provider.getBalance(mintingManager.address)).to.equal(price);
       });
 
@@ -1106,7 +1136,7 @@ describe('MintingManager', () => {
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
             ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20Mock.address],
+            [receiver.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1115,7 +1145,7 @@ describe('MintingManager', () => {
 
         await expect(
           mintingManager.connect(spender).buyForErc20(
-            spender.address,
+            receiver.address,
             labels,
             ['key'], ['value'],
             expiry,
@@ -1123,11 +1153,12 @@ describe('MintingManager', () => {
             price,
             signature,
           ),
-        ).to.emit(mintingManager, 'DomainPurchase').withArgs(tokenId, price, erc20Mock.address);
+        ).to.emit(mintingManager, 'DomainPurchase')
+          .withArgs(tokenId, spender.address, receiver.address, price, erc20Mock.address);
 
-        expect(await unsRegistry.ownerOf(tokenId)).to.equal(spender.address);
+        expect(await unsRegistry.ownerOf(tokenId)).to.equal(receiver.address);
         expect(await unsRegistry.get('key', tokenId)).to.equal('value');
-        expect(await unsRegistry.reverseOf(spender.address)).to.equal(tokenId);
+        expect(await unsRegistry.reverseOf(receiver.address)).to.equal(0);
 
         expect(await erc20Mock.balanceOf(mintingManager.address)).to.equal(price);
       });
@@ -1213,6 +1244,38 @@ describe('MintingManager', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.equal(spender.address);
         expect(await unsRegistry.reverseOf(spender.address)).to.equal(reverseTokenId);
 
+        expect(await erc20Mock.balanceOf(mintingManager.address)).to.equal(price);
+      });
+
+      it('does not set reverse resolution if sender is not owner', async () => {
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
+        const price = ethers.utils.parseEther('5');
+
+        const labels = ['erc20-onchain-purchase-reverse-not-owner', 'wallet'];
+        const tokenId = await unsRegistry.namehash(labels);
+
+        const purchaseHash = ethers.utils.arrayify(
+          ethers.utils.solidityKeccak256(
+            ['address', 'uint256', 'uint64', 'uint256', 'address'],
+            [receiver.address, tokenId, expiry, price, erc20Mock.address],
+          ),
+        );
+        const signature = await coinbase.signMessage(purchaseHash);
+
+        await erc20Mock.connect(spender).approve(mintingManager.address, price);
+
+        await mintingManager.connect(spender).buyForErc20(
+          receiver.address,
+          labels,
+          [], [],
+          expiry,
+          erc20Mock.address,
+          price,
+          signature,
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.equal(receiver.address);
+        expect(await unsRegistry.reverseOf(spender.address)).to.equal(0);
         expect(await erc20Mock.balanceOf(mintingManager.address)).to.equal(price);
       });
 
@@ -2014,10 +2077,18 @@ describe('MintingManager', () => {
 
         const initialBalance = await receiver.getBalance();
 
-        await mintingManager.connect(coinbase)['withdraw(address)'](receiver.address);
+        await expect(
+          mintingManager.connect(coinbase)['withdraw(address)'](receiver.address),
+        ).to.emit(mintingManager, 'Withdrawal').withArgs(receiver.address, price, ZERO_ADDRESS);
 
         expect(await receiver.getBalance()).to.equal(initialBalance.add(price));
         expect(await ethers.provider.getBalance(mintingManager.address)).to.equal(BigNumber.from(0));
+      });
+
+      it('rejects if not owner', async () => {
+        await expect(
+          mintingManager.connect(receiver)['withdraw(address)'](ZERO_ADDRESS),
+        ).to.be.reverted;
       });
 
       it('rejects if not owner', async () => {
@@ -2041,7 +2112,12 @@ describe('MintingManager', () => {
         const value = ethers.utils.parseEther('5');
         await erc20Mock.mint(mintingManager.address, value);
 
-        await mintingManager.connect(coinbase)['withdraw(address,address)'](erc20Mock.address, receiver.address);
+        await expect(
+          mintingManager.connect(coinbase)['withdraw(address,address)'](
+            erc20Mock.address,
+            receiver.address,
+          ),
+        ).to.emit(mintingManager, 'Withdrawal').withArgs(receiver.address, value, erc20Mock.address);
 
         expect(await erc20Mock.balanceOf(receiver.address)).to.equal(value);
       });

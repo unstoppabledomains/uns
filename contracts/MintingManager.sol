@@ -3,6 +3,8 @@
 
 pragma solidity ^0.8.0;
 
+import '@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 import './cns/IResolver.sol';
 import './cns/IMintingController.sol';
 import './cns/IURIPrefixController.sol';
@@ -13,8 +15,6 @@ import './roles/MinterRole.sol';
 import './utils/Blocklist.sol';
 import './utils/Pausable.sol';
 import './utils/Strings.sol';
-import '@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 
 /**
  * @title MintingManager
@@ -184,14 +184,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     ) external payable onlyAllowed(labels) whenNotPaused {
         require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
 
-        (uint256 tokenId, ) = _namehash(labels);
-
-        _verifyPurchaseSignature(owner, tokenId, expiry, price, address(0), signature);
+        _verifyPurchaseSignature(owner, labels, expiry, price, address(0), signature);
         require(msg.value >= price, 'MintingManager: NOT_ENOUGH_FUNDS');
 
-        _issueWithRecords(owner, labels, keys, values, true);
-
-        emit DomainPurchase(tokenId, price, address(0));
+        _handlePurchase(owner, labels, keys, values, price, address(0));
 
         if (msg.value > price) {
             payable(_msgSender()).transfer(msg.value - price);
@@ -213,15 +209,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     ) external onlyAllowed(labels) whenNotPaused {
         require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
 
-        (uint256 tokenId, ) = _namehash(labels);
-
-        _verifyPurchaseSignature(owner, tokenId, expiry, price, token, signature);
-
+        _verifyPurchaseSignature(owner, labels, expiry, price, token, signature);
         require(IERC20Upgradeable(token).transferFrom(_msgSender(), address(this), price), 'ERC20: LOW_LEVEL_FAIL');
 
-        _issueWithRecords(owner, labels, keys, values, true);
-
-        emit DomainPurchase(tokenId, price, token);
+        _handlePurchase(owner, labels, keys, values, price, token);
     }
 
     function setTokenURIPrefix(string calldata prefix) external override onlyOwner {
@@ -254,11 +245,20 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     }
 
     function withdraw(address recepient) external onlyOwner {
-        payable(recepient).transfer(address(this).balance);
+        require(recepient != address(0));
+
+        uint256 value = address(this).balance;
+        payable(recepient).transfer(value);
+
+        emit Withdrawal(recepient, value, address(0));
     }
 
     function withdraw(address token, address recepient) external onlyOwner {
-        require(IERC20Upgradeable(token).transfer(recepient, IERC20Upgradeable(token).balanceOf(address(this))), 'ERC20: LOW_LEVEL_FAIL');
+        uint256 value = IERC20Upgradeable(token).balanceOf(address(this));
+
+        require(IERC20Upgradeable(token).transfer(recepient, value), 'ERC20: LOW_LEVEL_FAIL');
+
+        emit Withdrawal(recepient, value, token);
     }
 
     function _buildLabels(uint256 tld, string memory label) private view returns (string[] memory) {
@@ -274,7 +274,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] memory keys,
         string[] memory values,
         bool withReverse
-    ) private {
+    ) private returns (uint256) {
         (uint256 tokenId, uint256 parentId) = _namehash(labels);
 
         // reverse record is limited for subdomains, it is possible to set a reverse record
@@ -297,6 +297,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
                 unsRegistry.mintWithRecords(to, labels, keys, values, withReverse);
             }
         }
+
+        return tokenId;
     }
 
     function _namehash(uint256 tokenId, string memory label) internal pure returns (uint256) {
@@ -428,16 +430,30 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function _verifyPurchaseSignature(
         address owner,
-        uint256 tokenId,
+        string[] calldata labels,
         uint64 expiry,
         uint256 price,
         address token,
         bytes memory signature
-    ) internal view {
+    ) private view {
+        (uint256 tokenId, ) = _namehash(labels);
         address signer = keccak256(abi.encodePacked(owner, tokenId, expiry, price, token)).toEthSignedMessageHash().recover(signature);
 
         require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
         require(expiry > block.timestamp, 'MintingManager: EXPIRED_SIGNATURE');
+    }
+
+    function _handlePurchase(
+        address owner,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        uint256 price,
+        address token
+    ) private {
+        uint256 tokenId = _issueWithRecords(owner, labels, keys, values, _msgSender() == owner);
+
+        emit DomainPurchase(tokenId, _msgSender(), owner, price, token);
     }
 
     // Reserved storage space to allow for layout changes in the future.

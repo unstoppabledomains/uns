@@ -8,6 +8,7 @@ import {
   UNSRegistry__factory,
 } from '../types/factories/contracts';
 import { MintingManagerForwarder__factory } from '../types/factories/contracts/metatx';
+import { ERC20Mock, ERC20Mock__factory } from '../types';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 import { ZERO_ADDRESS } from './helpers/constants';
 
@@ -67,6 +68,39 @@ describe('MintingManager (metatx)', () => {
     );
 
     await forwarder.execute(req, signature);
+
+    expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+  });
+
+  it('should be able to buy domain with ERC20 tokens', async () => {
+    const latestBlock = await ethers.provider.getBlock('latest');
+    const expiry = latestBlock.timestamp + 24 * 60 * 60;
+    const price = ethers.utils.parseEther('5');
+
+    const erc20Mock: ERC20Mock = await new ERC20Mock__factory(coinbase).deploy();
+    await erc20Mock.mint(receiver.address, price);
+
+    const labels = ['test-erc20-onchain-purchase-metatx', 'wallet'];
+    const tokenId = await unsRegistry.namehash(labels);
+
+    await erc20Mock.connect(receiver).approve(mintingManager.address, price);
+
+    const purchaseHash = ethers.utils.arrayify(
+      ethers.utils.solidityKeccak256(
+        ['address', 'uint256', 'uint64', 'uint256', 'address'],
+        [receiver.address, tokenId, expiry, price, erc20Mock.address],
+      ),
+    );
+    const signature = await coinbase.signMessage(purchaseHash);
+
+    const metaTxParams = await buildExecuteParams(
+      'buyForErc20(address,string[],string[],string[],uint64,address,uint256,bytes)',
+      [receiver.address, labels, [], [], expiry, erc20Mock.address, price, signature],
+      receiver,
+      tokenId,
+    );
+
+    await forwarder.execute(metaTxParams.req, metaTxParams.signature);
 
     expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
   });

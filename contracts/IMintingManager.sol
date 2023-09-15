@@ -9,7 +9,8 @@ interface IMintingManager is IERC1967 {
     event NewTld(uint256 indexed tokenId, string tld);
     event RemoveTld(uint256 indexed tokenId);
 
-    event DomainPurchase(uint256 indexed tokenId, uint256 price, address token);
+    event DomainPurchase(uint256 indexed tokenId, address indexed sender, address indexed owner, uint256 price, address token);
+    event Withdrawal(address recepient, uint256 value, address token);
 
     /**
      * @dev Adds new TLD
