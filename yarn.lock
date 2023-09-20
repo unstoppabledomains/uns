@@ -3534,6 +3534,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bip44-constants@npm:^243.0.0":
+  version: 243.0.0
+  resolution: "bip44-constants@npm:243.0.0"
+  checksum: cdf2360eab836aef4a71f6ed76539218e8c761a9bdee532e49f5b690646a259c68136c6779d89eb4819ed7b0572a13cbc60d5d32347c27d99fbff27ba109dba3
+  languageName: node
+  linkType: hard
+
 "blakejs@npm:^1.1.0":
   version: 1.1.0
   resolution: "blakejs@npm:1.1.0"
@@ -14275,6 +14282,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.42.0
     "@typescript-eslint/parser": ^5.42.0
     bip39: ^3.0.0
+    bip44-constants: ^243.0.0
     chai: ^4.3.6
     csv-parse: ^5.4.0
     debug: ^4.3.1

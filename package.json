@@ -96,6 +96,7 @@
   },
   "dependencies": {
     "bip39": "^3.0.0",
+    "bip44-constants": "^243.0.0",
     "ganache": "^7.4.0",
     "web3": "^1.7.4"
   },
