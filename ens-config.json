@@ -33,6 +33,9 @@
                 },
                 "PublicResolver": {
                     "address": "0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63",
+                    "legacyAddresses": [
+                        "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41"
+                    ],
                     "deploymentBlock": "0x10243b3"
                 },
                 "ProxyAdmin": {
@@ -87,6 +90,9 @@
                 },
                 "PublicResolver": {
                     "address": "0xd7a4F6473f32aC2Af804B3686AE8F1932bC35750",
+                    "legacyAddresses": [
+                        "0x342cf18D3e41DE491aa1a3067574C849AdA6a2Ad"
+                    ],
                     "deploymentBlock": "0x83fa9e"
                 },
                 "ProxyAdmin": {
@@ -148,18 +154,22 @@
                     "deploymentBlock": "0x36"
                 },
                 "ENSCustody": {
-                    "address": "0xf7313E5a57432B8A90233F7158D6dDE03572Dd9f",
-                    "deploymentBlock": "0x3f",
-                    "implementation": "0x38b83990077ac5DA78Aa9e72f5747D3A0b2374D9",
-                    "forwarder": "0xf7313E5a57432B8A90233F7158D6dDE03572Dd9f"
+                    "address": "0xDa429c9136b95E18c6396c7B18f85ACcc8575164",
+                    "deploymentBlock": "0x40",
+                    "implementation": "0xf7313E5a57432B8A90233F7158D6dDE03572Dd9f",
+                    "forwarder": "0xDa429c9136b95E18c6396c7B18f85ACcc8575164"
                 },
                 "LegacyENSRegistry": {
-                    "address": "0xB17aAe5B3A7815433fC82Cfd67Ea245767894f03",
-                    "deploymentBlock": "0x3c"
+                    "address": "0x653F5A2aF800684EcF2aAeAcE8dBE86afEaaEBC0",
+                    "deploymentBlock": "0x3d"
                 },
                 "LegacyETHRegistrarController": {
                     "address": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
                     "deploymentBlock": "0x32"
+                },
+                "LegacyPublicResolver": {
+                    "address": "0x4fbf7B2f171336958BE5D15FF762a5CfF5363568",
+                    "deploymentBlock": "0x3b"
                 }
             }
         }

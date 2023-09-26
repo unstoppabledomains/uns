@@ -199,6 +199,7 @@ export class Deployer {
     contract: Contract,
     implAddress?: string,
     forwarder?: Contract,
+    legacyAddress?: string,
   ): Promise<void> {
     const config = this.getDeployConfig();
 
@@ -209,6 +210,7 @@ export class Deployer {
           implementation: implAddress,
           transaction: contract.deployTransaction && (await contract.deployTransaction.wait()),
           forwarder: forwarder && forwarder.address,
+          legacyAddresses: legacyAddress? [legacyAddress]:[],
         },
       },
     });
