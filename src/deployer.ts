@@ -176,6 +176,7 @@ export class Deployer {
         implementation: value.implementation,
         deploymentBlock: value.transaction && ethers.BigNumber.from(value.transaction.blockNumber).toHexString(),
         forwarder: value.forwarder,
+        legacyAddresses: value.legacyAddresses,
       };
     }
 
@@ -214,6 +215,7 @@ export class Deployer {
         },
       },
     });
+    console.log('_config'+name, _config);
 
     this._saveConfig(_config);
   }
