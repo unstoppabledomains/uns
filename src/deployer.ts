@@ -215,7 +215,6 @@ export class Deployer {
         },
       },
     });
-    console.log('_config'+name, _config);
 
     this._saveConfig(_config);
   }
