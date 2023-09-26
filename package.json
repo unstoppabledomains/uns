@@ -95,6 +95,7 @@
     "yargs": "^17.6.0"
   },
   "dependencies": {
+    "@ensdomains/address-encoder": "^0.2.22",
     "bip39": "^3.0.0",
     "bip44-constants": "^243.0.0",
     "ganache": "^7.4.0",

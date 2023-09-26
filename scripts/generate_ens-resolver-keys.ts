@@ -11,6 +11,7 @@
 import * as fs from 'fs';
 import { exec } from 'child_process';
 import bip44Constants from 'bip44-constants';
+import { formatsByName } from '@ensdomains/address-encoder';
 import UnsResolverKeysJson from '../resolver-keys.json';
 
 type EnsResolverKey = {
@@ -24,19 +25,21 @@ type EnsResolverKeyMap = {
   [key: string]: EnsResolverKey;
 };
 
+const DEFAULT_VALIDATION_REGEX_STRING = '^(.+){1,1024}$';
+
 // Reference: https://docs.ens.domains/contract-api-reference/publicresolver#get-contract-abi
 const knownPublicResolverRecordKeys: EnsResolverKeyMap = {
   'pubkey.x': {
     unsKey: null,
     symbol: null,
     label: 'Public Key X',
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
   'pubkey.y': {
     unsKey: null,
     symbol: null,
     label: 'Public Key Y',
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
   'abi.json': {
     unsKey: null,
@@ -52,19 +55,19 @@ const knownTextRecordKeys: EnsResolverKeyMap = {
     unsKey: 'social.picture.value',
     symbol: null,
     label: 'Avatar',
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
   'text.description': {
     unsKey: null,
     symbol: null,
     label: 'Description',
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
   'text.display': {
     unsKey: null,
     symbol: null,
     label: 'Display Name',
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
   'text.email': {
     unsKey: 'whois.email.value',
@@ -76,89 +79,99 @@ const knownTextRecordKeys: EnsResolverKeyMap = {
     unsKey: null,
     symbol: null,
     label: 'Keywords',
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
   'text.mail': {
     unsKey: null,
     symbol: null,
     label: 'Mailing Address',
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
   'text.notice': {
     unsKey: null,
     symbol: null,
     label: 'Notice',
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
   'text.location': {
     unsKey: null,
     symbol: null,
     label: 'Location',
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
   'text.phone': {
     unsKey: null,
     symbol: null,
     label: 'Phone Number',
-    validationRegex: null,
+    validationRegex: '^[+]?[(]?[0-9]{3}[)]?[-s.]?[0-9]{3}[-s.]?[0-9]{4,6}$',
   },
   'text.url': {
     unsKey: null,
     symbol: null,
     label: 'Website URL',
-    validationRegex: null,
+    validationRegex:
+      '^(http(s)?|ipfs)://(www.)?[a-zA-Z0-9_]+([-.]{1}[a-zA-Z0-9_]+)*.[a-zA-Z0-9_]+(:[0-9]{1,5})?(/.*)?$',
   },
   'text.com.github': {
     unsKey: null,
     symbol: null,
     label: 'GitHub Username',
-    validationRegex: null,
+    validationRegex: '^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$',
   },
   'text.com.peepeth': {
     unsKey: null,
     symbol: null,
     label: 'Peepeth Username',
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
   'text.com.linkedin': {
     unsKey: null,
     symbol: null,
     label: 'LinkedIn Username',
-    validationRegex: null,
+    validationRegex: '^(http(s)?://)?([a-zA-Z0-9_]+.)?linkedin.com/(pub|in|profile)/([-a-zA-Z0-9]+)/*',
   },
   'text.com.twitter': {
     unsKey: 'social.twitter.username',
     symbol: null,
     label: 'Twitter Username',
-    validationRegex: null,
+    validationRegex: '^(?:https?://)?(?:www.)?(?:twitter.com/)?(?:#!/)?@?([a-zA-_Z0-9]+)(?:/.*)?$',
   },
   'text.io.keybase': {
     unsKey: null,
     symbol: null,
     label: 'Keybase Username',
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
   'text.org.telegram': {
     unsKey: null,
     symbol: null,
     label: 'Telegram Username',
-    validationRegex: null,
+    validationRegex: '/([a-zA-Z0-9_]{5,}$)/',
+  },
+  'text.eth.ens.delegate': {
+    unsKey: null,
+    symbol: null,
+    label: 'ETH ENS Delegate',
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   },
 };
 
 // Reference: https://github.com/ensdomains/content-hash/blob/master/src/profiles.ts#L165
+// https://github.com/ensdomains/ens-app-v3/blob/main/src/constants/supportedContentHashKeys.json
+// ENS APP content hash validation:
+// https://github.com/ensdomains/ens-app-v3/blob/07f8f25c582355d95526de62bc6b31be99eec742/src/utils/contenthash.ts#L169
 const knownEnsContentHashRecordKeys: EnsResolverKeyMap = {
   'contenthash.skynet': {
     unsKey: null,
     symbol: null,
     label: 'Skynet Content Hash',
-    validationRegex: null,
+    validationRegex: '^.{46}$',
   },
   'contenthash.swarm': {
     unsKey: null,
     symbol: null,
     label: 'Swarm Content Hash',
-    validationRegex: null,
+    validationRegex: '^.{4,}$',
   },
   'contenthash.ipfs': {
     unsKey: 'dweb.ipfs.hash',
@@ -171,45 +184,48 @@ const knownEnsContentHashRecordKeys: EnsResolverKeyMap = {
     unsKey: null,
     symbol: null,
     label: 'IPNS Content Hash',
-    validationRegex: null,
+    validationRegex: '^[a-zA-Z0-9]+$',
   },
   'contenthash.arweave': {
     unsKey: null,
     symbol: null,
     label: 'Arweave Content Hash',
-    validationRegex: null,
+    validationRegex: '^.{43}$',
   },
-  'contenthash.default': {
+  'contenthash.onion': {
     unsKey: null,
     symbol: null,
-    label: 'Default Content Hash',
-    validationRegex: null,
+    label: 'Onion Content Hash',
+    validationRegex: '^(.{16}|.{56})$',
   },
 };
 
-const BIP44_COIN_TYPE_OFF_SET = 2147483648;
 const unsSingleChainTokenFormat = (symbol: string) => `crypto.${symbol}.address`;
 const unsMultiChainERC20TokenFormat = (symbol: string) => `crypto.${symbol}.version.ERC20.address`;
 
+// Reference: https://github.com/ensdomains/ens-app-v3/blob/main/src/constants/coinList.ts
+const ensAppSupportedCoinListKeys = Object.keys(formatsByName).filter((c) => !c.match(/_LEGACY/));
 const unsKeysObj = UnsResolverKeysJson.keys;
 
-const ensCoinKeys: EnsResolverKeyMap = {};
+const bip44CoinNameMap: Record<string, string> = bip44Constants.reduce((map, [_, coinSymbol, coinName]) => {
+  map[coinSymbol] = coinName;
+  return map;
+}, {});
 
-// Map BIP-0044 coins with UNS resolver keys tokens
-bip44Constants.forEach((row) => {
-  const constant = row[0];
-  const coinSymbol = row[1];
-  const coinName = row[2];
-
-  const coinType = constant - BIP44_COIN_TYPE_OFF_SET;
+// Map ENS supported coins with UNS resolver keys tokens
+// For now, the ens-resolver-keys.json is only being used on the website frontend,
+// so we just need the same known coin list from ENS.
+const ensCoinKeys: EnsResolverKeyMap = ensAppSupportedCoinListKeys.reduce((map, coinSymbol) => {
+  const coinName = bip44CoinNameMap[coinSymbol];
+  const { coinType } = formatsByName[coinSymbol];
 
   const key = `addr.${coinType}`;
 
-  ensCoinKeys[key] = {
+  map[key] = {
     unsKey: null,
     symbol: coinSymbol,
     label: coinName,
-    validationRegex: null,
+    validationRegex: DEFAULT_VALIDATION_REGEX_STRING,
   };
 
   const unsSingleChainKey = unsSingleChainTokenFormat(coinSymbol);
@@ -217,16 +233,18 @@ bip44Constants.forEach((row) => {
 
   // Map single chain coins
   if (unsKeysObj[unsSingleChainKey]) {
-    ensCoinKeys[key].unsKey = unsSingleChainKey;
-    ensCoinKeys[key].validationRegex = unsKeysObj[unsSingleChainKey].validationRegex || null;
+    map[key].unsKey = unsSingleChainKey;
+    map[key].validationRegex = unsKeysObj[unsSingleChainKey].validationRegex || null;
   }
   // Map multi chain coins
   // We only map ERC20 tokens in the UNS resolver keys
   else if (unsKeysObj[unsMultiChainKey]) {
-    ensCoinKeys[key].unsKey = unsMultiChainKey;
-    ensCoinKeys[key].validationRegex = unsKeysObj[unsMultiChainKey].validationRegex || null;
+    map[key].unsKey = unsMultiChainKey;
+    map[key].validationRegex = unsKeysObj[unsMultiChainKey].validationRegex || null;
   }
-});
+
+  return map;
+}, {} as EnsResolverKeyMap);
 
 const resultKeys: EnsResolverKeyMap = {
   ...ensCoinKeys,
@@ -238,7 +256,7 @@ const resultKeys: EnsResolverKeyMap = {
 const resultTemplate = (keys: object) => ({
   version: '0.0.1',
   information: {
-    description: 'All ENS resolver keys supported by Unstoppable Domains with a defined meaning and related metadata',
+    description: 'All common ENS resolver keys with a defined meaning and related metadata',
     documentation: 'https://docs.unstoppabledomains.com/resolution/guides/records-reference',
     contribution: 'https://github.com/unstoppabledomains/uns/blob/main/ens-resolver-keys.json',
   },
