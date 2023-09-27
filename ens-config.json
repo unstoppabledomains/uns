@@ -180,10 +180,6 @@
                     "address": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
                     "deploymentBlock": "0x32",
                     "legacyAddresses": []
-                },
-                "LegacyPublicResolver": {
-                    "address": "0x4fbf7B2f171336958BE5D15FF762a5CfF5363568",
-                    "deploymentBlock": "0x3b"
                 }
             }
         }
