@@ -898,15 +898,13 @@ const deployENSTask = {
     const resolver = await ctx.artifacts[ArtifactName.PublicResolver]
       .connect(owner)
       .deploy(ens.address, nameWrapper.address, controller.address, reverseRegistrar.address);
+    await ctx.saveContractConfig(EnsContractName.PublicResolver, resolver);
     const legacyResolver = await ctx.artifacts[ArtifactName.PublicResolver]
       .connect(owner)
       .deploy(ens.address, nameWrapper.address, controller.address, reverseRegistrar.address);
-    await ctx.saveContractConfig(
+    await ctx.saveContractLegacyAddresses(
       EnsContractName.PublicResolver,
-      resolver,
-      undefined,
-      undefined,
-      legacyResolver.address,
+      [legacyResolver.address],
     );
     await reverseRegistrar.setDefaultResolver(resolver.address);
     const legacyEnsRegistry = await ctx.artifacts[ArtifactName.LegacyENSRegistry].connect(owner).deploy();
