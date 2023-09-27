@@ -176,6 +176,7 @@ export class Deployer {
         implementation: value.implementation,
         deploymentBlock: value.transaction && ethers.BigNumber.from(value.transaction.blockNumber).toHexString(),
         forwarder: value.forwarder,
+        legacyAddresses: value.legacyAddresses,
       };
     }
 
@@ -209,6 +210,23 @@ export class Deployer {
           implementation: implAddress,
           transaction: contract.deployTransaction && (await contract.deployTransaction.wait()),
           forwarder: forwarder && forwarder.address,
+        },
+      },
+    });
+
+    this._saveConfig(_config);
+  }
+
+  async saveContractLegacyAddresses (
+    name: ContractName,
+    legacyAddresses: string[] = [],
+  ): Promise<void> {
+    const config = this.getDeployConfig();
+
+    const _config = merge(config, {
+      contracts: {
+        [name]: {
+          legacyAddresses,
         },
       },
     });

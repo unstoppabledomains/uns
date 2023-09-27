@@ -1,3 +1,7 @@
+## v0.8.33
+
+- Added legacy public resolver addresses to ens config
+
 ## v0.8.32
 
 - `MintingManager@0.4.17` receives support for on-chain purchases with native tokens and ERC20
