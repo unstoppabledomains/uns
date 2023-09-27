@@ -1,0 +1,915 @@
+{
+  "version": "0.0.1",
+  "information": {
+    "description": "All common ENS resolver keys with a defined meaning and related metadata",
+    "documentation": "https://docs.unstoppabledomains.com/resolution/guides/records-reference",
+    "contribution": "https://github.com/unstoppabledomains/uns/blob/main/ens-resolver-keys.json"
+  },
+  "keys": {
+    "addr.0": {
+      "unsKey": "crypto.BTC.address",
+      "symbol": "BTC",
+      "label": "Bitcoin",
+      "validationRegex": "^bc1[ac-hj-np-z02-9]{6,87}$|^[13][a-km-zA-HJ-NP-Z1-9]{25,39}$"
+    },
+    "addr.2": {
+      "unsKey": "crypto.LTC.address",
+      "symbol": "LTC",
+      "label": "Litecoin",
+      "validationRegex": "^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$|^ltc1[a-zA-HJ-NP-Z0-9]{25,39}$"
+    },
+    "addr.3": {
+      "unsKey": "crypto.DOGE.address",
+      "symbol": "DOGE",
+      "label": "Dogecoin",
+      "validationRegex": "^D[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32}$"
+    },
+    "addr.4": {
+      "unsKey": null,
+      "symbol": "RDD",
+      "label": "Reddcoin",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.5": {
+      "unsKey": "crypto.DASH.address",
+      "symbol": "DASH",
+      "label": "Dash",
+      "validationRegex": "^X[1-9A-HJ-NP-Za-km-z]{33}$"
+    },
+    "addr.6": {
+      "unsKey": null,
+      "symbol": "PPC",
+      "label": "Peercoin",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.7": {
+      "unsKey": null,
+      "symbol": "NMC",
+      "label": "Namecoin",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.14": {
+      "unsKey": null,
+      "symbol": "VIA",
+      "label": "Viacoin",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.17": {
+      "unsKey": "crypto.GRS.address",
+      "symbol": "GRS",
+      "label": "Groestlcoin",
+      "validationRegex": "^[a-zA-Z0-9]{34}$"
+    },
+    "addr.20": {
+      "unsKey": "crypto.DGB.address",
+      "symbol": "DGB",
+      "label": "DigiByte",
+      "validationRegex": "(^[a-km-zA-HJ-NP-Z1-9]{34}$)|(^[a-zA-Z1-9]{42}$)|(^dgb1[a-zA-Z0-9]{39}$)"
+    },
+    "addr.22": {
+      "unsKey": "crypto.MONA.address",
+      "symbol": "MONA",
+      "label": "Monacoin",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.42": {
+      "unsKey": "crypto.DCR.address",
+      "symbol": "DCR",
+      "label": "Decred",
+      "validationRegex": "^D[a-zA-Z0-9]*$"
+    },
+    "addr.43": {
+      "unsKey": "crypto.XEM.address",
+      "symbol": "XEM",
+      "label": "NEM",
+      "validationRegex": "^N[ABCDEFGHIJKLMNOPQRSTUVWXYZ234567]{39}$"
+    },
+    "addr.55": {
+      "unsKey": null,
+      "symbol": "AIB",
+      "label": "AIB",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.57": {
+      "unsKey": null,
+      "symbol": "SYS",
+      "label": "Syscoin",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.60": {
+      "unsKey": "crypto.ETH.address",
+      "symbol": "ETH",
+      "label": "Ether",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "addr.74": {
+      "unsKey": "crypto.ICX.address",
+      "symbol": "ICX",
+      "label": "ICON",
+      "validationRegex": "^[a-km-zA-HJ-NP-Z0-9]{42}$"
+    },
+    "addr.77": {
+      "unsKey": "crypto.XVG.address",
+      "symbol": "XVG",
+      "label": "Verge Currency",
+      "validationRegex": "^[a-zA-Z0-9]{34}$|^[1-9A-HJ-NP-Za-km-z]{95}$"
+    },
+    "addr.105": {
+      "unsKey": "crypto.STRAT.address",
+      "symbol": "STRAT",
+      "label": "Stratis",
+      "validationRegex": "^S[a-km-zA-HJ-NP-Z1-9]{33}$"
+    },
+    "addr.111": {
+      "unsKey": "crypto.ARK.address",
+      "symbol": "ARK",
+      "label": "ARK",
+      "validationRegex": "^[a-zA-Z0-9]{34}$"
+    },
+    "addr.118": {
+      "unsKey": "crypto.ATOM.address",
+      "symbol": "ATOM",
+      "label": "Atom",
+      "validationRegex": "^(cosmos)1([qpzry9x8gf2tvdw0s3jn54khce6mua7l]+)$"
+    },
+    "addr.119": {
+      "unsKey": "crypto.ZIL.address",
+      "symbol": "ZIL",
+      "label": "Zilliqa",
+      "validationRegex": "^zil1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{38}$"
+    },
+    "addr.120": {
+      "unsKey": "crypto.EGLD.address",
+      "symbol": "EGLD",
+      "label": "MultiversX",
+      "validationRegex": "^0x[a-zA-Z0-9]*$"
+    },
+    "addr.121": {
+      "unsKey": "crypto.ZEN.address",
+      "symbol": "ZEN",
+      "label": "Zencash",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.128": {
+      "unsKey": "crypto.XMR.address",
+      "symbol": "XMR",
+      "label": "Monero",
+      "validationRegex": "^[48]{1}[0-9AB][1-9A-HJ-NP-Za-km-z]{93}$"
+    },
+    "addr.133": {
+      "unsKey": "crypto.ZEC.address",
+      "symbol": "ZEC",
+      "label": "Zcash",
+      "validationRegex": "^z([a-zA-Z0-9]){94}$|^zs1([a-zA-Z0-9]){75}$|^t([a-zA-Z0-9]){34}$"
+    },
+    "addr.134": {
+      "unsKey": "crypto.LSK.address",
+      "symbol": "LSK",
+      "label": "Lisk",
+      "validationRegex": "^[0-9a-z]{3}[23456789abcdefghjkmnopqrstuvwxyz]{38}$"
+    },
+    "addr.135": {
+      "unsKey": "crypto.STEEM.address",
+      "symbol": "STEEM",
+      "label": "Steem",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.136": {
+      "unsKey": "crypto.FIRO.address",
+      "symbol": "FIRO",
+      "validationRegex": "^[a-km-zA-HJ-NP-Z1-9]{34}$"
+    },
+    "addr.137": {
+      "unsKey": "crypto.RSK.address",
+      "symbol": "RSK",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "addr.141": {
+      "unsKey": "crypto.KMD.address",
+      "symbol": "KMD",
+      "label": "Komodo",
+      "validationRegex": "^R[a-km-zA-Z1-9]{33}$"
+    },
+    "addr.144": {
+      "unsKey": "crypto.XRP.address",
+      "symbol": "XRP",
+      "label": "Ripple",
+      "validationRegex": "^r[1-9a-km-zA-HJ-NP-Z]{24,34}$"
+    },
+    "addr.145": {
+      "unsKey": "crypto.BCH.address",
+      "symbol": "BCH",
+      "label": "Bitcoin Cash",
+      "validationRegex": "^[13][a-km-zA-HJ-NP-Z1-9]{33}$|^((bitcoincash|bchreg|bchtest):)?(q|p)[a-z0-9]{41}$|^((BITCOINCASH:)?(Q|P)[A-Z0-9]{41})$"
+    },
+    "addr.148": {
+      "unsKey": "crypto.XLM.address",
+      "symbol": "XLM",
+      "label": "Stellar Lumens",
+      "validationRegex": "^G[A-Z2-7]{55}$"
+    },
+    "addr.153": {
+      "unsKey": null,
+      "symbol": "BTM",
+      "label": "Bytom",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.156": {
+      "unsKey": "crypto.BTG.address",
+      "symbol": "BTG",
+      "label": "Bitcoin Gold",
+      "validationRegex": "^[GA][a-km-zA-HJ-NP-Z1-9]{33}$"
+    },
+    "addr.165": {
+      "unsKey": "crypto.NANO.address",
+      "symbol": "NANO",
+      "label": "Bitcoin Nano",
+      "validationRegex": "^nano_[1-9a-z]{60}$"
+    },
+    "addr.175": {
+      "unsKey": "crypto.RVN.address",
+      "symbol": "RVN",
+      "label": "Ravencoin",
+      "validationRegex": "^[a-zA-Z0-9]{34}$"
+    },
+    "addr.192": {
+      "unsKey": null,
+      "symbol": "LCC",
+      "label": "LitecoinCash",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.194": {
+      "unsKey": "crypto.EOS.address",
+      "symbol": "EOS",
+      "label": "EOS",
+      "validationRegex": "^[a-z][a-z1-5.]{10}[a-z1-5]$"
+    },
+    "addr.195": {
+      "unsKey": "crypto.TRX.address",
+      "symbol": "TRX",
+      "label": "Tron",
+      "validationRegex": "^[a-zA-Z0-9]{34}$"
+    },
+    "addr.204": {
+      "unsKey": null,
+      "symbol": "BCN",
+      "label": "Bytecoin",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.235": {
+      "unsKey": null,
+      "symbol": "FIO",
+      "label": "FIO",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.236": {
+      "unsKey": "crypto.BSV.address",
+      "symbol": "BSV",
+      "label": "BitcoinSV",
+      "validationRegex": "^bitcoincash:[a-zA-Z0-9]{42}$"
+    },
+    "addr.239": {
+      "unsKey": "crypto.NEO.address",
+      "symbol": "NEO",
+      "label": "NEO",
+      "validationRegex": "^A[0-9a-zA-Z]{33}$"
+    },
+    "addr.242": {
+      "unsKey": "crypto.NIM.address",
+      "symbol": "NIM",
+      "label": "Nimiq",
+      "validationRegex": "^NQ[0-9]{2} ([A-Z0-9]{4} ){7}[A-Z0-9]{4}$"
+    },
+    "addr.283": {
+      "unsKey": "crypto.ALGO.address",
+      "symbol": "ALGO",
+      "label": "Algorand",
+      "validationRegex": "^[a-zA-Z0-9]{58}$"
+    },
+    "addr.291": {
+      "unsKey": "crypto.IOST.address",
+      "symbol": "IOST",
+      "label": "IOST",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.301": {
+      "unsKey": null,
+      "symbol": "DIVI",
+      "label": "Divi Project",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.304": {
+      "unsKey": "crypto.IOTX.address",
+      "symbol": "IOTX",
+      "label": "IoTeX",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "addr.308": {
+      "unsKey": null,
+      "symbol": "BTS",
+      "label": "Bitshares",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.309": {
+      "unsKey": "crypto.CKB.address",
+      "symbol": "CKB",
+      "label": "Nervos CKB",
+      "validationRegex": "^ckb1q[a-zA-Z0-9]*$"
+    },
+    "addr.326": {
+      "unsKey": null,
+      "symbol": "MRX",
+      "label": "Metrix Coin",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.330": {
+      "unsKey": "crypto.LUNA.address",
+      "symbol": "LUNA",
+      "label": "Terra",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.354": {
+      "unsKey": "crypto.DOT.address",
+      "symbol": "DOT",
+      "label": "Polkadot",
+      "validationRegex": "^1[a-zA-Z0-9]*$"
+    },
+    "addr.360": {
+      "unsKey": "crypto.VSYS.address",
+      "symbol": "VSYS",
+      "label": "V Systems",
+      "validationRegex": "^[a-zA-Z0-9]{35}$"
+    },
+    "addr.367": {
+      "unsKey": null,
+      "symbol": "ABBC",
+      "label": "ABBC",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.397": {
+      "unsKey": "crypto.NEAR.address",
+      "symbol": "NEAR",
+      "label": "NEAR Protocol",
+      "validationRegex": "^((([a-z\\d]+[\\-_])*[a-z\\d]+\\.)*([a-z\\d]+[\\-_])*[a-z\\d]+)|([a-f0-9]{64})$"
+    },
+    "addr.415": {
+      "unsKey": "crypto.ETN.address",
+      "symbol": "ETN",
+      "label": "Electroneum",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.425": {
+      "unsKey": null,
+      "symbol": "AION",
+      "label": "Aion",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.434": {
+      "unsKey": "crypto.KSM.address",
+      "symbol": "KSM",
+      "label": "Kusama",
+      "validationRegex": "^[CDEFGHJ][a-zA-Z0-9]*$"
+    },
+    "addr.457": {
+      "unsKey": "crypto.AE.address",
+      "symbol": "AE",
+      "label": "æternity",
+      "validationRegex": "^ak_[a-km-zA-Z1-9]{48,52}$"
+    },
+    "addr.459": {
+      "unsKey": "crypto.KAVA.address",
+      "symbol": "KAVA",
+      "label": "Kava",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.461": {
+      "unsKey": "crypto.FIL.address",
+      "symbol": "FIL",
+      "label": "Filecoin",
+      "validationRegex": "^f[a-zA-Z0-9]*$"
+    },
+    "addr.472": {
+      "unsKey": "crypto.AR.address",
+      "symbol": "AR",
+      "label": "Arweave",
+      "validationRegex": "^[a-zA-Z0-9-_]{43}$"
+    },
+    "addr.489": {
+      "unsKey": null,
+      "symbol": "CCA",
+      "label": "Counos Coin",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.501": {
+      "unsKey": "crypto.SOL.address",
+      "symbol": "SOL",
+      "label": "Solana",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.535": {
+      "unsKey": "crypto.XHV.address",
+      "symbol": "XHV",
+      "label": "Haven Protocol",
+      "validationRegex": "^hv[a-zA-Z0-9]*$"
+    },
+    "addr.539": {
+      "unsKey": "crypto.FLOW.address",
+      "symbol": "FLOW",
+      "label": "Flow",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.566": {
+      "unsKey": null,
+      "symbol": "IRIS",
+      "label": "Irisnet",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.568": {
+      "unsKey": null,
+      "symbol": "LRG",
+      "label": "Large Coin",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.569": {
+      "unsKey": null,
+      "symbol": "SERO",
+      "label": "Super Zero Protocol",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.570": {
+      "unsKey": null,
+      "symbol": "BDX",
+      "label": "Beldex",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.571": {
+      "unsKey": null,
+      "symbol": "CCXX",
+      "label": "Counos X",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.573": {
+      "unsKey": "crypto.SRM.version.ERC20.address",
+      "symbol": "SRM",
+      "label": "Serum",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "addr.574": {
+      "unsKey": "crypto.VLX.address",
+      "symbol": "VLX",
+      "label": "Velas",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.576": {
+      "unsKey": null,
+      "symbol": "BPS",
+      "label": "BitcoinPoS",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.589": {
+      "unsKey": "crypto.TFUEL.address",
+      "symbol": "TFUEL",
+      "label": "Theta Fuel",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.592": {
+      "unsKey": null,
+      "symbol": "GRIN",
+      "label": "Grin",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.703": {
+      "unsKey": "crypto.VET.address",
+      "symbol": "VET",
+      "label": "VeChain Token",
+      "validationRegex": "^0x[a-km-zA-HJ-NP-Z0-9]{40}$"
+    },
+    "addr.714": {
+      "unsKey": "crypto.BNB.address",
+      "symbol": "BNB",
+      "label": "Binance",
+      "validationRegex": "^bnb[0-9a-z]{39}$"
+    },
+    "addr.825": {
+      "unsKey": "crypto.HIVE.address",
+      "symbol": "HIVE",
+      "validationRegex": "^(?!s*$).+"
+    },
+    "addr.904": {
+      "unsKey": "crypto.HNT.address",
+      "symbol": "HNT",
+      "label": "Helium",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.931": {
+      "unsKey": "crypto.RUNE.address",
+      "symbol": "RUNE",
+      "label": "THORChain (RUNE)",
+      "validationRegex": "^(bnb|tbnb)[a-zA-HJ-NP-Z0-9]{39}$"
+    },
+    "addr.999": {
+      "unsKey": "crypto.BCD.address",
+      "symbol": "BCD",
+      "label": "Bitcoin Diamond",
+      "validationRegex": "^[a-zA-Z0-9]{34}$"
+    },
+    "addr.1023": {
+      "unsKey": "crypto.ONE.address",
+      "symbol": "ONE",
+      "label": "HARMONY-ONE (Legacy)",
+      "validationRegex": "^one[a-zA-Z0-9]{39}$|^0x[a-fA-F0-9]{40}$"
+    },
+    "addr.1024": {
+      "unsKey": "crypto.ONT.address",
+      "symbol": "ONT",
+      "label": "Ontology",
+      "validationRegex": "^[a-zA-Z0-9]{34}$"
+    },
+    "addr.1237": {
+      "unsKey": null,
+      "symbol": "NOSTR",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.1729": {
+      "unsKey": "crypto.XTZ.address",
+      "symbol": "XTZ",
+      "label": "Tezos",
+      "validationRegex": "^(tz|KT)[a-km-zA-HJ-NP-Z1-9]{34}$"
+    },
+    "addr.1815": {
+      "unsKey": "crypto.ADA.address",
+      "symbol": "ADA",
+      "label": "Cardano",
+      "validationRegex": "^[1-9a-km-zA-HJ-NP-Z]{104}$|^A[1-9A-HJ-NP-Za-km-z]{58}$|^addr[0-9a-zA-Z]{99}$"
+    },
+    "addr.1991": {
+      "unsKey": "crypto.SC.address",
+      "symbol": "SC",
+      "label": "Sia",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.2301": {
+      "unsKey": "crypto.QTUM.address",
+      "symbol": "QTUM",
+      "label": "QTUM",
+      "validationRegex": "^Q[a-km-zA-HJ-NP-Z1-9]{33}$"
+    },
+    "addr.2303": {
+      "unsKey": null,
+      "symbol": "GXC",
+      "label": "GXChain",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.2305": {
+      "unsKey": null,
+      "symbol": "ELA",
+      "label": "Elastos",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.2718": {
+      "unsKey": null,
+      "symbol": "NAS",
+      "label": "Nebulas",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.3030": {
+      "unsKey": "crypto.HBAR.address",
+      "symbol": "HBAR",
+      "label": "Hedera HBAR",
+      "validationRegex": "^(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))(?:-([a-z]{5}))?$"
+    },
+    "addr.4218": {
+      "unsKey": "crypto.IOTA.address",
+      "symbol": "IOTA",
+      "label": "IOTA",
+      "validationRegex": "^[A-Z0-9]{90}$|^iota1[a-z0-9]{59}$"
+    },
+    "addr.5353": {
+      "unsKey": null,
+      "symbol": "HNS",
+      "label": "Handshake",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.5757": {
+      "unsKey": "crypto.STX.address",
+      "symbol": "STX",
+      "label": "Stacks",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.8444": {
+      "unsKey": "crypto.XCH.address",
+      "symbol": "XCH",
+      "label": "Chia",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.8964": {
+      "unsKey": null,
+      "symbol": "NULS",
+      "label": "NULS",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.9000": {
+      "unsKey": "crypto.AVAX.address",
+      "symbol": "AVAX",
+      "label": "Avalanche",
+      "validationRegex": "^0x[a-zA-Z0-9]*$"
+    },
+    "addr.9004": {
+      "unsKey": null,
+      "symbol": "STRK",
+      "label": "StarkNet",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.16754": {
+      "unsKey": "crypto.ARDR.address",
+      "symbol": "ARDR",
+      "label": "Ardor",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.19167": {
+      "unsKey": null,
+      "symbol": "ZEL",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.99999": {
+      "unsKey": null,
+      "symbol": "WICC",
+      "label": "Waykichain",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.5718350": {
+      "unsKey": "crypto.WAN.address",
+      "symbol": "WAN",
+      "label": "Wanchain",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "addr.5741564": {
+      "unsKey": "crypto.WAVES.address",
+      "symbol": "WAVES",
+      "label": "Waves",
+      "validationRegex": "^3[a-km-zA-HJ-NP-Z1-9]{34}$"
+    },
+    "addr.2147483658": {
+      "unsKey": null,
+      "symbol": "OP",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.2147483673": {
+      "unsKey": "crypto.CRO.address",
+      "symbol": "CRO",
+      "label": "Crypto Chain",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "addr.2147483704": {
+      "unsKey": null,
+      "symbol": "BSC",
+      "label": "Binance Smart Chain",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.2147483708": {
+      "unsKey": null,
+      "symbol": "GO",
+      "label": "GoChain GO",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.2147483709": {
+      "unsKey": "crypto.ETC.address",
+      "symbol": "ETC",
+      "label": "Ether Classic",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "addr.2147483736": {
+      "unsKey": null,
+      "symbol": "TOMO",
+      "label": "TOMO",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.2147483747": {
+      "unsKey": null,
+      "symbol": "POA",
+      "label": "Poa",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.2147483748": {
+      "unsKey": "crypto.GNO.address",
+      "symbol": "GNO",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "addr.2147483756": {
+      "unsKey": null,
+      "symbol": "TT",
+      "label": "ThunderCore",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.2147483785": {
+      "unsKey": "crypto.MATIC.version.ERC20.address",
+      "symbol": "MATIC",
+      "label": "Matic",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "addr.2147483894": {
+      "unsKey": "crypto.EWT.address",
+      "symbol": "EWT",
+      "label": "Energy Web",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.2147483898": {
+      "unsKey": "crypto.FTM.version.ERC20.address",
+      "symbol": "FTM",
+      "label": "Fantom",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "addr.2147484009": {
+      "unsKey": "crypto.THETA.address",
+      "symbol": "THETA",
+      "label": "Theta",
+      "validationRegex": "^0x[a-zA-Z0-9]*$"
+    },
+    "addr.2147484468": {
+      "unsKey": null,
+      "symbol": "CLO",
+      "label": "Callisto",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.2147523445": {
+      "unsKey": null,
+      "symbol": "NRG",
+      "label": "Energi",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.2147525809": {
+      "unsKey": null,
+      "symbol": "ARB1",
+      "label": "Arbitrum",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "addr.2147525868": {
+      "unsKey": "crypto.CELO.address",
+      "symbol": "CELO",
+      "label": "Celo",
+      "validationRegex": "^[a-zA-Z0-9]*$"
+    },
+    "addr.2147526762": {
+      "unsKey": null,
+      "symbol": "AVAXC",
+      "label": "Avalanche C-Chain",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "text.avatar": {
+      "unsKey": "social.picture.value",
+      "symbol": null,
+      "label": "Avatar",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "text.description": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Description",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "text.display": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Display Name",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "text.email": {
+      "unsKey": "whois.email.value",
+      "symbol": null,
+      "label": "Email",
+      "validationRegex": "^[^@]+@[^\\.]+\\..+$"
+    },
+    "text.keywords": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Keywords",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "text.mail": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Mailing Address",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "text.notice": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Notice",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "text.location": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Location",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "text.phone": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Phone Number",
+      "validationRegex": "^[+]?[(]?[0-9]{3}[)]?[-s.]?[0-9]{3}[-s.]?[0-9]{4,6}$"
+    },
+    "text.url": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Website URL",
+      "validationRegex": "^(http(s)?|ipfs)://(www.)?[a-zA-Z0-9_]+([-.]{1}[a-zA-Z0-9_]+)*.[a-zA-Z0-9_]+(:[0-9]{1,5})?(/.*)?$"
+    },
+    "text.com.github": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "GitHub Username",
+      "validationRegex": "^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$"
+    },
+    "text.com.peepeth": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Peepeth Username",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "text.com.linkedin": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "LinkedIn Username",
+      "validationRegex": "^(http(s)?://)?([a-zA-Z0-9_]+.)?linkedin.com/(pub|in|profile)/([-a-zA-Z0-9]+)/*"
+    },
+    "text.com.twitter": {
+      "unsKey": "social.twitter.username",
+      "symbol": null,
+      "label": "Twitter Username",
+      "validationRegex": "^(?:https?://)?(?:www.)?(?:twitter.com/)?(?:#!/)?@?([a-zA-_Z0-9]+)(?:/.*)?$"
+    },
+    "text.io.keybase": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Keybase Username",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "text.org.telegram": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Telegram Username",
+      "validationRegex": "/([a-zA-Z0-9_]{5,}$)/"
+    },
+    "text.eth.ens.delegate": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "ETH ENS Delegate",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "contenthash.skynet": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Skynet Content Hash",
+      "validationRegex": "^.{46}$"
+    },
+    "contenthash.swarm": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Swarm Content Hash",
+      "validationRegex": "^.{4,}$"
+    },
+    "contenthash.ipfs": {
+      "unsKey": "dweb.ipfs.hash",
+      "symbol": null,
+      "label": "IPFS Content Hash",
+      "validationRegex": "^(Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$"
+    },
+    "contenthash.ipns": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "IPNS Content Hash",
+      "validationRegex": "^[a-zA-Z0-9]+$"
+    },
+    "contenthash.arweave": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Arweave Content Hash",
+      "validationRegex": "^.{43}$"
+    },
+    "contenthash.onion": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Onion Content Hash",
+      "validationRegex": "^(.{16}|.{56})$"
+    },
+    "pubkey.x": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Public Key X",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "pubkey.y": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "Public Key Y",
+      "validationRegex": "^(.+){1,1024}$"
+    },
+    "abi.json": {
+      "unsKey": null,
+      "symbol": null,
+      "label": "ABI",
+      "validationRegex": null
+    }
+  }
+}

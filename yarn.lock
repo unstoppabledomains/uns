@@ -41,6 +41,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ensdomains/address-encoder@npm:^0.2.22":
+  version: 0.2.22
+  resolution: "@ensdomains/address-encoder@npm:0.2.22"
+  dependencies:
+    bech32: ^2.0.0
+    blakejs: ^1.1.0
+    bn.js: ^4.11.8
+    bs58: ^4.0.1
+    crypto-addr-codec: ^0.1.8
+    js-crc: ^0.2.0
+    js-sha256: ^0.9.0
+    js-sha512: ^0.8.0
+    nano-base32: ^1.0.1
+    ripemd160: ^2.0.2
+    sha3: ^2.1.3
+  checksum: c21dde6170984cde68977a8bdb84560630ee8e94ee890bae6ed5819004b95ac87a259df3268eaef15891b66a16a4cd9f4d9b0320c8a40c84583f9f600572cc42
+  languageName: node
+  linkType: hard
+
 "@ensdomains/buffer@npm:^0.1.1":
   version: 0.1.1
   resolution: "@ensdomains/buffer@npm:0.1.1"
@@ -3479,6 +3498,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bech32@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "bech32@npm:2.0.0"
+  checksum: fa15acb270b59aa496734a01f9155677b478987b773bf701f465858bf1606c6a970085babd43d71ce61895f1baa594cb41a2cd1394bd2c6698f03cc2d811300e
+  languageName: node
+  linkType: hard
+
+"big-integer@npm:1.6.36":
+  version: 1.6.36
+  resolution: "big-integer@npm:1.6.36"
+  checksum: 8cb9366ab72975a94ace5a99f6f81e0624dc8a5d14349df1f331d75ceec405c9286ad04c2a1188bc4ec4aa65cbbf1f8065f5d6b529fdb4a9d9867bbdfa769306
+  languageName: node
+  linkType: hard
+
 "bigint-crypto-utils@npm:^3.0.23":
   version: 3.1.4
   resolution: "bigint-crypto-utils@npm:3.1.4"
@@ -3531,6 +3564,13 @@ __metadata:
     safe-buffer: ^5.0.1
     unorm: ^1.3.3
   checksum: 26e83583c43a8430afea1c385328b447005c74ddaf997cd8d3e416057f4968360b08ebf7de32374d605295c3abdd7ddd448d8078a2aa3d951735f4499c23875b
+  languageName: node
+  linkType: hard
+
+"bip44-constants@npm:^243.0.0":
+  version: 243.0.0
+  resolution: "bip44-constants@npm:243.0.0"
+  checksum: cdf2360eab836aef4a71f6ed76539218e8c761a9bdee532e49f5b690646a259c68136c6779d89eb4819ed7b0572a13cbc60d5d32347c27d99fbff27ba109dba3
   languageName: node
   linkType: hard
 
@@ -3737,7 +3777,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bs58@npm:^4.0.0":
+"bs58@npm:^4.0.0, bs58@npm:^4.0.1":
   version: 4.0.1
   resolution: "bs58@npm:4.0.1"
   dependencies:
@@ -3798,6 +3838,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"buffer@npm:6.0.3, buffer@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "buffer@npm:6.0.3"
+  dependencies:
+    base64-js: ^1.3.1
+    ieee754: ^1.2.1
+  checksum: 5ad23293d9a731e4318e420025800b42bf0d264004c0286c8cc010af7a270c7a0f6522e84f54b9ad65cbd6db20b8badbfd8d2ebf4f80fa03dab093b89e68c3f9
+  languageName: node
+  linkType: hard
+
 "buffer@npm:^5.0.5, buffer@npm:^5.2.1, buffer@npm:^5.5.0, buffer@npm:^5.6.0":
   version: 5.7.1
   resolution: "buffer@npm:5.7.1"
@@ -3805,16 +3855,6 @@ __metadata:
     base64-js: ^1.3.1
     ieee754: ^1.1.13
   checksum: e2cf8429e1c4c7b8cbd30834ac09bd61da46ce35f5c22a78e6c2f04497d6d25541b16881e30a019c6fd3154150650ccee27a308eff3e26229d788bbdeb08ab84
-  languageName: node
-  linkType: hard
-
-"buffer@npm:^6.0.3":
-  version: 6.0.3
-  resolution: "buffer@npm:6.0.3"
-  dependencies:
-    base64-js: ^1.3.1
-    ieee754: ^1.2.1
-  checksum: 5ad23293d9a731e4318e420025800b42bf0d264004c0286c8cc010af7a270c7a0f6522e84f54b9ad65cbd6db20b8badbfd8d2ebf4f80fa03dab093b89e68c3f9
   languageName: node
   linkType: hard
 
@@ -4760,6 +4800,21 @@ __metadata:
   version: 0.0.2
   resolution: "crypt@npm:0.0.2"
   checksum: baf4c7bbe05df656ec230018af8cf7dbe8c14b36b98726939cef008d473f6fe7a4fad906cfea4062c93af516f1550a3f43ceb4d6615329612c6511378ed9fe34
+  languageName: node
+  linkType: hard
+
+"crypto-addr-codec@npm:^0.1.8":
+  version: 0.1.8
+  resolution: "crypto-addr-codec@npm:0.1.8"
+  dependencies:
+    base-x: ^3.0.8
+    big-integer: 1.6.36
+    blakejs: ^1.1.0
+    bs58: ^4.0.1
+    ripemd160-min: 0.0.6
+    safe-buffer: ^5.2.0
+    sha3: ^2.1.1
+  checksum: c9d16a81eeb7cf6ac9392349dcf7d4bd5b9f3dd73c60e472fe6cba256dc2f9ba45b756f23b65a2e1abfe0612cfb4e85dd8e480783288bba239eade8abb4c4f43
   languageName: node
   linkType: hard
 
@@ -8867,10 +8922,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"js-crc@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "js-crc@npm:0.2.0"
+  checksum: 3e307ae64236b745658e0df50d56809a810e67f39e45b7c1302433f10560819bea1d457841b2bac0eb42b72c96d60ae4c3232613275ea6c482b3cdb98a8bab09
+  languageName: node
+  linkType: hard
+
 "js-sdsl@npm:^4.1.4":
   version: 4.1.5
   resolution: "js-sdsl@npm:4.1.5"
   checksum: 695f657ddc5be462b97cac4e8e60f37de28d628ee0e23016baecff0bb584a18dddb5caeac537a775030f180b5afd62133ac4481e7024c8d03a62d73e4da0713e
+  languageName: node
+  linkType: hard
+
+"js-sha256@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "js-sha256@npm:0.9.0"
+  checksum: ffad54b3373f81581e245866abfda50a62c483803a28176dd5c28fd2d313e0bdf830e77dac7ff8afd193c53031618920f3d98daf21cbbe80082753ab639c0365
   languageName: node
   linkType: hard
 
@@ -8885,6 +8954,13 @@ __metadata:
   version: 0.8.0
   resolution: "js-sha3@npm:0.8.0"
   checksum: 75df77c1fc266973f06cce8309ce010e9e9f07ec35ab12022ed29b7f0d9c8757f5a73e1b35aa24840dced0dea7059085aa143d817aea9e188e2a80d569d9adce
+  languageName: node
+  linkType: hard
+
+"js-sha512@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "js-sha512@npm:0.8.0"
+  checksum: 32ca371ebd14c6c5c83360fd8b036cad2211537bef546b199ac8b901917299cab4c68f7f7c26ae72f836bbce0349cb463df9a62cdb4c90e38090fdb4db89ee87
   languageName: node
   linkType: hard
 
@@ -10491,6 +10567,13 @@ __metadata:
   version: 0.0.7
   resolution: "mute-stream@npm:0.0.7"
   checksum: a9d4772c1c84206aa37c218ed4751cd060239bf1d678893124f51e037f6f22f4a159b2918c030236c93252638a74beb29c9b1fd3267c9f24d4b3253cf1eaa86f
+  languageName: node
+  linkType: hard
+
+"nano-base32@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "nano-base32@npm:1.0.1"
+  checksum: 1abe4229f7197ac35c91376b0a897c01d783dc0bbad35b45b70486bdca79c552d8cc7f3780ae9c815d865e3d52adacf1ca4d805ef0bfd4718f982ef5942a8285
   languageName: node
   linkType: hard
 
@@ -12305,7 +12388,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ripemd160@npm:^2.0.0, ripemd160@npm:^2.0.1":
+"ripemd160-min@npm:0.0.6":
+  version: 0.0.6
+  resolution: "ripemd160-min@npm:0.0.6"
+  checksum: 3253fec273aee407e736df0baf69f90c65f56573d6fc537532041112e7c09a2f665ee2e618ef4a88eb494923d36614322eac26ddf35a504fcfedb422fd414c75
+  languageName: node
+  linkType: hard
+
+"ripemd160@npm:^2.0.0, ripemd160@npm:^2.0.1, ripemd160@npm:^2.0.2":
   version: 2.0.2
   resolution: "ripemd160@npm:2.0.2"
   dependencies:
@@ -12656,6 +12746,15 @@ __metadata:
     charenc: ">= 0.0.1"
     crypt: ">= 0.0.1"
   checksum: da9f47e949988e2f595ef19733fd1dc736866ef6de4e421a55c13b444c03ae532e528b7350ae6ea55d9fb053be61d4648ec2cd5250d46cfdbdf4f6b4e763713d
+  languageName: node
+  linkType: hard
+
+"sha3@npm:^2.1.1, sha3@npm:^2.1.3":
+  version: 2.1.4
+  resolution: "sha3@npm:2.1.4"
+  dependencies:
+    buffer: 6.0.3
+  checksum: fb49c8e18143cc46babc0e5d83d5f5d0149e645f26633a0e6a9aa2514df2ef91f10b6ece20da229e7ead8b8002d8e9514dcc747ef96a25b749294d6385c6f29f
   languageName: node
   linkType: hard
 
@@ -14250,6 +14349,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "uns@workspace:."
   dependencies:
+    "@ensdomains/address-encoder": ^0.2.22
     "@ensdomains/ens-contracts": ^0.0.21
     "@ethereumjs/tx": ^4.0.1
     "@nomiclabs/hardhat-ethers": ^2.2.1
@@ -14275,6 +14375,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.42.0
     "@typescript-eslint/parser": ^5.42.0
     bip39: ^3.0.0
+    bip44-constants: ^243.0.0
     chai: ^4.3.6
     csv-parse: ^5.4.0
     debug: ^4.3.1
