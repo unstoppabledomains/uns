@@ -1,5 +1,5 @@
 {
-    "version": "0.8.4",
+    "version": "0.8.5",
     "networks": {
         "1": {
             "contracts": {
@@ -240,7 +240,7 @@
                 },
                 "MintingManager": {
                     "address": "0x7be83293BeeDc9Eba1bd76c66A65F10F3efaeC26",
-                    "implementation": "0x97eD948251a5741611d2a6b9D7136782911Ff807",
+                    "implementation": "0x1FF7fC4473E3CDA0428830a1bc96028A0C12244C",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272f41",
                     "forwarder": "0xC37d3c4326ab0E1D2b9D8b916bBdf5715f780fcF"
@@ -449,7 +449,7 @@
                 },
                 "MintingManager": {
                     "address": "0x428189346bb3CC52f031A1092fd47C919AC30A9f",
-                    "implementation": "0x002380ccAFf852dEF50a176873d50f8019e36FBc",
+                    "implementation": "0x7037D47eA5385c185f3C655687F90A24FD98Be5E",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01213f4a",
                     "forwarder": "0xEf3a491A8750BEC2Dff5339CF6Df94436d432C4d"
