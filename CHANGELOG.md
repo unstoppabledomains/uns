@@ -1,3 +1,7 @@
+## v0.8.34
+
+- Upgraded `MintingManager@0.4.17` on Mumbai and Polygon mainnet
+
 ## v0.8.33
 
 - Added legacy public resolver addresses to ens config
