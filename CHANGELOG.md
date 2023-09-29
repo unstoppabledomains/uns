@@ -1,3 +1,7 @@
+## v0.8.35
+
+- `MintingManager@0.4.18` added cross-chain replay protection for on-chain purchases
+
 ## v0.8.34
 
 - Upgraded `MintingManager@0.4.17` on Mumbai and Polygon mainnet

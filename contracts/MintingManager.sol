@@ -25,7 +25,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using ECDSAUpgradeable for bytes32;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.17';
+    string public constant VERSION = '0.4.18';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -437,7 +437,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         bytes memory signature
     ) private view {
         (uint256 tokenId, ) = _namehash(labels);
-        address signer = keccak256(abi.encodePacked(owner, tokenId, expiry, price, token)).toEthSignedMessageHash().recover(signature);
+
+        address signer = keccak256(abi.encodePacked(address(this), block.chainid, owner, tokenId, expiry, price, token))
+            .toEthSignedMessageHash()
+            .recover(signature);
 
         require(isMinter(signer), 'MintingManager: SIGNER_IS_NOT_MINTER');
         require(expiry > block.timestamp, 'MintingManager: EXPIRED_SIGNATURE');
