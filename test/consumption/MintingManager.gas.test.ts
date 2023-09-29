@@ -1,5 +1,5 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { ethers } from 'hardhat';
+import { ethers, network } from 'hardhat';
 import { ERC20Mock, ERC20Mock__factory } from '../../types';
 import { MintingManager, UNSRegistry } from '../../types/contracts';
 import { MintingManagerForwarder } from '../../types/contracts/metatx';
@@ -303,6 +303,7 @@ describe('MintingManager (consumption)', () => {
 
   describe('Purchases', () => {
     let erc20Mock: ERC20Mock;
+    const chainId = network.config.chainId;
 
     const buyDomain = async () => {
       const latestBlock = await ethers.provider.getBlock('latest');
@@ -314,8 +315,8 @@ describe('MintingManager (consumption)', () => {
 
       const purchaseHash = ethers.utils.arrayify(
         ethers.utils.solidityKeccak256(
-          ['address', 'uint256', 'uint64', 'uint256', 'address'],
-          [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+          ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+          [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
         ),
       );
       const signature = await coinbase.signMessage(purchaseHash);
@@ -343,8 +344,8 @@ describe('MintingManager (consumption)', () => {
 
       const purchaseHash = ethers.utils.arrayify(
         ethers.utils.solidityKeccak256(
-          ['address', 'uint256', 'uint64', 'uint256', 'address'],
-          [spender.address, tokenId, expiry, price, erc20Mock.address],
+          ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+          [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
         ),
       );
       const signature = await coinbase.signMessage(purchaseHash);

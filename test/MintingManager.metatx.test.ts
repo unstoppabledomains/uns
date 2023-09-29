@@ -1,4 +1,4 @@
-import { ethers, upgrades } from 'hardhat';
+import { ethers, network, upgrades } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { MintingManager, UNSRegistry } from '../types/contracts';
@@ -87,8 +87,8 @@ describe('MintingManager (metatx)', () => {
 
     const purchaseHash = ethers.utils.arrayify(
       ethers.utils.solidityKeccak256(
-        ['address', 'uint256', 'uint64', 'uint256', 'address'],
-        [receiver.address, tokenId, expiry, price, erc20Mock.address],
+        ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+        [mintingManager.address, network.config.chainId, receiver.address, tokenId, expiry, price, erc20Mock.address],
       ),
     );
     const signature = await coinbase.signMessage(purchaseHash);

@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat';
+import { ethers, network } from 'hardhat';
 import { expect } from 'chai';
 import namehash from 'eth-ens-namehash';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -643,6 +643,7 @@ describe('MintingManager', () => {
 
   describe('Purchases', () => {
     let latestBlock: Block;
+    const chainId = network.config.chainId;
 
     beforeEach(async () => {
       [coinbase, spender, receiver] = signers;
@@ -676,8 +677,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [receiver.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, receiver.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -719,8 +720,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -759,8 +760,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -789,8 +790,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [receiver.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, receiver.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -823,8 +824,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -857,8 +858,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -885,8 +886,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -921,8 +922,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [receiver.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, receiver.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -950,8 +951,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -979,8 +980,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1008,8 +1009,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1037,8 +1038,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1057,7 +1058,7 @@ describe('MintingManager', () => {
       });
 
       it('reverts if signer is not minter', async () => {
-        const expiry = latestBlock.timestamp - 60;
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
 
         const price = ethers.utils.parseEther('1');
 
@@ -1066,8 +1067,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await spender.signMessage(purchaseHash);
@@ -1093,11 +1094,82 @@ describe('MintingManager', () => {
         const labels = ['invalid-signed-data', 'x'];
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, BigNumber.from(1), expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, BigNumber.from(1), expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await spender.signMessage(purchaseHash);
+
+        await expect(
+          mintingManager.connect(spender).buy(
+            spender.address,
+            labels,
+            [], [],
+            expiry,
+            price,
+            signature,
+            { value: price },
+          ),
+        ).to.be.revertedWith('MintingManager: SIGNER_IS_NOT_MINTER');
+      });
+
+      it('reverts if signed MintingManager address is wrong', async () => {
+        const anotherUnsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+        const anotherMintingManager = await new MintingManager__factory(coinbase).deploy();
+
+        await anotherUnsRegistry.initialize(anotherMintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+        await anotherMintingManager.initialize(
+          anotherUnsRegistry.address,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+        );
+        await anotherMintingManager.addMinter(coinbase.address);
+        await anotherMintingManager.setTokenURIPrefix('/');
+
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
+        const price = ethers.utils.parseEther('1');
+
+        const labels = ['invalid-minting-manager-addr', 'x'];
+        const tokenId = await unsRegistry.namehash(labels);
+
+        const purchaseHash = ethers.utils.arrayify(
+          ethers.utils.solidityKeccak256(
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+          ),
+        );
+        const signature = await coinbase.signMessage(purchaseHash);
+
+        await expect(
+          anotherMintingManager.connect(spender).buy(
+            spender.address,
+            labels,
+            [], [],
+            expiry,
+            price,
+            signature,
+            { value: price },
+          ),
+        ).to.be.revertedWith('MintingManager: SIGNER_IS_NOT_MINTER');
+      });
+
+      it('reverts if signed chainId is wrong', async () => {
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
+        const price = ethers.utils.parseEther('1');
+
+        const labels = ['invalid-chainid', 'x'];
+        const tokenId = await unsRegistry.namehash(labels);
+
+        const purchaseHash = ethers.utils.arrayify(
+          ethers.utils.solidityKeccak256(
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, 1, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+          ),
+        );
+        const signature = await coinbase.signMessage(purchaseHash);
 
         await expect(
           mintingManager.connect(spender).buy(
@@ -1135,8 +1207,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [receiver.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, receiver.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1180,8 +1252,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1223,8 +1295,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1256,8 +1328,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [receiver.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, receiver.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1289,8 +1361,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1318,8 +1390,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1357,8 +1429,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1388,8 +1460,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1419,8 +1491,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1450,8 +1522,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1481,8 +1553,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1512,8 +1584,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
           ),
         );
         const signature = await spender.signMessage(purchaseHash);
@@ -1541,8 +1613,8 @@ describe('MintingManager', () => {
         const labels = ['expired-erc20-purchase', 'x'];
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, BigNumber.from(1), expiry, price, erc20Mock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, BigNumber.from(1), expiry, price, erc20Mock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1571,8 +1643,8 @@ describe('MintingManager', () => {
 
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [spender.address, tokenId, expiry, price, erc20UnsafeMock.address],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20UnsafeMock.address],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1590,6 +1662,81 @@ describe('MintingManager', () => {
             signature,
           ),
         ).to.be.revertedWith('ERC20: LOW_LEVEL_FAIL');
+      });
+
+      it('reverts if signed MintingManager address is wrong', async () => {
+        const anotherUnsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+        const anotherMintingManager = await new MintingManager__factory(coinbase).deploy();
+
+        await anotherUnsRegistry.initialize(anotherMintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+        await anotherMintingManager.initialize(
+          anotherUnsRegistry.address,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+        );
+        await anotherMintingManager.addMinter(coinbase.address);
+        await anotherMintingManager.setTokenURIPrefix('/');
+
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
+        const price = ethers.utils.parseEther('1');
+
+        const labels = ['invalid-minting-manager-addr-erc20', 'x'];
+        const tokenId = await unsRegistry.namehash(labels);
+
+        await erc20Mock.connect(spender).approve(mintingManager.address, price);
+
+        const purchaseHash = ethers.utils.arrayify(
+          ethers.utils.solidityKeccak256(
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
+          ),
+        );
+        const signature = await coinbase.signMessage(purchaseHash);
+
+        await expect(
+          anotherMintingManager.connect(spender).buyForErc20(
+            spender.address,
+            labels,
+            [], [],
+            expiry,
+            erc20Mock.address,
+            price,
+            signature,
+          ),
+        ).to.be.revertedWith('MintingManager: SIGNER_IS_NOT_MINTER');
+      });
+
+      it('reverts if signed chainId is wrong', async () => {
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
+        const price = ethers.utils.parseEther('1');
+
+        const labels = ['invalid-chainid-erc20', 'x'];
+        const tokenId = await unsRegistry.namehash(labels);
+
+        await erc20Mock.connect(spender).approve(mintingManager.address, price);
+
+        const purchaseHash = ethers.utils.arrayify(
+          ethers.utils.solidityKeccak256(
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, 1, spender.address, tokenId, expiry, price, erc20Mock.address],
+          ),
+        );
+        const signature = await coinbase.signMessage(purchaseHash);
+
+        await expect(
+          mintingManager.connect(spender).buyForErc20(
+            spender.address,
+            labels,
+            [], [],
+            expiry,
+            erc20Mock.address,
+            price,
+            signature,
+          ),
+        ).to.be.revertedWith('MintingManager: SIGNER_IS_NOT_MINTER');
       });
     });
   });
@@ -2055,10 +2202,12 @@ describe('MintingManager', () => {
         const labels = ['withdrawal', 'wallet'];
         const tokenId = await unsRegistry.namehash(labels);
 
+        const chainId = network.config.chainId;
+
         const purchaseHash = ethers.utils.arrayify(
           ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'uint64', 'uint256', 'address'],
-            [receiver.address, tokenId, expiry, price, ZERO_ADDRESS],
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, receiver.address, tokenId, expiry, price, ZERO_ADDRESS],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
