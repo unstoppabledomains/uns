@@ -1,3 +1,7 @@
+## v0.8.37
+
+- Add ENS DNSSEC smart contracts to configs, artifacts and sandbox
+
 ## v0.8.36
 
 - Upgraded `MintingManager@0.4.18` on Mumbai and Polygon mainnet

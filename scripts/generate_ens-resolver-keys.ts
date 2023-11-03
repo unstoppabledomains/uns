@@ -207,6 +207,7 @@ const unsMultiChainERC20TokenFormat = (symbol: string) => `crypto.${symbol}.vers
 const ensAppSupportedCoinListKeys = Object.keys(formatsByName).filter((c) => !c.match(/_LEGACY/));
 const unsKeysObj = UnsResolverKeysJson.keys;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const bip44CoinNameMap: Record<string, string> = bip44Constants.reduce((map, [_, coinSymbol, coinName]) => {
   map[coinSymbol] = coinName;
   return map;
