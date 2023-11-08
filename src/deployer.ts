@@ -73,6 +73,15 @@ async function getArtifacts (): Promise<ArtifactsMap> {
     ENSCustody: await ethers.getContractFactory('ENSCustody'),
     LegacyENSRegistry: await ethers.getContractFactory('LegacyENSRegistry'),
     LegacyETHRegistrarController: await ethers.getContractFactory('LegacyETHRegistrarController'),
+    DNSRegistrar: await ethers.getContractFactory('DNSRegistrar'),
+    DNSSECImpl: await ethers.getContractFactory('DNSSECImpl'),
+    TLDPublicSuffixList: await ethers.getContractFactory('TLDPublicSuffixList'),
+    RSASHA256Algorithm: await ethers.getContractFactory('RSASHA256Algorithm'),
+    DummyAlgorithm: await ethers.getContractFactory('DummyAlgorithm'),
+    SHA1Digest: await ethers.getContractFactory('SHA1Digest'),
+    SHA256Digest: await ethers.getContractFactory('SHA256Digest'),
+    SHA1NSEC3Digest: await ethers.getContractFactory('SHA1NSEC3Digest'),
+    Root: await ethers.getContractFactory('Root'),
   };
 }
 

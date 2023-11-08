@@ -910,6 +910,53 @@ const deployENSTask = {
     const legacyEnsRegistry = await ctx.artifacts[ArtifactName.LegacyENSRegistry].connect(owner).deploy();
     await legacyEnsRegistry.setSubnodeOwner(ZERO_WORD, notNullSha('eth'), await owner.getAddress());
     await ctx.saveContractConfig(EnsContractName.LegacyENSRegistry, legacyEnsRegistry);
+
+    const algorithmsIds = {
+      [ArtifactName.RSASHA256Algorithm]: 8,
+      [ArtifactName.DummyAlgorithm]: 0,
+    };
+    const digestsIds = {
+      [ArtifactName.SHA256Digest]: 2,
+      [ArtifactName.SHA1Digest]: 1,
+    };
+    const nSecDigestsIds = {
+      [ArtifactName.SHA1NSEC3Digest]: 1,
+    };
+    const algorithmsAndDigests = {
+      [ArtifactName.RSASHA256Algorithm]: await ctx.artifacts[ArtifactName.RSASHA256Algorithm].connect(owner).deploy(),
+      [ArtifactName.DummyAlgorithm]: await ctx.artifacts[ArtifactName.DummyAlgorithm].connect(owner).deploy(),
+      [ArtifactName.SHA256Digest]: await ctx.artifacts[ArtifactName.SHA256Digest].connect(owner).deploy(),
+      [ArtifactName.SHA1Digest]: await ctx.artifacts[ArtifactName.SHA1Digest].connect(owner).deploy(),
+      [ArtifactName.SHA1NSEC3Digest]: await ctx.artifacts[ArtifactName.SHA1NSEC3Digest].connect(owner).deploy(),
+    };
+    // eslint-disable-next-line max-len
+    const rootTrustAnchors = '0x00002b000100000e1000244a5c080249aac11d7b6f6446702e54a1607371607a1a41855200fd2ce1cdde32f24e8fb500002b000100000e1000244f660802e06d44b80b8f1d39a95c0b0d7c65d08458e880409bbc683457104237c7f8ec8d';
+    const dnssecOracle = await ctx.artifacts[ArtifactName.DNSSECImpl].connect(owner).deploy(
+      rootTrustAnchors,
+    );
+    for (const [algorithm, id] of Object.entries(algorithmsIds)) {
+      await dnssecOracle.setAlgorithm(id, algorithmsAndDigests[algorithm].address);
+    }
+    for (const [digest, id] of Object.entries(digestsIds)) {
+      await dnssecOracle.setDigest(id, algorithmsAndDigests[digest].address);
+    }
+    for (const [nSecDigest, id] of Object.entries(nSecDigestsIds)) {
+      await dnssecOracle.setNSEC3Digest(id, algorithmsAndDigests[nSecDigest].address);
+    }
+    await ctx.saveContractConfig(EnsContractName.DNSSECImpl, dnssecOracle);
+
+    const tldPublicSuffixList = await ctx.artifacts[ArtifactName.TLDPublicSuffixList].connect(owner).deploy();
+    const dnsRegistrar = await ctx.artifacts[ArtifactName.DNSRegistrar].connect(owner).deploy(
+      dnssecOracle.address,
+      tldPublicSuffixList.address,
+      ens.address,
+    );
+    const root = await ctx.artifacts[ArtifactName.Root].connect(owner).deploy(
+      ens.address,
+    );
+    await root.setController(dnsRegistrar.address, true);
+    await ens.setOwner(ZERO_WORD, root.address);
+    await ctx.saveContractConfig(EnsContractName.DNSRegistrar, dnsRegistrar);
   },
   ensureDependencies: () => ({}),
 };
