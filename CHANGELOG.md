@@ -1,3 +1,7 @@
+## v0.8.38
+
+- Update regex validation across a set of tokens
+
 ## v0.8.37
 
 - Add ENS DNSSEC smart contracts to configs, artifacts and sandbox
