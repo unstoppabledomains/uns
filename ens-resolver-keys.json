@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
   "information": {
     "description": "All common ENS resolver keys with a defined meaning and related metadata",
     "documentation": "https://docs.unstoppabledomains.com/resolution/guides/records-reference",
@@ -540,7 +540,7 @@
       "unsKey": "crypto.ADA.address",
       "symbol": "ADA",
       "label": "Cardano",
-      "validationRegex": "^[1-9a-km-zA-HJ-NP-Z]{104}$|^A[1-9A-HJ-NP-Za-km-z]{58}$|^addr[0-9a-zA-Z]{99}$"
+      "validationRegex": "^[1-9a-km-zA-HJ-NP-Z]{104}$|^A[1-9A-HJ-NP-Za-km-z]{58}$|^addr([0-9a-zA-Z]{99}|[0-9a-zA-Z]{54})$"
     },
     "addr.1991": {
       "unsKey": "crypto.SC.address",
