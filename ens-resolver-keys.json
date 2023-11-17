@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "information": {
     "description": "All common ENS resolver keys with a defined meaning and related metadata",
     "documentation": "https://docs.unstoppabledomains.com/resolution/guides/records-reference",
