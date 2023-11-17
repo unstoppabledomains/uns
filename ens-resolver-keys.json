@@ -142,7 +142,7 @@
       "unsKey": "crypto.EGLD.address",
       "symbol": "EGLD",
       "label": "MultiversX",
-      "validationRegex": "erd[a-zA-Z0-9]{59}$"
+      "validationRegex": "^erd[a-zA-Z0-9]{59}$"
     },
     "addr.121": {
       "unsKey": "crypto.ZEN.address",
@@ -594,7 +594,7 @@
       "unsKey": "crypto.STX.address",
       "symbol": "STX",
       "label": "Stacks",
-      "validationRegex": "SP[A-Z0-9]{38,39}$"
+      "validationRegex": "^SP[A-Z0-9]{38,39}$"
     },
     "addr.8444": {
       "unsKey": "crypto.XCH.address",

@@ -1423,7 +1423,7 @@
     },
     "crypto.EGLD.address": {
       "deprecatedKeyName": "EGLD",
-      "validationRegex": "erd[a-zA-Z0-9]{59}$",
+      "validationRegex": "^erd[a-zA-Z0-9]{59}$",
       "deprecated": false
     },
     "crypto.TUSD.version.ERC20.address": {
@@ -1528,7 +1528,7 @@
     },
     "crypto.STX.address": {
       "deprecatedKeyName": "STX",
-      "validationRegex": "SP[A-Z0-9]{38,39}$",
+      "validationRegex": "^SP[A-Z0-9]{38,39}$",
       "deprecated": false
     },
     "crypto.MANA.version.ERC20.address": {
