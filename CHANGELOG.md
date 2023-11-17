@@ -1,3 +1,7 @@
+## v0.8.39
+
+- Updated `ADA` ENS token validation regex
+
 ## v0.8.38
 
 - Update regex validation across a set of tokens
