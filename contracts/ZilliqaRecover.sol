@@ -20,34 +20,25 @@ contract ZilliqaRecover is ERC2771Context {
     function claim(
         uint256 tokenId,
         uint256 publicKey,
+        address newOwnerAddress,
         bytes memory signature
     ) public {}
 
-    function getSlice(
-        bytes memory data,
-        uint256 begin,
-        uint256 end
-    ) public pure returns (bytes memory) {
-        bytes memory a = new bytes(end - begin + 1);
-        for (uint256 i = 0; i <= end - begin; i++) {
-            a[i] = data[i + begin - 1];
-        }
-        return a;
-    }
-
     function ethAddress(bytes memory publicKey) public pure returns (address) {
-        bytes memory hash = abi.encodePacked(keccak256(publicKey));
-        return address(uint160(bytes20(getSlice(hash, 13, 32))));
+        bytes32 hash = keccak256(publicKey);
+        return address(uint160(uint256(hash)));
     }
 
     function zilAddress(bytes memory publicKey) public pure returns (address) {
-        bytes memory hash = abi.encodePacked(sha256(compressPublicKey(publicKey)));
-        return address(uint160(bytes20(getSlice(hash, 13, 32))));
+        bytes32 hash = sha256(compressPublicKey(publicKey));
+        return address(uint160(uint256(hash)));
     }
 
     function compressPublicKey(bytes memory publicKey) public pure returns (bytes memory) {
-        bytes memory x = getSlice(publicKey, 1, 32);
-        uint16 lastByte = uint16(bytes2(getSlice(publicKey, 64, 64)));
+        // First 32 bytes of public key is X coordinate
+        // Other 32 bytes of public key is Y coordinate
+        bytes32 x = bytes32(publicKey);
+        uint8 lastByte = uint8(publicKey[publicKey.length - 1]);
         bool isEven = lastByte % 2 == 0;
         return abi.encodePacked(isEven ? 0x02 : 0x03, x);
     }

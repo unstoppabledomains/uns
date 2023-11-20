@@ -45,8 +45,8 @@ describe('ZilliqaRecover', () => {
     const zilAddress = getAddressFromPublicKey(normalizePublicKey(wallet.publicKey));
     // ETH public key format has a 0x04 constant prefix
     // We don't need to that when operating public key in a contract
-    const publicKey = wallet.publicKey.replace(/^0x04/, '0x');
     expect(zilAddress).to.eql(content.address);
+    const publicKey = wallet.publicKey.replace(/^0x04/, '0x');
     console.log({
       zilpubkey: getPubKeyFromPrivateKey(pk),
       ethpubkey: publicKey,
@@ -70,6 +70,7 @@ describe('ZilliqaRecover', () => {
     expect(await contract.ethAddress(publicKey)).to.eql(wallet.address);
     const compressedPublicKey = await contract.compressPublicKey(publicKey);
     expect(compressedPublicKey).to.eql('0x' + compressPublicKey(wallet.publicKey.replace('0x', '')));
+    // y^2 = a*x^3 + b
     expect(
       // zil checksum is not the same as eth checksum
       (await contract.zilAddress(publicKey)).toLowerCase(),
