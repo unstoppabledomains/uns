@@ -1,5 +1,5 @@
 {
-  "version": "2.1.29",
+  "version": "2.1.30",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -1853,7 +1853,7 @@
     },
     "crypto.ERG.address": {
       "deprecatedKeyName": "ERG",
-      "validationRegex": "^0x[a-zA-Z0-9]*$",
+      "validationRegex": "^[a-zA-Z0-9]{51}$",
       "deprecated": false
     },
     "crypto.WIN.address": {
