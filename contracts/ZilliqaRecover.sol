@@ -7,22 +7,59 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol';
 import './metatx/ERC2771Context.sol';
+import './IUNSRegistry.sol';
+import './metatx/Forwarder.sol';
+import './utils/Ownable.sol';
+import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol';
 
-contract ZilliqaRecover is ERC2771Context {
+contract ZilliqaRecover is ERC2771Context, Forwarder, Ownable {
     using SignatureCheckerUpgradeable for address;
     using ECDSAUpgradeable for bytes32;
-    mapping(uint256 => address) public tokenOwners;
+    event Claimed(uint256 tokenId, address oldAddress, address newAddress);
+    event ZilOwnership(uint256 tokenId, address zilAddress);
 
-    function initialize(uint256 tokenId, address owner) public initializer {
-        tokenOwners[tokenId] = owner;
+    mapping(uint256 => address) private _zilliqaOwners;
+    IUNSRegistry public registry;
+
+    function initialize(IUNSRegistry registry_, address owner) public initializer {
+        registry = registry_;
+        _transferOwnership(owner);
+        __Ownable_init();
+    }
+
+    function setZilOwner(uint256[] memory tokenIds, address owner) public onlyOwner {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            _zilliqaOwners[tokenIds[i]] = owner;
+            emit ZilOwnership(tokenIds[i], owner);
+        }
+    }
+
+    function claimAll(
+        uint256[] memory tokenIds,
+        bytes memory publicKey,
+        address newOwnerAddress
+    ) public correctPublicKey(publicKey) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            _claim(tokenIds[i], publicKey, newOwnerAddress);
+        }
+    }
+
+    function zilOwnerOf(uint256 tokenId) public view returns (address) {
+        return _zilliqaOwners[tokenId];
     }
 
     function claim(
         uint256 tokenId,
-        uint256 publicKey,
-        address newOwnerAddress,
-        bytes memory signature
-    ) public {}
+        bytes memory publicKey,
+        address newOwnerAddress
+    ) public correctPublicKey(publicKey) {
+        _claim(tokenId, publicKey, newOwnerAddress);
+    }
+
+    modifier correctPublicKey(bytes memory publicKey) {
+        require(_msgSender() == ethAddress(publicKey), 'ZilliqaRecover: PUBLIC_KEY_INVALID');
+        _;
+    }
 
     function ethAddress(bytes memory publicKey) public pure returns (address) {
         bytes32 hash = keccak256(publicKey);
@@ -43,24 +80,36 @@ contract ZilliqaRecover is ERC2771Context {
         return abi.encodePacked(isEven ? 0x02 : 0x03, x);
     }
 
-    function verify(
+    function verify1(
         uint256 tokenId,
         bytes memory publicKey,
         bytes memory signature
     ) public view returns (bool) {
-        (address recovered, ECDSAUpgradeable.RecoverError error) = recover(tokenId, publicKey, signature);
+        (address recovered, ECDSAUpgradeable.RecoverError error) = recover1(tokenId, publicKey, signature);
         return
             error == ECDSAUpgradeable.RecoverError.NoError &&
             recovered == ethAddress(publicKey) &&
-            tokenOwners[tokenId] == zilAddress(publicKey);
+            _zilliqaOwners[tokenId] == zilAddress(publicKey);
     }
 
-    function recover(
+    function recover1(
         uint256 tokenId,
         bytes memory publicKey,
         bytes memory signature
     ) public view returns (address recovered, ECDSAUpgradeable.RecoverError error) {
         return ECDSAUpgradeable.tryRecover(ethSignedMessage(tokenId, publicKey), signature);
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256 tokenId,
+        bytes calldata
+    ) external view returns (bytes4) {
+        if (_zilliqaOwners[tokenId] == address(0x00)) {
+            revert('ZilliqaRecover: TOKEN_HAS_NO_OWNER');
+        }
+        return ZilliqaRecover.onERC721Received.selector;
     }
 
     function message(uint256 tokenId, bytes memory publicKey) public view returns (bytes32) {
@@ -71,11 +120,11 @@ contract ZilliqaRecover is ERC2771Context {
         return message(tokenId, publicKey).toEthSignedMessageHash();
     }
 
-    function _msgSender() internal view override(ERC2771Context) returns (address) {
+    function _msgSender() internal view override(ERC2771Context, Ownable) returns (address) {
         return super._msgSender();
     }
 
-    function _msgData() internal view override(ERC2771Context) returns (bytes calldata) {
+    function _msgData() internal view override(ERC2771Context, Ownable) returns (bytes calldata) {
         return super._msgData();
     }
 
@@ -97,5 +146,19 @@ contract ZilliqaRecover is ERC2771Context {
             abi.encodeWithSelector(IERC1271Upgradeable.isValidSignature.selector, hash, signature)
         );
         return (success && result.length == 32 && abi.decode(result, (bytes32)) == bytes32(IERC1271Upgradeable.isValidSignature.selector));
+    }
+
+    function _claim(
+        uint256 tokenId,
+        bytes memory publicKey,
+        address newOwnerAddress
+    ) private {
+        require(_zilliqaOwners[tokenId] == zilAddress(publicKey), 'ZilliqaRecover: TOKEN_OWNED_BY_OTHER_ADDRESS');
+
+        _zilliqaOwners[tokenId] = address(0);
+        if (address(registry) != address(0)) {
+            registry.safeTransferFrom(address(this), newOwnerAddress, tokenId);
+        }
+        emit Claimed(tokenId, _msgSender(), newOwnerAddress);
     }
 }
