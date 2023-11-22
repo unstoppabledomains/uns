@@ -1,3 +1,7 @@
+## v0.8.40
+
+- Updated `ERG` UNS token validation regex
+
 ## v0.8.39
 
 - Updated `ADA` ENS token validation regex
