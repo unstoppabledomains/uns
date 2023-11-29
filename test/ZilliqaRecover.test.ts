@@ -36,6 +36,7 @@ const ZilKey: KeystoreV3 = JSON.parse(
 describe('ZilliqaRecover', () => {
   let signers: SignerWithAddress[];
   let coinbase: SignerWithAddress;
+  let thirdParty: SignerWithAddress;
   let privateKey: string;
   let zilWallet: Wallet;
   let newOwner: SignerWithAddress;
@@ -53,7 +54,7 @@ describe('ZilliqaRecover', () => {
   before(async () => {
     signers = await ethers.getSigners();
     privateKey = await decryptPrivateKey('UNSTesting32;', ZilKey);
-    [coinbase, newOwner] = signers;
+    [coinbase, newOwner, thirdParty] = signers;
     zilWallet = new Wallet(privateKey, coinbase.provider);
     // ETH public key format has a 0x04 constant prefix
     // We don't need to that when operating public key in a contract
@@ -100,27 +101,51 @@ describe('ZilliqaRecover', () => {
     });
   });
 
-  it('claims', async () => {
-    const { tokenId, label } = getRandomDomain();
-    await zilliqaRecover.mint(label, zilAddress);
-    expect(await unsRegistry.ownerOf(tokenId)).to.eql(zilliqaRecover.address);
-    await zilliqaRecover.connect(zilWallet).claim(tokenId, publicKey, newOwner.address);
-    expect(await unsRegistry.ownerOf(tokenId)).to.eql(newOwner.address);
+  describe('claim', async () => {
+    it('provides ability to recover zil domain', async () => {
+      const { tokenId, label } = getRandomDomain();
+      await zilliqaRecover.mint(label, zilAddress);
+      await zilliqaRecover.connect(zilWallet).claim(tokenId, publicKey, newOwner.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.eql(newOwner.address);
+    });
+
+    it('requires matching public key without prefix', async () => {
+      const { tokenId, label } = getRandomDomain();
+      await zilliqaRecover.mint(label, zilAddress);
+      await expect(
+        zilliqaRecover.connect(zilWallet).claim(
+          tokenId,
+          // Providing public key without 0x04 prefix removed
+          zilWallet.publicKey,
+          newOwner.address,
+        ),
+      ).to.be.revertedWith('ZilliqaRecover: PUBLIC_KEY_LENGTH_INVALID');
+      await expect(
+        zilliqaRecover.connect(zilWallet).claim(
+          tokenId,
+          Wallet.createRandom().publicKey,
+          newOwner.address,
+        ),
+      ).to.be.revertedWith('ZilliqaRecover: PUBLIC_KEY_DOENT_MATCH_SENDER_ADDRESS');
+    });
   });
 
-  it('claims via meta', async () => {
-    const { tokenId, label } = getRandomDomain();
-    const buildExecuteParams = buildExecuteFunc(zilliqaRecover.interface, zilliqaRecover.address, zilliqaRecover);
-    const params = await buildExecuteParams(
-      'claim(uint256,bytes,address)',
-      [tokenId, publicKey, newOwner.address],
-      zilWallet,
-      tokenId,
-    );
-    await zilliqaRecover.mint(label, zilAddress);
-    await zilliqaRecover.execute(params.req, params.signature);
+  describe('execute', async () => {
+    it('supports claiming via meta transaction', async () => {
+      const { tokenId, label } = getRandomDomain();
+      const buildExecuteParams = buildExecuteFunc(zilliqaRecover.interface, zilliqaRecover.address, zilliqaRecover);
+      await zilliqaRecover.mint(label, zilAddress);
 
-    expect(await unsRegistry.ownerOf(tokenId)).to.eql(newOwner.address);
+      const params = await buildExecuteParams(
+        'claim(uint256,bytes,address)',
+        [tokenId, publicKey, newOwner.address],
+        zilWallet,
+        tokenId,
+      );
+      await zilliqaRecover.execute(params.req, params.signature);
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.eql(newOwner.address);
+    });
   });
 
   describe('mintAll, claimAll', async () => {
