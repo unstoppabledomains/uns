@@ -42,13 +42,6 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         __Ownable_init();
     }
 
-    function setZilOwner(uint256[] memory tokenIds, address _zilAddress) public onlyOwner {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            _zilliqaOwners[tokenIds[i]] = _zilAddress;
-            emit ZilOwnership(tokenIds[i], _zilAddress);
-        }
-    }
-
     function mintAll(MintingToken[] calldata tokens) public onlyOwner {
         for (uint256 i = 0; i < tokens.length; i++) {
             MintingToken calldata data = tokens[i];
@@ -58,13 +51,6 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
 
     function mint(string calldata label, address zilOwner) public onlyOwner {
         _mint(label, zilOwner);
-    }
-
-    function _mint(string calldata label, address zilOwner) private {
-        string[] memory empty;
-        (string[] memory labels, uint256 tokenId) = _namehash(label);
-        _zilliqaOwners[tokenId] = zilOwner;
-        mintingManager.issueWithRecords(address(this), labels, empty, empty, false);
     }
 
     function claimAll(
@@ -115,44 +101,14 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         return abi.encodePacked(lastByte % 2 == 0 ? 0x02 : 0x03, x);
     }
 
-    function verify1(
-        uint256 tokenId,
-        bytes memory publicKey,
-        bytes memory signature
-    ) public view returns (bool) {
-        (address recovered, ECDSAUpgradeable.RecoverError error) = recover1(tokenId, publicKey, signature);
-        return
-            error == ECDSAUpgradeable.RecoverError.NoError &&
-            recovered == ethAddress(publicKey) &&
-            zilOwnerOf(tokenId) == zilAddress(publicKey);
-    }
-
-    function recover1(
-        uint256 tokenId,
-        bytes memory publicKey,
-        bytes memory signature
-    ) public view returns (address recovered, ECDSAUpgradeable.RecoverError error) {
-        return ECDSAUpgradeable.tryRecover(ethSignedMessage(tokenId, publicKey), signature);
-    }
-
     function onERC721Received(
         address,
         address,
         uint256 tokenId,
         bytes calldata
     ) external view returns (bytes4) {
-        if (zilOwnerOf(tokenId) == address(0x00)) {
-            revert('ZilliqaRecover: TOKEN_HAS_NO_OWNER');
-        }
+        require(zilOwnerOf(tokenId) == address(0x00), 'ZilliqaRecover: TOKEN_HAS_NO_OWNER');
         return ZilliqaRecover.onERC721Received.selector;
-    }
-
-    function message(uint256 tokenId, bytes memory publicKey) public view returns (bytes32) {
-        return keccak256(abi.encodePacked(block.chainid, tokenId, publicKey));
-    }
-
-    function ethSignedMessage(uint256 tokenId, bytes memory publicKey) public view returns (bytes32) {
-        return message(tokenId, publicKey).toEthSignedMessageHash();
     }
 
     function _msgSender() internal view override(ERC2771RegistryContext, ContextUpgradeable, Ownable) returns (address) {
@@ -161,22 +117,6 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
 
     function _msgData() internal view override(ERC2771RegistryContext, ContextUpgradeable, Ownable) returns (bytes calldata) {
         return super._msgData();
-    }
-
-    function _isValidSignatureNow(
-        address signer,
-        bytes32 hash,
-        bytes memory signature
-    ) internal view returns (bool) {
-        (address recovered, ECDSAUpgradeable.RecoverError error) = ECDSAUpgradeable.tryRecover(hash, signature);
-        if (error == ECDSAUpgradeable.RecoverError.NoError && recovered == signer) {
-            return true;
-        }
-
-        (bool success, bytes memory result) = signer.staticcall(
-            abi.encodeWithSelector(IERC1271Upgradeable.isValidSignature.selector, hash, signature)
-        );
-        return (success && result.length == 32 && abi.decode(result, (bytes32)) == bytes32(IERC1271Upgradeable.isValidSignature.selector));
     }
 
     function _claim(
@@ -191,6 +131,13 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
             registry.safeTransferFrom(address(this), newOwnerAddress, tokenId);
         }
         emit Claimed(tokenId, _msgSender(), newOwnerAddress);
+    }
+
+    function _mint(string calldata label, address zilOwner) private {
+        string[] memory empty;
+        (string[] memory labels, uint256 tokenId) = _namehash(label);
+        _zilliqaOwners[tokenId] = zilOwner;
+        mintingManager.issueWithRecords(address(this), labels, empty, empty, false);
     }
 
     function _namehash(string memory label) internal pure returns (string[] memory labels, uint256 tokenId) {

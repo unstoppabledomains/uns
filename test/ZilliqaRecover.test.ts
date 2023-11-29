@@ -57,6 +57,8 @@ describe('ZilliqaRecover', () => {
     privateKey = await decryptPrivateKey('UNSTesting32;', ZilKey);
     [coinbase, newOwner] = signers;
     zilWallet = new Wallet(privateKey, coinbase.provider);
+    // ETH public key format has a 0x04 constant prefix
+    // We don't need to that when operating public key in a contract
     publicKey = zilWallet.publicKey.replace(/^0x04/, '0x');
     zilAddress = getAddressFromPublicKey(normalizePublicKey(zilWallet.publicKey)).toLowerCase();
     await (
@@ -80,33 +82,17 @@ describe('ZilliqaRecover', () => {
 
   it('works', async () => {
     const { tokenId, label } = getRandomDomain();
-    // ETH public key format has a 0x04 constant prefix
-    // We don't need to that when operating public key in a contract
     expect(zilAddress).to.eql(ZilKey.address.toLowerCase());
-    const message = utils.solidityKeccak256(['uint256', 'uint256', 'bytes'], [NetworkId, tokenId, publicKey]);
-
-    expect(await zilliqaRecover.message(tokenId, publicKey)).to.eql(message, 'Low message failed');
-    expect(await zilliqaRecover.ethSignedMessage(tokenId, publicKey)).to.eql(
-      hashMessage(utils.arrayify(message)),
-      'High message failed',
-    );
     expect(await zilliqaRecover.ethAddress(publicKey)).to.eql(zilWallet.address);
     const compressedPublicKey = await zilliqaRecover.compressPublicKey(publicKey);
     expect(compressedPublicKey).to.eql('0x' + compressPublicKey(zilWallet.publicKey.replace('0x', '')));
-    // y^2 = a*x^3 + b
     expect(
       // zil checksum is not the same as eth checksum
       (await zilliqaRecover.zilAddress(publicKey)).toLowerCase(),
     ).to.eql(zilAddress);
-    const signature = await zilWallet.signMessage(ethers.utils.arrayify(message));
-    const recover = await zilliqaRecover.recover1(tokenId, publicKey, signature);
-    expect(recover.recovered).to.eql(zilWallet.address);
     await zilliqaRecover.mint(label, zilAddress);
     expect((await zilliqaRecover.zilOwnerOf(tokenId)).toLowerCase()).to.eql(zilAddress);
     expect(await unsRegistry.ownerOf(tokenId)).to.eql(zilliqaRecover.address);
-    const verify = await zilliqaRecover.verify1(tokenId, publicKey, signature);
-
-    expect(verify).to.eql(true);
   });
 
   it('claims', async () => {
