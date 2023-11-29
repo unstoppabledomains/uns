@@ -6,13 +6,16 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol';
-import './metatx/ERC2771Context.sol';
+import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
+import './metatx/ERC2771RegistryContext.sol';
 import './IUNSRegistry.sol';
 import './metatx/Forwarder.sol';
 import './utils/Ownable.sol';
-import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol';
 
-contract ZilliqaRecover is ERC2771Context, Forwarder, Ownable {
+// import '@openzeppelin/contractsupgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol';
+// import "../node_modules/hardhat/console.sol";
+
+contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, Forwarder {
     using SignatureCheckerUpgradeable for address;
     using ECDSAUpgradeable for bytes32;
     event Claimed(uint256 tokenId, address oldAddress, address newAddress);
@@ -27,10 +30,10 @@ contract ZilliqaRecover is ERC2771Context, Forwarder, Ownable {
         __Ownable_init();
     }
 
-    function setZilOwner(uint256[] memory tokenIds, address owner) public onlyOwner {
+    function setZilOwner(uint256[] memory tokenIds, address _zilAddress) public onlyOwner {
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            _zilliqaOwners[tokenIds[i]] = owner;
-            emit ZilOwnership(tokenIds[i], owner);
+            _zilliqaOwners[tokenIds[i]] = _zilAddress;
+            emit ZilOwnership(tokenIds[i], _zilAddress);
         }
     }
 
@@ -57,7 +60,8 @@ contract ZilliqaRecover is ERC2771Context, Forwarder, Ownable {
     }
 
     modifier correctPublicKey(bytes memory publicKey) {
-        require(_msgSender() == ethAddress(publicKey), 'ZilliqaRecover: PUBLIC_KEY_INVALID');
+        require(publicKey.length == 64, 'ZilliqaRecover: PUBLIC_KEY_LENGTH_INVALID');
+        require(_msgSender() == ethAddress(publicKey), 'ZilliqaRecover: PUBLIC_KEY_DOENT_MATCH_SENDER_ADDRESS');
         _;
     }
 
@@ -76,8 +80,7 @@ contract ZilliqaRecover is ERC2771Context, Forwarder, Ownable {
         // Other 32 bytes of public key is Y coordinate
         bytes32 x = bytes32(publicKey);
         uint8 lastByte = uint8(publicKey[publicKey.length - 1]);
-        bool isEven = lastByte % 2 == 0;
-        return abi.encodePacked(isEven ? 0x02 : 0x03, x);
+        return abi.encodePacked(lastByte % 2 == 0 ? 0x02 : 0x03, x);
     }
 
     function verify1(
@@ -89,7 +92,7 @@ contract ZilliqaRecover is ERC2771Context, Forwarder, Ownable {
         return
             error == ECDSAUpgradeable.RecoverError.NoError &&
             recovered == ethAddress(publicKey) &&
-            _zilliqaOwners[tokenId] == zilAddress(publicKey);
+            zilOwnerOf(tokenId) == zilAddress(publicKey);
     }
 
     function recover1(
@@ -106,7 +109,7 @@ contract ZilliqaRecover is ERC2771Context, Forwarder, Ownable {
         uint256 tokenId,
         bytes calldata
     ) external view returns (bytes4) {
-        if (_zilliqaOwners[tokenId] == address(0x00)) {
+        if (zilOwnerOf(tokenId) == address(0x00)) {
             revert('ZilliqaRecover: TOKEN_HAS_NO_OWNER');
         }
         return ZilliqaRecover.onERC721Received.selector;
@@ -120,11 +123,11 @@ contract ZilliqaRecover is ERC2771Context, Forwarder, Ownable {
         return message(tokenId, publicKey).toEthSignedMessageHash();
     }
 
-    function _msgSender() internal view override(ERC2771Context, Ownable) returns (address) {
+    function _msgSender() internal view override(ERC2771RegistryContext, ContextUpgradeable, Ownable) returns (address) {
         return super._msgSender();
     }
 
-    function _msgData() internal view override(ERC2771Context, Ownable) returns (bytes calldata) {
+    function _msgData() internal view override(ERC2771RegistryContext, ContextUpgradeable, Ownable) returns (bytes calldata) {
         return super._msgData();
     }
 
@@ -153,7 +156,7 @@ contract ZilliqaRecover is ERC2771Context, Forwarder, Ownable {
         bytes memory publicKey,
         address newOwnerAddress
     ) private {
-        require(_zilliqaOwners[tokenId] == zilAddress(publicKey), 'ZilliqaRecover: TOKEN_OWNED_BY_OTHER_ADDRESS');
+        require(zilOwnerOf(tokenId) == zilAddress(publicKey), 'ZilliqaRecover: TOKEN_OWNED_BY_OTHER_ADDRESS');
 
         _zilliqaOwners[tokenId] = address(0);
         if (address(registry) != address(0)) {
