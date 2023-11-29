@@ -6,8 +6,8 @@ import { ethers, network } from 'hardhat';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Wallet } from 'ethers';
-import { ZilliqaRecover__factory, UNSRegistry__factory } from '../types/factories/contracts';
-import { UNSRegistry, ZilliqaRecover } from '../types';
+import { ZilliqaRecover__factory, UNSRegistry__factory, MintingManager__factory } from '../types/factories/contracts';
+import { MintingManager, UNSRegistry, ZilliqaRecover } from '../types';
 import { ZERO_ADDRESS } from './helpers/constants';
 import { buildExecuteFunc } from './helpers/metatx';
 
@@ -44,11 +44,12 @@ describe('ZilliqaRecover', () => {
   let publicKey: string;
   let zilAddress: string;
   let unsRegistry: UNSRegistry;
+  let mintingManager: MintingManager;
   let zilliqaRecover: ZilliqaRecover;
 
   const getRandomDomain = () => {
-    const name = `hello-world-${Math.random().toString().replace('0.', '')}`;
-    return { name, tokenId: namehash(name), labels: name.split('.') };
+    const name = `hello-world-${Math.random().toString().replace('0.', '')}.zil`;
+    return { name, tokenId: namehash(name), labels: name.split('.'), label: name.split('.')[0] };
   };
 
   before(async () => {
@@ -63,12 +64,22 @@ describe('ZilliqaRecover', () => {
     ).wait();
     zilliqaRecover = await new ZilliqaRecover__factory(coinbase).deploy();
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-    await zilliqaRecover.initialize(unsRegistry.address, coinbase.address);
-    await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+    mintingManager = await new MintingManager__factory(coinbase).deploy();
+    await zilliqaRecover.initialize(unsRegistry.address, mintingManager.address, coinbase.address);
+    await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+    await mintingManager.initialize(
+      unsRegistry.address,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+    );
+    await mintingManager.addMinter(zilliqaRecover.address);
   });
 
   it('works', async () => {
-    const { tokenId } = getRandomDomain();
+    const { tokenId, label } = getRandomDomain();
     // ETH public key format has a 0x04 constant prefix
     // We don't need to that when operating public key in a contract
     expect(zilAddress).to.eql(ZilKey.address.toLowerCase());
@@ -90,23 +101,24 @@ describe('ZilliqaRecover', () => {
     const signature = await zilWallet.signMessage(ethers.utils.arrayify(message));
     const recover = await zilliqaRecover.recover1(tokenId, publicKey, signature);
     expect(recover.recovered).to.eql(zilWallet.address);
-    await zilliqaRecover.setZilOwner([tokenId], zilAddress);
+    await zilliqaRecover.mint(label, zilAddress);
+    expect((await zilliqaRecover.zilOwnerOf(tokenId)).toLowerCase()).to.eql(zilAddress);
+    expect(await unsRegistry.ownerOf(tokenId)).to.eql(zilliqaRecover.address);
     const verify = await zilliqaRecover.verify1(tokenId, publicKey, signature);
 
     expect(verify).to.eql(true);
   });
 
   it('claims', async () => {
-    const { tokenId, labels } = getRandomDomain();
-    await zilliqaRecover.setZilOwner([tokenId], zilAddress);
-    await unsRegistry.mintWithRecords(zilliqaRecover.address, labels, [], [], false);
+    const { tokenId, label } = getRandomDomain();
+    await zilliqaRecover.mint(label, zilAddress);
     expect(await unsRegistry.ownerOf(tokenId)).to.eql(zilliqaRecover.address);
     await zilliqaRecover.connect(zilWallet).claim(tokenId, publicKey, newOwner.address);
     expect(await unsRegistry.ownerOf(tokenId)).to.eql(newOwner.address);
   });
 
   it('claims via meta', async () => {
-    const { tokenId, labels } = getRandomDomain();
+    const { tokenId, label } = getRandomDomain();
     const buildExecuteParams = buildExecuteFunc(zilliqaRecover.interface, zilliqaRecover.address, zilliqaRecover);
     const params = await buildExecuteParams(
       'claim(uint256,bytes,address)',
@@ -114,11 +126,8 @@ describe('ZilliqaRecover', () => {
       zilWallet,
       tokenId,
     );
-    console.log({ params });
-    await zilliqaRecover.setZilOwner([tokenId], zilAddress);
-    await unsRegistry.mintWithRecords(zilliqaRecover.address, labels, [], [], false);
-    const tx = await zilliqaRecover.execute(params.req, params.signature);
-    await tx.wait();
+    await zilliqaRecover.mint(label, zilAddress);
+    await zilliqaRecover.execute(params.req, params.signature);
 
     expect(await unsRegistry.ownerOf(tokenId)).to.eql(newOwner.address);
   });
