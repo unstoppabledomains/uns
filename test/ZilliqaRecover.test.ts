@@ -78,19 +78,26 @@ describe('ZilliqaRecover', () => {
     await mintingManager.addMinter(zilliqaRecover.address);
   });
 
-  it('works', async () => {
-    const { tokenId, label } = getRandomDomain();
-    expect(zilAddress).to.eql(ZilKey.address.toLowerCase());
-    expect(await zilliqaRecover.ethAddress(publicKey)).to.eql(zilWallet.address);
-    const compressedPublicKey = await zilliqaRecover.compressPublicKey(publicKey);
-    expect(compressedPublicKey).to.eql('0x' + compressPublicKey(zilWallet.publicKey.replace('0x', '')));
-    expect(
-      // zil checksum is not the same as eth checksum
-      (await zilliqaRecover.zilAddress(publicKey)).toLowerCase(),
-    ).to.eql(zilAddress);
-    await zilliqaRecover.mint(label, zilAddress);
-    expect((await zilliqaRecover.zilOwnerOf(tokenId)).toLowerCase()).to.eql(zilAddress);
-    expect(await unsRegistry.ownerOf(tokenId)).to.eql(zilliqaRecover.address);
+  describe('ethAddress', async () => {
+    it('calculates eth address from public key', async () => {
+      expect(await zilliqaRecover.ethAddress(publicKey)).to.eql(zilWallet.address);
+    });
+  });
+
+  describe('compressedPublicKey', async () => {
+    it('compresses public key to zil format', async () => {
+      const compressedPublicKey = await zilliqaRecover.compressPublicKey(publicKey);
+      expect(compressedPublicKey).to.eql('0x' + compressPublicKey(zilWallet.publicKey.replace('0x', '')));
+    });
+  });
+
+  describe('zilAddress', async () => {
+    it('calculates zil address from public key', async () => {
+      expect(
+        // zil checksum is not the same as eth checksum
+        (await zilliqaRecover.zilAddress(publicKey)).toLowerCase(),
+      ).to.eql(zilAddress);
+    });
   });
 
   it('claims', async () => {
