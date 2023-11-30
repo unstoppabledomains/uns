@@ -13,9 +13,15 @@ import './IUNSRegistry.sol';
 import './IMintingManager.sol';
 import './metatx/Forwarder.sol';
 import './utils/Ownable.sol';
-import './utils/Multicall.sol';
 
-contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, Forwarder, Multicall, IERC721ReceiverUpgradeable {
+/**
+ * @title ZilliqaRecover
+ * @dev Custody contract for ZNS domains transferred from Zilliqa Blockchain.
+ * Tokens minted to the contract can be unlocked by their original owners from ZNS
+ * on Zilliqa blockchain by confirming their identity with EVM compatible signature
+ * generated from Zilliqa Private Key and proving a new ETH wallet address.
+ */
+contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, Forwarder, IERC721ReceiverUpgradeable {
     struct MintingToken {
         address zilOwner;
         string label;
@@ -24,6 +30,7 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
     using ECDSAUpgradeable for bytes32;
     event Claimed(uint256 tokenId, address oldAddress, address newAddress);
     event ZilOwnership(uint256 tokenId, address zilAddress);
+
     uint256 public constant ZIL_NODE = 0xd81bbfcee722494b885e891546eeac23d0eedcd44038d7a2f6ef9ec2f9e0d239;
 
     mapping(uint256 => address) private _znsOwners;
@@ -128,15 +135,11 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
 
     function _mint(string calldata label, address zilOwner) private {
         string[] memory empty;
-        (string[] memory labels, uint256 tokenId) = _namehash(label);
-        _znsOwners[tokenId] = zilOwner;
-        mintingManager.issueWithRecords(address(this), labels, empty, empty, false);
-    }
-
-    function _namehash(string memory label) internal pure returns (string[] memory labels, uint256 tokenId) {
-        tokenId = uint256(keccak256(abi.encodePacked(ZIL_NODE, keccak256(abi.encodePacked(label)))));
-        labels = new string[](2);
+        uint256 tokenId = uint256(keccak256(abi.encodePacked(ZIL_NODE, keccak256(abi.encodePacked(label)))));
+        string[] memory labels = new string[](2);
         labels[0] = label;
         labels[1] = 'zil';
+        _znsOwners[tokenId] = zilOwner;
+        mintingManager.issueWithRecords(address(this), labels, empty, empty, false);
     }
 }
