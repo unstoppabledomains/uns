@@ -121,12 +121,30 @@ describe('ZilliqaRecover', () => {
         ),
       ).to.be.revertedWith('ZilliqaRecover: PUBLIC_KEY_LENGTH_INVALID');
       await expect(
-        zilliqaRecover.connect(zilWallet).claim(
-          tokenId,
-          Wallet.createRandom().publicKey,
-          newOwner.address,
-        ),
+        zilliqaRecover.connect(zilWallet).claim(tokenId, Wallet.createRandom().publicKey, newOwner.address),
       ).to.be.revertedWith('ZilliqaRecover: PUBLIC_KEY_DOENT_MATCH_SENDER_ADDRESS');
+    });
+
+    it('forbids to return a domain', async () => {
+      const { tokenId, label } = getRandomDomain();
+      await zilliqaRecover.mint(label, zilAddress);
+      await zilliqaRecover.connect(zilWallet).claim(tokenId, publicKey, newOwner.address);
+      expect(await zilliqaRecover.znsOwnerOf(tokenId)).to.eql(ZERO_ADDRESS);
+      await expect(
+        unsRegistry
+          .connect(newOwner)
+          ['safeTransferFrom(address,address,uint256)'](newOwner.address, zilliqaRecover.address, tokenId),
+      ).to.be.revertedWith('ZilliqaRecover: UNKNOWN_TOKEN_RECEIVED');
+    });
+
+    it('checks token ownership', async () => {
+      const { tokenId, label } = getRandomDomain();
+      await zilliqaRecover.mint(label, zilAddress.replace(/0x..../, '0xf000'));
+      await expect(
+        zilliqaRecover
+          .connect(zilWallet)
+          .claim(tokenId, publicKey, newOwner.address),
+      ).to.be.revertedWith('ZilliqaRecover: TOKEN_OWNED_BY_OTHER_ADDRESS');
     });
   });
 
@@ -159,8 +177,8 @@ describe('ZilliqaRecover', () => {
 
       expect(await unsRegistry.ownerOf(domain1.tokenId)).to.eql(zilliqaRecover.address);
       expect(await unsRegistry.ownerOf(domain2.tokenId)).to.eql(zilliqaRecover.address);
-      expect((await zilliqaRecover.zilOwnerOf(domain1.tokenId)).toLowerCase()).to.eql(zilAddress);
-      expect((await zilliqaRecover.zilOwnerOf(domain2.tokenId)).toLowerCase()).to.eql(zilAddress);
+      expect((await zilliqaRecover.znsOwnerOf(domain1.tokenId)).toLowerCase()).to.eql(zilAddress);
+      expect((await zilliqaRecover.znsOwnerOf(domain2.tokenId)).toLowerCase()).to.eql(zilAddress);
       await zilliqaRecover.connect(zilWallet).claimAll([domain1.tokenId, domain2.tokenId], publicKey, newOwner.address);
 
       expect(await unsRegistry.ownerOf(domain1.tokenId)).to.eql(newOwner.address);
