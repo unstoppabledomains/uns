@@ -33,14 +33,21 @@ const ZilKey: KeystoreV3 = JSON.parse(
   readFileSync('./test/zil18k3cvzg379g02et9fg2ga395r027jx5jggzvh5.json').toString(),
 );
 
+const onChainPubKey = (wallet: Wallet | string): [string, string] => {
+  return (typeof wallet === 'string' ? wallet : wallet.publicKey)
+    .replace(/^0x04/, '')
+    .split(/(.{64})/)
+    .filter((s) => s.length)
+    .map((s) => `0x${s}`) as [string, string];
+};
+
 describe('ZilliqaRecover', () => {
   let signers: SignerWithAddress[];
   let coinbase: SignerWithAddress;
-  let thirdParty: SignerWithAddress;
   let privateKey: string;
   let zilWallet: Wallet;
   let newOwner: SignerWithAddress;
-  let publicKey: string;
+  let publicKey: [string, string];
   let zilAddress: string;
   let unsRegistry: UNSRegistry;
   let mintingManager: MintingManager;
@@ -54,11 +61,11 @@ describe('ZilliqaRecover', () => {
   before(async () => {
     signers = await ethers.getSigners();
     privateKey = await decryptPrivateKey('UNSTesting32;', ZilKey);
-    [coinbase, newOwner, thirdParty] = signers;
+    [coinbase, newOwner] = signers;
     zilWallet = new Wallet(privateKey, coinbase.provider);
     // ETH public key format has a 0x04 constant prefix
     // We don't need to that when operating public key in a contract
-    publicKey = zilWallet.publicKey.replace(/^0x04/, '0x');
+    publicKey = onChainPubKey(zilWallet.publicKey);
     zilAddress = getAddressFromPublicKey(normalizePublicKey(zilWallet.publicKey)).toLowerCase();
     await (
       await coinbase.sendTransaction({ to: zilWallet.address, value: BigNumber.from('100000000000000000000') })
@@ -81,13 +88,13 @@ describe('ZilliqaRecover', () => {
 
   describe('ethAddress', async () => {
     it('calculates eth address from public key', async () => {
-      expect(await zilliqaRecover.ethAddress(publicKey)).to.eql(zilWallet.address);
+      expect(await zilliqaRecover.ethAddress(...publicKey)).to.eql(zilWallet.address);
     });
   });
 
   describe('compressedPublicKey', async () => {
     it('compresses public key to zil format', async () => {
-      const compressedPublicKey = await zilliqaRecover.compressPublicKey(publicKey);
+      const compressedPublicKey = await zilliqaRecover.compressPublicKey(...publicKey);
       expect(compressedPublicKey).to.eql('0x' + compressPublicKey(zilWallet.publicKey.replace('0x', '')));
     });
   });
@@ -96,7 +103,7 @@ describe('ZilliqaRecover', () => {
     it('calculates zil address from public key', async () => {
       expect(
         // zil checksum is not the same as eth checksum
-        (await zilliqaRecover.zilAddress(publicKey)).toLowerCase(),
+        (await zilliqaRecover.zilAddress(...publicKey)).toLowerCase(),
       ).to.eql(zilAddress);
     });
   });
@@ -105,7 +112,7 @@ describe('ZilliqaRecover', () => {
     it('provides ability to recover zil domain', async () => {
       const { tokenId, label } = getRandomDomain();
       await zilliqaRecover.mint(label, zilAddress);
-      await zilliqaRecover.connect(zilWallet).claim(tokenId, publicKey, newOwner.address);
+      await zilliqaRecover.connect(zilWallet).claim(tokenId, ...publicKey, newOwner.address);
       expect(await unsRegistry.ownerOf(tokenId)).to.eql(newOwner.address);
     });
 
@@ -113,22 +120,16 @@ describe('ZilliqaRecover', () => {
       const { tokenId, label } = getRandomDomain();
       await zilliqaRecover.mint(label, zilAddress);
       await expect(
-        zilliqaRecover.connect(zilWallet).claim(
-          tokenId,
-          // Providing public key without 0x04 prefix removed
-          zilWallet.publicKey,
-          newOwner.address,
-        ),
-      ).to.be.revertedWith('ZilliqaRecover: PUBLIC_KEY_LENGTH_INVALID');
-      await expect(
-        zilliqaRecover.connect(zilWallet).claim(tokenId, Wallet.createRandom().publicKey, newOwner.address),
+        zilliqaRecover
+          .connect(zilWallet)
+          .claim(tokenId, ...onChainPubKey(Wallet.createRandom().publicKey), newOwner.address),
       ).to.be.revertedWith('ZilliqaRecover: PUBLIC_KEY_DOENT_MATCH_SENDER_ADDRESS');
     });
 
     it('forbids to return a domain', async () => {
       const { tokenId, label } = getRandomDomain();
       await zilliqaRecover.mint(label, zilAddress);
-      await zilliqaRecover.connect(zilWallet).claim(tokenId, publicKey, newOwner.address);
+      await zilliqaRecover.connect(zilWallet).claim(tokenId, ...publicKey, newOwner.address);
       expect(await zilliqaRecover.znsOwnerOf(tokenId)).to.eql(ZERO_ADDRESS);
       await expect(
         unsRegistry
@@ -140,11 +141,9 @@ describe('ZilliqaRecover', () => {
     it('checks token ownership', async () => {
       const { tokenId, label } = getRandomDomain();
       await zilliqaRecover.mint(label, zilAddress.replace(/0x..../, '0xf000'));
-      await expect(
-        zilliqaRecover
-          .connect(zilWallet)
-          .claim(tokenId, publicKey, newOwner.address),
-      ).to.be.revertedWith('ZilliqaRecover: TOKEN_OWNED_BY_OTHER_ADDRESS');
+      await expect(zilliqaRecover.connect(zilWallet).claim(tokenId, ...publicKey, newOwner.address)).to.be.revertedWith(
+        'ZilliqaRecover: TOKEN_OWNED_BY_OTHER_ADDRESS',
+      );
     });
   });
 
@@ -155,8 +154,8 @@ describe('ZilliqaRecover', () => {
       await zilliqaRecover.mint(label, zilAddress);
 
       const params = await buildExecuteParams(
-        'claim(uint256,bytes,address)',
-        [tokenId, publicKey, newOwner.address],
+        'claim(uint256,bytes32,bytes32,address)',
+        [tokenId, ...publicKey, newOwner.address],
         zilWallet,
         tokenId,
       );
@@ -179,7 +178,9 @@ describe('ZilliqaRecover', () => {
       expect(await unsRegistry.ownerOf(domain2.tokenId)).to.eql(zilliqaRecover.address);
       expect((await zilliqaRecover.znsOwnerOf(domain1.tokenId)).toLowerCase()).to.eql(zilAddress);
       expect((await zilliqaRecover.znsOwnerOf(domain2.tokenId)).toLowerCase()).to.eql(zilAddress);
-      await zilliqaRecover.connect(zilWallet).claimAll([domain1.tokenId, domain2.tokenId], publicKey, newOwner.address);
+      await zilliqaRecover
+        .connect(zilWallet)
+        .claimAll([domain1.tokenId, domain2.tokenId], ...publicKey, newOwner.address);
 
       expect(await unsRegistry.ownerOf(domain1.tokenId)).to.eql(newOwner.address);
       expect(await unsRegistry.ownerOf(domain2.tokenId)).to.eql(newOwner.address);

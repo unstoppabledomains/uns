@@ -54,11 +54,12 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
 
     function claimAll(
         uint256[] memory tokenIds,
-        bytes memory publicKey,
+        bytes32 publicKeyX,
+        bytes32 publicKeyY,
         address newOwnerAddress
-    ) public correctPublicKey(publicKey) {
+    ) public correctPublicKey(publicKeyX, publicKeyY) {
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            _claim(tokenIds[i], zilAddress(publicKey), newOwnerAddress);
+            _claim(tokenIds[i], zilAddress(publicKeyX, publicKeyY), newOwnerAddress);
         }
     }
 
@@ -68,36 +69,31 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
 
     function claim(
         uint256 tokenId,
-        bytes memory publicKey,
+        bytes32 publicKeyX,
+        bytes32 publicKeyY,
         address newOwnerAddress
-    ) public correctPublicKey(publicKey) {
-        _claim(tokenId, zilAddress(publicKey), newOwnerAddress);
+    ) public correctPublicKey(publicKeyX, publicKeyY) {
+        _claim(tokenId, zilAddress(publicKeyX, publicKeyX), newOwnerAddress);
     }
 
-    modifier correctPublicKey(bytes memory publicKey) {
-        // Default eth public key uses a constant 0x04 prefix.
-        // It needs to be removed offchain.
-        require(publicKey.length == 64, 'ZilliqaRecover: PUBLIC_KEY_LENGTH_INVALID');
-        require(_msgSender() == ethAddress(publicKey), 'ZilliqaRecover: PUBLIC_KEY_DOENT_MATCH_SENDER_ADDRESS');
+    modifier correctPublicKey(bytes32 publicKeyX, bytes32 publicKeyY) {
+        require(_msgSender() == ethAddress(publicKeyX, publicKeyY), 'ZilliqaRecover: PUBLIC_KEY_DOENT_MATCH_SENDER_ADDRESS');
         _;
     }
 
-    function ethAddress(bytes memory publicKey) public pure returns (address) {
-        bytes32 hash = keccak256(publicKey);
+    function ethAddress(bytes32 publicKeyX, bytes32 publicKeyY) public pure returns (address) {
+        bytes32 hash = keccak256(abi.encodePacked(publicKeyX, publicKeyY));
         return address(uint160(uint256(hash)));
     }
 
-    function zilAddress(bytes memory publicKey) public pure returns (address) {
-        bytes32 hash = sha256(compressPublicKey(publicKey));
+    function zilAddress(bytes32 publicKeyX, bytes32 publicKeyY) public pure returns (address) {
+        bytes32 hash = sha256(compressPublicKey(publicKeyX, publicKeyY));
         return address(uint160(uint256(hash)));
     }
 
-    function compressPublicKey(bytes memory publicKey) public pure returns (bytes memory) {
-        // First 32 bytes of public key is X coordinate
-        // Other 32 bytes of public key is Y coordinate
-        bytes32 x = bytes32(publicKey);
-        uint8 lastByte = uint8(publicKey[publicKey.length - 1]);
-        return abi.encodePacked(lastByte % 2 == 0 ? 0x02 : 0x03, x);
+    function compressPublicKey(bytes32 publicKeyX, bytes32 publicKeyY) public pure returns (bytes memory) {
+        uint8 lastByte = uint8(publicKeyY[publicKeyY.length - 1]);
+        return abi.encodePacked(lastByte % 2 == 0 ? 0x02 : 0x03, publicKeyX);
     }
 
     function onERC721Received(
