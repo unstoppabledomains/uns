@@ -32,4 +32,5 @@ export const TLD = {
   BINANCEUS: BigNumber.from('0x2a91107027b89ab420a4d8ec457493cfca12ab17615ec8c876695f1343f3f0fd'),
   REALM: BigNumber.from('0x2ac5a394f941733376764fbf4c4b2933098b23a405bd8c55c9a8d32e2c8fb696'),
   GO: BigNumber.from('0xa264639c3dbff58a1ded5efcf724e50a9c7847ff8197c87c00d009fbba2a3720'),
+  ALTIMIST: BigNumber.from('0x9bf15275eb85f2e69308f3dbfbe0f94cade4f05c2aa24ba7b9eba5ad2fb1a2cb'),
 };

@@ -99,7 +99,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         __ERC2771Context_init_unchained(forwarder);
         __Pausable_init_unchained();
 
-        string[19] memory tlds = [
+        string[20] memory tlds = [
             'crypto',
             'wallet',
             'x',
@@ -118,7 +118,8 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             'manga',
             'binanceus',
             'realm',
-            'go'
+            'go',
+            'altimist'
         ];
         for (uint256 i = 0; i < tlds.length; i++) {
             _addTld(tlds[i]);
