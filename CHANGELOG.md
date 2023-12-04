@@ -1,3 +1,7 @@
+## v0.8.41
+
+- Add `.altimist` TLD
+
 ## v0.8.40
 
 - Updated `ERG` UNS token validation regex
