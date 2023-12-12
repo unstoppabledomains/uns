@@ -37,6 +37,16 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
     IUNSRegistry public registry;
     IMintingManager public mintingManager;
 
+    /**
+     * @dev Checks if given public key matches the sender ethereum address
+     * @param publicKeyX public key X coordinate
+     * @param publicKeyY public key Y coordinate
+     */
+    modifier correctPublicKey(bytes32 publicKeyX, bytes32 publicKeyY) {
+        require(_msgSender() == ethAddress(publicKeyX, publicKeyY), 'ZilliqaRecover: PUBLIC_KEY_DOENT_MATCH_SENDER_ADDRESS');
+        _;
+    }
+
     function initialize(
         IUNSRegistry registry_,
         IMintingManager mintingManager_,
@@ -70,10 +80,6 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         }
     }
 
-    function znsOwnerOf(uint256 tokenId) public view returns (address) {
-        return _znsOwners[tokenId];
-    }
-
     function claim(
         uint256 tokenId,
         bytes32 publicKeyX,
@@ -83,9 +89,8 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         _claim(tokenId, zilAddress(publicKeyX, publicKeyX), newOwnerAddress);
     }
 
-    modifier correctPublicKey(bytes32 publicKeyX, bytes32 publicKeyY) {
-        require(_msgSender() == ethAddress(publicKeyX, publicKeyY), 'ZilliqaRecover: PUBLIC_KEY_DOENT_MATCH_SENDER_ADDRESS');
-        _;
+    function znsOwnerOf(uint256 tokenId) public view returns (address) {
+        return _znsOwners[tokenId];
     }
 
     function ethAddress(bytes32 publicKeyX, bytes32 publicKeyY) public pure returns (address) {
