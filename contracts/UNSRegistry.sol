@@ -3,7 +3,6 @@
 
 pragma solidity ^0.8.0;
 
-import 'hardhat/console.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
 
@@ -396,7 +395,6 @@ contract UNSRegistry is
         bool withReverse
     ) internal {
         _mint(to, tokenId);
-
         emit NewURI(tokenId, uri);
 
         if (withReverse) {
