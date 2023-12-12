@@ -8,11 +8,11 @@ import {IERC721ReceiverUpgradeable} from '@openzeppelin/contracts-upgradeable/to
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol';
 import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
-import './metatx/ERC2771RegistryContext.sol';
-import './IUNSRegistry.sol';
-import './IMintingManager.sol';
-import './metatx/Forwarder.sol';
-import './utils/Ownable.sol';
+import '../metatx/ERC2771RegistryContext.sol';
+import '../IUNSRegistry.sol';
+import '../IMintingManager.sol';
+import '../metatx/Forwarder.sol';
+import '../utils/Ownable.sol';
 
 /**
  * @title ZilliqaRecover

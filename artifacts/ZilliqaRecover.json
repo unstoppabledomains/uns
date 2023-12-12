@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "ZilliqaRecover",
-  "sourceName": "contracts/ZilliqaRecover.sol",
+  "sourceName": "contracts/custody/ZilliqaRecover.sol",
   "abi": [
     {
       "inputs": [],

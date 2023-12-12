@@ -6,10 +6,10 @@ import { ethers } from 'hardhat';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Wallet } from 'ethers';
-import { ZilliqaRecover__factory, UNSRegistry__factory, MintingManager__factory } from '../types/factories/contracts';
-import { MintingManager, UNSRegistry, ZilliqaRecover } from '../types';
-import { ZERO_ADDRESS } from './helpers/constants';
-import { buildExecuteFunc } from './helpers/metatx';
+import { ZilliqaRecover__factory, UNSRegistry__factory, MintingManager__factory } from '../../types/factories/contracts';
+import { MintingManager, UNSRegistry, ZilliqaRecover } from '../../types';
+import { ZERO_ADDRESS } from '../helpers/constants';
+import { buildExecuteFunc } from '../helpers/metatx';
 
 export const CompressedKeyRegex = /^(0x)?0(2|3)[a-f0-9]{64}$/i;
 export const UncompressedKeyRegex = /^(0x)?(04)?[a-f0-9]{128}$/i;
@@ -30,7 +30,7 @@ export const normalizePublicKey = (key: string): string => {
 export const messagePrefix = '\x19Ethereum Signed Message:\n';
 
 const ZilKey: KeystoreV3 = JSON.parse(
-  readFileSync('./test/zil18k3cvzg379g02et9fg2ga395r027jx5jggzvh5.json').toString(),
+  readFileSync(`${__dirname}/zil18k3cvzg379g02et9fg2ga395r027jx5jggzvh5.json`).toString(),
 );
 
 const onChainPubKey = (wallet: Wallet | string): [string, string] => {
