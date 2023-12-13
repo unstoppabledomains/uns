@@ -532,5 +532,31 @@ describe('UNSRegistry (metatx)', () => {
 
       expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
     });
+
+    it('should not allow passing malicious calldata to meta tx multicall', async () => {
+      const labels = ['res_label_m1x', 'crypto'];
+      const tokenId = await mintDomain(unsRegistry, owner, labels);
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
+
+      const { req, signature } = await buildExecuteParams(
+        'multicall(bytes[])',
+        [
+          [
+            ethers.utils.solidityPack(['bytes', 'address', 'uint256'], [
+              unsRegistry.interface.encodeFunctionData('setOwner', [nonOwner.address, tokenId]),
+              owner.address,
+              tokenId,
+            ]),
+          ],
+        ],
+        nonOwner,
+        tokenId,
+      );
+
+      await expect(
+        unsRegistry.connect(nonOwner).execute(req, signature),
+      ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    });
   });
 });

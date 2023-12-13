@@ -1,3 +1,7 @@
+## v0.8.42
+
+- Added test for Multicall + ERC2771 malicious calldata
+
 ## v0.8.41
 
 - Add `.altimist` TLD
