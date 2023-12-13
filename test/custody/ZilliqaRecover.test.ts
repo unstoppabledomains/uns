@@ -6,7 +6,7 @@ import { ethers } from 'hardhat';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Wallet } from 'ethers';
-import { ZilliqaRecover__factory, UNSRegistry__factory, MintingManager__factory } from '../../types/factories/contracts';
+import { custody, UNSRegistry__factory, MintingManager__factory } from '../../types/factories/contracts';
 import { MintingManager, UNSRegistry, ZilliqaRecover } from '../../types';
 import { ZERO_ADDRESS } from '../helpers/constants';
 import { buildExecuteFunc } from '../helpers/metatx';
@@ -70,7 +70,7 @@ describe('ZilliqaRecover', () => {
     await (
       await coinbase.sendTransaction({ to: zilWallet.address, value: BigNumber.from('100000000000000000000') })
     ).wait();
-    zilliqaRecover = await new ZilliqaRecover__factory(coinbase).deploy();
+    zilliqaRecover = await new custody.ZilliqaRecover__factory(coinbase).deploy();
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     mintingManager = await new MintingManager__factory(coinbase).deploy();
     await zilliqaRecover.initialize(unsRegistry.address, mintingManager.address, coinbase.address);
@@ -89,13 +89,6 @@ describe('ZilliqaRecover', () => {
   describe('ethAddress', async () => {
     it('calculates eth address from public key', async () => {
       expect(await zilliqaRecover.ethAddress(...publicKey)).to.eql(zilWallet.address);
-    });
-  });
-
-  describe('compressedPublicKey', async () => {
-    it('compresses public key to zil format', async () => {
-      const compressedPublicKey = await zilliqaRecover.compressPublicKey(...publicKey);
-      expect(compressedPublicKey).to.eql('0x' + compressPublicKey(zilWallet.publicKey.replace('0x', '')));
     });
   });
 

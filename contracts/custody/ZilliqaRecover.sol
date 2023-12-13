@@ -23,7 +23,9 @@ import '../utils/Ownable.sol';
  */
 contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, Forwarder, IERC721ReceiverUpgradeable {
     struct MintingToken {
+        // Zilliqa address that was an owner of the token
         address zilOwner;
+        // Token label without .zil suffix. Only SLDs avaiable
         string label;
     }
     using SignatureCheckerUpgradeable for address;
@@ -47,6 +49,12 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         _;
     }
 
+    /**
+     * @dev Initializes the contract
+     * @param registry_ UNSRegistry address
+     * @param mintingManager_ MintingManager address
+     * @param owner Owner address that can mint domains
+     */
     function initialize(
         IUNSRegistry registry_,
         IMintingManager mintingManager_,
@@ -58,6 +66,10 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         __Ownable_init();
     }
 
+    /**
+     * @dev Mints multiple .zil tokens to this custodial contract.
+     * @param tokens List of tokens to be minted
+     */
     function mintAll(MintingToken[] calldata tokens) public onlyOwner {
         for (uint256 i = 0; i < tokens.length; i++) {
             MintingToken calldata data = tokens[i];
@@ -65,10 +77,23 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         }
     }
 
-    function mint(string calldata label, address zilOwner) public onlyOwner {
-        _mint(label, zilOwner);
+    /**
+     * @dev Mints token to this custodial contract.
+     * @param label Domain label without TLD
+     * @param zilOwner owner address on ZNS
+     * @return minted token id
+     */
+    function mint(string calldata label, address zilOwner) public onlyOwner returns (uint256) {
+        return _mint(label, zilOwner);
     }
 
+    /**
+     * @dev Transfers tokens to new owner address
+     * @param tokenIds Array of token ids
+     * @param publicKeyX X coordinate of the public key of ZNS owner address.
+     * @param publicKeyY Y coordinate of the public key of ZNS owner address.
+     * @param newOwnerAddress new EVM owner address the token needs to be transferred to.
+     */
     function claimAll(
         uint256[] memory tokenIds,
         bytes32 publicKeyX,
@@ -80,6 +105,13 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         }
     }
 
+    /**
+     * @dev Transfers a token to new owner address
+     * @param tokenId Token id to be transfered.
+     * @param publicKeyX X coordinate of the public key of ZNS owner address.
+     * @param publicKeyY Y coordinate of the public key of ZNS owner address.
+     * @param newOwnerAddress new EVM owner address the token needs to be transferred to.
+     */
     function claim(
         uint256 tokenId,
         bytes32 publicKeyX,
@@ -89,23 +121,32 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         _claim(tokenId, zilAddress(publicKeyX, publicKeyX), newOwnerAddress);
     }
 
+    /**
+     * @return Zilliqa owner address of the token on ZNS
+     * @param tokenId Token
+     */
     function znsOwnerOf(uint256 tokenId) public view returns (address) {
         return _znsOwners[tokenId];
     }
 
+    /**
+     * @return EVM address calculated from public key
+     * @param publicKeyX X coordinate of the public key
+     * @param publicKeyY Y coordinate of the public key
+     */
     function ethAddress(bytes32 publicKeyX, bytes32 publicKeyY) public pure returns (address) {
         bytes32 hash = keccak256(abi.encodePacked(publicKeyX, publicKeyY));
         return address(uint160(uint256(hash)));
     }
 
+    /**
+     * @return Zilliqa address calculated from public key
+     * @param publicKeyX X coordinate of the public key
+     * @param publicKeyY Y coordinate of the public key
+     */
     function zilAddress(bytes32 publicKeyX, bytes32 publicKeyY) public pure returns (address) {
-        bytes32 hash = sha256(compressPublicKey(publicKeyX, publicKeyY));
+        bytes32 hash = sha256(_compressPublicKey(publicKeyX, publicKeyY));
         return address(uint160(uint256(hash)));
-    }
-
-    function compressPublicKey(bytes32 publicKeyX, bytes32 publicKeyY) public pure returns (bytes memory) {
-        uint8 lastByte = uint8(publicKeyY[publicKeyY.length - 1]);
-        return abi.encodePacked(lastByte % 2 == 0 ? 0x02 : 0x03, publicKeyX);
     }
 
     function onERC721Received(
@@ -116,6 +157,11 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
     ) external view returns (bytes4) {
         require(znsOwnerOf(tokenId) != address(0x00), 'ZilliqaRecover: UNKNOWN_TOKEN_RECEIVED');
         return ZilliqaRecover.onERC721Received.selector;
+    }
+
+    function _compressPublicKey(bytes32 publicKeyX, bytes32 publicKeyY) private pure returns (bytes memory) {
+        uint8 lastByte = uint8(publicKeyY[publicKeyY.length - 1]);
+        return abi.encodePacked(lastByte % 2 == 0 ? 0x02 : 0x03, publicKeyX);
     }
 
     function _msgSender() internal view override(ERC2771RegistryContext, ContextUpgradeable, Ownable) returns (address) {
@@ -138,7 +184,7 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         emit Claimed(tokenId, _msgSender(), newOwnerAddress);
     }
 
-    function _mint(string calldata label, address zilOwner) private {
+    function _mint(string calldata label, address zilOwner) private returns (uint256) {
         string[] memory empty;
         uint256 tokenId = uint256(keccak256(abi.encodePacked(ZIL_NODE, keccak256(abi.encodePacked(label)))));
         string[] memory labels = new string[](2);
@@ -146,5 +192,6 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         labels[1] = 'zil';
         _znsOwners[tokenId] = zilOwner;
         mintingManager.issueWithRecords(address(this), labels, empty, empty, false);
+        return tokenId;
     }
 }
