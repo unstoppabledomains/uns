@@ -12,9 +12,6 @@ jobs:
     concurrency: uns-release
     steps:
       - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.PAT }}
-
       - name: 'Extract current package version'
         run: node -p -e '`PACKAGE_VERSION=${"v" + require("./package.json").version}`' >> $GITHUB_ENV
 
@@ -58,5 +55,5 @@ jobs:
           commit_user_name: UNS Release Bot
           commit_user_email: release@unstoppabledomains.com
           commit_author: UNS Release bot <release@unstoppabledomains.com>
-          tagging_message: "${{ env.PACKAGE_VERSION }}"
+          tagging_message: '${{ env.PACKAGE_VERSION }}'
           skip_dirty_check: false
