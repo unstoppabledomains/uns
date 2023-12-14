@@ -23,6 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.legacyEthRegistrarControllerSol = exports.legacyEnsRegistrySol = void 0;
+exports.dnssec = exports.legacyEthRegistrarControllerSol = exports.legacyEnsRegistrySol = void 0;
 exports.legacyEnsRegistrySol = __importStar(require("./LegacyENSRegistry.sol"));
 exports.legacyEthRegistrarControllerSol = __importStar(require("./LegacyETHRegistrarController.sol"));
+exports.dnssec = __importStar(require("./dnssec"));

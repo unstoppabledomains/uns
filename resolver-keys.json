@@ -1,5 +1,5 @@
 {
-  "version": "2.1.28",
+  "version": "2.1.30",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -154,12 +154,12 @@
     "crypto.ADA.address": {
       "deprecatedKeyName": "ADA",
       "deprecated": false,
-      "validationRegex": "^[1-9a-km-zA-HJ-NP-Z]{104}$|^A[1-9A-HJ-NP-Za-km-z]{58}$|^addr[0-9a-zA-Z]{99}$"
+      "validationRegex": "^[1-9a-km-zA-HJ-NP-Z]{104}$|^A[1-9A-HJ-NP-Za-km-z]{58}$|^addr([0-9a-zA-Z]{99}|[0-9a-zA-Z]{54})$"
     },
     "crypto.EOS.address": {
       "deprecatedKeyName": "EOS",
       "deprecated": false,
-      "validationRegex": "^[a-z][a-z1-5.]{10}[a-z1-5]$"
+      "validationRegex": "^[1-5a-z]{12}$|^EOS[a-zA-Z0-9]{50}$|^PUB_K[0-9]_[a-zA-Z0-9]{50}$"
     },
     "crypto.XLM.address": {
       "deprecatedKeyName": "XLM",
@@ -319,7 +319,7 @@
     "crypto.BSV.address": {
       "deprecatedKeyName": "BSV",
       "deprecated": false,
-      "validationRegex": "^bitcoincash:[a-zA-Z0-9]{42}$"
+      "validationRegex": "^[a-zA-Z0-9]{33,34}$"
     },
     "crypto.GAS.address": {
       "deprecatedKeyName": "GAS",
@@ -458,7 +458,7 @@
     },
     "crypto.TLOS.address": {
       "deprecatedKeyName": "TLOS",
-      "validationRegex": "^[a-z][a-z1-5.]{10}[a-z1-5]$",
+      "validationRegex": "^[1-5a-z]{12}$",
       "deprecated": false
     },
     "crypto.XDC.address": {
@@ -523,7 +523,7 @@
     },
     "crypto.USDT.version.EOS.address": {
       "deprecatedKeyName": "USDT_EOS",
-      "validationRegex": "^[a-z][a-z1-5.]{10}[a-z1-5]$",
+      "validationRegex": "^[1-5a-z]{12}$|^EOS[a-zA-Z0-9]{50}$|^PUB_K[0-9]_[a-zA-Z0-9]{50}$",
       "deprecated": false
     },
     "crypto.USDT.version.OMNI.address": {
@@ -1373,7 +1373,7 @@
     },
     "crypto.RUNE.address": {
       "deprecatedKeyName": "RUNE",
-      "validationRegex": "^(bnb|tbnb)[a-zA-HJ-NP-Z0-9]{39}$",
+      "validationRegex": "^thor[a-zA-HJ-NP-Z0-9]{39}$",
       "deprecated": false
     },
     "crypto.HBAR.address": {
@@ -1423,7 +1423,7 @@
     },
     "crypto.EGLD.address": {
       "deprecatedKeyName": "EGLD",
-      "validationRegex": "^0x[a-zA-Z0-9]*$",
+      "validationRegex": "^erd[a-zA-Z0-9]{59}$",
       "deprecated": false
     },
     "crypto.TUSD.version.ERC20.address": {
@@ -1528,7 +1528,7 @@
     },
     "crypto.STX.address": {
       "deprecatedKeyName": "STX",
-      "validationRegex": "^[a-zA-Z0-9]*$",
+      "validationRegex": "^SP[A-Z0-9]{38,39}$",
       "deprecated": false
     },
     "crypto.MANA.version.ERC20.address": {
@@ -1853,7 +1853,7 @@
     },
     "crypto.ERG.address": {
       "deprecatedKeyName": "ERG",
-      "validationRegex": "^0x[a-zA-Z0-9]*$",
+      "validationRegex": "^[a-zA-Z0-9]{51}$",
       "deprecated": false
     },
     "crypto.WIN.address": {

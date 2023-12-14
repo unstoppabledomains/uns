@@ -1,0 +1,1 @@
+[{"inputs":[{"internalType":"bytes","name":"salt","type":"bytes"},{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"uint256","name":"iterations","type":"uint256"}],"name":"hash","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"pure","type":"function"}]

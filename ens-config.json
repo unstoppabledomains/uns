@@ -1,5 +1,5 @@
 {
-    "version": "0.1.8",
+    "version": "0.1.9",
     "networks": {
         "1": {
             "contracts": {
@@ -55,6 +55,14 @@
                 "LegacyETHRegistrarController": {
                     "address": "0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5",
                     "deploymentBlock": "0x8f2277"
+                },
+                "DNSRegistrar": {
+                    "address": "0x58774Bb8acD458A640aF0B88238369A167546ef2",
+                    "deploymentBlock": "0xc6faf4"
+                },
+                "DNSSECImpl": {
+                    "address": "0x46c6F79952d3046Bf673a28132ff2a81F306959c",
+                    "deploymentBlock": "0xc6fa9e"
                 }
             }
         },
@@ -112,6 +120,14 @@
                 "LegacyETHRegistrarController": {
                     "address": "0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5",
                     "deploymentBlock": "0x1fd6f0"
+                },
+                "DNSRegistrar": {
+                    "address": "0x8edc487D26F6c8Fa76e032066A3D4F87E273515d",
+                    "deploymentBlock": "0x62ba01"
+                },
+                "DNSSECImpl": {
+                    "address": "0xF427c4AdED8B6dfde604865c1a7E953B160C26f0",
+                    "deploymentBlock": "0x62b998"
                 }
             }
         },
@@ -165,10 +181,10 @@
                     "legacyAddresses": []
                 },
                 "ENSCustody": {
-                    "address": "0xDa429c9136b95E18c6396c7B18f85ACcc8575164",
-                    "deploymentBlock": "0x40",
-                    "implementation": "0xf7313E5a57432B8A90233F7158D6dDE03572Dd9f",
-                    "forwarder": "0xDa429c9136b95E18c6396c7B18f85ACcc8575164",
+                    "address": "0x2A82DC3E8A7c6E2eb6C0Bc8962fA5B21a5E41d81",
+                    "deploymentBlock": "0x50",
+                    "implementation": "0xFb82C655715B43b07863e9c2fd42f60bbd9838B0",
+                    "forwarder": "0x2A82DC3E8A7c6E2eb6C0Bc8962fA5B21a5E41d81",
                     "legacyAddresses": []
                 },
                 "LegacyENSRegistry": {
@@ -180,6 +196,14 @@
                     "address": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
                     "deploymentBlock": "0x32",
                     "legacyAddresses": []
+                },
+                "DNSSECImpl": {
+                    "address": "0x9dF67c91f1bFCB4D966cF764E9218685E7c59E8a",
+                    "deploymentBlock": "0x44"
+                },
+                "DNSRegistrar": {
+                    "address": "0x49Da8861C65460639925FeBE1FB4b5b59B443082",
+                    "deploymentBlock": "0x4b"
                 }
             }
         }

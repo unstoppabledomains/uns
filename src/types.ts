@@ -27,7 +27,16 @@ export enum ArtifactName {
   PublicResolver = 'PublicResolver',
   ENSCustody = 'ENSCustody',
   LegacyENSRegistry = 'LegacyENSRegistry',
-  LegacyETHRegistrarController = 'LegacyETHRegistrarController'
+  LegacyETHRegistrarController = 'LegacyETHRegistrarController',
+  DNSRegistrar = 'DNSRegistrar',
+  DNSSECImpl = 'DNSSECImpl',
+  TLDPublicSuffixList = 'TLDPublicSuffixList',
+  RSASHA256Algorithm = 'RSASHA256Algorithm',
+  DummyAlgorithm = 'DummyAlgorithm',
+  SHA1Digest = 'SHA1Digest',
+  SHA256Digest = 'SHA256Digest',
+  SHA1NSEC3Digest = 'SHA1NSEC3Digest',
+  Root = 'Root',
 }
 
 export enum UnsContractName {
@@ -62,6 +71,8 @@ export enum EnsContractName {
   ENSCustody = 'ENSCustody',
   LegacyENSRegistry = 'LegacyENSRegistry',
   LegacyETHRegistrarController = 'LegacyETHRegistrarController',
+  DNSRegistrar = 'DNSRegistrar',
+  DNSSECImpl = 'DNSSECImpl',
 }
 
 export type ContractName = EnsContractName | UnsContractName;

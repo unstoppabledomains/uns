@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.3",
   "information": {
     "description": "All common ENS resolver keys with a defined meaning and related metadata",
     "documentation": "https://docs.unstoppabledomains.com/resolution/guides/records-reference",
@@ -142,7 +142,7 @@
       "unsKey": "crypto.EGLD.address",
       "symbol": "EGLD",
       "label": "MultiversX",
-      "validationRegex": "^0x[a-zA-Z0-9]*$"
+      "validationRegex": "^erd[a-zA-Z0-9]{59}$"
     },
     "addr.121": {
       "unsKey": "crypto.ZEN.address",
@@ -242,7 +242,7 @@
       "unsKey": "crypto.EOS.address",
       "symbol": "EOS",
       "label": "EOS",
-      "validationRegex": "^[a-z][a-z1-5.]{10}[a-z1-5]$"
+      "validationRegex": "^[1-5a-z]{12}$|^EOS[a-zA-Z0-9]{50}$|^PUB_K[0-9]_[a-zA-Z0-9]{50}$"
     },
     "addr.195": {
       "unsKey": "crypto.TRX.address",
@@ -266,7 +266,7 @@
       "unsKey": "crypto.BSV.address",
       "symbol": "BSV",
       "label": "BitcoinSV",
-      "validationRegex": "^bitcoincash:[a-zA-Z0-9]{42}$"
+      "validationRegex": "^[a-zA-Z0-9]{33,34}$"
     },
     "addr.239": {
       "unsKey": "crypto.NEO.address",
@@ -505,7 +505,7 @@
       "unsKey": "crypto.RUNE.address",
       "symbol": "RUNE",
       "label": "THORChain (RUNE)",
-      "validationRegex": "^(bnb|tbnb)[a-zA-HJ-NP-Z0-9]{39}$"
+      "validationRegex": "^thor[a-zA-HJ-NP-Z0-9]{39}$"
     },
     "addr.999": {
       "unsKey": "crypto.BCD.address",
@@ -540,7 +540,7 @@
       "unsKey": "crypto.ADA.address",
       "symbol": "ADA",
       "label": "Cardano",
-      "validationRegex": "^[1-9a-km-zA-HJ-NP-Z]{104}$|^A[1-9A-HJ-NP-Za-km-z]{58}$|^addr[0-9a-zA-Z]{99}$"
+      "validationRegex": "^[1-9a-km-zA-HJ-NP-Z]{104}$|^A[1-9A-HJ-NP-Za-km-z]{58}$|^addr([0-9a-zA-Z]{99}|[0-9a-zA-Z]{54})$"
     },
     "addr.1991": {
       "unsKey": "crypto.SC.address",
@@ -594,7 +594,7 @@
       "unsKey": "crypto.STX.address",
       "symbol": "STX",
       "label": "Stacks",
-      "validationRegex": "^[a-zA-Z0-9]*$"
+      "validationRegex": "^SP[A-Z0-9]{38,39}$"
     },
     "addr.8444": {
       "unsKey": "crypto.XCH.address",
@@ -652,7 +652,7 @@
     "addr.2147483658": {
       "unsKey": null,
       "symbol": "OP",
-      "validationRegex": "^(.+){1,1024}$"
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
     },
     "addr.2147483673": {
       "unsKey": "crypto.CRO.address",
@@ -664,7 +664,7 @@
       "unsKey": null,
       "symbol": "BSC",
       "label": "Binance Smart Chain",
-      "validationRegex": "^(.+){1,1024}$"
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
     },
     "addr.2147483708": {
       "unsKey": null,
@@ -741,7 +741,7 @@
       "unsKey": null,
       "symbol": "ARB1",
       "label": "Arbitrum",
-      "validationRegex": "^(.+){1,1024}$"
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
     },
     "addr.2147525868": {
       "unsKey": "crypto.CELO.address",
@@ -753,7 +753,7 @@
       "unsKey": null,
       "symbol": "AVAXC",
       "label": "Avalanche C-Chain",
-      "validationRegex": "^(.+){1,1024}$"
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
     },
     "text.avatar": {
       "unsKey": "social.picture.value",

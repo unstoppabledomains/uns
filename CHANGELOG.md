@@ -1,3 +1,27 @@
+## v0.8.42
+
+- Added test for Multicall + ERC2771 malicious calldata
+
+## v0.8.41
+
+- Add `.altimist` TLD
+
+## v0.8.40
+
+- Updated `ERG` UNS token validation regex
+
+## v0.8.39
+
+- Updated `ADA` ENS token validation regex
+
+## v0.8.38
+
+- Update regex validation across a set of tokens
+
+## v0.8.37
+
+- Add ENS DNSSEC smart contracts to configs, artifacts and sandbox
+
 ## v0.8.36
 
 - Upgraded `MintingManager@0.4.18` on Mumbai and Polygon mainnet
