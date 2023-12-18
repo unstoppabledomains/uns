@@ -12,11 +12,12 @@ import '../metatx/ERC2771RegistryContext.sol';
 import '../IUNSRegistry.sol';
 import '../IMintingManager.sol';
 import '../metatx/Forwarder.sol';
-import '../utils/Ownable.sol';
+import '../roles/MinterRole.sol';
 
 error PublicKeyUnmatchSenderAddress(bytes32 publicKeyX, bytes32 publicKeyY);
 error UnknownTokenReceived(uint256 tokenId, address contractAddress);
 error TokenOwnedByOtherZilAddress(uint256 tokenId, address znsOwner, address receivedOwner);
+error SenderNotMinter(address sender);
 
 /**
  * @title ZilliqaRecover
@@ -25,7 +26,7 @@ error TokenOwnedByOtherZilAddress(uint256 tokenId, address znsOwner, address rec
  * on Zilliqa blockchain by confirming their identity with EVM compatible signature
  * generated from Zilliqa Private Key and proving a new ETH wallet address.
  */
-contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, Forwarder, IERC721ReceiverUpgradeable {
+contract ZilliqaRecover is ContextUpgradeable, ERC2771RegistryContext, Forwarder, IERC721ReceiverUpgradeable {
     struct MintingToken {
         // Zilliqa address that was an owner of the token.
         address zilOwner;
@@ -60,6 +61,13 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         _;
     }
 
+    modifier onlyMinter() {
+        if (!MinterRole(address(mintingManager)).isMinter(_msgSender()) || _msgSender() == address(this)) {
+            revert SenderNotMinter(_msgSender());
+        }
+        _;
+    }
+
     /**
      * @dev Initializes the contract
      * @param registry_ UNSRegistry address
@@ -68,14 +76,13 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
     function initialize(IUNSRegistry registry_, IMintingManager mintingManager_) public initializer {
         registry = registry_;
         mintingManager = mintingManager_;
-        _transferOwnership(_msgSender());
     }
 
     /**
      * @dev Mints multiple .zil tokens to this custodial contract.
      * @param tokens List of tokens to be minted
      */
-    function mintAll(MintingToken[] calldata tokens) public onlyOwner {
+    function mintAll(MintingToken[] calldata tokens) public onlyMinter {
         for (uint256 i = 0; i < tokens.length; i++) {
             _mint(tokens[i].label, tokens[i].zilOwner);
         }
@@ -87,7 +94,7 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
      * @param zilOwner owner address on ZNS
      * @return minted token id
      */
-    function mint(string calldata label, address zilOwner) public onlyOwner returns (uint256) {
+    function mint(string calldata label, address zilOwner) public onlyMinter returns (uint256) {
         uint256 tokenId = _mint(label, zilOwner);
         _protectTokenOperation(tokenId);
         return tokenId;
@@ -173,11 +180,11 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         return abi.encodePacked(lastByte % 2 == 0 ? 0x02 : 0x03, publicKeyX);
     }
 
-    function _msgSender() internal view override(ERC2771RegistryContext, ContextUpgradeable, Ownable) returns (address) {
+    function _msgSender() internal view override(ERC2771RegistryContext, ContextUpgradeable) returns (address) {
         return super._msgSender();
     }
 
-    function _msgData() internal view override(ERC2771RegistryContext, ContextUpgradeable, Ownable) returns (bytes calldata) {
+    function _msgData() internal view override(ERC2771RegistryContext, ContextUpgradeable) returns (bytes calldata) {
         return super._msgData();
     }
 

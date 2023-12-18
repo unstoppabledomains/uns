@@ -65,7 +65,7 @@ describe('ZilliqaRecover', () => {
       ZERO_ADDRESS,
       ZERO_ADDRESS,
     );
-    await mintingManager.addMinter(zilliqaRecover.address);
+    await mintingManager.addMinters([zilliqaRecover.address, coinbase.address]);
   });
 
   describe('ethAddress', async () => {
@@ -92,6 +92,11 @@ describe('ZilliqaRecover', () => {
         'ZnsTokenClaimed',
       );
       expect(await unsRegistry.ownerOf(tokenId)).to.eql(newOwner.address);
+    });
+
+    it('requires minting permission', async () => {
+      const { label } = getRandomDomain();
+      await expect(zilliqaRecover.connect(zilWallet).mint(label, zilAddress)).to.be.revertedWith('SenderNotMinter');
     });
 
     it('requires matching public key without prefix', async () => {
@@ -142,7 +147,7 @@ describe('ZilliqaRecover', () => {
       expect(await unsRegistry.ownerOf(tokenId)).to.eql(newOwner.address);
     });
 
-    it('supports claiming with invalid forwarded token', async () => {
+    it('reverts claiming with invalid forwarded token', async () => {
       const { tokenId, label } = getRandomDomain();
       const invalidTokenId = tokenId.replace(/0x..../, '0x0000');
       expect(invalidTokenId).to.not.eql(tokenId);

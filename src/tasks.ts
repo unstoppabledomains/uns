@@ -416,8 +416,6 @@ const deployZilliqaRecoverTask: Task = {
     }
     const proxyAdmin = await upgrades.admin.getInstance();
     const zilliqaRecoverImpl = await proxyAdmin.callStatic.getProxyImplementation(zilliqaRecover.address);
-    const minter = ctx.minters[0];
-    await zilliqaRecover.transferOwnership(minter);
     await ctx.saveContractConfig(UnsContractName.ZilliqaRecover, zilliqaRecover, zilliqaRecoverImpl, zilliqaRecover);
     await verify(ctx, zilliqaRecoverImpl, []);
   },
