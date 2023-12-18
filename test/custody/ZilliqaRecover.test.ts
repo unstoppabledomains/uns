@@ -55,7 +55,7 @@ describe('ZilliqaRecover', () => {
     zilliqaRecover = await new custody.ZilliqaRecover__factory(coinbase).deploy();
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     mintingManager = await new MintingManager__factory(coinbase).deploy();
-    await zilliqaRecover.initialize(unsRegistry.address, mintingManager.address, coinbase.address);
+    await zilliqaRecover.initialize(unsRegistry.address, mintingManager.address);
     await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await mintingManager.initialize(
       unsRegistry.address,

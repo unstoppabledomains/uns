@@ -16,6 +16,7 @@ export enum ArtifactName {
   MintableERC721Predicate = 'MintableERC721Predicate',
   RootChainManager = 'RootChainManager',
   DotCoinBurner = 'DotCoinBurner',
+  ZilliqaRecover = 'ZilliqaRecover',
   // ENS
   ENSRegistry = 'ENSRegistry',
   BaseRegistrarImplementation = 'BaseRegistrarImplementation',
@@ -57,6 +58,7 @@ export enum UnsContractName {
   MintableERC721Predicate = 'MintableERC721Predicate',
   RootChainManager = 'RootChainManager',
   DotCoinBurner = 'DotCoinBurner',
+  ZilliqaRecover = 'ZilliqaRecover',
 }
 
 export enum EnsContractName {

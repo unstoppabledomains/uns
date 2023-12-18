@@ -43,11 +43,6 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
     IUNSRegistry public registry;
     IMintingManager public mintingManager;
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    // constructor() {
-    // _disableInitializers();
-    // }
-
     /**
      * @dev Checks if given public key matches the sender ethereum address
      * @param publicKeyX public key X coordinate
@@ -69,16 +64,11 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
      * @dev Initializes the contract
      * @param registry_ UNSRegistry address
      * @param mintingManager_ MintingManager address
-     * @param owner Owner address that can mint domains
      */
-    function initialize(
-        IUNSRegistry registry_,
-        IMintingManager mintingManager_,
-        address owner
-    ) public initializer {
+    function initialize(IUNSRegistry registry_, IMintingManager mintingManager_) public initializer {
         registry = registry_;
         mintingManager = mintingManager_;
-        _transferOwnership(owner);
+        _transferOwnership(_msgSender());
     }
 
     /**

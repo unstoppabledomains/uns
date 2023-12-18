@@ -426,9 +426,15 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x54563a9e1cD2dCBD0BCA90D3CFA4A647e02C404a",
+                    "address": "0xD178b720229c39De617846F84cf9c8D32a63a23D",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x27"
+                    "deploymentBlock": "0x2b"
+                },
+                "ZilliqaRecover": {
+                    "address": "0x70fDaD6FB674d2EbAa36719839aCf496843994A2",
+                    "deploymentBlock": "0x25",
+                    "implementation": "0x56b793E4aD031Dd3EFeF272dc133D212d5fBddc3",
+                    "forwarder": "0x70fDaD6FB674d2EbAa36719839aCf496843994A2"
                 }
             }
         },
