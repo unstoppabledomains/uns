@@ -14,6 +14,10 @@ import '../IMintingManager.sol';
 import '../metatx/Forwarder.sol';
 import '../utils/Ownable.sol';
 
+error PublicKeyUnmatchSenderAddress(bytes32 publicKeyX, bytes32 publicKeyY);
+error UnknownTokenReceived(uint256 tokenId, address contractAddress);
+error TokenOwnedByOtherZilAddress(uint256 tokenId, address znsOwner, address receivedOwner);
+
 /**
  * @title ZilliqaRecover
  * @dev Custody contract for ZNS domains transferred from Zilliqa Blockchain.
@@ -23,15 +27,15 @@ import '../utils/Ownable.sol';
  */
 contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, Forwarder, IERC721ReceiverUpgradeable {
     struct MintingToken {
-        // Zilliqa address that was an owner of the token
+        // Zilliqa address that was an owner of the token.
         address zilOwner;
-        // Token label without .zil suffix. Only SLDs avaiable
+        // SLD label without .zil suffix, only .zil SLDs possible.
         string label;
     }
     using SignatureCheckerUpgradeable for address;
     using ECDSAUpgradeable for bytes32;
-    event Claimed(uint256 tokenId, address oldAddress, address newAddress);
-    event ZilOwnership(uint256 tokenId, address zilAddress);
+    event ZnsTokenClaimed(uint256 indexed tokenId, address indexed oldAddress, address indexed newAddress);
+    event ZnsTokenMinted(uint256 indexed tokenId, address indexed zilAddress, string label);
 
     uint256 public constant ZIL_NODE = 0xd81bbfcee722494b885e891546eeac23d0eedcd44038d7a2f6ef9ec2f9e0d239;
 
@@ -39,13 +43,25 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
     IUNSRegistry public registry;
     IMintingManager public mintingManager;
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    // constructor() {
+    // _disableInitializers();
+    // }
+
     /**
      * @dev Checks if given public key matches the sender ethereum address
      * @param publicKeyX public key X coordinate
      * @param publicKeyY public key Y coordinate
      */
     modifier correctPublicKey(bytes32 publicKeyX, bytes32 publicKeyY) {
-        require(_msgSender() == ethAddress(publicKeyX, publicKeyY), 'ZilliqaRecover: PUBLIC_KEY_DOENT_MATCH_SENDER_ADDRESS');
+        if (_msgSender() != ethAddress(publicKeyX, publicKeyY)) {
+            revert PublicKeyUnmatchSenderAddress(publicKeyX, publicKeyY);
+        }
+        _;
+    }
+
+    modifier protectTokenOperation(uint256 tokenId) {
+        _protectTokenOperation(tokenId);
         _;
     }
 
@@ -63,7 +79,6 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         registry = registry_;
         mintingManager = mintingManager_;
         _transferOwnership(owner);
-        __Ownable_init();
     }
 
     /**
@@ -72,8 +87,7 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
      */
     function mintAll(MintingToken[] calldata tokens) public onlyOwner {
         for (uint256 i = 0; i < tokens.length; i++) {
-            MintingToken calldata data = tokens[i];
-            _mint(data.label, data.zilOwner);
+            _mint(tokens[i].label, tokens[i].zilOwner);
         }
     }
 
@@ -84,7 +98,9 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
      * @return minted token id
      */
     function mint(string calldata label, address zilOwner) public onlyOwner returns (uint256) {
-        return _mint(label, zilOwner);
+        uint256 tokenId = _mint(label, zilOwner);
+        _protectTokenOperation(tokenId);
+        return tokenId;
     }
 
     /**
@@ -95,13 +111,14 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
      * @param newOwnerAddress new EVM owner address the token needs to be transferred to.
      */
     function claimAll(
-        uint256[] memory tokenIds,
+        uint256[] calldata tokenIds,
         bytes32 publicKeyX,
         bytes32 publicKeyY,
         address newOwnerAddress
     ) public correctPublicKey(publicKeyX, publicKeyY) {
+        address zilAddress_ = zilAddress(publicKeyX, publicKeyY);
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            _claim(tokenIds[i], zilAddress(publicKeyX, publicKeyY), newOwnerAddress);
+            _claim(tokenIds[i], zilAddress_, newOwnerAddress);
         }
     }
 
@@ -117,7 +134,7 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         bytes32 publicKeyX,
         bytes32 publicKeyY,
         address newOwnerAddress
-    ) public correctPublicKey(publicKeyX, publicKeyY) {
+    ) public correctPublicKey(publicKeyX, publicKeyY) protectTokenOperation(tokenId) {
         _claim(tokenId, zilAddress(publicKeyX, publicKeyX), newOwnerAddress);
     }
 
@@ -155,7 +172,9 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         uint256 tokenId,
         bytes calldata
     ) external view returns (bytes4) {
-        require(znsOwnerOf(tokenId) != address(0x00), 'ZilliqaRecover: UNKNOWN_TOKEN_RECEIVED');
+        if (_msgSender() != address(registry) || znsOwnerOf(tokenId) == address(0x00)) {
+            revert UnknownTokenReceived(tokenId, _msgSender());
+        }
         return ZilliqaRecover.onERC721Received.selector;
     }
 
@@ -177,11 +196,13 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         address zilAddress_,
         address newOwnerAddress
     ) private {
-        require(znsOwnerOf(tokenId) == zilAddress_, 'ZilliqaRecover: TOKEN_OWNED_BY_OTHER_ADDRESS');
+        if (znsOwnerOf(tokenId) != zilAddress_) {
+            revert TokenOwnedByOtherZilAddress(tokenId, znsOwnerOf(tokenId), zilAddress_);
+        }
 
         _znsOwners[tokenId] = address(0);
         registry.safeTransferFrom(address(this), newOwnerAddress, tokenId);
-        emit Claimed(tokenId, _msgSender(), newOwnerAddress);
+        emit ZnsTokenClaimed(tokenId, _msgSender(), newOwnerAddress);
     }
 
     function _mint(string calldata label, address zilOwner) private returns (uint256) {
@@ -192,6 +213,15 @@ contract ZilliqaRecover is Ownable, ContextUpgradeable, ERC2771RegistryContext, 
         labels[1] = 'zil';
         _znsOwners[tokenId] = zilOwner;
         mintingManager.issueWithRecords(address(this), labels, empty, empty, false);
+        emit ZnsTokenMinted(tokenId, zilOwner, label);
         return tokenId;
+    }
+
+    function _protectTokenOperation(uint256 tokenId) internal {
+        if (isTrustedForwarder(msg.sender)) {
+            _validateForwardedToken(tokenId);
+        } else {
+            _invalidateNonce(tokenId);
+        }
     }
 }

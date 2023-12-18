@@ -11,29 +11,13 @@ import { MintingManager, UNSRegistry, ZilliqaRecover } from '../../types';
 import { ZERO_ADDRESS } from '../helpers/constants';
 import { buildExecuteFunc } from '../helpers/metatx';
 
-export const CompressedKeyRegex = /^(0x)?0(2|3)[a-f0-9]{64}$/i;
-export const UncompressedKeyRegex = /^(0x)?(04)?[a-f0-9]{128}$/i;
-
-export const normalizePublicKey = (key: string): string => {
-  if (key.match(/^0x[a-f0-9]+$/i)) {
-    key = key.substring(2);
-  }
-  if (key.match(UncompressedKeyRegex)) {
-    if (key.length === 128) {
-      key = '04' + key;
-    }
-    key = compressPublicKey(key);
-  }
-  return key;
-};
-
-export const messagePrefix = '\x19Ethereum Signed Message:\n';
-
 const ZilKey: KeystoreV3 = JSON.parse(
   readFileSync(`${__dirname}/zil18k3cvzg379g02et9fg2ga395r027jx5jggzvh5.json`).toString(),
 );
 
 const onChainPubKey = (wallet: Wallet | string): [string, string] => {
+  // ETH public key format has a 0x04 constant prefix
+  // We don't need to that when operating public key in a contract
   return (typeof wallet === 'string' ? wallet : wallet.publicKey)
     .replace(/^0x04/, '')
     .split(/(.{64})/)
@@ -63,10 +47,8 @@ describe('ZilliqaRecover', () => {
     privateKey = await decryptPrivateKey('UNSTesting32;', ZilKey);
     [coinbase, newOwner] = signers;
     zilWallet = new Wallet(privateKey, coinbase.provider);
-    // ETH public key format has a 0x04 constant prefix
-    // We don't need to that when operating public key in a contract
     publicKey = onChainPubKey(zilWallet.publicKey);
-    zilAddress = getAddressFromPublicKey(normalizePublicKey(zilWallet.publicKey)).toLowerCase();
+    zilAddress = getAddressFromPublicKey(compressPublicKey(zilWallet.publicKey.replace('0x', ''))).toLowerCase();
     await (
       await coinbase.sendTransaction({ to: zilWallet.address, value: BigNumber.from('100000000000000000000') })
     ).wait();
@@ -101,11 +83,14 @@ describe('ZilliqaRecover', () => {
     });
   });
 
-  describe('claim', async () => {
+  describe('claim, mint', async () => {
     it('provides ability to recover zil domain', async () => {
       const { tokenId, label } = getRandomDomain();
-      await zilliqaRecover.mint(label, zilAddress);
-      await zilliqaRecover.connect(zilWallet).claim(tokenId, ...publicKey, newOwner.address);
+      await expect(zilliqaRecover.mint(label, zilAddress)).to.emit(zilliqaRecover, 'ZnsTokenMinted');
+      await expect(zilliqaRecover.connect(zilWallet).claim(tokenId, ...publicKey, newOwner.address)).to.emit(
+        zilliqaRecover,
+        'ZnsTokenClaimed',
+      );
       expect(await unsRegistry.ownerOf(tokenId)).to.eql(newOwner.address);
     });
 
@@ -116,7 +101,7 @@ describe('ZilliqaRecover', () => {
         zilliqaRecover
           .connect(zilWallet)
           .claim(tokenId, ...onChainPubKey(Wallet.createRandom().publicKey), newOwner.address),
-      ).to.be.revertedWith('ZilliqaRecover: PUBLIC_KEY_DOENT_MATCH_SENDER_ADDRESS');
+      ).to.be.revertedWith('PublicKeyUnmatchSenderAddress');
     });
 
     it('forbids to return a domain', async () => {
@@ -128,14 +113,14 @@ describe('ZilliqaRecover', () => {
         unsRegistry
           .connect(newOwner)
           ['safeTransferFrom(address,address,uint256)'](newOwner.address, zilliqaRecover.address, tokenId),
-      ).to.be.revertedWith('ZilliqaRecover: UNKNOWN_TOKEN_RECEIVED');
+      ).to.be.revertedWith('UnknownTokenReceived');
     });
 
     it('checks token ownership', async () => {
       const { tokenId, label } = getRandomDomain();
       await zilliqaRecover.mint(label, zilAddress.replace(/0x..../, '0xf000'));
       await expect(zilliqaRecover.connect(zilWallet).claim(tokenId, ...publicKey, newOwner.address)).to.be.revertedWith(
-        'ZilliqaRecover: TOKEN_OWNED_BY_OTHER_ADDRESS',
+        'TokenOwnedByOtherZilAddress',
       );
     });
   });
@@ -155,6 +140,26 @@ describe('ZilliqaRecover', () => {
       await zilliqaRecover.execute(params.req, params.signature);
 
       expect(await unsRegistry.ownerOf(tokenId)).to.eql(newOwner.address);
+    });
+
+    it('supports claiming with invalid forwarded token', async () => {
+      const { tokenId, label } = getRandomDomain();
+      const invalidTokenId = tokenId.replace(/0x..../, '0x0000');
+      expect(invalidTokenId).to.not.eql(tokenId);
+      const buildExecuteParams = buildExecuteFunc(zilliqaRecover.interface, zilliqaRecover.address, zilliqaRecover);
+      await zilliqaRecover.mint(label, zilAddress);
+
+      const params = await buildExecuteParams(
+        'claim(uint256,bytes32,bytes32,address)',
+        [tokenId, ...publicKey, newOwner.address],
+        zilWallet,
+        invalidTokenId,
+        await zilliqaRecover.nonceOf(invalidTokenId),
+      );
+      await expect(
+        // custody.connect(spender).execute(req, signature),
+        zilliqaRecover.execute(params.req, params.signature),
+      ).to.be.revertedWith('InvalidForwardedToken');
     });
   });
 

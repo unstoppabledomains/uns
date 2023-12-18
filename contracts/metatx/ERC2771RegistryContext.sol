@@ -6,6 +6,8 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 
+error InvalidForwardedToken(uint256 tokenId);
+
 /**
  * @dev https://eips.ethereum.org/EIPS/eip-2771[EIP 2771] is a standard for native meta transactions.
  *
@@ -75,6 +77,12 @@ abstract contract ERC2771RegistryContext is Initializable, ContextUpgradeable {
             return msg.data[:msg.data.length - 52];
         } else {
             return super._msgData();
+        }
+    }
+
+    function _validateForwardedToken(uint256 tokenId) internal view {
+        if (tokenId != _msgToken()) {
+            revert InvalidForwardedToken(tokenId);
         }
     }
 
