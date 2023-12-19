@@ -4,19 +4,30 @@ import { ethers, network } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { utils } from 'ethers';
 import { NameService, getNetworkConfig } from '../src/config';
-import { MintingManager__factory, UNSRegistry__factory } from '../types/factories/contracts';
-import { CNSRegistry__factory } from '../types/factories/dot-crypto/contracts';
 import { MintingManager, UNSRegistry } from '../types/contracts';
-import { CNSRegistry } from '../types/dot-crypto/contracts';
 import { unwrap } from '../src/helpers';
 import { BUFFERED_REGISTRATION_COST, REGISTRATION_TIME, TLD, ZERO_ADDRESS } from '../test/helpers/constants';
-import { ENSCustody, ENSCustody__factory, ETHRegistrarController, ETHRegistrarController__factory } from '../types';
+import {
+  CNSRegistry,
+  CNSRegistry__factory,
+  MintingManager__factory,
+  UNSRegistry__factory,
+  ENSCustody,
+  ENSCustody__factory,
+  ETHRegistrarController,
+  ETHRegistrarController__factory,
+  ZilliqaRecover,
+  ZilliqaRecover__factory,
+} from '../types';
 import { Sandbox } from '.';
 
 describe('Sandbox', async () => {
   const domainPrefix = 'sandbox';
 
-  let unsRegistry: UNSRegistry, cnsRegistry: CNSRegistry, mintingManager: MintingManager;
+  let unsRegistry: UNSRegistry,
+    cnsRegistry: CNSRegistry,
+    mintingManager: MintingManager,
+    zilliqaRecover: ZilliqaRecover;
   let signers: SignerWithAddress[], owner: SignerWithAddress, minter: SignerWithAddress;
   let predicateAddress: string;
 
@@ -41,6 +52,8 @@ describe('Sandbox', async () => {
     unsRegistry = new UNSRegistry__factory(owner).attach(unsContracts.UNSRegistry.address);
     cnsRegistry = new CNSRegistry__factory(owner).attach(unsContracts.CNSRegistry.address);
     mintingManager = new MintingManager__factory(owner).attach(unsContracts.MintingManager.address);
+    mintingManager = new MintingManager__factory(owner).attach(unsContracts.MintingManager.address);
+    zilliqaRecover = new ZilliqaRecover__factory(owner).attach(unsContracts.ZilliqaRecover.address);
 
     predicateAddress = unsContracts.MintableERC721Predicate.address;
     ethRegistrarController = new ETHRegistrarController__factory(owner).attach(
@@ -132,12 +145,21 @@ describe('Sandbox', async () => {
         assert.fail('Error is ecpected');
       } catch (error) {}
     });
+
+    it('mints .zil token to ZilliqaRecover custody', async () => {
+      const tx = await zilliqaRecover.connect(minter).mint(domainPrefix, owner.address);
+      await tx.wait();
+
+      const tokenId = await cnsRegistry.childIdOf(TLD.ZIL, domainPrefix);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.eq(zilliqaRecover.address);
+      expect(await zilliqaRecover.znsOwnerOf(tokenId)).to.be.eq(owner.address);
+    });
   });
 
   describe('ENS', () => {
     const secret = '0x0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF';
 
-    async function registerName (name, txOptions = { value: BUFFERED_REGISTRATION_COST }) {
+    const registerName = async (name, txOptions = { value: BUFFERED_REGISTRATION_COST }) => {
       const commitment = await ethRegistrarController.makeCommitment(
         name,
         registrantAddress,
@@ -171,16 +193,16 @@ describe('Sandbox', async () => {
       );
 
       return tx;
-    }
+    };
 
-    async function registerAndParkName (
+    const registerAndParkName = async (
       name,
       minter,
       resolver = ZERO_ADDRESS,
       selfCustody = false,
       callData: string[] = [],
       txOptions = {},
-    ) {
+    ) => {
       // make commitment
       const commitment = await custody.makeCommitment(
         name,
@@ -216,7 +238,7 @@ describe('Sandbox', async () => {
           txOptions,
         );
       return [commitTx, registerTx];
-    }
+    };
 
     it('should register ENS domain', async () => {
       const name = 'newname1';
