@@ -5,8 +5,6 @@
 pragma solidity ^0.8.0;
 
 import {IERC721ReceiverUpgradeable} from '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol';
 import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import '../metatx/ERC2771RegistryContext.sol';
 import '../IUNSRegistry.sol';
@@ -33,8 +31,6 @@ contract ZilliqaRecover is ContextUpgradeable, ERC2771RegistryContext, Forwarder
         // SLD label without .zil suffix, only .zil SLDs possible.
         string label;
     }
-    using SignatureCheckerUpgradeable for address;
-    using ECDSAUpgradeable for bytes32;
     event ZnsTokenClaimed(uint256 indexed tokenId, address indexed oldAddress, address indexed newAddress);
     event ZnsTokenMinted(uint256 indexed tokenId, address indexed zilAddress, string label);
 
