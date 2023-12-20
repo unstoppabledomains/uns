@@ -220,6 +220,12 @@
                     "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x78f5ac"
+                },
+                "ZilliqaRecover": {
+                    "address": "0x8f34d5d8c4E49A9B1873c677293E83D6916DC570",
+                    "deploymentBlock": "0x9c4a1f",
+                    "implementation": "0x2828DafDffB8331caA65e8f5D9a58Cb8b3fF1a12",
+                    "forwarder": "0x8f34d5d8c4E49A9B1873c677293E83D6916DC570"
                 }
             }
         },
@@ -542,6 +548,12 @@
                     "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01bbafc7"
+                },
+                "ZilliqaRecover": {
+                    "address": "0x65402b3daA0c6842d28B640a645cbb4cB375f891",
+                    "deploymentBlock": "0x029c49f0",
+                    "implementation": "0xdb70526bba0634a216bf114E669e4E45d0DaBee9",
+                    "forwarder": "0x65402b3daA0c6842d28B640a645cbb4cB375f891"
                 }
             }
         }
