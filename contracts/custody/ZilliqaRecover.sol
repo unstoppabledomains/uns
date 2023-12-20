@@ -64,6 +64,11 @@ contract ZilliqaRecover is ContextUpgradeable, ERC2771RegistryContext, Forwarder
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     /**
      * @dev Initializes the contract
      * @param registry_ UNSRegistry address
