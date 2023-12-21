@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { expect } from 'chai';
 import { decryptPrivateKey, getAddressFromPublicKey, compressPublicKey, KeystoreV3 } from '@zilliqa-js/crypto';
 import { namehash } from 'ethers/lib/utils';
-import { ethers } from 'hardhat';
+import { ethers, upgrades } from 'hardhat';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Wallet } from 'ethers';
@@ -52,10 +52,14 @@ describe('ZilliqaRecover', () => {
     await (
       await coinbase.sendTransaction({ to: zilWallet.address, value: BigNumber.from('100000000000000000000') })
     ).wait();
-    zilliqaRecover = await new custody.ZilliqaRecover__factory(coinbase).deploy();
+    // zilliqaRecover = await new custody.ZilliqaRecover__factory(coinbase).deploy();
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     mintingManager = await new MintingManager__factory(coinbase).deploy();
-    await zilliqaRecover.initialize(unsRegistry.address, mintingManager.address);
+    zilliqaRecover = (await upgrades.deployProxy(new custody.ZilliqaRecover__factory(coinbase), [
+      unsRegistry.address,
+      mintingManager.address,
+    ])) as ZilliqaRecover;
+    // await zilliqaRecover.initialize(unsRegistry.address, mintingManager.address);
     await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await mintingManager.initialize(
       unsRegistry.address,
@@ -181,6 +185,7 @@ describe('ZilliqaRecover', () => {
       expect(await unsRegistry.ownerOf(domain2.tokenId)).to.eql(zilliqaRecover.address);
       expect((await zilliqaRecover.znsOwnerOf(domain1.tokenId)).toLowerCase()).to.eql(zilAddress);
       expect((await zilliqaRecover.znsOwnerOf(domain2.tokenId)).toLowerCase()).to.eql(zilAddress);
+      expect(await zilliqaRecover.isOwnedBy(zilAddress, [domain1.tokenId, domain2.tokenId])).to.eql(true);
       await zilliqaRecover
         .connect(zilWallet)
         .claimAll([domain1.tokenId, domain2.tokenId], ...publicKey, newOwner.address);
