@@ -117,7 +117,7 @@ describe('ZilliqaRecover', () => {
       const { tokenId, label } = getRandomDomain();
       await zilliqaRecover.mint(label, zilAddress);
       await zilliqaRecover.connect(zilWallet).claim(tokenId, ...publicKey, newOwner.address);
-      expect(await zilliqaRecover.znsOwnerOf(tokenId)).to.eql(ZERO_ADDRESS);
+      expect(await zilliqaRecover.isOwnedBy(ZERO_ADDRESS, [tokenId])).to.eql(true);
       await expect(
         unsRegistry
           .connect(newOwner)

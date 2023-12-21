@@ -147,11 +147,11 @@ contract ZilliqaRecover is ContextUpgradeable, ERC2771RegistryContext, Forwarder
     /**
      * @return true all the tokens owned by specified zil address
      * @param tokenIds toke ids
-     * @param zilAddress address to be checked against
+     * @param zilAddress_ address to be checked against
      */
-    function isOwnedBy(address zilAddress, uint256[] calldata tokenIds) public view returns (bool) {
+    function isOwnedBy(address zilAddress_, uint256[] calldata tokenIds) public view returns (bool) {
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            if (znsOwnerOf(tokenIds[i]) != zilAddress) {
+            if (znsOwnerOf(tokenIds[i]) != zilAddress_) {
                 return false;
             }
         }
