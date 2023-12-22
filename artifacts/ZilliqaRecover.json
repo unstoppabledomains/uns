@@ -312,7 +312,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "zilAddress_",
+          "name": "_zilAddress",
           "type": "address"
         },
         {

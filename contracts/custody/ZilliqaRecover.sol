@@ -114,9 +114,9 @@ contract ZilliqaRecover is ContextUpgradeable, ERC2771RegistryContext, Forwarder
         bytes32 publicKeyY,
         address newOwnerAddress
     ) public correctPublicKey(publicKeyX, publicKeyY) {
-        address zilAddress_ = zilAddress(publicKeyX, publicKeyY);
+        address _zilAddress = zilAddress(publicKeyX, publicKeyY);
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            _claim(tokenIds[i], zilAddress_, newOwnerAddress);
+            _claim(tokenIds[i], _zilAddress, newOwnerAddress);
         }
     }
 
@@ -147,11 +147,11 @@ contract ZilliqaRecover is ContextUpgradeable, ERC2771RegistryContext, Forwarder
     /**
      * @return true all the tokens owned by specified zil address
      * @param tokenIds toke ids
-     * @param zilAddress_ address to be checked against
+     * @param _zilAddress address to be checked against
      */
-    function isOwnedBy(address zilAddress_, uint256[] calldata tokenIds) public view returns (bool) {
+    function isOwnedBy(address _zilAddress, uint256[] calldata tokenIds) public view returns (bool) {
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            if (znsOwnerOf(tokenIds[i]) != zilAddress_) {
+            if (znsOwnerOf(tokenIds[i]) != _zilAddress) {
                 return false;
             }
         }
@@ -205,11 +205,11 @@ contract ZilliqaRecover is ContextUpgradeable, ERC2771RegistryContext, Forwarder
 
     function _claim(
         uint256 tokenId,
-        address zilAddress_,
+        address _zilAddress,
         address newOwnerAddress
     ) private {
-        if (znsOwnerOf(tokenId) != zilAddress_) {
-            revert TokenOwnedByOtherZilAddress(tokenId, znsOwnerOf(tokenId), zilAddress_);
+        if (znsOwnerOf(tokenId) != _zilAddress) {
+            revert TokenOwnedByOtherZilAddress(tokenId, znsOwnerOf(tokenId), _zilAddress);
         }
 
         _znsOwners[tokenId] = address(0);

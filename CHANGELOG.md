@@ -1,3 +1,7 @@
+## v0.8.43
+
+- Added ZilliqaRecover contract
+
 ## v0.8.42
 
 - Added test for Multicall + ERC2771 malicious calldata
