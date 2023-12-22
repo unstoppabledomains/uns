@@ -20,6 +20,7 @@ var ArtifactName;
     ArtifactName["MintableERC721Predicate"] = "MintableERC721Predicate";
     ArtifactName["RootChainManager"] = "RootChainManager";
     ArtifactName["DotCoinBurner"] = "DotCoinBurner";
+    ArtifactName["ZilliqaRecover"] = "ZilliqaRecover";
     ArtifactName["ENSRegistry"] = "ENSRegistry";
     ArtifactName["BaseRegistrarImplementation"] = "BaseRegistrarImplementation";
     ArtifactName["ReverseRegistrar"] = "ReverseRegistrar";
@@ -60,6 +61,7 @@ var UnsContractName;
     UnsContractName["MintableERC721Predicate"] = "MintableERC721Predicate";
     UnsContractName["RootChainManager"] = "RootChainManager";
     UnsContractName["DotCoinBurner"] = "DotCoinBurner";
+    UnsContractName["ZilliqaRecover"] = "ZilliqaRecover";
 })(UnsContractName = exports.UnsContractName || (exports.UnsContractName = {}));
 var EnsContractName;
 (function (EnsContractName) {

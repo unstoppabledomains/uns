@@ -1,5 +1,5 @@
 {
-    "version": "0.8.5",
+    "version": "0.8.6",
     "networks": {
         "1": {
             "contracts": {
@@ -113,6 +113,11 @@
                     "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xf335e0"
+                },
+                "ZilliqaRecover": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -220,6 +225,11 @@
                     "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x78f5ac"
+                },
+                "ZilliqaRecover": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -327,6 +337,11 @@
                     "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x021cac00"
+                },
+                "ZilliqaRecover": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -426,9 +441,15 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x54563a9e1cD2dCBD0BCA90D3CFA4A647e02C404a",
+                    "address": "0xEE9A59532B50514d4Cb2440b19E9539b6380CEcf",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x27"
+                    "deploymentBlock": "0x2a"
+                },
+                "ZilliqaRecover": {
+                    "address": "0x70fDaD6FB674d2EbAa36719839aCf496843994A2",
+                    "deploymentBlock": "0x25",
+                    "implementation": "0x56b793E4aD031Dd3EFeF272dc133D212d5fBddc3",
+                    "forwarder": "0x70fDaD6FB674d2EbAa36719839aCf496843994A2"
                 }
             }
         },
@@ -536,6 +557,12 @@
                     "address": "0x65c6abdf52aD08A53A77488D1Acc5c666ada840F",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01bbafc7"
+                },
+                "ZilliqaRecover": {
+                    "address": "0x65402b3daA0c6842d28B640a645cbb4cB375f891",
+                    "deploymentBlock": "0x029c49f0",
+                    "implementation": "0xdb70526bba0634a216bf114E669e4E45d0DaBee9",
+                    "forwarder": "0x65402b3daA0c6842d28B640a645cbb4cB375f891"
                 }
             }
         }
