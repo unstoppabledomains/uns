@@ -273,6 +273,8 @@ export type { ENSCustody } from "./contracts/custody/ENSCustody";
 export { ENSCustody__factory } from "./factories/contracts/custody/ENSCustody__factory";
 export type { IENSCustody } from "./contracts/custody/IENSCustody";
 export { IENSCustody__factory } from "./factories/contracts/custody/IENSCustody__factory";
+export type { ZilliqaRecover } from "./contracts/custody/ZilliqaRecover";
+export { ZilliqaRecover__factory } from "./factories/contracts/custody/ZilliqaRecover__factory";
 export type { DotCoinBurner } from "./contracts/DotCoinBurner";
 export { DotCoinBurner__factory } from "./factories/contracts/DotCoinBurner__factory";
 export type { IUNSRegistryV07 } from "./contracts/history/IUNSRegistryV07";
