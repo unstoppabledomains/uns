@@ -449,6 +449,7 @@
                     "address": "0x70fDaD6FB674d2EbAa36719839aCf496843994A2",
                     "deploymentBlock": "0x25",
                     "implementation": "0x56b793E4aD031Dd3EFeF272dc133D212d5fBddc3",
+                    "legacyAddresses": [],
                     "forwarder": "0x70fDaD6FB674d2EbAa36719839aCf496843994A2"
                 }
             }
@@ -562,6 +563,7 @@
                     "address": "0xED5ab744F862A1A2294366B63f9040cd690D2AC5",
                     "deploymentBlock": "0x029d7604",
                     "implementation": "0x200Eb5A26ce1d84166e998fB63F56b8B636a2006",
+                    "legacyAddresses": [],
                     "forwarder": "0xED5ab744F862A1A2294366B63f9040cd690D2AC5"
                 }
             }
