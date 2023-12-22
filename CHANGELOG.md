@@ -1,3 +1,7 @@
+## v0.8.44
+
+- Fix missing config variables
+
 ## v0.8.43
 
 - Added ZilliqaRecover contract
