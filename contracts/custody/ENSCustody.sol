@@ -15,8 +15,8 @@ import {ReentrancyGuardUpgradeable} from '@openzeppelin/contracts-upgradeable/se
 import {IERC165Upgradeable} from '@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol';
 import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';
 import {StorageSlotUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol';
-import {IENSCustody, Unauthorised, InvalidToken, UnknownToken, CustodyNotEnoughBalance, OperationProhibited, InvalidForwardedToken, InvalidOwner} from './IENSCustody.sol';
-import {ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
+import {IENSCustody, Unauthorised, InvalidToken, UnknownToken, CustodyNotEnoughBalance, OperationProhibited, InvalidOwner} from './IENSCustody.sol';
+import {InvalidForwardedToken, ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
 import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
 
@@ -291,9 +291,7 @@ contract ENSCustody is
 
     function _protectTokenOperation(uint256 tokenId) internal {
         if (isTrustedForwarder(msg.sender)) {
-            if (tokenId != _msgToken()) {
-                revert InvalidForwardedToken(tokenId);
-            }
+            _validateForwardedToken(tokenId);
         } else {
             _invalidateNonce(tokenId);
         }

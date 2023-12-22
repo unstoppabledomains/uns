@@ -1,12 +1,11 @@
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { utils, Contract, BigNumberish, BigNumber } from 'ethers';
+import { utils, Contract, BigNumberish, BigNumber, Signer } from 'ethers';
 import { Interface } from '@ethersproject/abi/';
 
 export async function sign (
   data: string,
   address: string,
   nonce: BigNumberish | number,
-  signer: SignerWithAddress,
+  signer: ISignerWithAddress,
 ): Promise<string> {
   return signer.signMessage(
     utils.arrayify(utils.solidityKeccak256(['bytes32', 'address', 'uint256'], [utils.keccak256(data), address, nonce])),
@@ -16,7 +15,7 @@ export async function sign (
 export type ExecuteFunc = (
   selector: string,
   params: unknown[],
-  from: SignerWithAddress,
+  from: ISignerWithAddress,
   tokenId: BigNumberish,
   nonce?: BigNumber,
 ) => Promise<{
@@ -29,11 +28,13 @@ export type ExecuteFunc = (
   signature: string;
 }>;
 
+type ISignerWithAddress = Signer & {address: string};
+
 export function buildExecuteFunc (iface: Interface, toAddress: string, forwarder: Contract): ExecuteFunc {
   return async (
     selector: string,
     params: unknown[],
-    from: SignerWithAddress,
+    from: ISignerWithAddress,
     tokenId: BigNumberish,
     nonce?: BigNumber,
   ) => {

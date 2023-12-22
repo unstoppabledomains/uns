@@ -4,7 +4,14 @@ import { merge } from 'lodash';
 import { namehash } from 'ethers/lib/utils';
 import { ZERO_ADDRESS, ZERO_WORD } from '../test/helpers/constants';
 import { Deployer } from './deployer';
-import { ArtifactName, DependenciesMap, EnsContractName, UnsContractName, NsNetworkConfig } from './types';
+import {
+  ArtifactName,
+  DependenciesMap,
+  EnsContractName,
+  UnsContractName,
+  NsNetworkConfig,
+  ContractName,
+} from './types';
 import verify from './verify';
 import { notNullSha, unwrap, unwrapDependencies } from './helpers';
 
@@ -13,6 +20,26 @@ export type Task = {
   priority: number;
   run: (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => Promise<void>;
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => DependenciesMap;
+};
+
+const isSandbox = network.config.chainId === 1337;
+
+const ensureDeployed = (config: NsNetworkConfig, ...contracts: ContractName[]): DependenciesMap => {
+  return contracts
+    .map((name) => {
+      const contract = config.contracts[name];
+      if (!contract?.address) {
+        throw new Error(`${name} contract not found for network ${network.config.chainId}`);
+      }
+      return { [name]: contract };
+    })
+    .reduce((a, b) => ({ ...a, ...b }));
+};
+
+const ensureUpgradable = (config: NsNetworkConfig): void => {
+  if (!config.contracts.ProxyAdmin?.address) {
+    throw new Error('Current network configuration does not support upgrading');
+  }
 };
 
 export const deployCNSTask: Task = {
@@ -99,23 +126,16 @@ export const deployCNSForwardersTask: Task = {
     await resolverForwarder.deployTransaction.wait();
     await verify(ctx, resolverForwarder.address, [CNSRegistry.address, Resolver.address]);
   },
+
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { CNSRegistry, SignatureController, Resolver } = config.contracts;
-    const dependencies = {
-      CNSRegistry,
-      SignatureController,
-      Resolver,
-    };
-
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    return ensureDeployed(
+      config,
+      UnsContractName.CNSRegistry,
+      UnsContractName.SignatureController,
+      UnsContractName.Resolver,
+    );
   },
 };
 
@@ -224,26 +244,18 @@ const deployUNSTask = {
       }
     }
   },
+
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { CNSRegistry, MintingController, URIPrefixController, Resolver, RootChainManager } = config.contracts || {};
-
-    const dependencies = {
-      CNSRegistry,
-      RootChainManager,
-      MintingController,
-      URIPrefixController,
-      Resolver,
-    };
-
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    return ensureDeployed(
+      config,
+      UnsContractName.CNSRegistry,
+      UnsContractName.RootChainManager,
+      UnsContractName.MintingController,
+      UnsContractName.URIPrefixController,
+      UnsContractName.Resolver,
+    );
   },
 };
 
@@ -277,24 +289,16 @@ const deployUNSProxyReaderTask: Task = {
 
     await mintingManager.connect(owner).addProxyReaders([proxyReader.address]);
   },
+
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { CNSRegistry, UNSRegistry, MintingManager } = config.contracts || {};
-
-    const dependencies = {
-      CNSRegistry,
-      UNSRegistry,
-      MintingManager,
-    };
-
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    return ensureDeployed(
+      config,
+      UnsContractName.CNSRegistry,
+      UnsContractName.UNSRegistry,
+      UnsContractName.MintingManager,
+    );
   },
 };
 
@@ -323,27 +327,21 @@ const configureCNSTask = {
     }
 
     // Set tokenURI prefix only for Sandbox
-    if (network.config.chainId === 1337) {
+    if (isSandbox) {
       const mintingManager = ctx.artifacts.MintingManager.attach(MintingManager.address).connect(owner);
       await mintingManager.setTokenURIPrefix('https://example.com/');
     }
   },
+
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { MintingController, URIPrefixController, MintingManager } = config.contracts || {};
-    const dependencies = {
-      MintingController,
-      URIPrefixController,
-      MintingManager,
-    };
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    return ensureDeployed(
+      config,
+      UnsContractName.MintingController,
+      UnsContractName.URIPrefixController,
+      UnsContractName.MintingManager,
+    );
   },
 };
 
@@ -363,19 +361,11 @@ const deployMMForwarderTask = {
     await forwarder.deployTransaction.wait();
     await verify(ctx, forwarder.address, [MintingManager.address]);
   },
+
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { MintingManager } = config.contracts || {};
-    const dependencies = { MintingManager };
-
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    return ensureDeployed(config, UnsContractName.MintingManager);
   },
 };
 
@@ -394,15 +384,46 @@ const deployUNSOperatorTask: Task = {
     await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);
     await verify(ctx, unsOperatorImpl, []);
   },
+
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { ProxyAdmin } = config.contracts || {};
-    if (!ProxyAdmin || !ProxyAdmin.address) {
-      throw new Error('Current network configuration does not support upgrading');
-    }
+    ensureUpgradable(config);
 
     return {};
+  },
+};
+
+const deployZilliqaRecoverTask: Task = {
+  tags: ['zilliqa_recover', 'full'],
+  priority: 100,
+
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const { owner } = ctx.accounts;
+    const [UNSRegistry, MintingManager] = unwrapDependencies(dependencies, [
+      ArtifactName.UNSRegistry,
+      ArtifactName.MintingManager,
+    ]);
+
+    const zilliqaRecover = await upgrades.deployProxy(ctx.artifacts.ZilliqaRecover.connect(owner), [
+      UNSRegistry?.address,
+      MintingManager?.address,
+    ]);
+    await zilliqaRecover.deployTransaction.wait();
+    if (isSandbox) {
+      const mintingManager = await ctx.artifacts.MintingManager.attach(MintingManager.address).connect(owner);
+      await mintingManager.functions.addMinter(zilliqaRecover.address);
+    }
+    const proxyAdmin = await upgrades.admin.getInstance();
+    const zilliqaRecoverImpl = await proxyAdmin.callStatic.getProxyImplementation(zilliqaRecover.address);
+    await ctx.saveContractConfig(UnsContractName.ZilliqaRecover, zilliqaRecover, zilliqaRecoverImpl, zilliqaRecover);
+    await verify(ctx, zilliqaRecoverImpl, []);
+  },
+
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    return ensureDeployed(config, UnsContractName.UNSRegistry, UnsContractName.MintingManager);
   },
 };
 
@@ -422,21 +443,12 @@ const upgradeUNSRegistryTask: Task = {
     await ctx.saveContractConfig(UnsContractName.UNSRegistry, unsRegistry, unsRegistryImpl, unsRegistry);
     await verify(ctx, unsRegistryImpl, []);
   },
+
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { UNSRegistry, ProxyAdmin } = config.contracts || {};
-    if (!ProxyAdmin || !ProxyAdmin.address) {
-      throw new Error('Current network configuration does not support upgrading');
-    }
-    const dependencies = { UNSRegistry };
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.UNSRegistry);
   },
 };
 
@@ -456,22 +468,12 @@ const upgradeMintingManagerTask: Task = {
     await ctx.saveContractConfig(UnsContractName.MintingManager, mintingManager, mintingManagerImpl);
     await verify(ctx, mintingManagerImpl, []);
   },
+
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { MintingManager, ProxyAdmin } = config.contracts || {};
-    if (!ProxyAdmin || !ProxyAdmin.address) {
-      throw new Error('Current network configuration does not support upgrading');
-    }
-
-    const dependencies = { MintingManager };
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.MintingManager);
   },
 };
 
@@ -497,19 +499,8 @@ const upgradeProxyReaderTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { ProxyReader, ProxyAdmin } = config.contracts || {};
-    if (!ProxyAdmin || !ProxyAdmin.address) {
-      throw new Error('Current network configuration does not support upgrading');
-    }
-
-    const dependencies = { ProxyReader };
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.ProxyReader);
   },
 };
 
@@ -533,20 +524,8 @@ const upgradeUNSOperatorTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { UNSOperator, ProxyAdmin } = config.contracts || {};
-
-    if (!ProxyAdmin || !ProxyAdmin.address) {
-      throw new Error('Current network configuration does not support upgrading');
-    }
-
-    const dependencies = { UNSOperator };
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.UNSOperator);
   },
 };
 
@@ -580,18 +559,8 @@ const proposeUNSRegistryTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { UNSRegistry, ProxyAdmin } = config.contracts || {};
-    if (!ProxyAdmin || !ProxyAdmin.address) {
-      throw new Error('Current network configuration does not support upgrading');
-    }
-    const dependencies = { UNSRegistry };
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.UNSRegistry);
   },
 };
 
@@ -624,19 +593,8 @@ const proposeMintingManagerTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { MintingManager, ProxyAdmin } = config.contracts || {};
-    if (!ProxyAdmin || !ProxyAdmin.address) {
-      throw new Error('Current network configuration does not support upgrading');
-    }
-
-    const dependencies = { MintingManager };
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.MintingManager);
   },
 };
 
@@ -670,19 +628,8 @@ const proposeProxyReaderTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { ProxyReader, ProxyAdmin } = config.contracts || {};
-    if (!ProxyAdmin || !ProxyAdmin.address) {
-      throw new Error('Current network configuration does not support upgrading');
-    }
-
-    const dependencies = { ProxyReader };
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.ProxyReader);
   },
 };
 
@@ -738,20 +685,12 @@ const configurePolygonPosBridgeTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { UNSRegistry, MintableERC721Predicate, RootChainManager } = config.contracts || {};
-    const dependencies = {
-      UNSRegistry,
-      MintableERC721Predicate,
-      RootChainManager,
-    };
-
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    return ensureDeployed(
+      config,
+      UnsContractName.UNSRegistry,
+      UnsContractName.MintableERC721Predicate,
+      UnsContractName.RootChainManager,
+    );
   },
 };
 
@@ -770,18 +709,7 @@ const deployDotCoinBurnerTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { UNSRegistry } = config.contracts || {};
-    const dependencies = {
-      UNSRegistry,
-    };
-
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    return ensureDeployed(config, UnsContractName.UNSRegistry);
   },
 };
 
@@ -814,19 +742,8 @@ const prepareProxyReaderTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { ProxyReader, ProxyAdmin } = config.contracts || {};
-    if (!ProxyAdmin || !ProxyAdmin.address) {
-      throw new Error('Current network configuration does not support upgrading');
-    }
-
-    const dependencies = { ProxyReader };
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.ProxyReader);
   },
 };
 
@@ -880,12 +797,7 @@ const deployENSTask = {
 
     const legacyController = await ctx.artifacts[ArtifactName.LegacyETHRegistrarController]
       .connect(owner)
-      .deploy(
-        baseRegistrar.address,
-        priceOracle.address,
-        600,
-        86400,
-      );
+      .deploy(baseRegistrar.address, priceOracle.address, 600, 86400);
     await ctx.saveContractConfig(EnsContractName.LegacyETHRegistrarController, legacyController);
 
     await nameWrapper.setController(controller.address, true);
@@ -902,10 +814,7 @@ const deployENSTask = {
     const legacyResolver = await ctx.artifacts[ArtifactName.PublicResolver]
       .connect(owner)
       .deploy(ens.address, nameWrapper.address, controller.address, reverseRegistrar.address);
-    await ctx.saveContractLegacyAddresses(
-      EnsContractName.PublicResolver,
-      [legacyResolver.address],
-    );
+    await ctx.saveContractLegacyAddresses(EnsContractName.PublicResolver, [legacyResolver.address]);
     await reverseRegistrar.setDefaultResolver(resolver.address);
     const legacyEnsRegistry = await ctx.artifacts[ArtifactName.LegacyENSRegistry].connect(owner).deploy();
     await legacyEnsRegistry.setSubnodeOwner(ZERO_WORD, notNullSha('eth'), await owner.getAddress());
@@ -929,11 +838,10 @@ const deployENSTask = {
       [ArtifactName.SHA1Digest]: await ctx.artifacts[ArtifactName.SHA1Digest].connect(owner).deploy(),
       [ArtifactName.SHA1NSEC3Digest]: await ctx.artifacts[ArtifactName.SHA1NSEC3Digest].connect(owner).deploy(),
     };
-    // eslint-disable-next-line max-len
-    const rootTrustAnchors = '0x00002b000100000e1000244a5c080249aac11d7b6f6446702e54a1607371607a1a41855200fd2ce1cdde32f24e8fb500002b000100000e1000244f660802e06d44b80b8f1d39a95c0b0d7c65d08458e880409bbc683457104237c7f8ec8d';
-    const dnssecOracle = await ctx.artifacts[ArtifactName.DNSSECImpl].connect(owner).deploy(
-      rootTrustAnchors,
-    );
+    const rootTrustAnchors =
+      // eslint-disable-next-line max-len
+      '0x00002b000100000e1000244a5c080249aac11d7b6f6446702e54a1607371607a1a41855200fd2ce1cdde32f24e8fb500002b000100000e1000244f660802e06d44b80b8f1d39a95c0b0d7c65d08458e880409bbc683457104237c7f8ec8d';
+    const dnssecOracle = await ctx.artifacts[ArtifactName.DNSSECImpl].connect(owner).deploy(rootTrustAnchors);
     for (const [algorithm, id] of Object.entries(algorithmsIds)) {
       await dnssecOracle.setAlgorithm(id, algorithmsAndDigests[algorithm].address);
     }
@@ -946,14 +854,10 @@ const deployENSTask = {
     await ctx.saveContractConfig(EnsContractName.DNSSECImpl, dnssecOracle);
 
     const tldPublicSuffixList = await ctx.artifacts[ArtifactName.TLDPublicSuffixList].connect(owner).deploy();
-    const dnsRegistrar = await ctx.artifacts[ArtifactName.DNSRegistrar].connect(owner).deploy(
-      dnssecOracle.address,
-      tldPublicSuffixList.address,
-      ens.address,
-    );
-    const root = await ctx.artifacts[ArtifactName.Root].connect(owner).deploy(
-      ens.address,
-    );
+    const dnsRegistrar = await ctx.artifacts[ArtifactName.DNSRegistrar]
+      .connect(owner)
+      .deploy(dnssecOracle.address, tldPublicSuffixList.address, ens.address);
+    const root = await ctx.artifacts[ArtifactName.Root].connect(owner).deploy(ens.address);
     await root.setController(dnsRegistrar.address, true);
     await ens.setOwner(ZERO_WORD, root.address);
     await ctx.saveContractConfig(EnsContractName.DNSRegistrar, dnsRegistrar);
@@ -1002,21 +906,12 @@ const deployENSCustodyTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { ETHRegistrarController, NameWrapper, BaseRegistrarImplementation } = config.contracts || {};
-
-    const dependencies = {
-      ETHRegistrarController,
-      NameWrapper,
-      BaseRegistrarImplementation,
-    };
-
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    return ensureDeployed(
+      config,
+      EnsContractName.ETHRegistrarController,
+      EnsContractName.NameWrapper,
+      EnsContractName.BaseRegistrarImplementation,
+    );
   },
 };
 
@@ -1049,18 +944,8 @@ const proposeENSCustodyTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { ENSCustody, ProxyAdmin } = config.contracts || {};
-    if (!ProxyAdmin || !ProxyAdmin.address) {
-      throw new Error('Current network configuration does not support upgrading');
-    }
-    const dependencies = { ENSCustody };
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    ensureUpgradable(config);
+    return ensureDeployed(config, EnsContractName.ENSCustody);
   },
 };
 
@@ -1070,7 +955,7 @@ const fundENSCustodyTask: Task = {
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const { owner } = ctx.accounts;
 
-    if (network.config.chainId !== 1337) {
+    if (!isSandbox) {
       throw new Error('This task is only available for sandbox');
     }
 
@@ -1082,19 +967,7 @@ const fundENSCustodyTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
-    const { ENSCustody } = config.contracts || {};
-
-    const dependencies = {
-      ENSCustody,
-    };
-
-    for (const [key, value] of Object.entries(dependencies)) {
-      if (!value || !value.address) {
-        throw new Error(`${key} contract not found for network ${network.config.chainId}`);
-      }
-    }
-
-    return dependencies;
+    return ensureDeployed(config, EnsContractName.ENSCustody);
   },
 };
 
@@ -1121,4 +994,5 @@ export const tasks: Task[] = [
   deployENSCustodyTask,
   proposeENSCustodyTask,
   fundENSCustodyTask,
+  deployZilliqaRecoverTask,
 ];

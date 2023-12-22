@@ -61,6 +61,7 @@ async function getArtifacts (): Promise<ArtifactsMap> {
     MintableERC721Predicate: await ethers.getContractFactory('MintableERC721Predicate'),
     RootChainManager: await ethers.getContractFactory('RootChainManager'),
     DotCoinBurner: await ethers.getContractFactory('DotCoinBurner'),
+    ZilliqaRecover: await ethers.getContractFactory('ZilliqaRecover'),
 
     ENSRegistry: await ethers.getContractFactory('ENSRegistry'),
     BaseRegistrarImplementation: await ethers.getContractFactory('BaseRegistrarImplementation'),

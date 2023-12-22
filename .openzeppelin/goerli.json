@@ -29,6 +29,11 @@
       "address": "0x74d1fA29295028e58573b894A4bF2cE8541036d4",
       "txHash": "0x8fcf4c02aa1c09320990f6e679686bee2c0e81f37812c23bbdc6a9e47ba4dd71",
       "kind": "transparent"
+    },
+    {
+      "address": "0x8f34d5d8c4E49A9B1873c677293E83D6916DC570",
+      "txHash": "0x45e79317a0838c3e892806366e40a45e341f5941ef2a895cccaef32938b64d94",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -6346,6 +6351,105 @@
               }
             ],
             "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "328b7b02d41af1a12ec47fb3147cc7feae8eb2360e80a15e932c050f843b2788": {
+      "address": "0x2828DafDffB8331caA65e8f5D9a58Cb8b3fF1a12",
+      "txHash": "0x4b6196015c901b515fd00023967bc1b92c28a617157768a71e69afe62b027ba5",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC2771RegistryContext",
+            "src": "contracts/metatx/ERC2771RegistryContext.sol:89"
+          },
+          {
+            "label": "_znsOwners",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "ZilliqaRecover",
+            "src": "contracts/custody/ZilliqaRecover.sol:39"
+          },
+          {
+            "label": "registry",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_contract(IUNSRegistry)2540",
+            "contract": "ZilliqaRecover",
+            "src": "contracts/custody/ZilliqaRecover.sol:40"
+          },
+          {
+            "label": "mintingManager",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_contract(IMintingManager)2189",
+            "contract": "ZilliqaRecover",
+            "src": "contracts/custody/ZilliqaRecover.sol:41"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IMintingManager)2189": {
+            "label": "contract IMintingManager",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IUNSRegistry)2540": {
+            "label": "contract IUNSRegistry",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
           },
           "t_uint256": {
             "label": "uint256",

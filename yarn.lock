@@ -1922,6 +1922,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/sodium-native@npm:2.3.5":
+  version: 2.3.5
+  resolution: "@types/sodium-native@npm:2.3.5"
+  dependencies:
+    "@types/node": "*"
+  checksum: e81a9bfb15fa4333ec874e07608e583c32c067dea689ecb590d50db95ca81655ba80e6541bae425e0b8c8489ee41d244acc6773413c81f2254f30a721052670c
+  languageName: node
+  linkType: hard
+
 "@types/tar@npm:^6.1.2":
   version: 6.1.2
   resolution: "@types/tar@npm:6.1.2"
@@ -2096,6 +2105,38 @@ __metadata:
   version: 1.1.0
   resolution: "@yarnpkg/lockfile@npm:1.1.0"
   checksum: 05b881b4866a3546861fee756e6d3812776ea47fa6eb7098f983d6d0eefa02e12b66c3fff931574120f196286a7ad4879ce02743c8bb2be36c6a576c7852083a
+  languageName: node
+  linkType: hard
+
+"@zilliqa-js/crypto@npm:^3.4.4":
+  version: 3.4.4
+  resolution: "@zilliqa-js/crypto@npm:3.4.4"
+  dependencies:
+    "@zilliqa-js/util": 3.4.4
+    aes-js: ^3.1.1
+    buffer: ^6.0.3
+    elliptic: ^6.5.0
+    hash.js: ^1.1.5
+    hmac-drbg: ^1.0.1
+    pbkdf2: ^3.0.16
+    scrypt-js: ^3.0.1
+    scryptsy: ^2.1.0
+    sodium-randbytes: 0.14.0
+    tslib: 2.3.1
+    uuid: 8.3.2
+  checksum: 18cceef30fbda41c369a01ff2ed7bb51c6e5410200e6bf4b64e006538a7ff251fa21f87702431ed114f038c9cd5241ccc68ab0ab576341a4a2382d2a53b19d58
+  languageName: node
+  linkType: hard
+
+"@zilliqa-js/util@npm:3.4.4":
+  version: 3.4.4
+  resolution: "@zilliqa-js/util@npm:3.4.4"
+  dependencies:
+    bn.js: ^4.11.8
+    camelcase: ^5.0.0
+    long: ^4.0.0
+    tslib: 2.3.1
+  checksum: 3a402def54532a89f6f3fdffacf2804d40a31a36446ad4b25bb170ac1929d84a5fdff43c3d6f096ae2072c79150b62ed411b9d32ba40b71ce464b7480d5be0d0
   languageName: node
   linkType: hard
 
@@ -5302,7 +5343,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elliptic@npm:6.5.4, elliptic@npm:^6.4.0, elliptic@npm:^6.5.2, elliptic@npm:^6.5.3, elliptic@npm:^6.5.4":
+"elliptic@npm:6.5.4, elliptic@npm:^6.4.0, elliptic@npm:^6.5.0, elliptic@npm:^6.5.2, elliptic@npm:^6.5.3, elliptic@npm:^6.5.4":
   version: 6.5.4
   resolution: "elliptic@npm:6.5.4"
   dependencies:
@@ -8004,7 +8045,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hash.js@npm:1.1.7, hash.js@npm:^1.0.0, hash.js@npm:^1.0.3, hash.js@npm:^1.1.7":
+"hash.js@npm:1.1.7, hash.js@npm:^1.0.0, hash.js@npm:^1.0.3, hash.js@npm:^1.1.5, hash.js@npm:^1.1.7":
   version: 1.1.7
   resolution: "hash.js@npm:1.1.7"
   dependencies:
@@ -9747,6 +9788,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"long@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "long@npm:4.0.0"
+  checksum: 16afbe8f749c7c849db1f4de4e2e6a31ac6e617cead3bdc4f9605cb703cd20e1e9fc1a7baba674ffcca57d660a6e5b53a9e236d7b25a295d3855cca79cc06744
+  languageName: node
+  linkType: hard
+
 "looper@npm:^2.0.0":
   version: 2.0.0
   resolution: "looper@npm:2.0.0"
@@ -11418,7 +11466,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pbkdf2@npm:^3.0.17, pbkdf2@npm:^3.0.3, pbkdf2@npm:^3.0.9":
+"pbkdf2@npm:^3.0.16, pbkdf2@npm:^3.0.17, pbkdf2@npm:^3.0.3, pbkdf2@npm:^3.0.9":
   version: 3.1.2
   resolution: "pbkdf2@npm:3.1.2"
   dependencies:
@@ -12554,6 +12602,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"scryptsy@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "scryptsy@npm:2.1.0"
+  checksum: 46eee33a59895fbdc920da97446572083667512d8408548cc0d5f190eb4b84aa5d75a4bc8d0495530ff6a62d980497c72eb6fe8e6ab9c26aaa3d4dacb7954d08
+  languageName: node
+  linkType: hard
+
 "secp256k1@npm:4.0.3, secp256k1@npm:^4.0.0, secp256k1@npm:^4.0.1":
   version: 4.0.3
   resolution: "secp256k1@npm:4.0.3"
@@ -12943,6 +12998,26 @@ __metadata:
     ip: ^2.0.0
     smart-buffer: ^4.2.0
   checksum: 259d9e3e8e1c9809a7f5c32238c3d4d2a36b39b83851d0f573bfde5f21c4b1288417ce1af06af1452569cd1eb0841169afd4998f0e04ba04656f6b7f0e46d748
+  languageName: node
+  linkType: hard
+
+"sodium-native@npm:3.3.0":
+  version: 3.3.0
+  resolution: "sodium-native@npm:3.3.0"
+  dependencies:
+    node-gyp: latest
+    node-gyp-build: ^4.3.0
+  checksum: 4412bc90155261e2006c979788d3b33e3bdba1c41669c7054a876b8731a68886e1450b356791abd2c4e7b217d21f50adfdc1e194d8909dd003223195bd8ddc0a
+  languageName: node
+  linkType: hard
+
+"sodium-randbytes@npm:0.14.0":
+  version: 0.14.0
+  resolution: "sodium-randbytes@npm:0.14.0"
+  dependencies:
+    "@types/sodium-native": 2.3.5
+    sodium-native: 3.3.0
+  checksum: 1356651afc3da608ee89b4cb8e7adb85115c6e87d1e2ac7b957c7157c63551b7703c77d0d6c526fea910b76b6a5b584fcc1d864c35d7350e5b12928aa8d6ba3e
   languageName: node
   linkType: hard
 
@@ -13992,6 +14067,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:2.3.1":
+  version: 2.3.1
+  resolution: "tslib@npm:2.3.1"
+  checksum: de17a98d4614481f7fcb5cd53ffc1aaf8654313be0291e1bfaee4b4bb31a20494b7d218ff2e15017883e8ea9626599b3b0e0229c18383ba9dce89da2adf15cb9
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^1.8.1, tslib@npm:^1.9.0, tslib@npm:^1.9.3":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
@@ -14374,6 +14456,7 @@ __metadata:
     "@types/yargs": ^17.0.13
     "@typescript-eslint/eslint-plugin": ^5.42.0
     "@typescript-eslint/parser": ^5.42.0
+    "@zilliqa-js/crypto": ^3.4.4
     bip39: ^3.0.0
     bip44-constants: ^243.0.0
     chai: ^4.3.6
@@ -14552,21 +14635,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uuid@npm:8.3.2, uuid@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "uuid@npm:8.3.2"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
+  languageName: node
+  linkType: hard
+
 "uuid@npm:^3.3.2":
   version: 3.4.0
   resolution: "uuid@npm:3.4.0"
   bin:
     uuid: ./bin/uuid
   checksum: 58de2feed61c59060b40f8203c0e4ed7fd6f99d42534a499f1741218a1dd0c129f4aa1de797bcf822c8ea5da7e4137aa3673431a96dae729047f7aca7b27866f
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^8.3.2":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
   languageName: node
   linkType: hard
 
