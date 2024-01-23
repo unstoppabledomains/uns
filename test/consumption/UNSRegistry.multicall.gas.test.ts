@@ -5,10 +5,16 @@ import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
 import { TLD, ZERO_ADDRESS } from '../helpers/constants';
 import { percDiff } from '../helpers/consumption';
+import { mintDomain } from '../helpers/registry';
+import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 
 describe('UNSRegistry Multicall (consumption)', () => {
   let unsRegistry: UNSRegistry;
-  let signers: SignerWithAddress[], coinbase: SignerWithAddress, receiver: SignerWithAddress;
+  let signers: SignerWithAddress[],
+    coinbase: SignerWithAddress,
+    receiver: SignerWithAddress,
+    owner: SignerWithAddress;
+  let buildExecuteParams: ExecuteFunc;
 
   async function prepParams (params: unknown[][], labels: string[]) {
     const _params: unknown[][] = [];
@@ -37,12 +43,13 @@ describe('UNSRegistry Multicall (consumption)', () => {
 
   before(async () => {
     signers = await ethers.getSigners();
-    [coinbase, receiver] = signers;
+    [coinbase, receiver, owner] = signers;
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
+    buildExecuteParams = buildExecuteFunc(unsRegistry.interface, unsRegistry.address, unsRegistry);
   });
 
   it('Consumption', async () => {
@@ -160,5 +167,32 @@ describe('UNSRegistry Multicall (consumption)', () => {
       });
     }
     console.table(result);
+  });
+
+  it('Multiple transfers consumption (MetaTX) - 50 domains', async () => {
+    const domainsAmount = 50;
+    const mintedTokenIds: string[] = [];
+    for (let i = 0; i < domainsAmount; i++) {
+      const tokenId = await mintDomain(unsRegistry, owner, ['tm1-' + i, 'crypto']);
+      mintedTokenIds.push(tokenId.toString());
+    }
+
+    const muticallData: string[] = [];
+    const domainsReceiver = await ethers.Wallet.createRandom();
+    for (const tokenId of mintedTokenIds) {
+      const { req, signature } = await buildExecuteParams(
+        'transferFrom(address,address,uint256)',
+        [owner.address, domainsReceiver.address, tokenId],
+        owner,
+        tokenId,
+      );
+      muticallData.push(unsRegistry.interface.encodeFunctionData('execute', [req, signature]));
+    }
+    const tx = await unsRegistry.multicall(muticallData);
+    const receipt = await tx.wait();
+    console.table({
+      name: 'Transfer ' + domainsAmount + ' domains',
+      gasUsed: receipt.gasUsed.toString(),
+    });
   });
 });
