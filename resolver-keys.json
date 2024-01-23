@@ -1,5 +1,5 @@
 {
-  "version": "2.1.30",
+  "version": "2.1.31",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -531,10 +531,15 @@
       "validationRegex": "^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$",
       "deprecated": false
     },
+    "crypto.USDT.version.OKB.address": {
+      "deprecatedKeyName": "USDT_OKB",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
     "crypto.USDT.version.OKC.address": {
       "deprecatedKeyName": "USDT_OKC",
       "validationRegex": "^0x[a-fA-F0-9]{40}$|^ex[a-zA-HJ-NP-Z0-9]{6,90}$",
-      "deprecated": false
+      "deprecated": true
     },
     "crypto.FTM.version.ERC20.address": {
       "deprecatedKeyName": "FTM_ERC20",
