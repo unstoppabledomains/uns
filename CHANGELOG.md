@@ -1,3 +1,7 @@
+## v0.8.46
+
+- Deployed ZilliqaRecover to polygon mainnet
+
 ## v0.8.45
 
 - Deprecated `OKC` ERC20 and added `OKB` ERC20
