@@ -339,9 +339,11 @@
                     "deploymentBlock": "0x021cac00"
                 },
                 "ZilliqaRecover": {
-                    "address": "0x0000000000000000000000000000000000000000",
+                    "address": "0x07B58C81f160257BCb3a2d549ea02D36E3e70461",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x0"
+                    "deploymentBlock": "0x032b35a6",
+                    "implementation": "0x50752EcBedBb07543C4191E2492e2e888a7D04bD",
+                    "forwarder": "0x07B58C81f160257BCb3a2d549ea02D36E3e70461"
                 }
             }
         },
