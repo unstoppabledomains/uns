@@ -1,3 +1,7 @@
+## v0.8.45
+
+- Deprecated `OKC` ERC20 and added `OKB` ERC20
+
 ## v0.8.44
 
 - Fix missing config variables
