@@ -2655,6 +2655,11 @@
       "deprecatedKeyName": "VERSE",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
+    },
+    "crypto.NIBI.address": {
+      "deprecatedKeyName": "NIBI",
+      "validationRegex": "^nibi1[a-z0-9]{38}$",
+      "deprecated": false
     }
   }
 }
