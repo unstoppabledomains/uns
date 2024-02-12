@@ -1,3 +1,7 @@
+## v0.8.47
+
+- Add `NIBI` token
+
 ## v0.8.46
 
 - Deployed ZilliqaRecover to polygon mainnet
