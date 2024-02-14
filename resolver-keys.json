@@ -1,5 +1,5 @@
 {
-  "version": "2.1.31",
+  "version": "2.1.32",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -2654,6 +2654,11 @@
     "crypto.VERSE.address": {
       "deprecatedKeyName": "VERSE",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.NIBI.address": {
+      "deprecatedKeyName": "NIBI",
+      "validationRegex": "^nibi1[a-z0-9]{38}$",
       "deprecated": false
     }
   }
