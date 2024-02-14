@@ -1,3 +1,7 @@
+## v0.8.48
+
+- Add hdkey to dependencies
+
 ## v0.8.47
 
 - Add `NIBI` token
