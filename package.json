@@ -79,7 +79,6 @@
     "hardhat-contract-sizer": "^2.6.1",
     "hardhat-gas-reporter": "^1.0.9",
     "hardhat-tracer": "^2.3.2",
-    "hdkey": "^2.0.1",
     "husky": "^8.0.1",
     "lodash.merge": "^4.6.2",
     "merkle-patricia-tree": "^4.0.0",
@@ -100,6 +99,7 @@
     "bip39": "^3.0.0",
     "bip44-constants": "^243.0.0",
     "ganache": "^7.4.0",
+    "hdkey": "^2.0.1",
     "web3": "^1.7.4"
   },
   "packageManager": "yarn@3.4.1"
