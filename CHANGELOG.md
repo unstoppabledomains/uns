@@ -1,3 +1,7 @@
+## v0.8.49
+
+- Add `.pudgy` TLD
+
 ## v0.8.48
 
 - Add hdkey to dependencies
