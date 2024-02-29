@@ -37,7 +37,7 @@ describe('UNSRegistry (metatx)', () => {
     const receiverAddress = '0x1234567890123456789012345678901234567890';
 
     it('should transfer using meta-setOwner', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, ['res_label_113a', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['res_label_113a', 'crypto'] });
 
       const { req, signature } = await buildExecuteParams(
         'setOwner(address,uint256)',
@@ -51,7 +51,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert transfer using meta-setOwner when nonce invalidated', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, ['res_label_0896', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['res_label_0896', 'crypto'] });
 
       const { req, signature } = await buildExecuteParams(
         'setOwner(address,uint256)',
@@ -90,7 +90,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should transfer using meta-transferFrom', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, ['meta_1591', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['meta_1591', 'crypto'] });
 
       const { req, signature } = await buildExecuteParams(
         'transferFrom(address,address,uint256)',
@@ -104,7 +104,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert meta-transferFrom for non-onwer', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, ['meta_6458', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['meta_6458', 'crypto'] });
 
       const { req, signature } = await buildExecuteParams(
         'transferFrom(address,address,uint256)',
@@ -117,7 +117,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should transfer using meta-safeTransferFrom', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, ['meta_10235', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['meta_10235', 'crypto'] });
 
       const { req, signature } = await buildExecuteParams(
         'safeTransferFrom(address,address,uint256)',
@@ -131,7 +131,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert meta-safeTransferFrom for non-onwer', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, ['meta_e5iuw', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['meta_e5iuw', 'crypto'] });
 
       const { req, signature } = await buildExecuteParams(
         'safeTransferFrom(address,address,uint256)',
@@ -146,7 +146,7 @@ describe('UNSRegistry (metatx)', () => {
     // TODO: add tests for safeTransferFrom(address,address,uint256,bytes)
 
     it('should burn using meta-burn', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, ['meta_ar093', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['meta_ar093', 'crypto'] });
 
       const { req, signature } = await buildExecuteParams('burn(uint256)', [tokenId], owner, tokenId);
       await unsRegistry.execute(req, signature);
@@ -155,7 +155,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert meta-burn for non-onwer', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner, ['meta_53dg3', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['meta_53dg3', 'crypto'] });
 
       const { req, signature } = await buildExecuteParams('burn(uint256)', [tokenId], nonOwner, tokenId);
 
@@ -258,6 +258,7 @@ describe('UNSRegistry (metatx)', () => {
         'setReverse',
         'removeReverse',
         'addProxyReader',
+        'setExpiry', // onlyMintingManager action
       ];
 
       const getFuncs = () => {
@@ -277,7 +278,7 @@ describe('UNSRegistry (metatx)', () => {
         for (const func of getFuncs()) {
           const funcSigHash = utils.id(`${getFuncSignature(func)}_ok`);
 
-          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
+          paramValueMap.tokenId = await mintDomain({ unsRegistry, owner, labels: [funcSigHash, 'crypto'] });
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
           const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
@@ -290,7 +291,7 @@ describe('UNSRegistry (metatx)', () => {
           const funcSig = getFuncSignature(func);
           const funcSigHash = utils.id(`${funcSig}_doubleUse`);
 
-          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
+          paramValueMap.tokenId = await mintDomain({ unsRegistry, owner, labels: [funcSigHash, 'crypto'] });
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
           const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
@@ -307,7 +308,7 @@ describe('UNSRegistry (metatx)', () => {
           const funcSig = getFuncSignature(func);
           const funcSigHash = utils.id(`${funcSig}_nonceInvalidated`);
 
-          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
+          paramValueMap.tokenId = await mintDomain({ unsRegistry, owner, labels: [funcSigHash, 'crypto'] });
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
           const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
@@ -325,7 +326,7 @@ describe('UNSRegistry (metatx)', () => {
           const funcSig = getFuncSignature(func);
           const funcSigHash = utils.id(`${funcSig}_wrongToken`);
 
-          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
+          paramValueMap.tokenId = await mintDomain({ unsRegistry, owner, labels: [funcSigHash, 'crypto'] });
 
           const tokenIdForwarder = await unsRegistry.namehash([utils.id(`_${funcSig}`), 'crypto']);
           const req = await buidRequest(func, owner.address, tokenIdForwarder, paramValueMap);
@@ -339,7 +340,7 @@ describe('UNSRegistry (metatx)', () => {
         for (const func of getFuncs()) {
           const funcSigHash = utils.id(`${getFuncSignature(func)}_emptyTokenId`);
 
-          paramValueMap.tokenId = await mintDomain(unsRegistry, owner, [funcSigHash, 'crypto']);
+          paramValueMap.tokenId = await mintDomain({ unsRegistry, owner, labels: [funcSigHash, 'crypto'] });
 
           const req = await buidRequest(func, owner.address, 0, paramValueMap);
 
@@ -409,7 +410,7 @@ describe('UNSRegistry (metatx)', () => {
           .filter((x) => x.name === 'setReverse')[0];
         const funcSig = getFuncSignature(setReverseFunc);
         paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
-        const tokenId = await mintDomain(unsRegistry, owner, paramValueMap.labels);
+        const tokenId = await mintDomain({ unsRegistry, owner, labels: paramValueMap.labels });
         const req = await buidRequest(setReverseFunc, owner.address, tokenId, paramValueMap);
         const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
         await unsRegistry.execute(req, signature);
@@ -421,7 +422,7 @@ describe('UNSRegistry (metatx)', () => {
           .filter((x) => x.name === 'unlockWithRecords')[0];
         const funcSig = getFuncSignature(unlockWithRecordsLabels);
         paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
-        const tokenId = await mintDomain(unsRegistry, owner, paramValueMap.labels);
+        const tokenId = await mintDomain({ unsRegistry, owner, labels: paramValueMap.labels });
         const req = await buidRequest(unlockWithRecordsLabels, coinbase.address, tokenId, paramValueMap);
         const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
         await unsRegistry.execute(req, signature);
@@ -535,7 +536,7 @@ describe('UNSRegistry (metatx)', () => {
 
     it('should not allow passing malicious calldata to meta tx multicall', async () => {
       const labels = ['res_label_m1x', 'crypto'];
-      const tokenId = await mintDomain(unsRegistry, owner, labels);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels });
 
       expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
 

@@ -14,6 +14,7 @@ export const REGISTRATION_TIME = 28 * DAY;
 export const BUFFERED_REGISTRATION_COST = REGISTRATION_TIME + 3 * DAY;
 
 export const TLD = {
+  // Regular
   CRYPTO: BigNumber.from('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f'),
   WALLET: BigNumber.from('0x1e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230'),
   X: BigNumber.from('0x241e7e2b7fd7333b3c0c049b326316b811af0c01cfc0c7a90b466fda3a70fc2d'),
@@ -35,4 +36,11 @@ export const TLD = {
   GO: BigNumber.from('0xa264639c3dbff58a1ded5efcf724e50a9c7847ff8197c87c00d009fbba2a3720'),
   ALTIMIST: BigNumber.from('0x9bf15275eb85f2e69308f3dbfbe0f94cade4f05c2aa24ba7b9eba5ad2fb1a2cb'),
   PUDGY: BigNumber.from('0x17936dd2b9c99a1e1bfa039dd7d40118f3ed535fcd9c8cda23c8070ffb4c2264'),
+
+  // Expirable
+  COM: BigNumber.from('0xac2c11ea5d4a4826f418d3befbf0537de7f13572d2a433edfe4a7314ea5dc896'),
 };
+
+export const EXPIRABLE_TLDS = [
+  'COM',
+];

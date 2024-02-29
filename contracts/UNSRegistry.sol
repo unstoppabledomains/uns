@@ -31,7 +31,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.8.2';
+    string public constant VERSION = '0.9.0';
 
     string internal _prefix;
 
@@ -45,6 +45,9 @@ contract UNSRegistry is
 
     mapping(uint256 => string) internal _tokenNames;
 
+    // Mapping of tokenId to expiry timestamp
+    mapping(uint256 => uint64) internal _expiries;
+
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), 'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
         _;
@@ -57,11 +60,6 @@ contract UNSRegistry is
 
     modifier protectTokenOperation(uint256 tokenId) {
         _protectTokenOperation(tokenId);
-        _;
-    }
-
-    modifier onlyOwner(uint256 tokenId) {
-        _onlyOwner(tokenId);
         _;
     }
 
@@ -90,12 +88,36 @@ contract UNSRegistry is
 
     /// Ownership
 
+    function ownerOf(uint256 tokenId) public view virtual override(IERC721Upgradeable, ERC721Upgradeable) returns (address owner) {
+        if (!isExpired(tokenId)) {
+            owner = super.ownerOf(tokenId);
+        }
+    }
+
     function isApprovedOrOwner(address spender, uint256 tokenId) external view override returns (bool) {
         return _isApprovedOrOwner(spender, tokenId);
     }
 
     function approve(address to, uint256 tokenId) public override(IERC721Upgradeable, ERC721Upgradeable) protectTokenOperation(tokenId) {
         super.approve(to, tokenId);
+    }
+
+    /// Expiry
+
+    function expiryOf(uint256 tokenId) external view override returns (uint64) {
+        return _expiries[tokenId];
+    }
+
+    function isExpired(uint256 tokenId) public view returns (bool) {
+        return _expiries[tokenId] != 0 && _expiries[tokenId] < block.timestamp;
+    }
+
+    function setExpiry(uint64 expiry, uint256 tokenId) external onlyMintingManager {
+        _requireMinted(tokenId);
+        require(expiry > block.timestamp, 'Registry: EXPIRY_IN_PAST');
+
+        _expiries[tokenId] = expiry;
+        emit SetExpiry(tokenId, expiry);
     }
 
     /// Registry Constants
@@ -125,12 +147,13 @@ contract UNSRegistry is
         string[] calldata keys,
         string[] calldata values,
         bool withReverse
-    ) external override onlyMintingManager {
+    ) external onlyMintingManager {
         (uint256 tokenId, ) = _namehash(labels);
 
         _reset(tokenId);
-        _transfer(ownerOf(tokenId), to, tokenId);
+        _transfer(ERC721Upgradeable.ownerOf(tokenId), to, tokenId);
         _setMany(keys, values, tokenId);
+
         if (withReverse) {
             _safeSetReverse(to, tokenId, _uri(labels));
         }
@@ -154,7 +177,7 @@ contract UNSRegistry is
     /// Transfering
 
     function setOwner(address to, uint256 tokenId) external override onlyApprovedOrOwner(tokenId) protectTokenOperation(tokenId) {
-        _transfer(ownerOf(tokenId), to, tokenId);
+        _transfer(ERC721Upgradeable.ownerOf(tokenId), to, tokenId);
     }
 
     function transferFrom(
@@ -316,7 +339,7 @@ contract UNSRegistry is
      */
     function setReverse(string[] memory labels) external override {
         (uint256 tokenId, ) = _namehash(labels);
-        _onlyOwner(tokenId);
+        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
         _protectTokenOperation(tokenId);
         _setReverse(_msgSender(), tokenId, _uri(labels));
     }
@@ -422,9 +445,13 @@ contract UNSRegistry is
     ) internal override {
         super._beforeTokenTransfer(from, to, tokenId);
 
-        // This prevents the upgraded token from being burned or withdrawn from L2
         if (to == address(0)) {
+            // This prevents the upgraded token from being burned or withdrawn from L2
             _ensureNotUpgraded(tokenId);
+        }
+
+        if (_expiries[tokenId] != 0) {
+            require(to != address(0) && to != _getPredicate(), 'Registry: TOKEN_EXPIRABLE');
         }
 
         if (_reverses[from] == tokenId) {
@@ -471,8 +498,11 @@ contract UNSRegistry is
         }
     }
 
-    function _onlyOwner(uint256 tokenId) internal view {
-        require(ownerOf(tokenId) == _msgSender(), 'Registry: SENDER_IS_NOT_OWNER');
+    function _isApprovedOrOwner(address spender, uint256 tokenId) internal view override returns (bool) {
+        address owner = ownerOf(tokenId);
+
+        // owner != address(0) is ensuring token is not expired
+        return (owner != address(0) && (spender == owner || isApprovedForAll(owner, spender) || getApproved(tokenId) == spender));
     }
 
     function _ensureNotUpgraded(uint256 tokenId) internal view {
@@ -480,5 +510,5 @@ contract UNSRegistry is
     }
 
     // Reserved storage space to allow for layout changes in the future.
-    uint256[46] private __gap;
+    uint256[45] private __gap;
 }

@@ -3,12 +3,14 @@ import { expect } from 'chai';
 import namehash from 'eth-ens-namehash';
 import { utils, BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { Block } from '@ethersproject/abstract-provider';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistryMock } from '../types/contracts/mocks';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { UNSRegistryMock__factory } from '../types/factories/contracts/mocks';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { EXPIRABLE_TLDS, TLD, ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain, mintRandomDomain } from './helpers/registry';
+import { increaseTimeBy } from './helpers/utils';
 
 describe('UNSRegistry', () => {
   let unsRegistry: UNSRegistry;
@@ -19,11 +21,14 @@ describe('UNSRegistry', () => {
     owner: SignerWithAddress,
     reader: SignerWithAddress,
     receiver: SignerWithAddress,
+    sender: SignerWithAddress,
     accounts: string[];
+
+  let latestBlock: Block;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [coinbase, owner, reader, receiver] = signers;
+    [coinbase, owner, reader, receiver, sender] = signers;
     [, ...accounts] = signers.map((s) => s.address);
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
@@ -41,19 +46,23 @@ describe('UNSRegistry', () => {
     await unsRegistryMock.addProxyReader(reader.address);
   });
 
+  beforeEach(async () => {
+    latestBlock = await ethers.provider.getBlock('latest');
+  });
+
   describe('General', () => {
     it('should return zero root', async () => {
       expect(await unsRegistry.root()).to.be.equal(0);
     });
 
     it('should resolve properly', async () => {
-      const tokenId = await mintDomain(unsRegistry, coinbase.address, ['resolution', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['resolution', 'crypto'] });
       expect(await unsRegistry.resolverOf(tokenId)).to.be.equal(unsRegistry.address);
 
       await unsRegistry.burn(tokenId);
       expect(await unsRegistry.resolverOf(tokenId)).to.be.equal(ZERO_ADDRESS);
 
-      await mintDomain(unsRegistry, coinbase.address, ['resolution', 'crypto']);
+      await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['resolution', 'crypto'] });
       expect(await unsRegistry.resolverOf(tokenId)).to.be.equal(unsRegistry.address);
     });
 
@@ -67,20 +76,16 @@ describe('UNSRegistry', () => {
       expect(await unsRegistry.tokenURI(TLD.CRYPTO)).to.be.equal(`/${TLD.CRYPTO}`);
     });
 
-    it('should emit Transfer event on set owner', async () => {
-      const tokenId = await mintRandomDomain(unsRegistry, coinbase.address, 'crypto');
-      await unsRegistry.set('key_82', 'value_23', tokenId);
-      expect(await unsRegistry.get('key_82', tokenId)).to.be.equal('value_23');
-
-      await expect(unsRegistry.setOwner(receiver.address, tokenId))
-        .to.emit(unsRegistry, 'Transfer')
-        .withArgs(coinbase.address, receiver.address, tokenId);
-      expect(await unsRegistry.get('key_82', tokenId)).to.be.equal('value_23');
-    });
-
     for (const key of Object.keys(TLD)) {
       it(`should be possible to mint .${key} domain`, async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, [`mint-${key}`, key]);
+        const expiry = EXPIRABLE_TLDS.includes(key) ? latestBlock.timestamp + 60 * 60 * 24 : 0;
+
+        const tokenId = await mintDomain({
+          unsRegistry,
+          owner: coinbase.address,
+          labels: [`mint-${key}`],
+          expiry,
+        });
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
       });
     }
@@ -98,13 +103,63 @@ describe('UNSRegistry', () => {
 
     describe('exists', () => {
       it('should return true when token exists', async () => {
-        const tokenId = await mintRandomDomain(unsRegistry, coinbase.address, 'crypto');
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'crypto' });
         expect(await unsRegistry.exists(tokenId)).to.be.equal(true);
       });
 
       it('should return false when token exists', async () => {
         const tok = await unsRegistry.namehash(['token_doesnt_exists_1094u', 'crypto']);
         expect(await unsRegistry.exists(tok)).to.be.equal(false);
+      });
+
+      it('should return true with expirable token', async () => {
+        const tokenId = await mintRandomDomain({
+          unsRegistry,
+          owner: coinbase.address,
+          tld: 'com',
+          expiry: latestBlock.timestamp + 60 * 60 * 24,
+        });
+
+        expect(await unsRegistry.exists(tokenId)).to.be.equal(true);
+      });
+
+      it('should return true with expired token', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+        const tokenId = await mintRandomDomain({
+          unsRegistry,
+          owner: coinbase.address,
+          tld: 'com',
+          expiry,
+        });
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        expect(await unsRegistry.isExpired(tokenId)).to.be.equal(true);
+        expect(await unsRegistry.exists(tokenId)).to.be.equal(true);
+      });
+    });
+
+    describe('ownerOf', async () => {
+      it('should return owner of the token', async () => {
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'crypto' });
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+      });
+
+      it('should return owner of expirable token', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'crypto', expiry });
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+      });
+
+      it('should return zero address if token is expired', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'com', expiry });
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(ZERO_ADDRESS);
       });
     });
 
@@ -135,7 +190,7 @@ describe('UNSRegistry', () => {
       let tokenId: BigNumber;
 
       beforeEach(async () => {
-        tokenId = await mintRandomDomain(unsRegistry, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'crypto' });
       });
 
       it('should burn the domain', async () => {
@@ -146,29 +201,45 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.exists(tokenId)).to.be.equal(false);
       });
 
-      it('should revert if not owner', async () => {
-        await expect(unsRegistry.connect(signers[1]).burn(tokenId)).to.be.revertedWith(
-          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
-        );
+      it('should revert with expirable token', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'com', expiry });
+
+        await expect(unsRegistry.burn(tokenId)).to.be.revertedWith('Registry: TOKEN_EXPIRABLE');
       });
 
       it('should reset records on burn', async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['token-to-burn', 'crypto']);
+        const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['token-to-burn', 'crypto'] });
         await unsRegistry.set('key_31', 'value_23', tokenId);
         expect(await unsRegistry.get('key_31', tokenId)).to.be.equal('value_23');
 
         await expect(unsRegistry.burn(tokenId)).to.emit(unsRegistry, 'ResetRecords').withArgs(tokenId);
         expect(await unsRegistry.get('key_31', tokenId)).to.be.equal('');
 
-        await mintDomain(unsRegistry, coinbase.address, ['token-to-burn', 'crypto']);
+        await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['token-to-burn', 'crypto'] });
         expect(await unsRegistry.get('key_31', tokenId)).to.be.equal('');
       });
 
       it('should revert if tokenId is upgraded', async () => {
-        tokenId = await mintRandomDomain(unsRegistryMock, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry: unsRegistryMock, owner: coinbase.address, tld: 'crypto' });
         await unsRegistryMock.upgradeAll([tokenId]);
 
         await expect(unsRegistryMock.burn(tokenId)).to.be.revertedWith('Registry: TOKEN_UPGRADED');
+      });
+
+      it('should revert with expired token', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'com', expiry });
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(unsRegistry.burn(tokenId)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('should revert if not owner', async () => {
+        await expect(unsRegistry.connect(signers[1]).burn(tokenId)).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
       });
     });
   });
@@ -176,19 +247,19 @@ describe('UNSRegistry', () => {
   describe('Registry (minting)', () => {
     describe('mintWithRecords(address,string[],string[],string[],bool)', async () => {
       it('should mint domain with no records', async () => {
-        const tokenId = await mintDomain(unsRegistry, coinbase, ['label_12324_2', 'crypto']);
+        const tokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: ['label_12324_2', 'crypto'] });
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
       });
 
       it('should mint domain with record', async () => {
-        const tokenId = await mintDomain(
+        const tokenId = await mintDomain({
           unsRegistry,
-          coinbase.address,
-          ['label_38f6', 'crypto'],
-          false,
-          ['key_1'],
-          ['value_1'],
-        );
+          owner: coinbase,
+          labels: ['label_38f6', 'crypto'],
+          withoutReverse: false,
+          keys: ['key_1'],
+          values: ['value_1'],
+        });
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         expect(await unsRegistry.get('key_1', tokenId)).to.be.eql('value_1');
@@ -196,10 +267,10 @@ describe('UNSRegistry', () => {
 
       it('should mint subdomain', async () => {
         const labels = ['label_38g', 'crypto'];
-        await mintDomain(unsRegistry, coinbase.address, labels);
+        await mintDomain({ unsRegistry, owner: coinbase.address, labels: labels });
 
         labels.unshift('sub');
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, labels);
+        const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels });
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
       });
@@ -208,33 +279,70 @@ describe('UNSRegistry', () => {
         const labels = ['label_38f7', 'crypto'];
         const tokenId = await unsRegistry.namehash(labels);
 
-        await expect(unsRegistry.mintWithRecords(coinbase.address, labels, ['key1'], ['42'], true))
-          .to.emit(unsRegistry, 'NewURI')
+        await expect(
+          unsRegistry['mintWithRecords(address,string[],string[],string[],bool)'](
+            coinbase.address,
+            labels,
+            ['key1'],
+            ['42'], true,
+          ),
+        ).to.emit(unsRegistry, 'NewURI')
           .withArgs(tokenId, 'label_38f7.crypto');
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
       });
 
+      it('should revert re-minting an expired domain', async () => {
+        const labels = ['label_38f8', 'com'];
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+        const tokenId = await mintDomain({
+          unsRegistry,
+          owner: owner.address,
+          labels,
+          expiry,
+        });
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        expect(await unsRegistry.isExpired(tokenId)).to.be.eq(true);
+
+        await expect(
+          unsRegistry.mintWithRecords(
+            receiver.address,
+            labels,
+            [],
+            [],
+            true,
+          ),
+        ).to.be.revertedWith('ERC721: token already minted');
+      });
+
       it('should not allow minting subdomain if not minting manager', async () => {
         const labels = ['label_38qwe', 'crypto'];
-        await mintDomain(unsRegistry, owner, labels);
+        await mintDomain({ unsRegistry, owner, labels });
 
         labels.unshift('sub');
         const _registry = unsRegistry.connect(owner);
-        await expect(mintDomain(_registry, owner, labels)).to.be.revertedWith(
+        await expect(mintDomain({ unsRegistry: _registry, owner, labels })).to.be.revertedWith(
           'Registry: SENDER_IS_NOT_MINTING_MANAGER',
         );
       });
 
       it('should not allow minting subdomain if parent token is upgraded', async () => {
         const labels = ['label_38qwex', 'crypto'];
-        const parentTokenId = await mintDomain(unsRegistryMock, owner, labels);
+        const parentTokenId = await mintDomain({ unsRegistry: unsRegistryMock, owner, labels });
 
         await unsRegistryMock.connect(coinbase).upgradeAll([ parentTokenId ]);
 
         labels.unshift('sub');
 
-        await expect(mintDomain(unsRegistryMock, owner, labels)).to.be.revertedWith(
+        await expect(
+          mintDomain({
+            unsRegistry: unsRegistryMock,
+            owner,
+            labels,
+          })).to.be.revertedWith(
           'Registry: TOKEN_UPGRADED',
         );
       });
@@ -243,7 +351,14 @@ describe('UNSRegistry', () => {
     describe('unlockWithRecords(address,string[],string[],string[],bool)', async () => {
       it('should properly unlock domain and set new records without reverse', async () => {
         const labels = ['label_12324_unlock2', 'crypto'];
-        const tokenId = await mintDomain(unsRegistry, coinbase, labels, true, ['key'], ['value']);
+        const tokenId = await mintDomain({
+          unsRegistry,
+          owner: coinbase,
+          labels,
+          withoutReverse: true,
+          keys: ['key'],
+          values: ['value'],
+        });
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         expect(await unsRegistry.get('key', tokenId)).to.be.equal('value');
@@ -265,7 +380,14 @@ describe('UNSRegistry', () => {
 
       it('should properly unlock domain and set new records with reverse', async () => {
         const labels = ['label_12324_unlock3', 'crypto'];
-        const tokenId = await mintDomain(unsRegistry, coinbase, labels, false, ['key'], ['value']);
+        const tokenId = await mintDomain({
+          unsRegistry,
+          owner: coinbase,
+          labels,
+          withoutReverse: false,
+          keys: ['key'],
+          values: ['value'],
+        });
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         expect(await unsRegistry.get('key', tokenId)).to.be.equal('value');
@@ -285,9 +407,69 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.reverseOf(receiver.address)).to.be.equal(tokenId);
       });
 
+      it('should unlock expired domain to new owner, set records and reverse', async () => {
+        const labels = ['label_38f01', 'com'];
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+        const initialOwnerBalance = await unsRegistry.balanceOf(owner.address);
+
+        const tokenId = await mintDomain({
+          unsRegistry,
+          owner: owner.address,
+          labels,
+          expiry,
+        });
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        expect(
+          await unsRegistry.isExpired(tokenId),
+        ).to.be.eq(true);
+        expect(
+          (await unsRegistry.balanceOf(owner.address)).sub(initialOwnerBalance),
+        ).to.be.eq(1);
+
+        const newExpiry = expiry + 60 * 60 * 24;
+        const initialReceiverBalance = await unsRegistry.balanceOf(receiver.address);
+
+        // MintingManager call
+        await unsRegistry.setExpiry(newExpiry, tokenId);
+        await unsRegistry.connect(receiver).removeReverse();
+
+        await expect(
+          unsRegistry.unlockWithRecords(
+            receiver.address,
+            labels,
+            ['key1'],
+            ['42'],
+            true,
+          ),
+        ).to.emit(unsRegistry, 'Transfer')
+          .withArgs(owner.address, receiver.address, tokenId);
+
+        expect(
+          await unsRegistry.balanceOf(owner.address),
+        ).to.be.eq(initialOwnerBalance);
+        expect(
+          (await unsRegistry.balanceOf(receiver.address)).sub(initialReceiverBalance),
+        ).to.be.eq(1);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.eq(receiver.address);
+        expect(await unsRegistry.expiryOf(tokenId)).to.eq(newExpiry);
+        expect(await unsRegistry.get('key1', tokenId)).to.eq('42');
+        expect(await unsRegistry.reverseOf(receiver.address)).to.eq(tokenId);
+      });
+
       it('should fail if called by non-allowed address', async () => {
         const labels = ['label_12324_unlock_fail', 'crypto'];
-        await mintDomain(unsRegistry, coinbase, labels, false, ['key'], ['value']);
+        await mintDomain({
+          unsRegistry,
+          owner: coinbase,
+          labels,
+          withoutReverse: false,
+          keys: ['key'],
+          values: ['value'],
+        });
         await expect(
           unsRegistry
             .connect(receiver)
@@ -304,21 +486,74 @@ describe('UNSRegistry', () => {
   });
 
   describe('Registry (ownership management)', () => {
-    let tokenId;
+    let tokenId: BigNumber;
+    let expirableTokenId: BigNumber;
 
     beforeEach(async () => {
-      tokenId = await mintRandomDomain(unsRegistry, coinbase.address, 'crypto');
+      tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'crypto' });
+      expirableTokenId = await mintRandomDomain({
+        unsRegistry,
+        owner: coinbase.address,
+        tld: 'com',
+        expiry: latestBlock.timestamp + 60 * 60 * 24,
+      });
     });
 
     describe('setOwner', () => {
       it('sets owner correctly', async () => {
-        await unsRegistry.setOwner(owner.address, tokenId);
+        await expect(
+          unsRegistry.setOwner(owner.address, tokenId),
+        ).to.emit(unsRegistry, 'Transfer')
+          .withArgs(coinbase.address, owner.address, tokenId);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
+      it('sets owner correctly for expirable token', async () => {
+        await expect(
+          unsRegistry.setOwner(owner.address, expirableTokenId),
+        ).to.emit(unsRegistry, 'Transfer')
+          .withArgs(coinbase.address, owner.address, expirableTokenId);
+
+        expect(await unsRegistry.ownerOf(expirableTokenId)).to.be.equal(owner.address);
+      });
+
+      it('reverts if token is expired', async () => {
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.setOwner(owner.address, expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('reverts if expired and sender is approved', async () => {
+        await unsRegistry.approve(sender.address, expirableTokenId);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender).setOwner(owner.address, expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('reverts if expired and sender is approvedForAll', async () => {
+        await unsRegistry.setApprovalForAll(sender.address, true);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender).setOwner(owner.address, expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('reverts if not owner', async () => {
+        await expect(
+          unsRegistry.connect(signers[1]).setOwner(owner.address, tokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
       it('sets owner correctly even if token is upgraded', async () => {
-        tokenId = await mintRandomDomain(unsRegistryMock, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry: unsRegistryMock, owner: coinbase.address, tld: 'crypto' });
         await unsRegistryMock.upgradeAll([tokenId]);
 
         await unsRegistryMock.setOwner(owner.address, tokenId);
@@ -327,7 +562,7 @@ describe('UNSRegistry', () => {
       });
 
       it('produces ERC721 error when transfering upgraded token to zero address', async () => {
-        tokenId = await mintRandomDomain(unsRegistryMock, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry: unsRegistryMock, owner: coinbase.address, tld: 'crypto' });
         await unsRegistryMock.upgradeAll([tokenId]);
 
         await expect(unsRegistryMock.setOwner(ZERO_ADDRESS, tokenId)).to.be.revertedWith(
@@ -353,8 +588,50 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
+      it('transfers expirable token correctly', async () => {
+        await unsRegistry.transferFrom(coinbase.address, owner.address, expirableTokenId);
+
+        expect(await unsRegistry.ownerOf(expirableTokenId)).to.be.equal(owner.address);
+      });
+
+      it('reverts if token is expired', async () => {
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.transferFrom(coinbase.address, owner.address, expirableTokenId),
+        ).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
+      });
+
+      it('reverts if expired and sender is approved', async () => {
+        await unsRegistry.approve(sender.address, expirableTokenId);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender).transferFrom(coinbase.address, owner.address, expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('reverts if expired and sender is approvedForAll', async () => {
+        await unsRegistry.setApprovalForAll(sender.address, true);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender).transferFrom(coinbase.address, owner.address, expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('reverts if not owner', async () => {
+        await expect(
+          unsRegistry.connect(signers[1]).transferFrom(coinbase.address, owner.address, tokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
       it('transfers domain correctly even if token is upgraded', async () => {
-        tokenId = await mintRandomDomain(unsRegistryMock, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry: unsRegistryMock, owner: coinbase.address, tld: 'crypto' });
         await unsRegistryMock.upgradeAll([tokenId]);
 
         await unsRegistryMock.transferFrom(coinbase.address, owner.address, tokenId);
@@ -375,17 +652,63 @@ describe('UNSRegistry', () => {
     });
 
     describe('safeTransferFrom(address,address,uint256)', () => {
+      const selector = 'safeTransferFrom(address,address,uint256)';
+
       it('transfers domain correctly', async () => {
-        await unsRegistry['safeTransferFrom(address,address,uint256)'](coinbase.address, owner.address, tokenId);
+        await unsRegistry[selector](coinbase.address, owner.address, tokenId);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
+      it('transfers expirable domain correctly', async () => {
+        await unsRegistry[selector](coinbase.address, owner.address, expirableTokenId);
+
+        expect(await unsRegistry.ownerOf(expirableTokenId)).to.be.equal(owner.address);
+      });
+
+      it('reverts if token is expired', async () => {
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry[selector](coinbase.address, owner.address, expirableTokenId),
+        ).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
+      });
+
+      it('reverts if token is expired and sender is approved', async () => {
+        await unsRegistry.approve(sender.address, expirableTokenId);
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender)[selector](coinbase.address, owner.address, expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('reverts if token is expired and sender is approvedForAll', async () => {
+        await unsRegistry.setApprovalForAll(sender.address, true);
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender)[selector](coinbase.address, owner.address, expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('reverts if not owner', async () => {
+        await expect(
+          unsRegistry.connect(signers[1])[selector](
+            coinbase.address,
+            owner.address,
+            tokenId,
+          ),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
       it('transfers domain correctly even if token is upgraded', async () => {
-        tokenId = await mintRandomDomain(unsRegistryMock, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry: unsRegistryMock, owner: coinbase.address, tld: 'crypto' });
         await unsRegistryMock.upgradeAll([tokenId]);
 
-        await unsRegistryMock['safeTransferFrom(address,address,uint256)'](coinbase.address, owner.address, tokenId);
+        await unsRegistryMock[selector](coinbase.address, owner.address, tokenId);
 
         expect(await unsRegistryMock.ownerOf(tokenId)).to.be.equal(owner.address);
       });
@@ -394,7 +717,7 @@ describe('UNSRegistry', () => {
         await unsRegistry.set('key_12', 'value_23', tokenId);
         expect(await unsRegistry.get('key_12', tokenId)).to.be.equal('value_23');
 
-        await expect(unsRegistry['safeTransferFrom(address,address,uint256)'](coinbase.address, accounts[0], tokenId))
+        await expect(unsRegistry[selector](coinbase.address, accounts[0], tokenId))
           .to.emit(unsRegistry, 'ResetRecords')
           .withArgs(tokenId);
 
@@ -403,8 +726,10 @@ describe('UNSRegistry', () => {
     });
 
     describe('safeTransferFrom(address,address,uint256,bytes)', () => {
+      const selector = 'safeTransferFrom(address,address,uint256,bytes)';
+
       it('transfers domain correctly', async () => {
-        await unsRegistry['safeTransferFrom(address,address,uint256,bytes)'](
+        await unsRegistry[selector](
           coinbase.address,
           owner.address,
           tokenId,
@@ -414,11 +739,58 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       });
 
+      it('transfers expirable domain correctly', async () => {
+        await unsRegistry[selector](
+          coinbase.address,
+          owner.address,
+          expirableTokenId,
+          '0x',
+        );
+        expect(await unsRegistry.ownerOf(expirableTokenId)).to.be.equal(owner.address);
+      });
+
+      it('reverts if domain is expired', async () => {
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry[selector](coinbase.address, owner.address, expirableTokenId, '0x'),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('reverts if domain is expired and sender is approved', async () => {
+        await unsRegistry.approve(sender.address, expirableTokenId);
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender)[selector](coinbase.address, owner.address, expirableTokenId, '0x'),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('reverts if domain is expired and sender is approvedForAll', async () => {
+        await unsRegistry.setApprovalForAll(sender.address, true);
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender)[selector](coinbase.address, owner.address, expirableTokenId, '0x'),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('reverts if not owner', async () => {
+        await expect(
+          unsRegistry.connect(signers[1])[selector](
+            coinbase.address,
+            owner.address,
+            tokenId,
+            '0x',
+          ),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
       it('transfers domain correctly even if token is upgraded', async () => {
-        tokenId = await mintRandomDomain(unsRegistryMock, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry: unsRegistryMock, owner: coinbase.address, tld: 'crypto' });
         await unsRegistryMock.upgradeAll([tokenId]);
 
-        await unsRegistryMock['safeTransferFrom(address,address,uint256,bytes)'](
+        await unsRegistryMock[selector](
           coinbase.address,
           owner.address,
           tokenId,
@@ -433,7 +805,7 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.get('key_12', tokenId)).to.be.equal('value_23');
 
         await expect(
-          unsRegistry['safeTransferFrom(address,address,uint256,bytes)'](coinbase.address, accounts[0], tokenId, '0x'),
+          unsRegistry[selector](coinbase.address, accounts[0], tokenId, '0x'),
         )
           .to.emit(unsRegistry, 'ResetRecords')
           .withArgs(tokenId);
@@ -443,15 +815,22 @@ describe('UNSRegistry', () => {
   });
 
   describe('Registry (records management)', () => {
-    const initializeKey = async (key) => {
+    const initializeKey = async (key: string) => {
       await unsRegistry.addKey(key);
       return BigNumber.from(utils.id(key));
     };
 
-    let tokenId;
+    let tokenId: BigNumber;
+    let expirableTokenId: BigNumber;
 
     beforeEach(async () => {
-      tokenId = await mintRandomDomain(unsRegistry, coinbase.address, 'crypto');
+      tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'crypto' });
+      expirableTokenId = await mintRandomDomain({
+        unsRegistry,
+        owner: coinbase.address,
+        tld: 'com',
+        expiry: latestBlock.timestamp + 60 * 60 * 24,
+      });
     });
 
     describe('set & get', () => {
@@ -461,8 +840,14 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.get('key', tokenId)).to.be.equal('value');
       });
 
+      it('should be able to set and resolve record with expirable token', async () => {
+        await unsRegistry.set('key', 'value', expirableTokenId);
+
+        expect(await unsRegistry.get('key', expirableTokenId)).to.be.equal('value');
+      });
+
       it('should return empty value if token is upgraded and is being read from proxy reader', async () => {
-        tokenId = await mintRandomDomain(unsRegistryMock, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry: unsRegistryMock, owner: coinbase.address, tld: 'crypto' });
         await unsRegistryMock.upgradeAll([tokenId]);
 
         await unsRegistryMock.set('key', 'value', tokenId);
@@ -472,8 +857,35 @@ describe('UNSRegistry', () => {
       });
 
       it('should fail if not owner', async () => {
-        tokenId = await mintRandomDomain(unsRegistryMock, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry: unsRegistryMock, owner: coinbase.address, tld: 'crypto' });
         await expect(unsRegistryMock.connect(signers[1]).set('key', 'value', tokenId)).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
+      });
+
+      it('should fail if token is expired', async () => {
+        await increaseTimeBy(60 * 60 * 24);
+        await expect(unsRegistry.set('key', 'value', expirableTokenId)).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
+      });
+
+      it('should fail if token is expired and sender is approved', async () => {
+        await unsRegistry.approve(sender.address, expirableTokenId);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(unsRegistry.connect(sender).set('key', 'value', expirableTokenId)).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
+      });
+
+      it('should fail if token is expired and sender is approvedForAll', async () => {
+        await unsRegistry.setApprovalForAll(sender.address, true);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(unsRegistry.connect(sender).set('key', 'value', expirableTokenId)).to.be.revertedWith(
           'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
         );
       });
@@ -520,8 +932,20 @@ describe('UNSRegistry', () => {
         ]);
       });
 
+      it('should be able to set multiple records and resolve them with expirable token', async () => {
+        await unsRegistry.setMany(['key1'], ['value1'], expirableTokenId);
+        await unsRegistry.setMany(['key2', 'key3'], ['value2', 'value3'], expirableTokenId);
+        await unsRegistry.setMany(['key1', 'key2', 'key3'], ['value1', 'value2', 'value3'], expirableTokenId);
+
+        expect(await unsRegistry.getMany(['key1', 'key2', 'key3'], expirableTokenId)).to.be.eql([
+          'value1',
+          'value2',
+          'value3',
+        ]);
+      });
+
       it('should return empty values if token is upgraded and is being read from proxy reader', async () => {
-        tokenId = await mintRandomDomain(unsRegistryMock, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry: unsRegistryMock, owner: coinbase.address, tld: 'crypto' });
         await unsRegistryMock.upgradeAll([tokenId]);
 
         await unsRegistryMock.setMany(['key1', 'key2'], ['value1', 'value2'], tokenId);
@@ -541,6 +965,24 @@ describe('UNSRegistry', () => {
 
         expect(await unsRegistry.connect(signers[1]).getMany(['key'], tokenId)).to.be.deep.equal(['']);
       });
+
+      it('should be able to only read when token is expired', async () => {
+        await unsRegistry.setMany(['key1'], ['value1'], expirableTokenId);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(unsRegistry.setMany(['key'], ['value'], expirableTokenId)).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
+
+        await unsRegistry.approve(sender.address, expirableTokenId);
+
+        await expect(unsRegistry.connect(sender).setMany(['key'], ['value'], expirableTokenId)).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
+
+        expect(await unsRegistry.getMany(['key1'], expirableTokenId)).to.be.deep.equal(['value1']);
+      });
     });
 
     describe('reset', () => {
@@ -552,6 +994,14 @@ describe('UNSRegistry', () => {
         expect(await unsRegistry.getMany(['key1', 'key2'], tokenId)).to.deep.equal(['', '']);
       });
 
+      it('should reset all records with expirable token', async () => {
+        await unsRegistry.setMany(['key1', 'key2'], ['value1', 'value2'], expirableTokenId);
+
+        await unsRegistry.reset(expirableTokenId);
+
+        expect(await unsRegistry.getMany(['key1', 'key2'], expirableTokenId)).to.deep.equal(['', '']);
+      });
+
       it('should fail if not owner', async () => {
         await unsRegistry.setMany(['key1', 'key2'], ['value1', 'value2'], tokenId);
 
@@ -560,6 +1010,34 @@ describe('UNSRegistry', () => {
         );
 
         expect(await unsRegistry.getMany(['key1', 'key2'], tokenId)).to.deep.equal(['value1', 'value2']);
+      });
+
+      it('should fail with expired token', async () => {
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.reset(expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('should fail with expired token and sender is approved', async () => {
+        await unsRegistry.approve(sender.address, expirableTokenId);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender).reset(expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('should fail with expired token and sender is approvedForAll', async () => {
+        await unsRegistry.setApprovalForAll(sender.address, true);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender).reset(expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
       });
     });
 
@@ -570,6 +1048,26 @@ describe('UNSRegistry', () => {
 
         const keyFromHash = await unsRegistry.getKey(BigNumber.from(utils.id(expectedKey)));
         expect(keyFromHash).to.be.equal(expectedKey);
+      });
+
+      it('should get key by hash for expirable token', async () => {
+        const expectedKey = 'new-hashed-key';
+        await unsRegistry.set(expectedKey, 'value', expirableTokenId);
+
+        const keyFromHash = await unsRegistry.getKey(BigNumber.from(utils.id(expectedKey)));
+        expect(keyFromHash).to.be.equal(expectedKey);
+      });
+
+      it('should get key by hash for expired tokens', async () => {
+        const expectedKey = 'new-hash-key';
+        await unsRegistry.set(expectedKey, 'value', tokenId);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        const keyHash = BigNumber.from(utils.id(expectedKey));
+
+        expect(await unsRegistry.getKey(keyHash)).to.be.equal(expectedKey);
+        expect(await unsRegistry.getKeys([keyHash])).to.be.eql([expectedKey]);
       });
 
       it('should get many keys by hashes', async () => {
@@ -596,6 +1094,34 @@ describe('UNSRegistry', () => {
           unsRegistry.connect(signers[1]).reconfigure(['new-key'], ['new-value'], tokenId),
         ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
       });
+
+      it('should fail when trying to reconfigure expired domain', async () => {
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.reconfigure(['new-key'], ['new-value'], expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('should fail when trying to reconfigure expired domain and sender is approved', async () => {
+        await unsRegistry.approve(sender.address, expirableTokenId);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender).reconfigure(['new-key'], ['new-value'], expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
+
+      it('should fail when trying to reconfigure expired domain and sender is approvedForAll', async () => {
+        await unsRegistry.setApprovalForAll(sender.address, true);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        await expect(
+          unsRegistry.connect(sender).reconfigure(['new-key'], ['new-value'], expirableTokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      });
     });
 
     describe('record operations by hashes', async () => {
@@ -609,17 +1135,72 @@ describe('UNSRegistry', () => {
         expect(result.key).to.be.equal(key);
       });
 
+      it('should get values by key hashes with expirable token', async () => {
+        const key = 'get-key-by-hash-key';
+        const value = 'get-key-by-hash-value';
+        await unsRegistry.set(key, value, expirableTokenId);
+
+        const result = await unsRegistry.getByHash(utils.id(key), expirableTokenId);
+        expect(result.key).to.be.equal(key);
+        expect(result.value).to.be.equal(value);
+
+        expect(await unsRegistry.getManyByHash([utils.id(key)], expirableTokenId)).to.be.eql([
+          [key],
+          [value],
+        ]);
+      });
+
       it('should return empty value by keyhash if reader is ProxyReader and token is upgraded', async () => {
         const key = 'get-key-by-hash-key';
         const value = 'get-key-by-hash-value';
 
-        tokenId = await mintRandomDomain(unsRegistryMock, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry: unsRegistryMock, owner: coinbase.address, tld: 'crypto' });
         await unsRegistryMock.set(key, value, tokenId);
         await unsRegistryMock.upgradeAll([tokenId]);
 
         expect((await unsRegistryMock.connect(reader).getByHash(utils.id(key), tokenId)).value).to.be.equal('');
 
         expect((await unsRegistryMock.connect(coinbase).getByHash(utils.id(key), tokenId)).value).to.be.equal(value);
+      });
+
+      it('should revert setting new values by key hashes with expired token', async () => {
+        const key = 'get-key-by-hash-key';
+        const value = 'get-key-by-hash-value';
+
+        await unsRegistry.set(key, value, expirableTokenId);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        expect(
+          await unsRegistry.getByHash(utils.id(key), expirableTokenId),
+        ).to.be.eql([key, value]);
+
+        expect(await unsRegistry.getManyByHash(
+          [utils.id(key)], expirableTokenId),
+        ).to.be.eql([ [key], [value] ]);
+
+        await expect(unsRegistry.setByHash(utils.id(key), 'new-value', expirableTokenId)).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
+        await expect(unsRegistry.setManyByHash([utils.id(key)], ['new-value'], expirableTokenId)).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
+
+        await unsRegistry.approve(sender.address, expirableTokenId);
+
+        await expect(
+          unsRegistry.connect(sender).setByHash(utils.id(key), 'new-value', expirableTokenId),
+        ).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
+
+        await unsRegistry.setApprovalForAll(sender.address, true);
+
+        await expect(
+          unsRegistry.connect(sender).setManyByHash([utils.id(key)], ['new-value'], expirableTokenId),
+        ).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+        );
       });
 
       it('should get multiple values by hashes', async () => {
@@ -636,7 +1217,7 @@ describe('UNSRegistry', () => {
         const keys = ['key-to-hash-1', 'key-to-hash-2'];
         const values = ['value-42', 'value-43'];
 
-        tokenId = await mintRandomDomain(unsRegistryMock, coinbase.address, 'crypto');
+        tokenId = await mintRandomDomain({ unsRegistry: unsRegistryMock, owner: coinbase.address, tld: 'crypto' });
         await unsRegistryMock.setMany(keys, values, tokenId);
         await unsRegistryMock.upgradeAll([tokenId]);
 
@@ -742,6 +1323,91 @@ describe('UNSRegistry', () => {
         const exitsKeyHashTxReceipt3 = await exitsKeyHashTx3.wait();
 
         expect(newKeyHashTxReceipt3.gasUsed).to.be.above(exitsKeyHashTxReceipt3.gasUsed);
+      });
+    });
+  });
+
+  describe('Registry (renewals)', () => {
+    describe('expiryOf', () => {
+      it('should return expiry of a token', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase, tld: 'com', expiry });
+
+        expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
+      });
+
+      it('should return zero if token is not expirable', async () => {
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'crypto' });
+        expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(0);
+      });
+    });
+
+    describe('isExpired', () => {
+      it('should return false if token is not expired', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'com', expiry });
+
+        expect(await unsRegistry.isExpired(tokenId)).to.be.equal(false);
+      });
+
+      it('should return true if token is expired', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'com', expiry });
+
+        await increaseTimeBy(60 * 60 * 24 + 1);
+
+        expect(await unsRegistry.isExpired(tokenId)).to.be.equal(true);
+      });
+
+      it('should return false if token is not expirable', async () => {
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'crypto' });
+        expect(await unsRegistry.isExpired(tokenId)).to.be.equal(false);
+      });
+    });
+
+    describe('setExpiry', () => {
+      it('should set expiry for a token', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'com' });
+
+        const newExpiry = expiry + 60 * 60 * 24;
+
+        await expect(
+          unsRegistry.setExpiry(newExpiry, tokenId),
+        ).to.emit(unsRegistry, 'SetExpiry').withArgs(tokenId, newExpiry);
+
+        expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(newExpiry);
+      });
+
+      it('should not allow setting expiry in the past', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'com' });
+
+        await expect(unsRegistry.setExpiry(expiry - 60 * 60 * 24, tokenId)).to.be.revertedWith(
+          'Registry: EXPIRY_IN_PAST',
+        );
+      });
+
+      it('should not allow setting expiry for non-existent token', async () => {
+        const tokenId = await unsRegistry.namehash(['some_invalid_label', 'crypto']);
+
+        await expect(unsRegistry.setExpiry(latestBlock.timestamp + 60 * 60 * 24, tokenId)).to.be.revertedWith(
+          'ERC721: invalid token ID',
+        );
+      });
+
+      it('should revert if sender is not MintingManager', async () => {
+        const tokenId = await mintRandomDomain({ unsRegistry, owner: coinbase.address, tld: 'com' });
+
+        await expect(
+          unsRegistry.connect(signers[1]).setExpiry(
+            latestBlock.timestamp + 60 * 60 * 24,
+            tokenId,
+          ),
+        ).to.be.revertedWith(
+          'Registry: SENDER_IS_NOT_MINTING_MANAGER',
+        );
       });
     });
   });

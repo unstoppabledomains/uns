@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { MintingManager, UNSRegistry } from '../types/contracts';
 
@@ -432,6 +432,77 @@ describe('RootRegistry', () => {
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
       expect(await l1UnsRegistry.get('k2', tokenId)).to.be.eql('v2');
+    });
+  });
+
+  describe('Expirable tokens transfers', async () => {
+    let tokenId: BigNumber;
+
+    before(async () => {
+      const { timestamp } = await ethers.provider.getBlock('latest');
+      const labels = ['expirable-predicate-test', 'com'];
+
+      await mintingManager.issueExpirableWithRecords(
+        owner.address,
+        labels,
+        [],
+        [],
+        timestamp + 60 * 60 * 24,
+        true,
+      );
+
+      tokenId = await l1UnsRegistry.namehash(labels);
+    });
+
+    it('should revert setOwner to predicate', async () => {
+      await expect(
+        l1UnsRegistry.connect(owner).setOwner(predicate.address, tokenId),
+      ).to.be.revertedWith(
+        'Registry: TOKEN_EXPIRABLE',
+      );
+    });
+
+    it('should revert transferFrom to predicate', async () => {
+      await expect(
+        l1UnsRegistry.connect(owner).transferFrom(owner.address, predicate.address, tokenId),
+      ).to.be.revertedWith(
+        'Registry: TOKEN_EXPIRABLE',
+      );
+    });
+
+    it('should revert safeTransferFrom to predicate', async () => {
+      const selector = 'safeTransferFrom(address,address,uint256)';
+
+      await expect(
+        l1UnsRegistry.connect(owner)[selector](owner.address, predicate.address, tokenId),
+      ).to.be.revertedWith(
+        'Registry: TOKEN_EXPIRABLE',
+      );
+    });
+
+    it('should revert safeTransferFrom to predicate', async () => {
+      const selector = 'safeTransferFrom(address,address,uint256)';
+      const selectorWithBytes = 'safeTransferFrom(address,address,uint256,bytes)';
+
+      await expect(
+        l1UnsRegistry.connect(owner)[selector](owner.address, predicate.address, tokenId),
+      ).to.be.revertedWith(
+        'Registry: TOKEN_EXPIRABLE',
+      );
+
+      await expect(
+        l1UnsRegistry.connect(owner)[selectorWithBytes](owner.address, predicate.address, tokenId, '0x'),
+      ).to.be.revertedWith(
+        'Registry: TOKEN_EXPIRABLE',
+      );
+    });
+
+    it('should revert depositToPolygon', async () => {
+      await expect(
+        l1UnsRegistry.connect(owner).depositToPolygon(tokenId),
+      ).to.be.revertedWith(
+        'Registry: TOKEN_EXPIRABLE',
+      );
     });
   });
 });

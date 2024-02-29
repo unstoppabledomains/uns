@@ -1,3 +1,8 @@
+# v0.9.0
+
+- `UNSRegistry@0.9.0` receives support for expirable domains
+- `MintingManager@0.5.0` receives support for expirable domains, TLDs
+
 ## v0.8.49
 
 - Add `.pudgy` TLD

@@ -9,6 +9,7 @@ import {
   TLD,
   DEAD_ADDRESS,
   ZERO_ADDRESS,
+  EXPIRABLE_TLDS,
 } from './helpers/constants';
 import { mintDomain } from './helpers/registry';
 
@@ -37,7 +38,13 @@ describe('DotCoinBurner', () => {
     for (let i = 0; i < 10; i++) {
       const label = `batch-completed-${i}`;
       labelHashes.push(solidityKeccak256(['string'], [label]));
-      mintedTokenIds.push(await mintDomain(unsRegistry, accounts[0], [label, 'coin']));
+      mintedTokenIds.push(
+        await mintDomain({
+          unsRegistry,
+          owner: accounts[0],
+          labels: [label, 'coin'],
+        }),
+      );
     }
     expect(mintedTokenIds).lengthOf(10);
     const firstTokenId = mintedTokenIds[0];
@@ -51,7 +58,7 @@ describe('DotCoinBurner', () => {
   it('should emit correct BatchCompleted event for 1 domain', async () => {
     const label = 'batch-completed-single-domain';
     const labelHash = solidityKeccak256(['string'], [label]);
-    const mintedTokenId = await mintDomain(unsRegistry, accounts[0], [label, 'coin']);
+    const mintedTokenId = await mintDomain({ unsRegistry, owner: accounts[0], labels: [label, 'coin'] });
     await unsRegistry.connect(accounts[0]).setApprovalForAll(dotCoinBurner.address, true);
     await expect(dotCoinBurner.burnAll([labelHash]))
       .to.emit(dotCoinBurner, 'BatchCompleted')
@@ -70,7 +77,7 @@ describe('DotCoinBurner', () => {
     for (let i = 0; i < accounts.length; i++) {
       const label = `multiple-owners-${i}`;
       labelHashes.push(solidityKeccak256(['string'], [label]));
-      const tokenId = await mintDomain(unsRegistry, accounts[i], [label, 'coin']);
+      const tokenId = await mintDomain({ unsRegistry, owner: accounts[i], labels: [label, 'coin'] });
       mintedTokenIds.push(tokenId);
       await unsRegistry.connect(accounts[i]).setApprovalForAll(dotCoinBurner.address, true);
       expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(accounts[i].address);
@@ -85,13 +92,22 @@ describe('DotCoinBurner', () => {
 
   it('should fail if domain has incorrect extension', async () => {
     await unsRegistry.setApprovalForAll(dotCoinBurner.address, true);
-    // eslint-disable-next-line no-unused-expressions
     expect(TLD).to.be.not.empty;
-    for (const i in TLD) {
-      const extension = i.toLowerCase();
+
+    const latestBlock = await ethers.provider.getBlock('latest');
+
+    for (const tokenId in TLD) {
+      const extension = tokenId.toLowerCase();
       const label = `incorrect-extension-${extension}`;
       const labelHash = solidityKeccak256(['string'], [label]);
-      await mintDomain(unsRegistry, coinbase, [label, extension]);
+
+      await mintDomain({
+        unsRegistry,
+        owner: coinbase,
+        labels: [label, extension],
+        expiry: EXPIRABLE_TLDS.includes(extension) ? latestBlock.timestamp + 60 * 60 * 24 : 0,
+      });
+
       await expect(dotCoinBurner.burnAll([labelHash]))
         .to.be.revertedWith('ERC721: invalid token ID');
     }
@@ -100,7 +116,7 @@ describe('DotCoinBurner', () => {
   it('should fail if domain is not approved to spend', async () => {
     const label = 'not-approved-domain-to-burn';
     const labelHash = solidityKeccak256(['string'], [label]);
-    await mintDomain(unsRegistry, accounts[0], [label, 'coin']);
+    await mintDomain({ unsRegistry, owner: accounts[0], labels: [label, 'coin'] });
     await expect(dotCoinBurner.burnAll([labelHash]))
       .to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
   });
@@ -110,7 +126,7 @@ describe('DotCoinBurner', () => {
     for (let i = 0; i < accounts.length; i++) {
       const label = `one-of-five-is-not-approved-${i}`;
       labelHashes.push(solidityKeccak256(['string'], [label]));
-      await mintDomain(unsRegistry, accounts[i], [label, 'coin']);
+      await mintDomain({ unsRegistry, owner: accounts[i], labels: [label, 'coin'] });
       await unsRegistry.connect(accounts[i]).setApprovalForAll(dotCoinBurner.address, true);
     }
     await unsRegistry.connect(accounts[0]).setApprovalForAll(dotCoinBurner.address, false);
@@ -123,7 +139,7 @@ describe('DotCoinBurner', () => {
     for (let i = 0; i < accounts.length; i++) {
       const label = `multiple-method-callers-${i}`;
       const labelHash = solidityKeccak256(['string'], [label]);
-      const tokenId = await mintDomain(unsRegistry, accounts[i], [label, 'coin']);
+      const tokenId = await mintDomain({ unsRegistry, owner: accounts[i], labels: [label, 'coin'] });
       mintedTokenIds.push(tokenId);
       await unsRegistry.connect(accounts[i]).setApprovalForAll(dotCoinBurner.address, true);
       // Ensure that caller is different from domain owner

@@ -13,6 +13,7 @@ import {
   StablePriceOracle__factory,
 } from '../../types';
 import { REGISTRATION_TIME, ZERO_ADDRESS, ZERO_WORD } from '../helpers/constants';
+import { increaseTimeBy } from '../helpers/utils';
 
 describe('ENSCustody (proxy)', function () {
   let provider;
@@ -48,7 +49,7 @@ describe('ENSCustody (proxy)', function () {
     const { timestamp } = await provider.getBlock(commitTx.blockNumber);
     expect(await controller.commitments(commitment)).to.equal(timestamp);
 
-    await provider.send('evm_increaseTime', [(await controller.minCommitmentAge()).toNumber()]);
+    await increaseTimeBy((await controller.minCommitmentAge()).toNumber());
 
     // register
     const registerTx = await custody

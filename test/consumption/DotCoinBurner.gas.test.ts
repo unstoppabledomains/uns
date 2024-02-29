@@ -47,7 +47,7 @@ describe.skip('DotCoinBurner (consumption)', () => {
       for (let i = 0; i < amount; i++) {
         const label = `${labelPrefix}-${i}`;
         labelHashes.push(solidityKeccak256(['string'], [label]));
-        mintedTokenIds.push(await mintDomain(unsRegistry, accounts[0], [label, 'coin']));
+        mintedTokenIds.push(await mintDomain({ unsRegistry, owner: accounts[0], labels: [label, 'coin'] }));
       }
       await unsRegistry.connect(accounts[0]).setApprovalForAll(dotCoinBurner.address, true);
       const txReceipt = await (await dotCoinBurner.burnAll(labelHashes)).wait();

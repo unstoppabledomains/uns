@@ -44,7 +44,10 @@ abstract contract RootRegistry is ERC721Upgradeable, IRootRegistry {
 
     function _getPredicate() internal view returns (address predicate) {
         address manager = StorageSlotUpgradeable.getAddressSlot(_ROOT_CHAIN_MANAGER_SLOT).value;
-        bytes32 tokenType = RootChainManagerStorage(manager).tokenToType(address(this));
-        predicate = RootChainManagerStorage(manager).typeToPredicate(tokenType);
+
+        if (manager != address(0)) {
+            bytes32 tokenType = RootChainManagerStorage(manager).tokenToType(address(this));
+            predicate = RootChainManagerStorage(manager).typeToPredicate(tokenType);
+        }
     }
 }

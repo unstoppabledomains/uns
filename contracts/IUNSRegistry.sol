@@ -25,6 +25,8 @@ interface IUNSRegistry is
 
     event NewURIPrefix(string prefix);
 
+    event SetExpiry(uint256 indexed tokenId, uint64 expiry);
+
     /**
      * @dev Function to set the token URI Prefix for all tokens.
      * @param prefix string URI to assign
@@ -58,6 +60,18 @@ interface IUNSRegistry is
      * @param tokenId uint256 ID of the token
      */
     function exists(uint256 tokenId) external view override returns (bool);
+
+    /**
+     * @dev Expiry of the token.
+     * @param tokenId uint256 ID of the token
+     */
+    function expiryOf(uint256 tokenId) external view returns (uint64);
+
+    /**
+     * @dev Returns whether token is expired.
+     * @param tokenId uint256 ID of the token.
+     */
+    function isExpired(uint256 tokenId) external view returns (bool);
 
     /**
      * @dev Transfer domain ownership without resetting domain records.
@@ -119,4 +133,11 @@ interface IUNSRegistry is
      * @param addr address of ProxyReader
      */
     function addProxyReader(address addr) external;
+
+    /**
+     * @dev Sets token expiry
+     * @param expiry Token expiry timestamp
+     * @param tokenId uint256 ID of the token
+     */
+    function setExpiry(uint64 expiry, uint256 tokenId) external;
 }

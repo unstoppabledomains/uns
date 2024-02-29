@@ -174,7 +174,7 @@ describe('UNSRegistry (reverse)', () => {
     it('should not set reverse resolution if already set', async () => {
       const labels = ['reversemint42_2', 'crypto'];
       const uri = labels.join('.');
-      const tokenId = await mintDomain(unsRegistry, coinbase.address, labels);
+      const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels });
       expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
         tokenId,
       );
@@ -207,12 +207,12 @@ describe('UNSRegistry (reverse)', () => {
     it('should set reverse record', async () => {
       const labels = ['res_1', 'x'];
       const uri = labels.join('.');
-      const tokenId = await mintDomain(
+      const tokenId = await mintDomain({
         unsRegistry,
         owner,
-        ['res_1', 'x'],
-        true,
-      );
+        labels: ['res_1', 'x'],
+        withoutReverse: true,
+      }      );
       const _unsRegistry = unsRegistry.connect(owner);
 
       await expect(_unsRegistry['setReverse(string[])'](labels))
@@ -226,7 +226,7 @@ describe('UNSRegistry (reverse)', () => {
     it('should not resolve reverse record if reader is ProxyReader and token is upgraded', async () => {
       const labels = ['upgraded-token-1', 'x'];
       const uri = labels.join('.');
-      const tokenId = await mintDomain(unsRegistryMock, owner, labels);
+      const tokenId = await mintDomain({ unsRegistry: unsRegistryMock, owner, labels: labels });
 
       await unsRegistryMock.upgradeAll([tokenId]);
 
@@ -240,12 +240,12 @@ describe('UNSRegistry (reverse)', () => {
     it('should set reverse record (case-insensitive address)', async () => {
       const labels = ['res_1', 'x'];
       const uri = labels.join('.');
-      const tokenId = await mintDomain(
+      const tokenId = await mintDomain({
         unsRegistry,
         owner,
         labels,
-        true,
-      );
+        withoutReverse: true,
+      });
       const _unsRegistry = unsRegistry.connect(owner);
 
       await expect(_unsRegistry['setReverse(string[])'](labels))
@@ -269,12 +269,12 @@ describe('UNSRegistry (reverse)', () => {
 
     it('revert setting reverse record by non-owner', async () => {
       const labels = ['res_2', 'x'];
-      await mintDomain(
+      await mintDomain({
         unsRegistry,
         owner,
-        ['res_2', 'x'],
-        true,
-      );
+        labels: ['res_2', 'x'],
+        withoutReverse: true,
+      });
       const _unsRegistry = unsRegistry.connect(receiver);
 
       await expect(
@@ -287,7 +287,7 @@ describe('UNSRegistry (reverse)', () => {
     it('should remove reverse record on tranfer', async () => {
       const labels = ['remove-reverse-record-1', 'x'];
       const uri = labels.join('.');
-      const tokenId = await mintDomain(unsRegistry, owner, labels);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels });
       const _unsRegistry = unsRegistry.connect(owner);
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
@@ -306,8 +306,8 @@ describe('UNSRegistry (reverse)', () => {
       const labels = ['remove-reverse-multiple', 'x'];
       const uri = labels.join('.');
       const labels2 = ['remove-reverse-multiple-1', 'x'];
-      const tokenId = await mintDomain(unsRegistry, owner, labels);
-      const tokenId2 = await mintDomain(unsRegistry, owner, labels2);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels });
+      const tokenId2 = await mintDomain({ unsRegistry, owner, labels: labels2 });
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
       expect(await unsRegistry.reverseNameOf(owner.address)).to.be.equal(uri);
@@ -326,7 +326,7 @@ describe('UNSRegistry (reverse)', () => {
     it('should remove reverse record', async () => {
       const labels = ['rem_3', 'x'];
       const uri = labels.join('.');
-      const tokenId = await mintDomain(unsRegistry, owner, labels);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels });
       const _unsRegistry = unsRegistry.connect(owner);
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
@@ -354,12 +354,12 @@ describe('UNSRegistry (reverse)', () => {
     it('should set reverse resolution for labels', async () => {
       const labels = ['unhash1', 'x'];
       const uri = labels.join('.');
-      const tokenId = await mintDomain(
+      const tokenId = await mintDomain({
         unsRegistry,
         owner,
         labels,
-        true,
-      );
+        withoutReverse: true,
+      });
       const _unsRegistry = unsRegistry.connect(owner);
       await expect(_unsRegistry['setReverse(string[])'](labels))
         .to.emit(_unsRegistry, 'SetReverse')
@@ -370,12 +370,13 @@ describe('UNSRegistry (reverse)', () => {
 
     it('should not allow to set reverse resolution by non owner for labels', async () => {
       const labels = ['non-owner-unhash-1', 'x'];
-      await mintDomain(
+      await mintDomain({
         unsRegistry,
         owner,
         labels,
-        true,
-      );
+        withoutReverse: true,
+      });
+
       const _unsRegistry = unsRegistry.connect(reader);
       await expect(_unsRegistry['setReverse(string[])'](labels))
         .to.be.revertedWith('Registry: SENDER_IS_NOT_OWNER');
@@ -386,12 +387,12 @@ describe('UNSRegistry (reverse)', () => {
     it('should set reverse record', async () => {
       const labels = ['res_mtx_1', 'x'];
       const uri = labels.join('.');
-      const tokenId = await mintDomain(
+      const tokenId = await mintDomain({
         unsRegistry,
         owner,
         labels,
-        true,
-      );
+        withoutReverse: true,
+      });
 
       const params = await buildExecuteParams(
         'setReverse(string[])',
@@ -407,12 +408,12 @@ describe('UNSRegistry (reverse)', () => {
 
     it('revert setting reverse record by non-owner', async () => {
       const labels = ['res_mtx_2', 'x'];
-      const tokenId = await mintDomain(
+      const tokenId = await mintDomain({
         unsRegistry,
         owner,
         labels,
-        true,
-      );
+        withoutReverse: true,
+      });
 
       const params = await buildExecuteParams(
         'setReverse(string[])',
@@ -430,12 +431,12 @@ describe('UNSRegistry (reverse)', () => {
 
     it('revert setting reverse record when non-token based nonce', async () => {
       const labels = ['res_mtx_4', 'x'];
-      await mintDomain(
+      await mintDomain({
         unsRegistry,
         owner,
         labels,
-        true,
-      );
+        withoutReverse: true,
+      });
 
       const params = await buildExecuteParams(
         'setReverse(string[])',
@@ -454,7 +455,7 @@ describe('UNSRegistry (reverse)', () => {
     it('should remove reverse record', async () => {
       const labels = ['rem_mtx_4', 'x'];
       const uri = labels.join('.');
-      const tokenId = await mintDomain(unsRegistry, owner, labels);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels });
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
       expect(await unsRegistry.reverseNameOf(owner.address)).to.be.equal(uri);
 

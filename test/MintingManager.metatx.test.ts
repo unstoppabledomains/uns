@@ -72,6 +72,27 @@ describe('MintingManager (metatx)', () => {
     expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
   });
 
+  it('should mint expirable trough forwarder', async () => {
+    const labels = ['test-qw123-expirable', 'com'];
+    const tokenId = await unsRegistry.namehash(labels);
+
+    const latestBlock = await ethers.provider.getBlock('latest');
+    const expiry = latestBlock.timestamp + 24 * 60 * 60;
+
+    const { req, signature } = await buildExecuteParams(
+      'issueExpirableWithRecords(address,string[],string[],string[],uint64,bool)',
+      [receiver.address, labels, [], [], expiry, true],
+      coinbase,
+      tokenId,
+    );
+
+    await forwarder.execute(req, signature);
+
+    expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+    expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
+  });
+
+
   it('should be able to buy domain with ERC20 tokens', async () => {
     const latestBlock = await ethers.provider.getBlock('latest');
     const expiry = latestBlock.timestamp + 24 * 60 * 60;

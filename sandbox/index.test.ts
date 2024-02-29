@@ -19,6 +19,7 @@ import {
   ZilliqaRecover,
   ZilliqaRecover__factory,
 } from '../types';
+import { increaseTimeBy } from '../test/helpers/utils';
 import { Sandbox } from '.';
 
 describe('Sandbox', async () => {
@@ -177,8 +178,9 @@ describe('Sandbox', async () => {
         (await ethers.provider.getBlock(unwrap(tx, 'blockNumber'))).timestamp,
       );
 
-      await ethers.provider.send('evm_increaseTime', [(await ethRegistrarController.minCommitmentAge()).toNumber()]);
-      await ethers.provider.send('evm_mine', []);
+      await increaseTimeBy(
+        (await ethRegistrarController.minCommitmentAge()).toNumber(),
+      );
 
       tx = await ethRegistrarController.register(
         name,
@@ -219,8 +221,7 @@ describe('Sandbox', async () => {
       const { timestamp } = await ethers.provider.getBlock(unwrap(commitTx, 'blockNumber'));
       expect(await ethRegistrarController.commitments(commitment)).to.equal(timestamp);
 
-      await ethers.provider.send('evm_increaseTime', [(await ethRegistrarController.minCommitmentAge()).toNumber()]);
-      await ethers.provider.send('evm_mine', []);
+      await increaseTimeBy((await ethRegistrarController.minCommitmentAge()).toNumber());
 
       // register
       const registerTx = await custody
