@@ -3,12 +3,14 @@ import { expect } from 'chai';
 import { utils, BigNumber, Contract, BigNumberish } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { FunctionFragment } from 'ethers/lib/utils';
+import { Block } from '@ethersproject/abstract-provider';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 import { TLD, ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain } from './helpers/registry';
 import { getFuncSignature } from './helpers/proxy';
+import { increaseTimeBy } from './helpers/utils';
 
 describe('UNSRegistry (metatx)', () => {
   let unsRegistry: UNSRegistry, buildExecuteParams: ExecuteFunc;
@@ -19,6 +21,8 @@ describe('UNSRegistry (metatx)', () => {
     receiver: SignerWithAddress,
     accessControl: SignerWithAddress,
     operator: SignerWithAddress;
+
+  let latestBlock: Block;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -31,6 +35,10 @@ describe('UNSRegistry (metatx)', () => {
     await unsRegistry.setTokenURIPrefix('/');
 
     buildExecuteParams = buildExecuteFunc(unsRegistry.interface, unsRegistry.address, unsRegistry);
+  });
+
+  beforeEach(async () => {
+    latestBlock = await ethers.provider.getBlock('latest');
   });
 
   describe('General', () => {
@@ -62,6 +70,39 @@ describe('UNSRegistry (metatx)', () => {
       await unsRegistry.connect(owner).set('key', 'value', tokenId);
 
       await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('UNSRegistryForwarder: SIGNATURE_INVALID');
+    });
+
+    it('should revert meta-setOwner for non-onwer', async () => {
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['res_label_0899', 'crypto'] });
+
+      const { req, signature } = await buildExecuteParams(
+        'setOwner(address,uint256)',
+        [receiver.address, tokenId],
+        nonOwner,
+        tokenId,
+      );
+
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    });
+
+    it('should revert meta-setOwner for expired token', async () => {
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+      const tokenId = await mintDomain({
+        unsRegistry,
+        owner,
+        labels: ['res_label_0899_expired', 'com'],
+        expiry,
+      });
+      await increaseTimeBy(60 * 60 * 24);
+
+      const { req, signature } = await buildExecuteParams(
+        'setOwner(address,uint256)',
+        [receiver.address, tokenId],
+        owner,
+        tokenId,
+      );
+
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     });
 
     it('should setApprovalForAll using meta-setApprovalForAll', async () => {
@@ -116,6 +157,27 @@ describe('UNSRegistry (metatx)', () => {
       await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     });
 
+    it('should revert meta-transferFrom for expired token', async () => {
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+      const tokenId = await mintDomain({
+        unsRegistry,
+        owner,
+        labels: ['meta_6458_expired', 'com'],
+        expiry,
+      });
+
+      await increaseTimeBy(60 * 60 * 24);
+
+      const { req, signature } = await buildExecuteParams(
+        'transferFrom(address,address,uint256)',
+        [nonOwner.address, receiverAddress, tokenId],
+        nonOwner,
+        tokenId,
+      );
+
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    });
+
     it('should transfer using meta-safeTransferFrom', async () => {
       const tokenId = await mintDomain({ unsRegistry, owner, labels: ['meta_10235', 'crypto'] });
 
@@ -143,7 +205,72 @@ describe('UNSRegistry (metatx)', () => {
       await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     });
 
-    // TODO: add tests for safeTransferFrom(address,address,uint256,bytes)
+    it('should revert meta-safeTransferFrom for expired token', async () => {
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+      const tokenId = await mintDomain({
+        unsRegistry,
+        owner,
+        labels: ['meta_e5iuw_expired', 'com'],
+        expiry,
+      });
+      await increaseTimeBy(60 * 60 * 24);
+
+      const { req, signature } = await buildExecuteParams(
+        'safeTransferFrom(address,address,uint256)',
+        [owner.address, receiverAddress, tokenId],
+        owner,
+        tokenId,
+      );
+
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    });
+
+    it('should transfer using meta-safeTransferFrom with bytes', async () => {
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['meta_10235-b', 'crypto'] });
+
+      const { req, signature } = await buildExecuteParams(
+        'safeTransferFrom(address,address,uint256,bytes)',
+        [owner.address, receiverAddress, tokenId, '0x'],
+        owner,
+        tokenId,
+      );
+      await unsRegistry.execute(req, signature);
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiverAddress);
+    });
+
+    it('should revert meta-safeTransferFrom for non-onwer with bytes', async () => {
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['meta_e5iuw-b', 'crypto'] });
+
+      const { req, signature } = await buildExecuteParams(
+        'safeTransferFrom(address,address,uint256, bytes)',
+        [nonOwner.address, receiverAddress, tokenId, '0x'],
+        nonOwner,
+        tokenId,
+      );
+
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    });
+
+    it('should revert meta-safeTransferFrom for expired token', async () => {
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+      const tokenId = await mintDomain({
+        unsRegistry,
+        owner,
+        labels: ['meta_e5iuw_expired-b', 'com'],
+        expiry,
+      });
+      await increaseTimeBy(60 * 60 * 24);
+
+      const { req, signature } = await buildExecuteParams(
+        'safeTransferFrom(address,address,uint256,bytes)',
+        [owner.address, receiverAddress, tokenId, '0x'],
+        owner,
+        tokenId,
+      );
+
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+    });
 
     it('should burn using meta-burn', async () => {
       const tokenId = await mintDomain({ unsRegistry, owner, labels: ['meta_ar093', 'crypto'] });
@@ -193,31 +320,32 @@ describe('UNSRegistry (metatx)', () => {
 
     describe('Token-based functions (token should not be minted)', () => {
       const paramValueMap = {
-        uri: 'label',
-        data: '0x',
         keys: ['key1'],
         values: ['value1'],
-        to: '',
+        uri: 'awesome-uri',
+        labels: ['token-based', 'crypto'],
         tokenId: '',
+        to: '',
       };
 
-      const included = ['issueWithRecords'];
+      const included = [
+        'issueWithRecords',
+        'unlockWithRecords',
+        'mintTLD',
+      ];
 
       const getFuncs = () => {
         return registryFuncs()
-          .filter((x) => x.inputs.filter((i) => i.name === 'tokenId').length)
           .filter((x) => included.includes(x.name) || included.includes(getFuncSignature(x)));
       };
 
       before(async () => {
         paramValueMap.to = receiver.address;
+        paramValueMap.tokenId = (await unsRegistry.namehash(paramValueMap.labels)).toHexString();
       });
 
       it('should execute all functions successfully', async () => {
         for (const func of getFuncs()) {
-          const funcSigHash = utils.id(`${getFuncSignature(func)}_excl`);
-          paramValueMap.tokenId = (await unsRegistry.namehash([funcSigHash, 'crypto'])).toHexString();
-
           const req = await buidRequest(func, coinbase.address, paramValueMap.tokenId, paramValueMap);
           const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
           await unsRegistry.execute(req, signature);
@@ -484,6 +612,30 @@ describe('UNSRegistry (metatx)', () => {
       await unsRegistry.connect(nonOwner).execute(req, signature);
 
       expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+    });
+
+    it('should execute meta tx with multicall with expirable domain', async () => {
+      const labels = ['res_label_mb3_expirable', 'com'];
+      const tokenId = await unsRegistry.namehash(labels);
+
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+      const { req, signature } = await buildExecuteParams(
+        'multicall(bytes[])',
+        [
+          [
+            unsRegistry.interface.encodeFunctionData('mintWithRecords', [coinbase.address, labels, [], [], false]),
+            unsRegistry.interface.encodeFunctionData('setExpiry', [expiry, tokenId]),
+            unsRegistry.interface.encodeFunctionData('setOwner', [receiver.address, tokenId]),
+          ],
+        ],
+        coinbase,
+        tokenId,
+      );
+      await unsRegistry.connect(nonOwner).execute(req, signature);
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+      expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
     });
 
     it('should execute multiple meta txs through multicall', async () => {
