@@ -134,7 +134,6 @@ const config = {
     },
     mocha: {
         timeout: 100000,
-        require: ['./test/helpers/setup.ts'],
     },
     etherscan: {
         apiKey: (0, lodash_1.pickBy)({

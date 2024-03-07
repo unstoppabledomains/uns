@@ -197,6 +197,25 @@ const _abi = [
         inputs: [
             {
                 indexed: true,
+                internalType: "uint256",
+                name: "tokenId",
+                type: "uint256",
+            },
+            {
+                indexed: false,
+                internalType: "uint64",
+                name: "expiry",
+                type: "uint64",
+            },
+        ],
+        name: "SetExpiry",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            {
+                indexed: true,
                 internalType: "address",
                 name: "addr",
                 type: "address",
@@ -365,6 +384,25 @@ const _abi = [
     {
         inputs: [
             {
+                internalType: "uint256",
+                name: "tokenId",
+                type: "uint256",
+            },
+        ],
+        name: "expiryOf",
+        outputs: [
+            {
+                internalType: "uint64",
+                name: "",
+                type: "uint64",
+            },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
                 internalType: "string",
                 name: "key",
                 type: "string",
@@ -525,6 +563,25 @@ const _abi = [
             },
         ],
         name: "isApprovedOrOwner",
+        outputs: [
+            {
+                internalType: "bool",
+                name: "",
+                type: "bool",
+            },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "uint256",
+                name: "tokenId",
+                type: "uint256",
+            },
+        ],
+        name: "isExpired",
         outputs: [
             {
                 internalType: "bool",
@@ -923,6 +980,24 @@ const _abi = [
             },
         ],
         name: "setByHash",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "uint64",
+                name: "expiry",
+                type: "uint64",
+            },
+            {
+                internalType: "uint256",
+                name: "tokenId",
+                type: "uint256",
+            },
+        ],
+        name: "setExpiry",
         outputs: [],
         stateMutability: "nonpayable",
         type: "function",

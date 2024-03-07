@@ -11,7 +11,7 @@ export interface MintingManagerInterface extends utils.Interface {
         "addMinter(address)": FunctionFragment;
         "addMinters(address[])": FunctionFragment;
         "addProxyReaders(address[])": FunctionFragment;
-        "addTld(string)": FunctionFragment;
+        "addTld(string,bool)": FunctionFragment;
         "buy(address,string[],string[],string[],uint64,uint256,bytes)": FunctionFragment;
         "buyForErc20(address,string[],string[],string[],uint64,address,uint256,bytes)": FunctionFragment;
         "claim(uint256,string)": FunctionFragment;
@@ -28,6 +28,7 @@ export interface MintingManagerInterface extends utils.Interface {
         "isBlocked(uint256)": FunctionFragment;
         "isMinter(address)": FunctionFragment;
         "isTrustedForwarder(address)": FunctionFragment;
+        "issueExpirableWithRecords(address,string[],string[],string[],uint64,bool)": FunctionFragment;
         "issueWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
         "owner()": FunctionFragment;
         "pause()": FunctionFragment;
@@ -35,6 +36,7 @@ export interface MintingManagerInterface extends utils.Interface {
         "removeMinter(address)": FunctionFragment;
         "removeMinters(address[])": FunctionFragment;
         "removeTld(uint256)": FunctionFragment;
+        "renew(uint64,uint256)": FunctionFragment;
         "renounceMinter()": FunctionFragment;
         "renounceOwnership()": FunctionFragment;
         "renounceRole(bytes32,address)": FunctionFragment;
@@ -51,7 +53,7 @@ export interface MintingManagerInterface extends utils.Interface {
         "withdraw(address)": FunctionFragment;
         "withdraw(address,address)": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueExpirableWithRecords" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renew" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
@@ -59,7 +61,7 @@ export interface MintingManagerInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "addMinter", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "addMinters", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "addProxyReaders", values: [PromiseOrValue<string>[]]): string;
-    encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>, PromiseOrValue<boolean>]): string;
     encodeFunctionData(functionFragment: "buy", values: [
         PromiseOrValue<string>,
         PromiseOrValue<string>[],
@@ -110,6 +112,14 @@ export interface MintingManagerInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "isBlocked", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "isMinter", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "isTrustedForwarder", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "issueExpirableWithRecords", values: [
+        PromiseOrValue<string>,
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<BigNumberish>,
+        PromiseOrValue<boolean>
+    ]): string;
     encodeFunctionData(functionFragment: "issueWithRecords", values: [
         PromiseOrValue<string>,
         PromiseOrValue<string>[],
@@ -123,6 +133,7 @@ export interface MintingManagerInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "removeMinter", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "removeMinters", values: [PromiseOrValue<string>[]]): string;
     encodeFunctionData(functionFragment: "removeTld", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "renew", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "renounceMinter", values?: undefined): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
     encodeFunctionData(functionFragment: "renounceRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
@@ -162,6 +173,7 @@ export interface MintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "isBlocked", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isTrustedForwarder", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "issueExpirableWithRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "issueWithRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
@@ -169,6 +181,7 @@ export interface MintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "removeMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeMinters", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeTld", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "renew", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceRole", data: BytesLike): Result;
@@ -374,7 +387,7 @@ export interface MintingManager extends BaseContract {
         addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
-        addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
@@ -409,6 +422,9 @@ export interface MintingManager extends BaseContract {
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
+        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -424,6 +440,9 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         removeTld(tld: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         renounceMinter(overrides?: Overrides & {
@@ -479,7 +498,7 @@ export interface MintingManager extends BaseContract {
     addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
-    addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+    addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
@@ -514,6 +533,9 @@ export interface MintingManager extends BaseContract {
     isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
     isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
     isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
+    issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -529,6 +551,9 @@ export interface MintingManager extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     removeTld(tld: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     renounceMinter(overrides?: Overrides & {
@@ -578,7 +603,7 @@ export interface MintingManager extends BaseContract {
         addMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         addMinters(accounts: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
-        addTld(tld: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
+        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
         buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
@@ -595,6 +620,7 @@ export interface MintingManager extends BaseContract {
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
+        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         owner(overrides?: CallOverrides): Promise<string>;
         pause(overrides?: CallOverrides): Promise<void>;
@@ -602,6 +628,7 @@ export interface MintingManager extends BaseContract {
         removeMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         removeMinters(accounts: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
         removeTld(tld: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
+        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         renounceMinter(overrides?: CallOverrides): Promise<void>;
         renounceOwnership(overrides?: CallOverrides): Promise<void>;
         renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
@@ -666,7 +693,7 @@ export interface MintingManager extends BaseContract {
         addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
-        addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
@@ -701,6 +728,9 @@ export interface MintingManager extends BaseContract {
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
+        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
         issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
@@ -716,6 +746,9 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         removeTld(tld: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         renounceMinter(overrides?: Overrides & {
@@ -772,7 +805,7 @@ export interface MintingManager extends BaseContract {
         addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
-        addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
@@ -807,6 +840,9 @@ export interface MintingManager extends BaseContract {
         isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
         issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
@@ -822,6 +858,9 @@ export interface MintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         removeTld(tld: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         renounceMinter(overrides?: Overrides & {

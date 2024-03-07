@@ -35,6 +35,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         "depositToPolygon(uint256)": FunctionFragment;
         "execute((address,uint256,uint256,bytes),bytes)": FunctionFragment;
         "exists(uint256)": FunctionFragment;
+        "expiryOf(uint256)": FunctionFragment;
         "get(string,uint256)": FunctionFragment;
         "getApproved(uint256)": FunctionFragment;
         "getByHash(uint256,uint256)": FunctionFragment;
@@ -46,6 +47,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         "initialize(address,address,address,address)": FunctionFragment;
         "isApprovedForAll(address,address)": FunctionFragment;
         "isApprovedOrOwner(address,uint256)": FunctionFragment;
+        "isExpired(uint256)": FunctionFragment;
         "isTrustedForwarder(address)": FunctionFragment;
         "mint(address,uint256)": FunctionFragment;
         "mint(address,uint256,bytes)": FunctionFragment;
@@ -69,6 +71,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         "set(string,string,uint256)": FunctionFragment;
         "setApprovalForAll(address,bool)": FunctionFragment;
         "setByHash(uint256,string,uint256)": FunctionFragment;
+        "setExpiry(uint64,uint256)": FunctionFragment;
         "setMany(string[],string[],uint256)": FunctionFragment;
         "setManyByHash(uint256[],string[],uint256)": FunctionFragment;
         "setOwner(address,uint256)": FunctionFragment;
@@ -83,7 +86,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         "verify((address,uint256,uint256,bytes),bytes)": FunctionFragment;
         "withdrawFromPolygon(bytes,uint256,string[],string[])": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "BATCH_LIMIT" | "NAME" | "VERSION" | "addKey" | "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "execute" | "exists" | "get" | "getApproved" | "getByHash" | "getKey" | "getKeys" | "getMany" | "getManyByHash" | "getTokenName" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "isTrustedForwarder" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "multicall" | "name" | "namehash" | "nonceOf" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseNameOf" | "reverseOf" | "root" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "upgradeAll" | "verify" | "withdrawFromPolygon"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "BATCH_LIMIT" | "NAME" | "VERSION" | "addKey" | "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "execute" | "exists" | "expiryOf" | "get" | "getApproved" | "getByHash" | "getKey" | "getKeys" | "getMany" | "getManyByHash" | "getTokenName" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "isExpired" | "isTrustedForwarder" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "multicall" | "name" | "namehash" | "nonceOf" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseNameOf" | "reverseOf" | "root" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setExpiry" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "upgradeAll" | "verify" | "withdrawFromPolygon"): FunctionFragment;
     encodeFunctionData(functionFragment: "BATCH_LIMIT", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
     encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
@@ -96,6 +99,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "depositToPolygon", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "execute", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
     encodeFunctionData(functionFragment: "exists", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "expiryOf", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "get", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "getApproved", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "getByHash", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
@@ -112,6 +116,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     ]): string;
     encodeFunctionData(functionFragment: "isApprovedForAll", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "isApprovedOrOwner", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "isExpired", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "isTrustedForwarder", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "mint(address,uint256)", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "mint(address,uint256,bytes)", values: [
@@ -171,6 +176,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         PromiseOrValue<string>,
         PromiseOrValue<BigNumberish>
     ]): string;
+    encodeFunctionData(functionFragment: "setExpiry", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "setMany", values: [
         PromiseOrValue<string>[],
         PromiseOrValue<string>[],
@@ -219,6 +225,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "depositToPolygon", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "expiryOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "get", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getApproved", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getByHash", data: BytesLike): Result;
@@ -230,6 +237,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isApprovedForAll", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isApprovedOrOwner", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "isExpired", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isTrustedForwarder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "mint(address,uint256)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "mint(address,uint256,bytes)", data: BytesLike): Result;
@@ -253,6 +261,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "set", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setApprovalForAll", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setByHash", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setExpiry", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setMany", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setManyByHash", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setOwner", data: BytesLike): Result;
@@ -277,6 +286,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
         "RemoveReverse(address)": EventFragment;
         "ResetRecords(uint256)": EventFragment;
         "Set(uint256,string,string,string,string)": EventFragment;
+        "SetExpiry(uint256,uint64)": EventFragment;
         "SetReverse(address,uint256)": EventFragment;
         "Transfer(address,address,uint256)": EventFragment;
         "Upgraded(address)": EventFragment;
@@ -291,6 +301,7 @@ export interface UNSRegistryMockInterface extends utils.Interface {
     getEvent(nameOrSignatureOrTopic: "RemoveReverse"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "ResetRecords"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "Set"): EventFragment;
+    getEvent(nameOrSignatureOrTopic: "SetExpiry"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "SetReverse"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
@@ -380,6 +391,15 @@ export declare type SetEvent = TypedEvent<[
     string
 ], SetEventObject>;
 export declare type SetEventFilter = TypedEventFilter<SetEvent>;
+export interface SetExpiryEventObject {
+    tokenId: BigNumber;
+    expiry: BigNumber;
+}
+export declare type SetExpiryEvent = TypedEvent<[
+    BigNumber,
+    BigNumber
+], SetExpiryEventObject>;
+export declare type SetExpiryEventFilter = TypedEventFilter<SetExpiryEvent>;
 export interface SetReverseEventObject {
     addr: string;
     tokenId: BigNumber;
@@ -446,6 +466,7 @@ export interface UNSRegistryMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
+        expiryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
         get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string] & {
             value: string;
         }>;
@@ -471,6 +492,7 @@ export interface UNSRegistryMock extends BaseContract {
         }): Promise<ContractTransaction>;
         isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
         isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
+        isExpired(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
         "mint(address,uint256)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
@@ -495,7 +517,9 @@ export interface UNSRegistryMock extends BaseContract {
         onERC721Received(arg0: PromiseOrValue<string>, from: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
+        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string] & {
+            owner: string;
+        }>;
         reconfigure(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -526,6 +550,9 @@ export interface UNSRegistryMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         setByHash(keyHash: PromiseOrValue<BigNumberish>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        setExpiry(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
@@ -586,6 +613,7 @@ export interface UNSRegistryMock extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
+    expiryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
     get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
     getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
     getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, string] & {
@@ -605,6 +633,7 @@ export interface UNSRegistryMock extends BaseContract {
     }): Promise<ContractTransaction>;
     isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
     isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
+    isExpired(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
     isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
     "mint(address,uint256)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
@@ -656,6 +685,9 @@ export interface UNSRegistryMock extends BaseContract {
     setByHash(keyHash: PromiseOrValue<BigNumberish>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
+    setExpiry(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -700,6 +732,7 @@ export interface UNSRegistryMock extends BaseContract {
         depositToPolygon(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
         exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
+        expiryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, string] & {
@@ -717,6 +750,7 @@ export interface UNSRegistryMock extends BaseContract {
         initialize(mintingManager: PromiseOrValue<string>, cnsRegistry: PromiseOrValue<string>, rootChainManager: PromiseOrValue<string>, childChainManager: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
+        isExpired(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         "mint(address,uint256)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         "mint(address,uint256,bytes)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg2: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
@@ -740,6 +774,7 @@ export interface UNSRegistryMock extends BaseContract {
         set(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         setByHash(keyHash: PromiseOrValue<BigNumberish>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
+        setExpiry(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
@@ -775,6 +810,8 @@ export interface UNSRegistryMock extends BaseContract {
         ResetRecords(tokenId?: PromiseOrValue<BigNumberish> | null): ResetRecordsEventFilter;
         "Set(uint256,string,string,string,string)"(tokenId?: PromiseOrValue<BigNumberish> | null, keyIndex?: PromiseOrValue<string> | null, valueIndex?: PromiseOrValue<string> | null, key?: null, value?: null): SetEventFilter;
         Set(tokenId?: PromiseOrValue<BigNumberish> | null, keyIndex?: PromiseOrValue<string> | null, valueIndex?: PromiseOrValue<string> | null, key?: null, value?: null): SetEventFilter;
+        "SetExpiry(uint256,uint64)"(tokenId?: PromiseOrValue<BigNumberish> | null, expiry?: null): SetExpiryEventFilter;
+        SetExpiry(tokenId?: PromiseOrValue<BigNumberish> | null, expiry?: null): SetExpiryEventFilter;
         "SetReverse(address,uint256)"(addr?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): SetReverseEventFilter;
         SetReverse(addr?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): SetReverseEventFilter;
         "Transfer(address,address,uint256)"(from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): TransferEventFilter;
@@ -809,6 +846,7 @@ export interface UNSRegistryMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
+        expiryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
@@ -822,6 +860,7 @@ export interface UNSRegistryMock extends BaseContract {
         }): Promise<BigNumber>;
         isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
+        isExpired(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         "mint(address,uint256)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
@@ -871,6 +910,9 @@ export interface UNSRegistryMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         setByHash(keyHash: PromiseOrValue<BigNumberish>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        setExpiry(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
@@ -932,6 +974,7 @@ export interface UNSRegistryMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        expiryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -945,6 +988,7 @@ export interface UNSRegistryMock extends BaseContract {
         }): Promise<PopulatedTransaction>;
         isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        isExpired(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         "mint(address,uint256)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
@@ -994,6 +1038,9 @@ export interface UNSRegistryMock extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         setByHash(keyHash: PromiseOrValue<BigNumberish>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        setExpiry(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {

@@ -136,6 +136,11 @@ const _abi = [
                 name: "tld",
                 type: "string",
             },
+            {
+                internalType: "bool",
+                name: "isExpirable",
+                type: "bool",
+            },
         ],
         name: "addTld",
         outputs: [],
@@ -330,6 +335,44 @@ const _abi = [
                 type: "string[]",
             },
             {
+                internalType: "uint64",
+                name: "expiry",
+                type: "uint64",
+            },
+            {
+                internalType: "bool",
+                name: "withReverse",
+                type: "bool",
+            },
+        ],
+        name: "issueExpirableWithRecords",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
+                name: "to",
+                type: "address",
+            },
+            {
+                internalType: "string[]",
+                name: "labels",
+                type: "string[]",
+            },
+            {
+                internalType: "string[]",
+                name: "keys",
+                type: "string[]",
+            },
+            {
+                internalType: "string[]",
+                name: "values",
+                type: "string[]",
+            },
+            {
                 internalType: "bool",
                 name: "withReverse",
                 type: "bool",
@@ -349,6 +392,24 @@ const _abi = [
             },
         ],
         name: "removeTld",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "uint64",
+                name: "expiry",
+                type: "uint64",
+            },
+            {
+                internalType: "uint256",
+                name: "tokenId",
+                type: "uint256",
+            },
+        ],
+        name: "renew",
         outputs: [],
         stateMutability: "nonpayable",
         type: "function",

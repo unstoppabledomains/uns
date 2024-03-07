@@ -11,6 +11,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
         "deposit(address,bytes)": FunctionFragment;
         "depositToPolygon(uint256)": FunctionFragment;
         "exists(uint256)": FunctionFragment;
+        "expiryOf(uint256)": FunctionFragment;
         "get(string,uint256)": FunctionFragment;
         "getApproved(uint256)": FunctionFragment;
         "getByHash(uint256,uint256)": FunctionFragment;
@@ -18,6 +19,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
         "getManyByHash(uint256[],uint256)": FunctionFragment;
         "isApprovedForAll(address,address)": FunctionFragment;
         "isApprovedOrOwner(address,uint256)": FunctionFragment;
+        "isExpired(uint256)": FunctionFragment;
         "mint(address,uint256)": FunctionFragment;
         "mint(address,uint256,bytes)": FunctionFragment;
         "mintTLD(uint256,string)": FunctionFragment;
@@ -37,6 +39,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
         "set(string,string,uint256)": FunctionFragment;
         "setApprovalForAll(address,bool)": FunctionFragment;
         "setByHash(uint256,string,uint256)": FunctionFragment;
+        "setExpiry(uint64,uint256)": FunctionFragment;
         "setMany(string[],string[],uint256)": FunctionFragment;
         "setManyByHash(uint256[],string[],uint256)": FunctionFragment;
         "setOwner(address,uint256)": FunctionFragment;
@@ -49,7 +52,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
         "unlockWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
         "withdrawFromPolygon(bytes,uint256,string[],string[])": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "exists" | "get" | "getApproved" | "getByHash" | "getMany" | "getManyByHash" | "isApprovedForAll" | "isApprovedOrOwner" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "name" | "namehash" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseNameOf" | "reverseOf" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "withdrawFromPolygon"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "addProxyReader" | "approve" | "balanceOf" | "burn" | "deposit" | "depositToPolygon" | "exists" | "expiryOf" | "get" | "getApproved" | "getByHash" | "getMany" | "getManyByHash" | "isApprovedForAll" | "isApprovedOrOwner" | "isExpired" | "mint(address,uint256)" | "mint(address,uint256,bytes)" | "mintTLD" | "mintWithRecords" | "name" | "namehash" | "onERC721Received" | "ownerOf" | "reconfigure" | "removeReverse" | "reset" | "resolverOf" | "reverseNameOf" | "reverseOf" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "set" | "setApprovalForAll" | "setByHash" | "setExpiry" | "setMany" | "setManyByHash" | "setOwner" | "setReverse" | "setTokenURIPrefix" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unlockWithRecords" | "withdrawFromPolygon"): FunctionFragment;
     encodeFunctionData(functionFragment: "addProxyReader", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "approve", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>]): string;
@@ -57,6 +60,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "deposit", values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]): string;
     encodeFunctionData(functionFragment: "depositToPolygon", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "exists", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "expiryOf", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "get", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "getApproved", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "getByHash", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
@@ -64,6 +68,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "getManyByHash", values: [PromiseOrValue<BigNumberish>[], PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "isApprovedForAll", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "isApprovedOrOwner", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "isExpired", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "mint(address,uint256)", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "mint(address,uint256,bytes)", values: [
         PromiseOrValue<string>,
@@ -119,6 +124,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
         PromiseOrValue<string>,
         PromiseOrValue<BigNumberish>
     ]): string;
+    encodeFunctionData(functionFragment: "setExpiry", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "setMany", values: [
         PromiseOrValue<string>[],
         PromiseOrValue<string>[],
@@ -160,6 +166,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "depositToPolygon", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "expiryOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "get", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getApproved", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getByHash", data: BytesLike): Result;
@@ -167,6 +174,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "getManyByHash", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isApprovedForAll", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isApprovedOrOwner", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "isExpired", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "mint(address,uint256)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "mint(address,uint256,bytes)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "mintTLD", data: BytesLike): Result;
@@ -186,6 +194,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "set", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setApprovalForAll", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setByHash", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setExpiry", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setMany", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setManyByHash", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setOwner", data: BytesLike): Result;
@@ -207,6 +216,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
         "RemoveReverse(address)": EventFragment;
         "ResetRecords(uint256)": EventFragment;
         "Set(uint256,string,string,string,string)": EventFragment;
+        "SetExpiry(uint256,uint64)": EventFragment;
         "SetReverse(address,uint256)": EventFragment;
         "Transfer(address,address,uint256)": EventFragment;
         "Upgraded(address)": EventFragment;
@@ -220,6 +230,7 @@ export interface IUNSRegistryInterface extends utils.Interface {
     getEvent(nameOrSignatureOrTopic: "RemoveReverse"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "ResetRecords"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "Set"): EventFragment;
+    getEvent(nameOrSignatureOrTopic: "SetExpiry"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "SetReverse"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
     getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
@@ -304,6 +315,15 @@ export declare type SetEvent = TypedEvent<[
     string
 ], SetEventObject>;
 export declare type SetEventFilter = TypedEventFilter<SetEvent>;
+export interface SetExpiryEventObject {
+    tokenId: BigNumber;
+    expiry: BigNumber;
+}
+export declare type SetExpiryEvent = TypedEvent<[
+    BigNumber,
+    BigNumber
+], SetExpiryEventObject>;
+export declare type SetExpiryEventFilter = TypedEventFilter<SetExpiryEvent>;
 export interface SetReverseEventObject {
     addr: string;
     tokenId: BigNumber;
@@ -363,6 +383,7 @@ export interface IUNSRegistry extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
+        expiryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
         get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
         getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string] & {
             operator: string;
@@ -378,6 +399,7 @@ export interface IUNSRegistry extends BaseContract {
         }>;
         isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
         isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
+        isExpired(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
         "mint(address,uint256)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -425,6 +447,9 @@ export interface IUNSRegistry extends BaseContract {
         setByHash(keyHash: PromiseOrValue<BigNumberish>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        setExpiry(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -470,6 +495,7 @@ export interface IUNSRegistry extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
+    expiryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
     get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
     getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
     getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, string] & {
@@ -483,6 +509,7 @@ export interface IUNSRegistry extends BaseContract {
     }>;
     isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
     isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
+    isExpired(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
     "mint(address,uint256)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -528,6 +555,9 @@ export interface IUNSRegistry extends BaseContract {
     setByHash(keyHash: PromiseOrValue<BigNumberish>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
+    setExpiry(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -563,6 +593,7 @@ export interface IUNSRegistry extends BaseContract {
         deposit(user: PromiseOrValue<string>, depositData: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
         depositToPolygon(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
+        expiryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
         getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, string] & {
@@ -576,6 +607,7 @@ export interface IUNSRegistry extends BaseContract {
         }>;
         isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
         isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
+        isExpired(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
         "mint(address,uint256)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         "mint(address,uint256,bytes)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, metaData: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
         mintTLD(tokenId: PromiseOrValue<BigNumberish>, uri: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
@@ -595,6 +627,7 @@ export interface IUNSRegistry extends BaseContract {
         set(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setApprovalForAll(operator: PromiseOrValue<string>, _approved: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         setByHash(keyHash: PromiseOrValue<BigNumberish>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
+        setExpiry(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
@@ -626,6 +659,8 @@ export interface IUNSRegistry extends BaseContract {
         ResetRecords(tokenId?: PromiseOrValue<BigNumberish> | null): ResetRecordsEventFilter;
         "Set(uint256,string,string,string,string)"(tokenId?: PromiseOrValue<BigNumberish> | null, keyIndex?: PromiseOrValue<string> | null, valueIndex?: PromiseOrValue<string> | null, key?: null, value?: null): SetEventFilter;
         Set(tokenId?: PromiseOrValue<BigNumberish> | null, keyIndex?: PromiseOrValue<string> | null, valueIndex?: PromiseOrValue<string> | null, key?: null, value?: null): SetEventFilter;
+        "SetExpiry(uint256,uint64)"(tokenId?: PromiseOrValue<BigNumberish> | null, expiry?: null): SetExpiryEventFilter;
+        SetExpiry(tokenId?: PromiseOrValue<BigNumberish> | null, expiry?: null): SetExpiryEventFilter;
         "SetReverse(address,uint256)"(addr?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): SetReverseEventFilter;
         SetReverse(addr?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): SetReverseEventFilter;
         "Transfer(address,address,uint256)"(from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): TransferEventFilter;
@@ -651,6 +686,7 @@ export interface IUNSRegistry extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
+        expiryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
@@ -658,6 +694,7 @@ export interface IUNSRegistry extends BaseContract {
         getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
+        isExpired(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
         "mint(address,uint256)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
@@ -701,6 +738,9 @@ export interface IUNSRegistry extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         setByHash(keyHash: PromiseOrValue<BigNumberish>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        setExpiry(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
@@ -749,6 +789,7 @@ export interface IUNSRegistry extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        expiryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -756,6 +797,7 @@ export interface IUNSRegistry extends BaseContract {
         getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        isExpired(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         "mint(address,uint256)"(user: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
@@ -799,6 +841,9 @@ export interface IUNSRegistry extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         setByHash(keyHash: PromiseOrValue<BigNumberish>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        setExpiry(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {

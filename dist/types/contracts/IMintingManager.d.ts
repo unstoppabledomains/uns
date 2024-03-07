@@ -4,20 +4,22 @@ import type { Listener, Provider } from "@ethersproject/providers";
 import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../common";
 export interface IMintingManagerInterface extends utils.Interface {
     functions: {
-        "addTld(string)": FunctionFragment;
+        "addTld(string,bool)": FunctionFragment;
         "buy(address,string[],string[],string[],uint64,uint256,bytes)": FunctionFragment;
         "buyForErc20(address,string[],string[],string[],uint64,address,uint256,bytes)": FunctionFragment;
         "claim(uint256,string)": FunctionFragment;
         "claimTo(address,uint256,string)": FunctionFragment;
         "claimToWithRecords(address,uint256,string,string[],string[])": FunctionFragment;
+        "issueExpirableWithRecords(address,string[],string[],string[],uint64,bool)": FunctionFragment;
         "issueWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
         "removeTld(uint256)": FunctionFragment;
+        "renew(uint64,uint256)": FunctionFragment;
         "setTokenURIPrefix(string)": FunctionFragment;
         "withdraw(address)": FunctionFragment;
         "withdraw(address,address)": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "issueWithRecords" | "removeTld" | "setTokenURIPrefix" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
-    encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>]): string;
+    getFunction(nameOrSignatureOrTopic: "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "issueExpirableWithRecords" | "issueWithRecords" | "removeTld" | "renew" | "setTokenURIPrefix" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
+    encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>, PromiseOrValue<boolean>]): string;
     encodeFunctionData(functionFragment: "buy", values: [
         PromiseOrValue<string>,
         PromiseOrValue<string>[],
@@ -50,6 +52,14 @@ export interface IMintingManagerInterface extends utils.Interface {
         PromiseOrValue<string>[],
         PromiseOrValue<string>[]
     ]): string;
+    encodeFunctionData(functionFragment: "issueExpirableWithRecords", values: [
+        PromiseOrValue<string>,
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<string>[],
+        PromiseOrValue<BigNumberish>,
+        PromiseOrValue<boolean>
+    ]): string;
     encodeFunctionData(functionFragment: "issueWithRecords", values: [
         PromiseOrValue<string>,
         PromiseOrValue<string>[],
@@ -58,6 +68,7 @@ export interface IMintingManagerInterface extends utils.Interface {
         PromiseOrValue<boolean>
     ]): string;
     encodeFunctionData(functionFragment: "removeTld", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "renew", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "setTokenURIPrefix", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "withdraw(address)", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "withdraw(address,address)", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
@@ -67,8 +78,10 @@ export interface IMintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimTo", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimToWithRecords", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "issueExpirableWithRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "issueWithRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeTld", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "renew", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setTokenURIPrefix", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw(address)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw(address,address)", data: BytesLike): Result;
@@ -153,7 +166,7 @@ export interface IMintingManager extends BaseContract {
     once: OnEvent<this>;
     removeListener: OnEvent<this>;
     functions: {
-        addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
@@ -171,10 +184,16 @@ export interface IMintingManager extends BaseContract {
         claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         removeTld(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
@@ -187,7 +206,7 @@ export interface IMintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
     };
-    addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+    addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
@@ -205,10 +224,16 @@ export interface IMintingManager extends BaseContract {
     claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
+    issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     removeTld(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
@@ -221,14 +246,16 @@ export interface IMintingManager extends BaseContract {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     callStatic: {
-        addTld(tld: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
+        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
         buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
         claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
+        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         removeTld(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
+        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
@@ -248,7 +275,7 @@ export interface IMintingManager extends BaseContract {
         Withdrawal(recepient?: null, value?: null, token?: null): WithdrawalEventFilter;
     };
     estimateGas: {
-        addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
@@ -266,10 +293,16 @@ export interface IMintingManager extends BaseContract {
         claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
+        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
         issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         removeTld(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
@@ -283,7 +316,7 @@ export interface IMintingManager extends BaseContract {
         }): Promise<BigNumber>;
     };
     populateTransaction: {
-        addTld(tld: PromiseOrValue<string>, overrides?: Overrides & {
+        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
@@ -301,10 +334,16 @@ export interface IMintingManager extends BaseContract {
         claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
+        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
         issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         removeTld(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
