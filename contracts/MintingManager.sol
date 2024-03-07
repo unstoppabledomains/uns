@@ -25,7 +25,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using ECDSAUpgradeable for bytes32;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.4.18';
+    string public constant VERSION = '0.5.0';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -42,6 +42,11 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     address public unsOperator;
 
     /**
+     * @dev Mapping TLD `namehash` to whether they are expirable or not
+     */
+    mapping(uint256 => bool) internal _expirableTlds;
+
+    /**
      * @dev The modifier checks domain's tld and label on mint.
      * @param tld should be registered.
      * @param label should not have legacy CNS free domain prefix.
@@ -49,7 +54,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
     modifier onlyAllowedSLD(uint256 tld, string memory label) {
-        _ensureAllowed(tld, label);
+        _ensureAllowed(tld, label, 0);
         _;
     }
 
@@ -59,9 +64,9 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      *      Legacy CNS free domain prefix is 'udtestdev-'.
      *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
-    modifier onlyAllowed(string[] memory labels) {
+    modifier onlyAllowed(string[] memory labels, uint256 expiry) {
         require(labels.length >= 2, 'MintingManager: LABELS_LENGTH_BELOW_2');
-        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[0]);
+        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[0], expiry);
         _;
     }
 
@@ -123,12 +128,14 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             'pudgy'
         ];
         for (uint256 i = 0; i < tlds.length; i++) {
-            _addTld(tlds[i]);
+            _addTld(tlds[i], false);
         }
+
+        _addTld('com', true);
     }
 
-    function addTld(string calldata tld) external override onlyOwner {
-        _addTld(tld);
+    function addTld(string calldata tld, bool isExpirable) external override onlyOwner {
+        _addTld(tld, isExpirable);
     }
 
     function removeTld(uint256 tld) external override onlyOwner {
@@ -144,13 +151,36 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] calldata keys,
         string[] calldata values,
         bool withReverse
-    ) external override onlyIssuer(labels) onlyAllowed(labels) whenNotPaused {
-        _issueWithRecords(to, labels, keys, values, withReverse);
+    ) external override onlyIssuer(labels) onlyAllowed(labels, 0) whenNotPaused {
+        _issueWithRecords(to, labels, keys, values, 0, withReverse);
+    }
+
+    function issueExpirableWithRecords(
+        address to,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        uint64 expiry,
+        bool withReverse
+    ) external override onlyIssuer(labels) onlyAllowed(labels, expiry) whenNotPaused {
+        require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
+
+        _issueWithRecords(to, labels, keys, values, expiry, withReverse);
+    }
+
+    function renew(uint64 expiry, uint256 tokenId) external override onlyMinter {
+        uint64 currentExpiry = unsRegistry.expiryOf(tokenId);
+
+        require(currentExpiry != 0, 'MintingManager: TOKEN_NOT_EXPIRABLE');
+        require(expiry > currentExpiry, 'MintingManager: EXPIRY_NOT_EXTENDED');
+
+        unsRegistry.setExpiry(expiry, tokenId);
     }
 
     function claim(uint256 tld, string calldata label) external override onlyAllowedSLD(tld, label) whenNotPaused {
         string[] memory empty;
-        _issueWithRecords(_msgSender(), _buildLabels(tld, _freeSLDLabel(label)), empty, empty, true);
+
+        _issueWithRecords(_msgSender(), _buildLabels(tld, _freeSLDLabel(label)), empty, empty, 0, true);
     }
 
     function claimTo(
@@ -159,7 +189,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string calldata label
     ) external override onlyAllowedSLD(tld, label) whenNotPaused {
         string[] memory empty;
-        _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), empty, empty, true);
+        _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), empty, empty, 0, true);
     }
 
     function claimToWithRecords(
@@ -169,7 +199,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] calldata keys,
         string[] calldata values
     ) external override onlyAllowedSLD(tld, label) whenNotPaused {
-        _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), keys, values, true);
+        _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), keys, values, 0, true);
     }
 
     /**
@@ -183,7 +213,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         uint64 expiry,
         uint256 price,
         bytes calldata signature
-    ) external payable onlyAllowed(labels) whenNotPaused {
+    ) external payable onlyAllowed(labels, 0) whenNotPaused {
         require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
 
         _verifyPurchaseSignature(owner, labels, expiry, price, address(0), signature);
@@ -208,7 +238,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         address token,
         uint256 price,
         bytes calldata signature
-    ) external onlyAllowed(labels) whenNotPaused {
+    ) external onlyAllowed(labels, 0) whenNotPaused {
         require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
 
         _verifyPurchaseSignature(owner, labels, expiry, price, token, signature);
@@ -275,6 +305,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] memory labels,
         string[] memory keys,
         string[] memory values,
+        uint64 expiry,
         bool withReverse
     ) private returns (uint256) {
         (uint256 tokenId, uint256 parentId) = _namehash(labels);
@@ -285,18 +316,26 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             revert('MintingManager: REVERSE_RECORD_NOT_ALLOWED');
         }
 
-        if (unsRegistry.exists(tokenId) && unsRegistry.ownerOf(tokenId) == address(this)) {
+        if (unsRegistry.exists(tokenId) && (unsRegistry.ownerOf(tokenId) == address(this) || unsRegistry.isExpired(tokenId))) {
+            if (expiry > 0) {
+                unsRegistry.setExpiry(expiry, tokenId);
+            }
+
             unsRegistry.unlockWithRecords(to, labels, keys, values, withReverse);
         } else {
             _beforeTokenMint(tokenId);
 
-            if (_useCNS(labels) && labels.length == 2) {
+            if (_useCNS(labels) && labels.length == 2 && expiry == 0) {
                 cnsMintingController.mintSLDWithResolver(to, labels[0], address(cnsResolver));
                 if (keys.length > 0) {
                     cnsResolver.preconfigure(keys, values, tokenId);
                 }
             } else {
                 unsRegistry.mintWithRecords(to, labels, keys, values, withReverse);
+
+                if (expiry > 0) {
+                    unsRegistry.setExpiry(expiry, tokenId);
+                }
             }
         }
 
@@ -332,8 +371,14 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _block(tokenId);
     }
 
-    function _ensureAllowed(uint256 tld, string memory label) private view {
+    function _ensureAllowed(
+        uint256 tld,
+        string memory label,
+        uint256 expiry
+    ) private view {
         require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
+        require(_expirableTlds[tld] == (expiry > 0), 'MintingManager: TLD_EXPIRABLE_MISMATCH');
+
         Strings.Slice memory _label = label.toSlice();
         if (_label._len > 10) {
             require(
@@ -351,10 +396,12 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      * The function can be executed in order to mint '.crypto' token in UNS registry, while TLD already registered.
      * Sideffect: It is possible to add the same TLD multiple times, it will burn gas.
      */
-    function _addTld(string memory tld) private {
+    function _addTld(string memory tld, bool isExpirable) private {
         uint256 tokenId = _namehash(uint256(0x0), tld);
 
         _tlds[tokenId] = tld;
+        _expirableTlds[tokenId] = isExpirable;
+
         emit NewTld(tokenId, tld);
 
         if (!unsRegistry.exists(tokenId)) {
@@ -456,11 +503,11 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         uint256 price,
         address token
     ) private {
-        uint256 tokenId = _issueWithRecords(owner, labels, keys, values, _msgSender() == owner);
+        uint256 tokenId = _issueWithRecords(owner, labels, keys, values, 0, _msgSender() == owner);
 
         emit DomainPurchase(tokenId, _msgSender(), owner, price, token);
     }
 
     // Reserved storage space to allow for layout changes in the future.
-    uint256[49] private __gap;
+    uint256[48] private __gap;
 }

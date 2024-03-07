@@ -1,5 +1,6 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ethers, network } from 'hardhat';
+import { Block } from '@ethersproject/abstract-provider';
 import { ERC20Mock, ERC20Mock__factory } from '../../types';
 import { MintingManager, UNSRegistry } from '../../types/contracts';
 import { MintingManagerForwarder } from '../../types/contracts/metatx';
@@ -8,6 +9,7 @@ import { MintingManagerForwarder__factory } from '../../types/factories/contract
 import { ZERO_ADDRESS } from '../helpers/constants';
 import { percDiff } from '../helpers/consumption';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
+import { increaseTimeBy } from '../helpers/utils';
 
 describe('MintingManager (consumption)', () => {
   let unsRegistry: UNSRegistry, mintingManager: MintingManager, forwarder: MintingManagerForwarder;
@@ -15,6 +17,8 @@ describe('MintingManager (consumption)', () => {
     coinbase: SignerWithAddress,
     receiver: SignerWithAddress,
     spender: SignerWithAddress;
+
+  let latestBlock: Block;
 
   let buildExecuteParams: ExecuteFunc;
 
@@ -49,6 +53,10 @@ describe('MintingManager (consumption)', () => {
     await mintingManager.setForwarder(forwarder.address);
 
     buildExecuteParams = buildExecuteFunc(mintingManager.interface, mintingManager.address, forwarder);
+  });
+
+  beforeEach(async () => {
+    latestBlock = await ethers.provider.getBlock('latest');
   });
 
   describe('Mint consumption', () => {
@@ -114,6 +122,91 @@ describe('MintingManager (consumption)', () => {
         await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId);
         await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId2);
       }
+      console.table(result);
+    });
+  });
+
+  describe('Mint expirable consumption', () => {
+    const getCases = () => {
+      const expiry = latestBlock.timestamp + 2 * 60 * 60 * 24;
+
+      return [
+        {
+          func: 'issueExpirableWithRecords',
+          note: 'mint expirable',
+          selector: 'issueExpirableWithRecords(address,string[],string[],string[],uint64,bool)',
+          params: [receiver.address, ['expirable-consumption', 'com'], [], [], expiry, true],
+        },
+        {
+          func: 'issueExpirableWithRecords',
+          note: 're-mint returned expirable',
+          selector: 'issueExpirableWithRecords(address,string[],string[],string[],uint64,bool)',
+          params: [receiver.address, ['expirable-consumption', 'com'], [], [], expiry, true],
+        },
+        {
+          func: 'issueExpirableWithRecords',
+          note: 're-mint expired',
+          selector: 'issueExpirableWithRecords(address,string[],string[],string[],uint64,bool)',
+          params: [receiver.address, ['expired-consumption', 'com'], [], [], expiry, true],
+        },
+      ];
+    };
+
+    it('Consumption', async () => {
+      const result: unknown[] = [];
+
+      await mintingManager.issueExpirableWithRecords(
+        spender.address,
+        ['expired-consumption', 'com'],
+        [], [],
+        latestBlock.timestamp + 60 * 60 * 24,
+        true,
+      );
+      await mintingManager.issueExpirableWithRecords(
+        spender.address,
+        ['expired-consumption-meta', 'com'],
+        [], [],
+        latestBlock.timestamp + 60 * 60 * 24,
+        true,
+      );
+      await increaseTimeBy(60 * 60 * 24);
+
+      const cases = getCases();
+
+      for (let i = 0; i < cases.length; i++) {
+        const { note, selector, params } = cases[i];
+        const [acc, labels, ...rest] = params;
+        const executeParams = [acc, [labels[0] + '-meta', labels[1]], ...rest];
+
+        const tokenId = await unsRegistry.namehash(labels as string[]);
+        const tokenId2 = await unsRegistry.namehash(executeParams[1] as string[]);
+
+        const { req, signature } = await buildExecuteParams(selector, executeParams, coinbase, tokenId);
+        const executeTx = await forwarder.connect(spender).execute(req, signature);
+
+        const executeTxReceipt = await executeTx.wait();
+
+        await removeReverse();
+
+        const tx = await mintingManager[selector](...params);
+        tx.receipt = await tx.wait();
+
+        await removeReverse();
+
+        result.push({
+          note,
+          selector,
+          records: Array.isArray(params[2]) ? params[2].length : '-',
+          reverse: params[5],
+          execute: executeTxReceipt.gasUsed.toString(),
+          send: tx.receipt.gasUsed.toString(),
+          increase: percDiff(tx.receipt.gasUsed.toNumber(), executeTxReceipt.gasUsed.toNumber()) + ' %',
+        });
+
+        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId);
+        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId2);
+      }
+
       console.table(result);
     });
   });
@@ -306,7 +399,6 @@ describe('MintingManager (consumption)', () => {
     const chainId = network.config.chainId;
 
     const buyDomain = async () => {
-      const latestBlock = await ethers.provider.getBlock('latest');
       const expiry = latestBlock.timestamp + 24 * 60 * 60;
       const price = ethers.utils.parseEther('1');
 
@@ -335,7 +427,6 @@ describe('MintingManager (consumption)', () => {
     };
 
     const buyDomainForErc20 = async () => {
-      const latestBlock = await ethers.provider.getBlock('latest');
       const expiry = latestBlock.timestamp + 24 * 60 * 60;
       const price = ethers.utils.parseEther('1');
 

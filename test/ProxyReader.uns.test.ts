@@ -33,10 +33,20 @@ describe('ProxyReader (UNS only)', () => {
     await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
 
     // mint .wallet
-    walletTokenId = await mintDomain(unsRegistry, coinbase, [domainName, 'wallet'], true);
+    walletTokenId = await mintDomain({
+      unsRegistry,
+      owner: coinbase,
+      labels: [domainName, 'wallet'],
+      withoutReverse: true,
+    });
 
     // mint .crypto
-    cryptoTokenId = await mintDomain(unsRegistry, coinbase, [domainName, 'crypto'], true);
+    cryptoTokenId = await mintDomain({
+      unsRegistry,
+      owner: coinbase,
+      labels: [domainName, 'crypto'],
+      withoutReverse: true,
+    });
 
     proxyReader = await new ProxyReader__factory(coinbase).deploy();
     await proxyReader.initialize(unsRegistry.address, ZERO_ADDRESS);
@@ -248,8 +258,8 @@ describe('ProxyReader (UNS only)', () => {
       it('should aggregate balance from all registries', async () => {
         const _domainName = 'hey_hoy_23bkkcbv';
         const account = accounts[7];
-        await mintDomain(unsRegistry, account, [_domainName, 'crypto']);
-        await mintDomain(unsRegistry, account, [_domainName, 'wallet']);
+        await mintDomain({ unsRegistry, owner: account, labels: [_domainName, 'crypto'] });
+        await mintDomain({ unsRegistry, owner: account, labels: [_domainName, 'wallet'] });
 
         const proxyResult = await proxyReader.balanceOf(account);
         const result = await unsRegistry.balanceOf(account);
@@ -275,12 +285,12 @@ describe('ProxyReader (UNS only)', () => {
       });
 
       it('should return true for .wallet domain', async () => {
-        const tokenId = await mintDomain(unsRegistry, accounts[3], ['hey_hoy_97hds', 'wallet']);
+        const tokenId = await mintDomain({ unsRegistry, owner: accounts[3], labels: ['hey_hoy_97hds', 'wallet'] });
         expect(await proxyReader.exists(tokenId)).to.be.equal(true);
       });
 
       it('should return true for .crypto domain', async () => {
-        const tokenId = await mintDomain(unsRegistry, accounts[3], ['hey_hoy_97hds', 'crypto']);
+        const tokenId = await mintDomain({ unsRegistry, owner: accounts[3], labels: ['hey_hoy_97hds', 'crypto'] });
         expect(await proxyReader.exists(tokenId)).to.be.equal(true);
       });
 
@@ -303,7 +313,7 @@ describe('ProxyReader (UNS only)', () => {
         const owner = signers[3];
         const labels = ['hey_hoy_11sfg', 'wallet'];
         const uri = labels.join('.');
-        const tokenId = await mintDomain(unsRegistry, owner.address, ['hey_hoy_11sfg', 'wallet']);
+        const tokenId = await mintDomain({ unsRegistry, owner, labels: ['hey_hoy_11sfg', 'wallet'] });
         await unsRegistry.connect(owner)['setReverse(string[])'](labels);
 
         expect(await proxyReader.reverseOf(owner.address)).to.be.equal(tokenId);
@@ -487,7 +497,7 @@ describe('ProxyReader (UNS only)', () => {
 
       it('should return data for .crypto domain', async () => {
         // arrange
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['hey_hoy_121', 'crypto']);
+        const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['hey_hoy_121', 'crypto'] });
 
         // act
         const data = await proxyReader.callStatic.getData(keys, tokenId);
@@ -498,7 +508,7 @@ describe('ProxyReader (UNS only)', () => {
 
       it('should return data for .wallet domain', async () => {
         // arrange
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['hey_hoy_121', 'wallet']);
+        const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['hey_hoy_121', 'wallet'] });
 
         // act
         const data = await proxyReader.callStatic.getData(keys, tokenId);
@@ -531,8 +541,8 @@ describe('ProxyReader (UNS only)', () => {
       it('should return data for multiple .crypto|.wallet domains', async () => {
         // arrange
         const _domainName = 'test_1291';
-        const _walletTokenId = await mintDomain(unsRegistry, coinbase.address, [_domainName, 'wallet']);
-        const _cryptoTokenId = await mintDomain(unsRegistry, coinbase.address, [_domainName, 'crypto']);
+        const _walletTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: [_domainName, 'wallet'] });
+        const _cryptoTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: [_domainName, 'crypto'] });
 
         for (let i = 0; i < keys.length; i++) {
           await unsRegistry.set(keys[i], values[i], _walletTokenId);
@@ -596,7 +606,7 @@ describe('ProxyReader (UNS only)', () => {
       it('should return data by hashes for .crypto domain', async () => {
         // arrange
         const hashes = keys.map(utils.id);
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['hey_hoy_292', 'crypto']);
+        const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['hey_hoy_292', 'crypto'] });
         for (let i = 0; i < keys.length; i++) {
           await unsRegistry.set(keys[i], values[i], tokenId);
         }
@@ -616,7 +626,7 @@ describe('ProxyReader (UNS only)', () => {
       it('should return data by hashes for .wallet domain', async () => {
         // arrange
         const hashes = keys.map(utils.id);
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['hey_hoy_292', 'wallet']);
+        const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['hey_hoy_292', 'wallet'] });
         for (let i = 0; i < keys.length; i++) {
           await unsRegistry.set(keys[i], values[i], tokenId);
         }
@@ -664,8 +674,8 @@ describe('ProxyReader (UNS only)', () => {
         // arrange
         const hashes = keys.map(utils.id);
         const _domainName = 'test_1082q';
-        const _walletTokenId = await mintDomain(unsRegistry, coinbase.address, [_domainName, 'wallet']);
-        const _cryptoTokenId = await mintDomain(unsRegistry, coinbase.address, [_domainName, 'crypto']);
+        const _walletTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: [_domainName, 'wallet'] });
+        const _cryptoTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: [_domainName, 'crypto'] });
 
         for (let i = 0; i < keys.length; i++) {
           await unsRegistry.set(keys[i], values[i], _walletTokenId);
@@ -716,8 +726,8 @@ describe('ProxyReader (UNS only)', () => {
       it('should return owners for multiple .crypto|.wallet domains', async () => {
         // arrange
         const _domainName = 'test_125t';
-        const _walletTokenId = await mintDomain(unsRegistry, accounts[0], [_domainName, 'wallet']);
-        const _cryptoTokenId = await mintDomain(unsRegistry, coinbase.address, [_domainName, 'crypto']);
+        const _walletTokenId = await mintDomain({ unsRegistry, owner: accounts[0], labels: [_domainName, 'wallet'] });
+        const _cryptoTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: [_domainName, 'crypto'] });
 
         // act
         const owners = await proxyReader.callStatic.ownerOfForMany([walletTokenId, _walletTokenId, _cryptoTokenId]);
@@ -1009,13 +1019,13 @@ describe('ProxyReader (UNS only)', () => {
     });
 
     it('should return value for .wallet domain', async () => {
-      const tokenId = await mintDomain(unsRegistry, accounts[3], ['hey_hoy_98hds', 'wallet']);
+      const tokenId = await mintDomain({ unsRegistry, owner: accounts[3], labels: ['hey_hoy_98hds', 'wallet'] });
       const address = await proxyReader.registryOf(tokenId);
       expect(address).to.be.equal(unsRegistry.address);
     });
 
     it('should return value for .crypto domain', async () => {
-      const tokenId = await mintDomain(unsRegistry, accounts[3], ['hey_hoy_98hds', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner: accounts[3], labels: ['hey_hoy_98hds', 'crypto'] });
       const address = await proxyReader.registryOf(tokenId);
       expect(address).to.be.equal(unsRegistry.address);
     });

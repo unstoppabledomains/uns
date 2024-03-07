@@ -41,7 +41,7 @@ describe('ProxyReader (proxy)', () => {
     await unsRegistry.mintTLD(TLD.WALLET, 'wallet');
 
     // mint domain
-    walletTokenId = await mintDomain(unsRegistry, coinbase.address, ['test-proxy-proxy-reader', 'wallet']);
+    walletTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: ['test-proxy-proxy-reader', 'wallet'] });
   });
 
   it('should be able to read via Proxy', async () => {

@@ -28,6 +28,7 @@ import {
 } from '../../types';
 import { BUFFERED_REGISTRATION_COST, DAY, REGISTRATION_TIME, ZERO_ADDRESS, ZERO_WORD } from '../helpers/constants';
 import { makeInterfaceId } from '../helpers/makeInterfaceId';
+import { increaseTimeBy } from '../helpers/utils';
 
 describe('ENSCustody', function () {
   let provider;
@@ -67,7 +68,7 @@ describe('ENSCustody', function () {
     const { timestamp } = await provider.getBlock(tx.blockNumber);
     expect(await controller.commitments(commitment)).to.equal(timestamp);
 
-    await provider.send('evm_increaseTime', [(await controller.minCommitmentAge()).toNumber()]);
+    await increaseTimeBy((await controller.minCommitmentAge()).toNumber());
 
     tx = await controller.register(
       name,
@@ -108,7 +109,7 @@ describe('ENSCustody', function () {
     const { timestamp } = await provider.getBlock(commitTx.blockNumber);
     expect(await controller.commitments(commitment)).to.equal(timestamp);
 
-    await provider.send('evm_increaseTime', [(await controller.minCommitmentAge()).toNumber()]);
+    await increaseTimeBy((await controller.minCommitmentAge()).toNumber());
 
     // register
     const registerTx = await custody
@@ -853,7 +854,7 @@ describe('ENSCustody', function () {
       await registerAndParkName(name, minter, ZERO_ADDRESS, false);
 
       const gracePeriod = 90 * DAY;
-      await provider.send('evm_increaseTime', [REGISTRATION_TIME + gracePeriod + 1]);
+      await increaseTimeBy(REGISTRATION_TIME + gracePeriod + 1);
 
       await topupCustody(name);
       await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('');

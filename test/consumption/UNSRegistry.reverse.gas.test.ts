@@ -47,7 +47,7 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
       name = domainNameLength - 2 > name.length ? name + 'a' : name;
       const labels = [name, 'x'];
       const uri = labels.join('.');
-      const tokenId = await mintDomain(unsRegistry, owner, labels);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels });
 
       const newSetReverseParams = await buildExecuteParams(
         'setReverse(string[])',
@@ -60,7 +60,7 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
 
       const subdomainLabels = ['a', ...labels];
       const subdomainUri = subdomainLabels.join('.');
-      const subdomainTokenId = await mintDomain(unsRegistry, owner, subdomainLabels);
+      const subdomainTokenId = await mintDomain({ unsRegistry, owner, labels: subdomainLabels });
       const newSubdomainsSetReverseParams = await buildExecuteParams(
         'setReverse(string[])',
         [subdomainLabels],
@@ -76,7 +76,7 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
 
       const secondLevelSubdomainLabels = ['b', ...subdomainLabels];
       const secondLevelSubdomainUri = secondLevelSubdomainLabels.join('.');
-      const secondLevelSubdomainTokenId = await mintDomain(unsRegistry, owner, secondLevelSubdomainLabels);
+      const secondLevelSubdomainTokenId = await mintDomain({ unsRegistry, owner, labels: secondLevelSubdomainLabels });
       const newSecondLevelSubdomainSetReverseParams = await buildExecuteParams(
         'setReverse(string[])',
         [secondLevelSubdomainLabels],

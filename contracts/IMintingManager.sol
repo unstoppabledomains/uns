@@ -15,7 +15,7 @@ interface IMintingManager is IERC1967 {
     /**
      * @dev Adds new TLD
      */
-    function addTld(string calldata tld) external;
+    function addTld(string calldata tld, bool isExpirable) external;
 
     /**
      * @dev Removes TLD
@@ -37,6 +37,31 @@ interface IMintingManager is IERC1967 {
         string[] calldata values,
         bool withReverse
     ) external;
+
+    /**
+     * @dev Issues an expirable domain with records.
+     * @param to address to issue the new SLD or subdomain to.
+     * @param labels array of SLD or subdomain name labels splitted by '.' to issue.
+     * @param keys Record keys.
+     * @param values Record values.
+     * @param expiry Token expiration timestamp
+     * @param withReverse Flag indicating whether to install reverse resolution
+     */
+    function issueExpirableWithRecords(
+        address to,
+        string[] calldata labels,
+        string[] calldata keys,
+        string[] calldata values,
+        uint64 expiry,
+        bool withReverse
+    ) external;
+
+    /**
+     * @dev Renews a domain.
+     * @param expiry Token new expiration timestamp
+     * @param tokenId uint256 ID of the token
+     */
+    function renew(uint64 expiry, uint256 tokenId) external;
 
     /**
      * @dev Claims free domain. The fuction adds prefix to label.

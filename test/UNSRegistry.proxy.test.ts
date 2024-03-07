@@ -46,10 +46,10 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should resolve properly', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner.address, ['resolution', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['resolution', 'crypto'] });
       await unsRegistry.burn(tokenId);
 
-      await mintDomain(unsRegistry, owner.address, ['resolution', 'crypto']);
+      await mintDomain({ unsRegistry, owner, labels: ['resolution', 'crypto'] });
       await unsRegistry.transferFrom(owner.address, receiver.address, tokenId);
     });
 
@@ -72,7 +72,7 @@ describe('UNSRegistry (proxy)', () => {
       // should fail to set name if not owner
       await expect(unsRegistry.set('key', 'value', tokenId)).to.be.revertedWith('ERC721: invalid token ID');
 
-      await mintDomain(unsRegistry, owner.address, ['label_931', 'crypto']);
+      await mintDomain({ unsRegistry, owner, labels: ['label_931', 'crypto'] });
       await unsRegistry.set('key', 'value', tokenId);
       expect(await unsRegistry.get('key', tokenId)).to.be.equal('value');
 
@@ -99,7 +99,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should get key by hash', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner.address, ['heyhash', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['heyhash', 'crypto'] });
       const expectedKey = 'new-hashed-key';
 
       await unsRegistry.set(expectedKey, 'value', tokenId);
@@ -109,7 +109,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should get many keys by hashes', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner.address, ['heyhash-many', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['heyhash-many', 'crypto'] });
       const expectedKeys = ['keyhash-many-1', 'keyhash-many-2'];
 
       await unsRegistry.setMany(expectedKeys, ['value', 'value'], tokenId);
@@ -120,7 +120,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should not consume additional gas if key hash was set before', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner.address, ['heyhash-gas', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['heyhash-gas', 'crypto'] });
       const newKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tokenId);
       const newKeyHashTxReceipt = await newKeyHashTx.wait();
       const exitsKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tokenId);
@@ -157,7 +157,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should get value by key hash', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner.address, ['get-key-by-hash', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['get-key-by-hash', 'crypto'] });
       const key = 'get-key-by-hash-key';
       const expectedValue = 'get-key-by-hash-value';
 
@@ -169,7 +169,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should get multiple values by hashes', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner.address, ['get-many-keys-by-hash', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['get-many-keys-by-hash', 'crypto'] });
       const keys = ['key-to-hash-1', 'key-to-hash-2'];
       const expectedValues = ['value-42', 'value-43'];
 
@@ -181,7 +181,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should emit NewKey event new keys added', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner.address, ['new-key', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['new-key', 'crypto'] });
       const key = 'new-key';
       const value = 'value';
 
@@ -193,7 +193,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should emit correct Set event', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner.address, ['check-set-event', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['check-set-event', 'crypto'] });
       const key = 'new-key';
       const value = 'value';
 
@@ -203,7 +203,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should reconfigure resolver with new values', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner.address, ['reconfigure', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['reconfigure', 'crypto'] });
       await unsRegistry.set('old-key', 'old-value', tokenId);
       await unsRegistry.reconfigure(['new-key'], ['new-value'], tokenId);
 
@@ -217,7 +217,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should keep forwarding storage layout consistent after upgrade', async () => {
-      const tokenId = await mintDomain(unsRegistry, owner.address, ['up_state_domain_2', 'crypto']);
+      const tokenId = await mintDomain({ unsRegistry, owner, labels: ['up_state_domain_2', 'crypto'] });
       expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(0);
 
       const params1 = await buildExecuteParams(

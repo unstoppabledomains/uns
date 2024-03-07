@@ -178,7 +178,6 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 100000,
-    require: ['./test/helpers/setup.ts'],
   },
   etherscan: {
     apiKey: pickBy({

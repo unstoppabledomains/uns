@@ -48,7 +48,7 @@ describe('ProxyReader', () => {
     await unsRegistry.mintTLD(TLD.WALLET, 'wallet');
 
     // mint .wallet
-    walletTokenId = await mintDomain(unsRegistry, coinbase.address, [domainName, 'wallet']);
+    walletTokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: [domainName, 'wallet'] });
 
     // mint .crypto
     cryptoTokenId = await unsRegistry.namehash([domainName, 'crypto']);
@@ -247,7 +247,7 @@ describe('ProxyReader', () => {
         const _domainName = 'hey_hoy_23bkkcbv';
         const account = accounts[7];
         await mintingController.mintSLD(account, _domainName);
-        await mintDomain(unsRegistry, account, [_domainName, 'wallet']);
+        await mintDomain({ unsRegistry, owner: account, labels: [_domainName, 'wallet'] });
 
         const proxyResult = await proxyReader.balanceOf(account);
         const resolverResult1 = await unsRegistry.balanceOf(account);
@@ -274,7 +274,7 @@ describe('ProxyReader', () => {
       });
 
       it('should return true for .wallet domain', async () => {
-        const tokenId = await mintDomain(unsRegistry, accounts[3], ['hey_hoy_97hds', 'wallet']);
+        const tokenId = await mintDomain({ unsRegistry, owner: accounts[3], labels: ['hey_hoy_97hds', 'wallet'] });
         expect(await proxyReader.exists(tokenId)).to.be.equal(true);
       });
 
@@ -678,7 +678,7 @@ describe('ProxyReader', () => {
 
       it('should return data for .wallet domain', async () => {
         // arrange
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['hey_hoy_121', 'wallet']);
+        const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['hey_hoy_121', 'wallet'] });
 
         // act
         const data = await proxyReader.callStatic.getData(keys, tokenId);
@@ -741,7 +741,7 @@ describe('ProxyReader', () => {
         // arrange
         const _domainName = 'test_1291';
         const _cryptoTokenId = await unsRegistry.namehash([_domainName, 'crypto']);
-        const _walletTokenId = await mintDomain(unsRegistry, coinbase.address, [_domainName, 'wallet']);
+        const _walletTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: [_domainName, 'wallet'] });
         await mintingController.mintSLDWithResolver(coinbase.address, _domainName, resolver.address);
         for (let i = 0; i < keys.length; i++) {
           await resolver.set(keys[i], values[i], _cryptoTokenId);
@@ -826,7 +826,7 @@ describe('ProxyReader', () => {
       it('should return data by hashes for .wallet domain', async () => {
         // arrange
         const hashes = keys.map(utils.id);
-        const tokenId = await mintDomain(unsRegistry, coinbase.address, ['hey_hoy_292', 'wallet']);
+        const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['hey_hoy_292', 'wallet'] });
         for (let i = 0; i < keys.length; i++) {
           await unsRegistry.set(keys[i], values[i], tokenId);
         }
@@ -908,7 +908,7 @@ describe('ProxyReader', () => {
         const hashes = keys.map(utils.id);
         const _domainName = 'test_1082q';
         const _cryptoTokenId = await unsRegistry.namehash([_domainName, 'crypto']);
-        const _walletTokenId = await mintDomain(unsRegistry, coinbase.address, ['test_1082q', 'wallet']);
+        const _walletTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: ['test_1082q', 'wallet'] });
         await mintingController.mintSLDWithResolver(coinbase.address, _domainName, resolver.address);
 
         for (let i = 0; i < keys.length; i++) {
@@ -962,7 +962,7 @@ describe('ProxyReader', () => {
         // arrange
         const _domainName = 'test_125t';
         const _cryptoTokenId = await unsRegistry.namehash([_domainName, 'crypto']);
-        const _walletTokenId = await mintDomain(unsRegistry, accounts[0], ['test_125t', 'wallet']);
+        const _walletTokenId = await mintDomain({ unsRegistry, owner: accounts[0], labels: ['test_125t', 'wallet'] });
         await mintingController.mintSLDWithResolver(coinbase.address, _domainName, resolver.address);
 
         // act
@@ -1384,7 +1384,7 @@ describe('ProxyReader', () => {
     });
 
     it('should return value for .wallet domain', async () => {
-      const tokenId = await mintDomain(unsRegistry, accounts[3], ['hey_hoy_98hds', 'wallet']);
+      const tokenId = await mintDomain({ unsRegistry, owner: accounts[3], labels: ['hey_hoy_98hds', 'wallet'] });
       const address = await proxyReader.registryOf(tokenId);
 
       expect(address).to.be.equal(unsRegistry.address);

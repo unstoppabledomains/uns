@@ -22,6 +22,7 @@ import {
 } from '../types/factories/dot-crypto/contracts/controllers';
 import { ERC20UnsafeMock__factory } from '../types';
 import { ZERO_ADDRESS, TLD } from './helpers/constants';
+import { increaseTimeBy } from './helpers/utils';
 
 describe('MintingManager', () => {
   const DomainNamePrefix = 'uns-devtest-';
@@ -43,9 +44,15 @@ describe('MintingManager', () => {
     developer: SignerWithAddress,
     spender: SignerWithAddress;
 
+  let latestBlock: Block;
+
   before(async () => {
     signers = await ethers.getSigners();
     [coinbase] = signers;
+  });
+
+  beforeEach(async () => {
+    latestBlock = await ethers.provider.getBlock('latest');
   });
 
   describe('Ownership', () => {
@@ -204,7 +211,7 @@ describe('MintingManager', () => {
         const _hashname = namehash.hash(_tld);
         const labels = ['test-1', _tld];
 
-        await expect(mintingManager.addTld(_tld)).to.emit(mintingManager, 'NewTld').withArgs(_hashname, _tld);
+        await expect(mintingManager.addTld(_tld, false)).to.emit(mintingManager, 'NewTld').withArgs(_hashname, _tld);
 
         await mintingManager.issueWithRecords(coinbase.address, labels, [], [], true);
         const tokenId = await unsRegistry.namehash(labels);
@@ -213,10 +220,26 @@ describe('MintingManager', () => {
         expect(await unsRegistry.exists(_hashname)).to.be.equal(true);
       });
 
+      it('should add new expirable TLD', async () => {
+        const _tld = 'dotcom';
+        const _hashname = namehash.hash(_tld);
+        const labels = ['test-1', _tld];
+
+        await expect(mintingManager.addTld(_tld, true)).to.emit(mintingManager, 'NewTld').withArgs(_hashname, _tld);
+
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
+        await mintingManager.issueExpirableWithRecords(coinbase.address, labels, [], [], expiry, true);
+        const tokenId = await unsRegistry.namehash(labels);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+        expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
+        expect(await unsRegistry.exists(_hashname)).to.be.equal(true);
+      });
+
       it('should revert adding TLD when non-owner', async () => {
         const _tld = 'test1';
 
-        await expect(mintingManager.connect(spender).addTld(_tld)).to.be.revertedWith(
+        await expect(mintingManager.connect(spender).addTld(_tld, false)).to.be.revertedWith(
           'Ownable: caller is not the owner',
         );
       });
@@ -233,7 +256,7 @@ describe('MintingManager', () => {
         const tld = 'test-removing-tld';
         const hashname = namehash.hash(tld);
 
-        await mintingManager.addTld(tld);
+        await mintingManager.addTld(tld, false);
 
         await expect(mintingManager.removeTld(hashname)).to.emit(mintingManager, 'RemoveTld').withArgs(hashname);
         await expect(
@@ -251,7 +274,7 @@ describe('MintingManager', () => {
         const tld = 'test-removing-tld-when-not-owner';
         const hashname = namehash.hash(tld);
 
-        await mintingManager.addTld(tld);
+        await mintingManager.addTld(tld, false);
 
         await expect(mintingManager.connect(spender).removeTld(hashname)).to.be.revertedWith(
           'Ownable: caller is not the owner',
@@ -312,6 +335,12 @@ describe('MintingManager', () => {
           mintingManager.connect(developer).functions['claim(uint256,string)'](TLD.WALLET, 'udtestdev-t1'),
         ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
+
+      it('should revert minting an expirable domain', async () => {
+        await expect(
+          mintingManager.connect(developer).functions['claim(uint256,string)'](TLD.COM, 'udtestdev-t1-expirable'),
+        ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
+      });
     });
 
     describe('claimTo(address,uint256,string)', () => {
@@ -330,6 +359,14 @@ describe('MintingManager', () => {
             .connect(developer)
             .functions['claimTo(address,uint256,string)'](receiver.address, TLD.CRYPTO, 'udtestdev-t2'),
         ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
+      });
+
+      it('should revert minting an expirable domain', async () => {
+        await expect(
+          mintingManager
+            .connect(developer)
+            .functions['claimTo(address,uint256,string)'](receiver.address, TLD.COM, 'udtestdev-t2-expirable'),
+        ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
       });
     });
 
@@ -358,6 +395,14 @@ describe('MintingManager', () => {
         await expect(
           mintingManager.connect(developer).functions[selector](receiver.address, TLD.CRYPTO, 'udtestdev-t3', [], []),
         ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
+      });
+
+      it('should revert minting an expirable domain', async () => {
+        await expect(
+          mintingManager
+            .connect(developer)
+            .functions['claimTo(address,uint256,string)'](receiver.address, TLD.COM, 'udtestdev-t2-expirable'),
+        ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
       });
     });
   });
@@ -642,10 +687,11 @@ describe('MintingManager', () => {
   });
 
   describe('Purchases', () => {
-    let latestBlock: Block;
+    let snapshot: unknown;
+
     const chainId = network.config.chainId;
 
-    beforeEach(async () => {
+    before(async () => {
       [coinbase, spender, receiver] = signers;
 
       unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
@@ -663,8 +709,14 @@ describe('MintingManager', () => {
 
       await mintingManager.addMinter(coinbase.address);
       await mintingManager.setTokenURIPrefix('/');
+    });
 
-      latestBlock = await ethers.provider.getBlock('latest');
+    beforeEach(async () => {
+      snapshot = await ethers.provider.send('evm_snapshot', []);
+    });
+
+    afterEach(async () => {
+      await ethers.provider.send('evm_revert', [snapshot]);
     });
 
     describe('With native tokens', async () => {
@@ -1183,6 +1235,34 @@ describe('MintingManager', () => {
           ),
         ).to.be.revertedWith('MintingManager: SIGNER_IS_NOT_MINTER');
       });
+
+      it('reverts if TLD is expirable', async () => {
+        const requestExpiry = latestBlock.timestamp + 24 * 60 * 60;
+        const price = ethers.utils.parseEther('2.21');
+
+        const labels = ['expirable-onchain-purchase-test', 'com'];
+        const tokenId = await unsRegistry.namehash(labels);
+
+        const purchaseHash = ethers.utils.arrayify(
+          ethers.utils.solidityKeccak256(
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, receiver.address, tokenId, requestExpiry, price, ZERO_ADDRESS],
+          ),
+        );
+        const signature = await coinbase.signMessage(purchaseHash);
+
+        await expect(
+          mintingManager.connect(spender).buy(
+            receiver.address,
+            labels,
+            [], [],
+            requestExpiry,
+            price,
+            signature,
+            { value: price },
+          ),
+        ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
+      });
     });
 
     describe('With ERC20', () => {
@@ -1512,37 +1592,6 @@ describe('MintingManager', () => {
         ).to.be.revertedWith('MintingManager: TLD_NOT_REGISTERED');
       });
 
-      it('reverts if TLD does not exist', async () => {
-        const expiry = latestBlock.timestamp + 24 * 60 * 60;
-
-        const price = ethers.utils.parseEther('5');
-
-        const labels = ['domain', 'awesometld'];
-        const tokenId = await unsRegistry.namehash(labels);
-
-        const purchaseHash = ethers.utils.arrayify(
-          ethers.utils.solidityKeccak256(
-            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
-            [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
-          ),
-        );
-        const signature = await coinbase.signMessage(purchaseHash);
-
-        await erc20Mock.connect(spender).approve(mintingManager.address, price);
-
-        await expect(
-          mintingManager.connect(spender).buyForErc20(
-            spender.address,
-            labels,
-            [], [],
-            expiry,
-            erc20Mock.address,
-            price,
-            signature,
-          ),
-        ).to.be.revertedWith('MintingManager: TLD_NOT_REGISTERED');
-      });
-
       it('reverts if signature expired', async () => {
         const expiry = latestBlock.timestamp - 60;
 
@@ -1738,11 +1787,44 @@ describe('MintingManager', () => {
           ),
         ).to.be.revertedWith('MintingManager: SIGNER_IS_NOT_MINTER');
       });
+
+      it('reverts if TLD is expirable', async () => {
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
+
+        const price = ethers.utils.parseEther('5');
+
+        const labels = ['expirable-erc20-on-chain-purchase', 'com'];
+        const tokenId = await unsRegistry.namehash(labels);
+
+        const purchaseHash = ethers.utils.arrayify(
+          ethers.utils.solidityKeccak256(
+            ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
+            [mintingManager.address, chainId, receiver.address, tokenId, expiry, price, erc20Mock.address],
+          ),
+        );
+        const signature = await coinbase.signMessage(purchaseHash);
+
+        await erc20Mock.connect(spender).approve(mintingManager.address, price);
+
+        await expect(
+          mintingManager.connect(spender).buyForErc20(
+            receiver.address,
+            labels,
+            [], [],
+            expiry,
+            erc20Mock.address,
+            price,
+            signature,
+          ),
+        ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
+      });
     });
   });
 
   describe('Tld-based minting', () => {
     before(async () => {
+      [coinbase, spender, receiver] = signers;
+
       unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
 
       cnsRegistry = await new CNSRegistry__factory(coinbase).deploy();
@@ -1941,6 +2023,256 @@ describe('MintingManager', () => {
           mintingManager.issueWithRecords(coinbase.address, ['udtestdev-t8', 'crypto'], ['key1'], ['value1'], true),
         ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
+
+      it('should revert minting expirable domains', async () => {
+        await expect(
+          mintingManager.issueWithRecords(coinbase.address, ['issue-expirable-test', 'com'], [], [], true),
+        ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
+      });
+    });
+
+    describe('issueExpirableWithRecords(address,string[],string[],string[],uint64,bool)', () => {
+      beforeEach(async () => {
+        if(!(await unsRegistry.reverseOf(receiver.address)).eq(0)) {
+          await unsRegistry.connect(receiver).removeReverse();
+        }
+      });
+
+      it('should mint expirable .com with records and reverse', async () => {
+        const labels = ['expirable-test-a1', 'com'];
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
+
+        await mintingManager.connect(coinbase).issueExpirableWithRecords(
+          receiver.address,
+          labels,
+          ['key1'],
+          ['value1'],
+          expiry,
+          true,
+        );
+        const tokenId = await unsRegistry.namehash(labels);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.eq(receiver.address);
+        expect(await unsRegistry.get('key1', tokenId)).to.eq('value1');
+        expect(await unsRegistry.reverseOf(receiver.address)).to.eq(tokenId);
+        expect(await unsRegistry.expiryOf(tokenId)).to.eq(expiry);
+      });
+
+      it('should unlock returned .com with records and reverse', async () => {
+        const labels = ['expirable-test-a2', 'com'];
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
+
+        await mintingManager.connect(coinbase).issueExpirableWithRecords(
+          coinbase.address,
+          labels,
+          ['key1'],
+          ['value1'],
+          expiry,
+          false,
+        );
+        const tokenId = await unsRegistry.namehash(labels);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.eq(coinbase.address);
+        expect(await unsRegistry.get('key1', tokenId)).to.eq('value1');
+        expect(await unsRegistry.expiryOf(tokenId)).to.eq(expiry);
+
+        await unsRegistry.connect(coinbase).setOwner(mintingManager.address, tokenId);
+
+        const newExpiry = expiry + 60 * 60 * 24;
+        await mintingManager.connect(coinbase).issueExpirableWithRecords(
+          receiver.address,
+          labels,
+          ['key2'],
+          ['value2'],
+          newExpiry,
+          true,
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.eq(receiver.address);
+        expect(await unsRegistry.expiryOf(tokenId)).to.eq(newExpiry);
+
+        expect(await unsRegistry.get('key2', tokenId)).to.eq('value2');
+        expect(await unsRegistry.get('key1', tokenId)).to.eq('');
+
+        expect(await unsRegistry.reverseOf(receiver.address)).to.eq(tokenId);
+      });
+
+      it('should mint existing expired .com with records and reverse', async () => {
+        const labels = ['expirable-test-a3', 'com'];
+        const expiry = latestBlock.timestamp + 24 * 60 * 60;
+
+        await mintingManager.connect(coinbase).issueExpirableWithRecords(
+          receiver.address,
+          labels,
+          ['key1'],
+          ['value1'],
+          expiry,
+          false,
+        );
+        const tokenId = await unsRegistry.namehash(labels);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.eq(receiver.address);
+        expect(await unsRegistry.get('key1', tokenId)).to.eq('value1');
+        expect(await unsRegistry.expiryOf(tokenId)).to.eq(expiry);
+
+        await increaseTimeBy(60 * 60 * 24);
+
+        expect(await unsRegistry.isExpired(tokenId)).to.eq(true);
+
+        const newExpiry = expiry + 24 * 60 * 60;
+        await mintingManager.connect(coinbase).issueExpirableWithRecords(
+          receiver.address,
+          labels,
+          ['key2'],
+          ['value2'],
+          newExpiry,
+          true,
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.eq(receiver.address);
+        expect(await unsRegistry.get('key2', tokenId)).to.eq('value2');
+        expect(await unsRegistry.get('key1', tokenId)).to.eq('');
+
+        expect(await unsRegistry.expiryOf(tokenId)).to.eq(newExpiry);
+        expect(await unsRegistry.reverseOf(receiver.address)).to.eq(tokenId);
+      });
+
+      it('should unlock returned expired .com with records and reverse', async () => {
+        const labels = ['expirable-test-a4', 'com'];
+        const expiry = latestBlock.timestamp + 60 * 60;
+
+        await mintingManager.connect(coinbase).issueExpirableWithRecords(
+          coinbase.address,
+          labels,
+          ['key1'],
+          ['value1'],
+          expiry,
+          false,
+        );
+        const tokenId = await unsRegistry.namehash(labels);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.eq(coinbase.address);
+        expect(await unsRegistry.get('key1', tokenId)).to.eq('value1');
+        expect(await unsRegistry.expiryOf(tokenId)).to.eq(expiry);
+
+        await unsRegistry.connect(coinbase).setOwner(mintingManager.address, tokenId);
+
+        await increaseTimeBy(60 * 60);
+
+        expect(await unsRegistry.isExpired(tokenId)).to.eq(true);
+
+        const newExpiry = expiry + 24 * 60 * 60;
+
+        await mintingManager.connect(coinbase).issueExpirableWithRecords(
+          receiver.address,
+          labels,
+          ['key2'],
+          ['value2'],
+          newExpiry,
+          true,
+        );
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.eq(receiver.address);
+        expect(await unsRegistry.expiryOf(tokenId)).to.eq(newExpiry);
+
+        expect(await unsRegistry.get('key2', tokenId)).to.eq('value2');
+        expect(await unsRegistry.get('key1', tokenId)).to.eq('');
+
+        expect(await unsRegistry.reverseOf(receiver.address)).to.eq(tokenId);
+      });
+
+      it('should revert if TLD is not expirabe', async () => {
+        await expect(
+          mintingManager.issueExpirableWithRecords(
+            coinbase.address,
+            ['expirable-test-a5', 'crypto'],
+            [],
+            [],
+            latestBlock.timestamp + 24 * 60 * 60,
+            true,
+          ),
+        ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
+      });
+
+      it('should revert if caller is not minter', async () => {
+        await expect(
+          mintingManager.connect(signers[1]).issueExpirableWithRecords(
+            coinbase.address,
+            ['not-minter', 'com'],
+            [],
+            [],
+            latestBlock.timestamp + 24 * 60 * 60,
+            true,
+          ),
+        ).to.be.revertedWith('MintingManager: CALLER_IS_NOT_MINTER');
+      });
+
+      it('should revert with subdomain', async () => {
+        const labels = ['expirable-test-a6', 'com'];
+        const expiry = latestBlock.timestamp + 60 * 60;
+
+        await mintingManager.connect(coinbase).issueExpirableWithRecords(
+          coinbase.address,
+          labels,
+          [],
+          [],
+          expiry,
+          false,
+        );
+        const tokenId = await unsRegistry.namehash(labels);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.eq(coinbase.address);
+
+        await expect(
+          mintingManager.issueExpirableWithRecords(
+            coinbase.address,
+            ['sub', ...labels],
+            [],
+            [],
+            expiry,
+            true,
+          ),
+        ).to.be.revertedWith('MintingManager: SUBDOMAINS_NOT_ALLOWED');
+      });
+
+      it('should revert with subdomain of non-expirable SLD', async () => {
+        const labels = ['expirable-test-a7', 'x'];
+
+        await mintingManager.connect(coinbase).issueWithRecords(
+          coinbase.address,
+          labels,
+          [],
+          [],
+          false,
+        );
+        const tokenId = await unsRegistry.namehash(labels);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.eq(coinbase.address);
+
+        await expect(
+          mintingManager.issueExpirableWithRecords(
+            coinbase.address,
+            ['sub', ...labels],
+            [],
+            [],
+            latestBlock.timestamp + 24 * 60 * 60,
+            true,
+          ),
+        ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
+      });
+
+      it('should revert minting legacy CNS prefixed domains', async () => {
+        await expect(
+          mintingManager.issueExpirableWithRecords(
+            coinbase.address,
+            ['udtestdev-t8', 'com'],
+            ['key1'],
+            ['value1'],
+            latestBlock.timestamp + 24 * 60 * 60,
+            true,
+          ),
+        ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
+      });
     });
   });
 
@@ -1962,6 +2294,124 @@ describe('MintingManager', () => {
 
     it('should return zero resolver when initialized by zero address', async () => {
       expect(await mintingManager.cnsResolver()).to.be.equal(ZERO_ADDRESS);
+    });
+  });
+
+  describe('Renewals', () => {
+    before(async () => {
+      [coinbase, receiver] = signers;
+
+      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+      mintingManager = await new MintingManager__factory(coinbase).deploy();
+
+      await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
+      await mintingManager.addMinter(coinbase.address);
+    });
+
+    it('should renew an expirable domain', async () => {
+      const labels = ['test-renew-1', 'com'];
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+      await mintingManager.connect(coinbase).issueExpirableWithRecords(
+        coinbase.address,
+        labels,
+        [],
+        [],
+        expiry,
+        true,
+      );
+
+      const tokenId = await unsRegistry.namehash(['test-renew-1', 'com']);
+      expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
+
+      const newExpiry = expiry + 60 * 60 * 24;
+      await mintingManager.connect(coinbase).renew(newExpiry, tokenId);
+
+      expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(newExpiry);
+    });
+
+    it('should revert if domain is not exprialbe', async () => {
+      const labels = ['test-renew-2', 'crypto'];
+
+      await mintingManager.connect(coinbase).issueWithRecords(coinbase.address, labels, [], [], true);
+      const tokenId = await unsRegistry.namehash(labels);
+
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+      await expect(mintingManager.connect(coinbase).renew(expiry, tokenId)).to.be.revertedWith(
+        'MintingManager: TOKEN_NOT_EXPIRABLE',
+      );
+    });
+
+    it('should revert if expiry is not extended', async () => {
+      const labels = ['test-renew-3', 'com'];
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+      await mintingManager.connect(coinbase).issueExpirableWithRecords(
+        coinbase.address,
+        labels,
+        [],
+        [],
+        expiry,
+        true,
+      );
+      const tokenId = await unsRegistry.namehash(labels);
+
+      await expect(mintingManager.connect(coinbase).renew(expiry, tokenId)).to.be.revertedWith(
+        'MintingManager: EXPIRY_NOT_EXTENDED',
+      );
+    });
+
+    it('should revert if new expiry is in the past', async () => {
+      const labels = ['test-renew-4', 'com'];
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+      await mintingManager.connect(coinbase).issueExpirableWithRecords(
+        coinbase.address,
+        labels,
+        [],
+        [],
+        expiry,
+        true,
+      );
+      const tokenId = await unsRegistry.namehash(labels);
+
+      await increaseTimeBy(60 * 60 * 24);
+
+      const newExpiry = expiry + 1;
+
+      await expect(mintingManager.connect(coinbase).renew(newExpiry, tokenId)).to.be.revertedWith(
+        'Registry: EXPIRY_IN_PAST',
+      );
+    });
+
+    it('should revert if caller is not minter', async () => {
+      const labels = ['test-renew-5', 'com'];
+
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+      await mintingManager.connect(coinbase).issueExpirableWithRecords(
+        coinbase.address,
+        labels,
+        [],
+        [],
+        expiry,
+        true,
+      );
+      const tokenId = await unsRegistry.namehash(labels);
+
+      const newExpiry = expiry + 60 * 60 * 24;
+
+      await expect(mintingManager.connect(receiver).renew(newExpiry, tokenId)).to.be.revertedWith(
+        'MinterRole: CALLER_IS_NOT_MINTER',
+      );
     });
   });
 
@@ -1997,6 +2447,28 @@ describe('MintingManager', () => {
 
         await expect(
           mintingManager.issueWithRecords(coinbase.address, ['test-block-3pef', 'wallet'], [], [], true),
+        ).to.be.revertedWith('MintingManager: TOKEN_BLOCKED');
+      });
+
+      it('should revert minting expirable when token blocked', async () => {
+        await mintingManager.issueExpirableWithRecords(
+          coinbase.address,
+          ['test-block-3pef', 'com'],
+          [],
+          [],
+          latestBlock.timestamp + 60 * 60 * 24,
+          true,
+        );
+
+        await expect(
+          mintingManager.issueExpirableWithRecords(
+            coinbase.address,
+            ['test-block-3pef', 'com'],
+            [],
+            [],
+            latestBlock.timestamp,
+            true,
+          ),
         ).to.be.revertedWith('MintingManager: TOKEN_BLOCKED');
       });
 
@@ -2082,9 +2554,30 @@ describe('MintingManager', () => {
         ).to.be.revertedWith('Pausable: PAUSED');
       });
 
+      it('should revert mint when paused', async () => {
+        await expect(
+          mintingManager.issueWithRecords(coinbase.address, ['test-paused-mint', 'wallet'], [], [], true),
+        ).to.be.revertedWith('Pausable: PAUSED');
+      });
+
       it('should revert mint with records when paused', async () => {
         await expect(
           mintingManager.issueWithRecords(coinbase.address, ['test-paused-mint', 'wallet'], [], [], true),
+        ).to.be.revertedWith('Pausable: PAUSED');
+      });
+
+      it('should revert mint expirable with records when paused', async () => {
+        const { timestamp } = await ethers.provider.getBlock('latest');
+
+        await expect(
+          mintingManager.issueExpirableWithRecords(
+            coinbase.address,
+            ['test-paused-mint', 'com'],
+            [],
+            [],
+            timestamp + 24 * 60 * 60,
+            false,
+          ),
         ).to.be.revertedWith('Pausable: PAUSED');
       });
 
@@ -2171,8 +2664,6 @@ describe('MintingManager', () => {
   });
 
   describe('Withdrawals', () => {
-    let latestBlock: Block;
-
     before(async () => {
       [coinbase, receiver, spender] = signers;
 
@@ -2190,8 +2681,6 @@ describe('MintingManager', () => {
       );
 
       await mintingManager.addMinter(coinbase.address);
-
-      latestBlock = await ethers.provider.getBlock('latest');
     });
 
     describe('withdraw(address recepient)', () => {
