@@ -858,7 +858,9 @@ const deployENSTask = {
       .connect(owner)
       .deploy(dnssecOracle.address, tldPublicSuffixList.address, ens.address);
     const root = await ctx.artifacts[ArtifactName.Root].connect(owner).deploy(ens.address);
+    await ctx.saveContractConfig(EnsContractName.Root, root);
     await root.setController(dnsRegistrar.address, true);
+    await root.setController(owner.address, true);
     await ens.setOwner(ZERO_WORD, root.address);
     await ctx.saveContractConfig(EnsContractName.DNSRegistrar, dnsRegistrar);
   },
