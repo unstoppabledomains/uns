@@ -78,4 +78,5 @@ var EnsContractName;
     EnsContractName["LegacyETHRegistrarController"] = "LegacyETHRegistrarController";
     EnsContractName["DNSRegistrar"] = "DNSRegistrar";
     EnsContractName["DNSSECImpl"] = "DNSSECImpl";
+    EnsContractName["Root"] = "Root";
 })(EnsContractName = exports.EnsContractName || (exports.EnsContractName = {}));
