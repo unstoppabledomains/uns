@@ -1,3 +1,7 @@
+# v0.9.1
+
+- Add ENS `Root` contract to sandbox
+
 # v0.9.0
 
 - `UNSRegistry@0.9.0` receives support for expirable domains
