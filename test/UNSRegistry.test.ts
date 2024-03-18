@@ -348,6 +348,72 @@ describe('UNSRegistry', () => {
       });
     });
 
+    describe('unlock(address,uint256)', async () => {
+      it('should properly unlock domain resetting records', async () => {
+        const labels = ['label_12324_unlock', 'crypto'];
+        const tokenId = await mintDomain({
+          labels,
+          unsRegistry,
+          owner: coinbase.address,
+          keys: ['key'],
+          values: ['value'],
+        });
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+        expect(await unsRegistry.get('key', tokenId)).to.be.equal('value');
+
+        await unsRegistry.connect(coinbase).unlock(receiver.address, tokenId);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+        expect(await unsRegistry.get('key', tokenId)).to.be.equal('');
+      });
+
+      it('should properly unlock expirable domain', async () => {
+        const labels = ['label_12324_unlock', 'com'];
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const tokenId = await mintDomain({
+          labels,
+          unsRegistry,
+          owner: coinbase.address,
+          keys: ['key'],
+          values: ['value'],
+          expiry,
+        });
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+        expect(await unsRegistry.get('key', tokenId)).to.be.equal('value');
+        expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
+
+        await unsRegistry.connect(coinbase).unlock(receiver.address, tokenId);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
+        expect(await unsRegistry.get('key', tokenId)).to.be.equal('');
+      });
+
+      it('should fail if token is not minted', async () => {
+        const tokenId = await unsRegistry.namehash(['label_12325_unlock_fail', 'crypto']);
+        await expect(unsRegistry.unlock(receiver.address, tokenId)).to.be.revertedWith('ERC721: invalid token ID');
+      });
+
+      it('should fail if called by non-allowed address', async () => {
+        const labels = ['label_12325_unlock_fail', 'com'];
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+        const tokenId = await mintDomain({
+          labels,
+          unsRegistry,
+          owner: coinbase.address,
+          keys: ['key'],
+          values: ['value'],
+          expiry,
+        });
+
+        await expect(
+          unsRegistry.connect(receiver).unlock(receiver.address, tokenId),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_MINTING_MANAGER');
+      });
+    });
+
     describe('unlockWithRecords(address,string[],string[],string[],bool)', async () => {
       it('should properly unlock domain and set new records without reverse', async () => {
         const labels = ['label_12324_unlock2', 'crypto'];

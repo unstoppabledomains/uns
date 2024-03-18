@@ -25,7 +25,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using ECDSAUpgradeable for bytes32;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.5.0';
+    string public constant VERSION = '0.5.1';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -64,7 +64,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      *      Legacy CNS free domain prefix is 'udtestdev-'.
      *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
-    modifier onlyAllowed(string[] memory labels, uint256 expiry) {
+    modifier onlyAllowed(string[] memory labels, uint64 expiry) {
         require(labels.length >= 2, 'MintingManager: LABELS_LENGTH_BELOW_2');
         _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[0], expiry);
         _;
@@ -176,6 +176,12 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         require(expiry > currentExpiry, 'MintingManager: EXPIRY_NOT_EXTENDED');
 
         unsRegistry.setExpiry(expiry, tokenId);
+    }
+
+    function revoke(uint256 tokenId) external override onlyMinter {
+        require(unsRegistry.expiryOf(tokenId) != 0, 'MintingManager: TOKEN_NOT_EXPIRABLE');
+
+        unsRegistry.unlock(address(this), tokenId);
     }
 
     function claim(uint256 tld, string calldata label) external override onlyAllowedSLD(tld, label) whenNotPaused {
@@ -375,7 +381,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     function _ensureAllowed(
         uint256 tld,
         string memory label,
-        uint256 expiry
+        uint64 expiry
     ) private view {
         require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
         require(_expirableTlds[tld] == (expiry > 0), 'MintingManager: TLD_EXPIRABLE_MISMATCH');

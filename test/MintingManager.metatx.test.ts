@@ -92,6 +92,63 @@ describe('MintingManager (metatx)', () => {
     expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
   });
 
+  it('should renew expirable through forwarder', async () => {
+    const labels = ['test-qw123-expirable-renew', 'com'];
+    const tokenId = await unsRegistry.namehash(labels);
+    const latestBlock = await ethers.provider.getBlock('latest');
+
+    const expiry = latestBlock.timestamp + 24 * 60 * 60;
+
+    await mintingManager.issueExpirableWithRecords(
+      receiver.address,
+      labels,
+      [],
+      [],
+      expiry,
+      true,
+    );
+
+    const newExpiry = expiry + 24 * 60 * 60;
+
+    const { req, signature } = await buildExecuteParams(
+      'renew(uint64,uint256)',
+      [newExpiry, tokenId],
+      coinbase,
+      tokenId,
+    );
+
+    await forwarder.execute(req, signature);
+
+    expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(newExpiry);
+  });
+
+  it('should revoke expirable through forwarder', async () => {
+    const labels = ['test-qw123-expirable-revoke', 'com'];
+    const tokenId = await unsRegistry.namehash(labels);
+    const latestBlock = await ethers.provider.getBlock('latest');
+
+    const expiry = latestBlock.timestamp + 24 * 60 * 60;
+
+    await mintingManager.issueExpirableWithRecords(
+      receiver.address,
+      labels,
+      [],
+      [],
+      expiry,
+      true,
+    );
+
+    const { req, signature } = await buildExecuteParams(
+      'revoke(uint256)',
+      [tokenId],
+      coinbase,
+      tokenId,
+    );
+
+    await forwarder.execute(req, signature);
+
+    expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(mintingManager.address);
+  });
 
   it('should be able to buy domain with ERC20 tokens', async () => {
     const latestBlock = await ethers.provider.getBlock('latest');

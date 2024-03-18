@@ -113,6 +113,13 @@ interface IUNSRegistry is
     ) external;
 
     /**
+     * @dev unlock token
+     * @param to address to unlock the token to
+     * @param tokenId uint256 ID of the token
+     */
+    function unlock(address to, uint256 tokenId) external;
+
+    /**
      * @dev unlock token with records
      * @param to address to unlock the token to
      * @param labels array of domain labels splitted by '.' (for `aaa.bbb.crypto` it will be [`aaa`, `bbb`, `crypto`])
