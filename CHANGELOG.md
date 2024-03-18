@@ -1,8 +1,12 @@
-## v0.9.1
+## v0.9.2
 
 - Add `.austin` TLD
 
-# v0.9.0
+## v0.9.1
+
+- Add ENS `Root` contract to sandbox
+
+## v0.9.0
 
 - `UNSRegistry@0.9.0` receives support for expirable domains
 - `MintingManager@0.5.0` receives support for expirable domains, TLDs
