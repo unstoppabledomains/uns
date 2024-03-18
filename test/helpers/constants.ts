@@ -36,6 +36,7 @@ export const TLD = {
   GO: BigNumber.from('0xa264639c3dbff58a1ded5efcf724e50a9c7847ff8197c87c00d009fbba2a3720'),
   ALTIMIST: BigNumber.from('0x9bf15275eb85f2e69308f3dbfbe0f94cade4f05c2aa24ba7b9eba5ad2fb1a2cb'),
   PUDGY: BigNumber.from('0x17936dd2b9c99a1e1bfa039dd7d40118f3ed535fcd9c8cda23c8070ffb4c2264'),
+  AUSTIN: BigNumber.from('0x89e68000b532da79f9a0d4b8416eaa4f64294236ab233205343453d5bec22933'),
 
   // Expirable
   COM: BigNumber.from('0xac2c11ea5d4a4826f418d3befbf0537de7f13572d2a433edfe4a7314ea5dc896'),
