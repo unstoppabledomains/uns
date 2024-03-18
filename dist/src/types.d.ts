@@ -71,7 +71,8 @@ export declare enum EnsContractName {
     LegacyENSRegistry = "LegacyENSRegistry",
     LegacyETHRegistrarController = "LegacyETHRegistrarController",
     DNSRegistrar = "DNSRegistrar",
-    DNSSECImpl = "DNSSECImpl"
+    DNSSECImpl = "DNSSECImpl",
+    Root = "Root"
 }
 export declare type ContractName = EnsContractName | UnsContractName;
 export declare type ContractConfig = {

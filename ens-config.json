@@ -1,5 +1,5 @@
 {
-    "version": "0.1.10",
+    "version": "0.1.11",
     "networks": {
         "1": {
             "contracts": {
@@ -63,6 +63,10 @@
                 "DNSSECImpl": {
                     "address": "0x46c6F79952d3046Bf673a28132ff2a81F306959c",
                     "deploymentBlock": "0xc6fa9e"
+                },
+                "Root": {
+                    "address": "0xaB528d626EC275E3faD363fF1393A41F581c5897",
+                    "deploymentBlock": "0x8F22BC"
                 }
             }
         },
@@ -128,6 +132,10 @@
                 "DNSSECImpl": {
                     "address": "0xF427c4AdED8B6dfde604865c1a7E953B160C26f0",
                     "deploymentBlock": "0x62b998"
+                },
+                "Root": {
+                    "address": "0x31e789Eb325aB116997942f7809731197a3dc059",
+                    "deploymentBlock": "0x1FD760"
                 }
             }
         },
@@ -181,10 +189,10 @@
                     "legacyAddresses": []
                 },
                 "ENSCustody": {
-                    "address": "0x0794D2ccC545a585C114A4680d43484100E6ba44",
-                    "deploymentBlock": "0x53",
-                    "implementation": "0xe19E7Db2F62f1465072A01B8a8fF24a400947467",
-                    "forwarder": "0x0794D2ccC545a585C114A4680d43484100E6ba44",
+                    "address": "0x287DeE389Caaa49edc112888f2BcFD927b472e25",
+                    "deploymentBlock": "0x54",
+                    "implementation": "0x0794D2ccC545a585C114A4680d43484100E6ba44",
+                    "forwarder": "0x287DeE389Caaa49edc112888f2BcFD927b472e25",
                     "legacyAddresses": []
                 },
                 "LegacyENSRegistry": {
@@ -204,6 +212,10 @@
                 "DNSRegistrar": {
                     "address": "0x9B2565a3545A1312bdCb6e7148A7f7cAe8C2706B",
                     "deploymentBlock": "0x4e"
+                },
+                "Root": {
+                    "address": "0xFb82C655715B43b07863e9c2fd42f60bbd9838B0",
+                    "deploymentBlock": "0x4f"
                 }
             }
         }
