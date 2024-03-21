@@ -8,7 +8,7 @@ import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 import { TLD, ZERO_ADDRESS } from './helpers/constants';
-import { mintDomain } from './helpers/registry';
+import { mintDomain, mintRandomDomain } from './helpers/registry';
 import { getFuncSignature } from './helpers/proxy';
 import { increaseTimeBy } from './helpers/utils';
 
@@ -331,6 +331,7 @@ describe('UNSRegistry (metatx)', () => {
       const included = [
         'issueWithRecords',
         'unlockWithRecords',
+        'unlock',
         'mintTLD',
       ];
 
@@ -386,7 +387,8 @@ describe('UNSRegistry (metatx)', () => {
         'setReverse',
         'removeReverse',
         'addProxyReader',
-        'setExpiry', // onlyMintingManager action
+        'setExpiry', // onlyMintingManager action, covered in separate test case
+        'unlock',  // onlyMintingManager action, covered in a separate test case
       ];
 
       const getFuncs = () => {
@@ -476,6 +478,52 @@ describe('UNSRegistry (metatx)', () => {
           await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: TOKEN_INVALID');
         }
       });
+
+      it('should execute setExpiry via forwarder', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+        const tokenId = await mintRandomDomain({
+          unsRegistry,
+          owner,
+          tld: 'com',
+          expiry,
+        });
+        const newExpiry = expiry + 60 * 60 * 24;
+
+        const func = unsRegistry.interface.getFunction('setExpiry');
+        const req = await buidRequest(func, coinbase.address, 0, {
+          expiry: newExpiry,
+          tokenId,
+        });
+
+        const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+
+        await unsRegistry.execute(req, signature);
+
+        expect(await unsRegistry.expiryOf(tokenId)).to.eq(newExpiry);
+      });
+
+      it('should execute unlock via forwarder', async () => {
+        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const tokenId = await mintRandomDomain({
+          unsRegistry,
+          owner,
+          tld: 'com',
+          expiry,
+        });
+
+        const func = unsRegistry.interface.getFunction('unlock');
+        const req = await buidRequest(func, coinbase.address, 0, {
+          to: receiver.address,
+          tokenId,
+        });
+
+        const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+
+        await unsRegistry.execute(req, signature);
+
+        expect(await unsRegistry.ownerOf(tokenId)).to.eq(receiver.address);
+      });
     });
 
     describe('Non-Token functions', () => {
@@ -505,6 +553,7 @@ describe('UNSRegistry (metatx)', () => {
         'addProxyReader',
         'setReverse', // covered in separate test case
         'unlockWithRecords', // covered in separate test case
+        'unlock', // covered in separate test case
         'multicall',
       ];
 

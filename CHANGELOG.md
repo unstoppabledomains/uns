@@ -1,3 +1,8 @@
+## v0.9.3
+
+- Added `unlock` to UNSRegistry@0.9.1
+- Added `revoke` to MintingManager@0.5.1 used to revoke expirable domains
+
 ## v0.9.2
 
 - Add `.austin` TLD

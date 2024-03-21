@@ -2329,7 +2329,7 @@ describe('MintingManager', () => {
         true,
       );
 
-      const tokenId = await unsRegistry.namehash(['test-renew-1', 'com']);
+      const tokenId = await unsRegistry.namehash(labels);
       expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
 
       const newExpiry = expiry + 60 * 60 * 24;
@@ -2410,6 +2410,79 @@ describe('MintingManager', () => {
       const newExpiry = expiry + 60 * 60 * 24;
 
       await expect(mintingManager.connect(receiver).renew(newExpiry, tokenId)).to.be.revertedWith(
+        'MinterRole: CALLER_IS_NOT_MINTER',
+      );
+    });
+  });
+
+  describe('Revocations (expirable domains)', () => {
+    before(async () => {
+      [coinbase, receiver] = signers;
+
+      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+      mintingManager = await new MintingManager__factory(coinbase).deploy();
+
+      await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await mintingManager.initialize(
+        unsRegistry.address,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
+      await mintingManager.addMinter(coinbase.address);
+    });
+
+    it('should revoke an expirable domain', async () => {
+      const labels = ['test-revoke-1', 'com'];
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+      await mintingManager.connect(coinbase).issueExpirableWithRecords(
+        coinbase.address,
+        labels,
+        ['key1'],
+        ['awesome-value'],
+        expiry,
+        true,
+      );
+
+      const tokenId = await unsRegistry.namehash(labels);
+      expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
+
+      await mintingManager.connect(coinbase).revoke(tokenId);
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(mintingManager.address);
+      expect(await unsRegistry.get('key1', tokenId)).to.be.equal('');
+    });
+
+    it('should revert if domain is not exprialbe', async () => {
+      const labels = ['test-revoke-2', 'crypto'];
+
+      await mintingManager.connect(coinbase).issueWithRecords(coinbase.address, labels, [], [], true);
+      const tokenId = await unsRegistry.namehash(labels);
+
+      await expect(mintingManager.connect(coinbase).revoke(tokenId)).to.be.revertedWith(
+        'MintingManager: TOKEN_NOT_EXPIRABLE',
+      );
+    });
+
+    it('should revert if caller is not minter', async () => {
+      const labels = ['test-revoke-3', 'com'];
+
+      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+
+      await mintingManager.connect(coinbase).issueExpirableWithRecords(
+        coinbase.address,
+        labels,
+        [],
+        [],
+        expiry,
+        true,
+      );
+      const tokenId = await unsRegistry.namehash(labels);
+
+      await expect(mintingManager.connect(receiver).revoke(tokenId)).to.be.revertedWith(
         'MinterRole: CALLER_IS_NOT_MINTER',
       );
     });

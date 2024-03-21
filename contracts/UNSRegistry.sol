@@ -31,7 +31,7 @@ contract UNSRegistry is
     IUNSRegistry
 {
     string public constant NAME = 'UNS: Registry';
-    string public constant VERSION = '0.9.0';
+    string public constant VERSION = '0.9.1';
 
     string internal _prefix;
 
@@ -141,6 +141,11 @@ contract UNSRegistry is
         emit NewURI(tokenId, uri);
     }
 
+    function unlock(address to, uint256 tokenId) public override onlyMintingManager {
+        _reset(tokenId);
+        _transfer(ERC721Upgradeable.ownerOf(tokenId), to, tokenId);
+    }
+
     function unlockWithRecords(
         address to,
         string[] calldata labels,
@@ -150,8 +155,7 @@ contract UNSRegistry is
     ) external onlyMintingManager {
         (uint256 tokenId, ) = _namehash(labels);
 
-        _reset(tokenId);
-        _transfer(ERC721Upgradeable.ownerOf(tokenId), to, tokenId);
+        unlock(to, tokenId);
         _setMany(keys, values, tokenId);
 
         if (withReverse) {

@@ -64,6 +64,12 @@ interface IMintingManager is IERC1967 {
     function renew(uint64 expiry, uint256 tokenId) external;
 
     /**
+     * @dev Revokes an expirable domain.
+     * @param tokenId uint256 ID of the token
+     */
+    function revoke(uint256 tokenId) external;
+
+    /**
      * @dev Claims free domain. The fuction adds prefix to label.
      * @param tld id of parent token
      * @param label SLD label to mint
