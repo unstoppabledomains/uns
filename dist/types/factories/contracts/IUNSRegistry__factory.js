@@ -1174,6 +1174,24 @@ const _abi = [
                 type: "address",
             },
             {
+                internalType: "uint256",
+                name: "tokenId",
+                type: "uint256",
+            },
+        ],
+        name: "unlock",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
+                name: "to",
+                type: "address",
+            },
+            {
                 internalType: "string[]",
                 name: "labels",
                 type: "string[]",

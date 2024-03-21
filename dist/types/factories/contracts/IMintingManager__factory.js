@@ -417,6 +417,19 @@ const _abi = [
     {
         inputs: [
             {
+                internalType: "uint256",
+                name: "tokenId",
+                type: "uint256",
+            },
+        ],
+        name: "revoke",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
                 internalType: "string",
                 name: "prefix",
                 type: "string",

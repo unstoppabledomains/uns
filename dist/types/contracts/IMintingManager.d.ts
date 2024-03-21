@@ -14,11 +14,12 @@ export interface IMintingManagerInterface extends utils.Interface {
         "issueWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
         "removeTld(uint256)": FunctionFragment;
         "renew(uint64,uint256)": FunctionFragment;
+        "revoke(uint256)": FunctionFragment;
         "setTokenURIPrefix(string)": FunctionFragment;
         "withdraw(address)": FunctionFragment;
         "withdraw(address,address)": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "issueExpirableWithRecords" | "issueWithRecords" | "removeTld" | "renew" | "setTokenURIPrefix" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "issueExpirableWithRecords" | "issueWithRecords" | "removeTld" | "renew" | "revoke" | "setTokenURIPrefix" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
     encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>, PromiseOrValue<boolean>]): string;
     encodeFunctionData(functionFragment: "buy", values: [
         PromiseOrValue<string>,
@@ -69,6 +70,7 @@ export interface IMintingManagerInterface extends utils.Interface {
     ]): string;
     encodeFunctionData(functionFragment: "removeTld", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "renew", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "revoke", values: [PromiseOrValue<BigNumberish>]): string;
     encodeFunctionData(functionFragment: "setTokenURIPrefix", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "withdraw(address)", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "withdraw(address,address)", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
@@ -82,6 +84,7 @@ export interface IMintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "issueWithRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeTld", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renew", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "revoke", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setTokenURIPrefix", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw(address)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw(address,address)", data: BytesLike): Result;
@@ -196,6 +199,9 @@ export interface IMintingManager extends BaseContract {
         renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -236,6 +242,9 @@ export interface IMintingManager extends BaseContract {
     renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
+    revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -256,6 +265,7 @@ export interface IMintingManager extends BaseContract {
         issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
         removeTld(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
+        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
         "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
@@ -305,6 +315,9 @@ export interface IMintingManager extends BaseContract {
         renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
+        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
@@ -344,6 +357,9 @@ export interface IMintingManager extends BaseContract {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
         setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
