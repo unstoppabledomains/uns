@@ -410,10 +410,12 @@ const deployZilliqaRecoverTask: Task = {
       MintingManager?.address,
     ]);
     await zilliqaRecover.deployTransaction.wait();
+
     if (isSandbox) {
-      const mintingManager = await ctx.artifacts.MintingManager.attach(MintingManager.address).connect(owner);
+      const mintingManager = ctx.artifacts.MintingManager.attach(MintingManager.address).connect(owner);
       await mintingManager.functions.addMinter(zilliqaRecover.address);
     }
+
     const proxyAdmin = await upgrades.admin.getInstance();
     const zilliqaRecoverImpl = await proxyAdmin.callStatic.getProxyImplementation(zilliqaRecover.address);
     await ctx.saveContractConfig(UnsContractName.ZilliqaRecover, zilliqaRecover, zilliqaRecoverImpl, zilliqaRecover);
@@ -540,6 +542,10 @@ const proposeUNSRegistryTask: Task = {
       throw new Error('Version parameter is not provided');
     }
 
+    if(!ctx.multisig) {
+      throw new Error('Multisig address is not provided');
+    }
+
     ctx.log('Preparing proposal...');
     const proposal = await defender.proposeUpgrade(UNSRegistry.address, ctx.artifacts.UNSRegistry, {
       title: `Propose UNSRegistry to v${version}`,
@@ -575,6 +581,10 @@ const proposeMintingManagerTask: Task = {
       throw new Error('Version parameter is not provided');
     }
 
+    if(!ctx.multisig) {
+      throw new Error('Multisig address is not provided');
+    }
+
     ctx.log('Preparing proposal...');
     const proposal = await defender.proposeUpgrade(MintingManager.address, ctx.artifacts.MintingManager, {
       title: `Propose MintingManager to v${version}`,
@@ -607,6 +617,10 @@ const proposeProxyReaderTask: Task = {
     const version = params?.version;
     if (!version) {
       throw new Error('Version parameter is not provided');
+    }
+
+    if(!ctx.multisig) {
+      throw new Error('Multisig address is not provided');
     }
 
     ctx.log('Preparing proposal...');
@@ -926,6 +940,10 @@ const proposeENSCustodyTask: Task = {
     const version = params?.version;
     if (!version) {
       throw new Error('Version parameter is not provided');
+    }
+
+    if(!ctx.multisig) {
+      throw new Error('Multisig address is not provided');
     }
 
     ctx.log('Preparing proposal...');

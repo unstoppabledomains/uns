@@ -576,6 +576,63 @@
                     "address": "0xCbF16B0E2A06916F0Ca4892F704349d13E11cF66",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x5588B8"
+                },
+                "ENSCustody": {
+                    "address": "0xd2Bf816C7b23fF6e7d141ECC4c1e41DcC857aD45",
+                    "deploymentBlock": "0x5588b9",
+                    "implementation": "0x49Ac063337cF2fB26dD421Ab650b893CD54b900F",
+                    "forwarder": "0xd2Bf816C7b23fF6e7d141ECC4c1e41DcC857aD45"
+                },
+                "CNSRegistry": {
+                    "address": "0xAb005176D74900A9c25fDA144e2f9f329A409166",
+                    "deploymentBlock": "0x558be7",
+                    "forwarder": "0xD3146C740c0Fa128ab1aEA90e4E75194AC0Bbc9B"
+                },
+                "SignatureController": {
+                    "address": "0x5e6f02BA94648Fb25Ca98C6a577c04A0Db34c724",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x558bee"
+                },
+                "MintingController": {
+                    "address": "0xabec3fF0F0b6375F65CB9aEB01e8347bf697082F",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x558bef",
+                    "deprecated": true
+                },
+                "URIPrefixController": {
+                    "address": "0x89D35aABc8427a32ee7032e73975271e1480fd4E",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x558bf6",
+                    "deprecated": true
+                },
+                "Resolver": {
+                    "address": "0xf8F0622A88eC688140890153191Db1713442618D",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x558bfc",
+                    "forwarder": "0xA35F199591bD4F0Cb301ff85b6109Bda146dfb09"
+                },
+                "WhitelistedMinter": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "DomainZoneController": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "TwitterValidationOperator": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "FreeMinter": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
                 }
             }
         }
