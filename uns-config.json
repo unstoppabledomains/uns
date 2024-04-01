@@ -569,6 +569,15 @@
                     "forwarder": "0xED5ab744F862A1A2294366B63f9040cd690D2AC5"
                 }
             }
+        },
+        "11155111": {
+            "contracts": {
+                "ProxyAdmin": {
+                    "address": "0xCbF16B0E2A06916F0Ca4892F704349d13E11cF66",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x5588B8"
+                }
+            }
         }
     }
 }

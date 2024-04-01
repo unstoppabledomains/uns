@@ -240,6 +240,10 @@ const config: HardhatUserConfig = {
       polygon: '0xC8E1B5c41c42ad1cE8336714cA2b2f2588F0a337',
       goerli: '0x6DB268C88b8659141936F70e5e8acAa3f10597e8',
       mumbai: '0xFce156303580bA8cC44D07aDcc7723A12E596244',
+
+      // Multisigs will be created later
+      sepolia: '',
+      amoy: '',
     },
   },
   defender: {

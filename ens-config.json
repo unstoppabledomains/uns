@@ -275,6 +275,17 @@
                 "Root": {
                     "address": "0xDaaF96c344f63131acadD0Ea35170E7892d3dfBA",
                     "deploymentBlock": "0x387fc9"
+                },
+                "ProxyAdmin": {
+                    "address": "0xCbF16B0E2A06916F0Ca4892F704349d13E11cF66",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x5588B8"
+                },
+                "ENSCustody": {
+                    "address": "0xd2Bf816C7b23fF6e7d141ECC4c1e41DcC857aD45",
+                    "deploymentBlock": "0x5588b9",
+                    "implementation": "0x49Ac063337cF2fB26dD421Ab650b893CD54b900F",
+                    "forwarder": "0xd2Bf816C7b23fF6e7d141ECC4c1e41DcC857aD45"
                 }
             }
         }
