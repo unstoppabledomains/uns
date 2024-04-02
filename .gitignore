@@ -36,6 +36,8 @@ cache
 !.openzeppelin/unknown-137.json
 # mumbai network
 !.openzeppelin/unknown-80001.json
+# sepolia network
+!.openzeppelin/unknown-11155111.json
 
 .sandbox
 .deployer

@@ -633,6 +633,43 @@
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0",
                     "deprecated": true
+                },
+                "RootChainManager": {
+                    "address": "0x34F5A25B627f50Bb3f5cAb72807c4D4F405a9232",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x486867"
+                },
+                "UNSRegistry": {
+                    "address": "0xDD907B4d80B4a979fd77eE502580c55F2700292c",
+                    "deploymentBlock": "0x55a711",
+                    "implementation": "0x7f21bA760352326c55FD6A83D218c2FCd294Dd1c",
+                    "forwarder": "0xDD907B4d80B4a979fd77eE502580c55F2700292c"
+                },
+                "MintingManager": {
+                    "address": "0x1620637c0ce88cccfa919ef562b4398e3187189d",
+                    "deploymentBlock": "0x55a715",
+                    "implementation": "0x63B6F3F80d12A70eA26a57cdFDc16F33e6fD319A",
+                    "forwarder": "0x38F532B32E0b42E747483A37Dfaf05460b1F4Fa3"
+                },
+                "UNSOperator": {
+                    "address": "0x41fD65E5a1cbdcCdD69F8C11DA4c829F7d3565A6",
+                    "deploymentBlock": "0x55A717",
+                    "implementation": "0xf9A7A6516Ee73E4Bd3FA9fbABdA3C8DeA40c89FA"
+                },
+                "ProxyReader": {
+                    "address": "0x880F7D37E9E4EB6868F92F4bB9C8C0995178fdA9",
+                    "deploymentBlock": "0x55a857",
+                    "implementation": "0xdA0E8ec8f801593161e689275Ab1394e7791ee18"
+                },
+                "DotCoinBurner": {
+                    "address": "0x64E3ecF931610d2503247b7c7A885688de54241A",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x55f932"
+                },
+                "ZilliqaRecover": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         }
