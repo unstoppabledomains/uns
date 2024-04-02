@@ -1,3 +1,7 @@
+## v0.9.5
+
+- Add `.bitget` TLD
+
 ## v0.9.4
 
 - Upgraded `UNSRegistry` and `MintingManager` on mumbai
