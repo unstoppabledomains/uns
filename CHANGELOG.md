@@ -1,3 +1,7 @@
+## v0.9.6
+
+- Add `.pog` TLD
+
 ## v0.9.5
 
 - Add `.bitget` TLD
