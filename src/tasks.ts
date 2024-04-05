@@ -379,6 +379,7 @@ const deployUNSOperatorTask: Task = {
     await unsOperator.deployTransaction.wait();
 
     const proxyAdmin = await upgrades.admin.getInstance();
+    await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
 
     const unsOperatorImpl = await proxyAdmin.callStatic.getProxyImplementation(unsOperator.address);
     await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);

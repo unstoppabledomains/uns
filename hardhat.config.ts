@@ -147,7 +147,7 @@ const config: HardhatUserConfig = {
       accounts: process.env.SEPOLIA_UNS_PRIVATE_KEY ? [process.env.SEPOLIA_UNS_PRIVATE_KEY] : undefined,
     },
     amoy: {
-      url: `https://amoy.infura.io/v3/${process.env.AMOY_INFURA_KEY}`,
+      url: `https://polygon-amoy.infura.io/v3/${process.env.AMOY_INFURA_KEY}`,
       chainId: 80002,
       accounts: process.env.AMOY_UNS_PRIVATE_KEY ? [process.env.AMOY_UNS_PRIVATE_KEY] : undefined,
     },
@@ -195,11 +195,21 @@ const config: HardhatUserConfig = {
       goerli: process.env.ETHERSCAN_API_KEY,
       sepolia: process.env.ETHERSCAN_API_KEY,
 
-      //what to do with amoy???
-
       polygon: process.env.POLYGONSCAN_API_KEY,
       polygonMumbai: process.env.POLYGONSCAN_API_KEY,
+
+      polygonAmoy: process.env.OKLINK_API_KEY,
     }) as Record<string, string>,
+    customChains: [
+      {
+        network: 'polygonAmoy',
+        chainId: 80002,
+        urls: {
+          apiURL: 'https://www.oklink.com/api/explorer/v1/contract/verify/async/api/polygonAmoy',
+          browserURL: 'https://www.oklink.com/polygonAmoy',
+        },
+      },
+    ],
   },
   abiExporter: {
     path: './artifacts/abi',
@@ -213,23 +223,11 @@ const config: HardhatUserConfig = {
       hardhat: ['0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'],
       localhost: ['0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'],
       sandbox: ['0x9DC64b2558b458A15C7f01c192D874Ef460f0A29'],
-      goerli: [
-        // What are this accounts?
-        // '0xb3B86785A51B950fd54ABdF420ff3B60E091870c',
-        // '0x7EF88A779651f26a4967026a32Cae4F01fF8D151',
-        // '0x0c71a3494484459bbF9777Dd3109515B2E653CCb',
-        // '0x288DA3443BBEBcc7a339182323aa3F23126DFe7a',
-        // '0xe45541799119C1D63b60e0F834F3A381D4BEDbea',
-        // '0xdb36B5c4cF1D96f020D7629a09cB54ab787414d6',
-        // '0x3b9FB7983d897B7fe2fD7563e07e24CbA830b03B',
-        // '0x903aA579B9eF13862Fda73275B349017d8fD09eB',
-        // '0x7Ac8596cfbb0504DFDEC08d5088B67E7fbfae47f',
-        // '0xB83180632b72f988585AF02FC27229bF2Eabd139',
-        '0x1daf08a27304a78434e22ab79bea508e341f910d', // whitelister signer L1
-      ],
-      mumbai: ['0x31df70766e92c0a69ada7ecb6dc1634d64748be2'],
 
+      goerli: ['0x1daf08a27304a78434e22ab79bea508e341f910d'],
       sepolia: ['0x1daf08a27304a78434e22ab79bea508e341f910d'],
+
+      mumbai: ['0x31df70766e92c0a69ada7ecb6dc1634d64748be2'],
       amoy: ['0x31df70766e92c0a69ada7ecb6dc1634d64748be2'],
 
       mainnet: ['0x5465c72ce00196550d6f89c40830f6bc81599f4f'],
