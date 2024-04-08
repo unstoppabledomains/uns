@@ -169,9 +169,9 @@ NOTE: All private keys should be in HEX format with `0x` prefix
 Network | Variables
 --- | ---
 Mainnet | MAINNET_INFURA_KEY <br /> MAINNET_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
-Goerli | GOERLI_INFURA_KEY <br /> GOERLI_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
+Sepolia | SEPOLIA_INFURA_KEY <br /> SEPOLIA_UNS_PRIVATE_KEY <br /> ETHERSCAN_API_KEY
 Polygon | POLYGON_INFURA_KEY <br /> POLYGON_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY
-Mumbai | MUMBAI_INFURA_KEY <br /> MUMBAI_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY
+Amoy | AMOY_INFURA_KEY <br /> AMOY_UNS_PRIVATE_KEY <br /> OKLINK_API_KEY
 
 <div id="backward-incompatibility"></div>
 
@@ -220,11 +220,11 @@ yarn hardhat run --network <network> scripts/filename.ts
 
 As scripts make JSON-RPC calls to Infura and sign transactions, you'll need to specify 2 environment variables.
 Those variables' names depend on the network you want deploy the contracts to. Assuming you want to deploy new contracts
-to Goerli, you'll need the following variables:
+to Sepolia, you'll need the following variables:
 
 ```
-export GOERLI_UNS_PRIVATE_KEY=<HEX_PRIVATE_KEY>
-export GOERLI_INFURA_KEY=<INFURA_PROJECT_ID>
+export SEPOLIA_UNS_PRIVATE_KEY=<HEX_PRIVATE_KEY>
+export SEPOLIA_INFURA_KEY=<INFURA_PROJECT_ID>
 ```
 
 The scripts located in `./scripts` directory are wrappers around Deployer tasks. You can see their definitions inside
@@ -247,10 +247,10 @@ yarn hardhat run --network <network> scripts/deploy.ts
 
 Warning: In case of contracts' redeployment, make sure there is no deployment output file `.deployer/{chain_id}.json`
 
-### Deploying UNS on L2(Polygon/Mumbai)
+### Deploying UNS on L2(Polygon/Amoy)
 ```
-yarn hardhat run --network mumbai scripts/deploy_UNS_only.ts
+yarn hardhat run --network amoy scripts/deploy_UNS_only.ts
 ```
 
 ## L2 Polygon
-There are configs networks [Mainnet](https://static.matic.network/network/mainnet/v1/index.json), [Testnet](https://static.matic.network/network/testnet/mumbai/index.json)
+There are configs networks [Mainnet](https://static.polygon.technology/network/mainnet/v1/index.json), [Testnet](https://static.polygon.technology/network/testnet/amoy/index.json)
