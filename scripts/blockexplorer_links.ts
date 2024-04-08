@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import {unwrap} from '../src/helpers';
+import { unwrap } from '../src/helpers';
 
 type ContractSetup = {
   address: string;

@@ -7,7 +7,7 @@ async function main () {
   console.log('Network:', network.name);
 
   const chainId: number = unwrap(network.config, 'chainId');
-  if (![1, 5, 1337, 11155111].includes(chainId)) {
+  if (![1, 5, 1337].includes(chainId)) {
     throw new Error(`Unsupported network ${chainId}`);
   }
 
