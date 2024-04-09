@@ -93,7 +93,7 @@ export class Deployer {
   public log: debug.Debugger;
 
   public minters: string[];
-  public multisig: string;
+  public multisig: string | null;
   public network: NetworkConfig;
 
   static async create (options?: DeployerOptions): Promise<Deployer> {
@@ -117,10 +117,6 @@ export class Deployer {
     minters: string[],
     multisig: string,
   ) {
-    if (!multisig && network.name !== 'sandbox') {
-      throw new Error('Multisig address is not set');
-    }
-
     this.options = {
       ...DEFAULT_OPTIONS,
       ...options,

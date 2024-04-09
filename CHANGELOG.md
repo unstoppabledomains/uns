@@ -1,3 +1,8 @@
+## v0.9.7
+
+- Deployed smart contracts to Sepolia, Amoy
+- Removed Goerli, Mumbai
+
 ## v0.9.6
 
 - Add `.pog` TLD

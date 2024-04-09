@@ -34,8 +34,10 @@ cache
 .openzeppelin/unknown-*.json
 # polygon network
 !.openzeppelin/unknown-137.json
-# mumbai network
-!.openzeppelin/unknown-80001.json
+# sepolia network
+!.openzeppelin/unknown-11155111.json
+# amoy network
+!.openzeppelin/unknown-80002.json
 
 .sandbox
 .deployer
@@ -54,3 +56,5 @@ slither.sarif
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+.env

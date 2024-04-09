@@ -12,6 +12,7 @@ async function main () {
   }
 
   const config = getNetworkConfig(chainId, NameService.ENS);
+
   if (!config) {
     throw new Error(`Config not found for network ${chainId}`);
   }

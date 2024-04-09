@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { unwrap } from '../src/helpers';
 
 type ContractSetup = {
   address: string;
@@ -19,10 +20,9 @@ const isValidAddress = (address?: string): boolean => {
 
 const BlockExplorerUrls = {
   1: 'https://etherscan.io',
-  5: 'https://goerli.etherscan.io',
   137: 'http://polygonscan.com',
-  // 1337: "http://localhost",
-  80001: 'https://mumbai.polygonscan.com',
+  80002: 'https://www.oklink.com/amoy',
+  11155111: 'https://sepolia.etherscan.io/',
 };
 
 const Networks = Object.keys(BlockExplorerUrls);
@@ -50,7 +50,7 @@ const contractLinks = (
         ? [address]
         : [];
   return addresses.length
-    ? addresses.map((a) => link(network, a)).join('<br/>')
+    ? addresses.map((a) => link(network, unwrap(a))).join('<br/>')
     : '&mdash;';
 };
 
