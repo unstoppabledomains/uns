@@ -4,7 +4,7 @@ declare module 'hardhat/types/config' {
     interface HardhatUserConfig {
         uns?: {
             minters: MintersMap;
-            multisig: Record<string, string>;
+            multisig: Record<string, string | null>;
         };
     }
     interface HardhatConfig {
