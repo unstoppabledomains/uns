@@ -1,5 +1,5 @@
 {
-    "version": "0.9.0",
+    "version": "0.9.1",
     "networks": {
         "1": {
             "contracts": {
@@ -522,7 +522,7 @@
                 "MintableERC721Predicate": {
                     "address": "0xf8D2ecCA43F50F04922A13c417aEd05C34F1EF52",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x0"
+                    "deploymentBlock": "0x486873"
                 },
                 "RootChainManager": {
                     "address": "0x34F5A25B627f50Bb3f5cAb72807c4D4F405a9232",

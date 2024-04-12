@@ -1,3 +1,7 @@
+## v0.9.8
+
+- Fixed MintableERC721Predicate deployment block for sepolia
+
 ## v0.9.7
 
 - Deployed smart contracts to Sepolia, Amoy
