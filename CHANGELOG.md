@@ -1,3 +1,7 @@
+## v0.9.9
+
+- Add `.clay` TLD
+
 ## v0.9.8
 
 - Fixed MintableERC721Predicate deployment block for sepolia
