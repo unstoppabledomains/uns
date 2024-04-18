@@ -2,7 +2,7 @@ import { server, Server, EthereumProvider, ServerOptions } from 'ganache';
 
 const DEFAULT_PORT = 7545;
 
-export type ServerConfigOptions = ServerOptions<'ethereum'> & {
+export type ServerConfigOptions = ServerOptions & {
   url: string;
   port?: number;
   hostname?: string;
@@ -16,7 +16,7 @@ export class GanacheService {
 
   constructor (options: ServerConfigOptions) {
     this.options = this.validateAndTransformOptions(options);
-    this.server = server<'ethereum'>(this.options as ServerOptions<'ethereum'>);
+    this.server = server(this.options as ServerOptions);
     this.provider = this.server.provider;
   }
 

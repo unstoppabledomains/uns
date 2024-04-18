@@ -1,6 +1,6 @@
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { getBytes, parseEther, solidityPackedKeccak256 } from 'ethers';
 import { ethers, network } from 'hardhat';
-import { Block } from '@ethersproject/abstract-provider';
 import { ERC20Mock, ERC20Mock__factory } from '../../types';
 import { MintingManager, UNSRegistry } from '../../types/contracts';
 import { MintingManagerForwarder } from '../../types/contracts/metatx';
@@ -9,7 +9,7 @@ import { MintingManagerForwarder__factory } from '../../types/factories/contract
 import { ZERO_ADDRESS } from '../helpers/constants';
 import { percDiff } from '../helpers/consumption';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
-import { increaseTimeBy } from '../helpers/utils';
+import { getLatestBlockTimestamp, increaseTimeBy } from '../helpers/utils';
 
 describe('MintingManager (consumption)', () => {
   let unsRegistry: UNSRegistry, mintingManager: MintingManager, forwarder: MintingManagerForwarder;
@@ -18,7 +18,7 @@ describe('MintingManager (consumption)', () => {
     receiver: SignerWithAddress,
     spender: SignerWithAddress;
 
-  let latestBlock: Block;
+  let latestBlockTimestamp: number;
 
   let buildExecuteParams: ExecuteFunc;
 
@@ -36,12 +36,12 @@ describe('MintingManager (consumption)', () => {
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     mintingManager = await new MintingManager__factory(coinbase).deploy();
-    await unsRegistry.initialize(mintingManager.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+    await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-    forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(mintingManager.address);
+    forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(await mintingManager.getAddress());
 
     await mintingManager.initialize(
-      unsRegistry.address,
+      await unsRegistry.getAddress(),
       ZERO_ADDRESS,
       ZERO_ADDRESS,
       ZERO_ADDRESS,
@@ -50,13 +50,13 @@ describe('MintingManager (consumption)', () => {
     );
     await mintingManager.addMinter(coinbase.address);
     await mintingManager.setTokenURIPrefix('/');
-    await mintingManager.setForwarder(forwarder.address);
+    await mintingManager.setForwarder(await forwarder.getAddress());
 
-    buildExecuteParams = buildExecuteFunc(mintingManager.interface, mintingManager.address, forwarder);
+    buildExecuteParams = buildExecuteFunc(mintingManager.interface, await mintingManager.getAddress(), forwarder);
   });
 
   beforeEach(async () => {
-    latestBlock = await ethers.provider.getBlock('latest');
+    latestBlockTimestamp = await getLatestBlockTimestamp();
   });
 
   describe('Mint consumption', () => {
@@ -100,7 +100,7 @@ describe('MintingManager (consumption)', () => {
         const { req, signature } = await buildExecuteParams(selector, executeParams, coinbase, tokenId);
         const executeTx = await forwarder.connect(spender).execute(req, signature);
 
-        const executeTxReceipt = await executeTx.wait();
+        const executeTxReceipt = (await executeTx.wait())!;
 
         await removeReverse();
 
@@ -116,11 +116,11 @@ describe('MintingManager (consumption)', () => {
           reverse: params[4],
           execute: executeTxReceipt.gasUsed.toString(),
           send: tx.receipt.gasUsed.toString(),
-          increase: percDiff(tx.receipt.gasUsed.toNumber(), executeTxReceipt.gasUsed.toNumber()) + ' %',
+          increase: percDiff(tx.receipt.gasUsed, executeTxReceipt.gasUsed) + ' %',
         });
 
-        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId);
-        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId2);
+        await unsRegistry.connect(receiver).setOwner(await mintingManager.getAddress(), tokenId);
+        await unsRegistry.connect(receiver).setOwner(await mintingManager.getAddress(), tokenId2);
       }
       console.table(result);
     });
@@ -128,7 +128,7 @@ describe('MintingManager (consumption)', () => {
 
   describe('Mint expirable consumption', () => {
     const getCases = () => {
-      const expiry = latestBlock.timestamp + 2 * 60 * 60 * 24;
+      const expiry = latestBlockTimestamp + 2 * 60 * 60 * 24;
 
       return [
         {
@@ -158,15 +158,17 @@ describe('MintingManager (consumption)', () => {
       await mintingManager.issueExpirableWithRecords(
         spender.address,
         ['expired-consumption', 'com'],
-        [], [],
-        latestBlock.timestamp + 60 * 60 * 24,
+        [],
+        [],
+        latestBlockTimestamp + 60 * 60 * 24,
         true,
       );
       await mintingManager.issueExpirableWithRecords(
         spender.address,
         ['expired-consumption-meta', 'com'],
-        [], [],
-        latestBlock.timestamp + 60 * 60 * 24,
+        [],
+        [],
+        latestBlockTimestamp + 60 * 60 * 24,
         true,
       );
       await increaseTimeBy(60 * 60 * 24);
@@ -184,7 +186,7 @@ describe('MintingManager (consumption)', () => {
         const { req, signature } = await buildExecuteParams(selector, executeParams, coinbase, tokenId);
         const executeTx = await forwarder.connect(spender).execute(req, signature);
 
-        const executeTxReceipt = await executeTx.wait();
+        const executeTxReceipt = (await executeTx.wait())!;
 
         await removeReverse();
 
@@ -200,11 +202,11 @@ describe('MintingManager (consumption)', () => {
           reverse: params[5],
           execute: executeTxReceipt.gasUsed.toString(),
           send: tx.receipt.gasUsed.toString(),
-          increase: percDiff(tx.receipt.gasUsed.toNumber(), executeTxReceipt.gasUsed.toNumber()) + ' %',
+          increase: percDiff(tx.receipt.gasUsed, executeTxReceipt.gasUsed) + ' %',
         });
 
-        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId);
-        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId2);
+        await unsRegistry.connect(receiver).setOwner(await mintingManager.getAddress(), tokenId);
+        await unsRegistry.connect(receiver).setOwner(await mintingManager.getAddress(), tokenId2);
       }
 
       console.table(result);
@@ -368,7 +370,7 @@ describe('MintingManager (consumption)', () => {
         const { req, signature } = await buildExecuteParams(selector, executeParams, coinbase, tokenId);
         const executeTx = await forwarder.connect(spender).execute(req, signature);
 
-        const executeTxReceipt = await executeTx.wait();
+        const executeTxReceipt = (await executeTx.wait())!;
 
         await removeReverse();
 
@@ -384,11 +386,11 @@ describe('MintingManager (consumption)', () => {
           reverse: params[4],
           execute: executeTxReceipt.gasUsed.toString(),
           send: tx.receipt.gasUsed.toString(),
-          increase: percDiff(tx.receipt.gasUsed.toNumber(), executeTxReceipt.gasUsed.toNumber()) + ' %',
+          increase: percDiff(tx.receipt.gasUsed, executeTxReceipt.gasUsed) + ' %',
         });
 
-        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId);
-        await unsRegistry.connect(receiver).setOwner(mintingManager.address, tokenId2);
+        await unsRegistry.connect(receiver).setOwner(await mintingManager.getAddress(), tokenId);
+        await unsRegistry.connect(receiver).setOwner(await mintingManager.getAddress(), tokenId2);
       }
       console.table(result);
     });
@@ -399,78 +401,78 @@ describe('MintingManager (consumption)', () => {
     const chainId = network.config.chainId;
 
     const buyDomain = async () => {
-      const expiry = latestBlock.timestamp + 24 * 60 * 60;
-      const price = ethers.utils.parseEther('1');
+      const expiry = latestBlockTimestamp + 24 * 60 * 60;
+      const price = parseEther('1');
 
       const labels = ['onchainpurchase-consumption', 'nft'];
       const tokenId = await unsRegistry.namehash(labels);
 
-      const purchaseHash = ethers.utils.arrayify(
-        ethers.utils.solidityKeccak256(
+      const purchaseHash = getBytes(
+        solidityPackedKeccak256(
           ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
-          [mintingManager.address, chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
+          [await mintingManager.getAddress(), chainId, spender.address, tokenId, expiry, price, ZERO_ADDRESS],
         ),
       );
       const signature = await coinbase.signMessage(purchaseHash);
 
-      const tx = await mintingManager.connect(spender).buy(
-        spender.address,
-        labels,
-        ['key'], ['value'],
-        expiry,
-        price,
-        signature,
-        { value: price },
-      );
+      const tx = await mintingManager
+        .connect(spender)
+        .buy(spender.address, labels, ['key'], ['value'], expiry, price, signature, { value: price });
 
-      return tx.wait();
+      return (await tx.wait())!;
     };
 
     const buyDomainForErc20 = async () => {
-      const expiry = latestBlock.timestamp + 24 * 60 * 60;
-      const price = ethers.utils.parseEther('1');
+      const expiry = latestBlockTimestamp + 24 * 60 * 60;
+      const price = parseEther('1');
 
       const labels = ['onchainpurchase-consumption-erc20', 'nft'];
       const tokenId = await unsRegistry.namehash(labels);
 
-      const purchaseHash = ethers.utils.arrayify(
-        ethers.utils.solidityKeccak256(
+      const purchaseHash = getBytes(
+        solidityPackedKeccak256(
           ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
-          [mintingManager.address, chainId, spender.address, tokenId, expiry, price, erc20Mock.address],
+          [
+            await mintingManager.getAddress(),
+            chainId,
+            spender.address,
+            tokenId,
+            expiry,
+            price,
+            await erc20Mock.getAddress(),
+          ],
         ),
       );
       const signature = await coinbase.signMessage(purchaseHash);
 
-      await erc20Mock.connect(spender).approve(mintingManager.address, price);
+      await erc20Mock.connect(spender).approve(await mintingManager.getAddress(), price);
 
-      const tx = await mintingManager.connect(spender).buyForErc20(
-        spender.address,
-        labels,
-        ['key'], ['value'],
-        expiry,
-        erc20Mock.address,
-        price,
-        signature,
-      );
+      const tx = await mintingManager
+        .connect(spender)
+        .buyForErc20(
+          spender.address,
+          labels,
+          ['key'],
+          ['value'],
+          expiry,
+          await erc20Mock.getAddress(),
+          price,
+          signature,
+        );
 
-      return tx.wait();
+      return (await tx.wait())!;
     };
 
     before(async () => {
       erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
 
-      await erc20Mock.mint(spender.address, ethers.utils.parseEther('1'));
+      await erc20Mock.mint(spender.address, parseEther('1'));
     });
 
     it('Consumption', async () => {
       const result: unknown[] = [];
 
-      await mintingManager.connect(coinbase).issueWithRecords(
-        spender.address,
-        ['reverse', 'x'],
-        [], [],
-        true,
-      );
+      await mintingManager.connect(coinbase).issueWithRecords(spender.address, ['reverse', 'x'], [], [], true);
 
       const buyDomainReceipt = await buyDomain();
       const buyDomainErc20Receipt = await buyDomainForErc20();

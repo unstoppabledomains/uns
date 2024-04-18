@@ -22,7 +22,8 @@
     "assert": false,
     "web3": false,
     "usePlugin": false,
-    "extendEnvironment": false
+    "extendEnvironment": false,
+    "BigInt": true
   },
   "ignorePatterns": [
     "types/**/*",
@@ -34,7 +35,7 @@
     "strict": ["error", "global"],
     // Code style
     "array-bracket-spacing": ["off"],
-    "camelcase": ["error", {"properties": "always", "ignoreImports": true}],
+    "camelcase": ["error", {"properties": "always", "allow": [".*__factory"]}],
     "comma-dangle": ["error", "always-multiline"],
     "comma-spacing": ["error", {"before": false, "after": true}],
     "dot-notation": ["error", {"allowKeywords": true, "allowPattern": ""}],

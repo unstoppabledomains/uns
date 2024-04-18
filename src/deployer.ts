@@ -3,13 +3,13 @@ import fs from 'fs';
 import { ethers, network, config } from 'hardhat';
 import { merge } from 'lodash';
 import debug from 'debug';
-import { Contract, ContractFactory } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { BaseContract, toBeHex, ZeroAddress } from 'ethers';
 import { NetworkConfig } from 'hardhat/types';
 import { TransactionResponse } from '@ethersproject/abstract-provider';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ArtifactName, NsConfig, NsNetworkConfig, ContractConfigMap, UnsContractName, ContractName } from './types';
 import { Task, tasks } from './tasks';
-import { unwrap } from './helpers';
+import { unwrap } from './utils';
 
 const log = debug('UNS:deployer');
 
@@ -18,77 +18,30 @@ type DeployerOptions = {
   proxy: boolean;
 };
 
+type DeployedContract = {
+  address: string;
+  legacyAddresses: string[];
+  deploymentBlock: string;
+  implementation: string;
+  forwarder: string;
+  transaction: TransactionResponse;
+}
+
 type DeployConfig = {
   contracts: {
-    [k in ArtifactName]: {
-      address: string;
-      legacyAddresses: string[];
-      deploymentBlock: string;
-      implementation: string;
-      forwarder: string;
-      transaction: TransactionResponse;
-    };
+    [k in ArtifactName]: DeployedContract;
   };
 };
 
 type AccountsMap = Record<string, SignerWithAddress>;
-
-type ArtifactsMap = {
-  [k in ArtifactName]: ContractFactory;
-};
 
 const DEFAULT_OPTIONS: DeployerOptions = {
   basePath: './.deployer',
   proxy: true,
 };
 
-async function getArtifacts (): Promise<ArtifactsMap> {
-  return {
-    CNSRegistry: await ethers.getContractFactory('CNSRegistry'),
-    CNSRegistryForwarder: await ethers.getContractFactory('CNSRegistryForwarder'),
-    SignatureController: await ethers.getContractFactory('SignatureController'),
-    MintingController: await ethers.getContractFactory('MintingController'),
-    URIPrefixController: await ethers.getContractFactory('URIPrefixController'),
-    Resolver: await ethers.getContractFactory('dot-crypto/contracts/Resolver.sol:Resolver'),
-    ResolverForwarder: await ethers.getContractFactory('ResolverForwarder'),
-    UNSRegistry: await ethers.getContractFactory('UNSRegistry'),
-    MintingManager: await ethers.getContractFactory('MintingManager'),
-    UNSOperator: await ethers.getContractFactory('UNSOperator'),
-    MintingManagerForwarder: await ethers.getContractFactory('MintingManagerForwarder'),
-    ProxyReader: await ethers.getContractFactory('contracts/ProxyReader.sol:ProxyReader'),
-    DummyStateSender: await ethers.getContractFactory('DummyStateSender'),
-    SimpleCheckpointManager: await ethers.getContractFactory('SimpleCheckpointManager'),
-    MintableERC721Predicate: await ethers.getContractFactory('MintableERC721Predicate'),
-    RootChainManager: await ethers.getContractFactory('RootChainManager'),
-    DotCoinBurner: await ethers.getContractFactory('DotCoinBurner'),
-    ZilliqaRecover: await ethers.getContractFactory('ZilliqaRecover'),
-
-    ENSRegistry: await ethers.getContractFactory('ENSRegistry'),
-    BaseRegistrarImplementation: await ethers.getContractFactory('BaseRegistrarImplementation'),
-    ReverseRegistrar: await ethers.getContractFactory('ReverseRegistrar'),
-    NameWrapper: await ethers.getContractFactory('NameWrapper'),
-    DummyOracle: await ethers.getContractFactory('DummyOracle'),
-    StablePriceOracle: await ethers.getContractFactory('StablePriceOracle'),
-    ETHRegistrarController: await ethers.getContractFactory('ETHRegistrarController'),
-    PublicResolver: await ethers.getContractFactory('PublicResolver'),
-    ENSCustody: await ethers.getContractFactory('ENSCustody'),
-    LegacyENSRegistry: await ethers.getContractFactory('LegacyENSRegistry'),
-    LegacyETHRegistrarController: await ethers.getContractFactory('LegacyETHRegistrarController'),
-    DNSRegistrar: await ethers.getContractFactory('DNSRegistrar'),
-    DNSSECImpl: await ethers.getContractFactory('DNSSECImpl'),
-    TLDPublicSuffixList: await ethers.getContractFactory('TLDPublicSuffixList'),
-    RSASHA256Algorithm: await ethers.getContractFactory('RSASHA256Algorithm'),
-    DummyAlgorithm: await ethers.getContractFactory('DummyAlgorithm'),
-    SHA1Digest: await ethers.getContractFactory('SHA1Digest'),
-    SHA256Digest: await ethers.getContractFactory('SHA256Digest'),
-    SHA1NSEC3Digest: await ethers.getContractFactory('SHA1NSEC3Digest'),
-    Root: await ethers.getContractFactory('Root'),
-  };
-}
-
 export class Deployer {
   public options: DeployerOptions;
-  public artifacts: ArtifactsMap;
   public accounts: AccountsMap;
   public log: debug.Debugger;
 
@@ -103,7 +56,6 @@ export class Deployer {
 
     return new Deployer(
       options ?? DEFAULT_OPTIONS,
-      await getArtifacts(),
       { owner },
       _unsConfig.minters[network.name],
       _unsConfig.multisig[network.name],
@@ -112,7 +64,6 @@ export class Deployer {
 
   constructor (
     options: DeployerOptions,
-    artifacts: ArtifactsMap,
     accounts: AccountsMap,
     minters: string[],
     multisig: string,
@@ -121,7 +72,6 @@ export class Deployer {
       ...DEFAULT_OPTIONS,
       ...options,
     };
-    this.artifacts = artifacts;
     this.accounts = accounts;
     this.minters = minters;
     this.multisig = multisig;
@@ -137,7 +87,6 @@ export class Deployer {
 
     this.log('Initialized deployer', {
       options: this.options,
-      artifacts: Object.keys(artifacts),
       accounts: Object.values(accounts)
         .filter((a) => !!a)
         .map((a) => a.address),
@@ -180,7 +129,7 @@ export class Deployer {
         ...emptyConfig,
         address: value.address,
         implementation: value.implementation,
-        deploymentBlock: value.transaction && ethers.BigNumber.from(value.transaction.blockNumber).toHexString(),
+        deploymentBlock: value.transaction && toBeHex(BigInt(value.transaction.blockNumber ?? 0)),
         forwarder: value.forwarder,
         legacyAddresses: value.legacyAddresses,
       };
@@ -203,19 +152,19 @@ export class Deployer {
 
   async saveContractConfig (
     name: ContractName,
-    contract: Contract,
+    contract: BaseContract,
     implAddress?: string,
-    forwarder?: Contract,
+    forwarder?: BaseContract,
   ): Promise<void> {
     const config = this.getDeployConfig();
 
     const _config = merge(config, {
       contracts: {
         [name]: {
-          address: contract.address,
+          address: await contract.getAddress(),
           implementation: implAddress,
-          transaction: contract.deployTransaction && (await contract.deployTransaction.wait()),
-          forwarder: forwarder && forwarder.address,
+          transaction: (await contract.deploymentTransaction()?.wait()),
+          forwarder: forwarder && await forwarder.getAddress(),
         },
       },
     });
@@ -240,14 +189,28 @@ export class Deployer {
     this._saveConfig(_config);
   }
 
-  async saveForwarderConfig (name: UnsContractName, contract: Contract): Promise<void> {
+  async saveForwarderConfig (name: UnsContractName, contract: BaseContract): Promise<void> {
     const config = this.getDeployConfig();
 
     const _config = merge(config, {
       contracts: {
         [name]: {
           ...((config.contracts || {})[name] || {}),
-          forwarder: contract.address,
+          forwarder: await contract.getAddress(),
+        },
+      },
+    });
+
+    this._saveConfig(_config);
+  }
+
+  async saveContractEmptyConfig (name: UnsContractName) {
+    const config = this.getDeployConfig();
+
+    const _config = merge(config, {
+      contracts: {
+        [name]: {
+          address: ZeroAddress,
         },
       },
     });

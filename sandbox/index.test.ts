@@ -1,11 +1,11 @@
 // process.env.HARDHAT_NETWORK = 'sandbox';
 import { assert, expect } from 'chai';
 import { ethers, network } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { utils } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { AbiCoder } from 'ethers';
 import { NameService, getNetworkConfig } from '../src/config';
 import { MintingManager, UNSRegistry } from '../types/contracts';
-import { unwrap } from '../src/helpers';
+import { unwrap } from '../src/utils';
 import { BUFFERED_REGISTRATION_COST, REGISTRATION_TIME, TLD, ZERO_ADDRESS } from '../test/helpers/constants';
 import {
   CNSRegistry,
@@ -37,7 +37,7 @@ describe('Sandbox', async () => {
 
   let sandbox: Sandbox;
 
-  const abiCoder = new utils.AbiCoder();
+  const abiCoder = new AbiCoder();
 
   before(async () => {
     sandbox = await Sandbox.start({ verbose: true });
@@ -50,18 +50,19 @@ describe('Sandbox', async () => {
     const { contracts: unsContracts } = getNetworkConfig(chainId, NameService.UNS);
     const { contracts: ensContracts } = getNetworkConfig(chainId, NameService.ENS);
 
-    unsRegistry = new UNSRegistry__factory(owner).attach(unsContracts.UNSRegistry.address);
-    cnsRegistry = new CNSRegistry__factory(owner).attach(unsContracts.CNSRegistry.address);
-    mintingManager = new MintingManager__factory(owner).attach(unsContracts.MintingManager.address);
-    mintingManager = new MintingManager__factory(owner).attach(unsContracts.MintingManager.address);
-    zilliqaRecover = new ZilliqaRecover__factory(owner).attach(unsContracts.ZilliqaRecover.address);
+    unsRegistry = UNSRegistry__factory.connect(unsContracts.UNSRegistry.address, owner);
+    cnsRegistry = CNSRegistry__factory.connect(unsContracts.CNSRegistry.address, owner);
+    mintingManager = MintingManager__factory.connect(unsContracts.MintingManager.address, owner);
+    mintingManager = MintingManager__factory.connect(unsContracts.MintingManager.address, owner);
+    zilliqaRecover = ZilliqaRecover__factory.connect(unsContracts.ZilliqaRecover.address, owner);
 
     predicateAddress = unsContracts.MintableERC721Predicate.address;
-    ethRegistrarController = new ETHRegistrarController__factory(owner).attach(
+    ethRegistrarController = ETHRegistrarController__factory.connect(
       ensContracts.ETHRegistrarController.address,
+      owner,
     );
 
-    custody = new ENSCustody__factory(owner).attach(ensContracts.ENSCustody.address);
+    custody = ENSCustody__factory.connect(ensContracts.ENSCustody.address, owner);
   });
 
   beforeEach(async () => {
@@ -112,7 +113,7 @@ describe('Sandbox', async () => {
 
       await cnsRegistry['safeTransferFrom(address,address,uint256,bytes)'](
         owner.address,
-        unsRegistry.address,
+        await unsRegistry.getAddress(),
         tokenId,
         abiCoder.encode(['bool'], [false]),
       );
@@ -120,7 +121,7 @@ describe('Sandbox', async () => {
       expect(await unsRegistry.ownerOf(tokenId)).to.be.eq(owner.address);
       // Somehow error cannot be decoded automatically here, used try...catch
       try {
-        await cnsRegistry.callStatic.ownerOf(tokenId);
+        await cnsRegistry.ownerOf.staticCall(tokenId);
         assert.fail('Error is ecpected');
       } catch (error) {}
     });
@@ -134,7 +135,7 @@ describe('Sandbox', async () => {
 
       await cnsRegistry['safeTransferFrom(address,address,uint256,bytes)'](
         owner.address,
-        unsRegistry.address,
+        await unsRegistry.getAddress(),
         tokenId,
         abiCoder.encode(['bool'], [true]),
       );
@@ -142,7 +143,7 @@ describe('Sandbox', async () => {
       expect(await unsRegistry.ownerOf(tokenId)).to.be.eq(predicateAddress);
       // Somehow error cannot be decoded automatically here, used try...catch
       try {
-        await cnsRegistry.callStatic.ownerOf(tokenId);
+        await cnsRegistry.ownerOf.staticCall(tokenId);
         assert.fail('Error is ecpected');
       } catch (error) {}
     });
@@ -152,7 +153,7 @@ describe('Sandbox', async () => {
       await tx.wait();
 
       const tokenId = await cnsRegistry.childIdOf(TLD.ZIL, domainPrefix);
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.eq(zilliqaRecover.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.eq(await zilliqaRecover.getAddress());
       expect(await zilliqaRecover.znsOwnerOf(tokenId)).to.be.eq(owner.address);
     });
   });
@@ -160,7 +161,7 @@ describe('Sandbox', async () => {
   describe('ENS', () => {
     const secret = '0x0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF';
 
-    const registerName = async (name, txOptions = { value: BUFFERED_REGISTRATION_COST }) => {
+    const registerName = async (name: string, txOptions = { value: BUFFERED_REGISTRATION_COST }) => {
       const commitment = await ethRegistrarController.makeCommitment(
         name,
         registrantAddress,
@@ -173,13 +174,14 @@ describe('Sandbox', async () => {
       );
 
       let tx = await ethRegistrarController.commit(commitment);
-
-      expect(await ethRegistrarController.commitments(commitment)).to.equal(
-        (await ethers.provider.getBlock(unwrap(tx, 'blockNumber'))).timestamp,
+      const block = await ethers.provider.getBlock(
+        unwrap(tx, 'blockNumber'),
       );
 
+      expect(await ethRegistrarController.commitments(commitment)).to.equal(block?.timestamp);
+
       await increaseTimeBy(
-        (await ethRegistrarController.minCommitmentAge()).toNumber(),
+        await ethRegistrarController.minCommitmentAge(),
       );
 
       tx = await ethRegistrarController.register(
@@ -198,8 +200,8 @@ describe('Sandbox', async () => {
     };
 
     const registerAndParkName = async (
-      name,
-      minter,
+      name: string,
+      minter: SignerWithAddress,
       resolver = ZERO_ADDRESS,
       selfCustody = false,
       callData: string[] = [],
@@ -218,10 +220,13 @@ describe('Sandbox', async () => {
         selfCustody,
       );
       const commitTx = await custody.connect(minter).commit(commitment);
-      const { timestamp } = await ethers.provider.getBlock(unwrap(commitTx, 'blockNumber'));
+      const block = await ethers.provider.getBlock(unwrap(commitTx, 'blockNumber'));
+      const timestamp = block?.timestamp;
       expect(await ethRegistrarController.commitments(commitment)).to.equal(timestamp);
 
-      await increaseTimeBy((await ethRegistrarController.minCommitmentAge()).toNumber());
+      await increaseTimeBy(
+        await ethRegistrarController.minCommitmentAge(),
+      );
 
       // register
       const registerTx = await custody

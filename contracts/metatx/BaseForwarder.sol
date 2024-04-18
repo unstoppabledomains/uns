@@ -12,11 +12,7 @@ abstract contract BaseForwarder is IForwarder {
     using ECDSAUpgradeable for bytes32;
     using SignatureCheckerUpgradeable for address;
 
-    function _verify(
-        ForwardRequest memory req,
-        address target,
-        bytes memory signature
-    ) internal view virtual returns (bool) {
+    function _verify(ForwardRequest memory req, address target, bytes memory signature) internal view virtual returns (bool) {
         uint256 nonce = this.nonceOf(req.tokenId);
         bytes32 hash = keccak256(abi.encodePacked(keccak256(req.data), target, req.nonce)).toEthSignedMessageHash();
 
@@ -41,9 +37,7 @@ abstract contract BaseForwarder is IForwarder {
         return _verifyCallResult(success, returndata, 'BaseForwarder: CALL_FAILED');
     }
 
-    function _invalidateNonce(
-        uint256 /* tokenId */
-    ) internal virtual {}
+    function _invalidateNonce(uint256 /* tokenId */) internal virtual {}
 
     function _buildData(
         address from,
@@ -54,11 +48,7 @@ abstract contract BaseForwarder is IForwarder {
         return abi.encodePacked(data, from, tokenId);
     }
 
-    function _verifyCallResult(
-        bool success,
-        bytes memory returndata,
-        string memory errorMessage
-    ) private pure returns (bytes memory) {
+    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage) private pure returns (bytes memory) {
         if (success) {
             return returndata;
         } else {

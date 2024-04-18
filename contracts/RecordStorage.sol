@@ -28,12 +28,10 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         (key, value) = _getByHash(keyHash, tokenId);
     }
 
-    function getManyByHash(uint256[] calldata keyHashes, uint256 tokenId)
-        external
-        view
-        override
-        returns (string[] memory keys, string[] memory values)
-    {
+    function getManyByHash(
+        uint256[] calldata keyHashes,
+        uint256 tokenId
+    ) external view override returns (string[] memory keys, string[] memory values) {
         keys = new string[](keyHashes.length);
         values = new string[](keyHashes.length);
         for (uint256 i = 0; i < keyHashes.length; i++) {
@@ -45,50 +43,30 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         return _tokenPresets[tokenId] == 0 ? tokenId : _tokenPresets[tokenId];
     }
 
-    function _set(
-        string calldata key,
-        string calldata value,
-        uint256 tokenId
-    ) internal {
+    function _set(string calldata key, string calldata value, uint256 tokenId) internal {
         uint256 keyHash = uint256(keccak256(abi.encodePacked(key)));
         _addKey(keyHash, key);
         _set(keyHash, key, value, tokenId);
     }
 
-    function _setMany(
-        string[] calldata keys,
-        string[] calldata values,
-        uint256 tokenId
-    ) internal {
+    function _setMany(string[] calldata keys, string[] calldata values, uint256 tokenId) internal {
         for (uint256 i = 0; i < keys.length; i++) {
             _set(keys[i], values[i], tokenId);
         }
     }
 
-    function _setByHash(
-        uint256 keyHash,
-        string calldata value,
-        uint256 tokenId
-    ) internal {
+    function _setByHash(uint256 keyHash, string calldata value, uint256 tokenId) internal {
         require(_existsKey(keyHash), 'RecordStorage: KEY_NOT_FOUND');
         _set(keyHash, getKey(keyHash), value, tokenId);
     }
 
-    function _setManyByHash(
-        uint256[] calldata keyHashes,
-        string[] calldata values,
-        uint256 tokenId
-    ) internal {
+    function _setManyByHash(uint256[] calldata keyHashes, string[] calldata values, uint256 tokenId) internal {
         for (uint256 i = 0; i < keyHashes.length; i++) {
             _setByHash(keyHashes[i], values[i], tokenId);
         }
     }
 
-    function _reconfigure(
-        string[] calldata keys,
-        string[] calldata values,
-        uint256 tokenId
-    ) internal {
+    function _reconfigure(string[] calldata keys, string[] calldata values, uint256 tokenId) internal {
         _reset(tokenId);
         _setMany(keys, values, tokenId);
     }
@@ -115,12 +93,7 @@ abstract contract RecordStorage is KeyStorage, IRecordStorage {
         return _records[_presetOf(tokenId)][keyHash];
     }
 
-    function _set(
-        uint256 keyHash,
-        string memory key,
-        string memory value,
-        uint256 tokenId
-    ) private {
+    function _set(uint256 keyHash, string memory key, string memory value, uint256 tokenId) private {
         if (bytes(_records[_presetOf(tokenId)][keyHash]).length == 0) {
             emit NewKey(tokenId, key, key);
         }

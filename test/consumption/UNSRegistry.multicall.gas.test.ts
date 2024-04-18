@@ -1,6 +1,6 @@
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { ContractTransactionReceipt, Interface } from 'ethers';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { Interface } from 'ethers/lib/utils';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
 import { TLD, ZERO_ADDRESS } from '../helpers/constants';
@@ -133,12 +133,12 @@ describe('UNSRegistry Multicall (consumption)', () => {
     for (let i = 0; i < cases.length; i++) {
       const { name, labels, selectors, params } = cases[i];
 
-      let cumGasUsed = 0;
+      let cumGasUsed = BigInt(0);
       const params1 = await prepParams(params, labels);
       for (let i = 0; i < selectors.length; i++) {
         const tx = await unsRegistry[selectors[i]](...params1[i]);
-        const receipt = await tx.wait();
-        cumGasUsed += receipt.gasUsed.toNumber();
+        const receipt = (await tx.wait()) as ContractTransactionReceipt;
+        cumGasUsed += receipt.gasUsed;
       }
 
       const labels2 = [labels[0] + '-multi', labels[1]];
@@ -147,16 +147,16 @@ describe('UNSRegistry Multicall (consumption)', () => {
       const iface: Interface = unsRegistry.interface;
       const tx = await unsRegistry.multicall(
         selectors.map((selector, index) =>
-          iface.encodeFunctionData(unsRegistry.interface.functions[selector].name, params2[index]),
+          iface.encodeFunctionData(unsRegistry.interface.getFunctionName(selector), params2[index]),
         ),
       );
-      const receipt = await tx.wait();
+      const receipt = (await tx.wait())!;
 
       result.push({
         name,
         seq: cumGasUsed.toString(),
         multicall: receipt.gasUsed.toString(),
-        increase: percDiff(cumGasUsed, receipt.gasUsed.toNumber()) + ' %',
+        increase: percDiff(cumGasUsed, receipt.gasUsed) + ' %',
       });
     }
     console.table(result);

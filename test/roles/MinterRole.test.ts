@@ -1,7 +1,6 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { BigNumber } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { MinterRoleMock__factory } from '../../types/factories/contracts/mocks';
 import { MinterRoleMock } from '../../types/contracts/mocks';
 import { ZERO_ADDRESS } from './../helpers/constants';
@@ -35,9 +34,9 @@ describe('MinterRole', () => {
     });
 
     it('revert adding minter account by non-owner account', async () => {
-      await expect(
-        minterRole.connect(minter).addMinter(minter2.address),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).addMinter(minter2.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
     });
 
     it('should add multiple minter accounts', async () => {
@@ -48,9 +47,9 @@ describe('MinterRole', () => {
     });
 
     it('revert adding multiple minter accounts by non-owner account', async () => {
-      await expect(
-        minterRole.connect(minter).addMinters([minter2.address, minter3.address]),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).addMinters([minter2.address, minter3.address])).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
     });
 
     it('should remove minter account', async () => {
@@ -60,9 +59,9 @@ describe('MinterRole', () => {
     });
 
     it('revert remove minter account by non-owner account', async () => {
-      await expect(
-        minterRole.connect(minter).removeMinter(minter.address),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).removeMinter(minter.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
     });
 
     it('should remove multiple minter accounts', async () => {
@@ -72,9 +71,9 @@ describe('MinterRole', () => {
     });
 
     it('revert removing multiple minter accounts by non-owner account', async () => {
-      await expect(
-        minterRole.connect(minter).removeMinters([minter.address]),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).removeMinters([minter.address])).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
     });
   });
 
@@ -96,41 +95,41 @@ describe('MinterRole', () => {
     it('revert managing minters when ownership transferred', async () => {
       await minterRole.connect(coinbase).transferOwnership(receiver.address);
 
-      await expect(
-        minterRole.connect(minter).addMinter(minter2.address),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).addMinter(minter2.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
 
-      await expect(
-        minterRole.connect(minter).addMinters([minter2.address]),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).addMinters([minter2.address])).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
 
-      await expect(
-        minterRole.connect(minter).removeMinter(minter.address),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).removeMinter(minter.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
 
-      await expect(
-        minterRole.connect(minter).removeMinters([minter.address]),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).removeMinters([minter.address])).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
     });
 
     it('revert adding minter when ownership renounced', async () => {
       await minterRole.connect(coinbase).renounceOwnership();
 
-      await expect(
-        minterRole.connect(minter).addMinter(minter2.address),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).addMinter(minter2.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
 
-      await expect(
-        minterRole.connect(minter).addMinters([minter2.address]),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).addMinters([minter2.address])).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
 
-      await expect(
-        minterRole.connect(minter).removeMinter(minter.address),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).removeMinter(minter.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
 
-      await expect(
-        minterRole.connect(minter).removeMinters([minter.address]),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(minterRole.connect(minter).removeMinters([minter.address])).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
     });
   });
 
@@ -140,9 +139,7 @@ describe('MinterRole', () => {
 
       expect(await minterRole.isMinter(minter.address)).to.be.equal(false);
 
-      await expect(
-        minterRole.connect(minter).olnyMinterFunc(),
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+      await expect(minterRole.connect(minter).olnyMinterFunc()).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
     });
 
     it('should renounce minter account 2', async () => {
@@ -152,9 +149,9 @@ describe('MinterRole', () => {
 
       expect(await minterRole.isMinter(coinbase.address)).to.be.equal(false);
 
-      await expect(
-        minterRole.connect(coinbase).olnyMinterFunc(),
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+      await expect(minterRole.connect(coinbase).olnyMinterFunc()).to.be.revertedWith(
+        'MinterRole: CALLER_IS_NOT_MINTER',
+      );
     });
 
     it('should renounce minter account 3', async () => {
@@ -164,98 +161,86 @@ describe('MinterRole', () => {
 
       expect(await minterRole.isMinter(faucet.address)).to.be.equal(false);
 
-      await expect(
-        minterRole.connect(faucet).olnyMinterFunc(),
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+      await expect(minterRole.connect(faucet).olnyMinterFunc()).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
     });
   });
 
   describe('close minter account', () => {
     it('revert when closing by non-minter account', async () => {
-      await expect(
-        minterRole.connect(receiver).closeMinter(receiver.address),
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+      await expect(minterRole.connect(receiver).closeMinter(receiver.address)).to.be.revertedWith(
+        'MinterRole: CALLER_IS_NOT_MINTER',
+      );
     });
 
     it('revert when zero account', async () => {
-      await expect(
-        minterRole.connect(minter).closeMinter(ZERO_ADDRESS),
-      ).to.be.revertedWith('MinterRole: RECEIVER_IS_EMPTY');
+      await expect(minterRole.connect(minter).closeMinter(ZERO_ADDRESS)).to.be.revertedWith(
+        'MinterRole: RECEIVER_IS_EMPTY',
+      );
     });
 
     it('close minter without forwarding funds', async () => {
-      const initBalance = await faucet.getBalance();
+      const initBalance = await ethers.provider.getBalance(faucet.address);
       await minterRole.connect(minter).closeMinter(faucet.address, { value: 0 });
 
-      await expect(
-        minterRole.olnyMinterFunc(),
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+      await expect(minterRole.olnyMinterFunc()).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
 
-      expect(await faucet.getBalance()).to.be.equal(initBalance);
+      expect(await ethers.provider.getBalance(faucet.address)).to.be.equal(initBalance);
     });
 
     it('close minter with forwarding funds', async () => {
-      const value = 1;
-      const initBalance = await faucet.getBalance();
+      const value = BigInt(1);
+      const initBalance = await ethers.provider.getBalance(faucet.address);
 
       await minterRole.connect(minter).closeMinter(faucet.address, { value });
 
-      await expect(
-        minterRole.olnyMinterFunc(),
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+      await expect(minterRole.olnyMinterFunc()).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
 
-      expect(await faucet.getBalance()).to.be.equal(BigNumber.from(initBalance).add(value));
+      expect(await ethers.provider.getBalance(faucet.address)).to.be.equal(initBalance + value);
     });
   });
 
   describe('rotate minter account', () => {
     it('revert when rotateing by non-minter account', async () => {
-      await expect(
-        minterRole.connect(receiver).rotateMinter(receiver.address),
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+      await expect(minterRole.connect(receiver).rotateMinter(receiver.address)).to.be.revertedWith(
+        'MinterRole: CALLER_IS_NOT_MINTER',
+      );
     });
 
     it('revert when zero account', async () => {
-      await expect(
-        minterRole.connect(minter).rotateMinter(ZERO_ADDRESS),
-      ).to.be.revertedWith('MinterRole: RECEIVER_IS_EMPTY');
+      await expect(minterRole.connect(minter).rotateMinter(ZERO_ADDRESS)).to.be.revertedWith(
+        'MinterRole: RECEIVER_IS_EMPTY',
+      );
     });
 
     it('rotate minter without defining value', async () => {
-      const initBalance = await receiver.getBalance();
+      const initBalance = await ethers.provider.getBalance(receiver.address);
 
       await minterRole.connect(minter).rotateMinter(receiver.address);
 
-      await expect(
-        minterRole.olnyMinterFunc(),
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+      await expect(minterRole.olnyMinterFunc()).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
 
-      expect(await receiver.getBalance()).to.be.equal(initBalance);
+      expect(await ethers.provider.getBalance(receiver.address)).to.be.equal(initBalance);
     });
 
     it('rotate minter without forwarding funds', async () => {
-      const initBalance = await receiver.getBalance();
+      const initBalance = await ethers.provider.getBalance(receiver.address);
 
       await minterRole.connect(minter).rotateMinter(receiver.address, { value: 0 });
 
-      await expect(
-        minterRole.olnyMinterFunc(),
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+      await expect(minterRole.olnyMinterFunc()).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
 
-      expect(await receiver.getBalance()).to.be.equal(initBalance);
+      expect(await ethers.provider.getBalance(receiver.address)).to.be.equal(initBalance);
     });
 
     it('rotate minter with forwarding funds', async () => {
-      const value = 3;
-      const initBalance = await receiver.getBalance();
+      const value = BigInt(3);
+      const initBalance = await ethers.provider.getBalance(receiver.address);
 
       await minterRole.connect(minter).rotateMinter(receiver.address, { value });
 
-      await expect(
-        minterRole.olnyMinterFunc(),
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+      await expect(minterRole.olnyMinterFunc()).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
 
-      expect(await receiver.getBalance()).to.be.equal(BigNumber.from(initBalance).add(value));
+      expect(await ethers.provider.getBalance(receiver.address)).to.be.equal(initBalance + value);
     });
   });
 });

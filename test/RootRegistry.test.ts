@@ -1,9 +1,8 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { BigNumber, utils } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { AbiCoder, hexlify, keccak256 } from 'ethers';
 import { MintingManager, UNSRegistry } from '../types/contracts';
-
 import { MintingManager__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { CNSRegistry__factory, Resolver__factory } from '../types/factories/dot-crypto/contracts';
 import {
@@ -26,6 +25,7 @@ import { SimpleCheckpointManager } from '../types/contracts/@maticnetwork/pos-po
 import { buildPredicateExitInput, writeCheckpoint, buildExitInput } from './helpers/polygon';
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { getLatestBlockTimestamp } from './helpers/utils';
 
 describe('RootRegistry', () => {
   let l1UnsRegistry: UNSRegistry, l2UnsRegistry: UNSRegistry, mintingManager: MintingManager, cnsRegistry: CNSRegistry;
@@ -47,7 +47,7 @@ describe('RootRegistry', () => {
 
   let buildExecuteCnsParams: ExecuteFunc, buildExecuteUnsParams: ExecuteFunc;
 
-  const abiCoder = new utils.AbiCoder();
+  const abiCoder = new AbiCoder();
 
   const mintDomainL1 = async (owner: string, labels: string[]) => {
     await mintingManager.issueWithRecords(owner, labels, [], [], true);
@@ -65,22 +65,27 @@ describe('RootRegistry', () => {
     l1UnsRegistry = await new UNSRegistry__factory(registryOwner).connect(registryOwner).deploy();
 
     cnsRegistry = await new CNSRegistry__factory(registryOwner).deploy();
-    mintingController = await new MintingController__factory(registryOwner).deploy(cnsRegistry.address);
-    await cnsRegistry.addController(mintingController.address);
+    mintingController = await new MintingController__factory(registryOwner).deploy(await cnsRegistry.getAddress());
+    await cnsRegistry.addController(await mintingController.getAddress());
 
-    signatureController = await new SignatureController__factory(registryOwner).deploy(cnsRegistry.address);
-    await cnsRegistry.addController(signatureController.address);
-    cnsForwarder = await new CNSRegistryForwarder__factory(registryOwner).deploy(signatureController.address);
+    signatureController = await new SignatureController__factory(registryOwner).deploy(await cnsRegistry.getAddress());
+    await cnsRegistry.addController(await signatureController.getAddress());
+    cnsForwarder = await new CNSRegistryForwarder__factory(registryOwner).deploy(
+      await signatureController.getAddress(),
+    );
 
-    resolver = await new Resolver__factory(registryOwner).deploy(cnsRegistry.address, mintingController.address);
+    resolver = await new Resolver__factory(registryOwner).deploy(
+      await cnsRegistry.getAddress(),
+      await mintingController.getAddress(),
+    );
 
-    uriPrefixController = await new URIPrefixController__factory(registryOwner).deploy(cnsRegistry.address);
-    await cnsRegistry.addController(uriPrefixController.address);
+    uriPrefixController = await new URIPrefixController__factory(registryOwner).deploy(await cnsRegistry.getAddress());
+    await cnsRegistry.addController(await uriPrefixController.getAddress());
 
     mintingManager = await new MintingManager__factory(registryOwner).deploy();
 
-    await mintingController.addMinter(mintingManager.address);
-    await uriPrefixController.addWhitelisted(mintingManager.address);
+    await mintingController.addMinter(await mintingManager.getAddress());
+    await uriPrefixController.addWhitelisted(await mintingManager.getAddress());
 
     l2UnsRegistry = await new UNSRegistry__factory(registryOwner).connect(registryOwner).deploy();
 
@@ -92,40 +97,54 @@ describe('RootRegistry', () => {
 
     // deploy and init predicate
     predicate = await new MintableERC721Predicate__factory(predicateOwner).connect(predicateOwner).deploy();
-    await predicate.initialize(predicateOwner.address);
+    await predicate.initialize(await predicateOwner.getAddress());
 
     // deploy and setup root chain manager
     rootChainManager = await new RootChainManager__factory(rcmOwner).connect(rcmOwner).deploy();
     await rootChainManager.initialize(rcmOwner.address);
-    await rootChainManager.setCheckpointManager(checkpointManager.address);
-    await rootChainManager.setStateSender(stateSender.address);
-    await rootChainManager.registerPredicate(utils.keccak256(l1UnsRegistry.address), predicate.address);
+    await rootChainManager.setCheckpointManager(await checkpointManager.getAddress());
+    await rootChainManager.setStateSender(await stateSender.getAddress());
+    await rootChainManager.registerPredicate(keccak256(await l1UnsRegistry.getAddress()), await predicate.getAddress());
     await rootChainManager.mapToken(
-      l1UnsRegistry.address,
-      l2UnsRegistry.address,
-      utils.keccak256(l1UnsRegistry.address),
+      await l1UnsRegistry.getAddress(),
+      await l2UnsRegistry.getAddress(),
+      keccak256(await l1UnsRegistry.getAddress()),
     );
-    await predicate.grantRole(await predicate.MANAGER_ROLE(), rootChainManager.address);
+    await predicate.grantRole(await predicate.MANAGER_ROLE(), await rootChainManager.getAddress());
 
     // post-configuration
-    await l1UnsRegistry.initialize(mintingManager.address, cnsRegistry.address, rootChainManager.address, ZERO_ADDRESS);
+    await l1UnsRegistry.initialize(
+      await mintingManager.getAddress(),
+      await cnsRegistry.getAddress(),
+      await rootChainManager.getAddress(),
+      ZERO_ADDRESS,
+    );
 
-    await l2UnsRegistry.initialize(registryOwner.address, ZERO_ADDRESS, ZERO_ADDRESS, registryOwner.address);
+    await l2UnsRegistry.initialize(
+      await registryOwner.getAddress(),
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+      await registryOwner.getAddress(),
+    );
     await l2UnsRegistry.mintTLD(TLD.WALLET, 'wallet');
 
     await mintingManager.initialize(
-      l1UnsRegistry.address,
-      mintingController.address,
-      uriPrefixController.address,
-      resolver.address,
+      await l1UnsRegistry.getAddress(),
+      await mintingController.getAddress(),
+      await uriPrefixController.getAddress(),
+      await resolver.getAddress(),
       ZERO_ADDRESS,
       ZERO_ADDRESS,
     );
     await mintingManager.addMinter(registryOwner.address);
     await mintingManager.setTokenURIPrefix('https://metadata.unstoppabledomains.ooo/metadata/');
 
-    buildExecuteCnsParams = buildExecuteFunc(cnsRegistry.interface, signatureController.address, cnsForwarder);
-    buildExecuteUnsParams = buildExecuteFunc(l1UnsRegistry.interface, l1UnsRegistry.address, l1UnsRegistry);
+    buildExecuteCnsParams = buildExecuteFunc(
+      cnsRegistry.interface,
+      await signatureController.getAddress(),
+      cnsForwarder,
+    );
+    buildExecuteUnsParams = buildExecuteFunc(l1UnsRegistry.interface, await l1UnsRegistry.getAddress(), l1UnsRegistry);
   });
 
   describe('Deposit', () => {
@@ -135,9 +154,9 @@ describe('RootRegistry', () => {
 
         await expect(l1UnsRegistry.connect(owner).depositToPolygon(tokenId))
           .to.emit(predicate, 'LockedMintableERC721')
-          .withArgs(l1UnsRegistry.address, owner.address, l1UnsRegistry.address, tokenId);
+          .withArgs(await l1UnsRegistry.getAddress(), owner.address, await l1UnsRegistry.getAddress(), tokenId);
 
-        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
+        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(await predicate.getAddress());
       });
 
       it('should meta-deposit token through UNS registry', async () => {
@@ -146,9 +165,9 @@ describe('RootRegistry', () => {
         const { req, signature } = await buildExecuteUnsParams('depositToPolygon(uint256)', [tokenId], owner, tokenId);
         await expect(l1UnsRegistry.execute(req, signature))
           .to.emit(predicate, 'LockedMintableERC721')
-          .withArgs(l1UnsRegistry.address, owner.address, l1UnsRegistry.address, tokenId);
+          .withArgs(await l1UnsRegistry.getAddress(), owner.address, await l1UnsRegistry.getAddress(), tokenId);
 
-        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
+        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(await predicate.getAddress());
       });
 
       it('should deposit CNS domains through MintingManager', async () => {
@@ -159,14 +178,14 @@ describe('RootRegistry', () => {
           .connect(owner)
           ['safeTransferFrom(address,address,uint256,bytes)'](
             owner.address,
-            l1UnsRegistry.address,
+            await l1UnsRegistry.getAddress(),
             tokenId,
             abiCoder.encode(['bool'], [true]),
           );
 
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
         expect(await l1UnsRegistry.exists(tokenId)).to.be.equal(true);
-        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
+        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(await predicate.getAddress());
       });
 
       it('should mate-deposit CNS domains through MintingManager', async () => {
@@ -175,7 +194,7 @@ describe('RootRegistry', () => {
 
         const { req, signature } = await buildExecuteCnsParams(
           'safeTransferFrom(address,address,uint256,bytes)',
-          [owner.address, l1UnsRegistry.address, tokenId, abiCoder.encode(['bool'], [true])],
+          [owner.address, await l1UnsRegistry.getAddress(), tokenId, abiCoder.encode(['bool'], [true])],
           owner,
           tokenId,
         );
@@ -184,7 +203,7 @@ describe('RootRegistry', () => {
 
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
         expect(await l1UnsRegistry.exists(tokenId)).to.be.equal(true);
-        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
+        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(await predicate.getAddress());
       });
 
       it('should mate-deposit(legacy) CNS domains through MintingManager', async () => {
@@ -194,20 +213,26 @@ describe('RootRegistry', () => {
 
         const data = cnsRegistry.interface.encodeFunctionData('safeTransferFrom(address,address,uint256,bytes)', [
           owner.address,
-          l1UnsRegistry.address,
+          await l1UnsRegistry.getAddress(),
           tokenId,
           abiCoder.encode(['bool'], [true]),
         ]);
         const nonce = await signatureController.nonceOf(tokenId);
-        const signature = await sign(data, signatureController.address, nonce, owner);
+        const signature = await sign(data, await signatureController.getAddress(), nonce, owner);
 
         await signatureController
           .connect(spender)
-          [funcSig](owner.address, l1UnsRegistry.address, tokenId, abiCoder.encode(['bool'], [true]), signature);
+          [funcSig](
+            owner.address,
+            await l1UnsRegistry.getAddress(),
+            tokenId,
+            abiCoder.encode(['bool'], [true]),
+            signature,
+          );
 
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
         expect(await l1UnsRegistry.exists(tokenId)).to.be.equal(true);
-        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
+        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(await predicate.getAddress());
       });
     });
 
@@ -215,14 +240,14 @@ describe('RootRegistry', () => {
       it('should deposit token', async () => {
         const tokenId = await mintDomainL1(owner.address, ['poly-2d-aq1', 'wallet']);
 
-        await l1UnsRegistry.connect(owner).approve(predicate.address, tokenId);
+        await l1UnsRegistry.connect(owner).approve(await predicate.getAddress(), tokenId);
 
-        const data = utils.defaultAbiCoder.encode(['uint256'], [tokenId]);
-        await expect(rootChainManager.connect(owner).depositFor(owner.address, l1UnsRegistry.address, data))
+        const data = new AbiCoder().encode(['uint256'], [tokenId]);
+        await expect(rootChainManager.connect(owner).depositFor(owner.address, await l1UnsRegistry.getAddress(), data))
           .to.emit(predicate, 'LockedMintableERC721')
-          .withArgs(owner.address, owner.address, l1UnsRegistry.address, tokenId);
+          .withArgs(owner.address, owner.address, await l1UnsRegistry.getAddress(), tokenId);
 
-        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
+        expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(await predicate.getAddress());
       });
     });
 
@@ -233,7 +258,7 @@ describe('RootRegistry', () => {
 
         await cnsRegistry
           .connect(owner)
-          ['safeTransferFrom(address,address,uint256)'](owner.address, l1UnsRegistry.address, tokenId);
+          ['safeTransferFrom(address,address,uint256)'](owner.address, await l1UnsRegistry.getAddress(), tokenId);
 
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
         expect(await l1UnsRegistry.exists(tokenId)).to.be.equal(true);
@@ -247,13 +272,15 @@ describe('RootRegistry', () => {
 
         const data = cnsRegistry.interface.encodeFunctionData('safeTransferFrom(address,address,uint256)', [
           owner.address,
-          l1UnsRegistry.address,
+          await l1UnsRegistry.getAddress(),
           tokenId,
         ]);
         const nonce = await signatureController.nonceOf(tokenId);
-        const signature = await sign(data, signatureController.address, nonce, owner);
+        const signature = await sign(data, await signatureController.getAddress(), nonce, owner);
 
-        await signatureController.connect(spender)[funcSig](owner.address, l1UnsRegistry.address, tokenId, signature);
+        await signatureController
+          .connect(spender)
+          [funcSig](owner.address, await l1UnsRegistry.getAddress(), tokenId, signature);
 
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
         expect(await l1UnsRegistry.exists(tokenId)).to.be.equal(true);
@@ -268,7 +295,7 @@ describe('RootRegistry', () => {
           .connect(owner)
           ['safeTransferFrom(address,address,uint256,bytes)'](
             owner.address,
-            l1UnsRegistry.address,
+            await l1UnsRegistry.getAddress(),
             tokenId,
             abiCoder.encode(['bool'], [false]),
           );
@@ -285,16 +312,22 @@ describe('RootRegistry', () => {
 
         const data = cnsRegistry.interface.encodeFunctionData('safeTransferFrom(address,address,uint256,bytes)', [
           owner.address,
-          l1UnsRegistry.address,
+          await l1UnsRegistry.getAddress(),
           tokenId,
           abiCoder.encode(['bool'], [false]),
         ]);
         const nonce = await signatureController.nonceOf(tokenId);
-        const signature = await sign(data, signatureController.address, nonce, owner);
+        const signature = await sign(data, await signatureController.getAddress(), nonce, owner);
 
         await signatureController
           .connect(spender)
-          [funcSig](owner.address, l1UnsRegistry.address, tokenId, abiCoder.encode(['bool'], [false]), signature);
+          [funcSig](
+            owner.address,
+            await l1UnsRegistry.getAddress(),
+            tokenId,
+            abiCoder.encode(['bool'], [false]),
+            signature,
+          );
 
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
         expect(await l1UnsRegistry.exists(tokenId)).to.be.equal(true);
@@ -309,7 +342,7 @@ describe('RootRegistry', () => {
         await expect(
           randomERC721
             .connect(owner)
-            ['safeTransferFrom(address,address,uint256)'](owner.address, l1UnsRegistry.address, tokenId),
+            ['safeTransferFrom(address,address,uint256)'](owner.address, await l1UnsRegistry.getAddress(), tokenId),
         ).to.be.revertedWith('Registry: ERC721_RECEIVING_PROHIBITED');
       });
     });
@@ -319,10 +352,10 @@ describe('RootRegistry', () => {
     it('should withdraw a domain', async () => {
       const tokenId = await mintDomainL1(owner.address, ['poly-1w-as1', 'wallet']);
       await l1UnsRegistry.connect(owner).depositToPolygon(tokenId);
-      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(predicate.address);
+      expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(await predicate.getAddress());
 
       const inputData = buildPredicateExitInput(owner.address, ZERO_ADDRESS, tokenId);
-      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, inputData);
+      await predicate.exitTokens(ZERO_ADDRESS, await l1UnsRegistry.getAddress(), inputData);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
     });
@@ -332,7 +365,7 @@ describe('RootRegistry', () => {
       await expect(l1UnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: invalid token ID');
 
       const inputData = buildPredicateExitInput(owner.address, ZERO_ADDRESS, tokenId);
-      await predicate.exitTokens(ZERO_ADDRESS, l1UnsRegistry.address, inputData);
+      await predicate.exitTokens(ZERO_ADDRESS, await l1UnsRegistry.getAddress(), inputData);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
     });
@@ -362,7 +395,7 @@ describe('RootRegistry', () => {
           0,
           checkpointData.number,
           checkpointData.number,
-          utils.hexlify(checkpointData.header.root),
+          hexlify(checkpointData.header.root),
         );
     };
 
@@ -375,7 +408,7 @@ describe('RootRegistry', () => {
       const { setCheckPointTx, checkpointData } = await writeCheckpoint(checkpointManager, rcmOwner, txn);
       await expectNewHeaderBlockEventEmitted(setCheckPointTx, checkpointData);
 
-      const data = await buildExitInput(checkpointManager, receipt, checkpointData);
+      const data = await buildExitInput(checkpointManager, receipt!, checkpointData);
       await rootChainManager.exit(data);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
@@ -390,7 +423,7 @@ describe('RootRegistry', () => {
       const { setCheckPointTx, checkpointData } = await writeCheckpoint(checkpointManager, rcmOwner, txn);
       await expectNewHeaderBlockEventEmitted(setCheckPointTx, checkpointData);
 
-      const data = await buildExitInput(checkpointManager, receipt, checkpointData);
+      const data = await buildExitInput(checkpointManager, receipt!, checkpointData);
       await l1UnsRegistry.connect(owner).withdrawFromPolygon(data, tokenId, [], []);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
@@ -405,7 +438,7 @@ describe('RootRegistry', () => {
       const { setCheckPointTx, checkpointData } = await writeCheckpoint(checkpointManager, rcmOwner, txn);
       await expectNewHeaderBlockEventEmitted(setCheckPointTx, checkpointData);
 
-      const data = await buildExitInput(checkpointManager, receipt, checkpointData);
+      const data = await buildExitInput(checkpointManager, receipt!, checkpointData);
       await l1UnsRegistry.connect(owner).withdrawFromPolygon(data, tokenId, ['k1'], ['v1']);
 
       expect(await l1UnsRegistry.ownerOf(tokenId)).to.be.equal(owner.address);
@@ -421,7 +454,7 @@ describe('RootRegistry', () => {
       const { setCheckPointTx, checkpointData } = await writeCheckpoint(checkpointManager, rcmOwner, txn);
       await expectNewHeaderBlockEventEmitted(setCheckPointTx, checkpointData);
 
-      const data = await buildExitInput(checkpointManager, receipt, checkpointData);
+      const data = await buildExitInput(checkpointManager, receipt!, checkpointData);
       const { req, signature } = await buildExecuteUnsParams(
         'withdrawFromPolygon(bytes,uint256,string[],string[])',
         [data, tokenId, ['k2'], ['v2']],
@@ -436,48 +469,35 @@ describe('RootRegistry', () => {
   });
 
   describe('Expirable tokens transfers', async () => {
-    let tokenId: BigNumber;
+    let tokenId: bigint;
 
     before(async () => {
-      const { timestamp } = await ethers.provider.getBlock('latest');
+      const timestamp = await getLatestBlockTimestamp();
       const labels = ['expirable-predicate-test', 'com'];
 
-      await mintingManager.issueExpirableWithRecords(
-        owner.address,
-        labels,
-        [],
-        [],
-        timestamp + 60 * 60 * 24,
-        true,
-      );
+      await mintingManager.issueExpirableWithRecords(owner.address, labels, [], [], timestamp + 60 * 60 * 24, true);
 
       tokenId = await l1UnsRegistry.namehash(labels);
     });
 
     it('should revert setOwner to predicate', async () => {
-      await expect(
-        l1UnsRegistry.connect(owner).setOwner(predicate.address, tokenId),
-      ).to.be.revertedWith(
+      await expect(l1UnsRegistry.connect(owner).setOwner(await predicate.getAddress(), tokenId)).to.be.revertedWith(
         'Registry: TOKEN_EXPIRABLE',
       );
     });
 
     it('should revert transferFrom to predicate', async () => {
       await expect(
-        l1UnsRegistry.connect(owner).transferFrom(owner.address, predicate.address, tokenId),
-      ).to.be.revertedWith(
-        'Registry: TOKEN_EXPIRABLE',
-      );
+        l1UnsRegistry.connect(owner).transferFrom(owner.address, await predicate.getAddress(), tokenId),
+      ).to.be.revertedWith('Registry: TOKEN_EXPIRABLE');
     });
 
     it('should revert safeTransferFrom to predicate', async () => {
       const selector = 'safeTransferFrom(address,address,uint256)';
 
       await expect(
-        l1UnsRegistry.connect(owner)[selector](owner.address, predicate.address, tokenId),
-      ).to.be.revertedWith(
-        'Registry: TOKEN_EXPIRABLE',
-      );
+        l1UnsRegistry.connect(owner)[selector](owner.address, await predicate.getAddress(), tokenId),
+      ).to.be.revertedWith('Registry: TOKEN_EXPIRABLE');
     });
 
     it('should revert safeTransferFrom to predicate', async () => {
@@ -485,22 +505,16 @@ describe('RootRegistry', () => {
       const selectorWithBytes = 'safeTransferFrom(address,address,uint256,bytes)';
 
       await expect(
-        l1UnsRegistry.connect(owner)[selector](owner.address, predicate.address, tokenId),
-      ).to.be.revertedWith(
-        'Registry: TOKEN_EXPIRABLE',
-      );
+        l1UnsRegistry.connect(owner)[selector](owner.address, await predicate.getAddress(), tokenId),
+      ).to.be.revertedWith('Registry: TOKEN_EXPIRABLE');
 
       await expect(
-        l1UnsRegistry.connect(owner)[selectorWithBytes](owner.address, predicate.address, tokenId, '0x'),
-      ).to.be.revertedWith(
-        'Registry: TOKEN_EXPIRABLE',
-      );
+        l1UnsRegistry.connect(owner)[selectorWithBytes](owner.address, await predicate.getAddress(), tokenId, '0x'),
+      ).to.be.revertedWith('Registry: TOKEN_EXPIRABLE');
     });
 
     it('should revert depositToPolygon', async () => {
-      await expect(
-        l1UnsRegistry.connect(owner).depositToPolygon(tokenId),
-      ).to.be.revertedWith(
+      await expect(l1UnsRegistry.connect(owner).depositToPolygon(tokenId)).to.be.revertedWith(
         'Registry: TOKEN_EXPIRABLE',
       );
     });

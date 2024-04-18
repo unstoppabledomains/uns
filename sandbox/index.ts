@@ -7,8 +7,8 @@ import secp256k1 from 'secp256k1';
 import createKeccakHash from 'keccak';
 import debug from 'debug';
 import { EthereumProvider } from 'ganache';
-import { HttpNetworkUserConfig } from 'hardhat/types';
-import { unwrap } from '../src/helpers';
+import type { HttpNetworkUserConfig } from 'hardhat/types';
+import { unwrap } from '../src/utils';
 import { GanacheService } from './ganache-service';
 
 const log = debug('UNS:sandbox');

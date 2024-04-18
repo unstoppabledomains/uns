@@ -82,11 +82,7 @@ interface IMintingManager is IERC1967 {
      * @param tld id of parent token
      * @param label SLD label to mint
      */
-    function claimTo(
-        address to,
-        uint256 tld,
-        string calldata label
-    ) external;
+    function claimTo(address to, uint256 tld, string calldata label) external;
 
     /**
      * @dev Claims free domain. The fuction adds prefix to label.
@@ -94,13 +90,7 @@ interface IMintingManager is IERC1967 {
      * @param tld id of parent token
      * @param label SLD label to mint
      */
-    function claimToWithRecords(
-        address to,
-        uint256 tld,
-        string calldata label,
-        string[] calldata keys,
-        string[] calldata values
-    ) external;
+    function claimToWithRecords(address to, uint256 tld, string calldata label, string[] calldata keys, string[] calldata values) external;
 
     /**
      * @dev Purchases a SLD using native token.

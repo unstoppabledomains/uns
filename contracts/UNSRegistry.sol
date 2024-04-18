@@ -208,12 +208,7 @@ contract UNSRegistry is
     // This is the keccak-256 hash of "uns.cns_registry" subtracted by 1
     bytes32 internal constant _CNS_REGISTRY_SLOT = 0x8ffb960699dc2ba88f34d0e41c029c3c36c95149679fe1d0153a9582bec92378;
 
-    function onERC721Received(
-        address,
-        address from,
-        uint256 tokenId,
-        bytes calldata data
-    ) external override returns (bytes4) {
+    function onERC721Received(address, address from, uint256 tokenId, bytes calldata data) external override returns (bytes4) {
         if (_msgSender() == StorageSlotUpgradeable.getAddressSlot(_CNS_REGISTRY_SLOT).value) {
             ICNSRegistry(_msgSender()).burn(tokenId);
             if (data.length > 0 && abi.decode(data, (bool))) {
@@ -323,11 +318,7 @@ contract UNSRegistry is
     /**
      * @dev See {RootRegistry-mint(address,uint256,bytes)}.
      */
-    function mint(
-        address user,
-        uint256 tokenId,
-        bytes calldata
-    ) external override onlyPredicate {
+    function mint(address user, uint256 tokenId, bytes calldata) external override onlyPredicate {
         _mint(user, tokenId);
     }
 
@@ -415,12 +406,7 @@ contract UNSRegistry is
         return uint256(keccak256(abi.encodePacked(tokenId, keccak256(abi.encodePacked(label)))));
     }
 
-    function _mint(
-        address to,
-        uint256 tokenId,
-        string memory uri,
-        bool withReverse
-    ) internal {
+    function _mint(address to, uint256 tokenId, string memory uri, bool withReverse) internal {
         _mint(to, tokenId);
         emit NewURI(tokenId, uri);
 
@@ -442,11 +428,7 @@ contract UNSRegistry is
         return super._msgData();
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override {
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
         super._beforeTokenTransfer(from, to, tokenId);
 
         if (to == address(0)) {
@@ -463,11 +445,7 @@ contract UNSRegistry is
         }
     }
 
-    function _setReverse(
-        address addr,
-        uint256 tokenId,
-        string memory uri
-    ) internal {
+    function _setReverse(address addr, uint256 tokenId, string memory uri) internal {
         if (bytes(_tokenNames[tokenId]).length == 0) {
             _tokenNames[tokenId] = uri;
         }
@@ -475,11 +453,7 @@ contract UNSRegistry is
         emit SetReverse(addr, tokenId);
     }
 
-    function _safeSetReverse(
-        address addr,
-        uint256 tokenId,
-        string memory uri
-    ) internal {
+    function _safeSetReverse(address addr, uint256 tokenId, string memory uri) internal {
         if (address(0xdead) != addr && _reverses[addr] == 0) {
             _setReverse(addr, tokenId, uri);
         }

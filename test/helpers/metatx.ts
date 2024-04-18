@@ -1,5 +1,5 @@
-import { utils, Contract, BigNumberish, BigNumber, Signer } from 'ethers';
-import { Interface } from '@ethersproject/abi/';
+import { Contract, BigNumberish, Signer, Interface, solidityPackedKeccak256, keccak256, getBytes } from 'ethers';
+import type { BaseRoutingForwarderMock, MintingManagerForwarder, UNSRegistry } from '../../types';
 
 export async function sign (
   data: string,
@@ -8,7 +8,7 @@ export async function sign (
   signer: ISignerWithAddress,
 ): Promise<string> {
   return signer.signMessage(
-    utils.arrayify(utils.solidityKeccak256(['bytes32', 'address', 'uint256'], [utils.keccak256(data), address, nonce])),
+    getBytes(solidityPackedKeccak256(['bytes32', 'address', 'uint256'], [keccak256(data), address, nonce])),
   );
 }
 
@@ -17,7 +17,7 @@ export type ExecuteFunc = (
   params: unknown[],
   from: ISignerWithAddress,
   tokenId: BigNumberish,
-  nonce?: BigNumber,
+  nonce?: bigint,
 ) => Promise<{
   req: {
     from: string;
@@ -30,13 +30,17 @@ export type ExecuteFunc = (
 
 type ISignerWithAddress = Signer & {address: string};
 
-export function buildExecuteFunc (iface: Interface, toAddress: string, forwarder: Contract): ExecuteFunc {
+export function buildExecuteFunc (
+  iface: Interface,
+  toAddress: string,
+  forwarder: Contract | MintingManagerForwarder | UNSRegistry | BaseRoutingForwarderMock,
+): ExecuteFunc {
   return async (
     selector: string,
     params: unknown[],
     from: ISignerWithAddress,
     tokenId: BigNumberish,
-    nonce?: BigNumber,
+    nonce?: bigint,
   ) => {
     const data = iface.encodeFunctionData(selector, params);
 

@@ -178,12 +178,7 @@ contract ZilliqaRecover is ContextUpgradeable, ERC2771RegistryContext, Forwarder
         return address(uint160(uint256(hash)));
     }
 
-    function onERC721Received(
-        address,
-        address,
-        uint256 tokenId,
-        bytes calldata
-    ) external view returns (bytes4) {
+    function onERC721Received(address, address, uint256 tokenId, bytes calldata) external view returns (bytes4) {
         if (_msgSender() != address(registry) || znsOwnerOf(tokenId) == address(0x00)) {
             revert UnknownTokenReceived(tokenId, _msgSender());
         }
@@ -203,11 +198,7 @@ contract ZilliqaRecover is ContextUpgradeable, ERC2771RegistryContext, Forwarder
         return super._msgData();
     }
 
-    function _claim(
-        uint256 tokenId,
-        address _zilAddress,
-        address newOwnerAddress
-    ) private {
+    function _claim(uint256 tokenId, address _zilAddress, address newOwnerAddress) private {
         if (znsOwnerOf(tokenId) != _zilAddress) {
             revert TokenOwnedByOtherZilAddress(tokenId, znsOwnerOf(tokenId), _zilAddress);
         }

@@ -61,11 +61,7 @@ contract ENSCustody is
         _disableInitializers();
     }
 
-    function initialize(
-        address controller,
-        address wrapper,
-        address registrar
-    ) public initializer {
+    function initialize(address controller, address wrapper, address registrar) public initializer {
         StorageSlotUpgradeable.getAddressSlot(_ENS_CONTROLLER_SLOT).value = controller;
         StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value = wrapper;
         StorageSlotUpgradeable.getAddressSlot(_ENS_BASE_REGISTRAR_SLOT).value = registrar;
@@ -81,25 +77,16 @@ contract ENSCustody is
         StorageSlotUpgradeable.getAddressSlot(_ENS_BASE_REGISTRAR_SLOT).value = baseRegistrar;
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(AccessControlUpgradeable, IERC165Upgradeable)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(AccessControlUpgradeable, IERC165Upgradeable) returns (bool) {
         return
             interfaceId == type(IERC721ReceiverUpgradeable).interfaceId ||
             interfaceId == type(IERC1155ReceiverUpgradeable).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
-    function onERC721Received(
-        address,
-        address,
-        uint256 tokenId,
-        bytes calldata data
-    ) external returns (bytes4) {
+    function onERC721Received(address, address, uint256 tokenId, bytes calldata data) external returns (bytes4) {
         address registrar = StorageSlotUpgradeable.getAddressSlot(_ENS_BASE_REGISTRAR_SLOT).value;
 
         if (_msgSender() == registrar) {

@@ -1,6 +1,4 @@
-import { utils, BigNumber } from 'ethers';
-import { FunctionFragment } from 'ethers/lib/utils';
-import { ProxyReader } from '../../types/contracts';
+import { keccak256, FunctionFragment, solidityPacked, toBeHex, BaseContract } from 'ethers';
 
 export const getFuncSignature = (fragment: FunctionFragment): string => {
   return `${fragment.name}(${fragment.inputs
@@ -8,23 +6,23 @@ export const getFuncSignature = (fragment: FunctionFragment): string => {
     .join(',')})`;
 };
 
-export const getInterfaceId = (proxyReader: ProxyReader, functions: string[]): string => {
-  let interfaceId: BigNumber | undefined;
+export const getInterfaceId = (contract: BaseContract, functions: string[]): string => {
+  let interfaceId: bigint | undefined;
 
   for (const functionName of functions) {
-    const funcInterface = Object.values(proxyReader.interface.functions).find((x) => x.name === functionName);
+    const funcInterface = contract.interface.getFunction(functionName);
 
     if(!funcInterface) {
       throw new Error('getInterfaceId: could not find function with name ' + functionName);
     }
 
     const funcSignature = getFuncSignature(funcInterface);
-    const funcInterfaceId = utils.keccak256(utils.solidityPack(['string'], [funcSignature])).slice(0, 10);
+    const funcInterfaceId = keccak256(solidityPacked(['string'], [funcSignature])).slice(0, 10);
 
     if (interfaceId === undefined) {
-      interfaceId = BigNumber.from(funcInterfaceId);
+      interfaceId = BigInt(funcInterfaceId);
     } else {
-      interfaceId = interfaceId.xor(BigNumber.from(funcInterfaceId));
+      interfaceId = interfaceId ^ BigInt(funcInterfaceId);
     }
   }
 
@@ -32,5 +30,5 @@ export const getInterfaceId = (proxyReader: ProxyReader, functions: string[]): s
     throw new Error('getInterfaceId: could not get interfaceId. Probably no functions supplied?');
   }
 
-  return interfaceId.toHexString();
+  return toBeHex(interfaceId);
 };

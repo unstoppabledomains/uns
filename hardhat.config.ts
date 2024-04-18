@@ -34,14 +34,14 @@ declare module 'hardhat/types/config' {
 }
 
 import '@typechain/hardhat';
-import '@nomiclabs/hardhat-ethers';
-import '@nomiclabs/hardhat-waffle';
+import '@nomicfoundation/hardhat-ethers';
+import '@nomicfoundation/hardhat-verify';
+import '@nomicfoundation/hardhat-chai-matchers';
+
 import '@nomiclabs/hardhat-solhint';
-import '@nomiclabs/hardhat-etherscan';
 import 'hardhat-tracer';
 
 import '@openzeppelin/hardhat-upgrades';
-import '@openzeppelin/hardhat-defender';
 
 // There are no type declarations for
 import 'solidity-coverage';
@@ -161,7 +161,7 @@ const config: HardhatUserConfig = {
   },
   typechain: {
     outDir: 'types',
-    target: 'ethers-v5',
+    target: 'ethers-v6',
   },
   gasReporter: {
     enabled: argv.enableGasReport,

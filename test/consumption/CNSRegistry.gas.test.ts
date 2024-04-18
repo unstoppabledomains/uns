@@ -1,4 +1,4 @@
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
 import { CNSRegistryForwarder } from '../../types/contracts/metatx';
 import { CNSRegistry } from '../../types/dot-crypto/contracts';
@@ -32,15 +32,15 @@ describe('CNSRegistry (consumption)', () => {
     [owner, receiver, spender] = signers;
 
     registry = await new CNSRegistry__factory(owner).deploy();
-    mintingController = await new MintingController__factory(owner).deploy(registry.address);
-    signatureController = await new SignatureController__factory(owner).deploy(registry.address);
+    mintingController = await new MintingController__factory(owner).deploy(await registry.getAddress());
+    signatureController = await new SignatureController__factory(owner).deploy(await registry.getAddress());
 
-    await registry.addController(mintingController.address);
-    await registry.addController(signatureController.address);
+    await registry.addController(await mintingController.getAddress());
+    await registry.addController(await signatureController.getAddress());
 
-    forwarder = await new CNSRegistryForwarder__factory(owner).deploy(signatureController.address);
+    forwarder = await new CNSRegistryForwarder__factory(owner).deploy(await signatureController.getAddress());
 
-    buildExecuteParams = buildExecuteFunc(registry.interface, signatureController.address, forwarder);
+    buildExecuteParams = buildExecuteFunc(registry.interface, await signatureController.getAddress(), forwarder);
   });
 
   it('`transferFrom` consumption', async () => {
@@ -51,7 +51,7 @@ describe('CNSRegistry (consumption)', () => {
     const tokenId = await mintDomain(label, owner.address);
     const directTx = await registry.connect(owner).transferFrom(owner.address, receiver.address, tokenId);
 
-    const directTxReceipt = await directTx.wait();
+    const directTxReceipt = (await directTx.wait())!;
 
     // Old meta-tx
     const tokenIdFor = await mintDomain(label + 'for', owner.address);
@@ -61,12 +61,12 @@ describe('CNSRegistry (consumption)', () => {
       tokenIdFor,
     ]);
     const nonceFor = await signatureController.nonceOf(tokenIdFor);
-    const signatureFor = await sign(dataFor, signatureController.address, nonceFor, owner);
+    const signatureFor = await sign(dataFor, await signatureController.getAddress(), nonceFor, owner);
     const forTx = await signatureController
       .connect(spender)
       .transferFromFor(owner.address, receiver.address, tokenIdFor, signatureFor);
 
-    const forTxReceipt = await forTx.wait();
+    const forTxReceipt = (await forTx.wait())!;
 
     // Forwarder
     const tokenIdForward = await mintDomain(label + 'forward', owner.address);
@@ -78,15 +78,15 @@ describe('CNSRegistry (consumption)', () => {
     );
     const forwardTx = await forwarder.connect(spender).execute(req, signature);
 
-    const forwardTxReceipt = await forwardTx.wait();
+    const forwardTxReceipt = (await forwardTx.wait())!;
 
     result.push({
       selector: 'transferFrom(address,address,uint256)',
       directTx: directTxReceipt.gasUsed.toString(),
       forTx: forTxReceipt.gasUsed.toString(),
-      diff1: percDiff(directTxReceipt.gasUsed.toNumber(), forTxReceipt.gasUsed.toNumber()) + ' %',
+      diff1: percDiff(directTxReceipt.gasUsed, forTxReceipt.gasUsed) + ' %',
       forwardTx: forwardTxReceipt.gasUsed.toString(),
-      diff2: percDiff(forTxReceipt.gasUsed.toNumber(), forwardTxReceipt.gasUsed.toNumber()) + ' %',
+      diff2: percDiff(forTxReceipt.gasUsed, forwardTxReceipt.gasUsed) + ' %',
     });
     console.table(result);
   });

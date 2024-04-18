@@ -193,11 +193,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _issueWithRecords(_msgSender(), _buildLabels(tld, _freeSLDLabel(label)), empty, empty, 0, true);
     }
 
-    function claimTo(
-        address to,
-        uint256 tld,
-        string calldata label
-    ) external override onlyAllowedSLD(tld, label) whenNotPaused {
+    function claimTo(address to, uint256 tld, string calldata label) external override onlyAllowedSLD(tld, label) whenNotPaused {
         string[] memory empty;
         _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), empty, empty, 0, true);
     }
@@ -381,11 +377,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         _block(tokenId);
     }
 
-    function _ensureAllowed(
-        uint256 tld,
-        string memory label,
-        uint64 expiry
-    ) private view {
+    function _ensureAllowed(uint256 tld, string memory label, uint64 expiry) private view {
         require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
         require(_expirableTlds[tld] == (expiry > 0), 'MintingManager: TLD_EXPIRABLE_MISMATCH');
 

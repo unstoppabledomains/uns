@@ -1,6 +1,6 @@
 import * as crypto from 'crypto';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
@@ -10,9 +10,7 @@ import { mintDomain } from '../helpers/registry';
 describe('UNSRegistry Set Reverse (consumption)', () => {
   let unsRegistry: UNSRegistry;
 
-  let signers: SignerWithAddress[],
-    coinbase: SignerWithAddress,
-    owner: SignerWithAddress;
+  let signers: SignerWithAddress[], coinbase: SignerWithAddress, owner: SignerWithAddress;
   let buildExecuteParams: ExecuteFunc;
 
   before(async () => {
@@ -26,11 +24,7 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.mintTLD(TLD.X, 'x');
 
-    buildExecuteParams = buildExecuteFunc(
-      unsRegistry.interface,
-      unsRegistry.address,
-      unsRegistry,
-    );
+    buildExecuteParams = buildExecuteFunc(unsRegistry.interface, await unsRegistry.getAddress(), unsRegistry);
   });
 
   describe('Set Reverse Consumption', () => {
@@ -49,14 +43,10 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
       const uri = labels.join('.');
       const tokenId = await mintDomain({ unsRegistry, owner, labels });
 
-      const newSetReverseParams = await buildExecuteParams(
-        'setReverse(string[])',
-        [labels],
-        owner,
-        tokenId,
-      );
-      const newTxReceipt =
-        await (await unsRegistry.execute(newSetReverseParams.req, newSetReverseParams.signature)).wait();
+      const newSetReverseParams = await buildExecuteParams('setReverse(string[])', [labels], owner, tokenId);
+      const newTxReceipt = await (
+        await unsRegistry.execute(newSetReverseParams.req, newSetReverseParams.signature)
+      ).wait();
 
       const subdomainLabels = ['a', ...labels];
       const subdomainUri = subdomainLabels.join('.');
@@ -67,12 +57,9 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
         owner,
         subdomainTokenId,
       );
-      const newSubdomainTxReceipt =
-        await (await unsRegistry
-          .execute(
-            newSubdomainsSetReverseParams.req,
-            newSubdomainsSetReverseParams.signature,
-          )).wait();
+      const newSubdomainTxReceipt = await (
+        await unsRegistry.execute(newSubdomainsSetReverseParams.req, newSubdomainsSetReverseParams.signature)
+      ).wait();
 
       const secondLevelSubdomainLabels = ['b', ...subdomainLabels];
       const secondLevelSubdomainUri = secondLevelSubdomainLabels.join('.');
@@ -83,20 +70,20 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
         owner,
         secondLevelSubdomainTokenId,
       );
-      const newSecondLevelSubdomainTxReceipt =
-        await (await unsRegistry
-          .execute(
-            newSecondLevelSubdomainSetReverseParams.req,
-            newSecondLevelSubdomainSetReverseParams.signature,
-          )).wait();
+      const newSecondLevelSubdomainTxReceipt = await (
+        await unsRegistry.execute(
+          newSecondLevelSubdomainSetReverseParams.req,
+          newSecondLevelSubdomainSetReverseParams.signature,
+        )
+      ).wait();
 
       return {
-        'length': uri.length,
-        'gas': newTxReceipt.gasUsed.toString(),
+        length: uri.length,
+        gas: newTxReceipt?.gasUsed.toString(),
         '1 level subdomain length': subdomainUri.length,
-        '1 level subdomain gas': newSubdomainTxReceipt.gasUsed.toString(),
+        '1 level subdomain gas': newSubdomainTxReceipt?.gasUsed.toString(),
         '2 level subdomain length': secondLevelSubdomainUri.length,
-        '2 level subdomain gas': newSecondLevelSubdomainTxReceipt.gasUsed.toString(),
+        '2 level subdomain gas': newSecondLevelSubdomainTxReceipt?.gasUsed.toString(),
       };
     }
   });

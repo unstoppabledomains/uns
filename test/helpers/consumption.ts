@@ -1,3 +1,3 @@
-export function percDiff (a: number, b: number) {
-  return (-((a - b) / a) * 100).toFixed(2);
+export function percDiff (a: bigint, b: bigint) {
+  return Number((-((a - b) / a) * BigInt(100))).toFixed(2);
 }

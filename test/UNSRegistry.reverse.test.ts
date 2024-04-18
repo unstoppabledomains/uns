@@ -1,6 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { EventLog } from 'ethers';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistryMock } from '../types/contracts/mocks';
 import { UNSRegistry__factory } from '../types/factories/contracts';
@@ -33,11 +34,7 @@ describe('UNSRegistry (reverse)', () => {
     await unsRegistry.mintTLD(TLD.X, 'x');
     await unsRegistry.setTokenURIPrefix('/');
 
-    buildExecuteParams = buildExecuteFunc(
-      unsRegistry.interface,
-      unsRegistry.address,
-      unsRegistry,
-    );
+    buildExecuteParams = buildExecuteFunc(unsRegistry.interface, await unsRegistry.getAddress(), unsRegistry);
 
     await unsRegistry.addProxyReader(reader.address);
 
@@ -52,20 +49,14 @@ describe('UNSRegistry (reverse)', () => {
 
   describe('Minting', () => {
     it('should produce NewURI and SetReverse events', async () => {
-      const mintTx = await unsRegistry.mintWithRecords(
-        owner.address,
-        ['testminting', 'crypto'],
-        [],
-        [],
-        true,
-      );
+      const mintTx = await unsRegistry.mintWithRecords(owner.address, ['testminting', 'crypto'], [], [], true);
       const mintTxReceipt = await mintTx.wait();
 
-      const newUriEventIndex = mintTxReceipt.events?.findIndex(
-        ({ event }) => event === 'NewURI',
+      const newUriEventIndex = mintTxReceipt?.logs.findIndex((log) =>
+        log instanceof EventLog ? log.eventName === 'NewURI' : false,
       );
-      const setReverseIndex = mintTxReceipt.events?.findIndex(
-        ({ event }) => event === 'SetReverse',
+      const setReverseIndex = mintTxReceipt?.logs.findIndex((log) =>
+        log instanceof EventLog ? log.eventName === 'SetReverse' : false,
       );
 
       expect(newUriEventIndex).to.be.greaterThan(0);
@@ -73,20 +64,14 @@ describe('UNSRegistry (reverse)', () => {
     });
 
     it('should only produce NewURI and not SetReverse events with setReverse = false', async () => {
-      const mintTx = await unsRegistry.mintWithRecords(
-        owner.address,
-        ['testminting2', 'crypto'],
-        [],
-        [],
-        false,
-      );
+      const mintTx = await unsRegistry.mintWithRecords(owner.address, ['testminting2', 'crypto'], [], [], false);
       const mintTxReceipt = await mintTx.wait();
 
-      const newUriEventIndex = mintTxReceipt.events?.findIndex(
-        ({ event }) => event === 'NewURI',
+      const newUriEventIndex = mintTxReceipt?.logs.findIndex((log) =>
+        log instanceof EventLog ? log.eventName === 'NewURI' : false,
       );
-      const setReverseIndex = mintTxReceipt.events?.findIndex(
-        ({ event }) => event === 'SetReverse',
+      const setReverseIndex = mintTxReceipt?.logs.findIndex((log) =>
+        log instanceof EventLog ? log.eventName === 'SetReverse' : false,
       );
 
       expect(newUriEventIndex).to.be.greaterThan(0);
@@ -98,75 +83,42 @@ describe('UNSRegistry (reverse)', () => {
       const uri = labels.join('.');
       const tokenId = await unsRegistry.namehash(labels);
 
-      await unsRegistry.mintWithRecords(
-        coinbase.address,
-        labels,
-        ['key_1'],
-        ['value_1'],
-        true,
-      );
+      await unsRegistry.mintWithRecords(coinbase.address, labels, ['key_1'], ['value_1'], true);
 
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-        coinbase.address,
-      );
-      expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
-        tokenId,
-      );
-      expect(await unsRegistry.reverseNameOf(coinbase.address)).to.be.equal(
-        uri,
-      );
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+      expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(tokenId);
+      expect(await unsRegistry.reverseNameOf(coinbase.address)).to.be.equal(uri);
     });
 
     it('should not set reverse resolution on mint if withReverse = false', async () => {
       const labels = ['reversemint4_21', 'crypto'];
       const tokenId = await unsRegistry.namehash(labels);
 
-      await unsRegistry.mintWithRecords(
-        coinbase.address,
-        labels,
-        ['key_1'],
-        ['value_1'],
-        false,
-      );
+      await unsRegistry.mintWithRecords(coinbase.address, labels, ['key_1'], ['value_1'], false);
 
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(
-        coinbase.address,
-      );
-      expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
-        ZERO_ADDRESS,
-      );
-      expect(await unsRegistry.reverseNameOf(coinbase.address)).to.be.equal(
-        '',
-      );
+      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
+      expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(ZERO_ADDRESS);
+      expect(await unsRegistry.reverseNameOf(coinbase.address)).to.be.equal('');
     });
 
     it('should produce SetReverse event after NewURI', async () => {
       const labels = ['reversemint41_2', 'crypto'];
       const tokenId = await unsRegistry.namehash(labels);
 
-      const mintTx = await unsRegistry.mintWithRecords(
-        coinbase.address,
-        labels,
-        ['key_1'],
-        ['value_1'],
-        true,
-      );
+      const mintTx = await unsRegistry.mintWithRecords(coinbase.address, labels, ['key_1'], ['value_1'], true);
       const mintTxReceipt = await mintTx.wait();
 
-      const newUriEventIndex = mintTxReceipt.events?.findIndex(
-        ({ event }) => event === 'NewURI',
+      const newUriEventIndex = mintTxReceipt?.logs.findIndex((log) =>
+        log instanceof EventLog ? log.eventName === 'NewURI' : false,
       );
-      const setReverseIndex = mintTxReceipt.events?.findIndex(
-        ({ event }) => event === 'SetReverse',
+      const setReverseIndex = mintTxReceipt?.logs.findIndex((log) =>
+        log instanceof EventLog ? log.eventName === 'SetReverse' : false,
       );
 
       expect(setReverseIndex).to.be.greaterThan(0);
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(mintTxReceipt.events?.[setReverseIndex!].args).to.deep.equal([
-        coinbase.address,
-        tokenId,
-      ]);
+      const setReverseEvent = mintTxReceipt?.logs?.[setReverseIndex!] as EventLog;
+      expect(setReverseEvent.args).to.deep.equal([coinbase.address, tokenId]);
 
       expect(setReverseIndex).to.be.greaterThan(newUriEventIndex);
     });
@@ -175,31 +127,18 @@ describe('UNSRegistry (reverse)', () => {
       const labels = ['reversemint42_2', 'crypto'];
       const uri = labels.join('.');
       const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels });
-      expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
-        tokenId,
-      );
-      expect(await unsRegistry.reverseNameOf(coinbase.address)).to.be.equal(
-        uri,
-      );
+      expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(tokenId);
+      expect(await unsRegistry.reverseNameOf(coinbase.address)).to.be.equal(uri);
 
       const labels1 = ['reversemint43', 'crypto'];
 
-      await expect(
-        unsRegistry.mintWithRecords(
-          coinbase.address,
-          labels1,
-          ['key_1'],
-          ['value_1'],
-          true,
-        ),
-      ).not.to.emit(unsRegistry, 'SetReverse');
+      await expect(unsRegistry.mintWithRecords(coinbase.address, labels1, ['key_1'], ['value_1'], true)).not.to.emit(
+        unsRegistry,
+        'SetReverse',
+      );
 
-      expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(
-        tokenId,
-      );
-      expect(await unsRegistry.reverseNameOf(coinbase.address)).to.be.equal(
-        uri,
-      );
+      expect(await unsRegistry.reverseOf(coinbase.address)).to.be.equal(tokenId);
+      expect(await unsRegistry.reverseNameOf(coinbase.address)).to.be.equal(uri);
     });
   });
 
@@ -212,7 +151,7 @@ describe('UNSRegistry (reverse)', () => {
         owner,
         labels: ['res_1', 'x'],
         withoutReverse: true,
-      }      );
+      });
       const _unsRegistry = unsRegistry.connect(owner);
 
       await expect(_unsRegistry['setReverse(string[])'](labels))
@@ -252,19 +191,11 @@ describe('UNSRegistry (reverse)', () => {
         .to.emit(unsRegistry, 'SetReverse')
         .withArgs(owner.address, tokenId.toString());
 
-      expect(
-        await unsRegistry.reverseOf(ethers.utils.getAddress(owner.address)),
-      ).to.be.equal(tokenId);
-      expect(
-        await unsRegistry.reverseOf(owner.address.toLowerCase()),
-      ).to.be.equal(tokenId);
+      expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
+      expect(await unsRegistry.reverseOf(owner.address.toLowerCase())).to.be.equal(tokenId);
 
-      expect(
-        await unsRegistry.reverseNameOf(ethers.utils.getAddress(owner.address)),
-      ).to.be.equal(uri);
-      expect(
-        await unsRegistry.reverseNameOf(owner.address.toLowerCase()),
-      ).to.be.equal(uri);
+      expect(await unsRegistry.reverseNameOf(owner.address)).to.be.equal(uri);
+      expect(await unsRegistry.reverseNameOf(owner.address.toLowerCase())).to.be.equal(uri);
     });
 
     it('revert setting reverse record by non-owner', async () => {
@@ -277,9 +208,7 @@ describe('UNSRegistry (reverse)', () => {
       });
       const _unsRegistry = unsRegistry.connect(receiver);
 
-      await expect(
-        _unsRegistry['setReverse(string[])'](labels),
-      ).to.be.revertedWith('Registry: SENDER_IS_NOT_OWNER');
+      await expect(_unsRegistry['setReverse(string[])'](labels)).to.be.revertedWith('Registry: SENDER_IS_NOT_OWNER');
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
     });
@@ -312,9 +241,7 @@ describe('UNSRegistry (reverse)', () => {
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
       expect(await unsRegistry.reverseNameOf(owner.address)).to.be.equal(uri);
 
-      await unsRegistry
-        .connect(owner)
-        .transferFrom(owner.address, receiver.address, tokenId2);
+      await unsRegistry.connect(owner).transferFrom(owner.address, receiver.address, tokenId2);
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
       expect(await unsRegistry.reverseOf(receiver.address)).to.be.equal(0);
@@ -332,9 +259,7 @@ describe('UNSRegistry (reverse)', () => {
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
       expect(await unsRegistry.reverseNameOf(owner.address)).to.be.equal(uri);
 
-      await expect(_unsRegistry.removeReverse())
-        .to.emit(unsRegistry, 'RemoveReverse')
-        .withArgs(owner.address);
+      await expect(_unsRegistry.removeReverse()).to.emit(unsRegistry, 'RemoveReverse').withArgs(owner.address);
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
       expect(await unsRegistry.reverseNameOf(owner.address)).to.be.equal('');
@@ -346,9 +271,7 @@ describe('UNSRegistry (reverse)', () => {
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
       expect(await unsRegistry.reverseNameOf(owner.address)).to.be.equal('');
 
-      await expect(_unsRegistry.removeReverse()).to.be.revertedWith(
-        'Registry: REVERSE_RECORD_IS_EMPTY',
-      );
+      await expect(_unsRegistry.removeReverse()).to.be.revertedWith('Registry: REVERSE_RECORD_IS_EMPTY');
     });
 
     it('should set reverse resolution for labels', async () => {
@@ -378,8 +301,7 @@ describe('UNSRegistry (reverse)', () => {
       });
 
       const _unsRegistry = unsRegistry.connect(reader);
-      await expect(_unsRegistry['setReverse(string[])'](labels))
-        .to.be.revertedWith('Registry: SENDER_IS_NOT_OWNER');
+      await expect(_unsRegistry['setReverse(string[])'](labels)).to.be.revertedWith('Registry: SENDER_IS_NOT_OWNER');
     });
   });
 
@@ -394,12 +316,7 @@ describe('UNSRegistry (reverse)', () => {
         withoutReverse: true,
       });
 
-      const params = await buildExecuteParams(
-        'setReverse(string[])',
-        [labels],
-        owner,
-        tokenId,
-      );
+      const params = await buildExecuteParams('setReverse(string[])', [labels], owner, tokenId);
       await unsRegistry.execute(params.req, params.signature);
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
@@ -415,12 +332,7 @@ describe('UNSRegistry (reverse)', () => {
         withoutReverse: true,
       });
 
-      const params = await buildExecuteParams(
-        'setReverse(string[])',
-        [labels],
-        receiver,
-        tokenId,
-      );
+      const params = await buildExecuteParams('setReverse(string[])', [labels], receiver, tokenId);
       await expect(unsRegistry.execute(params.req, params.signature)).to.be.revertedWith(
         'Registry: SENDER_IS_NOT_OWNER',
       );
@@ -438,15 +350,8 @@ describe('UNSRegistry (reverse)', () => {
         withoutReverse: true,
       });
 
-      const params = await buildExecuteParams(
-        'setReverse(string[])',
-        [labels],
-        owner,
-        1,
-      );
-      await expect(unsRegistry.execute(params.req, params.signature)).to.be.revertedWith(
-        'Registry: TOKEN_INVALID',
-      );
+      const params = await buildExecuteParams('setReverse(string[])', [labels], owner, 1);
+      await expect(unsRegistry.execute(params.req, params.signature)).to.be.revertedWith('Registry: TOKEN_INVALID');
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);
       expect(await unsRegistry.reverseNameOf(owner.address)).to.be.equal('');
@@ -459,12 +364,7 @@ describe('UNSRegistry (reverse)', () => {
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(tokenId);
       expect(await unsRegistry.reverseNameOf(owner.address)).to.be.equal(uri);
 
-      const { req, signature } = await buildExecuteParams(
-        'removeReverse()',
-        [],
-        owner,
-        owner.address,
-      );
+      const { req, signature } = await buildExecuteParams('removeReverse()', [], owner, owner.address);
       await unsRegistry.execute(req, signature);
 
       expect(await unsRegistry.reverseOf(owner.address)).to.be.equal(0);

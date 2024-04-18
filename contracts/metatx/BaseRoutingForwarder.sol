@@ -15,23 +15,15 @@ import './BaseForwarder.sol';
 abstract contract BaseRoutingForwarder is BaseForwarder {
     mapping(bytes4 => bytes4) private _routes;
 
-    function _buildRouteData(
-        bytes4 selector,
-        bytes memory data,
-        bytes memory signature
-    ) internal view virtual returns (bytes memory);
+    function _buildRouteData(bytes4 selector, bytes memory data, bytes memory signature) internal view virtual returns (bytes memory);
 
-    function _verify(
-        ForwardRequest memory req,
-        address target,
-        bytes memory signature
-    ) internal view override returns (bool) {
+    function _verify(ForwardRequest memory req, address target, bytes memory signature) internal view override returns (bool) {
         return super._verify(req, target, signature) && _isKnownRoute(req.data);
     }
 
     function _buildData(
-        address, /* from */
-        uint256, /* tokenId */
+        address /* from */,
+        uint256 /* tokenId */,
         bytes memory data,
         bytes memory signature
     ) internal view override returns (bytes memory) {
