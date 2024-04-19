@@ -216,9 +216,8 @@ const config: HardhatUserConfig = {
     multisig: {
       mainnet: '0x6bEca92600be24179ae70A430AEF4aE632fddDc8',
       polygon: '0xC8E1B5c41c42ad1cE8336714cA2b2f2588F0a337',
-      // Multisigs will be created in the next PR
-      sepolia: null,
-      amoy: null,
+      sepolia: '0x1197C09C38d460584473e8837D79c14343f24890',
+      amoy: '0x458adB6cce7D9984b74bC83c6F71Fbd1fd16085e',
     },
   },
   defender: {
