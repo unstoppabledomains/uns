@@ -2,7 +2,7 @@ import fs from 'fs';
 import tar from 'tar';
 import { NameService, mergeNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
-import { unwrap } from '../src/helpers';
+import { unwrap } from '../src/utils';
 import { Sandbox } from '.';
 
 // NOTE: Node module execution is used for rebuilding sandbox package

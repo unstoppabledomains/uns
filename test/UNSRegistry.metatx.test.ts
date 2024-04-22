@@ -1,16 +1,14 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { utils, BigNumber, Contract, BigNumberish } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { FunctionFragment } from 'ethers/lib/utils';
-import { Block } from '@ethersproject/abstract-provider';
+import { BigNumberish, FunctionFragment, id, Fragment, BaseContract, solidityPacked } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 import { TLD, ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain, mintRandomDomain } from './helpers/registry';
 import { getFuncSignature } from './helpers/proxy';
-import { increaseTimeBy } from './helpers/utils';
+import { getLatestBlockTimestamp, increaseTimeBy } from './helpers/utils';
 
 describe('UNSRegistry (metatx)', () => {
   let unsRegistry: UNSRegistry, buildExecuteParams: ExecuteFunc;
@@ -22,7 +20,7 @@ describe('UNSRegistry (metatx)', () => {
     accessControl: SignerWithAddress,
     operator: SignerWithAddress;
 
-  let latestBlock: Block;
+  let latestBlockTimestamp: number;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -34,11 +32,11 @@ describe('UNSRegistry (metatx)', () => {
     await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
 
-    buildExecuteParams = buildExecuteFunc(unsRegistry.interface, unsRegistry.address, unsRegistry);
+    buildExecuteParams = buildExecuteFunc(unsRegistry.interface, await unsRegistry.getAddress(), unsRegistry);
   });
 
   beforeEach(async () => {
-    latestBlock = await ethers.provider.getBlock('latest');
+    latestBlockTimestamp = await getLatestBlockTimestamp();
   });
 
   describe('General', () => {
@@ -86,7 +84,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert meta-setOwner for expired token', async () => {
-      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+      const expiry = latestBlockTimestamp + 60 * 60 * 24;
       const tokenId = await mintDomain({
         unsRegistry,
         owner,
@@ -158,7 +156,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert meta-transferFrom for expired token', async () => {
-      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+      const expiry = latestBlockTimestamp + 60 * 60 * 24;
       const tokenId = await mintDomain({
         unsRegistry,
         owner,
@@ -206,7 +204,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert meta-safeTransferFrom for expired token', async () => {
-      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+      const expiry = latestBlockTimestamp + 60 * 60 * 24;
       const tokenId = await mintDomain({
         unsRegistry,
         owner,
@@ -253,7 +251,7 @@ describe('UNSRegistry (metatx)', () => {
     });
 
     it('should revert meta-safeTransferFrom for expired token', async () => {
-      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+      const expiry = latestBlockTimestamp + 60 * 60 * 24;
       const tokenId = await mintDomain({
         unsRegistry,
         owner,
@@ -292,9 +290,13 @@ describe('UNSRegistry (metatx)', () => {
 
   describe('ABI-based', () => {
     const registryFuncs = () => {
-      return Object.values(unsRegistry.interface.functions).filter(
-        (fragment: FunctionFragment) => !['view', 'pure'].includes(fragment.stateMutability),
-      );
+      return Object.values(unsRegistry.interface.fragments).filter((fragment: Fragment) => {
+        if (fragment instanceof FunctionFragment) {
+          return !['view', 'pure'].includes(fragment.stateMutability);
+        }
+
+        return false;
+      }) as FunctionFragment[];
     };
 
     const buidRequest = async (
@@ -303,7 +305,7 @@ describe('UNSRegistry (metatx)', () => {
       tokenId: BigNumberish,
       paramsMap: any, // eslint-disable-line @typescript-eslint/no-explicit-any
     ) => {
-      const contract: Contract = unsRegistry;
+      const contract = unsRegistry as BaseContract;
 
       const req = {
         from,
@@ -324,31 +326,25 @@ describe('UNSRegistry (metatx)', () => {
         values: ['value1'],
         uri: 'awesome-uri',
         labels: ['token-based', 'crypto'],
-        tokenId: '',
+        tokenId: BigInt(0),
         to: '',
       };
 
-      const included = [
-        'issueWithRecords',
-        'unlockWithRecords',
-        'unlock',
-        'mintTLD',
-      ];
+      const included = ['issueWithRecords', 'unlockWithRecords', 'unlock', 'mintTLD'];
 
       const getFuncs = () => {
-        return registryFuncs()
-          .filter((x) => included.includes(x.name) || included.includes(getFuncSignature(x)));
+        return registryFuncs().filter((x) => included.includes(x.name) || included.includes(getFuncSignature(x)));
       };
 
       before(async () => {
         paramValueMap.to = receiver.address;
-        paramValueMap.tokenId = (await unsRegistry.namehash(paramValueMap.labels)).toHexString();
+        paramValueMap.tokenId = await unsRegistry.namehash(paramValueMap.labels);
       });
 
       it('should execute all functions successfully', async () => {
         for (const func of getFuncs()) {
           const req = await buidRequest(func, coinbase.address, paramValueMap.tokenId, paramValueMap);
-          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+          const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, coinbase);
           await unsRegistry.execute(req, signature);
         }
       });
@@ -360,13 +356,13 @@ describe('UNSRegistry (metatx)', () => {
         data: '0x',
         key: 'key_t1',
         keys: ['key_t1'],
-        keyHash: BigNumber.from(utils.id('key_t1')),
-        keyHashes: [BigNumber.from(utils.id('key_t1'))],
+        keyHash: BigInt(id('key_t1')),
+        keyHashes: [BigInt(id('key_t1'))],
         value: 'value',
         values: ['value1'],
         from: '',
         to: '',
-        tokenId: BigNumber.from('0x0'),
+        tokenId: BigInt('0x0'),
       };
 
       const excluded = [
@@ -388,7 +384,7 @@ describe('UNSRegistry (metatx)', () => {
         'removeReverse',
         'addProxyReader',
         'setExpiry', // onlyMintingManager action, covered in separate test case
-        'unlock',  // onlyMintingManager action, covered in a separate test case
+        'unlock', // onlyMintingManager action, covered in a separate test case
       ];
 
       const getFuncs = () => {
@@ -406,12 +402,12 @@ describe('UNSRegistry (metatx)', () => {
 
       it('should execute all functions successfully', async () => {
         for (const func of getFuncs()) {
-          const funcSigHash = utils.id(`${getFuncSignature(func)}_ok`);
+          const funcSigHash = id(`${getFuncSignature(func)}_ok`);
 
           paramValueMap.tokenId = await mintDomain({ unsRegistry, owner, labels: [funcSigHash, 'crypto'] });
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
-          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+          const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, owner);
           await unsRegistry.execute(req, signature);
         }
       });
@@ -419,12 +415,12 @@ describe('UNSRegistry (metatx)', () => {
       it('should revert execution of all token-based functions when used signature', async () => {
         for (const func of getFuncs()) {
           const funcSig = getFuncSignature(func);
-          const funcSigHash = utils.id(`${funcSig}_doubleUse`);
+          const funcSigHash = id(`${funcSig}_doubleUse`);
 
           paramValueMap.tokenId = await mintDomain({ unsRegistry, owner, labels: [funcSigHash, 'crypto'] });
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
-          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+          const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, owner);
           await unsRegistry.execute(req, signature);
 
           await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
@@ -436,12 +432,12 @@ describe('UNSRegistry (metatx)', () => {
       it('should revert execution of all token-based functions when nonce invalidated', async () => {
         for (const func of getFuncs()) {
           const funcSig = getFuncSignature(func);
-          const funcSigHash = utils.id(`${funcSig}_nonceInvalidated`);
+          const funcSigHash = id(`${funcSig}_nonceInvalidated`);
 
           paramValueMap.tokenId = await mintDomain({ unsRegistry, owner, labels: [funcSigHash, 'crypto'] });
 
           const req = await buidRequest(func, owner.address, paramValueMap.tokenId, paramValueMap);
-          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+          const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, owner);
 
           await unsRegistry.connect(owner).set('key', 'value', paramValueMap.tokenId);
 
@@ -454,33 +450,33 @@ describe('UNSRegistry (metatx)', () => {
       it('should fail execution of all token-based functions when tokenId does not match', async () => {
         for (const func of getFuncs()) {
           const funcSig = getFuncSignature(func);
-          const funcSigHash = utils.id(`${funcSig}_wrongToken`);
+          const funcSigHash = id(`${funcSig}_wrongToken`);
 
           paramValueMap.tokenId = await mintDomain({ unsRegistry, owner, labels: [funcSigHash, 'crypto'] });
 
-          const tokenIdForwarder = await unsRegistry.namehash([utils.id(`_${funcSig}`), 'crypto']);
+          const tokenIdForwarder = await unsRegistry.namehash([id(`_${funcSig}`), 'crypto']);
           const req = await buidRequest(func, owner.address, tokenIdForwarder, paramValueMap);
 
-          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+          const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, owner);
           await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: TOKEN_INVALID');
         }
       });
 
       it('should fail execution of all token-based functions when tokenId is empty', async () => {
         for (const func of getFuncs()) {
-          const funcSigHash = utils.id(`${getFuncSignature(func)}_emptyTokenId`);
+          const funcSigHash = id(`${getFuncSignature(func)}_emptyTokenId`);
 
           paramValueMap.tokenId = await mintDomain({ unsRegistry, owner, labels: [funcSigHash, 'crypto'] });
 
           const req = await buidRequest(func, owner.address, 0, paramValueMap);
 
-          const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+          const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, owner);
           await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: TOKEN_INVALID');
         }
       });
 
       it('should execute setExpiry via forwarder', async () => {
-        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const expiry = latestBlockTimestamp + 60 * 60 * 24;
 
         const tokenId = await mintRandomDomain({
           unsRegistry,
@@ -496,7 +492,7 @@ describe('UNSRegistry (metatx)', () => {
           tokenId,
         });
 
-        const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+        const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, coinbase);
 
         await unsRegistry.execute(req, signature);
 
@@ -504,7 +500,7 @@ describe('UNSRegistry (metatx)', () => {
       });
 
       it('should execute unlock via forwarder', async () => {
-        const expiry = latestBlock.timestamp + 60 * 60 * 24;
+        const expiry = latestBlockTimestamp + 60 * 60 * 24;
         const tokenId = await mintRandomDomain({
           unsRegistry,
           owner,
@@ -518,7 +514,7 @@ describe('UNSRegistry (metatx)', () => {
           tokenId,
         });
 
-        const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+        const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, coinbase);
 
         await unsRegistry.execute(req, signature);
 
@@ -537,7 +533,7 @@ describe('UNSRegistry (metatx)', () => {
         values: ['value1'],
         approved: true,
         prefix: '/',
-        tld: BigNumber.from('0x0'),
+        tld: BigInt('0x0'),
         account: '',
         to: '',
         operator: '',
@@ -573,10 +569,10 @@ describe('UNSRegistry (metatx)', () => {
       it('should execute all functions successfully', async () => {
         for (const func of getFuncs()) {
           const funcSig = getFuncSignature(func);
-          paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
+          paramValueMap.labels = [id(`${funcSig}_label`), 'crypto'];
 
           const req = await buidRequest(func, coinbase.address, 0, paramValueMap);
-          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+          const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, coinbase);
           await unsRegistry.execute(req, signature);
         }
       });
@@ -586,10 +582,10 @@ describe('UNSRegistry (metatx)', () => {
           .filter((x) => !x.inputs.filter((i) => i.name === 'tokenId').length)
           .filter((x) => x.name === 'setReverse')[0];
         const funcSig = getFuncSignature(setReverseFunc);
-        paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
+        paramValueMap.labels = [id(`${funcSig}_label`), 'crypto'];
         const tokenId = await mintDomain({ unsRegistry, owner, labels: paramValueMap.labels });
         const req = await buidRequest(setReverseFunc, owner.address, tokenId, paramValueMap);
-        const signature = await sign(req.data, unsRegistry.address, req.nonce, owner);
+        const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, owner);
         await unsRegistry.execute(req, signature);
       });
 
@@ -598,22 +594,22 @@ describe('UNSRegistry (metatx)', () => {
           .filter((x) => !x.inputs.filter((i) => i.name === 'tokenId').length)
           .filter((x) => x.name === 'unlockWithRecords')[0];
         const funcSig = getFuncSignature(unlockWithRecordsLabels);
-        paramValueMap.labels = [utils.id(`${funcSig}_label`), 'crypto'];
+        paramValueMap.labels = [id(`${funcSig}_label`), 'crypto'];
         const tokenId = await mintDomain({ unsRegistry, owner, labels: paramValueMap.labels });
         const req = await buidRequest(unlockWithRecordsLabels, coinbase.address, tokenId, paramValueMap);
-        const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+        const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, coinbase);
         await unsRegistry.execute(req, signature);
       });
 
       it('should revert execution of all functions when used signature', async () => {
         for (const func of getFuncs()) {
           const funcSig = getFuncSignature(func);
-          paramValueMap.labels = [utils.id(`${funcSig}_doubleUse`), 'crypto'];
-          paramValueMap.key = utils.id(`${funcSig}_doubleUse`);
+          paramValueMap.labels = [id(`${funcSig}_doubleUse`), 'crypto'];
+          paramValueMap.key = id(`${funcSig}_doubleUse`);
 
-          const tokenIdForwarder = await unsRegistry.namehash([utils.id(`_${funcSig}`), 'crypto']);
+          const tokenIdForwarder = await unsRegistry.namehash([id(`_${funcSig}`), 'crypto']);
           const req = await buidRequest(func, coinbase.address, tokenIdForwarder, paramValueMap);
-          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+          const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, coinbase);
           await unsRegistry.execute(req, signature);
 
           await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
@@ -625,15 +621,15 @@ describe('UNSRegistry (metatx)', () => {
       it('should revert execution of all functions when used signature and tokenId is empty', async () => {
         for (const func of getFuncs()) {
           const funcSig = getFuncSignature(func);
-          paramValueMap.labels = [utils.id(`${funcSig}_doubleUse_0`), 'crypto'];
+          paramValueMap.labels = [id(`${funcSig}_doubleUse_0`), 'crypto'];
 
           const tokenId = 0;
           const nonce = await unsRegistry.nonceOf(tokenId);
           const req = await buidRequest(func, coinbase.address, tokenId, paramValueMap);
-          const signature = await sign(req.data, unsRegistry.address, req.nonce, coinbase);
+          const signature = await sign(req.data, await unsRegistry.getAddress(), req.nonce, coinbase);
           await unsRegistry.execute(req, signature);
 
-          expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(nonce.add(1));
+          expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(nonce + BigInt(1));
           await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
             'UNSRegistryForwarder: SIGNATURE_INVALID',
           );
@@ -667,7 +663,7 @@ describe('UNSRegistry (metatx)', () => {
       const labels = ['res_label_mb3_expirable', 'com'];
       const tokenId = await unsRegistry.namehash(labels);
 
-      const expiry = latestBlock.timestamp + 60 * 60 * 24;
+      const expiry = latestBlockTimestamp + 60 * 60 * 24;
 
       const { req, signature } = await buildExecuteParams(
         'multicall(bytes[])',
@@ -696,7 +692,7 @@ describe('UNSRegistry (metatx)', () => {
         [owner.address, labels, [], [], false],
         coinbase,
         tokenId,
-        BigNumber.from(0),
+        BigInt(0),
       );
 
       const transferMetaParams = await buildExecuteParams(
@@ -704,7 +700,7 @@ describe('UNSRegistry (metatx)', () => {
         [receiver.address, tokenId],
         owner,
         tokenId,
-        BigNumber.from(1),
+        BigInt(1),
       );
 
       await unsRegistry.multicall([
@@ -724,7 +720,7 @@ describe('UNSRegistry (metatx)', () => {
         [receiver.address, tokenId],
         owner,
         tokenId,
-        BigNumber.from(0),
+        BigInt(0),
       );
 
       await unsRegistry.multicall([
@@ -745,20 +741,23 @@ describe('UNSRegistry (metatx)', () => {
         'multicall(bytes[])',
         [
           [
-            ethers.utils.solidityPack(['bytes', 'address', 'uint256'], [
-              unsRegistry.interface.encodeFunctionData('setOwner', [nonOwner.address, tokenId]),
-              owner.address,
-              tokenId,
-            ]),
+            solidityPacked(
+              ['bytes', 'address', 'uint256'],
+              [
+                unsRegistry.interface.encodeFunctionData('setOwner', [nonOwner.address, tokenId]),
+                owner.address,
+                tokenId,
+              ],
+            ),
           ],
         ],
         nonOwner,
         tokenId,
       );
 
-      await expect(
-        unsRegistry.connect(nonOwner).execute(req, signature),
-      ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.connect(nonOwner).execute(req, signature)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
   });
 });

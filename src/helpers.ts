@@ -1,24 +1,57 @@
-import { sha3 } from 'web3-utils';
-import { ArtifactName, DependenciesMap, ContractConfig } from './types';
+import {
+  ContractAddressOrInstance,
+  DeployProxyOptions,
+  UpgradeProxyOptions,
+} from '@openzeppelin/hardhat-upgrades/dist/utils';
+import type { BaseContract, ContractFactory } from 'ethers';
+import { network, upgrades } from 'hardhat';
+import { DependenciesMap, ContractName, NsNetworkConfig } from './types';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function unwrap (object: object, key: string): any {
-  if (!object[key]) {
-    throw new Error(`Unwrap: cannot find key ${key} on object ${object.toString()}`);
+export const ensureDeployed = (config: NsNetworkConfig, ...contracts: ContractName[]): DependenciesMap => {
+  return contracts
+    .map((name) => {
+      const contract = config.contracts[name];
+      if (!contract?.address) {
+        throw new Error(`${name} contract not found for network ${network.config.chainId}`);
+      }
+      return { [name]: contract };
+    })
+    .reduce((a, b) => ({ ...a, ...b }));
+};
+
+export const ensureUpgradable = (config: NsNetworkConfig): void => {
+  if (!config.contracts.ProxyAdmin?.address) {
+    throw new Error('Current network configuration does not support upgrading');
   }
+};
 
-  return object[key];
-}
+export const deployProxy = async <T extends BaseContract>(
+  implFactory: ContractFactory,
+  args?: unknown[],
+  opts?: DeployProxyOptions,
+): Promise<T> => {
+  const proxy = await upgrades.deployProxy(implFactory, args, opts);
 
-export function unwrapDependencies (dependencies: DependenciesMap, keys: ArtifactName[]): ContractConfig[] {
-  return keys.map((key) => unwrap(dependencies, key));
-}
+  await proxy.waitForDeployment();
 
-export function notNullSha (value: string) {
-  const res = sha3(value);
-  if (!res) {
-    throw new Error('notNullSha: SHA returns null');
-  }
+  return proxy as unknown as T;
+};
 
-  return res;
-}
+export const upgradeProxy = async <T extends BaseContract>(
+  proxy: ContractAddressOrInstance,
+  implFactory: ContractFactory,
+  opts?: UpgradeProxyOptions,
+): Promise<T> => {
+  const upgraded = await upgrades.upgradeProxy(proxy, implFactory, opts);
+
+  await upgraded.waitForDeployment();
+
+  return proxy as unknown as T;
+};
+
+/**
+ * Only used for ProxyReader, as ProxyReader has a `getAddress` contract function
+ */
+export const getContractAddress = async (contract: BaseContract): Promise<string> => {
+  return contract.getAddress();
+};

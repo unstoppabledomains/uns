@@ -2,7 +2,7 @@ import { network } from 'hardhat';
 import merge from 'lodash.merge';
 import { getNetworkConfig, mergeNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
-import { unwrap } from '../src/helpers';
+import { unwrap } from '../src/utils';
 
 async function main () {
   console.log('Network:', network.name);

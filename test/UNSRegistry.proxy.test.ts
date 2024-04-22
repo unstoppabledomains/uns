@@ -1,10 +1,11 @@
-import { ethers, upgrades } from 'hardhat';
+import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { utils, BigNumber } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { id } from 'ethers';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { UNSRegistryV07__factory } from '../types';
+import { deployProxy, upgradeProxy } from '../src/helpers';
 import { mintDomain } from './helpers/registry';
 import { TLD, ZERO_ADDRESS } from './helpers/constants';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
@@ -25,19 +26,15 @@ describe('UNSRegistry (proxy)', () => {
     unsRegistryV07Factory = new UNSRegistryV07__factory(owner);
     unsRegistryFactory = new UNSRegistry__factory(owner);
 
-    unsRegistry = (await upgrades.deployProxy(
-      unsRegistryV07Factory,
-      [owner.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS],
-      {
-        initializer: 'initialize',
-        unsafeAllow: ['delegatecall'],
-      },
-    )) as UNSRegistry;
+    unsRegistry = (await deployProxy(unsRegistryV07Factory, [owner.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS], {
+      initializer: 'initialize',
+      unsafeAllow: ['delegatecall'],
+    })) as unknown as UNSRegistry;
 
     await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
 
-    buildExecuteParams = buildExecuteFunc(unsRegistry.interface, unsRegistry.address, unsRegistry);
+    buildExecuteParams = buildExecuteFunc(unsRegistry.interface, await unsRegistry.getAddress(), unsRegistry);
   });
 
   describe('Registry', () => {
@@ -104,7 +101,7 @@ describe('UNSRegistry (proxy)', () => {
 
       await unsRegistry.set(expectedKey, 'value', tokenId);
 
-      const keyFromHash = await unsRegistry.getKey(BigNumber.from(utils.id(expectedKey)));
+      const keyFromHash = await unsRegistry.getKey(BigInt(id(expectedKey)));
       expect(keyFromHash).to.be.equal(expectedKey);
     });
 
@@ -114,7 +111,7 @@ describe('UNSRegistry (proxy)', () => {
 
       await unsRegistry.setMany(expectedKeys, ['value', 'value'], tokenId);
 
-      const expectedKeyHashes = expectedKeys.map((key) => BigNumber.from(utils.id(key)));
+      const expectedKeyHashes = expectedKeys.map((key) => BigInt(id(key)));
       const keysFromHashes = await unsRegistry.getKeys(expectedKeyHashes);
       expect(keysFromHashes).to.be.eql(expectedKeys);
     });
@@ -125,7 +122,7 @@ describe('UNSRegistry (proxy)', () => {
       const newKeyHashTxReceipt = await newKeyHashTx.wait();
       const exitsKeyHashTx = await unsRegistry.set('keyhash-gas', 'value', tokenId);
       const exitsKeyHashTxReceipt = await exitsKeyHashTx.wait();
-      expect(newKeyHashTxReceipt.gasUsed).to.be.above(exitsKeyHashTxReceipt.gasUsed);
+      expect(newKeyHashTxReceipt?.gasUsed).to.be.above(exitsKeyHashTxReceipt?.gasUsed);
 
       const newKeyHashTx2 = await unsRegistry.setMany(
         ['keyhash-gas-1', 'keyhash-gas-2'],
@@ -139,7 +136,7 @@ describe('UNSRegistry (proxy)', () => {
         tokenId,
       );
       const exitsKeyHashTxReceipt2 = await exitsKeyHashTx2.wait();
-      expect(newKeyHashTxReceipt2.gasUsed).to.be.above(exitsKeyHashTxReceipt2.gasUsed);
+      expect(newKeyHashTxReceipt2?.gasUsed).to.be.above(exitsKeyHashTxReceipt2?.gasUsed);
 
       const newKeyHashTx3 = await unsRegistry.setMany(
         ['keyhash-gas-3', 'keyhash-gas-4', 'keyhash-gas-5'],
@@ -153,7 +150,7 @@ describe('UNSRegistry (proxy)', () => {
         tokenId,
       );
       const exitsKeyHashTxReceipt3 = await exitsKeyHashTx3.wait();
-      expect(newKeyHashTxReceipt3.gasUsed).to.be.above(exitsKeyHashTxReceipt3.gasUsed);
+      expect(newKeyHashTxReceipt3?.gasUsed).to.be.above(exitsKeyHashTxReceipt3?.gasUsed);
     });
 
     it('should get value by key hash', async () => {
@@ -163,7 +160,7 @@ describe('UNSRegistry (proxy)', () => {
 
       await unsRegistry.set(key, expectedValue, tokenId);
 
-      const result = await unsRegistry.getByHash(utils.id(key), tokenId);
+      const result = await unsRegistry.getByHash(id(key), tokenId);
       expect(result.value).to.be.equal(expectedValue);
       expect(result.key).to.be.equal(key);
     });
@@ -175,7 +172,7 @@ describe('UNSRegistry (proxy)', () => {
 
       await unsRegistry.setMany(keys, expectedValues, tokenId);
 
-      const hashedKeys = keys.map((key) => BigNumber.from(utils.id(key)));
+      const hashedKeys = keys.map((key) => BigInt(id(key)));
       const result = await unsRegistry.getManyByHash(hashedKeys, tokenId);
       expect(result).to.be.eql([keys, expectedValues]);
     });
@@ -185,9 +182,7 @@ describe('UNSRegistry (proxy)', () => {
       const key = 'new-key';
       const value = 'value';
 
-      await expect(unsRegistry.set(key, value, tokenId))
-        .to.emit(unsRegistry, 'NewKey')
-        .withArgs(tokenId, utils.id(key), key);
+      await expect(unsRegistry.set(key, value, tokenId)).to.emit(unsRegistry, 'NewKey').withArgs(tokenId, key, key);
 
       await expect(unsRegistry.set(key, value, tokenId)).not.to.emit(unsRegistry, 'NewKey');
     });
@@ -199,7 +194,7 @@ describe('UNSRegistry (proxy)', () => {
 
       await expect(unsRegistry.set(key, value, tokenId))
         .to.emit(unsRegistry, 'Set')
-        .withArgs(tokenId, utils.id(key), utils.id(value), key, value);
+        .withArgs(tokenId, key, value, key, value);
     });
 
     it('should reconfigure resolver with new values', async () => {
@@ -229,9 +224,9 @@ describe('UNSRegistry (proxy)', () => {
       await unsRegistry.execute(params1.req, params1.signature);
       expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(1);
 
-      unsRegistry = (await upgrades.upgradeProxy(unsRegistry.address, unsRegistryFactory, {
+      await upgradeProxy<UNSRegistry>(await unsRegistry.getAddress(), unsRegistryFactory, {
         unsafeAllow: ['delegatecall'],
-      })) as UNSRegistry;
+      });
 
       expect(await unsRegistry.nonceOf(tokenId)).to.be.equal(1);
 

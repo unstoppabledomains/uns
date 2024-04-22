@@ -1,10 +1,8 @@
-import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { randomBytes } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { UNSRegistry } from '../../types/contracts/UNSRegistry';
 
-const generateRandomLabel = () => 'domain-' + ethers.utils.hexlify(
-  ethers.utils.randomBytes(16),
-);
+const generateRandomLabel = () => 'domain-' + Buffer.from(randomBytes(16)).toString('hex');
 
 type BaseMintParams = {
   unsRegistry: UNSRegistry,

@@ -11,11 +11,7 @@ contract ERC20UnsafeMock is ERC20Mock {
         return false;
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 value
-    ) public virtual override returns (bool) {
+    function transferFrom(address from, address to, uint256 value) public virtual override returns (bool) {
         super.transferFrom(from, to, value);
         return false;
     }

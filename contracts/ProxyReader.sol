@@ -148,12 +148,10 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         }
     }
 
-    function getManyByHash(uint256[] calldata keyHashes, uint256 tokenId)
-        external
-        view
-        override
-        returns (string[] memory keys, string[] memory values)
-    {
+    function getManyByHash(
+        uint256[] calldata keyHashes,
+        uint256 tokenId
+    ) external view override returns (string[] memory keys, string[] memory values) {
         keys = new string[](keyHashes.length);
         values = new string[](keyHashes.length);
         if (_useUns(tokenId)) {
@@ -168,29 +166,17 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         }
     }
 
-    function getData(string[] calldata keys, uint256 tokenId)
-        external
-        view
-        override
-        returns (
-            address resolver,
-            address owner,
-            string[] memory values
-        )
-    {
+    function getData(
+        string[] calldata keys,
+        uint256 tokenId
+    ) external view override returns (address resolver, address owner, string[] memory values) {
         return _getData(keys, tokenId);
     }
 
-    function getDataForMany(string[] calldata keys, uint256[] calldata tokenIds)
-        external
-        view
-        override
-        returns (
-            address[] memory resolvers,
-            address[] memory owners,
-            string[][] memory values
-        )
-    {
+    function getDataForMany(
+        string[] calldata keys,
+        uint256[] calldata tokenIds
+    ) external view override returns (address[] memory resolvers, address[] memory owners, string[][] memory values) {
         resolvers = new address[](tokenIds.length);
         owners = new address[](tokenIds.length);
         values = new string[][](tokenIds.length);
@@ -200,30 +186,21 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         }
     }
 
-    function getDataByHash(uint256[] calldata keyHashes, uint256 tokenId)
-        external
-        view
-        override
-        returns (
-            address resolver,
-            address owner,
-            string[] memory keys,
-            string[] memory values
-        )
-    {
+    function getDataByHash(
+        uint256[] calldata keyHashes,
+        uint256 tokenId
+    ) external view override returns (address resolver, address owner, string[] memory keys, string[] memory values) {
         return _getDataByHash(keyHashes, tokenId);
     }
 
-    function getDataByHashForMany(uint256[] calldata keyHashes, uint256[] calldata tokenIds)
+    function getDataByHashForMany(
+        uint256[] calldata keyHashes,
+        uint256[] calldata tokenIds
+    )
         external
         view
         override
-        returns (
-            address[] memory resolvers,
-            address[] memory owners,
-            string[][] memory keys,
-            string[][] memory values
-        )
+        returns (address[] memory resolvers, address[] memory owners, string[][] memory keys, string[][] memory values)
     {
         resolvers = new address[](tokenIds.length);
         owners = new address[](tokenIds.length);
@@ -350,15 +327,10 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         }
     }
 
-    function _getData(string[] calldata keys, uint256 tokenId)
-        private
-        view
-        returns (
-            address resolver,
-            address owner,
-            string[] memory values
-        )
-    {
+    function _getData(
+        string[] calldata keys,
+        uint256 tokenId
+    ) private view returns (address resolver, address owner, string[] memory values) {
         values = new string[](keys.length);
         if (_useUns(tokenId)) {
             resolver = _unsRegistry.resolverOf(tokenId);
@@ -375,16 +347,10 @@ contract ProxyReader is ERC165Upgradeable, MulticallUpgradeable, Ownable, IRegis
         }
     }
 
-    function _getDataByHash(uint256[] calldata keyHashes, uint256 tokenId)
-        private
-        view
-        returns (
-            address resolver,
-            address owner,
-            string[] memory keys,
-            string[] memory values
-        )
-    {
+    function _getDataByHash(
+        uint256[] calldata keyHashes,
+        uint256 tokenId
+    ) private view returns (address resolver, address owner, string[] memory keys, string[] memory values) {
         keys = new string[](keyHashes.length);
         values = new string[](keyHashes.length);
         if (_useUns(tokenId)) {

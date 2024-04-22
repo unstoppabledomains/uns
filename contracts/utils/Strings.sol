@@ -42,11 +42,7 @@ library Strings {
      * @param len The sub slice length.
      * @return The slice of the original slice.
      */
-    function slice(
-        Slice memory self,
-        uint256 index,
-        uint256 len
-    ) internal pure returns (Slice memory) {
+    function slice(Slice memory self, uint256 index, uint256 len) internal pure returns (Slice memory) {
         return Slice(len, self._ptr + index);
     }
 }

@@ -32,8 +32,8 @@ interface IRecordReader {
      * @param keyHashes The key to query the value of.
      * @param tokenId The token id to set.
      */
-    function getManyByHash(uint256[] calldata keyHashes, uint256 tokenId)
-        external
-        view
-        returns (string[] memory keys, string[] memory values);
+    function getManyByHash(
+        uint256[] calldata keyHashes,
+        uint256 tokenId
+    ) external view returns (string[] memory keys, string[] memory values);
 }

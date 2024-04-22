@@ -19,10 +19,5 @@ interface IRootRegistry is IMintableERC721 {
      * @param keys New record keys
      * @param values New record values
      */
-    function withdrawFromPolygon(
-        bytes calldata inputData,
-        uint256 tokenId,
-        string[] calldata keys,
-        string[] calldata values
-    ) external;
+    function withdrawFromPolygon(bytes calldata inputData, uint256 tokenId, string[] calldata keys, string[] calldata values) external;
 }

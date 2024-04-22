@@ -54,11 +54,7 @@ contract BaseRoutingForwarderMock is BaseRoutingForwarder {
         revert('mockFor');
     }
 
-    function _buildRouteData(
-        bytes4 selector,
-        bytes memory data,
-        bytes memory signature
-    ) internal pure override returns (bytes memory) {
+    function _buildRouteData(bytes4 selector, bytes memory data, bytes memory signature) internal pure override returns (bytes memory) {
         if (selector == bytes4(keccak256('transferFromFor(address,address,uint256,bytes)'))) {
             (address p1, address p2, uint256 p3) = abi.decode(data, (address, address, uint256));
             return abi.encodeWithSelector(selector, p1, p2, p3, signature);

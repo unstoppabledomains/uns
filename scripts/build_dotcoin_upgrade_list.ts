@@ -1,16 +1,15 @@
 import path from 'path';
 import fs from 'fs';
-import { network } from 'hardhat';
-import { utils, BigNumber, Contract } from 'ethers';
-import { Log } from '@ethersproject/abstract-provider';
+import { network, ethers } from 'hardhat';
+import { BaseContract, id, Log, toBeHex } from 'ethers';
 import { getNetworkConfig } from '../src/config';
 import { UNSRegistry__factory } from '../types/factories/contracts';
-import { unwrap } from '../src/helpers';
+import { unwrap } from '../src/utils';
 
-const NEW_URI_EVENT_TOPIC = utils.id('NewURI(uint256,string)');
+const NEW_URI_EVENT_TOPIC = id('NewURI(uint256,string)');
 
-const normalizeTokenId = (bigNumber: BigNumber) => {
-  return utils.hexZeroPad(bigNumber.toHexString(), 32).toLowerCase();
+const normalizeTokenId = (number: bigint) => {
+  return toBeHex(number, 32).toLowerCase();
 };
 
 type State = {
@@ -60,7 +59,7 @@ function getContractsConfig (chainId: number) {
 }
 
 async function fetchLogs (
-  contract: Contract,
+  contract: BaseContract,
   topics: string[],
   fromBlock: number,
   toBlock: number,
@@ -69,18 +68,19 @@ async function fetchLogs (
   const maxBlock = fromBlock + limit;
   const _toBlock = Math.min(maxBlock, toBlock);
 
-  console.log(`Fetching events blocks [${contract.address}: ${fromBlock}-${_toBlock}]`);
+  console.log(`Fetching events blocks [${await contract.getAddress()}: ${fromBlock}-${_toBlock}]`);
 
   try {
-    const events = await contract.provider.getLogs({
-      address: contract.address,
+    const events = await ethers.provider.getLogs({
+      address: await contract.getAddress(),
       topics,
       fromBlock,
       toBlock: _toBlock,
     });
 
     return toBlock > maxBlock ? events.concat(await fetchLogs(contract, topics, _toBlock, toBlock, limit)) : events;
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     console.log('FAIL', err);
 
     if (err.message === 'query returned more than 10000 results') {
@@ -124,7 +124,7 @@ async function main () {
     throw new Error('Current network configuration does not hase UNSRegistry');
   }
 
-  const unsRegistryContract = new UNSRegistry__factory().attach(contractsConfig.UNSRegistry.address);
+  const unsRegistryContract = UNSRegistry__factory.connect(contractsConfig.UNSRegistry.address);
 
   const currentState = readState(chainId);
   const newState = JSON.parse(JSON.stringify(currentState));
@@ -134,7 +134,7 @@ async function main () {
     : currentState.latestSyncedL2Block;
 
   const fromBlock = Math.max(latestSyncedBlock, parseInt(contractsConfig.UNSRegistry.deploymentBlock));
-  const toBlock = await unsRegistryContract.provider.getBlockNumber();
+  const toBlock = await ethers.provider.getBlockNumber();
 
   console.log('Fetching events from ' + fromBlock + ' to ' + toBlock);
 
@@ -150,7 +150,12 @@ async function main () {
 
   const parsedLogs = result.map((log) => unsRegistryContract.interface.parseLog(log));
 
-  parsedLogs.forEach(({ name, args }) => {
+  parsedLogs.forEach((log) => {
+    if (!log) {
+      return;
+    }
+
+    const { name, args } = log;
     if (name !== 'NewURI') {
       return;
     }

@@ -2,7 +2,7 @@ import fs from 'fs';
 import { ethers, network } from 'hardhat';
 import { parse } from 'csv-parse/sync';
 import { chunk, at } from 'lodash';
-import { unwrap } from '../src/helpers';
+import { unwrap } from '../src/utils';
 import { getNetworkConfig } from '../src/config';
 import { ProxyReader__factory } from '../types/factories/contracts';
 import { ProxyReader } from '../types/contracts/ProxyReader';

@@ -1,9 +1,8 @@
 import * as fs from 'fs';
-import { unwrap } from '../src/helpers';
 
 type ContractSetup = {
   address: string;
-  forwarder?: string;
+  forwarder: string;
   implementation?: string;
   legacyAddresses: string[];
   deprecated: boolean;
@@ -41,7 +40,7 @@ const link = (network: string, address: string): string => {
 
 const contractLinks = (
   network: string,
-  address?: string | string[],
+  address: string | string[],
 ): string => {
   const addresses =
     address instanceof Array
@@ -50,7 +49,7 @@ const contractLinks = (
         ? [address]
         : [];
   return addresses.length
-    ? addresses.map((a) => link(network, unwrap(a))).join('<br/>')
+    ? addresses.map((a) => link(network, a)).join('<br/>')
     : '&mdash;';
 };
 

@@ -1,22 +1,27 @@
+
+/**
+ * values are paths the specific contracts
+ */
 export enum ArtifactName {
   CNSRegistry = 'CNSRegistry',
   CNSRegistryForwarder = 'CNSRegistryForwarder',
   SignatureController = 'SignatureController',
   MintingController = 'MintingController',
   URIPrefixController = 'URIPrefixController',
-  Resolver = 'Resolver',
+  Resolver = 'dot-crypto/contracts/Resolver.sol:Resolver',
   ResolverForwarder = 'ResolverForwarder',
   UNSRegistry = 'UNSRegistry',
   MintingManager = 'MintingManager',
   UNSOperator = 'UNSOperator',
   MintingManagerForwarder = 'MintingManagerForwarder',
-  ProxyReader = 'ProxyReader',
+  ProxyReader = 'contracts/ProxyReader.sol:ProxyReader',
   DummyStateSender = 'DummyStateSender',
   CheckpointManager = 'SimpleCheckpointManager',
   MintableERC721Predicate = 'MintableERC721Predicate',
   RootChainManager = 'RootChainManager',
   DotCoinBurner = 'DotCoinBurner',
   ZilliqaRecover = 'ZilliqaRecover',
+
   // ENS
   ENSRegistry = 'ENSRegistry',
   BaseRegistrarImplementation = 'BaseRegistrarImplementation',

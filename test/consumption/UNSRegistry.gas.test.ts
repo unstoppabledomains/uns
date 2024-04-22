@@ -1,6 +1,6 @@
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { ContractTransactionReceipt, id } from 'ethers';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber, utils } from 'ethers';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
 import { TLD, ZERO_ADDRESS } from '../helpers/constants';
@@ -10,9 +10,9 @@ describe('UNSRegistry (consumption)', () => {
   let unsRegistry: UNSRegistry;
   let signers: SignerWithAddress[], coinbase: SignerWithAddress;
 
-  const initializeKey = async (key) => {
+  const initializeKey = async (key: string) => {
     await unsRegistry.addKey(key);
-    return BigNumber.from(utils.id(key));
+    return BigInt(id(key));
   };
 
   before(async () => {
@@ -66,6 +66,7 @@ describe('UNSRegistry (consumption)', () => {
         params2: ['9898219.c054e083d016bc5000000000000000000000000000000000000000000000000000000000000.f4240', 'v1'],
       },
     ];
+
     for (let i = 0; i < cases.length; i++) {
       const { name, selector1, selector2, labels1, labels2, params1, params2 } = cases[i];
 
@@ -79,17 +80,17 @@ describe('UNSRegistry (consumption)', () => {
       const keyHash = await initializeKey(key);
 
       const tx1 = await unsRegistry[selector1](...params1, tokenId1);
-      tx1.receipt = await tx1.wait();
+      const tx1Receipt = (await tx1.wait()) as ContractTransactionReceipt;
 
       const tx2 = await unsRegistry[selector2](keyHash, value, tokenId2);
-      tx2.receipt = await tx2.wait();
+      const tx2Receipt = (await tx2.wait()) as ContractTransactionReceipt;
 
       result.push({
         name,
         recordLen: params1[0].length,
-        set: tx1.receipt.gasUsed.toString(),
-        setByHash: tx2.receipt.gasUsed.toString(),
-        increase: percDiff(tx1.receipt.gasUsed.toNumber(), tx2.receipt.gasUsed.toNumber()) + ' %',
+        set: tx1Receipt.gasUsed.toString(),
+        setByHash: tx2Receipt.gasUsed.toString(),
+        increase: percDiff(tx1Receipt.gasUsed, tx2Receipt.gasUsed) + ' %',
       });
     }
     console.table(result);
@@ -152,17 +153,17 @@ describe('UNSRegistry (consumption)', () => {
       const keyHashes = keys.map(async (key) => await initializeKey(key));
 
       const tx1 = await unsRegistry[selector1](...params1, tokenId1);
-      tx1.receipt = await tx1.wait();
+      const tx1Receipt = (await tx1.wait()) as ContractTransactionReceipt;
 
       const tx2 = await unsRegistry[selector2](keyHashes, values, tokenId2);
-      tx2.receipt = await tx2.wait();
+      const tx2Receipt = (await tx2.wait()) as ContractTransactionReceipt;
 
       result.push({
         name,
         records: params1[0].length,
-        setMany: tx1.receipt.gasUsed.toString(),
-        setManyByHash: tx2.receipt.gasUsed.toString(),
-        increase: percDiff(tx1.receipt.gasUsed.toNumber(), tx2.receipt.gasUsed.toNumber()) + ' %',
+        setMany: tx1Receipt.gasUsed.toString(),
+        setManyByHash: tx2Receipt.gasUsed.toString(),
+        increase: percDiff(tx1Receipt.gasUsed, tx2Receipt.gasUsed) + ' %',
       });
     }
     console.table(result);

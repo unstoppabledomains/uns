@@ -1,8 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-
-import { BigNumber, utils } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { id } from 'ethers';
 import { ProxyReader, UNSRegistry } from '../types/contracts';
 import { ProxyReader__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { getInterfaceId } from './helpers/proxy';
@@ -16,12 +15,12 @@ describe('ProxyReader (UNS only)', () => {
 
   let unsRegistry: UNSRegistry, proxyReader: ProxyReader;
   let signers: SignerWithAddress[], coinbase: SignerWithAddress, accounts: string[];
-  let walletTokenId: BigNumber, cryptoTokenId: BigNumber;
+  let walletTokenId: bigint, cryptoTokenId: bigint;
 
   before(async () => {
     signers = await ethers.getSigners();
     [coinbase] = signers;
-    [, ...accounts] = signers.map(s => s.address);
+    [, ...accounts] = signers.map((s) => s.address);
 
     // deploy UNS
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
@@ -49,7 +48,7 @@ describe('ProxyReader (UNS only)', () => {
     });
 
     proxyReader = await new ProxyReader__factory(coinbase).deploy();
-    await proxyReader.initialize(unsRegistry.address, ZERO_ADDRESS);
+    await proxyReader.initialize(unsRegistry.getAddress(), ZERO_ADDRESS);
   });
 
   it('should support IERC165 interface', async () => {
@@ -62,8 +61,17 @@ describe('ProxyReader (UNS only)', () => {
   describe('IRegistryReader', () => {
     it('should support IRegistryReader interface', async () => {
       const functions = [
-        'tokenURI', 'isApprovedOrOwner', 'resolverOf', 'namehash', 'balanceOf',
-        'ownerOf', 'getApproved', 'isApprovedForAll', 'exists', 'reverseOf', 'reverseNameOf',
+        'tokenURI',
+        'isApprovedOrOwner',
+        'resolverOf',
+        'namehash',
+        'balanceOf',
+        'ownerOf',
+        'getApproved',
+        'isApprovedForAll',
+        'exists',
+        'reverseOf',
+        'reverseNameOf',
       ];
 
       const interfaceId = getInterfaceId(proxyReader, functions);
@@ -71,9 +79,9 @@ describe('ProxyReader (UNS only)', () => {
     });
 
     it('should revert isApprovedForAll call', async () => {
-      await expect(
-        proxyReader.isApprovedForAll(accounts[0], accounts[1]),
-      ).to.be.revertedWith('ProxyReader: UNSUPPORTED_METHOD');
+      await expect(proxyReader.isApprovedForAll(accounts[0], accounts[1])).to.be.revertedWith(
+        'ProxyReader: UNSUPPORTED_METHOD',
+      );
     });
 
     describe('getApproved', () => {
@@ -165,7 +173,7 @@ describe('ProxyReader (UNS only)', () => {
     describe('ownerOf', () => {
       it('should return empty owner for unknown domain', async () => {
         const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
-        const owners = await proxyReader.callStatic.ownerOf(unknownTokenId);
+        const owners = await proxyReader.ownerOf.staticCall(unknownTokenId);
         expect(owners).to.be.equal(ZERO_ADDRESS);
       });
 
@@ -192,7 +200,7 @@ describe('ProxyReader (UNS only)', () => {
         const resolverResult = await unsRegistry.resolverOf(walletTokenId);
 
         expect(proxyResult).to.be.equal(resolverResult);
-        expect(resolverResult).to.be.equal(unsRegistry.address);
+        expect(resolverResult).to.be.equal(await unsRegistry.getAddress());
       });
 
       it('should return resolver of .crypto domain', async () => {
@@ -200,7 +208,7 @@ describe('ProxyReader (UNS only)', () => {
         const resolverResult = await unsRegistry.resolverOf(cryptoTokenId);
 
         expect(proxyResult).to.be.equal(resolverResult);
-        expect(resolverResult).to.be.equal(unsRegistry.address);
+        expect(resolverResult).to.be.equal(await unsRegistry.getAddress());
       });
 
       it('should return false value when token does not exist', async () => {
@@ -215,8 +223,9 @@ describe('ProxyReader (UNS only)', () => {
         const resolverResult = await unsRegistry.tokenURI(walletTokenId);
 
         expect(proxyResult).to.be.equal(resolverResult);
-        expect(resolverResult).to.be
-          .equal('/40559307672254207728557027035302885851369665055277251407821151545011532191308');
+        expect(resolverResult).to.be.equal(
+          '/40559307672254207728557027035302885851369665055277251407821151545011532191308',
+        );
       });
 
       it('should return tokenURI of .crypto domain', async () => {
@@ -224,8 +233,9 @@ describe('ProxyReader (UNS only)', () => {
         const resolverResult = await unsRegistry.tokenURI(cryptoTokenId);
 
         expect(proxyResult).to.be.equal(resolverResult);
-        expect(resolverResult).to.be
-          .equal('/107771857897517834290909154724501010203356272148473478760301214125032721342346');
+        expect(resolverResult).to.be.equal(
+          '/107771857897517834290909154724501010203356272148473478760301214125032721342346',
+        );
       });
 
       it('should return empty tokenURI when token does not exist', async () => {
@@ -240,8 +250,9 @@ describe('ProxyReader (UNS only)', () => {
         const resolverResult = await unsRegistry.namehash(['test', 'wallet']);
 
         expect(proxyResult).to.be.equal(resolverResult);
-        expect(resolverResult).to.be
-          .equal('50586162622368517199428676025463367639931450566950616867100918499864570754504');
+        expect(resolverResult).to.be.equal(
+          '50586162622368517199428676025463367639931450566950616867100918499864570754504',
+        );
       });
 
       it('should return namehash of .crypto domain', async () => {
@@ -249,8 +260,9 @@ describe('ProxyReader (UNS only)', () => {
         const resolverResult = await unsRegistry.namehash(['test', 'crypto']);
 
         expect(proxyResult).to.be.equal(resolverResult);
-        expect(resolverResult).to.be
-          .equal('82856763987730893573226808376519199326595862773989062576563108342755511775491');
+        expect(resolverResult).to.be.equal(
+          '82856763987730893573226808376519199326595862773989062576563108342755511775491',
+        );
       });
     });
 
@@ -405,7 +417,7 @@ describe('ProxyReader (UNS only)', () => {
 
     describe('getByHash', () => {
       it('should return value of record for .wallet domain', async () => {
-        const keyHash = utils.id('get_key_4235');
+        const keyHash = id('get_key_4235');
         await unsRegistry.set('get_key_4235', 'value1454', walletTokenId);
 
         const proxyResult = await proxyReader.getByHash(keyHash, walletTokenId);
@@ -416,7 +428,7 @@ describe('ProxyReader (UNS only)', () => {
       });
 
       it('should return value of record for .crypto domain', async () => {
-        const keyHash = utils.id('get_key_0946');
+        const keyHash = id('get_key_0946');
         await unsRegistry.set('get_key_0946', 'value4521', cryptoTokenId);
 
         const proxyResult = await proxyReader.getByHash(keyHash, cryptoTokenId);
@@ -429,7 +441,7 @@ describe('ProxyReader (UNS only)', () => {
 
     describe('getManyByHash', () => {
       it('should return list with empty value for unregistered key', async () => {
-        const keyHash = utils.id('key_aaaaaa');
+        const keyHash = id('key_aaaaaa');
         const result = await proxyReader.getManyByHash([keyHash], walletTokenId);
         expect(result[0]).to.be.eql(['']);
       });
@@ -437,7 +449,7 @@ describe('ProxyReader (UNS only)', () => {
       it('should return list with single value for .wallet domain', async () => {
         const [key] = keys;
         const [value] = values;
-        const keyHash = utils.id(key);
+        const keyHash = id(key);
         await unsRegistry.set(key, value, walletTokenId);
 
         const proxyResult = await proxyReader.getManyByHash([keyHash], walletTokenId);
@@ -450,7 +462,7 @@ describe('ProxyReader (UNS only)', () => {
       it('should return list with single value for .crypto domain', async () => {
         const [key] = keys;
         const [value] = values;
-        const keyHash = utils.id(key);
+        const keyHash = id(key);
         await unsRegistry.set(key, value, cryptoTokenId);
 
         const proxyResult = await proxyReader.getManyByHash([keyHash], cryptoTokenId);
@@ -477,7 +489,7 @@ describe('ProxyReader (UNS only)', () => {
         const _tokenId = await unsRegistry.namehash([_domainName, 'wallet']);
 
         // act
-        const data = await proxyReader.callStatic.getData(keys, _tokenId);
+        const data = await proxyReader.getData.staticCall(keys, _tokenId);
 
         // asserts
         expect(data).to.be.eql([ZERO_ADDRESS, ZERO_ADDRESS, ['', '']]);
@@ -489,7 +501,7 @@ describe('ProxyReader (UNS only)', () => {
         const _tokenId = await unsRegistry.namehash([_domainName, 'crypto']);
 
         // act
-        const data = await proxyReader.callStatic.getData(keys, _tokenId);
+        const data = await proxyReader.getData.staticCall(keys, _tokenId);
 
         // asserts
         expect(data).to.be.eql([ZERO_ADDRESS, ZERO_ADDRESS, ['', '']]);
@@ -500,10 +512,10 @@ describe('ProxyReader (UNS only)', () => {
         const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['hey_hoy_121', 'crypto'] });
 
         // act
-        const data = await proxyReader.callStatic.getData(keys, tokenId);
+        const data = await proxyReader.getData.staticCall(keys, tokenId);
 
         // asserts
-        expect(data).to.be.eql([unsRegistry.address, coinbase.address, ['', '']]);
+        expect(data).to.be.eql([await unsRegistry.getAddress(), coinbase.address, ['', '']]);
       });
 
       it('should return data for .wallet domain', async () => {
@@ -511,16 +523,16 @@ describe('ProxyReader (UNS only)', () => {
         const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['hey_hoy_121', 'wallet'] });
 
         // act
-        const data = await proxyReader.callStatic.getData(keys, tokenId);
+        const data = await proxyReader.getData.staticCall(keys, tokenId);
 
         // asserts
-        expect(data).to.be.eql([unsRegistry.address, coinbase.address, ['', '']]);
+        expect(data).to.be.eql([await unsRegistry.getAddress(), coinbase.address, ['', '']]);
       });
     });
 
     describe('getDataForMany', () => {
       it('should return empty lists for empty list of domains', async () => {
-        const data = await proxyReader.callStatic.getDataForMany([], []);
+        const data = await proxyReader.getDataForMany.staticCall([], []);
 
         expect(data).to.be.eql([[], [], []]);
       });
@@ -532,10 +544,17 @@ describe('ProxyReader (UNS only)', () => {
         const _cryptoTokenId = await unsRegistry.namehash([_domainName, 'crypto']);
 
         // act
-        const data = await proxyReader.callStatic.getDataForMany(keys, [_walletTokenId, _cryptoTokenId]);
+        const data = await proxyReader.getDataForMany.staticCall(keys, [_walletTokenId, _cryptoTokenId]);
 
         // asserts
-        expect(data).to.be.eql([[ZERO_ADDRESS, ZERO_ADDRESS], [ZERO_ADDRESS, ZERO_ADDRESS], [['', ''], ['', '']]]);
+        expect(data).to.be.eql([
+          [ZERO_ADDRESS, ZERO_ADDRESS],
+          [ZERO_ADDRESS, ZERO_ADDRESS],
+          [
+            ['', ''],
+            ['', ''],
+          ],
+        ]);
       });
 
       it('should return data for multiple .crypto|.wallet domains', async () => {
@@ -550,13 +569,16 @@ describe('ProxyReader (UNS only)', () => {
         }
 
         // act
-        const data = await proxyReader.callStatic.getDataForMany(keys, [_walletTokenId, _cryptoTokenId]);
+        const data = await proxyReader.getDataForMany.staticCall(keys, [_walletTokenId, _cryptoTokenId]);
 
         // assert
         expect(data).to.be.eql([
-          [unsRegistry.address, unsRegistry.address],
+          [await unsRegistry.getAddress(), await unsRegistry.getAddress()],
           [coinbase.address, coinbase.address],
-          [['test.value1', 'test.value2'], ['test.value1', 'test.value2']],
+          [
+            ['test.value1', 'test.value2'],
+            ['test.value1', 'test.value2'],
+          ],
         ]);
       });
 
@@ -565,11 +587,11 @@ describe('ProxyReader (UNS only)', () => {
         const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
 
         // act
-        const data = await proxyReader.callStatic.getDataForMany([], [walletTokenId, unknownTokenId]);
+        const data = await proxyReader.getDataForMany.staticCall([], [walletTokenId, unknownTokenId]);
 
         // assert
         expect(data).to.be.eql([
-          [unsRegistry.address, ZERO_ADDRESS],
+          [await unsRegistry.getAddress(), ZERO_ADDRESS],
           [coinbase.address, ZERO_ADDRESS],
           [[], []],
         ]);
@@ -579,12 +601,12 @@ describe('ProxyReader (UNS only)', () => {
     describe('getDataByHash', () => {
       it('should return empty data for non-existing .wallet domain', async () => {
         // arrange
-        const hashes = keys.map(utils.id);
+        const hashes = keys.map(id);
         const _domainName = 'hey_hoy_29224';
         const _tokenId = await unsRegistry.namehash([_domainName, 'wallet']);
 
         // act
-        const data = await proxyReader.callStatic.getDataByHash(hashes, _tokenId);
+        const data = await proxyReader.getDataByHash.staticCall(hashes, _tokenId);
 
         // asserts
         expect(data).to.be.eql([ZERO_ADDRESS, ZERO_ADDRESS, keys, ['', '']]);
@@ -592,12 +614,12 @@ describe('ProxyReader (UNS only)', () => {
 
       it('should return empty data for non-existing .crypto domain', async () => {
         // arrange
-        const hashes = keys.map(utils.id);
+        const hashes = keys.map(id);
         const _domainName = 'hey_hoy_29228';
         const _tokenId = await unsRegistry.namehash([_domainName, 'crypto']);
 
         // act
-        const data = await proxyReader.callStatic.getDataByHash(hashes, _tokenId);
+        const data = await proxyReader.getDataByHash.staticCall(hashes, _tokenId);
 
         // asserts
         expect(data).to.be.eql([ZERO_ADDRESS, ZERO_ADDRESS, keys, ['', '']]);
@@ -605,74 +627,67 @@ describe('ProxyReader (UNS only)', () => {
 
       it('should return data by hashes for .crypto domain', async () => {
         // arrange
-        const hashes = keys.map(utils.id);
+        const hashes = keys.map(id);
         const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['hey_hoy_292', 'crypto'] });
         for (let i = 0; i < keys.length; i++) {
           await unsRegistry.set(keys[i], values[i], tokenId);
         }
 
         // act
-        const data = await proxyReader.callStatic.getDataByHash(hashes, tokenId);
+        const data = await proxyReader.getDataByHash.staticCall(hashes, tokenId);
 
         // assert
-        expect(data).to.be.eql([
-          unsRegistry.address,
-          coinbase.address,
-          keys,
-          values,
-        ]);
+        expect(data).to.be.eql([await unsRegistry.getAddress(), coinbase.address, keys, values]);
       });
 
       it('should return data by hashes for .wallet domain', async () => {
         // arrange
-        const hashes = keys.map(utils.id);
+        const hashes = keys.map(id);
         const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['hey_hoy_292', 'wallet'] });
         for (let i = 0; i < keys.length; i++) {
           await unsRegistry.set(keys[i], values[i], tokenId);
         }
 
         // act
-        const data = await proxyReader.callStatic.getDataByHash(hashes, tokenId);
+        const data = await proxyReader.getDataByHash.staticCall(hashes, tokenId);
 
         // assert
-        expect(data).to.be.eql([
-          unsRegistry.address,
-          coinbase.address,
-          keys,
-          values,
-        ]);
+        expect(data).to.be.eql([await unsRegistry.getAddress(), coinbase.address, keys, values]);
       });
     });
 
     describe('getDataByHashForMany', () => {
       it('should return empty lists for empty list of domains', async () => {
-        const data = await proxyReader.callStatic.getDataByHashForMany([], []);
+        const data = await proxyReader.getDataByHashForMany.staticCall([], []);
 
         expect(data).to.be.eql([[], [], [], []]);
       });
 
       it('should return empty data for non-existing .crypto|.wallet domains', async () => {
         // arrange
-        const hashes = keys.map(utils.id);
+        const hashes = keys.map(id);
         const _domainName = 'hey_hoy_1037';
         const _walletTokenId = await unsRegistry.namehash([_domainName, 'wallet']);
         const _cryptoTokenId = await unsRegistry.namehash([_domainName, 'crypto']);
 
         // act
-        const data = await proxyReader.callStatic.getDataByHashForMany(hashes, [_walletTokenId, _cryptoTokenId]);
+        const data = await proxyReader.getDataByHashForMany.staticCall(hashes, [_walletTokenId, _cryptoTokenId]);
 
         // asserts
         expect(data).to.be.eql([
           [ZERO_ADDRESS, ZERO_ADDRESS],
           [ZERO_ADDRESS, ZERO_ADDRESS],
           [keys, keys],
-          [['', ''], ['', '']],
+          [
+            ['', ''],
+            ['', ''],
+          ],
         ]);
       });
 
       it('should return data for multiple .crypto|.wallet domains', async () => {
         // arrange
-        const hashes = keys.map(utils.id);
+        const hashes = keys.map(id);
         const _domainName = 'test_1082q';
         const _walletTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: [_domainName, 'wallet'] });
         const _cryptoTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: [_domainName, 'crypto'] });
@@ -683,14 +698,20 @@ describe('ProxyReader (UNS only)', () => {
         }
 
         // act
-        const data = await proxyReader.callStatic.getDataByHashForMany(hashes, [_walletTokenId, _cryptoTokenId]);
+        const data = await proxyReader.getDataByHashForMany.staticCall(hashes, [_walletTokenId, _cryptoTokenId]);
 
         // assert
         expect(data).to.be.eql([
-          [unsRegistry.address, unsRegistry.address],
+          [await unsRegistry.getAddress(), await unsRegistry.getAddress()],
           [coinbase.address, coinbase.address],
-          [['test.key1', 'test.key2'], ['test.key1', 'test.key2']],
-          [['test.value1', 'test.value2'], ['test.value1', 'test.value2']],
+          [
+            ['test.key1', 'test.key2'],
+            ['test.key1', 'test.key2'],
+          ],
+          [
+            ['test.value1', 'test.value2'],
+            ['test.value1', 'test.value2'],
+          ],
         ]);
       });
 
@@ -699,11 +720,11 @@ describe('ProxyReader (UNS only)', () => {
         const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
 
         // act
-        const data = await proxyReader.callStatic.getDataByHashForMany([], [walletTokenId, unknownTokenId]);
+        const data = await proxyReader.getDataByHashForMany.staticCall([], [walletTokenId, unknownTokenId]);
 
         // assert
         expect(data).to.be.eql([
-          [unsRegistry.address, ZERO_ADDRESS],
+          [await unsRegistry.getAddress(), ZERO_ADDRESS],
           [coinbase.address, ZERO_ADDRESS],
           [[], []],
           [[], []],
@@ -714,12 +735,12 @@ describe('ProxyReader (UNS only)', () => {
     describe('ownerOfForMany', () => {
       it('should return empty owner for unknown domain', async () => {
         const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
-        const owners = await proxyReader.callStatic.ownerOfForMany([unknownTokenId]);
+        const owners = await proxyReader.ownerOfForMany.staticCall([unknownTokenId]);
         expect(owners).to.be.eql([ZERO_ADDRESS]);
       });
 
       it('should return empty list for empty list of domains', async () => {
-        const owners = await proxyReader.callStatic.ownerOfForMany([]);
+        const owners = await proxyReader.ownerOfForMany.staticCall([]);
         expect(owners).to.be.eql([]);
       });
 
@@ -730,7 +751,7 @@ describe('ProxyReader (UNS only)', () => {
         const _cryptoTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: [_domainName, 'crypto'] });
 
         // act
-        const owners = await proxyReader.callStatic.ownerOfForMany([walletTokenId, _walletTokenId, _cryptoTokenId]);
+        const owners = await proxyReader.ownerOfForMany.staticCall([walletTokenId, _walletTokenId, _cryptoTokenId]);
 
         // assert
         expect(owners).to.be.eql([coinbase.address, accounts[0], coinbase.address]);
@@ -741,7 +762,7 @@ describe('ProxyReader (UNS only)', () => {
         const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
 
         // act
-        const owners = await proxyReader.callStatic.ownerOfForMany([walletTokenId, unknownTokenId]);
+        const owners = await proxyReader.ownerOfForMany.staticCall([walletTokenId, unknownTokenId]);
 
         // assert
         expect(owners).to.be.eql([coinbase.address, ZERO_ADDRESS]);
@@ -757,24 +778,12 @@ describe('ProxyReader (UNS only)', () => {
     const ethLegacyKey = 'crypto.ETH.address';
 
     beforeEach(async () => {
-      await proxyReader['addBlockchainNetworks(string[],string[])'](
-        ['MATIC', 'ETH'],
-        ['ETH', 'ETH'],
-      );
+      await proxyReader['addBlockchainNetworks(string[],string[])'](['MATIC', 'ETH'], ['ETH', 'ETH']);
 
-      await proxyReader.addLegacyRecords(
-        ['token.ETH.MATIC.USDC.address'],
-        [[usdcMaticLegacyKey, usdcLegacyKey]],
-      );
-      await proxyReader.addLegacyRecords(
-        ['token.ETH.ETH.USDC.address'],
-        [[usdcEthLegacyKey, usdcLegacyKey]],
-      );
+      await proxyReader.addLegacyRecords(['token.ETH.MATIC.USDC.address'], [[usdcMaticLegacyKey, usdcLegacyKey]]);
+      await proxyReader.addLegacyRecords(['token.ETH.ETH.USDC.address'], [[usdcEthLegacyKey, usdcLegacyKey]]);
 
-      await proxyReader.addLegacyRecords(
-        ['token.ETH.ETH.ETH.address'],
-        [[ethLegacyKey]],
-      );
+      await proxyReader.addLegacyRecords(['token.ETH.ETH.ETH.address'], [[ethLegacyKey]]);
     });
 
     afterEach(async () => {
@@ -790,9 +799,7 @@ describe('ProxyReader (UNS only)', () => {
 
     describe('getAddressKeys', () => {
       it('returns the list of address keys and legacy keys in the correct order', async () => {
-        expect(
-          await proxyReader.getAddressKeys('ETH', 'USDC'),
-        ).to.deep.equal([
+        expect(await proxyReader.getAddressKeys('ETH', 'USDC')).to.deep.equal([
           'token.ETH.ETH.USDC.address',
           usdcEthLegacyKey,
           usdcLegacyKey,
@@ -800,9 +807,7 @@ describe('ProxyReader (UNS only)', () => {
           'token.ETH.address',
         ]);
 
-        expect(
-          await proxyReader.getAddressKeys('MATIC', 'USDC'),
-        ).to.deep.equal([
+        expect(await proxyReader.getAddressKeys('MATIC', 'USDC')).to.deep.equal([
           'token.ETH.MATIC.USDC.address',
           usdcMaticLegacyKey,
           usdcLegacyKey,
@@ -810,9 +815,7 @@ describe('ProxyReader (UNS only)', () => {
           'token.ETH.address',
         ]);
 
-        expect(
-          await proxyReader.getAddressKeys('ETH', 'ETH'),
-        ).to.deep.equal([
+        expect(await proxyReader.getAddressKeys('ETH', 'ETH')).to.deep.equal([
           'token.ETH.ETH.ETH.address',
           ethLegacyKey,
           'token.ETH.ETH.address',
@@ -821,17 +824,13 @@ describe('ProxyReader (UNS only)', () => {
       });
 
       it('returns the list of address keys without legacy keys if they are not defined', async () => {
-        expect(
-          await proxyReader.getAddressKeys('ETH', 'USDT'),
-        ).to.deep.equal([
+        expect(await proxyReader.getAddressKeys('ETH', 'USDT')).to.deep.equal([
           'token.ETH.ETH.USDT.address',
           'token.ETH.ETH.address',
           'token.ETH.address',
         ]);
 
-        expect(
-          await proxyReader.getAddressKeys('MATIC', 'MATIC'),
-        ).to.deep.equal([
+        expect(await proxyReader.getAddressKeys('MATIC', 'MATIC')).to.deep.equal([
           'token.ETH.MATIC.MATIC.address',
           'token.ETH.MATIC.address',
           'token.ETH.address',
@@ -839,163 +838,103 @@ describe('ProxyReader (UNS only)', () => {
       });
 
       it('returns empty list when family is not defined', async () => {
-        expect(
-          await proxyReader.getAddressKeys('UDTOKEN', 'UDTOKEN'),
-        ).to.deep.equal([]);
+        expect(await proxyReader.getAddressKeys('UDTOKEN', 'UDTOKEN')).to.deep.equal([]);
       });
     });
 
     describe('getAddress', () => {
+      const getAddress = async (network: string, token: string, tokenId: bigint) => {
+        return await proxyReader.getFunction('getAddress')(network, token, tokenId);
+      };
+
       it('should return most specific record by address keys', async () => {
-        const [
-          tokenKey,
-          legacyTokenKey1,
-          legacyTokenKey2,
-          networkKey,
-          familyKey,
-        ] = await proxyReader.getAddressKeys('ETH', 'USDC');
+        const [tokenKey, legacyTokenKey1, legacyTokenKey2, networkKey, familyKey] = await proxyReader.getAddressKeys(
+          'ETH',
+          'USDC',
+        );
 
         await unsRegistry.set(familyKey, 'family-level-record', walletTokenId);
-        expect(
-          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
-        ).to.equal('family-level-record');
+        expect(await getAddress('ETH', 'USDC', walletTokenId)).to.equal('family-level-record');
 
         await unsRegistry.set(networkKey, 'network-level-record', walletTokenId);
-        expect(
-          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
-        ).to.equal('network-level-record');
+        expect(await getAddress('ETH', 'USDC', walletTokenId)).to.equal('network-level-record');
 
         await unsRegistry.set(legacyTokenKey2, 'legacy-key-2-record', walletTokenId);
-        expect(
-          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
-        ).to.equal('legacy-key-2-record');
+        expect(await getAddress('ETH', 'USDC', walletTokenId)).to.equal('legacy-key-2-record');
 
         await unsRegistry.set(legacyTokenKey1, 'legacy-key-1-record', walletTokenId);
-        expect(
-          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
-        ).to.equal('legacy-key-1-record');
+        expect(await getAddress('ETH', 'USDC', walletTokenId)).to.equal('legacy-key-1-record');
 
         await unsRegistry.set(tokenKey, 'token-level-record', walletTokenId);
-        expect(
-          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
-        ).to.equal('token-level-record');
+        expect(await getAddress('ETH', 'USDC', walletTokenId)).to.equal('token-level-record');
       });
 
       it('should return most specific record by address keys with skipped levels', async () => {
-        const [
-          tokenKey,
-          legacyTokenKey,
-          ,
-          ,
-          familyKey,
-        ] = await proxyReader.getAddressKeys('ETH', 'USDC');
+        const [tokenKey, legacyTokenKey, , , familyKey] = await proxyReader.getAddressKeys('ETH', 'USDC');
 
         await unsRegistry.set(tokenKey, 'token-level-record', walletTokenId);
-        expect(
-          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
-        ).to.equal('token-level-record');
+        expect(await getAddress('ETH', 'USDC', walletTokenId)).to.equal('token-level-record');
 
         await unsRegistry.set(familyKey, 'family-level-record', walletTokenId);
-        expect(
-          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
-        ).to.equal('token-level-record');
+        expect(await getAddress('ETH', 'USDC', walletTokenId)).to.equal('token-level-record');
 
         await unsRegistry.set(tokenKey, '', walletTokenId);
 
-        expect(
-          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
-        ).to.equal('family-level-record');
+        expect(await getAddress('ETH', 'USDC', walletTokenId)).to.equal('family-level-record');
 
         await unsRegistry.set(legacyTokenKey, 'legacy-key-1-record', walletTokenId);
-        expect(
-          await proxyReader.getAddress('ETH', 'USDC', walletTokenId),
-        ).to.equal('legacy-key-1-record');
+        expect(await getAddress('ETH', 'USDC', walletTokenId)).to.equal('legacy-key-1-record');
       });
 
       it('should return empty string if family is not defined', async () => {
-        expect(
-          await proxyReader.getAddress('UDTOKEN', 'UDTOKEN', walletTokenId),
-        ).to.equal('');
+        expect(await getAddress('UDTOKEN', 'UDTOKEN', walletTokenId)).to.equal('');
       });
 
       it('should return empty string if token does not exist', async () => {
-        expect(
-          await proxyReader.getAddress('ETH', 'USDC', 0x42),
-        ).to.equal('');
+        expect(await getAddress('ETH', 'USDC', BigInt(42))).to.equal('');
       });
     });
 
     describe('getAddressKey', () => {
       it('should return most specific record key by address keys', async () => {
-        const [
-          tokenKey,
-          legacyTokenKey,
-          networkKey,
-          familyKey,
-        ] = await proxyReader.getAddressKeys('ETH', 'USDC');
+        const [tokenKey, legacyTokenKey, networkKey, familyKey] = await proxyReader.getAddressKeys('ETH', 'USDC');
 
         await unsRegistry.set(familyKey, '42', walletTokenId);
-        expect(
-          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
-        ).to.equal(familyKey);
+        expect(await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId)).to.equal(familyKey);
 
         await unsRegistry.set(networkKey, '42', walletTokenId);
-        expect(
-          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
-        ).to.equal(networkKey);
+        expect(await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId)).to.equal(networkKey);
 
         await unsRegistry.set(legacyTokenKey, '42', walletTokenId);
-        expect(
-          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
-        ).to.equal(legacyTokenKey);
+        expect(await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId)).to.equal(legacyTokenKey);
 
         await unsRegistry.set(tokenKey, '42', walletTokenId);
-        expect(
-          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
-        ).to.equal(tokenKey);
+        expect(await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId)).to.equal(tokenKey);
       });
 
       it('should return most specific record key by address keys with skipped levels', async () => {
-        const [
-          tokenKey,
-          legacyTokenKey,
-          ,
-          ,
-          familyKey,
-        ] = await proxyReader.getAddressKeys('ETH', 'USDC');
+        const [tokenKey, legacyTokenKey, , , familyKey] = await proxyReader.getAddressKeys('ETH', 'USDC');
 
         await unsRegistry.set(tokenKey, '42', walletTokenId);
-        expect(
-          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
-        ).to.equal(tokenKey);
+        expect(await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId)).to.equal(tokenKey);
 
         await unsRegistry.set(familyKey, '42', walletTokenId);
-        expect(
-          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
-        ).to.equal(tokenKey);
+        expect(await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId)).to.equal(tokenKey);
 
         await unsRegistry.set(tokenKey, '', walletTokenId);
 
-        expect(
-          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
-        ).to.equal(familyKey);
+        expect(await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId)).to.equal(familyKey);
 
         await unsRegistry.set(legacyTokenKey, '42', walletTokenId);
-        expect(
-          await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId),
-        ).to.equal(legacyTokenKey);
+        expect(await proxyReader.getAddressKey('ETH', 'USDC', walletTokenId)).to.equal(legacyTokenKey);
       });
 
       it('should return empty string if token does not exist', async () => {
-        expect(
-          await proxyReader.getAddressKey('ETH', 'USDC', 0x42),
-        ).to.equal('');
+        expect(await proxyReader.getAddressKey('ETH', 'USDC', 0x42)).to.equal('');
       });
 
       it('should return empty string if family is not defined', async () => {
-        expect(
-          await proxyReader.getAddressKey('UDTOKEN', 'UDTOKEN', walletTokenId),
-        ).to.equal('');
+        expect(await proxyReader.getAddressKey('UDTOKEN', 'UDTOKEN', walletTokenId)).to.equal('');
       });
     });
   });
@@ -1021,23 +960,23 @@ describe('ProxyReader (UNS only)', () => {
     it('should return value for .wallet domain', async () => {
       const tokenId = await mintDomain({ unsRegistry, owner: accounts[3], labels: ['hey_hoy_98hds', 'wallet'] });
       const address = await proxyReader.registryOf(tokenId);
-      expect(address).to.be.equal(unsRegistry.address);
+      expect(address).to.be.equal(await unsRegistry.getAddress());
     });
 
     it('should return value for .crypto domain', async () => {
       const tokenId = await mintDomain({ unsRegistry, owner: accounts[3], labels: ['hey_hoy_98hds', 'crypto'] });
       const address = await proxyReader.registryOf(tokenId);
-      expect(address).to.be.equal(unsRegistry.address);
+      expect(address).to.be.equal(await unsRegistry.getAddress());
     });
 
     it('should return value for .crypto TLD', async () => {
       const address = await proxyReader.registryOf(TLD.CRYPTO);
-      expect(address).to.be.equal(unsRegistry.address);
+      expect(address).to.be.equal(await unsRegistry.getAddress());
     });
 
     it('should return value for .wallet TLD', async () => {
       const address = await proxyReader.registryOf(TLD.WALLET);
-      expect(address).to.be.equal(unsRegistry.address);
+      expect(address).to.be.equal(await unsRegistry.getAddress());
     });
   });
 });

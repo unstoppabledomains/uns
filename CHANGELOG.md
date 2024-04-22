@@ -1,3 +1,7 @@
+## v0.9.10
+
+- Migrated to `ethers@6`, updated other dependencies
+
 ## v0.9.9
 
 - Add `.clay` TLD

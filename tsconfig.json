@@ -25,9 +25,10 @@
     "./uns-config.json"
   ],
   "include": [
+    "./types/**/*.ts",
     "./sandbox/**/*.ts",
     "./src/*.ts",
-    "./types/**/*.ts",
+    "./scripts/*.ts",
     "./test/**/*.ts"
   ]
 }

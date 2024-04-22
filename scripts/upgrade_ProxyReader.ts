@@ -1,7 +1,7 @@
 import { network } from 'hardhat';
 import { mergeNetworkConfig, getNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
-import { unwrap } from '../src/helpers';
+import { unwrap } from '../src/utils';
 
 async function main () {
   console.log('Network:', network.name);

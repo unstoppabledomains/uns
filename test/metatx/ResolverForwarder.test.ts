@@ -1,22 +1,12 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 import { TLD } from '../helpers/constants';
 import { ResolverForwarder } from '../../types/contracts/metatx';
-import {
-  CNSRegistry,
-  Resolver,
-} from '../../types/dot-crypto/contracts';
-import {
-  MintingController,
-  SignatureController,
-} from '../../types/dot-crypto/contracts/controllers';
-import {
-  CNSRegistry__factory,
-  Resolver__factory,
-} from '../../types/factories/dot-crypto/contracts';
+import { CNSRegistry, Resolver } from '../../types/dot-crypto/contracts';
+import { MintingController, SignatureController } from '../../types/dot-crypto/contracts/controllers';
+import { CNSRegistry__factory, Resolver__factory } from '../../types/factories/dot-crypto/contracts';
 import {
   MintingController__factory,
   SignatureController__factory,
@@ -33,19 +23,13 @@ describe('ResolverForwarder', () => {
   let signers: SignerWithAddress[], owner: SignerWithAddress;
   let buildExecuteParams: ExecuteFunc;
 
-  const mintDomain = async (
-    label: string,
-    owner: string,
-    resolverAddress: string = resolver.address,
-  ): Promise<BigNumber> => {
-    await mintingController.mintSLDWithResolver(owner, label, resolverAddress);
+  const mintDomain = async (label: string, owner: string, resolverAddress?: string): Promise<bigint> => {
+    await mintingController.mintSLDWithResolver(owner, label, resolverAddress ?? (await resolver.getAddress()));
+
     return await registry.childIdOf(TLD.CRYPTO, label);
   };
 
-  const mintDomainWithoutResolver = async (
-    label: string,
-    owner: string,
-  ): Promise<BigNumber> => {
+  const mintDomainWithoutResolver = async (label: string, owner: string): Promise<bigint> => {
     await mintingController.mintSLD(owner, label);
     return await registry.childIdOf(TLD.CRYPTO, label);
   };
@@ -55,30 +39,22 @@ describe('ResolverForwarder', () => {
     [owner] = signers;
 
     registry = await new CNSRegistry__factory(owner).deploy();
-    mintingController = await new MintingController__factory(owner).deploy(
-      registry.address,
-    );
-    signatureController = await new SignatureController__factory(owner).deploy(
-      registry.address,
-    );
+    mintingController = await new MintingController__factory(owner).deploy(await registry.getAddress());
+    signatureController = await new SignatureController__factory(owner).deploy(await registry.getAddress());
     resolver = await new Resolver__factory(owner).deploy(
-      registry.address,
-      mintingController.address,
+      await registry.getAddress(),
+      await mintingController.getAddress(),
     );
 
-    await registry.addController(mintingController.address);
-    await registry.addController(signatureController.address);
+    await registry.addController(await mintingController.getAddress());
+    await registry.addController(await signatureController.getAddress());
 
     forwarder = await new ResolverForwarder__factory(owner).deploy(
-      registry.address,
-      resolver.address,
+      await registry.getAddress(),
+      await resolver.getAddress(),
     );
 
-    buildExecuteParams = buildExecuteFunc(
-      resolver.interface,
-      resolver.address,
-      forwarder,
-    );
+    buildExecuteParams = buildExecuteFunc(resolver.interface, await resolver.getAddress(), forwarder);
   });
 
   describe('nonceOf', () => {
@@ -90,12 +66,7 @@ describe('ResolverForwarder', () => {
       expect(nonceF).to.be.equal(0);
       expect(nonceF).to.be.equal(nonceR);
 
-      const { req, signature } = await buildExecuteParams(
-        'reset(uint256)',
-        [tokenId],
-        owner,
-        tokenId,
-      );
+      const { req, signature } = await buildExecuteParams('reset(uint256)', [tokenId], owner, tokenId);
       await forwarder.execute(req, signature);
 
       nonceF = await forwarder.nonceOf(tokenId);
@@ -105,47 +76,31 @@ describe('ResolverForwarder', () => {
     });
 
     it('should return nonce from default resolver when domain doesn\'t have own', async () => {
-      const tokenId = await mintDomainWithoutResolver(
-        'test_foo_no_res',
-        owner.address,
-      );
+      const tokenId = await mintDomainWithoutResolver('test_foo_no_res', owner.address);
       const nonceF = await forwarder.nonceOf(tokenId);
       const nonceR = await resolver.nonceOf(tokenId);
 
       expect(nonceF).to.be.equal(nonceR);
 
       // should be reverted when domain resolver is not set
-      await expect(registry.resolverOf(tokenId)).to.be.revertedWith('');
+      await expect(registry.resolverOf(tokenId)).to.be.revertedWithoutReason();
     });
 
     it('should return nonce from default resolver when resolver is non-contract', async () => {
-      const tokenId = await mintDomain(
-        'test_foo_noc',
-        owner.address,
-        owner.address,
-      );
+      const tokenId = await mintDomain('test_foo_noc', owner.address, owner.address);
       expect(await forwarder.nonceOf(tokenId)).to.be.equal(0);
     });
 
     it('should return nonce from default resolver when resolver is wrong', async () => {
-      const tokenId = await mintDomain(
-        'test_foo_nof',
-        owner.address,
-        forwarder.address,
-      );
+      const tokenId = await mintDomain('test_foo_nof', owner.address, await forwarder.getAddress());
       expect(await forwarder.nonceOf(tokenId)).to.be.equal(0);
     });
 
     it('should return nonce from default resolver when resolver is wrong 2', async () => {
       const tokenId = await mintDomain('test_foo_nof2', owner.address);
-      const { req, signature } = await buildExecuteParams(
-        'reset(uint256)',
-        [tokenId],
-        owner,
-        tokenId,
-      );
+      const { req, signature } = await buildExecuteParams('reset(uint256)', [tokenId], owner, tokenId);
       await forwarder.execute(req, signature);
-      await registry.resolveTo(forwarder.address, tokenId);
+      await registry.resolveTo(await forwarder.getAddress(), tokenId);
 
       expect(await forwarder.nonceOf(tokenId)).to.be.equal(1);
     });
@@ -154,50 +109,28 @@ describe('ResolverForwarder', () => {
   describe('verify', () => {
     it('should verify successfully', async () => {
       const tokenId = await mintDomain('test_foo_10', owner.address);
-      const { req, signature } = await buildExecuteParams(
-        'reset(uint256)',
-        [tokenId],
-        owner,
-        tokenId,
-      );
+      const { req, signature } = await buildExecuteParams('reset(uint256)', [tokenId], owner, tokenId);
 
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
     });
 
     it('should fail verification when unknown function call', async () => {
       const tokenId = await mintDomain('test_foo_13', owner.address);
-      const { req, signature } = await buildExecuteParams(
-        'get(string,uint256)',
-        ['k', tokenId],
-        owner,
-        tokenId,
-      );
+      const { req, signature } = await buildExecuteParams('get(string,uint256)', ['k', tokenId], owner, tokenId);
 
       expect(await forwarder.verify(req, signature)).to.be.equal(false);
     });
 
     it('should fail verification when nonce is incorrect', async () => {
       const tokenId = await mintDomain('test_foo_14', owner.address);
-      const { req, signature } = await buildExecuteParams(
-        'reset(uint256)',
-        [tokenId],
-        owner,
-        tokenId,
-      );
+      const { req, signature } = await buildExecuteParams('reset(uint256)', [tokenId], owner, tokenId);
 
-      expect(
-        await forwarder.verify({ ...req, nonce: 100 }, signature),
-      ).to.be.equal(false);
+      expect(await forwarder.verify({ ...req, nonce: 100 }, signature)).to.be.equal(false);
     });
 
     it('should fail verification when signature used', async () => {
       const tokenId = await mintDomain('test_foo_15', owner.address);
-      const { req, signature } = await buildExecuteParams(
-        'reset(uint256)',
-        [tokenId],
-        owner,
-        tokenId,
-      );
+      const { req, signature } = await buildExecuteParams('reset(uint256)', [tokenId], owner, tokenId);
       await forwarder.execute(req, signature);
 
       expect(await forwarder.verify(req, signature)).to.be.equal(false);
@@ -210,12 +143,7 @@ describe('ResolverForwarder', () => {
       await resolver.set('k', 'v', tokenId);
       expect(await resolver.get('k', tokenId)).to.be.equal('v');
 
-      const { req, signature } = await buildExecuteParams(
-        'reset(uint256)',
-        [tokenId],
-        owner,
-        tokenId,
-      );
+      const { req, signature } = await buildExecuteParams('reset(uint256)', [tokenId], owner, tokenId);
       expect(await forwarder.verify(req, signature)).to.be.equal(true);
 
       await forwarder.execute(req, signature);

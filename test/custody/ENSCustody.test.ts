@@ -1,9 +1,9 @@
-import { ethers, upgrades } from 'hardhat';
+import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { namehash } from 'ethers/lib/utils';
+import { ContractTransactionResponse, EventLog, namehash } from 'ethers';
 import { sha3Raw as sha3 } from 'web3-utils';
-import { BigNumber, ContractTransaction } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { HardhatEthersProvider } from '@nomicfoundation/hardhat-ethers/internal/hardhat-ethers-provider';
 import {
   BaseRegistrarImplementation__factory,
   DummyOracle__factory,
@@ -28,11 +28,12 @@ import {
 } from '../../types';
 import { BUFFERED_REGISTRATION_COST, DAY, REGISTRATION_TIME, ZERO_ADDRESS, ZERO_WORD } from '../helpers/constants';
 import { makeInterfaceId } from '../helpers/makeInterfaceId';
-import { increaseTimeBy } from '../helpers/utils';
+import { getLatestBlockTimestamp, increaseTimeBy } from '../helpers/utils';
+import { deployProxy } from '../../src/helpers';
 
 describe('ENSCustody', function () {
-  let provider;
-  let result;
+  let provider: HardhatEthersProvider;
+  let result: unknown;
 
   let ensRegistry: ENSRegistry;
   let resolver: PublicResolver;
@@ -65,10 +66,10 @@ describe('ENSCustody', function () {
       0,
     );
     let tx = await controller.commit(commitment);
-    const { timestamp } = await provider.getBlock(tx.blockNumber);
+    const timestamp = await getLatestBlockTimestamp();
     expect(await controller.commitments(commitment)).to.equal(timestamp);
 
-    await increaseTimeBy((await controller.minCommitmentAge()).toNumber());
+    await increaseTimeBy(await controller.minCommitmentAge());
 
     tx = await controller.register(
       name,
@@ -106,10 +107,10 @@ describe('ENSCustody', function () {
       selfCustody,
     );
     const commitTx = await custody.connect(minter).commit(commitment);
-    const { timestamp } = await provider.getBlock(commitTx.blockNumber);
+    const timestamp = await getLatestBlockTimestamp();
     expect(await controller.commitments(commitment)).to.equal(timestamp);
 
-    await increaseTimeBy((await controller.minCommitmentAge()).toNumber());
+    await increaseTimeBy(await controller.minCommitmentAge());
 
     // register
     const registerTx = await custody
@@ -146,19 +147,21 @@ describe('ENSCustody', function () {
 
   async function topupCustody (name: string, registrationTime = REGISTRATION_TIME) {
     const [base, premium] = await controller.rentPrice(name, registrationTime);
-    const price = base.add(premium);
-    await owner.sendTransaction({ to: custody.address, value: price });
+    const price = base + premium;
+    await owner.sendTransaction({ to: await custody.getAddress(), value: price });
     return price;
   }
 
-  async function assertGasSpent (address: string, prevBalance: BigNumber, txs: ContractTransaction[]) {
-    let spent = BigNumber.from(0);
+  async function assertGasSpent (address: string, prevBalance: bigint, txs: ContractTransactionResponse[]) {
+    let spent = BigInt(0);
+
     for (const tx of txs) {
       const receipt = await provider.getTransactionReceipt(tx.hash);
-      const gasFee = receipt.gasUsed.mul(tx.gasPrice);
-      spent = spent.add(gasFee);
+      const gasFee = receipt!.gasUsed * tx.gasPrice;
+      spent = spent + gasFee;
     }
-    expect(await provider.getBalance(address)).to.equal(prevBalance.sub(spent));
+
+    expect(await provider.getBalance(address)).to.equal(prevBalance - spent);
   }
 
   async function assertOwnership (name: string, owner: string, selfCustody = false) {
@@ -168,15 +171,15 @@ describe('ENSCustody', function () {
     // if 2LD
     if (name.split('.').length === 1) {
       expect(await controller.available(name)).to.equal(false);
-      expect(await baseRegistrar.ownerOf(tokenId)).to.equal(nameWrapper.address);
+      expect(await baseRegistrar.ownerOf(tokenId)).to.equal(await nameWrapper.getAddress());
     }
 
-    expect(await ensRegistry.owner(node)).to.equal(nameWrapper.address);
+    expect(await ensRegistry.owner(node)).to.equal(await nameWrapper.getAddress());
 
     if (selfCustody) {
       expect(await nameWrapper.ownerOf(node)).to.equal(owner);
     } else {
-      expect(await nameWrapper.ownerOf(node)).to.equal(custody.address);
+      expect(await nameWrapper.ownerOf(node)).to.equal(await custody.getAddress());
       expect(await custody.ownerOf(node)).to.equal(owner);
     }
   }
@@ -197,48 +200,51 @@ describe('ENSCustody', function () {
     newOwnerAddress = await newOwner.getAddress();
 
     ensRegistry = await new ENSRegistry__factory(owner).deploy();
-    baseRegistrar = await new BaseRegistrarImplementation__factory(owner).deploy(ensRegistry.address, namehash('eth'));
-    reverseRegistrar = await new ReverseRegistrar__factory(owner).deploy(ensRegistry.address);
+    baseRegistrar = await new BaseRegistrarImplementation__factory(owner).deploy(
+      await ensRegistry.getAddress(),
+      namehash('eth'),
+    );
+    reverseRegistrar = await new ReverseRegistrar__factory(owner).deploy(await ensRegistry.getAddress());
 
     await ensRegistry.setSubnodeOwner(ZERO_WORD, sha3('reverse'), ownerAddress);
-    await ensRegistry.setSubnodeOwner(namehash('reverse'), sha3('addr'), reverseRegistrar.address);
+    await ensRegistry.setSubnodeOwner(namehash('reverse'), sha3('addr'), await reverseRegistrar.getAddress());
 
     nameWrapper = await new NameWrapper__factory(owner).deploy(
-      ensRegistry.address,
-      baseRegistrar.address,
+      await ensRegistry.getAddress(),
+      await baseRegistrar.getAddress(),
       ownerAddress,
     );
 
-    await ensRegistry.setSubnodeOwner(ZERO_WORD, sha3('eth'), baseRegistrar.address);
+    await ensRegistry.setSubnodeOwner(ZERO_WORD, sha3('eth'), await baseRegistrar.getAddress());
 
     const dummyOracle = await new DummyOracle__factory(owner).deploy('100000000');
-    priceOracle = await new StablePriceOracle__factory(owner).deploy(dummyOracle.address, [0, 0, 4, 2, 1]);
+    priceOracle = await new StablePriceOracle__factory(owner).deploy(await dummyOracle.getAddress(), [0, 0, 4, 2, 1]);
     controller = await new ETHRegistrarController__factory(owner).deploy(
-      baseRegistrar.address,
-      priceOracle.address,
+      await baseRegistrar.getAddress(),
+      await priceOracle.getAddress(),
       600,
       86400,
-      reverseRegistrar.address,
-      nameWrapper.address,
-      ensRegistry.address,
+      await reverseRegistrar.getAddress(),
+      await nameWrapper.getAddress(),
+      await ensRegistry.getAddress(),
     );
-    await nameWrapper.setController(controller.address, true);
-    await baseRegistrar.addController(nameWrapper.address);
-    await reverseRegistrar.setController(controller.address, true);
+    await nameWrapper.setController(await controller.getAddress(), true);
+    await baseRegistrar.addController(await nameWrapper.getAddress());
+    await reverseRegistrar.setController(await controller.getAddress(), true);
 
     resolver = await new PublicResolver__factory(owner).deploy(
-      ensRegistry.address,
-      nameWrapper.address,
-      controller.address,
-      reverseRegistrar.address,
+      await ensRegistry.getAddress(),
+      await nameWrapper.getAddress(),
+      await controller.getAddress(),
+      await reverseRegistrar.getAddress(),
     );
 
-    custody = (await upgrades.deployProxy(new ENSCustody__factory(owner), [
-      controller.address,
-      nameWrapper.address,
-      baseRegistrar.address,
+    custody = (await deployProxy(new ENSCustody__factory(owner), [
+      await controller.getAddress(),
+      await nameWrapper.getAddress(),
+      await baseRegistrar.getAddress(),
     ])) as ENSCustody;
-    await custody.addMinter(minter.address);
+    await custody.addMinter(await minter.getAddress());
 
     erc1155 = await new ERC1155Mock__factory(owner).deploy('');
   });
@@ -258,15 +264,15 @@ describe('ENSCustody', function () {
     await registerName(name);
 
     expect(await controller.available(name)).to.equal(false);
-    expect(await ensRegistry.owner(node)).to.equal(nameWrapper.address);
-    expect(await baseRegistrar.ownerOf(tokenId)).to.equal(nameWrapper.address);
+    expect(await ensRegistry.owner(node)).to.equal(await nameWrapper.getAddress());
+    expect(await baseRegistrar.ownerOf(tokenId)).to.equal(await nameWrapper.getAddress());
     expect(await nameWrapper.ownerOf(node)).to.equal(registrantAddress);
   });
 
   it('should return correct rent price', async () => {
     const name = 'ts-pa92';
     const [base, premium] = await controller.rentPrice(name, REGISTRATION_TIME);
-    const price = base.add(premium);
+    const price = base + premium;
 
     expect(await custody.rentPrice(name, REGISTRATION_TIME)).to.equal(price);
   });
@@ -279,13 +285,15 @@ describe('ENSCustody', function () {
       await registerName(name);
 
       await expect(
-        nameWrapper.connect(registrant).safeTransferFrom(
-          registrantAddress,
-          custody.address,
-          node,
-          1,
-          new ethers.utils.AbiCoder().encode(['address'], [registrantAddress]),
-        ),
+        nameWrapper
+          .connect(registrant)
+          .safeTransferFrom(
+            registrantAddress,
+            await custody.getAddress(),
+            node,
+            1,
+            new ethers.AbiCoder().encode(['address'], [registrantAddress]),
+          ),
       ).to.emit(custody, 'Parked');
 
       await assertOwnership(name, registrantAddress, false);
@@ -297,13 +305,15 @@ describe('ENSCustody', function () {
 
       await registerName(name);
 
-      await nameWrapper.connect(registrant).safeTransferFrom(
-        registrantAddress,
-        custody.address,
-        node,
-        1,
-        new ethers.utils.AbiCoder().encode(['address'], [newOwnerAddress]),
-      );
+      await nameWrapper
+        .connect(registrant)
+        .safeTransferFrom(
+          registrantAddress,
+          await custody.getAddress(),
+          node,
+          1,
+          new ethers.AbiCoder().encode(['address'], [newOwnerAddress]),
+        );
 
       await assertOwnership(name, newOwnerAddress, false);
     });
@@ -315,13 +325,7 @@ describe('ENSCustody', function () {
       await registerName(name);
 
       await expect(
-        nameWrapper.connect(registrant).safeTransferFrom(
-          registrantAddress,
-          custody.address,
-          node,
-          1,
-          '0x',
-        ),
+        nameWrapper.connect(registrant).safeTransferFrom(registrantAddress, await custody.getAddress(), node, 1, '0x'),
       ).to.be.reverted;
     });
 
@@ -332,13 +336,15 @@ describe('ENSCustody', function () {
       await registerName(name);
 
       await expect(
-        nameWrapper.connect(registrant).safeTransferFrom(
-          registrantAddress,
-          custody.address,
-          node,
-          1,
-          new ethers.utils.AbiCoder().encode(['address'], [ZERO_ADDRESS]),
-        ),
+        nameWrapper
+          .connect(registrant)
+          .safeTransferFrom(
+            registrantAddress,
+            await custody.getAddress(),
+            node,
+            1,
+            new ethers.AbiCoder().encode(['address'], [ZERO_ADDRESS]),
+          ),
       ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
     });
 
@@ -350,10 +356,10 @@ describe('ENSCustody', function () {
       await expect(
         erc1155.safeTransferFrom(
           owner.address,
-          custody.address,
+          await custody.getAddress(),
           erc1155TokenId1,
           1,
-          new ethers.utils.AbiCoder().encode(['address'], [ownerAddress]),
+          new ethers.AbiCoder().encode(['address'], [ownerAddress]),
         ),
       ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
     });
@@ -372,10 +378,10 @@ describe('ENSCustody', function () {
           .connect(registrant)
           .safeBatchTransferFrom(
             registrantAddress,
-            custody.address,
+            await custody.getAddress(),
             [node1, node2],
             [1, 1],
-            new ethers.utils.AbiCoder().encode(['address'], [registrantAddress]),
+            new ethers.AbiCoder().encode(['address'], [registrantAddress]),
           ),
       ).to.emit(custody, 'Parked');
 
@@ -397,10 +403,10 @@ describe('ENSCustody', function () {
           .connect(registrant)
           .safeBatchTransferFrom(
             registrantAddress,
-            custody.address,
+            await custody.getAddress(),
             [node1, node2],
             [1, 1],
-            new ethers.utils.AbiCoder().encode(['address'], [ZERO_ADDRESS]),
+            new ethers.AbiCoder().encode(['address'], [ZERO_ADDRESS]),
           ),
       ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
     });
@@ -415,13 +421,10 @@ describe('ENSCustody', function () {
       await expect(
         erc1155.safeBatchTransferFrom(
           owner.address,
-          custody.address,
-          [
-            erc1155TokenId1,
-            erc1155TokenId2,
-          ],
+          await custody.getAddress(),
+          [erc1155TokenId1, erc1155TokenId2],
           [1, 1],
-          new ethers.utils.AbiCoder().encode(['address'], [registrantAddress]),
+          new ethers.AbiCoder().encode(['address'], [registrantAddress]),
         ),
       ).to.be.revertedWith('ERC1155: transfer to non ERC1155Receiver implementer');
     });
@@ -433,21 +436,23 @@ describe('ENSCustody', function () {
       const node = namehash(`${name}.eth`);
       const subNode = namehash(`${subName}.eth`);
 
-      const { timestamp } = await provider.getBlock('latest');
+      const timestamp = await getLatestBlockTimestamp();
       await registerName(name);
 
-      const expiry = timestamp + (await controller.minCommitmentAge()).toNumber();
+      const expiry = BigInt(timestamp) + (await controller.minCommitmentAge());
       await nameWrapper.connect(registrant).setSubnodeOwner(node, 'sub', registrantAddress, 0, expiry);
       await assertOwnership(subName, registrantAddress, true);
 
       await expect(
-        nameWrapper.connect(registrant).safeTransferFrom(
-          registrantAddress,
-          custody.address,
-          subNode,
-          1,
-          new ethers.utils.AbiCoder().encode(['address'], [registrantAddress]),
-        ),
+        nameWrapper
+          .connect(registrant)
+          .safeTransferFrom(
+            registrantAddress,
+            await custody.getAddress(),
+            subNode,
+            1,
+            new ethers.AbiCoder().encode(['address'], [registrantAddress]),
+          ),
       ).to.emit(custody, 'Parked');
 
       await assertOwnership(subName, registrantAddress, false);
@@ -460,21 +465,23 @@ describe('ENSCustody', function () {
       const node = namehash(`${name}.eth`);
       const subNode = namehash(`${subName}.eth`);
 
-      const { timestamp } = await provider.getBlock('latest');
+      const timestamp = await getLatestBlockTimestamp();
       await registerName(name);
 
-      const expiry = timestamp + (await controller.minCommitmentAge()).toNumber();
+      const expiry = BigInt(timestamp) + (await controller.minCommitmentAge());
       await nameWrapper.connect(registrant).setSubnodeOwner(node, 'sub', registrantAddress, 0, expiry);
       await assertOwnership(subName, registrantAddress, true);
 
       await expect(
-        nameWrapper.connect(registrant).safeBatchTransferFrom(
-          registrantAddress,
-          custody.address,
-          [subNode],
-          [1],
-          new ethers.utils.AbiCoder().encode(['address'], [newOwnerAddress]),
-        ),
+        nameWrapper
+          .connect(registrant)
+          .safeBatchTransferFrom(
+            registrantAddress,
+            await custody.getAddress(),
+            [subNode],
+            [1],
+            new ethers.AbiCoder().encode(['address'], [newOwnerAddress]),
+          ),
       ).to.emit(custody, 'Parked');
 
       await assertOwnership(subName, newOwnerAddress, false);
@@ -489,18 +496,15 @@ describe('ENSCustody', function () {
       await registerAndUnwrapName(name);
       await assertWrapped(name, false);
 
-      const abiCoder = new ethers.utils.AbiCoder();
+      const abiCoder = new ethers.AbiCoder();
 
       const wrapTx = await baseRegistrar
         .connect(registrant)
         ['safeTransferFrom(address,address,uint256,bytes)'](
           registrant.address,
-          custody.address,
+          await custody.getAddress(),
           labelHash,
-          abiCoder.encode(
-            ['address', 'address', 'string'],
-            [registrantAddress, resolver.address, name],
-          ),
+          abiCoder.encode(['address', 'address', 'string'], [registrantAddress, await resolver.getAddress(), name]),
         );
       await wrapTx.wait();
 
@@ -515,18 +519,15 @@ describe('ENSCustody', function () {
       await registerAndUnwrapName(name);
       await assertWrapped(name, false);
 
-      const abiCoder = new ethers.utils.AbiCoder();
+      const abiCoder = new ethers.AbiCoder();
 
       const wrapTx = await baseRegistrar
         .connect(registrant)
         ['safeTransferFrom(address,address,uint256,bytes)'](
           registrant.address,
-          custody.address,
+          await custody.getAddress(),
           labelHash,
-          abiCoder.encode(
-            ['address', 'address', 'string'],
-            [newOwnerAddress, resolver.address, name],
-          ),
+          abiCoder.encode(['address', 'address', 'string'], [newOwnerAddress, await resolver.getAddress(), name]),
         );
       await wrapTx.wait();
 
@@ -541,19 +542,16 @@ describe('ENSCustody', function () {
       await registerAndUnwrapName(name);
       await assertWrapped(name, false);
 
-      const abiCoder = new ethers.utils.AbiCoder();
+      const abiCoder = new ethers.AbiCoder();
 
       await expect(
         baseRegistrar
           .connect(registrant)
           ['safeTransferFrom(address,address,uint256,bytes)'](
             registrant.address,
-            custody.address,
+            await custody.getAddress(),
             labelHash,
-            abiCoder.encode(
-              ['address', 'address', 'string'],
-              [registrantAddress, resolver.address, name],
-            ),
+            abiCoder.encode(['address', 'address', 'string'], [registrantAddress, await resolver.getAddress(), name]),
           ),
       ).to.emit(custody, 'Parked');
 
@@ -571,20 +569,22 @@ describe('ENSCustody', function () {
       await registerAndUnwrapName(name);
       await assertWrapped(name, false);
 
-      const abiCoder = new ethers.utils.AbiCoder();
+      const abiCoder = new ethers.AbiCoder();
       await expect(
         baseRegistrar
           .connect(registrant)
           ['safeTransferFrom(address,address,uint256,bytes)'](
             registrant.address,
-            custody.address,
+            await custody.getAddress(),
             labelHash,
             abiCoder.encode(
               ['address', 'address', 'string'],
-              [newOwnerAddress, resolver.address, invalidName],
+              [newOwnerAddress, await resolver.getAddress(), invalidName],
             ),
           ),
-      ).to.be.revertedWith(`LabelMismatch("${invalidLabelHash}", "${labelHash}")`);
+      )
+        .to.be.revertedWithCustomError(nameWrapper, 'LabelMismatch')
+        .withArgs(invalidLabelHash, labelHash);
     });
 
     it('should reject if no data is passed', async () => {
@@ -597,7 +597,7 @@ describe('ENSCustody', function () {
       await expect(
         baseRegistrar
           .connect(registrant)
-          ['safeTransferFrom(address,address,uint256)'](registrant.address, custody.address, labelHash),
+          ['safeTransferFrom(address,address,uint256)'](registrant.address, await custody.getAddress(), labelHash),
       ).to.be.reverted;
     });
 
@@ -608,19 +608,17 @@ describe('ENSCustody', function () {
       await registerAndUnwrapName(name);
       await assertWrapped(name, false);
 
-      const abiCoder = new ethers.utils.AbiCoder();
+      const abiCoder = new ethers.AbiCoder();
 
-      await expect(baseRegistrar
-        .connect(registrant)
-        ['safeTransferFrom(address,address,uint256,bytes)'](
-          registrant.address,
-          custody.address,
-          labelHash,
-          abiCoder.encode(
-            ['string', 'address'],
-            [name, resolver.address],
+      await expect(
+        baseRegistrar
+          .connect(registrant)
+          ['safeTransferFrom(address,address,uint256,bytes)'](
+            registrant.address,
+            await custody.getAddress(),
+            labelHash,
+            abiCoder.encode(['string', 'address'], [name, await resolver.getAddress()]),
           ),
-        ),
       ).to.be.reverted;
     });
 
@@ -631,19 +629,17 @@ describe('ENSCustody', function () {
       await registerAndUnwrapName(name);
       await assertWrapped(name, false);
 
-      const abiCoder = new ethers.utils.AbiCoder();
+      const abiCoder = new ethers.AbiCoder();
 
-      await expect(baseRegistrar
-        .connect(registrant)
-        ['safeTransferFrom(address,address,uint256,bytes)'](
-          registrant.address,
-          custody.address,
-          labelHash,
-          abiCoder.encode(
-            ['string', 'address'],
-            [name, resolver.address],
+      await expect(
+        baseRegistrar
+          .connect(registrant)
+          ['safeTransferFrom(address,address,uint256,bytes)'](
+            registrant.address,
+            await custody.getAddress(),
+            labelHash,
+            abiCoder.encode(['string', 'address'], [name, await resolver.getAddress()]),
           ),
-        ),
       ).to.be.reverted;
     });
 
@@ -654,26 +650,27 @@ describe('ENSCustody', function () {
       await registerAndUnwrapName(name);
       await assertWrapped(name, false);
 
-      const abiCoder = new ethers.utils.AbiCoder();
+      const abiCoder = new ethers.AbiCoder();
 
-      await expect(baseRegistrar
-        .connect(registrant)
-        ['safeTransferFrom(address,address,uint256,bytes)'](
-          registrant.address,
-          custody.address,
-          labelHash,
-          abiCoder.encode(
-            ['address', 'address', 'string'],
-            [ZERO_ADDRESS, resolver.address, name],
+      await expect(
+        baseRegistrar
+          .connect(registrant)
+          ['safeTransferFrom(address,address,uint256,bytes)'](
+            registrant.address,
+            await custody.getAddress(),
+            labelHash,
+            abiCoder.encode(['address', 'address', 'string'], [ZERO_ADDRESS, await resolver.getAddress(), name]),
           ),
-        ),
-      ).to.be.revertedWith('InvalidOwner');
+      ).to.be.revertedWithCustomError(custody, 'InvalidOwner');
     });
 
     it('should reject transferring if called not from regisrar', async () => {
       const erc721Mock = await new ERC721Mock__factory(owner).deploy();
 
-      await expect(erc721Mock.mint(custody.address, 1)).to.be.revertedWith('OperationProhibited()');
+      await expect(erc721Mock.mint(await custody.getAddress(), 1)).to.be.revertedWithCustomError(
+        custody,
+        'OperationProhibited',
+      );
     });
 
     it('unwrapped subdomains should not be a ERC721 token', async () => {
@@ -688,7 +685,11 @@ describe('ENSCustody', function () {
       await expect(
         baseRegistrar
           .connect(registrant)
-          ['safeTransferFrom(address,address,uint256)'](registrant.address, custody.address, sha3(`sub.${name}`)),
+          ['safeTransferFrom(address,address,uint256)'](
+            registrant.address,
+            await custody.getAddress(),
+            sha3(`sub.${name}`),
+          ),
       ).to.be.reverted;
     });
   });
@@ -697,13 +698,13 @@ describe('ENSCustody', function () {
     it('should register and park name', async () => {
       const name = 'ts-ld91';
       const price = await topupCustody(name);
-      const custodyBalance = await provider.getBalance(custody.address);
+      const custodyBalance = await provider.getBalance(await custody.getAddress());
       const minterBalance = await provider.getBalance(minter.address);
 
       const txs = await registerAndParkName(name, minter, ZERO_ADDRESS, false);
 
       await assertOwnership(name, registrantAddress);
-      expect(await provider.getBalance(custody.address)).to.equal(custodyBalance.sub(price));
+      expect(await provider.getBalance(await custody.getAddress())).to.equal(custodyBalance - price);
       await assertGasSpent(minter.address, minterBalance, txs);
     });
 
@@ -716,13 +717,17 @@ describe('ENSCustody', function () {
 
       const receipt = await registerTx.wait();
 
-      expect(receipt.events?.filter(({ event }) => event === 'Parked').length).to.be.equal(1);
+      const hasParkedEvents = !!receipt?.logs.filter((log) =>
+        log instanceof EventLog ? log.eventName === 'Parked' : false,
+      ).length;
+      expect(hasParkedEvents).to.be.true;
     });
 
     it('should revert when custody has not enough balance', async () => {
       const name = 'ts-tw75';
 
-      await expect(registerAndParkName(name, minter, ZERO_ADDRESS, false)).to.be.revertedWith(
+      await expect(registerAndParkName(name, minter, ZERO_ADDRESS, false)).to.be.revertedWithCustomError(
+        custody,
         'CustodyNotEnoughBalance',
       );
     });
@@ -731,11 +736,11 @@ describe('ENSCustody', function () {
       const name = 'ts-tw14';
       const price = await topupCustody(name);
 
-      const balance = await provider.getBalance(custody.address);
-      await registerAndParkName(name, minter, resolver.address, false);
+      const balance = await provider.getBalance(await custody.getAddress());
+      await registerAndParkName(name, minter, await resolver.getAddress(), false);
 
       await assertOwnership(name, registrantAddress);
-      expect(await provider.getBalance(custody.address)).to.equal(balance.sub(price));
+      expect(await provider.getBalance(await custody.getAddress())).to.equal(balance - price);
     });
 
     it('should register and park name with resolver and initial records', async () => {
@@ -744,7 +749,7 @@ describe('ENSCustody', function () {
       const callData = [resolver.interface.encodeFunctionData('setAddr(bytes32,address)', [node, registrantAddress])];
       await topupCustody(name);
 
-      await registerAndParkName(name, minter, resolver.address, false, callData);
+      await registerAndParkName(name, minter, await resolver.getAddress(), false, callData);
 
       await assertOwnership(name, registrantAddress);
       expect(await resolver['addr(bytes32)'](node)).to.equal(registrantAddress);
@@ -771,7 +776,10 @@ describe('ENSCustody', function () {
       await registerAndParkName(name, minter, ZERO_ADDRESS, false);
       await assertOwnership(name, registrantAddress);
 
-      await expect(custody.safeTransfer(registrantAddress, node)).to.be.revertedWith('Unauthorised');
+      await expect(custody.safeTransfer(registrantAddress, node)).to.be.revertedWithCustomError(
+        custody,
+        'Unauthorised',
+      );
     });
 
     it('should revert registration by non-minter', async () => {
@@ -790,13 +798,13 @@ describe('ENSCustody', function () {
       await topupCustody(name);
       await registerAndParkName(name, minter, ZERO_ADDRESS, false);
       const price = await topupCustody(name, REGISTRATION_TIME);
-      const custodyBalance = await provider.getBalance(custody.address);
+      const custodyBalance = await provider.getBalance(await custody.getAddress());
       const minterBalance = await provider.getBalance(minter.address);
 
       const tx = await custody.connect(minter).renew(name, REGISTRATION_TIME);
 
       await assertOwnership(name, registrantAddress);
-      expect(await provider.getBalance(custody.address)).to.equal(custodyBalance.sub(price));
+      expect(await provider.getBalance(await custody.getAddress())).to.equal(custodyBalance - price);
       await assertGasSpent(minter.address, minterBalance, [tx]);
     });
 
@@ -806,11 +814,11 @@ describe('ENSCustody', function () {
       await registerAndParkName(name, minter, ZERO_ADDRESS, true);
       const price = await topupCustody(name, REGISTRATION_TIME);
 
-      const custodyBalance = await provider.getBalance(custody.address);
+      const custodyBalance = await provider.getBalance(await custody.getAddress());
       const minterBalance = await provider.getBalance(minter.address);
       const tx = await custody.connect(minter).renew(name, REGISTRATION_TIME);
       await assertOwnership(name, registrantAddress, true);
-      expect(await provider.getBalance(custody.address)).to.equal(custodyBalance.sub(price));
+      expect(await provider.getBalance(await custody.getAddress())).to.equal(custodyBalance - price);
       await assertGasSpent(minter.address, minterBalance, [tx]);
     });
 
@@ -835,7 +843,8 @@ describe('ENSCustody', function () {
       await topupCustody(name);
       await registerAndParkName(name, minter, ZERO_ADDRESS, false);
 
-      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith(
+      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWithCustomError(
+        custody,
         'CustodyNotEnoughBalance',
       );
     });
@@ -857,13 +866,13 @@ describe('ENSCustody', function () {
       await increaseTimeBy(REGISTRATION_TIME + gracePeriod + 1);
 
       await topupCustody(name);
-      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('');
+      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWithoutReason();
     });
 
     it('should revert renewing if domain does not exist', async () => {
       const name = 'dm-not-exist-1';
       await topupCustody(name, REGISTRATION_TIME);
-      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWith('');
+      await expect(custody.connect(minter).renew(name, REGISTRATION_TIME)).to.be.revertedWithoutReason();
       expect(await controller.available(name)).to.equal(true);
     });
 
@@ -876,11 +885,11 @@ describe('ENSCustody', function () {
       const tokenId = sha3(name);
       await nameWrapper.connect(registrant).unwrapETH2LD(tokenId, registrantAddress, registrantAddress);
 
-      const custodyBalance = await provider.getBalance(custody.address);
+      const custodyBalance = await provider.getBalance(await custody.getAddress());
       const minterBalance = await provider.getBalance(minter.address);
       const tx = await custody.connect(minter).renew(name, REGISTRATION_TIME);
       expect(await ensRegistry.owner(namehash(`${name}.eth`))).to.equal(registrantAddress);
-      expect(await provider.getBalance(custody.address)).to.equal(custodyBalance.sub(price));
+      expect(await provider.getBalance(await custody.getAddress())).to.equal(custodyBalance - price);
       await assertGasSpent(minter.address, minterBalance, [tx]);
     });
   });
@@ -900,7 +909,7 @@ describe('ENSCustody', function () {
     it('reverts with InvalidToken error if token not known', async () => {
       const node = namehash('not-existent.eth');
 
-      await expect(custody.ownerOf(node)).to.be.revertedWith('InvalidToken');
+      await expect(custody.ownerOf(node)).to.be.revertedWithCustomError(custody, 'InvalidToken');
     });
 
     it('reverts with UnknownToken if subdomain was externally claimed from custody', async () => {
@@ -910,21 +919,23 @@ describe('ENSCustody', function () {
       const node = namehash(`${name}.eth`);
       const subNode = namehash(`${subName}.eth`);
 
-      const { timestamp } = await provider.getBlock('latest');
+      const timestamp = await getLatestBlockTimestamp();
       await registerName(name);
 
-      const expiry = timestamp + (await controller.minCommitmentAge()).toNumber();
+      const expiry = BigInt(timestamp) + (await controller.minCommitmentAge());
       await nameWrapper.connect(registrant).setSubnodeOwner(node, 'sub', registrantAddress, 0, expiry);
       await assertOwnership(subName, registrantAddress, true);
 
       await expect(
-        nameWrapper.connect(registrant).safeTransferFrom(
-          registrantAddress,
-          custody.address,
-          subNode,
-          1,
-          new ethers.utils.AbiCoder().encode(['address'], [registrantAddress]),
-        ),
+        nameWrapper
+          .connect(registrant)
+          .safeTransferFrom(
+            registrantAddress,
+            await custody.getAddress(),
+            subNode,
+            1,
+            new ethers.AbiCoder().encode(['address'], [registrantAddress]),
+          ),
       ).to.emit(custody, 'Parked');
       await assertOwnership(subName, registrantAddress, false);
 
@@ -932,13 +943,13 @@ describe('ENSCustody', function () {
 
       expect(await nameWrapper.ownerOf(subNode)).to.equal(registrantAddress);
 
-      await expect(custody.ownerOf(subNode)).to.be.revertedWith('UnknownToken');
+      await expect(custody.ownerOf(subNode)).to.be.revertedWithCustomError(custody, 'UnknownToken');
     });
   });
 
   describe('setBaseRegistrar', async () => {
     it('sets the registrar only if owner is calling', async () => {
-      await custody.connect(owner).setBaseRegistrar(baseRegistrar.address);
+      await custody.connect(owner).setBaseRegistrar(await baseRegistrar.getAddress());
 
       await expect(custody.connect(registrant).setBaseRegistrar(ZERO_ADDRESS)).to.be.revertedWith(
         'Ownable: caller is not the owner',
@@ -978,10 +989,7 @@ describe('ENSCustody', function () {
         // skip interfaces for which we don't have a function list
         if (INTERFACES[k] === undefined) continue;
         for (const fnName of INTERFACES[k]) {
-          expect(Object.keys(custody.interface.functions).filter((fn) => fn === fnName).length).to.equal(
-            1,
-            `did not find ${fnName}`,
-          );
+          expect(custody.interface.getFunction(fnName)).to.not.be.null;
         }
       }
     });
