@@ -1,62 +1,42 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../common";
-export interface MulticallUpgradeableInterface extends utils.Interface {
-    functions: {
-        "multicall(bytes[])": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "multicall"): FunctionFragment;
-    encodeFunctionData(functionFragment: "multicall", values: [PromiseOrValue<BytesLike>[]]): string;
-    decodeFunctionResult(functionFragment: "multicall", data: BytesLike): Result;
-    events: {
-        "Initialized(uint8)": EventFragment;
-    };
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../common";
+export interface MulticallUpgradeableInterface extends Interface {
+    getFunction(nameOrSignature: "multicall"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
+    encodeFunctionData(functionFragment: "multicall", values: [BytesLike[]]): string;
+    decodeFunctionResult(functionFragment: "multicall", data: BytesLike): Result;
 }
-export interface InitializedEventObject {
-    version: number;
+export declare namespace InitializedEvent {
+    type InputTuple = [version: BigNumberish];
+    type OutputTuple = [version: bigint];
+    interface OutputObject {
+        version: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
-export declare type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
 export interface MulticallUpgradeable extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): MulticallUpgradeable;
+    waitForDeployment(): Promise<this>;
     interface: MulticallUpgradeableInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: CallOverrides): Promise<string[]>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    multicall: TypedContractMethod<[data: BytesLike[]], [string[]], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "multicall"): TypedContractMethod<[data: BytesLike[]], [string[]], "nonpayable">;
+    getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     filters: {
-        "Initialized(uint8)"(version?: null): InitializedEventFilter;
-        Initialized(version?: null): InitializedEventFilter;
-    };
-    estimateGas: {
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "Initialized(uint8)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=MulticallUpgradeable.d.ts.map

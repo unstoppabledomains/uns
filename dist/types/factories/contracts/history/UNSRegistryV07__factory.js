@@ -1438,23 +1438,20 @@ class UNSRegistryV07__factory extends ethers_1.ContractFactory {
             super(_abi, _bytecode, args[0]);
         }
     }
-    deploy(overrides) {
-        return super.deploy(overrides || {});
-    }
     getDeployTransaction(overrides) {
         return super.getDeployTransaction(overrides || {});
     }
-    attach(address) {
-        return super.attach(address);
+    deploy(overrides) {
+        return super.deploy(overrides || {});
     }
-    connect(signer) {
-        return super.connect(signer);
+    connect(runner) {
+        return super.connect(runner);
     }
     static createInterface() {
-        return new ethers_1.utils.Interface(_abi);
+        return new ethers_1.Interface(_abi);
     }
-    static connect(address, signerOrProvider) {
-        return new ethers_1.Contract(address, _abi, signerOrProvider);
+    static connect(address, runner) {
+        return new ethers_1.Contract(address, _abi, runner);
     }
 }
 exports.UNSRegistryV07__factory = UNSRegistryV07__factory;

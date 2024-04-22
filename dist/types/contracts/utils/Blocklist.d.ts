@@ -1,85 +1,84 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
-export interface BlocklistInterface extends utils.Interface {
-    functions: {
-        "isBlocked(uint256)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "isBlocked"): FunctionFragment;
-    encodeFunctionData(functionFragment: "isBlocked", values: [PromiseOrValue<BigNumberish>]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
+export interface BlocklistInterface extends Interface {
+    getFunction(nameOrSignature: "isBlocked"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "Blocked" | "BlocklistDisabled" | "BlocklistEnabled" | "Initialized"): EventFragment;
+    encodeFunctionData(functionFragment: "isBlocked", values: [BigNumberish]): string;
     decodeFunctionResult(functionFragment: "isBlocked", data: BytesLike): Result;
-    events: {
-        "Blocked(uint256)": EventFragment;
-        "BlocklistDisabled(address)": EventFragment;
-        "BlocklistEnabled(address)": EventFragment;
-        "Initialized(uint8)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "Blocked"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "BlocklistDisabled"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "BlocklistEnabled"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
 }
-export interface BlockedEventObject {
-    tokenId: BigNumber;
+export declare namespace BlockedEvent {
+    type InputTuple = [tokenId: BigNumberish];
+    type OutputTuple = [tokenId: bigint];
+    interface OutputObject {
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type BlockedEvent = TypedEvent<[BigNumber], BlockedEventObject>;
-export declare type BlockedEventFilter = TypedEventFilter<BlockedEvent>;
-export interface BlocklistDisabledEventObject {
-    account: string;
+export declare namespace BlocklistDisabledEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type BlocklistDisabledEvent = TypedEvent<[
-    string
-], BlocklistDisabledEventObject>;
-export declare type BlocklistDisabledEventFilter = TypedEventFilter<BlocklistDisabledEvent>;
-export interface BlocklistEnabledEventObject {
-    account: string;
+export declare namespace BlocklistEnabledEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type BlocklistEnabledEvent = TypedEvent<[
-    string
-], BlocklistEnabledEventObject>;
-export declare type BlocklistEnabledEventFilter = TypedEventFilter<BlocklistEnabledEvent>;
-export interface InitializedEventObject {
-    version: number;
+export declare namespace InitializedEvent {
+    type InputTuple = [version: BigNumberish];
+    type OutputTuple = [version: bigint];
+    interface OutputObject {
+        version: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
-export declare type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
 export interface Blocklist extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): Blocklist;
+    waitForDeployment(): Promise<this>;
     interface: BlocklistInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
-    };
-    isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-    callStatic: {
-        isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    isBlocked: TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "isBlocked"): TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
+    getEvent(key: "Blocked"): TypedContractEvent<BlockedEvent.InputTuple, BlockedEvent.OutputTuple, BlockedEvent.OutputObject>;
+    getEvent(key: "BlocklistDisabled"): TypedContractEvent<BlocklistDisabledEvent.InputTuple, BlocklistDisabledEvent.OutputTuple, BlocklistDisabledEvent.OutputObject>;
+    getEvent(key: "BlocklistEnabled"): TypedContractEvent<BlocklistEnabledEvent.InputTuple, BlocklistEnabledEvent.OutputTuple, BlocklistEnabledEvent.OutputObject>;
+    getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     filters: {
-        "Blocked(uint256)"(tokenId?: null): BlockedEventFilter;
-        Blocked(tokenId?: null): BlockedEventFilter;
-        "BlocklistDisabled(address)"(account?: null): BlocklistDisabledEventFilter;
-        BlocklistDisabled(account?: null): BlocklistDisabledEventFilter;
-        "BlocklistEnabled(address)"(account?: null): BlocklistEnabledEventFilter;
-        BlocklistEnabled(account?: null): BlocklistEnabledEventFilter;
-        "Initialized(uint8)"(version?: null): InitializedEventFilter;
-        Initialized(version?: null): InitializedEventFilter;
-    };
-    estimateGas: {
-        isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "Blocked(uint256)": TypedContractEvent<BlockedEvent.InputTuple, BlockedEvent.OutputTuple, BlockedEvent.OutputObject>;
+        Blocked: TypedContractEvent<BlockedEvent.InputTuple, BlockedEvent.OutputTuple, BlockedEvent.OutputObject>;
+        "BlocklistDisabled(address)": TypedContractEvent<BlocklistDisabledEvent.InputTuple, BlocklistDisabledEvent.OutputTuple, BlocklistDisabledEvent.OutputObject>;
+        BlocklistDisabled: TypedContractEvent<BlocklistDisabledEvent.InputTuple, BlocklistDisabledEvent.OutputTuple, BlocklistDisabledEvent.OutputObject>;
+        "BlocklistEnabled(address)": TypedContractEvent<BlocklistEnabledEvent.InputTuple, BlocklistEnabledEvent.OutputTuple, BlocklistEnabledEvent.OutputObject>;
+        BlocklistEnabled: TypedContractEvent<BlocklistEnabledEvent.InputTuple, BlocklistEnabledEvent.OutputTuple, BlocklistEnabledEvent.OutputObject>;
+        "Initialized(uint8)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=Blocklist.d.ts.map

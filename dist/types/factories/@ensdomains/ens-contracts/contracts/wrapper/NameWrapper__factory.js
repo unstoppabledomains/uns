@@ -1468,23 +1468,20 @@ class NameWrapper__factory extends ethers_1.ContractFactory {
             super(_abi, _bytecode, args[0]);
         }
     }
-    deploy(_ens, _registrar, _metadataService, overrides) {
-        return super.deploy(_ens, _registrar, _metadataService, overrides || {});
-    }
     getDeployTransaction(_ens, _registrar, _metadataService, overrides) {
         return super.getDeployTransaction(_ens, _registrar, _metadataService, overrides || {});
     }
-    attach(address) {
-        return super.attach(address);
+    deploy(_ens, _registrar, _metadataService, overrides) {
+        return super.deploy(_ens, _registrar, _metadataService, overrides || {});
     }
-    connect(signer) {
-        return super.connect(signer);
+    connect(runner) {
+        return super.connect(runner);
     }
     static createInterface() {
-        return new ethers_1.utils.Interface(_abi);
+        return new ethers_1.Interface(_abi);
     }
-    static connect(address, signerOrProvider) {
-        return new ethers_1.Contract(address, _abi, signerOrProvider);
+    static connect(address, runner) {
+        return new ethers_1.Contract(address, _abi, runner);
     }
 }
 exports.NameWrapper__factory = NameWrapper__factory;

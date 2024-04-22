@@ -1,58 +1,43 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
-export interface IAddrResolverInterface extends utils.Interface {
-    functions: {
-        "addr(bytes32)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "addr"): FunctionFragment;
-    encodeFunctionData(functionFragment: "addr", values: [PromiseOrValue<BytesLike>]): string;
-    decodeFunctionResult(functionFragment: "addr", data: BytesLike): Result;
-    events: {
-        "AddrChanged(bytes32,address)": EventFragment;
-    };
+import type { BaseContract, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../../common";
+export interface IAddrResolverInterface extends Interface {
+    getFunction(nameOrSignature: "addr"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AddrChanged"): EventFragment;
+    encodeFunctionData(functionFragment: "addr", values: [BytesLike]): string;
+    decodeFunctionResult(functionFragment: "addr", data: BytesLike): Result;
 }
-export interface AddrChangedEventObject {
-    node: string;
-    a: string;
+export declare namespace AddrChangedEvent {
+    type InputTuple = [node: BytesLike, a: AddressLike];
+    type OutputTuple = [node: string, a: string];
+    interface OutputObject {
+        node: string;
+        a: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type AddrChangedEvent = TypedEvent<[
-    string,
-    string
-], AddrChangedEventObject>;
-export declare type AddrChangedEventFilter = TypedEventFilter<AddrChangedEvent>;
 export interface IAddrResolver extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IAddrResolver;
+    waitForDeployment(): Promise<this>;
     interface: IAddrResolverInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        addr(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-    };
-    addr(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    callStatic: {
-        addr(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    addr: TypedContractMethod<[node: BytesLike], [string], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "addr"): TypedContractMethod<[node: BytesLike], [string], "view">;
+    getEvent(key: "AddrChanged"): TypedContractEvent<AddrChangedEvent.InputTuple, AddrChangedEvent.OutputTuple, AddrChangedEvent.OutputObject>;
     filters: {
-        "AddrChanged(bytes32,address)"(node?: PromiseOrValue<BytesLike> | null, a?: null): AddrChangedEventFilter;
-        AddrChanged(node?: PromiseOrValue<BytesLike> | null, a?: null): AddrChangedEventFilter;
-    };
-    estimateGas: {
-        addr(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        addr(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "AddrChanged(bytes32,address)": TypedContractEvent<AddrChangedEvent.InputTuple, AddrChangedEvent.OutputTuple, AddrChangedEvent.OutputObject>;
+        AddrChanged: TypedContractEvent<AddrChangedEvent.InputTuple, AddrChangedEvent.OutputTuple, AddrChangedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=IAddrResolver.d.ts.map

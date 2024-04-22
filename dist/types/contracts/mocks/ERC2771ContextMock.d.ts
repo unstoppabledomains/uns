@@ -1,19 +1,10 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
-export interface ERC2771ContextMockInterface extends utils.Interface {
-    functions: {
-        "initialize(address)": FunctionFragment;
-        "isTrustedForwarder(address)": FunctionFragment;
-        "msgData()": FunctionFragment;
-        "msgSender()": FunctionFragment;
-        "msgToken()": FunctionFragment;
-        "run()": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "initialize" | "isTrustedForwarder" | "msgData" | "msgSender" | "msgToken" | "run"): FunctionFragment;
-    encodeFunctionData(functionFragment: "initialize", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "isTrustedForwarder", values: [PromiseOrValue<string>]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
+export interface ERC2771ContextMockInterface extends Interface {
+    getFunction(nameOrSignature: "initialize" | "isTrustedForwarder" | "msgData" | "msgSender" | "msgToken" | "run"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
+    encodeFunctionData(functionFragment: "initialize", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "isTrustedForwarder", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "msgData", values?: undefined): string;
     encodeFunctionData(functionFragment: "msgSender", values?: undefined): string;
     encodeFunctionData(functionFragment: "msgToken", values?: undefined): string;
@@ -24,79 +15,56 @@ export interface ERC2771ContextMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "msgSender", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "msgToken", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "run", data: BytesLike): Result;
-    events: {
-        "Initialized(uint8)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
 }
-export interface InitializedEventObject {
-    version: number;
+export declare namespace InitializedEvent {
+    type InputTuple = [version: BigNumberish];
+    type OutputTuple = [version: bigint];
+    interface OutputObject {
+        version: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
-export declare type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
 export interface ERC2771ContextMock extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): ERC2771ContextMock;
+    waitForDeployment(): Promise<this>;
     interface: ERC2771ContextMockInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        initialize(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        msgData(overrides?: CallOverrides): Promise<[string]>;
-        msgSender(overrides?: CallOverrides): Promise<[string]>;
-        msgToken(overrides?: CallOverrides): Promise<[BigNumber]>;
-        run(overrides?: CallOverrides): Promise<[string]>;
-    };
-    initialize(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    msgData(overrides?: CallOverrides): Promise<string>;
-    msgSender(overrides?: CallOverrides): Promise<string>;
-    msgToken(overrides?: CallOverrides): Promise<BigNumber>;
-    run(overrides?: CallOverrides): Promise<string>;
-    callStatic: {
-        initialize(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        msgData(overrides?: CallOverrides): Promise<string>;
-        msgSender(overrides?: CallOverrides): Promise<string>;
-        msgToken(overrides?: CallOverrides): Promise<BigNumber>;
-        run(overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    initialize: TypedContractMethod<[
+        forwarder: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    isTrustedForwarder: TypedContractMethod<[
+        forwarder: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    msgData: TypedContractMethod<[], [string], "view">;
+    msgSender: TypedContractMethod<[], [string], "view">;
+    msgToken: TypedContractMethod<[], [bigint], "view">;
+    run: TypedContractMethod<[], [string], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "initialize"): TypedContractMethod<[forwarder: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "isTrustedForwarder"): TypedContractMethod<[forwarder: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "msgData"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "msgSender"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "msgToken"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "run"): TypedContractMethod<[], [string], "view">;
+    getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     filters: {
-        "Initialized(uint8)"(version?: null): InitializedEventFilter;
-        Initialized(version?: null): InitializedEventFilter;
-    };
-    estimateGas: {
-        initialize(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        msgData(overrides?: CallOverrides): Promise<BigNumber>;
-        msgSender(overrides?: CallOverrides): Promise<BigNumber>;
-        msgToken(overrides?: CallOverrides): Promise<BigNumber>;
-        run(overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        initialize(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        msgData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        msgSender(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        msgToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        run(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "Initialized(uint8)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=ERC2771ContextMock.d.ts.map

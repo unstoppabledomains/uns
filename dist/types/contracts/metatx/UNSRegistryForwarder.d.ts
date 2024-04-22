@@ -1,97 +1,89 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
 export declare namespace IForwarder {
     type ForwardRequestStruct = {
-        from: PromiseOrValue<string>;
-        nonce: PromiseOrValue<BigNumberish>;
-        tokenId: PromiseOrValue<BigNumberish>;
-        data: PromiseOrValue<BytesLike>;
+        from: AddressLike;
+        nonce: BigNumberish;
+        tokenId: BigNumberish;
+        data: BytesLike;
     };
     type ForwardRequestStructOutput = [
-        string,
-        BigNumber,
-        BigNumber,
-        string
+        from: string,
+        nonce: bigint,
+        tokenId: bigint,
+        data: string
     ] & {
         from: string;
-        nonce: BigNumber;
-        tokenId: BigNumber;
+        nonce: bigint;
+        tokenId: bigint;
         data: string;
     };
 }
-export interface UNSRegistryForwarderInterface extends utils.Interface {
-    functions: {
-        "execute((address,uint256,uint256,bytes),bytes)": FunctionFragment;
-        "nonceOf(uint256)": FunctionFragment;
-        "verify((address,uint256,uint256,bytes),bytes)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "execute" | "nonceOf" | "verify"): FunctionFragment;
-    encodeFunctionData(functionFragment: "execute", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "nonceOf", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "verify", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
+export interface UNSRegistryForwarderInterface extends Interface {
+    getFunction(nameOrSignature: "execute" | "nonceOf" | "verify"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
+    encodeFunctionData(functionFragment: "execute", values: [IForwarder.ForwardRequestStruct, BytesLike]): string;
+    encodeFunctionData(functionFragment: "nonceOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "verify", values: [IForwarder.ForwardRequestStruct, BytesLike]): string;
     decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "nonceOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "verify", data: BytesLike): Result;
-    events: {
-        "Initialized(uint8)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
 }
-export interface InitializedEventObject {
-    version: number;
+export declare namespace InitializedEvent {
+    type InputTuple = [version: BigNumberish];
+    type OutputTuple = [version: bigint];
+    interface OutputObject {
+        version: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
-export declare type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
 export interface UNSRegistryForwarder extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): UNSRegistryForwarder;
+    waitForDeployment(): Promise<this>;
     interface: UNSRegistryForwarderInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-    };
-    execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    callStatic: {
-        execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    execute: TypedContractMethod<[
+        req: IForwarder.ForwardRequestStruct,
+        signature: BytesLike
+    ], [
+        string
+    ], "nonpayable">;
+    nonceOf: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+    verify: TypedContractMethod<[
+        req: IForwarder.ForwardRequestStruct,
+        signature: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "execute"): TypedContractMethod<[
+        req: IForwarder.ForwardRequestStruct,
+        signature: BytesLike
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "nonceOf"): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+    getFunction(nameOrSignature: "verify"): TypedContractMethod<[
+        req: IForwarder.ForwardRequestStruct,
+        signature: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     filters: {
-        "Initialized(uint8)"(version?: null): InitializedEventFilter;
-        Initialized(version?: null): InitializedEventFilter;
-    };
-    estimateGas: {
-        execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "Initialized(uint8)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=UNSRegistryForwarder.d.ts.map

@@ -1,91 +1,44 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../common";
-export interface ProxyReaderInterface extends utils.Interface {
-    functions: {
-        "NAME()": FunctionFragment;
-        "VERSION()": FunctionFragment;
-        "addBlockchainNetworks(string[],string[])": FunctionFragment;
-        "addBlockchainNetworks(string[],string)": FunctionFragment;
-        "addLegacyRecords(string[],string[][])": FunctionFragment;
-        "balanceOf(address)": FunctionFragment;
-        "exists(uint256)": FunctionFragment;
-        "get(string,uint256)": FunctionFragment;
-        "getAddress(string,string,uint256)": FunctionFragment;
-        "getAddressKey(string,string,uint256)": FunctionFragment;
-        "getAddressKeys(string,string)": FunctionFragment;
-        "getApproved(uint256)": FunctionFragment;
-        "getByHash(uint256,uint256)": FunctionFragment;
-        "getData(string[],uint256)": FunctionFragment;
-        "getDataByHash(uint256[],uint256)": FunctionFragment;
-        "getDataByHashForMany(uint256[],uint256[])": FunctionFragment;
-        "getDataForMany(string[],uint256[])": FunctionFragment;
-        "getMany(string[],uint256)": FunctionFragment;
-        "getManyByHash(uint256[],uint256)": FunctionFragment;
-        "initialize(address,address)": FunctionFragment;
-        "isApprovedForAll(address,address)": FunctionFragment;
-        "isApprovedOrOwner(address,uint256)": FunctionFragment;
-        "multicall(bytes[])": FunctionFragment;
-        "namehash(string[])": FunctionFragment;
-        "owner()": FunctionFragment;
-        "ownerOf(uint256)": FunctionFragment;
-        "ownerOfForMany(uint256[])": FunctionFragment;
-        "registryOf(uint256)": FunctionFragment;
-        "renounceOwnership()": FunctionFragment;
-        "resolverOf(uint256)": FunctionFragment;
-        "reverseNameOf(address)": FunctionFragment;
-        "reverseOf(address)": FunctionFragment;
-        "setOwner(address)": FunctionFragment;
-        "supportsInterface(bytes4)": FunctionFragment;
-        "tokenURI(uint256)": FunctionFragment;
-        "transferOwnership(address)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "NAME" | "VERSION" | "addBlockchainNetworks(string[],string[])" | "addBlockchainNetworks(string[],string)" | "addLegacyRecords" | "balanceOf" | "exists" | "get" | "getAddress" | "getAddressKey" | "getAddressKeys" | "getApproved" | "getByHash" | "getData" | "getDataByHash" | "getDataByHashForMany" | "getDataForMany" | "getMany" | "getManyByHash" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "multicall" | "namehash" | "owner" | "ownerOf" | "ownerOfForMany" | "registryOf" | "renounceOwnership" | "resolverOf" | "reverseNameOf" | "reverseOf" | "setOwner" | "supportsInterface" | "tokenURI" | "transferOwnership"): FunctionFragment;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../common";
+export interface ProxyReaderInterface extends Interface {
+    getFunction(nameOrSignature: "NAME" | "VERSION" | "addBlockchainNetworks(string[],string[])" | "addBlockchainNetworks(string[],string)" | "addLegacyRecords" | "balanceOf" | "exists" | "get" | "getAddress" | "getAddressKey" | "getAddressKeys" | "getApproved" | "getByHash" | "getData" | "getDataByHash" | "getDataByHashForMany" | "getDataForMany" | "getMany" | "getManyByHash" | "initialize" | "isApprovedForAll" | "isApprovedOrOwner" | "multicall" | "namehash" | "owner" | "ownerOf" | "ownerOfForMany" | "registryOf" | "renounceOwnership" | "resolverOf" | "reverseNameOf" | "reverseOf" | "setOwner" | "supportsInterface" | "tokenURI" | "transferOwnership"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "Initialized" | "OwnershipTransferred" | "SetLegacyRecords" | "SetNetworkFamily"): EventFragment;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
     encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
-    encodeFunctionData(functionFragment: "addBlockchainNetworks(string[],string[])", values: [PromiseOrValue<string>[], PromiseOrValue<string>[]]): string;
-    encodeFunctionData(functionFragment: "addBlockchainNetworks(string[],string)", values: [PromiseOrValue<string>[], PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "addLegacyRecords", values: [PromiseOrValue<string>[], PromiseOrValue<string>[][]]): string;
-    encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "exists", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "get", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getAddress", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "getAddressKey", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "getAddressKeys", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "getApproved", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getByHash", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getData", values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getDataByHash", values: [PromiseOrValue<BigNumberish>[], PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getDataByHashForMany", values: [PromiseOrValue<BigNumberish>[], PromiseOrValue<BigNumberish>[]]): string;
-    encodeFunctionData(functionFragment: "getDataForMany", values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]): string;
-    encodeFunctionData(functionFragment: "getMany", values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getManyByHash", values: [PromiseOrValue<BigNumberish>[], PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "initialize", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "isApprovedForAll", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "isApprovedOrOwner", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "multicall", values: [PromiseOrValue<BytesLike>[]]): string;
-    encodeFunctionData(functionFragment: "namehash", values: [PromiseOrValue<string>[]]): string;
+    encodeFunctionData(functionFragment: "addBlockchainNetworks(string[],string[])", values: [string[], string[]]): string;
+    encodeFunctionData(functionFragment: "addBlockchainNetworks(string[],string)", values: [string[], string]): string;
+    encodeFunctionData(functionFragment: "addLegacyRecords", values: [string[], string[][]]): string;
+    encodeFunctionData(functionFragment: "balanceOf", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "exists", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "get", values: [string, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getAddress", values: [string, string, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getAddressKey", values: [string, string, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getAddressKeys", values: [string, string]): string;
+    encodeFunctionData(functionFragment: "getApproved", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getByHash", values: [BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getData", values: [string[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getDataByHash", values: [BigNumberish[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getDataByHashForMany", values: [BigNumberish[], BigNumberish[]]): string;
+    encodeFunctionData(functionFragment: "getDataForMany", values: [string[], BigNumberish[]]): string;
+    encodeFunctionData(functionFragment: "getMany", values: [string[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getManyByHash", values: [BigNumberish[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "isApprovedForAll", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "isApprovedOrOwner", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "multicall", values: [BytesLike[]]): string;
+    encodeFunctionData(functionFragment: "namehash", values: [string[]]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-    encodeFunctionData(functionFragment: "ownerOf", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "ownerOfForMany", values: [PromiseOrValue<BigNumberish>[]]): string;
-    encodeFunctionData(functionFragment: "registryOf", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "ownerOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "ownerOfForMany", values: [BigNumberish[]]): string;
+    encodeFunctionData(functionFragment: "registryOf", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
-    encodeFunctionData(functionFragment: "resolverOf", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "reverseNameOf", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "reverseOf", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "setOwner", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "tokenURI", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "transferOwnership", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "resolverOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "reverseNameOf", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "reverseOf", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "setOwner", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "tokenURI", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
     decodeFunctionResult(functionFragment: "NAME", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addBlockchainNetworks(string[],string[])", data: BytesLike): Result;
@@ -122,91 +75,128 @@ export interface ProxyReaderInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
-    events: {
-        "Initialized(uint8)": EventFragment;
-        "OwnershipTransferred(address,address)": EventFragment;
-        "SetLegacyRecords(string)": EventFragment;
-        "SetNetworkFamily(string)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "SetLegacyRecords"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "SetNetworkFamily"): EventFragment;
 }
-export interface InitializedEventObject {
-    version: number;
+export declare namespace InitializedEvent {
+    type InputTuple = [version: BigNumberish];
+    type OutputTuple = [version: bigint];
+    interface OutputObject {
+        version: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
-export declare type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
-export interface OwnershipTransferredEventObject {
-    previousOwner: string;
-    newOwner: string;
+export declare namespace OwnershipTransferredEvent {
+    type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
+    type OutputTuple = [previousOwner: string, newOwner: string];
+    interface OutputObject {
+        previousOwner: string;
+        newOwner: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type OwnershipTransferredEvent = TypedEvent<[
-    string,
-    string
-], OwnershipTransferredEventObject>;
-export declare type OwnershipTransferredEventFilter = TypedEventFilter<OwnershipTransferredEvent>;
-export interface SetLegacyRecordsEventObject {
-    tokenKey: string;
+export declare namespace SetLegacyRecordsEvent {
+    type InputTuple = [tokenKey: string];
+    type OutputTuple = [tokenKey: string];
+    interface OutputObject {
+        tokenKey: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type SetLegacyRecordsEvent = TypedEvent<[
-    string
-], SetLegacyRecordsEventObject>;
-export declare type SetLegacyRecordsEventFilter = TypedEventFilter<SetLegacyRecordsEvent>;
-export interface SetNetworkFamilyEventObject {
-    network: string;
+export declare namespace SetNetworkFamilyEvent {
+    type InputTuple = [network: string];
+    type OutputTuple = [network: string];
+    interface OutputObject {
+        network: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type SetNetworkFamilyEvent = TypedEvent<[
-    string
-], SetNetworkFamilyEventObject>;
-export declare type SetNetworkFamilyEventFilter = TypedEventFilter<SetNetworkFamilyEvent>;
 export interface ProxyReader extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): ProxyReader;
+    waitForDeployment(): Promise<this>;
     interface: ProxyReaderInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        NAME(overrides?: CallOverrides): Promise<[string]>;
-        VERSION(overrides?: CallOverrides): Promise<[string]>;
-        "addBlockchainNetworks(string[],string[])"(networks: PromiseOrValue<string>[], families: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "addBlockchainNetworks(string[],string)"(networks: PromiseOrValue<string>[], family: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        addLegacyRecords(keys: PromiseOrValue<string>[], legacyKeys: PromiseOrValue<string>[][], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
-        get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string] & {
-            value: string;
-        }>;
-        getAddress(network: PromiseOrValue<string>, token: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string] & {
-            addr: string;
-        }>;
-        getAddressKey(network: PromiseOrValue<string>, token: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string] & {
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    NAME: TypedContractMethod<[], [string], "view">;
+    VERSION: TypedContractMethod<[], [string], "view">;
+    "addBlockchainNetworks(string[],string[])": TypedContractMethod<[
+        networks: string[],
+        families: string[]
+    ], [
+        void
+    ], "nonpayable">;
+    "addBlockchainNetworks(string[],string)": TypedContractMethod<[
+        networks: string[],
+        family: string
+    ], [
+        void
+    ], "nonpayable">;
+    addLegacyRecords: TypedContractMethod<[
+        keys: string[],
+        legacyKeys: string[][]
+    ], [
+        void
+    ], "nonpayable">;
+    balanceOf: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+    exists: TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
+    get: TypedContractMethod<[
+        key: string,
+        tokenId: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getAddress: TypedContractMethod<[
+        network: string,
+        token: string,
+        tokenId: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getAddressKey: TypedContractMethod<[
+        network: string,
+        token: string,
+        tokenId: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getAddressKeys: TypedContractMethod<[
+        network: string,
+        token: string
+    ], [
+        string[]
+    ], "view">;
+    getApproved: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getByHash: TypedContractMethod<[
+        keyHash: BigNumberish,
+        tokenId: BigNumberish
+    ], [
+        [string, string] & {
             key: string;
-        }>;
-        getAddressKeys(network: PromiseOrValue<string>, token: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[string[]] & {
-            keys: string[];
-        }>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, string] & {
-            key: string;
             value: string;
-        }>;
-        getData(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[
+        }
+    ], "view">;
+    getData: TypedContractMethod<[
+        keys: string[],
+        tokenId: BigNumberish
+    ], [
+        [
             string,
             string,
             string[]
@@ -214,8 +204,13 @@ export interface ProxyReader extends BaseContract {
             resolver: string;
             owner: string;
             values: string[];
-        }>;
-        getDataByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[
+        }
+    ], "view">;
+    getDataByHash: TypedContractMethod<[
+        keyHashes: BigNumberish[],
+        tokenId: BigNumberish
+    ], [
+        [
             string,
             string,
             string[],
@@ -225,8 +220,13 @@ export interface ProxyReader extends BaseContract {
             owner: string;
             keys: string[];
             values: string[];
-        }>;
-        getDataByHashForMany(keyHashes: PromiseOrValue<BigNumberish>[], tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[
+        }
+    ], "view">;
+    getDataByHashForMany: TypedContractMethod<[
+        keyHashes: BigNumberish[],
+        tokenIds: BigNumberish[]
+    ], [
+        [
             string[],
             string[],
             string[][],
@@ -236,8 +236,13 @@ export interface ProxyReader extends BaseContract {
             owners: string[];
             keys: string[][];
             values: string[][];
-        }>;
-        getDataForMany(keys: PromiseOrValue<string>[], tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[
+        }
+    ], "view">;
+    getDataForMany: TypedContractMethod<[
+        keys: string[],
+        tokenIds: BigNumberish[]
+    ], [
+        [
             string[],
             string[],
             string[][]
@@ -245,156 +250,126 @@ export interface ProxyReader extends BaseContract {
             resolvers: string[];
             owners: string[];
             values: string[][];
-        }>;
-        getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string[]] & {
-            values: string[];
-        }>;
-        getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string[], string[]] & {
+        }
+    ], "view">;
+    getMany: TypedContractMethod<[
+        keys: string[],
+        tokenId: BigNumberish
+    ], [
+        string[]
+    ], "view">;
+    getManyByHash: TypedContractMethod<[
+        keyHashes: BigNumberish[],
+        tokenId: BigNumberish
+    ], [
+        [string[], string[]] & {
             keys: string[];
             values: string[];
-        }>;
-        initialize(unsRegistry: PromiseOrValue<string>, cnsRegistry: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        isApprovedForAll(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<[BigNumber]>;
-        owner(overrides?: CallOverrides): Promise<[string]>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        ownerOfForMany(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[string[]] & {
-            owners: string[];
-        }>;
-        registryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[string]>;
-        reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        setOwner(addr: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    NAME(overrides?: CallOverrides): Promise<string>;
-    VERSION(overrides?: CallOverrides): Promise<string>;
-    "addBlockchainNetworks(string[],string[])"(networks: PromiseOrValue<string>[], families: PromiseOrValue<string>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "addBlockchainNetworks(string[],string)"(networks: PromiseOrValue<string>[], family: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    addLegacyRecords(keys: PromiseOrValue<string>[], legacyKeys: PromiseOrValue<string>[][], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-    exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-    get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    getAddress(network: PromiseOrValue<string>, token: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    getAddressKey(network: PromiseOrValue<string>, token: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    getAddressKeys(network: PromiseOrValue<string>, token: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string[]>;
-    getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, string] & {
-        key: string;
-        value: string;
-    }>;
-    getData(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[
-        string,
-        string,
+        }
+    ], "view">;
+    initialize: TypedContractMethod<[
+        unsRegistry: AddressLike,
+        cnsRegistry: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    isApprovedForAll: TypedContractMethod<[
+        arg0: AddressLike,
+        arg1: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    isApprovedOrOwner: TypedContractMethod<[
+        spender: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        boolean
+    ], "view">;
+    multicall: TypedContractMethod<[data: BytesLike[]], [string[]], "nonpayable">;
+    namehash: TypedContractMethod<[labels: string[]], [bigint], "view">;
+    owner: TypedContractMethod<[], [string], "view">;
+    ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    ownerOfForMany: TypedContractMethod<[
+        tokenIds: BigNumberish[]
+    ], [
         string[]
-    ] & {
-        resolver: string;
-        owner: string;
-        values: string[];
-    }>;
-    getDataByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[
-        string,
-        string,
-        string[],
-        string[]
-    ] & {
-        resolver: string;
-        owner: string;
-        keys: string[];
-        values: string[];
-    }>;
-    getDataByHashForMany(keyHashes: PromiseOrValue<BigNumberish>[], tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[
-        string[],
-        string[],
-        string[][],
-        string[][]
-    ] & {
-        resolvers: string[];
-        owners: string[];
-        keys: string[][];
-        values: string[][];
-    }>;
-    getDataForMany(keys: PromiseOrValue<string>[], tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[
-        string[],
-        string[],
-        string[][]
-    ] & {
-        resolvers: string[];
-        owners: string[];
-        values: string[][];
-    }>;
-    getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string[]>;
-    getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string[], string[]] & {
-        keys: string[];
-        values: string[];
-    }>;
-    initialize(unsRegistry: PromiseOrValue<string>, cnsRegistry: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    isApprovedForAll(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-    multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<BigNumber>;
-    owner(overrides?: CallOverrides): Promise<string>;
-    ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    ownerOfForMany(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<string[]>;
-    registryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    renounceOwnership(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-    reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-    setOwner(addr: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        NAME(overrides?: CallOverrides): Promise<string>;
-        VERSION(overrides?: CallOverrides): Promise<string>;
-        "addBlockchainNetworks(string[],string[])"(networks: PromiseOrValue<string>[], families: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
-        "addBlockchainNetworks(string[],string)"(networks: PromiseOrValue<string>[], family: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        addLegacyRecords(keys: PromiseOrValue<string>[], legacyKeys: PromiseOrValue<string>[][], overrides?: CallOverrides): Promise<void>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-        get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        getAddress(network: PromiseOrValue<string>, token: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        getAddressKey(network: PromiseOrValue<string>, token: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        getAddressKeys(network: PromiseOrValue<string>, token: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string[]>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, string] & {
+    ], "view">;
+    registryOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+    resolverOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    reverseNameOf: TypedContractMethod<[addr: AddressLike], [string], "view">;
+    reverseOf: TypedContractMethod<[addr: AddressLike], [bigint], "view">;
+    setOwner: TypedContractMethod<[addr: AddressLike], [void], "nonpayable">;
+    supportsInterface: TypedContractMethod<[
+        interfaceId: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    tokenURI: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    transferOwnership: TypedContractMethod<[
+        newOwner: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "NAME"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "VERSION"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "addBlockchainNetworks(string[],string[])"): TypedContractMethod<[
+        networks: string[],
+        families: string[]
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "addBlockchainNetworks(string[],string)"): TypedContractMethod<[
+        networks: string[],
+        family: string
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "addLegacyRecords"): TypedContractMethod<[
+        keys: string[],
+        legacyKeys: string[][]
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "balanceOf"): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+    getFunction(nameOrSignature: "exists"): TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
+    getFunction(nameOrSignature: "get"): TypedContractMethod<[
+        key: string,
+        tokenId: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "getAddress"): TypedContractMethod<[
+        network: string,
+        token: string,
+        tokenId: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "getAddressKey"): TypedContractMethod<[
+        network: string,
+        token: string,
+        tokenId: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "getAddressKeys"): TypedContractMethod<[network: string, token: string], [string[]], "view">;
+    getFunction(nameOrSignature: "getApproved"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "getByHash"): TypedContractMethod<[
+        keyHash: BigNumberish,
+        tokenId: BigNumberish
+    ], [
+        [string, string] & {
             key: string;
             value: string;
-        }>;
-        getData(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[
+        }
+    ], "view">;
+    getFunction(nameOrSignature: "getData"): TypedContractMethod<[
+        keys: string[],
+        tokenId: BigNumberish
+    ], [
+        [
             string,
             string,
             string[]
@@ -402,8 +377,13 @@ export interface ProxyReader extends BaseContract {
             resolver: string;
             owner: string;
             values: string[];
-        }>;
-        getDataByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[
+        }
+    ], "view">;
+    getFunction(nameOrSignature: "getDataByHash"): TypedContractMethod<[
+        keyHashes: BigNumberish[],
+        tokenId: BigNumberish
+    ], [
+        [
             string,
             string,
             string[],
@@ -413,8 +393,13 @@ export interface ProxyReader extends BaseContract {
             owner: string;
             keys: string[];
             values: string[];
-        }>;
-        getDataByHashForMany(keyHashes: PromiseOrValue<BigNumberish>[], tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[
+        }
+    ], "view">;
+    getFunction(nameOrSignature: "getDataByHashForMany"): TypedContractMethod<[
+        keyHashes: BigNumberish[],
+        tokenIds: BigNumberish[]
+    ], [
+        [
             string[],
             string[],
             string[][],
@@ -424,8 +409,13 @@ export interface ProxyReader extends BaseContract {
             owners: string[];
             keys: string[][];
             values: string[][];
-        }>;
-        getDataForMany(keys: PromiseOrValue<string>[], tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[
+        }
+    ], "view">;
+    getFunction(nameOrSignature: "getDataForMany"): TypedContractMethod<[
+        keys: string[],
+        tokenIds: BigNumberish[]
+    ], [
+        [
             string[],
             string[],
             string[][]
@@ -433,147 +423,68 @@ export interface ProxyReader extends BaseContract {
             resolvers: string[];
             owners: string[];
             values: string[][];
-        }>;
-        getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string[]>;
-        getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string[], string[]] & {
+        }
+    ], "view">;
+    getFunction(nameOrSignature: "getMany"): TypedContractMethod<[
+        keys: string[],
+        tokenId: BigNumberish
+    ], [
+        string[]
+    ], "view">;
+    getFunction(nameOrSignature: "getManyByHash"): TypedContractMethod<[
+        keyHashes: BigNumberish[],
+        tokenId: BigNumberish
+    ], [
+        [string[], string[]] & {
             keys: string[];
             values: string[];
-        }>;
-        initialize(unsRegistry: PromiseOrValue<string>, cnsRegistry: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        isApprovedForAll(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: CallOverrides): Promise<string[]>;
-        namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<BigNumber>;
-        owner(overrides?: CallOverrides): Promise<string>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        ownerOfForMany(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<string[]>;
-        registryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        renounceOwnership(overrides?: CallOverrides): Promise<void>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        setOwner(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-    };
+        }
+    ], "view">;
+    getFunction(nameOrSignature: "initialize"): TypedContractMethod<[
+        unsRegistry: AddressLike,
+        cnsRegistry: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "isApprovedForAll"): TypedContractMethod<[
+        arg0: AddressLike,
+        arg1: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "isApprovedOrOwner"): TypedContractMethod<[
+        spender: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "multicall"): TypedContractMethod<[data: BytesLike[]], [string[]], "nonpayable">;
+    getFunction(nameOrSignature: "namehash"): TypedContractMethod<[labels: string[]], [bigint], "view">;
+    getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "ownerOf"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "ownerOfForMany"): TypedContractMethod<[tokenIds: BigNumberish[]], [string[]], "view">;
+    getFunction(nameOrSignature: "registryOf"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "renounceOwnership"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "resolverOf"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "reverseNameOf"): TypedContractMethod<[addr: AddressLike], [string], "view">;
+    getFunction(nameOrSignature: "reverseOf"): TypedContractMethod<[addr: AddressLike], [bigint], "view">;
+    getFunction(nameOrSignature: "setOwner"): TypedContractMethod<[addr: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
+    getFunction(nameOrSignature: "tokenURI"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+    getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+    getEvent(key: "OwnershipTransferred"): TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+    getEvent(key: "SetLegacyRecords"): TypedContractEvent<SetLegacyRecordsEvent.InputTuple, SetLegacyRecordsEvent.OutputTuple, SetLegacyRecordsEvent.OutputObject>;
+    getEvent(key: "SetNetworkFamily"): TypedContractEvent<SetNetworkFamilyEvent.InputTuple, SetNetworkFamilyEvent.OutputTuple, SetNetworkFamilyEvent.OutputObject>;
     filters: {
-        "Initialized(uint8)"(version?: null): InitializedEventFilter;
-        Initialized(version?: null): InitializedEventFilter;
-        "OwnershipTransferred(address,address)"(previousOwner?: PromiseOrValue<string> | null, newOwner?: PromiseOrValue<string> | null): OwnershipTransferredEventFilter;
-        OwnershipTransferred(previousOwner?: PromiseOrValue<string> | null, newOwner?: PromiseOrValue<string> | null): OwnershipTransferredEventFilter;
-        "SetLegacyRecords(string)"(tokenKey?: null): SetLegacyRecordsEventFilter;
-        SetLegacyRecords(tokenKey?: null): SetLegacyRecordsEventFilter;
-        "SetNetworkFamily(string)"(network?: null): SetNetworkFamilyEventFilter;
-        SetNetworkFamily(network?: null): SetNetworkFamilyEventFilter;
-    };
-    estimateGas: {
-        NAME(overrides?: CallOverrides): Promise<BigNumber>;
-        VERSION(overrides?: CallOverrides): Promise<BigNumber>;
-        "addBlockchainNetworks(string[],string[])"(networks: PromiseOrValue<string>[], families: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "addBlockchainNetworks(string[],string)"(networks: PromiseOrValue<string>[], family: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        addLegacyRecords(keys: PromiseOrValue<string>[], legacyKeys: PromiseOrValue<string>[][], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getAddress(network: PromiseOrValue<string>, token: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getAddressKey(network: PromiseOrValue<string>, token: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getAddressKeys(network: PromiseOrValue<string>, token: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getData(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getDataByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getDataByHashForMany(keyHashes: PromiseOrValue<BigNumberish>[], tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
-        getDataForMany(keys: PromiseOrValue<string>[], tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
-        getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        initialize(unsRegistry: PromiseOrValue<string>, cnsRegistry: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        isApprovedForAll(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<BigNumber>;
-        owner(overrides?: CallOverrides): Promise<BigNumber>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        ownerOfForMany(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
-        registryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        setOwner(addr: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        NAME(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        "addBlockchainNetworks(string[],string[])"(networks: PromiseOrValue<string>[], families: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "addBlockchainNetworks(string[],string)"(networks: PromiseOrValue<string>[], family: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        addLegacyRecords(keys: PromiseOrValue<string>[], legacyKeys: PromiseOrValue<string>[][], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        exists(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getAddress(network: PromiseOrValue<string>, token: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getAddressKey(network: PromiseOrValue<string>, token: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getAddressKeys(network: PromiseOrValue<string>, token: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getData(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getDataByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getDataByHashForMany(keyHashes: PromiseOrValue<BigNumberish>[], tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getDataForMany(keys: PromiseOrValue<string>[], tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        initialize(unsRegistry: PromiseOrValue<string>, cnsRegistry: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        isApprovedForAll(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        multicall(data: PromiseOrValue<BytesLike>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        namehash(labels: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        ownerOfForMany(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        registryOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        reverseNameOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        reverseOf(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        setOwner(addr: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "Initialized(uint8)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        "OwnershipTransferred(address,address)": TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+        OwnershipTransferred: TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+        "SetLegacyRecords(string)": TypedContractEvent<SetLegacyRecordsEvent.InputTuple, SetLegacyRecordsEvent.OutputTuple, SetLegacyRecordsEvent.OutputObject>;
+        SetLegacyRecords: TypedContractEvent<SetLegacyRecordsEvent.InputTuple, SetLegacyRecordsEvent.OutputTuple, SetLegacyRecordsEvent.OutputObject>;
+        "SetNetworkFamily(string)": TypedContractEvent<SetNetworkFamilyEvent.InputTuple, SetNetworkFamilyEvent.OutputTuple, SetNetworkFamilyEvent.OutputObject>;
+        SetNetworkFamily: TypedContractEvent<SetNetworkFamilyEvent.InputTuple, SetNetworkFamilyEvent.OutputTuple, SetNetworkFamilyEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=ProxyReader.d.ts.map

@@ -1,95 +1,64 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../common";
-export interface MinterRoleInterface extends utils.Interface {
-    functions: {
-        "addMinter(address)": FunctionFragment;
-        "isMinter(address)": FunctionFragment;
-        "renounceMinter()": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "addMinter" | "isMinter" | "renounceMinter"): FunctionFragment;
-    encodeFunctionData(functionFragment: "addMinter", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "isMinter", values: [PromiseOrValue<string>]): string;
+import type { BaseContract, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../common";
+export interface MinterRoleInterface extends Interface {
+    getFunction(nameOrSignature: "addMinter" | "isMinter" | "renounceMinter"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "MinterAdded" | "MinterRemoved"): EventFragment;
+    encodeFunctionData(functionFragment: "addMinter", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "isMinter", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "renounceMinter", values?: undefined): string;
     decodeFunctionResult(functionFragment: "addMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceMinter", data: BytesLike): Result;
-    events: {
-        "MinterAdded(address)": EventFragment;
-        "MinterRemoved(address)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "MinterAdded"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "MinterRemoved"): EventFragment;
 }
-export interface MinterAddedEventObject {
-    account: string;
+export declare namespace MinterAddedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type MinterAddedEvent = TypedEvent<[string], MinterAddedEventObject>;
-export declare type MinterAddedEventFilter = TypedEventFilter<MinterAddedEvent>;
-export interface MinterRemovedEventObject {
-    account: string;
+export declare namespace MinterRemovedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type MinterRemovedEvent = TypedEvent<[string], MinterRemovedEventObject>;
-export declare type MinterRemovedEventFilter = TypedEventFilter<MinterRemovedEvent>;
 export interface MinterRole extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): MinterRole;
+    waitForDeployment(): Promise<this>;
     interface: MinterRoleInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        addMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        renounceMinter(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    addMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    renounceMinter(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        addMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        renounceMinter(overrides?: CallOverrides): Promise<void>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    addMinter: TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
+    isMinter: TypedContractMethod<[account: AddressLike], [boolean], "view">;
+    renounceMinter: TypedContractMethod<[], [void], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "addMinter"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "isMinter"): TypedContractMethod<[account: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "renounceMinter"): TypedContractMethod<[], [void], "nonpayable">;
+    getEvent(key: "MinterAdded"): TypedContractEvent<MinterAddedEvent.InputTuple, MinterAddedEvent.OutputTuple, MinterAddedEvent.OutputObject>;
+    getEvent(key: "MinterRemoved"): TypedContractEvent<MinterRemovedEvent.InputTuple, MinterRemovedEvent.OutputTuple, MinterRemovedEvent.OutputObject>;
     filters: {
-        "MinterAdded(address)"(account?: PromiseOrValue<string> | null): MinterAddedEventFilter;
-        MinterAdded(account?: PromiseOrValue<string> | null): MinterAddedEventFilter;
-        "MinterRemoved(address)"(account?: PromiseOrValue<string> | null): MinterRemovedEventFilter;
-        MinterRemoved(account?: PromiseOrValue<string> | null): MinterRemovedEventFilter;
-    };
-    estimateGas: {
-        addMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        renounceMinter(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        addMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        renounceMinter(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "MinterAdded(address)": TypedContractEvent<MinterAddedEvent.InputTuple, MinterAddedEvent.OutputTuple, MinterAddedEvent.OutputObject>;
+        MinterAdded: TypedContractEvent<MinterAddedEvent.InputTuple, MinterAddedEvent.OutputTuple, MinterAddedEvent.OutputObject>;
+        "MinterRemoved(address)": TypedContractEvent<MinterRemovedEvent.InputTuple, MinterRemovedEvent.OutputTuple, MinterRemovedEvent.OutputObject>;
+        MinterRemoved: TypedContractEvent<MinterRemovedEvent.InputTuple, MinterRemovedEvent.OutputTuple, MinterRemovedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=MinterRole.d.ts.map

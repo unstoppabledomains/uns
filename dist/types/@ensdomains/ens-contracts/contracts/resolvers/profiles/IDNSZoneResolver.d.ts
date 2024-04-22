@@ -1,60 +1,52 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
-export interface IDNSZoneResolverInterface extends utils.Interface {
-    functions: {
-        "zonehash(bytes32)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "zonehash"): FunctionFragment;
-    encodeFunctionData(functionFragment: "zonehash", values: [PromiseOrValue<BytesLike>]): string;
-    decodeFunctionResult(functionFragment: "zonehash", data: BytesLike): Result;
-    events: {
-        "DNSZonehashChanged(bytes32,bytes,bytes)": EventFragment;
-    };
+import type { BaseContract, BytesLike, FunctionFragment, Result, Interface, EventFragment, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../../common";
+export interface IDNSZoneResolverInterface extends Interface {
+    getFunction(nameOrSignature: "zonehash"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "DNSZonehashChanged"): EventFragment;
+    encodeFunctionData(functionFragment: "zonehash", values: [BytesLike]): string;
+    decodeFunctionResult(functionFragment: "zonehash", data: BytesLike): Result;
 }
-export interface DNSZonehashChangedEventObject {
-    node: string;
-    lastzonehash: string;
-    zonehash: string;
+export declare namespace DNSZonehashChangedEvent {
+    type InputTuple = [
+        node: BytesLike,
+        lastzonehash: BytesLike,
+        zonehash: BytesLike
+    ];
+    type OutputTuple = [
+        node: string,
+        lastzonehash: string,
+        zonehash: string
+    ];
+    interface OutputObject {
+        node: string;
+        lastzonehash: string;
+        zonehash: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type DNSZonehashChangedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], DNSZonehashChangedEventObject>;
-export declare type DNSZonehashChangedEventFilter = TypedEventFilter<DNSZonehashChangedEvent>;
 export interface IDNSZoneResolver extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IDNSZoneResolver;
+    waitForDeployment(): Promise<this>;
     interface: IDNSZoneResolverInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        zonehash(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-    };
-    zonehash(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    callStatic: {
-        zonehash(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    zonehash: TypedContractMethod<[node: BytesLike], [string], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "zonehash"): TypedContractMethod<[node: BytesLike], [string], "view">;
+    getEvent(key: "DNSZonehashChanged"): TypedContractEvent<DNSZonehashChangedEvent.InputTuple, DNSZonehashChangedEvent.OutputTuple, DNSZonehashChangedEvent.OutputObject>;
     filters: {
-        "DNSZonehashChanged(bytes32,bytes,bytes)"(node?: PromiseOrValue<BytesLike> | null, lastzonehash?: null, zonehash?: null): DNSZonehashChangedEventFilter;
-        DNSZonehashChanged(node?: PromiseOrValue<BytesLike> | null, lastzonehash?: null, zonehash?: null): DNSZonehashChangedEventFilter;
-    };
-    estimateGas: {
-        zonehash(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        zonehash(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "DNSZonehashChanged(bytes32,bytes,bytes)": TypedContractEvent<DNSZonehashChangedEvent.InputTuple, DNSZonehashChangedEvent.OutputTuple, DNSZonehashChangedEvent.OutputObject>;
+        DNSZonehashChanged: TypedContractEvent<DNSZonehashChangedEvent.InputTuple, DNSZonehashChangedEvent.OutputTuple, DNSZonehashChangedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=IDNSZoneResolver.d.ts.map

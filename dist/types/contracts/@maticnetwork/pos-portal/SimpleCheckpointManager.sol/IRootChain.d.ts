@@ -1,52 +1,56 @@
-import type { BaseContract, BigNumber, BigNumberish, Signer, utils } from "ethers";
-import type { EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../common";
-export interface IRootChainInterface extends utils.Interface {
-    functions: {};
-    events: {
-        "NewHeaderBlock(address,uint256,uint256,uint256,uint256,bytes32)": EventFragment;
-    };
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener } from "../../../../common";
+export interface IRootChainInterface extends Interface {
     getEvent(nameOrSignatureOrTopic: "NewHeaderBlock"): EventFragment;
 }
-export interface NewHeaderBlockEventObject {
-    proposer: string;
-    headerBlockId: BigNumber;
-    reward: BigNumber;
-    start: BigNumber;
-    end: BigNumber;
-    root: string;
+export declare namespace NewHeaderBlockEvent {
+    type InputTuple = [
+        proposer: AddressLike,
+        headerBlockId: BigNumberish,
+        reward: BigNumberish,
+        start: BigNumberish,
+        end: BigNumberish,
+        root: BytesLike
+    ];
+    type OutputTuple = [
+        proposer: string,
+        headerBlockId: bigint,
+        reward: bigint,
+        start: bigint,
+        end: bigint,
+        root: string
+    ];
+    interface OutputObject {
+        proposer: string;
+        headerBlockId: bigint;
+        reward: bigint;
+        start: bigint;
+        end: bigint;
+        root: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NewHeaderBlockEvent = TypedEvent<[
-    string,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    string
-], NewHeaderBlockEventObject>;
-export declare type NewHeaderBlockEventFilter = TypedEventFilter<NewHeaderBlockEvent>;
 export interface IRootChain extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IRootChain;
+    waitForDeployment(): Promise<this>;
     interface: IRootChainInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {};
-    callStatic: {};
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getEvent(key: "NewHeaderBlock"): TypedContractEvent<NewHeaderBlockEvent.InputTuple, NewHeaderBlockEvent.OutputTuple, NewHeaderBlockEvent.OutputObject>;
     filters: {
-        "NewHeaderBlock(address,uint256,uint256,uint256,uint256,bytes32)"(proposer?: PromiseOrValue<string> | null, headerBlockId?: PromiseOrValue<BigNumberish> | null, reward?: PromiseOrValue<BigNumberish> | null, start?: null, end?: null, root?: null): NewHeaderBlockEventFilter;
-        NewHeaderBlock(proposer?: PromiseOrValue<string> | null, headerBlockId?: PromiseOrValue<BigNumberish> | null, reward?: PromiseOrValue<BigNumberish> | null, start?: null, end?: null, root?: null): NewHeaderBlockEventFilter;
+        "NewHeaderBlock(address,uint256,uint256,uint256,uint256,bytes32)": TypedContractEvent<NewHeaderBlockEvent.InputTuple, NewHeaderBlockEvent.OutputTuple, NewHeaderBlockEvent.OutputObject>;
+        NewHeaderBlock: TypedContractEvent<NewHeaderBlockEvent.InputTuple, NewHeaderBlockEvent.OutputTuple, NewHeaderBlockEvent.OutputObject>;
     };
-    estimateGas: {};
-    populateTransaction: {};
 }
 //# sourceMappingURL=IRootChain.d.ts.map

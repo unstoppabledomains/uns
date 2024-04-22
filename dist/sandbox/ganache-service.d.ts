@@ -1,5 +1,5 @@
 import { Server, EthereumProvider, ServerOptions } from 'ganache';
-export declare type ServerConfigOptions = ServerOptions<'ethereum'> & {
+export declare type ServerConfigOptions = ServerOptions & {
     url: string;
     port?: number;
     hostname?: string;

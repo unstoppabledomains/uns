@@ -21,13 +21,12 @@ declare module 'hardhat/types/config' {
     }
 }
 import '@typechain/hardhat';
-import '@nomiclabs/hardhat-ethers';
-import '@nomiclabs/hardhat-waffle';
+import '@nomicfoundation/hardhat-ethers';
+import '@nomicfoundation/hardhat-verify';
+import '@nomicfoundation/hardhat-chai-matchers';
 import '@nomiclabs/hardhat-solhint';
-import '@nomiclabs/hardhat-etherscan';
 import 'hardhat-tracer';
 import '@openzeppelin/hardhat-upgrades';
-import '@openzeppelin/hardhat-defender';
 import 'solidity-coverage';
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';

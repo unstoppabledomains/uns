@@ -1,72 +1,70 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "../../../common";
-export interface PausableUpgradeableInterface extends utils.Interface {
-    functions: {
-        "paused()": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "paused"): FunctionFragment;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../common";
+export interface PausableUpgradeableInterface extends Interface {
+    getFunction(nameOrSignature: "paused"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "Initialized" | "Paused" | "Unpaused"): EventFragment;
     encodeFunctionData(functionFragment: "paused", values?: undefined): string;
     decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
-    events: {
-        "Initialized(uint8)": EventFragment;
-        "Paused(address)": EventFragment;
-        "Unpaused(address)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
-export interface InitializedEventObject {
-    version: number;
+export declare namespace InitializedEvent {
+    type InputTuple = [version: BigNumberish];
+    type OutputTuple = [version: bigint];
+    interface OutputObject {
+        version: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
-export declare type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
-export interface PausedEventObject {
-    account: string;
+export declare namespace PausedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type PausedEvent = TypedEvent<[string], PausedEventObject>;
-export declare type PausedEventFilter = TypedEventFilter<PausedEvent>;
-export interface UnpausedEventObject {
-    account: string;
+export declare namespace UnpausedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type UnpausedEvent = TypedEvent<[string], UnpausedEventObject>;
-export declare type UnpausedEventFilter = TypedEventFilter<UnpausedEvent>;
 export interface PausableUpgradeable extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): PausableUpgradeable;
+    waitForDeployment(): Promise<this>;
     interface: PausableUpgradeableInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        paused(overrides?: CallOverrides): Promise<[boolean]>;
-    };
-    paused(overrides?: CallOverrides): Promise<boolean>;
-    callStatic: {
-        paused(overrides?: CallOverrides): Promise<boolean>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    paused: TypedContractMethod<[], [boolean], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "paused"): TypedContractMethod<[], [boolean], "view">;
+    getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+    getEvent(key: "Paused"): TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
+    getEvent(key: "Unpaused"): TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
     filters: {
-        "Initialized(uint8)"(version?: null): InitializedEventFilter;
-        Initialized(version?: null): InitializedEventFilter;
-        "Paused(address)"(account?: null): PausedEventFilter;
-        Paused(account?: null): PausedEventFilter;
-        "Unpaused(address)"(account?: null): UnpausedEventFilter;
-        Unpaused(account?: null): UnpausedEventFilter;
-    };
-    estimateGas: {
-        paused(overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "Initialized(uint8)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        "Paused(address)": TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
+        Paused: TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
+        "Unpaused(address)": TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
+        Unpaused: TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=PausableUpgradeable.d.ts.map

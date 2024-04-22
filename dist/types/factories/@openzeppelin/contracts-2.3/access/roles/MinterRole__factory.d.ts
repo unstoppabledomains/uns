@@ -1,49 +1,69 @@
-import { Signer } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { type ContractRunner } from "ethers";
 import type { MinterRole, MinterRoleInterface } from "../../../../../@openzeppelin/contracts-2.3/access/roles/MinterRole";
 export declare class MinterRole__factory {
-    static readonly abi: ({
-        inputs: never[];
-        payable: boolean;
-        stateMutability: string;
-        type: string;
-        anonymous?: undefined;
-        name?: undefined;
-        constant?: undefined;
-        outputs?: undefined;
-    } | {
-        anonymous: boolean;
-        inputs: {
-            indexed: boolean;
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        name: string;
-        type: string;
-        payable?: undefined;
-        stateMutability?: undefined;
-        constant?: undefined;
-        outputs?: undefined;
-    } | {
-        constant: boolean;
-        inputs: {
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        name: string;
-        outputs: {
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        payable: boolean;
-        stateMutability: string;
-        type: string;
-        anonymous?: undefined;
-    })[];
+    static readonly abi: readonly [{
+        readonly inputs: readonly [];
+        readonly payable: false;
+        readonly stateMutability: "nonpayable";
+        readonly type: "constructor";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "address";
+            readonly name: "account";
+            readonly type: "address";
+        }];
+        readonly name: "MinterAdded";
+        readonly type: "event";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "address";
+            readonly name: "account";
+            readonly type: "address";
+        }];
+        readonly name: "MinterRemoved";
+        readonly type: "event";
+    }, {
+        readonly constant: false;
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "account";
+            readonly type: "address";
+        }];
+        readonly name: "addMinter";
+        readonly outputs: readonly [];
+        readonly payable: false;
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly constant: true;
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "account";
+            readonly type: "address";
+        }];
+        readonly name: "isMinter";
+        readonly outputs: readonly [{
+            readonly internalType: "bool";
+            readonly name: "";
+            readonly type: "bool";
+        }];
+        readonly payable: false;
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }, {
+        readonly constant: false;
+        readonly inputs: readonly [];
+        readonly name: "renounceMinter";
+        readonly outputs: readonly [];
+        readonly payable: false;
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }];
     static createInterface(): MinterRoleInterface;
-    static connect(address: string, signerOrProvider: Signer | Provider): MinterRole;
+    static connect(address: string, runner?: ContractRunner | null): MinterRole;
 }
 //# sourceMappingURL=MinterRole__factory.d.ts.map

@@ -18,13 +18,12 @@ const task_names_1 = require("hardhat/builtin-tasks/task-names");
 const config_1 = require("hardhat/config");
 const lodash_1 = require("lodash");
 require("@typechain/hardhat");
-require("@nomiclabs/hardhat-ethers");
-require("@nomiclabs/hardhat-waffle");
+require("@nomicfoundation/hardhat-ethers");
+require("@nomicfoundation/hardhat-verify");
+require("@nomicfoundation/hardhat-chai-matchers");
 require("@nomiclabs/hardhat-solhint");
-require("@nomiclabs/hardhat-etherscan");
 require("hardhat-tracer");
 require("@openzeppelin/hardhat-upgrades");
-require("@openzeppelin/hardhat-defender");
 require("solidity-coverage");
 require("hardhat-gas-reporter");
 require("hardhat-contract-sizer");
@@ -117,7 +116,7 @@ const config = {
     },
     typechain: {
         outDir: 'types',
-        target: 'ethers-v5',
+        target: 'ethers-v6',
     },
     gasReporter: {
         enabled: argv.enableGasReport,
@@ -172,8 +171,8 @@ const config = {
         multisig: {
             mainnet: '0x6bEca92600be24179ae70A430AEF4aE632fddDc8',
             polygon: '0xC8E1B5c41c42ad1cE8336714cA2b2f2588F0a337',
-            sepolia: null,
-            amoy: null,
+            sepolia: '0x1197C09C38d460584473e8837D79c14343f24890',
+            amoy: '0x458adB6cce7D9984b74bC83c6F71Fbd1fd16085e',
         },
     },
     defender: {

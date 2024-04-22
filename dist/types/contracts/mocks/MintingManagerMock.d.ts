@@ -1,158 +1,82 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PayableOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
-export interface MintingManagerMockInterface extends utils.Interface {
-    functions: {
-        "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-        "MINTER_ROLE()": FunctionFragment;
-        "NAME()": FunctionFragment;
-        "VERSION()": FunctionFragment;
-        "addMinter(address)": FunctionFragment;
-        "addMinters(address[])": FunctionFragment;
-        "addProxyReaders(address[])": FunctionFragment;
-        "addTld(string,bool)": FunctionFragment;
-        "buy(address,string[],string[],string[],uint64,uint256,bytes)": FunctionFragment;
-        "buyForErc20(address,string[],string[],string[],uint64,address,uint256,bytes)": FunctionFragment;
-        "claim(uint256,string)": FunctionFragment;
-        "claimTo(address,uint256,string)": FunctionFragment;
-        "claimToWithRecords(address,uint256,string,string[],string[])": FunctionFragment;
-        "closeMinter(address)": FunctionFragment;
-        "cnsMintingController()": FunctionFragment;
-        "cnsResolver()": FunctionFragment;
-        "cnsURIPrefixController()": FunctionFragment;
-        "getRoleAdmin(bytes32)": FunctionFragment;
-        "grantRole(bytes32,address)": FunctionFragment;
-        "hasRole(bytes32,address)": FunctionFragment;
-        "initialize(address,address,address,address,address,address)": FunctionFragment;
-        "isBlocked(uint256)": FunctionFragment;
-        "isMinter(address)": FunctionFragment;
-        "isTrustedForwarder(address)": FunctionFragment;
-        "issueExpirableWithRecords(address,string[],string[],string[],uint64,bool)": FunctionFragment;
-        "issueWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
-        "owner()": FunctionFragment;
-        "pause()": FunctionFragment;
-        "paused()": FunctionFragment;
-        "removeMinter(address)": FunctionFragment;
-        "removeMinters(address[])": FunctionFragment;
-        "removeTld(uint256)": FunctionFragment;
-        "renew(uint64,uint256)": FunctionFragment;
-        "renounceMinter()": FunctionFragment;
-        "renounceOwnership()": FunctionFragment;
-        "renounceRole(bytes32,address)": FunctionFragment;
-        "revoke(uint256)": FunctionFragment;
-        "revokeRole(bytes32,address)": FunctionFragment;
-        "rotateMinter(address)": FunctionFragment;
-        "setForwarder(address)": FunctionFragment;
-        "setOperator(address)": FunctionFragment;
-        "setTokenURIPrefix(string)": FunctionFragment;
-        "supportsInterface(bytes4)": FunctionFragment;
-        "transferOwnership(address)": FunctionFragment;
-        "unpause()": FunctionFragment;
-        "unsOperator()": FunctionFragment;
-        "unsRegistry()": FunctionFragment;
-        "upgradeAll(uint256[])": FunctionFragment;
-        "withdraw(address)": FunctionFragment;
-        "withdraw(address,address)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueExpirableWithRecords" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renew" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revoke" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry" | "upgradeAll" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
+export interface MintingManagerMockInterface extends Interface {
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueExpirableWithRecords" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renew" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revoke" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry" | "upgradeAll" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "AdminChanged" | "Blocked" | "BlocklistDisabled" | "BlocklistEnabled" | "DomainPurchase" | "Initialized" | "NewTld" | "OwnershipTransferred" | "Paused" | "RemoveTld" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Unpaused" | "Upgraded" | "Withdrawal"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "NAME", values?: undefined): string;
     encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
-    encodeFunctionData(functionFragment: "addMinter", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "addMinters", values: [PromiseOrValue<string>[]]): string;
-    encodeFunctionData(functionFragment: "addProxyReaders", values: [PromiseOrValue<string>[]]): string;
-    encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>, PromiseOrValue<boolean>]): string;
+    encodeFunctionData(functionFragment: "addMinter", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "addMinters", values: [AddressLike[]]): string;
+    encodeFunctionData(functionFragment: "addProxyReaders", values: [AddressLike[]]): string;
+    encodeFunctionData(functionFragment: "addTld", values: [string, boolean]): string;
     encodeFunctionData(functionFragment: "buy", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
+        AddressLike,
+        string[],
+        string[],
+        string[],
+        BigNumberish,
+        BigNumberish,
+        BytesLike
     ]): string;
     encodeFunctionData(functionFragment: "buyForErc20", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
+        AddressLike,
+        string[],
+        string[],
+        string[],
+        BigNumberish,
+        AddressLike,
+        BigNumberish,
+        BytesLike
     ]): string;
-    encodeFunctionData(functionFragment: "claim", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "claimTo", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "claimToWithRecords", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[]
-    ]): string;
-    encodeFunctionData(functionFragment: "closeMinter", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "claim", values: [BigNumberish, string]): string;
+    encodeFunctionData(functionFragment: "claimTo", values: [AddressLike, BigNumberish, string]): string;
+    encodeFunctionData(functionFragment: "claimToWithRecords", values: [AddressLike, BigNumberish, string, string[], string[]]): string;
+    encodeFunctionData(functionFragment: "closeMinter", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "cnsMintingController", values?: undefined): string;
     encodeFunctionData(functionFragment: "cnsResolver", values?: undefined): string;
     encodeFunctionData(functionFragment: "cnsURIPrefixController", values?: undefined): string;
-    encodeFunctionData(functionFragment: "getRoleAdmin", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "grantRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "hasRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "initialize", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>
+        AddressLike,
+        AddressLike,
+        AddressLike,
+        AddressLike,
+        AddressLike,
+        AddressLike
     ]): string;
-    encodeFunctionData(functionFragment: "isBlocked", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "isMinter", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "isTrustedForwarder", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "issueExpirableWithRecords", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<boolean>
-    ]): string;
-    encodeFunctionData(functionFragment: "issueWithRecords", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<boolean>
-    ]): string;
+    encodeFunctionData(functionFragment: "isBlocked", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "isMinter", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "isTrustedForwarder", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "issueExpirableWithRecords", values: [AddressLike, string[], string[], string[], BigNumberish, boolean]): string;
+    encodeFunctionData(functionFragment: "issueWithRecords", values: [AddressLike, string[], string[], string[], boolean]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "pause", values?: undefined): string;
     encodeFunctionData(functionFragment: "paused", values?: undefined): string;
-    encodeFunctionData(functionFragment: "removeMinter", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "removeMinters", values: [PromiseOrValue<string>[]]): string;
-    encodeFunctionData(functionFragment: "removeTld", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "renew", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "removeMinter", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "removeMinters", values: [AddressLike[]]): string;
+    encodeFunctionData(functionFragment: "removeTld", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "renew", values: [BigNumberish, BigNumberish]): string;
     encodeFunctionData(functionFragment: "renounceMinter", values?: undefined): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
-    encodeFunctionData(functionFragment: "renounceRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "revoke", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "revokeRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "rotateMinter", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "setForwarder", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "setOperator", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "setTokenURIPrefix", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "transferOwnership", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "renounceRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "revoke", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "revokeRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "rotateMinter", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "setForwarder", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "setOperator", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "setTokenURIPrefix", values: [string]): string;
+    encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
     encodeFunctionData(functionFragment: "unsOperator", values?: undefined): string;
     encodeFunctionData(functionFragment: "unsRegistry", values?: undefined): string;
-    encodeFunctionData(functionFragment: "upgradeAll", values: [PromiseOrValue<BigNumberish>[]]): string;
-    encodeFunctionData(functionFragment: "withdraw(address)", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "withdraw(address,address)", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "upgradeAll", values: [BigNumberish[]]): string;
+    encodeFunctionData(functionFragment: "withdraw(address)", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "withdraw(address,address)", values: [AddressLike, AddressLike]): string;
     decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "MINTER_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "NAME", data: BytesLike): Result;
@@ -203,737 +127,643 @@ export interface MintingManagerMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "upgradeAll", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw(address)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw(address,address)", data: BytesLike): Result;
-    events: {
-        "AdminChanged(address,address)": EventFragment;
-        "Blocked(uint256)": EventFragment;
-        "BlocklistDisabled(address)": EventFragment;
-        "BlocklistEnabled(address)": EventFragment;
-        "DomainPurchase(uint256,address,address,uint256,address)": EventFragment;
-        "Initialized(uint8)": EventFragment;
-        "NewTld(uint256,string)": EventFragment;
-        "OwnershipTransferred(address,address)": EventFragment;
-        "Paused(address)": EventFragment;
-        "RemoveTld(uint256)": EventFragment;
-        "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
-        "RoleGranted(bytes32,address,address)": EventFragment;
-        "RoleRevoked(bytes32,address,address)": EventFragment;
-        "Unpaused(address)": EventFragment;
-        "Upgraded(address)": EventFragment;
-        "Withdrawal(address,uint256,address)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "AdminChanged"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Blocked"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "BlocklistDisabled"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "BlocklistEnabled"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "DomainPurchase"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NewTld"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "RemoveTld"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Withdrawal"): EventFragment;
 }
-export interface AdminChangedEventObject {
-    previousAdmin: string;
-    newAdmin: string;
+export declare namespace AdminChangedEvent {
+    type InputTuple = [previousAdmin: AddressLike, newAdmin: AddressLike];
+    type OutputTuple = [previousAdmin: string, newAdmin: string];
+    interface OutputObject {
+        previousAdmin: string;
+        newAdmin: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type AdminChangedEvent = TypedEvent<[
-    string,
-    string
-], AdminChangedEventObject>;
-export declare type AdminChangedEventFilter = TypedEventFilter<AdminChangedEvent>;
-export interface BlockedEventObject {
-    tokenId: BigNumber;
+export declare namespace BlockedEvent {
+    type InputTuple = [tokenId: BigNumberish];
+    type OutputTuple = [tokenId: bigint];
+    interface OutputObject {
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type BlockedEvent = TypedEvent<[BigNumber], BlockedEventObject>;
-export declare type BlockedEventFilter = TypedEventFilter<BlockedEvent>;
-export interface BlocklistDisabledEventObject {
-    account: string;
+export declare namespace BlocklistDisabledEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type BlocklistDisabledEvent = TypedEvent<[
-    string
-], BlocklistDisabledEventObject>;
-export declare type BlocklistDisabledEventFilter = TypedEventFilter<BlocklistDisabledEvent>;
-export interface BlocklistEnabledEventObject {
-    account: string;
+export declare namespace BlocklistEnabledEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type BlocklistEnabledEvent = TypedEvent<[
-    string
-], BlocklistEnabledEventObject>;
-export declare type BlocklistEnabledEventFilter = TypedEventFilter<BlocklistEnabledEvent>;
-export interface DomainPurchaseEventObject {
-    tokenId: BigNumber;
-    sender: string;
-    owner: string;
-    price: BigNumber;
-    token: string;
+export declare namespace DomainPurchaseEvent {
+    type InputTuple = [
+        tokenId: BigNumberish,
+        sender: AddressLike,
+        owner: AddressLike,
+        price: BigNumberish,
+        token: AddressLike
+    ];
+    type OutputTuple = [
+        tokenId: bigint,
+        sender: string,
+        owner: string,
+        price: bigint,
+        token: string
+    ];
+    interface OutputObject {
+        tokenId: bigint;
+        sender: string;
+        owner: string;
+        price: bigint;
+        token: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type DomainPurchaseEvent = TypedEvent<[
-    BigNumber,
-    string,
-    string,
-    BigNumber,
-    string
-], DomainPurchaseEventObject>;
-export declare type DomainPurchaseEventFilter = TypedEventFilter<DomainPurchaseEvent>;
-export interface InitializedEventObject {
-    version: number;
+export declare namespace InitializedEvent {
+    type InputTuple = [version: BigNumberish];
+    type OutputTuple = [version: bigint];
+    interface OutputObject {
+        version: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
-export declare type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
-export interface NewTldEventObject {
-    tokenId: BigNumber;
-    tld: string;
+export declare namespace NewTldEvent {
+    type InputTuple = [tokenId: BigNumberish, tld: string];
+    type OutputTuple = [tokenId: bigint, tld: string];
+    interface OutputObject {
+        tokenId: bigint;
+        tld: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NewTldEvent = TypedEvent<[BigNumber, string], NewTldEventObject>;
-export declare type NewTldEventFilter = TypedEventFilter<NewTldEvent>;
-export interface OwnershipTransferredEventObject {
-    previousOwner: string;
-    newOwner: string;
+export declare namespace OwnershipTransferredEvent {
+    type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
+    type OutputTuple = [previousOwner: string, newOwner: string];
+    interface OutputObject {
+        previousOwner: string;
+        newOwner: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type OwnershipTransferredEvent = TypedEvent<[
-    string,
-    string
-], OwnershipTransferredEventObject>;
-export declare type OwnershipTransferredEventFilter = TypedEventFilter<OwnershipTransferredEvent>;
-export interface PausedEventObject {
-    account: string;
+export declare namespace PausedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type PausedEvent = TypedEvent<[string], PausedEventObject>;
-export declare type PausedEventFilter = TypedEventFilter<PausedEvent>;
-export interface RemoveTldEventObject {
-    tokenId: BigNumber;
+export declare namespace RemoveTldEvent {
+    type InputTuple = [tokenId: BigNumberish];
+    type OutputTuple = [tokenId: bigint];
+    interface OutputObject {
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RemoveTldEvent = TypedEvent<[BigNumber], RemoveTldEventObject>;
-export declare type RemoveTldEventFilter = TypedEventFilter<RemoveTldEvent>;
-export interface RoleAdminChangedEventObject {
-    role: string;
-    previousAdminRole: string;
-    newAdminRole: string;
+export declare namespace RoleAdminChangedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        previousAdminRole: BytesLike,
+        newAdminRole: BytesLike
+    ];
+    type OutputTuple = [
+        role: string,
+        previousAdminRole: string,
+        newAdminRole: string
+    ];
+    interface OutputObject {
+        role: string;
+        previousAdminRole: string;
+        newAdminRole: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RoleAdminChangedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], RoleAdminChangedEventObject>;
-export declare type RoleAdminChangedEventFilter = TypedEventFilter<RoleAdminChangedEvent>;
-export interface RoleGrantedEventObject {
-    role: string;
-    account: string;
-    sender: string;
+export declare namespace RoleGrantedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        account: AddressLike,
+        sender: AddressLike
+    ];
+    type OutputTuple = [role: string, account: string, sender: string];
+    interface OutputObject {
+        role: string;
+        account: string;
+        sender: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RoleGrantedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], RoleGrantedEventObject>;
-export declare type RoleGrantedEventFilter = TypedEventFilter<RoleGrantedEvent>;
-export interface RoleRevokedEventObject {
-    role: string;
-    account: string;
-    sender: string;
+export declare namespace RoleRevokedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        account: AddressLike,
+        sender: AddressLike
+    ];
+    type OutputTuple = [role: string, account: string, sender: string];
+    interface OutputObject {
+        role: string;
+        account: string;
+        sender: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RoleRevokedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], RoleRevokedEventObject>;
-export declare type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
-export interface UnpausedEventObject {
-    account: string;
+export declare namespace UnpausedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type UnpausedEvent = TypedEvent<[string], UnpausedEventObject>;
-export declare type UnpausedEventFilter = TypedEventFilter<UnpausedEvent>;
-export interface UpgradedEventObject {
-    implementation: string;
+export declare namespace UpgradedEvent {
+    type InputTuple = [implementation: AddressLike];
+    type OutputTuple = [implementation: string];
+    interface OutputObject {
+        implementation: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type UpgradedEvent = TypedEvent<[string], UpgradedEventObject>;
-export declare type UpgradedEventFilter = TypedEventFilter<UpgradedEvent>;
-export interface WithdrawalEventObject {
-    recepient: string;
-    value: BigNumber;
-    token: string;
+export declare namespace WithdrawalEvent {
+    type InputTuple = [
+        recepient: AddressLike,
+        value: BigNumberish,
+        token: AddressLike
+    ];
+    type OutputTuple = [recepient: string, value: bigint, token: string];
+    interface OutputObject {
+        recepient: string;
+        value: bigint;
+        token: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type WithdrawalEvent = TypedEvent<[
-    string,
-    BigNumber,
-    string
-], WithdrawalEventObject>;
-export declare type WithdrawalEventFilter = TypedEventFilter<WithdrawalEvent>;
 export interface MintingManagerMock extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): MintingManagerMock;
+    waitForDeployment(): Promise<this>;
     interface: MintingManagerMockInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
-        MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
-        NAME(overrides?: CallOverrides): Promise<[string]>;
-        VERSION(overrides?: CallOverrides): Promise<[string]>;
-        addMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        addMinters(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        closeMinter(receiver: PromiseOrValue<string>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        cnsMintingController(overrides?: CallOverrides): Promise<[string]>;
-        cnsResolver(overrides?: CallOverrides): Promise<[string]>;
-        cnsURIPrefixController(overrides?: CallOverrides): Promise<[string]>;
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, unsOperator_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
-        isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        owner(overrides?: CallOverrides): Promise<[string]>;
-        pause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        paused(overrides?: CallOverrides): Promise<[boolean]>;
-        removeMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        removeMinters(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        removeTld(tld: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        renounceMinter(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        rotateMinter(receiver: PromiseOrValue<string>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setForwarder(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setOperator(operator: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        unpause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        unsOperator(overrides?: CallOverrides): Promise<[string]>;
-        unsRegistry(overrides?: CallOverrides): Promise<[string]>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-    MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
-    NAME(overrides?: CallOverrides): Promise<string>;
-    VERSION(overrides?: CallOverrides): Promise<string>;
-    addMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    addMinters(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    closeMinter(receiver: PromiseOrValue<string>, overrides?: PayableOverrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    cnsMintingController(overrides?: CallOverrides): Promise<string>;
-    cnsResolver(overrides?: CallOverrides): Promise<string>;
-    cnsURIPrefixController(overrides?: CallOverrides): Promise<string>;
-    getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, unsOperator_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-    isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    owner(overrides?: CallOverrides): Promise<string>;
-    pause(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    paused(overrides?: CallOverrides): Promise<boolean>;
-    removeMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    removeMinters(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    removeTld(tld: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    renounceMinter(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    renounceOwnership(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    rotateMinter(receiver: PromiseOrValue<string>, overrides?: PayableOverrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setForwarder(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setOperator(operator: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    unpause(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    unsOperator(overrides?: CallOverrides): Promise<string>;
-    unsRegistry(overrides?: CallOverrides): Promise<string>;
-    upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-        MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
-        NAME(overrides?: CallOverrides): Promise<string>;
-        VERSION(overrides?: CallOverrides): Promise<string>;
-        addMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        addMinters(accounts: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
-        addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
-        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
-        closeMinter(receiver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        cnsMintingController(overrides?: CallOverrides): Promise<string>;
-        cnsResolver(overrides?: CallOverrides): Promise<string>;
-        cnsURIPrefixController(overrides?: CallOverrides): Promise<string>;
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, unsOperator_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-        isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        owner(overrides?: CallOverrides): Promise<string>;
-        pause(overrides?: CallOverrides): Promise<void>;
-        paused(overrides?: CallOverrides): Promise<boolean>;
-        removeMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        removeMinters(accounts: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
-        removeTld(tld: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        renounceMinter(overrides?: CallOverrides): Promise<void>;
-        renounceOwnership(overrides?: CallOverrides): Promise<void>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        rotateMinter(receiver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        setForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        setOperator(operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        unpause(overrides?: CallOverrides): Promise<void>;
-        unsOperator(overrides?: CallOverrides): Promise<string>;
-        unsRegistry(overrides?: CallOverrides): Promise<string>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<void>;
-        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    DEFAULT_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
+    MINTER_ROLE: TypedContractMethod<[], [string], "view">;
+    NAME: TypedContractMethod<[], [string], "view">;
+    VERSION: TypedContractMethod<[], [string], "view">;
+    addMinter: TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
+    addMinters: TypedContractMethod<[
+        accounts: AddressLike[]
+    ], [
+        void
+    ], "nonpayable">;
+    addProxyReaders: TypedContractMethod<[
+        addrs: AddressLike[]
+    ], [
+        void
+    ], "nonpayable">;
+    addTld: TypedContractMethod<[
+        tld: string,
+        isExpirable: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    buy: TypedContractMethod<[
+        owner: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        price: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "payable">;
+    buyForErc20: TypedContractMethod<[
+        owner: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        token: AddressLike,
+        price: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    claim: TypedContractMethod<[
+        tld: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    claimTo: TypedContractMethod<[
+        to: AddressLike,
+        tld: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    claimToWithRecords: TypedContractMethod<[
+        to: AddressLike,
+        tld: BigNumberish,
+        label: string,
+        keys: string[],
+        values: string[]
+    ], [
+        void
+    ], "nonpayable">;
+    closeMinter: TypedContractMethod<[receiver: AddressLike], [void], "payable">;
+    cnsMintingController: TypedContractMethod<[], [string], "view">;
+    cnsResolver: TypedContractMethod<[], [string], "view">;
+    cnsURIPrefixController: TypedContractMethod<[], [string], "view">;
+    getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
+    grantRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    hasRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    initialize: TypedContractMethod<[
+        unsRegistry_: AddressLike,
+        cnsMintingController_: AddressLike,
+        cnsURIPrefixController_: AddressLike,
+        cnsResolver_: AddressLike,
+        unsOperator_: AddressLike,
+        forwarder: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    isBlocked: TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
+    isMinter: TypedContractMethod<[account: AddressLike], [boolean], "view">;
+    isTrustedForwarder: TypedContractMethod<[
+        forwarder: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    issueExpirableWithRecords: TypedContractMethod<[
+        to: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        withReverse: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    issueWithRecords: TypedContractMethod<[
+        to: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        withReverse: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    owner: TypedContractMethod<[], [string], "view">;
+    pause: TypedContractMethod<[], [void], "nonpayable">;
+    paused: TypedContractMethod<[], [boolean], "view">;
+    removeMinter: TypedContractMethod<[
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    removeMinters: TypedContractMethod<[
+        accounts: AddressLike[]
+    ], [
+        void
+    ], "nonpayable">;
+    removeTld: TypedContractMethod<[tld: BigNumberish], [void], "nonpayable">;
+    renew: TypedContractMethod<[
+        expiry: BigNumberish,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    renounceMinter: TypedContractMethod<[], [void], "nonpayable">;
+    renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+    renounceRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    revoke: TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    revokeRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    rotateMinter: TypedContractMethod<[receiver: AddressLike], [void], "payable">;
+    setForwarder: TypedContractMethod<[
+        forwarder: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    setOperator: TypedContractMethod<[
+        operator: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    setTokenURIPrefix: TypedContractMethod<[
+        prefix: string
+    ], [
+        void
+    ], "nonpayable">;
+    supportsInterface: TypedContractMethod<[
+        interfaceId: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    transferOwnership: TypedContractMethod<[
+        newOwner: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    unpause: TypedContractMethod<[], [void], "nonpayable">;
+    unsOperator: TypedContractMethod<[], [string], "view">;
+    unsRegistry: TypedContractMethod<[], [string], "view">;
+    upgradeAll: TypedContractMethod<[
+        tokenIds: BigNumberish[]
+    ], [
+        void
+    ], "nonpayable">;
+    "withdraw(address)": TypedContractMethod<[
+        recepient: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    "withdraw(address,address)": TypedContractMethod<[
+        token: AddressLike,
+        recepient: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "MINTER_ROLE"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "NAME"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "VERSION"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "addMinter"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "addMinters"): TypedContractMethod<[accounts: AddressLike[]], [void], "nonpayable">;
+    getFunction(nameOrSignature: "addProxyReaders"): TypedContractMethod<[addrs: AddressLike[]], [void], "nonpayable">;
+    getFunction(nameOrSignature: "addTld"): TypedContractMethod<[
+        tld: string,
+        isExpirable: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "buy"): TypedContractMethod<[
+        owner: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        price: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "payable">;
+    getFunction(nameOrSignature: "buyForErc20"): TypedContractMethod<[
+        owner: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        token: AddressLike,
+        price: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "claim"): TypedContractMethod<[
+        tld: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "claimTo"): TypedContractMethod<[
+        to: AddressLike,
+        tld: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "claimToWithRecords"): TypedContractMethod<[
+        to: AddressLike,
+        tld: BigNumberish,
+        label: string,
+        keys: string[],
+        values: string[]
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "closeMinter"): TypedContractMethod<[receiver: AddressLike], [void], "payable">;
+    getFunction(nameOrSignature: "cnsMintingController"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "cnsResolver"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "cnsURIPrefixController"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "getRoleAdmin"): TypedContractMethod<[role: BytesLike], [string], "view">;
+    getFunction(nameOrSignature: "grantRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "hasRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "initialize"): TypedContractMethod<[
+        unsRegistry_: AddressLike,
+        cnsMintingController_: AddressLike,
+        cnsURIPrefixController_: AddressLike,
+        cnsResolver_: AddressLike,
+        unsOperator_: AddressLike,
+        forwarder: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "isBlocked"): TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
+    getFunction(nameOrSignature: "isMinter"): TypedContractMethod<[account: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "isTrustedForwarder"): TypedContractMethod<[forwarder: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "issueExpirableWithRecords"): TypedContractMethod<[
+        to: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        withReverse: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "issueWithRecords"): TypedContractMethod<[
+        to: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        withReverse: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "pause"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "paused"): TypedContractMethod<[], [boolean], "view">;
+    getFunction(nameOrSignature: "removeMinter"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "removeMinters"): TypedContractMethod<[accounts: AddressLike[]], [void], "nonpayable">;
+    getFunction(nameOrSignature: "removeTld"): TypedContractMethod<[tld: BigNumberish], [void], "nonpayable">;
+    getFunction(nameOrSignature: "renew"): TypedContractMethod<[
+        expiry: BigNumberish,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "renounceMinter"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "renounceOwnership"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "renounceRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "revoke"): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    getFunction(nameOrSignature: "revokeRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "rotateMinter"): TypedContractMethod<[receiver: AddressLike], [void], "payable">;
+    getFunction(nameOrSignature: "setForwarder"): TypedContractMethod<[forwarder: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "setOperator"): TypedContractMethod<[operator: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "setTokenURIPrefix"): TypedContractMethod<[prefix: string], [void], "nonpayable">;
+    getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
+    getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "unpause"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "unsOperator"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "unsRegistry"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "upgradeAll"): TypedContractMethod<[tokenIds: BigNumberish[]], [void], "nonpayable">;
+    getFunction(nameOrSignature: "withdraw(address)"): TypedContractMethod<[recepient: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "withdraw(address,address)"): TypedContractMethod<[
+        token: AddressLike,
+        recepient: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getEvent(key: "AdminChanged"): TypedContractEvent<AdminChangedEvent.InputTuple, AdminChangedEvent.OutputTuple, AdminChangedEvent.OutputObject>;
+    getEvent(key: "Blocked"): TypedContractEvent<BlockedEvent.InputTuple, BlockedEvent.OutputTuple, BlockedEvent.OutputObject>;
+    getEvent(key: "BlocklistDisabled"): TypedContractEvent<BlocklistDisabledEvent.InputTuple, BlocklistDisabledEvent.OutputTuple, BlocklistDisabledEvent.OutputObject>;
+    getEvent(key: "BlocklistEnabled"): TypedContractEvent<BlocklistEnabledEvent.InputTuple, BlocklistEnabledEvent.OutputTuple, BlocklistEnabledEvent.OutputObject>;
+    getEvent(key: "DomainPurchase"): TypedContractEvent<DomainPurchaseEvent.InputTuple, DomainPurchaseEvent.OutputTuple, DomainPurchaseEvent.OutputObject>;
+    getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+    getEvent(key: "NewTld"): TypedContractEvent<NewTldEvent.InputTuple, NewTldEvent.OutputTuple, NewTldEvent.OutputObject>;
+    getEvent(key: "OwnershipTransferred"): TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+    getEvent(key: "Paused"): TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
+    getEvent(key: "RemoveTld"): TypedContractEvent<RemoveTldEvent.InputTuple, RemoveTldEvent.OutputTuple, RemoveTldEvent.OutputObject>;
+    getEvent(key: "RoleAdminChanged"): TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+    getEvent(key: "RoleGranted"): TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+    getEvent(key: "RoleRevoked"): TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+    getEvent(key: "Unpaused"): TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
+    getEvent(key: "Upgraded"): TypedContractEvent<UpgradedEvent.InputTuple, UpgradedEvent.OutputTuple, UpgradedEvent.OutputObject>;
+    getEvent(key: "Withdrawal"): TypedContractEvent<WithdrawalEvent.InputTuple, WithdrawalEvent.OutputTuple, WithdrawalEvent.OutputObject>;
     filters: {
-        "AdminChanged(address,address)"(previousAdmin?: null, newAdmin?: null): AdminChangedEventFilter;
-        AdminChanged(previousAdmin?: null, newAdmin?: null): AdminChangedEventFilter;
-        "Blocked(uint256)"(tokenId?: null): BlockedEventFilter;
-        Blocked(tokenId?: null): BlockedEventFilter;
-        "BlocklistDisabled(address)"(account?: null): BlocklistDisabledEventFilter;
-        BlocklistDisabled(account?: null): BlocklistDisabledEventFilter;
-        "BlocklistEnabled(address)"(account?: null): BlocklistEnabledEventFilter;
-        BlocklistEnabled(account?: null): BlocklistEnabledEventFilter;
-        "DomainPurchase(uint256,address,address,uint256,address)"(tokenId?: PromiseOrValue<BigNumberish> | null, sender?: PromiseOrValue<string> | null, owner?: PromiseOrValue<string> | null, price?: null, token?: null): DomainPurchaseEventFilter;
-        DomainPurchase(tokenId?: PromiseOrValue<BigNumberish> | null, sender?: PromiseOrValue<string> | null, owner?: PromiseOrValue<string> | null, price?: null, token?: null): DomainPurchaseEventFilter;
-        "Initialized(uint8)"(version?: null): InitializedEventFilter;
-        Initialized(version?: null): InitializedEventFilter;
-        "NewTld(uint256,string)"(tokenId?: PromiseOrValue<BigNumberish> | null, tld?: null): NewTldEventFilter;
-        NewTld(tokenId?: PromiseOrValue<BigNumberish> | null, tld?: null): NewTldEventFilter;
-        "OwnershipTransferred(address,address)"(previousOwner?: PromiseOrValue<string> | null, newOwner?: PromiseOrValue<string> | null): OwnershipTransferredEventFilter;
-        OwnershipTransferred(previousOwner?: PromiseOrValue<string> | null, newOwner?: PromiseOrValue<string> | null): OwnershipTransferredEventFilter;
-        "Paused(address)"(account?: null): PausedEventFilter;
-        Paused(account?: null): PausedEventFilter;
-        "RemoveTld(uint256)"(tokenId?: PromiseOrValue<BigNumberish> | null): RemoveTldEventFilter;
-        RemoveTld(tokenId?: PromiseOrValue<BigNumberish> | null): RemoveTldEventFilter;
-        "RoleAdminChanged(bytes32,bytes32,bytes32)"(role?: PromiseOrValue<BytesLike> | null, previousAdminRole?: PromiseOrValue<BytesLike> | null, newAdminRole?: PromiseOrValue<BytesLike> | null): RoleAdminChangedEventFilter;
-        RoleAdminChanged(role?: PromiseOrValue<BytesLike> | null, previousAdminRole?: PromiseOrValue<BytesLike> | null, newAdminRole?: PromiseOrValue<BytesLike> | null): RoleAdminChangedEventFilter;
-        "RoleGranted(bytes32,address,address)"(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleGrantedEventFilter;
-        RoleGranted(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleGrantedEventFilter;
-        "RoleRevoked(bytes32,address,address)"(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleRevokedEventFilter;
-        RoleRevoked(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleRevokedEventFilter;
-        "Unpaused(address)"(account?: null): UnpausedEventFilter;
-        Unpaused(account?: null): UnpausedEventFilter;
-        "Upgraded(address)"(implementation?: PromiseOrValue<string> | null): UpgradedEventFilter;
-        Upgraded(implementation?: PromiseOrValue<string> | null): UpgradedEventFilter;
-        "Withdrawal(address,uint256,address)"(recepient?: null, value?: null, token?: null): WithdrawalEventFilter;
-        Withdrawal(recepient?: null, value?: null, token?: null): WithdrawalEventFilter;
-    };
-    estimateGas: {
-        DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-        MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-        NAME(overrides?: CallOverrides): Promise<BigNumber>;
-        VERSION(overrides?: CallOverrides): Promise<BigNumber>;
-        addMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        addMinters(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        closeMinter(receiver: PromiseOrValue<string>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        cnsMintingController(overrides?: CallOverrides): Promise<BigNumber>;
-        cnsResolver(overrides?: CallOverrides): Promise<BigNumber>;
-        cnsURIPrefixController(overrides?: CallOverrides): Promise<BigNumber>;
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, unsOperator_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        owner(overrides?: CallOverrides): Promise<BigNumber>;
-        pause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        paused(overrides?: CallOverrides): Promise<BigNumber>;
-        removeMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        removeMinters(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        removeTld(tld: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        renounceMinter(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        rotateMinter(receiver: PromiseOrValue<string>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setForwarder(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setOperator(operator: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        unpause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        unsOperator(overrides?: CallOverrides): Promise<BigNumber>;
-        unsRegistry(overrides?: CallOverrides): Promise<BigNumber>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        NAME(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        addMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        addMinters(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        addProxyReaders(addrs: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        closeMinter(receiver: PromiseOrValue<string>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        cnsMintingController(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        cnsResolver(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        cnsURIPrefixController(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        initialize(unsRegistry_: PromiseOrValue<string>, cnsMintingController_: PromiseOrValue<string>, cnsURIPrefixController_: PromiseOrValue<string>, cnsResolver_: PromiseOrValue<string>, unsOperator_: PromiseOrValue<string>, forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        isBlocked(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isMinter(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        pause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        removeMinter(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        removeMinters(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        removeTld(tld: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        renounceMinter(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        rotateMinter(receiver: PromiseOrValue<string>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setForwarder(forwarder: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setOperator(operator: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        unpause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        unsOperator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        unsRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        upgradeAll(tokenIds: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "AdminChanged(address,address)": TypedContractEvent<AdminChangedEvent.InputTuple, AdminChangedEvent.OutputTuple, AdminChangedEvent.OutputObject>;
+        AdminChanged: TypedContractEvent<AdminChangedEvent.InputTuple, AdminChangedEvent.OutputTuple, AdminChangedEvent.OutputObject>;
+        "Blocked(uint256)": TypedContractEvent<BlockedEvent.InputTuple, BlockedEvent.OutputTuple, BlockedEvent.OutputObject>;
+        Blocked: TypedContractEvent<BlockedEvent.InputTuple, BlockedEvent.OutputTuple, BlockedEvent.OutputObject>;
+        "BlocklistDisabled(address)": TypedContractEvent<BlocklistDisabledEvent.InputTuple, BlocklistDisabledEvent.OutputTuple, BlocklistDisabledEvent.OutputObject>;
+        BlocklistDisabled: TypedContractEvent<BlocklistDisabledEvent.InputTuple, BlocklistDisabledEvent.OutputTuple, BlocklistDisabledEvent.OutputObject>;
+        "BlocklistEnabled(address)": TypedContractEvent<BlocklistEnabledEvent.InputTuple, BlocklistEnabledEvent.OutputTuple, BlocklistEnabledEvent.OutputObject>;
+        BlocklistEnabled: TypedContractEvent<BlocklistEnabledEvent.InputTuple, BlocklistEnabledEvent.OutputTuple, BlocklistEnabledEvent.OutputObject>;
+        "DomainPurchase(uint256,address,address,uint256,address)": TypedContractEvent<DomainPurchaseEvent.InputTuple, DomainPurchaseEvent.OutputTuple, DomainPurchaseEvent.OutputObject>;
+        DomainPurchase: TypedContractEvent<DomainPurchaseEvent.InputTuple, DomainPurchaseEvent.OutputTuple, DomainPurchaseEvent.OutputObject>;
+        "Initialized(uint8)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        "NewTld(uint256,string)": TypedContractEvent<NewTldEvent.InputTuple, NewTldEvent.OutputTuple, NewTldEvent.OutputObject>;
+        NewTld: TypedContractEvent<NewTldEvent.InputTuple, NewTldEvent.OutputTuple, NewTldEvent.OutputObject>;
+        "OwnershipTransferred(address,address)": TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+        OwnershipTransferred: TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+        "Paused(address)": TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
+        Paused: TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
+        "RemoveTld(uint256)": TypedContractEvent<RemoveTldEvent.InputTuple, RemoveTldEvent.OutputTuple, RemoveTldEvent.OutputObject>;
+        RemoveTld: TypedContractEvent<RemoveTldEvent.InputTuple, RemoveTldEvent.OutputTuple, RemoveTldEvent.OutputObject>;
+        "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+        RoleAdminChanged: TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+        "RoleGranted(bytes32,address,address)": TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+        RoleGranted: TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+        "RoleRevoked(bytes32,address,address)": TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+        RoleRevoked: TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+        "Unpaused(address)": TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
+        Unpaused: TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
+        "Upgraded(address)": TypedContractEvent<UpgradedEvent.InputTuple, UpgradedEvent.OutputTuple, UpgradedEvent.OutputObject>;
+        Upgraded: TypedContractEvent<UpgradedEvent.InputTuple, UpgradedEvent.OutputTuple, UpgradedEvent.OutputObject>;
+        "Withdrawal(address,uint256,address)": TypedContractEvent<WithdrawalEvent.InputTuple, WithdrawalEvent.OutputTuple, WithdrawalEvent.OutputObject>;
+        Withdrawal: TypedContractEvent<WithdrawalEvent.InputTuple, WithdrawalEvent.OutputTuple, WithdrawalEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=MintingManagerMock.d.ts.map

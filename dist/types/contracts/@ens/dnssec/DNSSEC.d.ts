@@ -1,190 +1,189 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../common";
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../common";
 export declare namespace DNSSEC {
     type RRSetWithSignatureStruct = {
-        rrset: PromiseOrValue<BytesLike>;
-        sig: PromiseOrValue<BytesLike>;
+        rrset: BytesLike;
+        sig: BytesLike;
     };
-    type RRSetWithSignatureStructOutput = [string, string] & {
+    type RRSetWithSignatureStructOutput = [rrset: string, sig: string] & {
         rrset: string;
         sig: string;
     };
 }
-export interface DNSSECInterface extends utils.Interface {
-    functions: {
-        "anchors()": FunctionFragment;
-        "deleteRRSet(uint16,bytes,(bytes,bytes),bytes)": FunctionFragment;
-        "deleteRRSetNSEC3(uint16,bytes,(bytes,bytes),(bytes,bytes),bytes)": FunctionFragment;
-        "rrdata(uint16,bytes)": FunctionFragment;
-        "submitRRSet((bytes,bytes),bytes)": FunctionFragment;
-        "submitRRSets((bytes,bytes)[],bytes)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "anchors" | "deleteRRSet" | "deleteRRSetNSEC3" | "rrdata" | "submitRRSet" | "submitRRSets"): FunctionFragment;
+export interface DNSSECInterface extends Interface {
+    getFunction(nameOrSignature: "anchors" | "deleteRRSet" | "deleteRRSetNSEC3" | "rrdata" | "submitRRSet" | "submitRRSets"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "AlgorithmUpdated" | "DigestUpdated" | "NSEC3DigestUpdated" | "RRSetUpdated"): EventFragment;
     encodeFunctionData(functionFragment: "anchors", values?: undefined): string;
     encodeFunctionData(functionFragment: "deleteRRSet", values: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>,
+        BigNumberish,
+        BytesLike,
         DNSSEC.RRSetWithSignatureStruct,
-        PromiseOrValue<BytesLike>
+        BytesLike
     ]): string;
     encodeFunctionData(functionFragment: "deleteRRSetNSEC3", values: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>,
+        BigNumberish,
+        BytesLike,
         DNSSEC.RRSetWithSignatureStruct,
         DNSSEC.RRSetWithSignatureStruct,
-        PromiseOrValue<BytesLike>
+        BytesLike
     ]): string;
-    encodeFunctionData(functionFragment: "rrdata", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "submitRRSet", values: [DNSSEC.RRSetWithSignatureStruct, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "submitRRSets", values: [DNSSEC.RRSetWithSignatureStruct[], PromiseOrValue<BytesLike>]): string;
+    encodeFunctionData(functionFragment: "rrdata", values: [BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "submitRRSet", values: [DNSSEC.RRSetWithSignatureStruct, BytesLike]): string;
+    encodeFunctionData(functionFragment: "submitRRSets", values: [DNSSEC.RRSetWithSignatureStruct[], BytesLike]): string;
     decodeFunctionResult(functionFragment: "anchors", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "deleteRRSet", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "deleteRRSetNSEC3", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "rrdata", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "submitRRSet", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "submitRRSets", data: BytesLike): Result;
-    events: {
-        "AlgorithmUpdated(uint8,address)": EventFragment;
-        "DigestUpdated(uint8,address)": EventFragment;
-        "NSEC3DigestUpdated(uint8,address)": EventFragment;
-        "RRSetUpdated(bytes,bytes)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "AlgorithmUpdated"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "DigestUpdated"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NSEC3DigestUpdated"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "RRSetUpdated"): EventFragment;
 }
-export interface AlgorithmUpdatedEventObject {
-    id: number;
-    addr: string;
+export declare namespace AlgorithmUpdatedEvent {
+    type InputTuple = [id: BigNumberish, addr: AddressLike];
+    type OutputTuple = [id: bigint, addr: string];
+    interface OutputObject {
+        id: bigint;
+        addr: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type AlgorithmUpdatedEvent = TypedEvent<[
-    number,
-    string
-], AlgorithmUpdatedEventObject>;
-export declare type AlgorithmUpdatedEventFilter = TypedEventFilter<AlgorithmUpdatedEvent>;
-export interface DigestUpdatedEventObject {
-    id: number;
-    addr: string;
+export declare namespace DigestUpdatedEvent {
+    type InputTuple = [id: BigNumberish, addr: AddressLike];
+    type OutputTuple = [id: bigint, addr: string];
+    interface OutputObject {
+        id: bigint;
+        addr: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type DigestUpdatedEvent = TypedEvent<[
-    number,
-    string
-], DigestUpdatedEventObject>;
-export declare type DigestUpdatedEventFilter = TypedEventFilter<DigestUpdatedEvent>;
-export interface NSEC3DigestUpdatedEventObject {
-    id: number;
-    addr: string;
+export declare namespace NSEC3DigestUpdatedEvent {
+    type InputTuple = [id: BigNumberish, addr: AddressLike];
+    type OutputTuple = [id: bigint, addr: string];
+    interface OutputObject {
+        id: bigint;
+        addr: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NSEC3DigestUpdatedEvent = TypedEvent<[
-    number,
-    string
-], NSEC3DigestUpdatedEventObject>;
-export declare type NSEC3DigestUpdatedEventFilter = TypedEventFilter<NSEC3DigestUpdatedEvent>;
-export interface RRSetUpdatedEventObject {
-    name: string;
-    rrset: string;
+export declare namespace RRSetUpdatedEvent {
+    type InputTuple = [name: BytesLike, rrset: BytesLike];
+    type OutputTuple = [name: string, rrset: string];
+    interface OutputObject {
+        name: string;
+        rrset: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RRSetUpdatedEvent = TypedEvent<[
-    string,
-    string
-], RRSetUpdatedEventObject>;
-export declare type RRSetUpdatedEventFilter = TypedEventFilter<RRSetUpdatedEvent>;
 export interface DNSSEC extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): DNSSEC;
+    waitForDeployment(): Promise<this>;
     interface: DNSSECInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        anchors(overrides?: CallOverrides): Promise<[string]>;
-        deleteRRSet(deleteType: PromiseOrValue<BigNumberish>, deleteName: PromiseOrValue<BytesLike>, nsec: DNSSEC.RRSetWithSignatureStruct, proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        deleteRRSetNSEC3(deleteType: PromiseOrValue<BigNumberish>, deleteName: PromiseOrValue<BytesLike>, closestEncloser: DNSSEC.RRSetWithSignatureStruct, nextClosest: DNSSEC.RRSetWithSignatureStruct, dnskey: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        rrdata(dnstype: PromiseOrValue<BigNumberish>, name: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[number, number, string]>;
-        submitRRSet(input: DNSSEC.RRSetWithSignatureStruct, proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        submitRRSets(input: DNSSEC.RRSetWithSignatureStruct[], proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    anchors(overrides?: CallOverrides): Promise<string>;
-    deleteRRSet(deleteType: PromiseOrValue<BigNumberish>, deleteName: PromiseOrValue<BytesLike>, nsec: DNSSEC.RRSetWithSignatureStruct, proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    deleteRRSetNSEC3(deleteType: PromiseOrValue<BigNumberish>, deleteName: PromiseOrValue<BytesLike>, closestEncloser: DNSSEC.RRSetWithSignatureStruct, nextClosest: DNSSEC.RRSetWithSignatureStruct, dnskey: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    rrdata(dnstype: PromiseOrValue<BigNumberish>, name: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[number, number, string]>;
-    submitRRSet(input: DNSSEC.RRSetWithSignatureStruct, proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    submitRRSets(input: DNSSEC.RRSetWithSignatureStruct[], proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        anchors(overrides?: CallOverrides): Promise<string>;
-        deleteRRSet(deleteType: PromiseOrValue<BigNumberish>, deleteName: PromiseOrValue<BytesLike>, nsec: DNSSEC.RRSetWithSignatureStruct, proof: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        deleteRRSetNSEC3(deleteType: PromiseOrValue<BigNumberish>, deleteName: PromiseOrValue<BytesLike>, closestEncloser: DNSSEC.RRSetWithSignatureStruct, nextClosest: DNSSEC.RRSetWithSignatureStruct, dnskey: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        rrdata(dnstype: PromiseOrValue<BigNumberish>, name: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[number, number, string]>;
-        submitRRSet(input: DNSSEC.RRSetWithSignatureStruct, proof: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        submitRRSets(input: DNSSEC.RRSetWithSignatureStruct[], proof: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    anchors: TypedContractMethod<[], [string], "view">;
+    deleteRRSet: TypedContractMethod<[
+        deleteType: BigNumberish,
+        deleteName: BytesLike,
+        nsec: DNSSEC.RRSetWithSignatureStruct,
+        proof: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    deleteRRSetNSEC3: TypedContractMethod<[
+        deleteType: BigNumberish,
+        deleteName: BytesLike,
+        closestEncloser: DNSSEC.RRSetWithSignatureStruct,
+        nextClosest: DNSSEC.RRSetWithSignatureStruct,
+        dnskey: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    rrdata: TypedContractMethod<[
+        dnstype: BigNumberish,
+        name: BytesLike
+    ], [
+        [bigint, bigint, string]
+    ], "view">;
+    submitRRSet: TypedContractMethod<[
+        input: DNSSEC.RRSetWithSignatureStruct,
+        proof: BytesLike
+    ], [
+        string
+    ], "nonpayable">;
+    submitRRSets: TypedContractMethod<[
+        input: DNSSEC.RRSetWithSignatureStruct[],
+        proof: BytesLike
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "anchors"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "deleteRRSet"): TypedContractMethod<[
+        deleteType: BigNumberish,
+        deleteName: BytesLike,
+        nsec: DNSSEC.RRSetWithSignatureStruct,
+        proof: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "deleteRRSetNSEC3"): TypedContractMethod<[
+        deleteType: BigNumberish,
+        deleteName: BytesLike,
+        closestEncloser: DNSSEC.RRSetWithSignatureStruct,
+        nextClosest: DNSSEC.RRSetWithSignatureStruct,
+        dnskey: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "rrdata"): TypedContractMethod<[
+        dnstype: BigNumberish,
+        name: BytesLike
+    ], [
+        [bigint, bigint, string]
+    ], "view">;
+    getFunction(nameOrSignature: "submitRRSet"): TypedContractMethod<[
+        input: DNSSEC.RRSetWithSignatureStruct,
+        proof: BytesLike
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "submitRRSets"): TypedContractMethod<[
+        input: DNSSEC.RRSetWithSignatureStruct[],
+        proof: BytesLike
+    ], [
+        string
+    ], "nonpayable">;
+    getEvent(key: "AlgorithmUpdated"): TypedContractEvent<AlgorithmUpdatedEvent.InputTuple, AlgorithmUpdatedEvent.OutputTuple, AlgorithmUpdatedEvent.OutputObject>;
+    getEvent(key: "DigestUpdated"): TypedContractEvent<DigestUpdatedEvent.InputTuple, DigestUpdatedEvent.OutputTuple, DigestUpdatedEvent.OutputObject>;
+    getEvent(key: "NSEC3DigestUpdated"): TypedContractEvent<NSEC3DigestUpdatedEvent.InputTuple, NSEC3DigestUpdatedEvent.OutputTuple, NSEC3DigestUpdatedEvent.OutputObject>;
+    getEvent(key: "RRSetUpdated"): TypedContractEvent<RRSetUpdatedEvent.InputTuple, RRSetUpdatedEvent.OutputTuple, RRSetUpdatedEvent.OutputObject>;
     filters: {
-        "AlgorithmUpdated(uint8,address)"(id?: null, addr?: null): AlgorithmUpdatedEventFilter;
-        AlgorithmUpdated(id?: null, addr?: null): AlgorithmUpdatedEventFilter;
-        "DigestUpdated(uint8,address)"(id?: null, addr?: null): DigestUpdatedEventFilter;
-        DigestUpdated(id?: null, addr?: null): DigestUpdatedEventFilter;
-        "NSEC3DigestUpdated(uint8,address)"(id?: null, addr?: null): NSEC3DigestUpdatedEventFilter;
-        NSEC3DigestUpdated(id?: null, addr?: null): NSEC3DigestUpdatedEventFilter;
-        "RRSetUpdated(bytes,bytes)"(name?: null, rrset?: null): RRSetUpdatedEventFilter;
-        RRSetUpdated(name?: null, rrset?: null): RRSetUpdatedEventFilter;
-    };
-    estimateGas: {
-        anchors(overrides?: CallOverrides): Promise<BigNumber>;
-        deleteRRSet(deleteType: PromiseOrValue<BigNumberish>, deleteName: PromiseOrValue<BytesLike>, nsec: DNSSEC.RRSetWithSignatureStruct, proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        deleteRRSetNSEC3(deleteType: PromiseOrValue<BigNumberish>, deleteName: PromiseOrValue<BytesLike>, closestEncloser: DNSSEC.RRSetWithSignatureStruct, nextClosest: DNSSEC.RRSetWithSignatureStruct, dnskey: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        rrdata(dnstype: PromiseOrValue<BigNumberish>, name: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        submitRRSet(input: DNSSEC.RRSetWithSignatureStruct, proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        submitRRSets(input: DNSSEC.RRSetWithSignatureStruct[], proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        anchors(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        deleteRRSet(deleteType: PromiseOrValue<BigNumberish>, deleteName: PromiseOrValue<BytesLike>, nsec: DNSSEC.RRSetWithSignatureStruct, proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        deleteRRSetNSEC3(deleteType: PromiseOrValue<BigNumberish>, deleteName: PromiseOrValue<BytesLike>, closestEncloser: DNSSEC.RRSetWithSignatureStruct, nextClosest: DNSSEC.RRSetWithSignatureStruct, dnskey: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        rrdata(dnstype: PromiseOrValue<BigNumberish>, name: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        submitRRSet(input: DNSSEC.RRSetWithSignatureStruct, proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        submitRRSets(input: DNSSEC.RRSetWithSignatureStruct[], proof: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "AlgorithmUpdated(uint8,address)": TypedContractEvent<AlgorithmUpdatedEvent.InputTuple, AlgorithmUpdatedEvent.OutputTuple, AlgorithmUpdatedEvent.OutputObject>;
+        AlgorithmUpdated: TypedContractEvent<AlgorithmUpdatedEvent.InputTuple, AlgorithmUpdatedEvent.OutputTuple, AlgorithmUpdatedEvent.OutputObject>;
+        "DigestUpdated(uint8,address)": TypedContractEvent<DigestUpdatedEvent.InputTuple, DigestUpdatedEvent.OutputTuple, DigestUpdatedEvent.OutputObject>;
+        DigestUpdated: TypedContractEvent<DigestUpdatedEvent.InputTuple, DigestUpdatedEvent.OutputTuple, DigestUpdatedEvent.OutputObject>;
+        "NSEC3DigestUpdated(uint8,address)": TypedContractEvent<NSEC3DigestUpdatedEvent.InputTuple, NSEC3DigestUpdatedEvent.OutputTuple, NSEC3DigestUpdatedEvent.OutputObject>;
+        NSEC3DigestUpdated: TypedContractEvent<NSEC3DigestUpdatedEvent.InputTuple, NSEC3DigestUpdatedEvent.OutputTuple, NSEC3DigestUpdatedEvent.OutputObject>;
+        "RRSetUpdated(bytes,bytes)": TypedContractEvent<RRSetUpdatedEvent.InputTuple, RRSetUpdatedEvent.OutputTuple, RRSetUpdatedEvent.OutputObject>;
+        RRSetUpdated: TypedContractEvent<RRSetUpdatedEvent.InputTuple, RRSetUpdatedEvent.OutputTuple, RRSetUpdatedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=DNSSEC.d.ts.map

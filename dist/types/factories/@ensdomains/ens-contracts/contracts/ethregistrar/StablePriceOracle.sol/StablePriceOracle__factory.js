@@ -211,23 +211,20 @@ class StablePriceOracle__factory extends ethers_1.ContractFactory {
             super(_abi, _bytecode, args[0]);
         }
     }
-    deploy(_usdOracle, _rentPrices, overrides) {
-        return super.deploy(_usdOracle, _rentPrices, overrides || {});
-    }
     getDeployTransaction(_usdOracle, _rentPrices, overrides) {
         return super.getDeployTransaction(_usdOracle, _rentPrices, overrides || {});
     }
-    attach(address) {
-        return super.attach(address);
+    deploy(_usdOracle, _rentPrices, overrides) {
+        return super.deploy(_usdOracle, _rentPrices, overrides || {});
     }
-    connect(signer) {
-        return super.connect(signer);
+    connect(runner) {
+        return super.connect(runner);
     }
     static createInterface() {
-        return new ethers_1.utils.Interface(_abi);
+        return new ethers_1.Interface(_abi);
     }
-    static connect(address, signerOrProvider) {
-        return new ethers_1.Contract(address, _abi, signerOrProvider);
+    static connect(address, runner) {
+        return new ethers_1.Contract(address, _abi, runner);
     }
 }
 exports.StablePriceOracle__factory = StablePriceOracle__factory;

@@ -1,123 +1,100 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
-export interface ABIResolverInterface extends utils.Interface {
-    functions: {
-        "ABI(bytes32,uint256)": FunctionFragment;
-        "clearRecords(bytes32)": FunctionFragment;
-        "recordVersions(bytes32)": FunctionFragment;
-        "setABI(bytes32,uint256,bytes)": FunctionFragment;
-        "supportsInterface(bytes4)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "ABI" | "clearRecords" | "recordVersions" | "setABI" | "supportsInterface"): FunctionFragment;
-    encodeFunctionData(functionFragment: "ABI", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "clearRecords", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "recordVersions", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "setABI", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
-    encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../../common";
+export interface ABIResolverInterface extends Interface {
+    getFunction(nameOrSignature: "ABI" | "clearRecords" | "recordVersions" | "setABI" | "supportsInterface"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "ABIChanged" | "VersionChanged"): EventFragment;
+    encodeFunctionData(functionFragment: "ABI", values: [BytesLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "clearRecords", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "recordVersions", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "setABI", values: [BytesLike, BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     decodeFunctionResult(functionFragment: "ABI", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "clearRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "recordVersions", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setABI", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
-    events: {
-        "ABIChanged(bytes32,uint256)": EventFragment;
-        "VersionChanged(bytes32,uint64)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "ABIChanged"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "VersionChanged"): EventFragment;
 }
-export interface ABIChangedEventObject {
-    node: string;
-    contentType: BigNumber;
+export declare namespace ABIChangedEvent {
+    type InputTuple = [node: BytesLike, contentType: BigNumberish];
+    type OutputTuple = [node: string, contentType: bigint];
+    interface OutputObject {
+        node: string;
+        contentType: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ABIChangedEvent = TypedEvent<[
-    string,
-    BigNumber
-], ABIChangedEventObject>;
-export declare type ABIChangedEventFilter = TypedEventFilter<ABIChangedEvent>;
-export interface VersionChangedEventObject {
-    node: string;
-    newVersion: BigNumber;
+export declare namespace VersionChangedEvent {
+    type InputTuple = [node: BytesLike, newVersion: BigNumberish];
+    type OutputTuple = [node: string, newVersion: bigint];
+    interface OutputObject {
+        node: string;
+        newVersion: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type VersionChangedEvent = TypedEvent<[
-    string,
-    BigNumber
-], VersionChangedEventObject>;
-export declare type VersionChangedEventFilter = TypedEventFilter<VersionChangedEvent>;
 export interface ABIResolver extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): ABIResolver;
+    waitForDeployment(): Promise<this>;
     interface: ABIResolverInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        ABI(node: PromiseOrValue<BytesLike>, contentTypes: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber, string]>;
-        clearRecords(node: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        recordVersions(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        setABI(node: PromiseOrValue<BytesLike>, contentType: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-    };
-    ABI(node: PromiseOrValue<BytesLike>, contentTypes: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber, string]>;
-    clearRecords(node: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    recordVersions(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    setABI(node: PromiseOrValue<BytesLike>, contentType: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    callStatic: {
-        ABI(node: PromiseOrValue<BytesLike>, contentTypes: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber, string]>;
-        clearRecords(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        recordVersions(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        setABI(node: PromiseOrValue<BytesLike>, contentType: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    ABI: TypedContractMethod<[
+        node: BytesLike,
+        contentTypes: BigNumberish
+    ], [
+        [bigint, string]
+    ], "view">;
+    clearRecords: TypedContractMethod<[node: BytesLike], [void], "nonpayable">;
+    recordVersions: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+    setABI: TypedContractMethod<[
+        node: BytesLike,
+        contentType: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    supportsInterface: TypedContractMethod<[
+        interfaceID: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "ABI"): TypedContractMethod<[
+        node: BytesLike,
+        contentTypes: BigNumberish
+    ], [
+        [bigint, string]
+    ], "view">;
+    getFunction(nameOrSignature: "clearRecords"): TypedContractMethod<[node: BytesLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "recordVersions"): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+    getFunction(nameOrSignature: "setABI"): TypedContractMethod<[
+        node: BytesLike,
+        contentType: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceID: BytesLike], [boolean], "view">;
+    getEvent(key: "ABIChanged"): TypedContractEvent<ABIChangedEvent.InputTuple, ABIChangedEvent.OutputTuple, ABIChangedEvent.OutputObject>;
+    getEvent(key: "VersionChanged"): TypedContractEvent<VersionChangedEvent.InputTuple, VersionChangedEvent.OutputTuple, VersionChangedEvent.OutputObject>;
     filters: {
-        "ABIChanged(bytes32,uint256)"(node?: PromiseOrValue<BytesLike> | null, contentType?: PromiseOrValue<BigNumberish> | null): ABIChangedEventFilter;
-        ABIChanged(node?: PromiseOrValue<BytesLike> | null, contentType?: PromiseOrValue<BigNumberish> | null): ABIChangedEventFilter;
-        "VersionChanged(bytes32,uint64)"(node?: PromiseOrValue<BytesLike> | null, newVersion?: null): VersionChangedEventFilter;
-        VersionChanged(node?: PromiseOrValue<BytesLike> | null, newVersion?: null): VersionChangedEventFilter;
-    };
-    estimateGas: {
-        ABI(node: PromiseOrValue<BytesLike>, contentTypes: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        clearRecords(node: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        recordVersions(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        setABI(node: PromiseOrValue<BytesLike>, contentType: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        ABI(node: PromiseOrValue<BytesLike>, contentTypes: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        clearRecords(node: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        recordVersions(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        setABI(node: PromiseOrValue<BytesLike>, contentType: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "ABIChanged(bytes32,uint256)": TypedContractEvent<ABIChangedEvent.InputTuple, ABIChangedEvent.OutputTuple, ABIChangedEvent.OutputObject>;
+        ABIChanged: TypedContractEvent<ABIChangedEvent.InputTuple, ABIChangedEvent.OutputTuple, ABIChangedEvent.OutputObject>;
+        "VersionChanged(bytes32,uint64)": TypedContractEvent<VersionChangedEvent.InputTuple, VersionChangedEvent.OutputTuple, VersionChangedEvent.OutputObject>;
+        VersionChanged: TypedContractEvent<VersionChangedEvent.InputTuple, VersionChangedEvent.OutputTuple, VersionChangedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=ABIResolver.d.ts.map

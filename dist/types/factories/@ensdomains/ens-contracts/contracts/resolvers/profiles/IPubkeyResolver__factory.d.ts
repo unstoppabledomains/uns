@@ -1,36 +1,46 @@
-import { Signer } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { type ContractRunner } from "ethers";
 import type { IPubkeyResolver, IPubkeyResolverInterface } from "../../../../../../@ensdomains/ens-contracts/contracts/resolvers/profiles/IPubkeyResolver";
 export declare class IPubkeyResolver__factory {
-    static readonly abi: ({
-        anonymous: boolean;
-        inputs: {
-            indexed: boolean;
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        name: string;
-        type: string;
-        outputs?: undefined;
-        stateMutability?: undefined;
-    } | {
-        inputs: {
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        name: string;
-        outputs: {
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        stateMutability: string;
-        type: string;
-        anonymous?: undefined;
-    })[];
+    static readonly abi: readonly [{
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "bytes32";
+            readonly name: "node";
+            readonly type: "bytes32";
+        }, {
+            readonly indexed: false;
+            readonly internalType: "bytes32";
+            readonly name: "x";
+            readonly type: "bytes32";
+        }, {
+            readonly indexed: false;
+            readonly internalType: "bytes32";
+            readonly name: "y";
+            readonly type: "bytes32";
+        }];
+        readonly name: "PubkeyChanged";
+        readonly type: "event";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "bytes32";
+            readonly name: "node";
+            readonly type: "bytes32";
+        }];
+        readonly name: "pubkey";
+        readonly outputs: readonly [{
+            readonly internalType: "bytes32";
+            readonly name: "x";
+            readonly type: "bytes32";
+        }, {
+            readonly internalType: "bytes32";
+            readonly name: "y";
+            readonly type: "bytes32";
+        }];
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }];
     static createInterface(): IPubkeyResolverInterface;
-    static connect(address: string, signerOrProvider: Signer | Provider): IPubkeyResolver;
+    static connect(address: string, runner?: ContractRunner | null): IPubkeyResolver;
 }
 //# sourceMappingURL=IPubkeyResolver__factory.d.ts.map

@@ -1,64 +1,26 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../common";
-export interface IBaseRegistrarInterface extends utils.Interface {
-    functions: {
-        "addController(address)": FunctionFragment;
-        "approve(address,uint256)": FunctionFragment;
-        "available(uint256)": FunctionFragment;
-        "balanceOf(address)": FunctionFragment;
-        "getApproved(uint256)": FunctionFragment;
-        "isApprovedForAll(address,address)": FunctionFragment;
-        "nameExpires(uint256)": FunctionFragment;
-        "ownerOf(uint256)": FunctionFragment;
-        "reclaim(uint256,address)": FunctionFragment;
-        "register(uint256,address,uint256)": FunctionFragment;
-        "removeController(address)": FunctionFragment;
-        "renew(uint256,uint256)": FunctionFragment;
-        "safeTransferFrom(address,address,uint256)": FunctionFragment;
-        "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
-        "setApprovalForAll(address,bool)": FunctionFragment;
-        "setResolver(address)": FunctionFragment;
-        "supportsInterface(bytes4)": FunctionFragment;
-        "transferFrom(address,address,uint256)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "addController" | "approve" | "available" | "balanceOf" | "getApproved" | "isApprovedForAll" | "nameExpires" | "ownerOf" | "reclaim" | "register" | "removeController" | "renew" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setApprovalForAll" | "setResolver" | "supportsInterface" | "transferFrom"): FunctionFragment;
-    encodeFunctionData(functionFragment: "addController", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "approve", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "available", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "getApproved", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "isApprovedForAll", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "nameExpires", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "ownerOf", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "reclaim", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "register", values: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "removeController", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "renew", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256)", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256,bytes)", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
-    encodeFunctionData(functionFragment: "setApprovalForAll", values: [PromiseOrValue<string>, PromiseOrValue<boolean>]): string;
-    encodeFunctionData(functionFragment: "setResolver", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "transferFrom", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../common";
+export interface IBaseRegistrarInterface extends Interface {
+    getFunction(nameOrSignature: "addController" | "approve" | "available" | "balanceOf" | "getApproved" | "isApprovedForAll" | "nameExpires" | "ownerOf" | "reclaim" | "register" | "removeController" | "renew" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setApprovalForAll" | "setResolver" | "supportsInterface" | "transferFrom"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "Approval" | "ApprovalForAll" | "ControllerAdded" | "ControllerRemoved" | "NameMigrated" | "NameRegistered" | "NameRenewed" | "Transfer"): EventFragment;
+    encodeFunctionData(functionFragment: "addController", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "approve", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "available", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "balanceOf", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "getApproved", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "isApprovedForAll", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "nameExpires", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "ownerOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "reclaim", values: [BigNumberish, AddressLike]): string;
+    encodeFunctionData(functionFragment: "register", values: [BigNumberish, AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "removeController", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "renew", values: [BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256)", values: [AddressLike, AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256,bytes)", values: [AddressLike, AddressLike, BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "setApprovalForAll", values: [AddressLike, boolean]): string;
+    encodeFunctionData(functionFragment: "setResolver", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "transferFrom", values: [AddressLike, AddressLike, BigNumberish]): string;
     decodeFunctionResult(functionFragment: "addController", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "available", data: BytesLike): Result;
@@ -77,326 +39,321 @@ export interface IBaseRegistrarInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "setResolver", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferFrom", data: BytesLike): Result;
-    events: {
-        "Approval(address,address,uint256)": EventFragment;
-        "ApprovalForAll(address,address,bool)": EventFragment;
-        "ControllerAdded(address)": EventFragment;
-        "ControllerRemoved(address)": EventFragment;
-        "NameMigrated(uint256,address,uint256)": EventFragment;
-        "NameRegistered(uint256,address,uint256)": EventFragment;
-        "NameRenewed(uint256,uint256)": EventFragment;
-        "Transfer(address,address,uint256)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "ControllerAdded"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "ControllerRemoved"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NameMigrated"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NameRegistered"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NameRenewed"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
-export interface ApprovalEventObject {
-    owner: string;
-    approved: string;
-    tokenId: BigNumber;
+export declare namespace ApprovalEvent {
+    type InputTuple = [
+        owner: AddressLike,
+        approved: AddressLike,
+        tokenId: BigNumberish
+    ];
+    type OutputTuple = [owner: string, approved: string, tokenId: bigint];
+    interface OutputObject {
+        owner: string;
+        approved: string;
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ApprovalEvent = TypedEvent<[
-    string,
-    string,
-    BigNumber
-], ApprovalEventObject>;
-export declare type ApprovalEventFilter = TypedEventFilter<ApprovalEvent>;
-export interface ApprovalForAllEventObject {
-    owner: string;
-    operator: string;
-    approved: boolean;
+export declare namespace ApprovalForAllEvent {
+    type InputTuple = [
+        owner: AddressLike,
+        operator: AddressLike,
+        approved: boolean
+    ];
+    type OutputTuple = [
+        owner: string,
+        operator: string,
+        approved: boolean
+    ];
+    interface OutputObject {
+        owner: string;
+        operator: string;
+        approved: boolean;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ApprovalForAllEvent = TypedEvent<[
-    string,
-    string,
-    boolean
-], ApprovalForAllEventObject>;
-export declare type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
-export interface ControllerAddedEventObject {
-    controller: string;
+export declare namespace ControllerAddedEvent {
+    type InputTuple = [controller: AddressLike];
+    type OutputTuple = [controller: string];
+    interface OutputObject {
+        controller: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ControllerAddedEvent = TypedEvent<[
-    string
-], ControllerAddedEventObject>;
-export declare type ControllerAddedEventFilter = TypedEventFilter<ControllerAddedEvent>;
-export interface ControllerRemovedEventObject {
-    controller: string;
+export declare namespace ControllerRemovedEvent {
+    type InputTuple = [controller: AddressLike];
+    type OutputTuple = [controller: string];
+    interface OutputObject {
+        controller: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ControllerRemovedEvent = TypedEvent<[
-    string
-], ControllerRemovedEventObject>;
-export declare type ControllerRemovedEventFilter = TypedEventFilter<ControllerRemovedEvent>;
-export interface NameMigratedEventObject {
-    id: BigNumber;
-    owner: string;
-    expires: BigNumber;
+export declare namespace NameMigratedEvent {
+    type InputTuple = [
+        id: BigNumberish,
+        owner: AddressLike,
+        expires: BigNumberish
+    ];
+    type OutputTuple = [id: bigint, owner: string, expires: bigint];
+    interface OutputObject {
+        id: bigint;
+        owner: string;
+        expires: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NameMigratedEvent = TypedEvent<[
-    BigNumber,
-    string,
-    BigNumber
-], NameMigratedEventObject>;
-export declare type NameMigratedEventFilter = TypedEventFilter<NameMigratedEvent>;
-export interface NameRegisteredEventObject {
-    id: BigNumber;
-    owner: string;
-    expires: BigNumber;
+export declare namespace NameRegisteredEvent {
+    type InputTuple = [
+        id: BigNumberish,
+        owner: AddressLike,
+        expires: BigNumberish
+    ];
+    type OutputTuple = [id: bigint, owner: string, expires: bigint];
+    interface OutputObject {
+        id: bigint;
+        owner: string;
+        expires: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NameRegisteredEvent = TypedEvent<[
-    BigNumber,
-    string,
-    BigNumber
-], NameRegisteredEventObject>;
-export declare type NameRegisteredEventFilter = TypedEventFilter<NameRegisteredEvent>;
-export interface NameRenewedEventObject {
-    id: BigNumber;
-    expires: BigNumber;
+export declare namespace NameRenewedEvent {
+    type InputTuple = [id: BigNumberish, expires: BigNumberish];
+    type OutputTuple = [id: bigint, expires: bigint];
+    interface OutputObject {
+        id: bigint;
+        expires: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NameRenewedEvent = TypedEvent<[
-    BigNumber,
-    BigNumber
-], NameRenewedEventObject>;
-export declare type NameRenewedEventFilter = TypedEventFilter<NameRenewedEvent>;
-export interface TransferEventObject {
-    from: string;
-    to: string;
-    tokenId: BigNumber;
+export declare namespace TransferEvent {
+    type InputTuple = [
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ];
+    type OutputTuple = [from: string, to: string, tokenId: bigint];
+    interface OutputObject {
+        from: string;
+        to: string;
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type TransferEvent = TypedEvent<[
-    string,
-    string,
-    BigNumber
-], TransferEventObject>;
-export declare type TransferEventFilter = TypedEventFilter<TransferEvent>;
 export interface IBaseRegistrar extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IBaseRegistrar;
+    waitForDeployment(): Promise<this>;
     interface: IBaseRegistrarInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        addController(controller: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        available(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber] & {
-            balance: BigNumber;
-        }>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string] & {
-            operator: string;
-        }>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        nameExpires(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string] & {
-            owner: string;
-        }>;
-        reclaim(id: PromiseOrValue<BigNumberish>, owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        register(id: PromiseOrValue<BigNumberish>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        removeController(controller: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        renew(id: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "safeTransferFrom(address,address,uint256,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-        transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    addController(controller: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    available(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-    balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-    getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    nameExpires(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    reclaim(id: PromiseOrValue<BigNumberish>, owner: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    register(id: PromiseOrValue<BigNumberish>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    removeController(controller: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    renew(id: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "safeTransferFrom(address,address,uint256,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        addController(controller: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        available(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        nameExpires(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        reclaim(id: PromiseOrValue<BigNumberish>, owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        register(id: PromiseOrValue<BigNumberish>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        removeController(controller: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        renew(id: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        "safeTransferFrom(address,address,uint256,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        setResolver(resolver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-        transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    addController: TypedContractMethod<[
+        controller: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    approve: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    available: TypedContractMethod<[id: BigNumberish], [boolean], "view">;
+    balanceOf: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+    getApproved: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    isApprovedForAll: TypedContractMethod<[
+        owner: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    nameExpires: TypedContractMethod<[id: BigNumberish], [bigint], "view">;
+    ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    reclaim: TypedContractMethod<[
+        id: BigNumberish,
+        owner: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    register: TypedContractMethod<[
+        id: BigNumberish,
+        owner: AddressLike,
+        duration: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    removeController: TypedContractMethod<[
+        controller: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    renew: TypedContractMethod<[
+        id: BigNumberish,
+        duration: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    "safeTransferFrom(address,address,uint256)": TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    "safeTransferFrom(address,address,uint256,bytes)": TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    setApprovalForAll: TypedContractMethod<[
+        operator: AddressLike,
+        approved: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    setResolver: TypedContractMethod<[
+        resolver: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    supportsInterface: TypedContractMethod<[
+        interfaceId: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    transferFrom: TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "addController"): TypedContractMethod<[controller: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "approve"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "available"): TypedContractMethod<[id: BigNumberish], [boolean], "view">;
+    getFunction(nameOrSignature: "balanceOf"): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+    getFunction(nameOrSignature: "getApproved"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "isApprovedForAll"): TypedContractMethod<[
+        owner: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "nameExpires"): TypedContractMethod<[id: BigNumberish], [bigint], "view">;
+    getFunction(nameOrSignature: "ownerOf"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "reclaim"): TypedContractMethod<[
+        id: BigNumberish,
+        owner: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "register"): TypedContractMethod<[
+        id: BigNumberish,
+        owner: AddressLike,
+        duration: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "removeController"): TypedContractMethod<[controller: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "renew"): TypedContractMethod<[
+        id: BigNumberish,
+        duration: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "safeTransferFrom(address,address,uint256)"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "safeTransferFrom(address,address,uint256,bytes)"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setApprovalForAll"): TypedContractMethod<[
+        operator: AddressLike,
+        approved: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setResolver"): TypedContractMethod<[resolver: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
+    getFunction(nameOrSignature: "transferFrom"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getEvent(key: "Approval"): TypedContractEvent<ApprovalEvent.InputTuple, ApprovalEvent.OutputTuple, ApprovalEvent.OutputObject>;
+    getEvent(key: "ApprovalForAll"): TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+    getEvent(key: "ControllerAdded"): TypedContractEvent<ControllerAddedEvent.InputTuple, ControllerAddedEvent.OutputTuple, ControllerAddedEvent.OutputObject>;
+    getEvent(key: "ControllerRemoved"): TypedContractEvent<ControllerRemovedEvent.InputTuple, ControllerRemovedEvent.OutputTuple, ControllerRemovedEvent.OutputObject>;
+    getEvent(key: "NameMigrated"): TypedContractEvent<NameMigratedEvent.InputTuple, NameMigratedEvent.OutputTuple, NameMigratedEvent.OutputObject>;
+    getEvent(key: "NameRegistered"): TypedContractEvent<NameRegisteredEvent.InputTuple, NameRegisteredEvent.OutputTuple, NameRegisteredEvent.OutputObject>;
+    getEvent(key: "NameRenewed"): TypedContractEvent<NameRenewedEvent.InputTuple, NameRenewedEvent.OutputTuple, NameRenewedEvent.OutputObject>;
+    getEvent(key: "Transfer"): TypedContractEvent<TransferEvent.InputTuple, TransferEvent.OutputTuple, TransferEvent.OutputObject>;
     filters: {
-        "Approval(address,address,uint256)"(owner?: PromiseOrValue<string> | null, approved?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): ApprovalEventFilter;
-        Approval(owner?: PromiseOrValue<string> | null, approved?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): ApprovalEventFilter;
-        "ApprovalForAll(address,address,bool)"(owner?: PromiseOrValue<string> | null, operator?: PromiseOrValue<string> | null, approved?: null): ApprovalForAllEventFilter;
-        ApprovalForAll(owner?: PromiseOrValue<string> | null, operator?: PromiseOrValue<string> | null, approved?: null): ApprovalForAllEventFilter;
-        "ControllerAdded(address)"(controller?: PromiseOrValue<string> | null): ControllerAddedEventFilter;
-        ControllerAdded(controller?: PromiseOrValue<string> | null): ControllerAddedEventFilter;
-        "ControllerRemoved(address)"(controller?: PromiseOrValue<string> | null): ControllerRemovedEventFilter;
-        ControllerRemoved(controller?: PromiseOrValue<string> | null): ControllerRemovedEventFilter;
-        "NameMigrated(uint256,address,uint256)"(id?: PromiseOrValue<BigNumberish> | null, owner?: PromiseOrValue<string> | null, expires?: null): NameMigratedEventFilter;
-        NameMigrated(id?: PromiseOrValue<BigNumberish> | null, owner?: PromiseOrValue<string> | null, expires?: null): NameMigratedEventFilter;
-        "NameRegistered(uint256,address,uint256)"(id?: PromiseOrValue<BigNumberish> | null, owner?: PromiseOrValue<string> | null, expires?: null): NameRegisteredEventFilter;
-        NameRegistered(id?: PromiseOrValue<BigNumberish> | null, owner?: PromiseOrValue<string> | null, expires?: null): NameRegisteredEventFilter;
-        "NameRenewed(uint256,uint256)"(id?: PromiseOrValue<BigNumberish> | null, expires?: null): NameRenewedEventFilter;
-        NameRenewed(id?: PromiseOrValue<BigNumberish> | null, expires?: null): NameRenewedEventFilter;
-        "Transfer(address,address,uint256)"(from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): TransferEventFilter;
-        Transfer(from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): TransferEventFilter;
-    };
-    estimateGas: {
-        addController(controller: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        available(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        nameExpires(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        reclaim(id: PromiseOrValue<BigNumberish>, owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        register(id: PromiseOrValue<BigNumberish>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        removeController(controller: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        renew(id: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "safeTransferFrom(address,address,uint256,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        addController(controller: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        available(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        nameExpires(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        reclaim(id: PromiseOrValue<BigNumberish>, owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        register(id: PromiseOrValue<BigNumberish>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        removeController(controller: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        renew(id: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "safeTransferFrom(address,address,uint256,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "Approval(address,address,uint256)": TypedContractEvent<ApprovalEvent.InputTuple, ApprovalEvent.OutputTuple, ApprovalEvent.OutputObject>;
+        Approval: TypedContractEvent<ApprovalEvent.InputTuple, ApprovalEvent.OutputTuple, ApprovalEvent.OutputObject>;
+        "ApprovalForAll(address,address,bool)": TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+        ApprovalForAll: TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+        "ControllerAdded(address)": TypedContractEvent<ControllerAddedEvent.InputTuple, ControllerAddedEvent.OutputTuple, ControllerAddedEvent.OutputObject>;
+        ControllerAdded: TypedContractEvent<ControllerAddedEvent.InputTuple, ControllerAddedEvent.OutputTuple, ControllerAddedEvent.OutputObject>;
+        "ControllerRemoved(address)": TypedContractEvent<ControllerRemovedEvent.InputTuple, ControllerRemovedEvent.OutputTuple, ControllerRemovedEvent.OutputObject>;
+        ControllerRemoved: TypedContractEvent<ControllerRemovedEvent.InputTuple, ControllerRemovedEvent.OutputTuple, ControllerRemovedEvent.OutputObject>;
+        "NameMigrated(uint256,address,uint256)": TypedContractEvent<NameMigratedEvent.InputTuple, NameMigratedEvent.OutputTuple, NameMigratedEvent.OutputObject>;
+        NameMigrated: TypedContractEvent<NameMigratedEvent.InputTuple, NameMigratedEvent.OutputTuple, NameMigratedEvent.OutputObject>;
+        "NameRegistered(uint256,address,uint256)": TypedContractEvent<NameRegisteredEvent.InputTuple, NameRegisteredEvent.OutputTuple, NameRegisteredEvent.OutputObject>;
+        NameRegistered: TypedContractEvent<NameRegisteredEvent.InputTuple, NameRegisteredEvent.OutputTuple, NameRegisteredEvent.OutputObject>;
+        "NameRenewed(uint256,uint256)": TypedContractEvent<NameRenewedEvent.InputTuple, NameRenewedEvent.OutputTuple, NameRenewedEvent.OutputObject>;
+        NameRenewed: TypedContractEvent<NameRenewedEvent.InputTuple, NameRenewedEvent.OutputTuple, NameRenewedEvent.OutputObject>;
+        "Transfer(address,address,uint256)": TypedContractEvent<TransferEvent.InputTuple, TransferEvent.OutputTuple, TransferEvent.OutputObject>;
+        Transfer: TypedContractEvent<TransferEvent.InputTuple, TransferEvent.OutputTuple, TransferEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=IBaseRegistrar.d.ts.map

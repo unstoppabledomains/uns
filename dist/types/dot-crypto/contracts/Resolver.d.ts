@@ -1,76 +1,25 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
-export interface ResolverInterface extends utils.Interface {
-    functions: {
-        "get(string,uint256)": FunctionFragment;
-        "getByHash(uint256,uint256)": FunctionFragment;
-        "getMany(string[],uint256)": FunctionFragment;
-        "getManyByHash(uint256[],uint256)": FunctionFragment;
-        "hashToKey(uint256)": FunctionFragment;
-        "hashesToKeys(uint256[])": FunctionFragment;
-        "nonceOf(uint256)": FunctionFragment;
-        "preconfigure(string[],string[],uint256)": FunctionFragment;
-        "reconfigure(string[],string[],uint256)": FunctionFragment;
-        "reconfigureFor(string[],string[],uint256,bytes)": FunctionFragment;
-        "registry()": FunctionFragment;
-        "reset(uint256)": FunctionFragment;
-        "resetFor(uint256,bytes)": FunctionFragment;
-        "set(string,string,uint256)": FunctionFragment;
-        "setFor(string,string,uint256,bytes)": FunctionFragment;
-        "setMany(string[],string[],uint256)": FunctionFragment;
-        "setManyFor(string[],string[],uint256,bytes)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "get" | "getByHash" | "getMany" | "getManyByHash" | "hashToKey" | "hashesToKeys" | "nonceOf" | "preconfigure" | "reconfigure" | "reconfigureFor" | "registry" | "reset" | "resetFor" | "set" | "setFor" | "setMany" | "setManyFor"): FunctionFragment;
-    encodeFunctionData(functionFragment: "get", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getByHash", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getMany", values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getManyByHash", values: [PromiseOrValue<BigNumberish>[], PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "hashToKey", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "hashesToKeys", values: [PromiseOrValue<BigNumberish>[]]): string;
-    encodeFunctionData(functionFragment: "nonceOf", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "preconfigure", values: [
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "reconfigure", values: [
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "reconfigureFor", values: [
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
+export interface ResolverInterface extends Interface {
+    getFunction(nameOrSignature: "get" | "getByHash" | "getMany" | "getManyByHash" | "hashToKey" | "hashesToKeys" | "nonceOf" | "preconfigure" | "reconfigure" | "reconfigureFor" | "registry" | "reset" | "resetFor" | "set" | "setFor" | "setMany" | "setManyFor"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "NewKey" | "ResetRecords" | "Set"): EventFragment;
+    encodeFunctionData(functionFragment: "get", values: [string, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getByHash", values: [BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getMany", values: [string[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getManyByHash", values: [BigNumberish[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "hashToKey", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "hashesToKeys", values: [BigNumberish[]]): string;
+    encodeFunctionData(functionFragment: "nonceOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "preconfigure", values: [string[], string[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "reconfigure", values: [string[], string[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "reconfigureFor", values: [string[], string[], BigNumberish, BytesLike]): string;
     encodeFunctionData(functionFragment: "registry", values?: undefined): string;
-    encodeFunctionData(functionFragment: "reset", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "resetFor", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "set", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "setFor", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
-    encodeFunctionData(functionFragment: "setMany", values: [
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "setManyFor", values: [
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
+    encodeFunctionData(functionFragment: "reset", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "resetFor", values: [BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "set", values: [string, string, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setFor", values: [string, string, BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "setMany", values: [string[], string[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setManyFor", values: [string[], string[], BigNumberish, BytesLike]): string;
     decodeFunctionResult(functionFragment: "get", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getByHash", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getMany", data: BytesLike): Result;
@@ -88,252 +37,276 @@ export interface ResolverInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "setFor", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setMany", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setManyFor", data: BytesLike): Result;
-    events: {
-        "NewKey(uint256,string,string)": EventFragment;
-        "ResetRecords(uint256)": EventFragment;
-        "Set(uint256,string,string,string,string)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "NewKey"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "ResetRecords"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Set"): EventFragment;
 }
-export interface NewKeyEventObject {
-    tokenId: BigNumber;
-    keyIndex: string;
-    key: string;
+export declare namespace NewKeyEvent {
+    type InputTuple = [
+        tokenId: BigNumberish,
+        keyIndex: string,
+        key: string
+    ];
+    type OutputTuple = [tokenId: bigint, keyIndex: string, key: string];
+    interface OutputObject {
+        tokenId: bigint;
+        keyIndex: string;
+        key: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NewKeyEvent = TypedEvent<[
-    BigNumber,
-    string,
-    string
-], NewKeyEventObject>;
-export declare type NewKeyEventFilter = TypedEventFilter<NewKeyEvent>;
-export interface ResetRecordsEventObject {
-    tokenId: BigNumber;
+export declare namespace ResetRecordsEvent {
+    type InputTuple = [tokenId: BigNumberish];
+    type OutputTuple = [tokenId: bigint];
+    interface OutputObject {
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ResetRecordsEvent = TypedEvent<[
-    BigNumber
-], ResetRecordsEventObject>;
-export declare type ResetRecordsEventFilter = TypedEventFilter<ResetRecordsEvent>;
-export interface SetEventObject {
-    tokenId: BigNumber;
-    keyIndex: string;
-    valueIndex: string;
-    key: string;
-    value: string;
-}
-export declare type SetEvent = TypedEvent<[
-    BigNumber,
-    string,
-    string,
-    string,
-    string
-], SetEventObject>;
-export declare type SetEventFilter = TypedEventFilter<SetEvent>;
-export interface Resolver extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
-    interface: ResolverInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, string] & {
-            key: string;
-            value: string;
-        }>;
-        getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string[]]>;
-        getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string[], string[]] & {
-            keys: string[];
-            values: string[];
-        }>;
-        hashToKey(keyHash: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        hashesToKeys(hashes: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[string[]]>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        preconfigure(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        reconfigure(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        reconfigureFor(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        registry(overrides?: CallOverrides): Promise<[string]>;
-        reset(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        resetFor(tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        set(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setFor(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setManyFor(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, string] & {
+export declare namespace SetEvent {
+    type InputTuple = [
+        tokenId: BigNumberish,
+        keyIndex: string,
+        valueIndex: string,
+        key: string,
+        value: string
+    ];
+    type OutputTuple = [
+        tokenId: bigint,
+        keyIndex: string,
+        valueIndex: string,
+        key: string,
+        value: string
+    ];
+    interface OutputObject {
+        tokenId: bigint;
+        keyIndex: string;
+        valueIndex: string;
         key: string;
         value: string;
-    }>;
-    getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string[]>;
-    getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string[], string[]] & {
-        keys: string[];
-        values: string[];
-    }>;
-    hashToKey(keyHash: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    hashesToKeys(hashes: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<string[]>;
-    nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    preconfigure(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    reconfigure(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    reconfigureFor(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    registry(overrides?: CallOverrides): Promise<string>;
-    reset(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    resetFor(tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    set(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setFor(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setManyFor(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, string] & {
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
+}
+export interface Resolver extends BaseContract {
+    connect(runner?: ContractRunner | null): Resolver;
+    waitForDeployment(): Promise<this>;
+    interface: ResolverInterface;
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    get: TypedContractMethod<[
+        key: string,
+        tokenId: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getByHash: TypedContractMethod<[
+        keyHash: BigNumberish,
+        tokenId: BigNumberish
+    ], [
+        [string, string] & {
             key: string;
             value: string;
-        }>;
-        getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string[]>;
-        getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string[], string[]] & {
+        }
+    ], "view">;
+    getMany: TypedContractMethod<[
+        keys: string[],
+        tokenId: BigNumberish
+    ], [
+        string[]
+    ], "view">;
+    getManyByHash: TypedContractMethod<[
+        keyHashes: BigNumberish[],
+        tokenId: BigNumberish
+    ], [
+        [string[], string[]] & {
             keys: string[];
             values: string[];
-        }>;
-        hashToKey(keyHash: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        hashesToKeys(hashes: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<string[]>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        preconfigure(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        reconfigure(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        reconfigureFor(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        registry(overrides?: CallOverrides): Promise<string>;
-        reset(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        resetFor(tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        set(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        setFor(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        setManyFor(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-    };
+        }
+    ], "view">;
+    hashToKey: TypedContractMethod<[keyHash: BigNumberish], [string], "view">;
+    hashesToKeys: TypedContractMethod<[
+        hashes: BigNumberish[]
+    ], [
+        string[]
+    ], "view">;
+    nonceOf: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+    preconfigure: TypedContractMethod<[
+        keys: string[],
+        values: string[],
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    reconfigure: TypedContractMethod<[
+        keys: string[],
+        values: string[],
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    reconfigureFor: TypedContractMethod<[
+        keys: string[],
+        values: string[],
+        tokenId: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    registry: TypedContractMethod<[], [string], "view">;
+    reset: TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    resetFor: TypedContractMethod<[
+        tokenId: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    set: TypedContractMethod<[
+        key: string,
+        value: string,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    setFor: TypedContractMethod<[
+        key: string,
+        value: string,
+        tokenId: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    setMany: TypedContractMethod<[
+        keys: string[],
+        values: string[],
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    setManyFor: TypedContractMethod<[
+        keys: string[],
+        values: string[],
+        tokenId: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "get"): TypedContractMethod<[
+        key: string,
+        tokenId: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "getByHash"): TypedContractMethod<[
+        keyHash: BigNumberish,
+        tokenId: BigNumberish
+    ], [
+        [string, string] & {
+            key: string;
+            value: string;
+        }
+    ], "view">;
+    getFunction(nameOrSignature: "getMany"): TypedContractMethod<[
+        keys: string[],
+        tokenId: BigNumberish
+    ], [
+        string[]
+    ], "view">;
+    getFunction(nameOrSignature: "getManyByHash"): TypedContractMethod<[
+        keyHashes: BigNumberish[],
+        tokenId: BigNumberish
+    ], [
+        [string[], string[]] & {
+            keys: string[];
+            values: string[];
+        }
+    ], "view">;
+    getFunction(nameOrSignature: "hashToKey"): TypedContractMethod<[keyHash: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "hashesToKeys"): TypedContractMethod<[hashes: BigNumberish[]], [string[]], "view">;
+    getFunction(nameOrSignature: "nonceOf"): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+    getFunction(nameOrSignature: "preconfigure"): TypedContractMethod<[
+        keys: string[],
+        values: string[],
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "reconfigure"): TypedContractMethod<[
+        keys: string[],
+        values: string[],
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "reconfigureFor"): TypedContractMethod<[
+        keys: string[],
+        values: string[],
+        tokenId: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "registry"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "reset"): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    getFunction(nameOrSignature: "resetFor"): TypedContractMethod<[
+        tokenId: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "set"): TypedContractMethod<[
+        key: string,
+        value: string,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setFor"): TypedContractMethod<[
+        key: string,
+        value: string,
+        tokenId: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setMany"): TypedContractMethod<[
+        keys: string[],
+        values: string[],
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setManyFor"): TypedContractMethod<[
+        keys: string[],
+        values: string[],
+        tokenId: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getEvent(key: "NewKey"): TypedContractEvent<NewKeyEvent.InputTuple, NewKeyEvent.OutputTuple, NewKeyEvent.OutputObject>;
+    getEvent(key: "ResetRecords"): TypedContractEvent<ResetRecordsEvent.InputTuple, ResetRecordsEvent.OutputTuple, ResetRecordsEvent.OutputObject>;
+    getEvent(key: "Set"): TypedContractEvent<SetEvent.InputTuple, SetEvent.OutputTuple, SetEvent.OutputObject>;
     filters: {
-        "NewKey(uint256,string,string)"(tokenId?: PromiseOrValue<BigNumberish> | null, keyIndex?: PromiseOrValue<string> | null, key?: null): NewKeyEventFilter;
-        NewKey(tokenId?: PromiseOrValue<BigNumberish> | null, keyIndex?: PromiseOrValue<string> | null, key?: null): NewKeyEventFilter;
-        "ResetRecords(uint256)"(tokenId?: PromiseOrValue<BigNumberish> | null): ResetRecordsEventFilter;
-        ResetRecords(tokenId?: PromiseOrValue<BigNumberish> | null): ResetRecordsEventFilter;
-        "Set(uint256,string,string,string,string)"(tokenId?: PromiseOrValue<BigNumberish> | null, keyIndex?: PromiseOrValue<string> | null, valueIndex?: PromiseOrValue<string> | null, key?: null, value?: null): SetEventFilter;
-        Set(tokenId?: PromiseOrValue<BigNumberish> | null, keyIndex?: PromiseOrValue<string> | null, valueIndex?: PromiseOrValue<string> | null, key?: null, value?: null): SetEventFilter;
-    };
-    estimateGas: {
-        get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        hashToKey(keyHash: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        hashesToKeys(hashes: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        preconfigure(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        reconfigure(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        reconfigureFor(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        registry(overrides?: CallOverrides): Promise<BigNumber>;
-        reset(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        resetFor(tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        set(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setFor(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setManyFor(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        get(key: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getByHash(keyHash: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getMany(keys: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getManyByHash(keyHashes: PromiseOrValue<BigNumberish>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        hashToKey(keyHash: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        hashesToKeys(hashes: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        preconfigure(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        reconfigure(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        reconfigureFor(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        registry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        reset(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        resetFor(tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        set(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setFor(key: PromiseOrValue<string>, value: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setMany(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setManyFor(keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], tokenId: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "NewKey(uint256,string,string)": TypedContractEvent<NewKeyEvent.InputTuple, NewKeyEvent.OutputTuple, NewKeyEvent.OutputObject>;
+        NewKey: TypedContractEvent<NewKeyEvent.InputTuple, NewKeyEvent.OutputTuple, NewKeyEvent.OutputObject>;
+        "ResetRecords(uint256)": TypedContractEvent<ResetRecordsEvent.InputTuple, ResetRecordsEvent.OutputTuple, ResetRecordsEvent.OutputObject>;
+        ResetRecords: TypedContractEvent<ResetRecordsEvent.InputTuple, ResetRecordsEvent.OutputTuple, ResetRecordsEvent.OutputObject>;
+        "Set(uint256,string,string,string,string)": TypedContractEvent<SetEvent.InputTuple, SetEvent.OutputTuple, SetEvent.OutputObject>;
+        Set: TypedContractEvent<SetEvent.InputTuple, SetEvent.OutputTuple, SetEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=Resolver.d.ts.map

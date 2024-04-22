@@ -1,81 +1,87 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
-export interface IDNSRecordResolverInterface extends utils.Interface {
-    functions: {
-        "dnsRecord(bytes32,bytes32,uint16)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "dnsRecord"): FunctionFragment;
-    encodeFunctionData(functionFragment: "dnsRecord", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../../common";
+export interface IDNSRecordResolverInterface extends Interface {
+    getFunction(nameOrSignature: "dnsRecord"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "DNSRecordChanged" | "DNSRecordDeleted"): EventFragment;
+    encodeFunctionData(functionFragment: "dnsRecord", values: [BytesLike, BytesLike, BigNumberish]): string;
     decodeFunctionResult(functionFragment: "dnsRecord", data: BytesLike): Result;
-    events: {
-        "DNSRecordChanged(bytes32,bytes,uint16,bytes)": EventFragment;
-        "DNSRecordDeleted(bytes32,bytes,uint16)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "DNSRecordChanged"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "DNSRecordDeleted"): EventFragment;
 }
-export interface DNSRecordChangedEventObject {
-    node: string;
-    name: string;
-    resource: number;
-    record: string;
+export declare namespace DNSRecordChangedEvent {
+    type InputTuple = [
+        node: BytesLike,
+        name: BytesLike,
+        resource: BigNumberish,
+        record: BytesLike
+    ];
+    type OutputTuple = [
+        node: string,
+        name: string,
+        resource: bigint,
+        record: string
+    ];
+    interface OutputObject {
+        node: string;
+        name: string;
+        resource: bigint;
+        record: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type DNSRecordChangedEvent = TypedEvent<[
-    string,
-    string,
-    number,
-    string
-], DNSRecordChangedEventObject>;
-export declare type DNSRecordChangedEventFilter = TypedEventFilter<DNSRecordChangedEvent>;
-export interface DNSRecordDeletedEventObject {
-    node: string;
-    name: string;
-    resource: number;
+export declare namespace DNSRecordDeletedEvent {
+    type InputTuple = [
+        node: BytesLike,
+        name: BytesLike,
+        resource: BigNumberish
+    ];
+    type OutputTuple = [node: string, name: string, resource: bigint];
+    interface OutputObject {
+        node: string;
+        name: string;
+        resource: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type DNSRecordDeletedEvent = TypedEvent<[
-    string,
-    string,
-    number
-], DNSRecordDeletedEventObject>;
-export declare type DNSRecordDeletedEventFilter = TypedEventFilter<DNSRecordDeletedEvent>;
 export interface IDNSRecordResolver extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IDNSRecordResolver;
+    waitForDeployment(): Promise<this>;
     interface: IDNSRecordResolverInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        dnsRecord(node: PromiseOrValue<BytesLike>, name: PromiseOrValue<BytesLike>, resource: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-    };
-    dnsRecord(node: PromiseOrValue<BytesLike>, name: PromiseOrValue<BytesLike>, resource: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    callStatic: {
-        dnsRecord(node: PromiseOrValue<BytesLike>, name: PromiseOrValue<BytesLike>, resource: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    dnsRecord: TypedContractMethod<[
+        node: BytesLike,
+        name: BytesLike,
+        resource: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "dnsRecord"): TypedContractMethod<[
+        node: BytesLike,
+        name: BytesLike,
+        resource: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getEvent(key: "DNSRecordChanged"): TypedContractEvent<DNSRecordChangedEvent.InputTuple, DNSRecordChangedEvent.OutputTuple, DNSRecordChangedEvent.OutputObject>;
+    getEvent(key: "DNSRecordDeleted"): TypedContractEvent<DNSRecordDeletedEvent.InputTuple, DNSRecordDeletedEvent.OutputTuple, DNSRecordDeletedEvent.OutputObject>;
     filters: {
-        "DNSRecordChanged(bytes32,bytes,uint16,bytes)"(node?: PromiseOrValue<BytesLike> | null, name?: null, resource?: null, record?: null): DNSRecordChangedEventFilter;
-        DNSRecordChanged(node?: PromiseOrValue<BytesLike> | null, name?: null, resource?: null, record?: null): DNSRecordChangedEventFilter;
-        "DNSRecordDeleted(bytes32,bytes,uint16)"(node?: PromiseOrValue<BytesLike> | null, name?: null, resource?: null): DNSRecordDeletedEventFilter;
-        DNSRecordDeleted(node?: PromiseOrValue<BytesLike> | null, name?: null, resource?: null): DNSRecordDeletedEventFilter;
-    };
-    estimateGas: {
-        dnsRecord(node: PromiseOrValue<BytesLike>, name: PromiseOrValue<BytesLike>, resource: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        dnsRecord(node: PromiseOrValue<BytesLike>, name: PromiseOrValue<BytesLike>, resource: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "DNSRecordChanged(bytes32,bytes,uint16,bytes)": TypedContractEvent<DNSRecordChangedEvent.InputTuple, DNSRecordChangedEvent.OutputTuple, DNSRecordChangedEvent.OutputObject>;
+        DNSRecordChanged: TypedContractEvent<DNSRecordChangedEvent.InputTuple, DNSRecordChangedEvent.OutputTuple, DNSRecordChangedEvent.OutputObject>;
+        "DNSRecordDeleted(bytes32,bytes,uint16)": TypedContractEvent<DNSRecordDeletedEvent.InputTuple, DNSRecordDeletedEvent.OutputTuple, DNSRecordDeletedEvent.OutputObject>;
+        DNSRecordDeleted: TypedContractEvent<DNSRecordDeletedEvent.InputTuple, DNSRecordDeletedEvent.OutputTuple, DNSRecordDeletedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=IDNSRecordResolver.d.ts.map

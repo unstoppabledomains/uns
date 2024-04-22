@@ -1,74 +1,35 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PayableOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../common";
-export interface LegacyETHRegistrarControllerInterface extends utils.Interface {
-    functions: {
-        "MIN_REGISTRATION_DURATION()": FunctionFragment;
-        "available(string)": FunctionFragment;
-        "commit(bytes32)": FunctionFragment;
-        "commitments(bytes32)": FunctionFragment;
-        "isOwner()": FunctionFragment;
-        "makeCommitment(string,address,bytes32)": FunctionFragment;
-        "makeCommitmentWithConfig(string,address,bytes32,address,address)": FunctionFragment;
-        "maxCommitmentAge()": FunctionFragment;
-        "minCommitmentAge()": FunctionFragment;
-        "owner()": FunctionFragment;
-        "register(string,address,uint256,bytes32)": FunctionFragment;
-        "registerWithConfig(string,address,uint256,bytes32,address,address)": FunctionFragment;
-        "renew(string,uint256)": FunctionFragment;
-        "renounceOwnership()": FunctionFragment;
-        "rentPrice(string,uint256)": FunctionFragment;
-        "setCommitmentAges(uint256,uint256)": FunctionFragment;
-        "setPriceOracle(address)": FunctionFragment;
-        "supportsInterface(bytes4)": FunctionFragment;
-        "transferOwnership(address)": FunctionFragment;
-        "valid(string)": FunctionFragment;
-        "withdraw()": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "MIN_REGISTRATION_DURATION" | "available" | "commit" | "commitments" | "isOwner" | "makeCommitment" | "makeCommitmentWithConfig" | "maxCommitmentAge" | "minCommitmentAge" | "owner" | "register" | "registerWithConfig" | "renew" | "renounceOwnership" | "rentPrice" | "setCommitmentAges" | "setPriceOracle" | "supportsInterface" | "transferOwnership" | "valid" | "withdraw"): FunctionFragment;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../common";
+export interface LegacyETHRegistrarControllerInterface extends Interface {
+    getFunction(nameOrSignature: "MIN_REGISTRATION_DURATION" | "available" | "commit" | "commitments" | "isOwner" | "makeCommitment" | "makeCommitmentWithConfig" | "maxCommitmentAge" | "minCommitmentAge" | "owner" | "register" | "registerWithConfig" | "renew" | "renounceOwnership" | "rentPrice" | "setCommitmentAges" | "setPriceOracle" | "supportsInterface" | "transferOwnership" | "valid" | "withdraw"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "NameRegistered" | "NameRenewed" | "NewPriceOracle" | "OwnershipTransferred"): EventFragment;
     encodeFunctionData(functionFragment: "MIN_REGISTRATION_DURATION", values?: undefined): string;
-    encodeFunctionData(functionFragment: "available", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "commit", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "commitments", values: [PromiseOrValue<BytesLike>]): string;
+    encodeFunctionData(functionFragment: "available", values: [string]): string;
+    encodeFunctionData(functionFragment: "commit", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "commitments", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "isOwner", values?: undefined): string;
-    encodeFunctionData(functionFragment: "makeCommitment", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BytesLike>
-    ]): string;
-    encodeFunctionData(functionFragment: "makeCommitmentWithConfig", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>
-    ]): string;
+    encodeFunctionData(functionFragment: "makeCommitment", values: [string, AddressLike, BytesLike]): string;
+    encodeFunctionData(functionFragment: "makeCommitmentWithConfig", values: [string, AddressLike, BytesLike, AddressLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "maxCommitmentAge", values?: undefined): string;
     encodeFunctionData(functionFragment: "minCommitmentAge", values?: undefined): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-    encodeFunctionData(functionFragment: "register", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
+    encodeFunctionData(functionFragment: "register", values: [string, AddressLike, BigNumberish, BytesLike]): string;
     encodeFunctionData(functionFragment: "registerWithConfig", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>
+        string,
+        AddressLike,
+        BigNumberish,
+        BytesLike,
+        AddressLike,
+        AddressLike
     ]): string;
-    encodeFunctionData(functionFragment: "renew", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "renew", values: [string, BigNumberish]): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
-    encodeFunctionData(functionFragment: "rentPrice", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "setCommitmentAges", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "setPriceOracle", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "transferOwnership", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "valid", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "rentPrice", values: [string, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setCommitmentAges", values: [BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setPriceOracle", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "valid", values: [string]): string;
     encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
     decodeFunctionResult(functionFragment: "MIN_REGISTRATION_DURATION", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "available", data: BytesLike): Result;
@@ -91,269 +52,252 @@ export interface LegacyETHRegistrarControllerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "valid", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
-    events: {
-        "NameRegistered(string,bytes32,address,uint256,uint256)": EventFragment;
-        "NameRenewed(string,bytes32,uint256,uint256)": EventFragment;
-        "NewPriceOracle(address)": EventFragment;
-        "OwnershipTransferred(address,address)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "NameRegistered"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NameRenewed"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NewPriceOracle"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
-export interface NameRegisteredEventObject {
-    name: string;
-    label: string;
-    owner: string;
-    cost: BigNumber;
-    expires: BigNumber;
+export declare namespace NameRegisteredEvent {
+    type InputTuple = [
+        name: string,
+        label: BytesLike,
+        owner: AddressLike,
+        cost: BigNumberish,
+        expires: BigNumberish
+    ];
+    type OutputTuple = [
+        name: string,
+        label: string,
+        owner: string,
+        cost: bigint,
+        expires: bigint
+    ];
+    interface OutputObject {
+        name: string;
+        label: string;
+        owner: string;
+        cost: bigint;
+        expires: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NameRegisteredEvent = TypedEvent<[
-    string,
-    string,
-    string,
-    BigNumber,
-    BigNumber
-], NameRegisteredEventObject>;
-export declare type NameRegisteredEventFilter = TypedEventFilter<NameRegisteredEvent>;
-export interface NameRenewedEventObject {
-    name: string;
-    label: string;
-    cost: BigNumber;
-    expires: BigNumber;
+export declare namespace NameRenewedEvent {
+    type InputTuple = [
+        name: string,
+        label: BytesLike,
+        cost: BigNumberish,
+        expires: BigNumberish
+    ];
+    type OutputTuple = [
+        name: string,
+        label: string,
+        cost: bigint,
+        expires: bigint
+    ];
+    interface OutputObject {
+        name: string;
+        label: string;
+        cost: bigint;
+        expires: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NameRenewedEvent = TypedEvent<[
-    string,
-    string,
-    BigNumber,
-    BigNumber
-], NameRenewedEventObject>;
-export declare type NameRenewedEventFilter = TypedEventFilter<NameRenewedEvent>;
-export interface NewPriceOracleEventObject {
-    oracle: string;
+export declare namespace NewPriceOracleEvent {
+    type InputTuple = [oracle: AddressLike];
+    type OutputTuple = [oracle: string];
+    interface OutputObject {
+        oracle: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NewPriceOracleEvent = TypedEvent<[
-    string
-], NewPriceOracleEventObject>;
-export declare type NewPriceOracleEventFilter = TypedEventFilter<NewPriceOracleEvent>;
-export interface OwnershipTransferredEventObject {
-    previousOwner: string;
-    newOwner: string;
+export declare namespace OwnershipTransferredEvent {
+    type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
+    type OutputTuple = [previousOwner: string, newOwner: string];
+    interface OutputObject {
+        previousOwner: string;
+        newOwner: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type OwnershipTransferredEvent = TypedEvent<[
-    string,
-    string
-], OwnershipTransferredEventObject>;
-export declare type OwnershipTransferredEventFilter = TypedEventFilter<OwnershipTransferredEvent>;
 export interface LegacyETHRegistrarController extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): LegacyETHRegistrarController;
+    waitForDeployment(): Promise<this>;
     interface: LegacyETHRegistrarControllerInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        MIN_REGISTRATION_DURATION(overrides?: CallOverrides): Promise<[BigNumber]>;
-        available(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        commit(commitment: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        commitments(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        isOwner(overrides?: CallOverrides): Promise<[boolean]>;
-        makeCommitment(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, secret: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        makeCommitmentWithConfig(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[string]>;
-        maxCommitmentAge(overrides?: CallOverrides): Promise<[BigNumber]>;
-        minCommitmentAge(overrides?: CallOverrides): Promise<[BigNumber]>;
-        owner(overrides?: CallOverrides): Promise<[string]>;
-        register(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        registerWithConfig(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, addr: PromiseOrValue<string>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        renew(name: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        rentPrice(name: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        setCommitmentAges(_minCommitmentAge: PromiseOrValue<BigNumberish>, _maxCommitmentAge: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setPriceOracle(_prices: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        valid(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        withdraw(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    MIN_REGISTRATION_DURATION(overrides?: CallOverrides): Promise<BigNumber>;
-    available(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    commit(commitment: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    commitments(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    isOwner(overrides?: CallOverrides): Promise<boolean>;
-    makeCommitment(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, secret: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    makeCommitmentWithConfig(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-    maxCommitmentAge(overrides?: CallOverrides): Promise<BigNumber>;
-    minCommitmentAge(overrides?: CallOverrides): Promise<BigNumber>;
-    owner(overrides?: CallOverrides): Promise<string>;
-    register(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    registerWithConfig(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, addr: PromiseOrValue<string>, overrides?: PayableOverrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    renew(name: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: PayableOverrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    renounceOwnership(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    rentPrice(name: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    setCommitmentAges(_minCommitmentAge: PromiseOrValue<BigNumberish>, _maxCommitmentAge: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setPriceOracle(_prices: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    valid(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    withdraw(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        MIN_REGISTRATION_DURATION(overrides?: CallOverrides): Promise<BigNumber>;
-        available(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        commit(commitment: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        commitments(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        isOwner(overrides?: CallOverrides): Promise<boolean>;
-        makeCommitment(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, secret: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        makeCommitmentWithConfig(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        maxCommitmentAge(overrides?: CallOverrides): Promise<BigNumber>;
-        minCommitmentAge(overrides?: CallOverrides): Promise<BigNumber>;
-        owner(overrides?: CallOverrides): Promise<string>;
-        register(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        registerWithConfig(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        renew(name: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        renounceOwnership(overrides?: CallOverrides): Promise<void>;
-        rentPrice(name: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        setCommitmentAges(_minCommitmentAge: PromiseOrValue<BigNumberish>, _maxCommitmentAge: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        setPriceOracle(_prices: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        valid(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        withdraw(overrides?: CallOverrides): Promise<void>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    MIN_REGISTRATION_DURATION: TypedContractMethod<[], [bigint], "view">;
+    available: TypedContractMethod<[name: string], [boolean], "view">;
+    commit: TypedContractMethod<[commitment: BytesLike], [void], "nonpayable">;
+    commitments: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+    isOwner: TypedContractMethod<[], [boolean], "view">;
+    makeCommitment: TypedContractMethod<[
+        name: string,
+        owner: AddressLike,
+        secret: BytesLike
+    ], [
+        string
+    ], "view">;
+    makeCommitmentWithConfig: TypedContractMethod<[
+        name: string,
+        owner: AddressLike,
+        secret: BytesLike,
+        resolver: AddressLike,
+        addr: AddressLike
+    ], [
+        string
+    ], "view">;
+    maxCommitmentAge: TypedContractMethod<[], [bigint], "view">;
+    minCommitmentAge: TypedContractMethod<[], [bigint], "view">;
+    owner: TypedContractMethod<[], [string], "view">;
+    register: TypedContractMethod<[
+        name: string,
+        owner: AddressLike,
+        duration: BigNumberish,
+        secret: BytesLike
+    ], [
+        void
+    ], "payable">;
+    registerWithConfig: TypedContractMethod<[
+        name: string,
+        owner: AddressLike,
+        duration: BigNumberish,
+        secret: BytesLike,
+        resolver: AddressLike,
+        addr: AddressLike
+    ], [
+        void
+    ], "payable">;
+    renew: TypedContractMethod<[
+        name: string,
+        duration: BigNumberish
+    ], [
+        void
+    ], "payable">;
+    renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+    rentPrice: TypedContractMethod<[
+        name: string,
+        duration: BigNumberish
+    ], [
+        bigint
+    ], "view">;
+    setCommitmentAges: TypedContractMethod<[
+        _minCommitmentAge: BigNumberish,
+        _maxCommitmentAge: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    setPriceOracle: TypedContractMethod<[
+        _prices: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    supportsInterface: TypedContractMethod<[
+        interfaceID: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    transferOwnership: TypedContractMethod<[
+        newOwner: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    valid: TypedContractMethod<[name: string], [boolean], "view">;
+    withdraw: TypedContractMethod<[], [void], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "MIN_REGISTRATION_DURATION"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "available"): TypedContractMethod<[name: string], [boolean], "view">;
+    getFunction(nameOrSignature: "commit"): TypedContractMethod<[commitment: BytesLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "commitments"): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+    getFunction(nameOrSignature: "isOwner"): TypedContractMethod<[], [boolean], "view">;
+    getFunction(nameOrSignature: "makeCommitment"): TypedContractMethod<[
+        name: string,
+        owner: AddressLike,
+        secret: BytesLike
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "makeCommitmentWithConfig"): TypedContractMethod<[
+        name: string,
+        owner: AddressLike,
+        secret: BytesLike,
+        resolver: AddressLike,
+        addr: AddressLike
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "maxCommitmentAge"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "minCommitmentAge"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "register"): TypedContractMethod<[
+        name: string,
+        owner: AddressLike,
+        duration: BigNumberish,
+        secret: BytesLike
+    ], [
+        void
+    ], "payable">;
+    getFunction(nameOrSignature: "registerWithConfig"): TypedContractMethod<[
+        name: string,
+        owner: AddressLike,
+        duration: BigNumberish,
+        secret: BytesLike,
+        resolver: AddressLike,
+        addr: AddressLike
+    ], [
+        void
+    ], "payable">;
+    getFunction(nameOrSignature: "renew"): TypedContractMethod<[
+        name: string,
+        duration: BigNumberish
+    ], [
+        void
+    ], "payable">;
+    getFunction(nameOrSignature: "renounceOwnership"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "rentPrice"): TypedContractMethod<[
+        name: string,
+        duration: BigNumberish
+    ], [
+        bigint
+    ], "view">;
+    getFunction(nameOrSignature: "setCommitmentAges"): TypedContractMethod<[
+        _minCommitmentAge: BigNumberish,
+        _maxCommitmentAge: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setPriceOracle"): TypedContractMethod<[_prices: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceID: BytesLike], [boolean], "view">;
+    getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "valid"): TypedContractMethod<[name: string], [boolean], "view">;
+    getFunction(nameOrSignature: "withdraw"): TypedContractMethod<[], [void], "nonpayable">;
+    getEvent(key: "NameRegistered"): TypedContractEvent<NameRegisteredEvent.InputTuple, NameRegisteredEvent.OutputTuple, NameRegisteredEvent.OutputObject>;
+    getEvent(key: "NameRenewed"): TypedContractEvent<NameRenewedEvent.InputTuple, NameRenewedEvent.OutputTuple, NameRenewedEvent.OutputObject>;
+    getEvent(key: "NewPriceOracle"): TypedContractEvent<NewPriceOracleEvent.InputTuple, NewPriceOracleEvent.OutputTuple, NewPriceOracleEvent.OutputObject>;
+    getEvent(key: "OwnershipTransferred"): TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
     filters: {
-        "NameRegistered(string,bytes32,address,uint256,uint256)"(name?: null, label?: PromiseOrValue<BytesLike> | null, owner?: PromiseOrValue<string> | null, cost?: null, expires?: null): NameRegisteredEventFilter;
-        NameRegistered(name?: null, label?: PromiseOrValue<BytesLike> | null, owner?: PromiseOrValue<string> | null, cost?: null, expires?: null): NameRegisteredEventFilter;
-        "NameRenewed(string,bytes32,uint256,uint256)"(name?: null, label?: PromiseOrValue<BytesLike> | null, cost?: null, expires?: null): NameRenewedEventFilter;
-        NameRenewed(name?: null, label?: PromiseOrValue<BytesLike> | null, cost?: null, expires?: null): NameRenewedEventFilter;
-        "NewPriceOracle(address)"(oracle?: PromiseOrValue<string> | null): NewPriceOracleEventFilter;
-        NewPriceOracle(oracle?: PromiseOrValue<string> | null): NewPriceOracleEventFilter;
-        "OwnershipTransferred(address,address)"(previousOwner?: PromiseOrValue<string> | null, newOwner?: PromiseOrValue<string> | null): OwnershipTransferredEventFilter;
-        OwnershipTransferred(previousOwner?: PromiseOrValue<string> | null, newOwner?: PromiseOrValue<string> | null): OwnershipTransferredEventFilter;
-    };
-    estimateGas: {
-        MIN_REGISTRATION_DURATION(overrides?: CallOverrides): Promise<BigNumber>;
-        available(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        commit(commitment: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        commitments(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        isOwner(overrides?: CallOverrides): Promise<BigNumber>;
-        makeCommitment(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, secret: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        makeCommitmentWithConfig(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        maxCommitmentAge(overrides?: CallOverrides): Promise<BigNumber>;
-        minCommitmentAge(overrides?: CallOverrides): Promise<BigNumber>;
-        owner(overrides?: CallOverrides): Promise<BigNumber>;
-        register(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        registerWithConfig(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, addr: PromiseOrValue<string>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        renew(name: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        rentPrice(name: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        setCommitmentAges(_minCommitmentAge: PromiseOrValue<BigNumberish>, _maxCommitmentAge: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setPriceOracle(_prices: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        valid(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        withdraw(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        MIN_REGISTRATION_DURATION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        available(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        commit(commitment: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        commitments(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        makeCommitment(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, secret: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        makeCommitmentWithConfig(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        maxCommitmentAge(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        minCommitmentAge(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        register(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        registerWithConfig(name: PromiseOrValue<string>, owner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, secret: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, addr: PromiseOrValue<string>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        renew(name: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        rentPrice(name: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        setCommitmentAges(_minCommitmentAge: PromiseOrValue<BigNumberish>, _maxCommitmentAge: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setPriceOracle(_prices: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        valid(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        withdraw(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "NameRegistered(string,bytes32,address,uint256,uint256)": TypedContractEvent<NameRegisteredEvent.InputTuple, NameRegisteredEvent.OutputTuple, NameRegisteredEvent.OutputObject>;
+        NameRegistered: TypedContractEvent<NameRegisteredEvent.InputTuple, NameRegisteredEvent.OutputTuple, NameRegisteredEvent.OutputObject>;
+        "NameRenewed(string,bytes32,uint256,uint256)": TypedContractEvent<NameRenewedEvent.InputTuple, NameRenewedEvent.OutputTuple, NameRenewedEvent.OutputObject>;
+        NameRenewed: TypedContractEvent<NameRenewedEvent.InputTuple, NameRenewedEvent.OutputTuple, NameRenewedEvent.OutputObject>;
+        "NewPriceOracle(address)": TypedContractEvent<NewPriceOracleEvent.InputTuple, NewPriceOracleEvent.OutputTuple, NewPriceOracleEvent.OutputObject>;
+        NewPriceOracle: TypedContractEvent<NewPriceOracleEvent.InputTuple, NewPriceOracleEvent.OutputTuple, NewPriceOracleEvent.OutputObject>;
+        "OwnershipTransferred(address,address)": TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+        OwnershipTransferred: TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=LegacyETHRegistrarController.d.ts.map

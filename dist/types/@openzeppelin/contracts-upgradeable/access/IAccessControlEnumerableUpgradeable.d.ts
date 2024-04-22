@@ -1,25 +1,15 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../common";
-export interface IAccessControlEnumerableUpgradeableInterface extends utils.Interface {
-    functions: {
-        "getRoleAdmin(bytes32)": FunctionFragment;
-        "getRoleMember(bytes32,uint256)": FunctionFragment;
-        "getRoleMemberCount(bytes32)": FunctionFragment;
-        "grantRole(bytes32,address)": FunctionFragment;
-        "hasRole(bytes32,address)": FunctionFragment;
-        "renounceRole(bytes32,address)": FunctionFragment;
-        "revokeRole(bytes32,address)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "getRoleAdmin" | "getRoleMember" | "getRoleMemberCount" | "grantRole" | "hasRole" | "renounceRole" | "revokeRole"): FunctionFragment;
-    encodeFunctionData(functionFragment: "getRoleAdmin", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "getRoleMember", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getRoleMemberCount", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "grantRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "hasRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "renounceRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "revokeRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../common";
+export interface IAccessControlEnumerableUpgradeableInterface extends Interface {
+    getFunction(nameOrSignature: "getRoleAdmin" | "getRoleMember" | "getRoleMemberCount" | "grantRole" | "hasRole" | "renounceRole" | "revokeRole"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "RoleAdminChanged" | "RoleGranted" | "RoleRevoked"): EventFragment;
+    encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "getRoleMember", values: [BytesLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getRoleMemberCount", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "renounceRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "revokeRole", values: [BytesLike, AddressLike]): string;
     decodeFunctionResult(functionFragment: "getRoleAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getRoleMember", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getRoleMemberCount", data: BytesLike): Result;
@@ -27,136 +17,150 @@ export interface IAccessControlEnumerableUpgradeableInterface extends utils.Inte
     decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
-    events: {
-        "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
-        "RoleGranted(bytes32,address,address)": EventFragment;
-        "RoleRevoked(bytes32,address,address)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
 }
-export interface RoleAdminChangedEventObject {
-    role: string;
-    previousAdminRole: string;
-    newAdminRole: string;
+export declare namespace RoleAdminChangedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        previousAdminRole: BytesLike,
+        newAdminRole: BytesLike
+    ];
+    type OutputTuple = [
+        role: string,
+        previousAdminRole: string,
+        newAdminRole: string
+    ];
+    interface OutputObject {
+        role: string;
+        previousAdminRole: string;
+        newAdminRole: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RoleAdminChangedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], RoleAdminChangedEventObject>;
-export declare type RoleAdminChangedEventFilter = TypedEventFilter<RoleAdminChangedEvent>;
-export interface RoleGrantedEventObject {
-    role: string;
-    account: string;
-    sender: string;
+export declare namespace RoleGrantedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        account: AddressLike,
+        sender: AddressLike
+    ];
+    type OutputTuple = [role: string, account: string, sender: string];
+    interface OutputObject {
+        role: string;
+        account: string;
+        sender: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RoleGrantedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], RoleGrantedEventObject>;
-export declare type RoleGrantedEventFilter = TypedEventFilter<RoleGrantedEvent>;
-export interface RoleRevokedEventObject {
-    role: string;
-    account: string;
-    sender: string;
+export declare namespace RoleRevokedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        account: AddressLike,
+        sender: AddressLike
+    ];
+    type OutputTuple = [role: string, account: string, sender: string];
+    interface OutputObject {
+        role: string;
+        account: string;
+        sender: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RoleRevokedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], RoleRevokedEventObject>;
-export declare type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
 export interface IAccessControlEnumerableUpgradeable extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IAccessControlEnumerableUpgradeable;
+    waitForDeployment(): Promise<this>;
     interface: IAccessControlEnumerableUpgradeableInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        getRoleMember(role: PromiseOrValue<BytesLike>, index: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        getRoleMemberCount(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    getRoleMember(role: PromiseOrValue<BytesLike>, index: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    getRoleMemberCount(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        getRoleMember(role: PromiseOrValue<BytesLike>, index: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        getRoleMemberCount(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
+    getRoleMember: TypedContractMethod<[
+        role: BytesLike,
+        index: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getRoleMemberCount: TypedContractMethod<[role: BytesLike], [bigint], "view">;
+    grantRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    hasRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    renounceRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    revokeRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "getRoleAdmin"): TypedContractMethod<[role: BytesLike], [string], "view">;
+    getFunction(nameOrSignature: "getRoleMember"): TypedContractMethod<[
+        role: BytesLike,
+        index: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "getRoleMemberCount"): TypedContractMethod<[role: BytesLike], [bigint], "view">;
+    getFunction(nameOrSignature: "grantRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "hasRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "renounceRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "revokeRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getEvent(key: "RoleAdminChanged"): TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+    getEvent(key: "RoleGranted"): TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+    getEvent(key: "RoleRevoked"): TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
     filters: {
-        "RoleAdminChanged(bytes32,bytes32,bytes32)"(role?: PromiseOrValue<BytesLike> | null, previousAdminRole?: PromiseOrValue<BytesLike> | null, newAdminRole?: PromiseOrValue<BytesLike> | null): RoleAdminChangedEventFilter;
-        RoleAdminChanged(role?: PromiseOrValue<BytesLike> | null, previousAdminRole?: PromiseOrValue<BytesLike> | null, newAdminRole?: PromiseOrValue<BytesLike> | null): RoleAdminChangedEventFilter;
-        "RoleGranted(bytes32,address,address)"(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleGrantedEventFilter;
-        RoleGranted(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleGrantedEventFilter;
-        "RoleRevoked(bytes32,address,address)"(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleRevokedEventFilter;
-        RoleRevoked(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleRevokedEventFilter;
-    };
-    estimateGas: {
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        getRoleMember(role: PromiseOrValue<BytesLike>, index: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getRoleMemberCount(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getRoleMember(role: PromiseOrValue<BytesLike>, index: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getRoleMemberCount(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+        RoleAdminChanged: TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+        "RoleGranted(bytes32,address,address)": TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+        RoleGranted: TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+        "RoleRevoked(bytes32,address,address)": TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+        RoleRevoked: TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=IAccessControlEnumerableUpgradeable.d.ts.map

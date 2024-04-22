@@ -1,58 +1,43 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
-export interface IContentHashResolverInterface extends utils.Interface {
-    functions: {
-        "contenthash(bytes32)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "contenthash"): FunctionFragment;
-    encodeFunctionData(functionFragment: "contenthash", values: [PromiseOrValue<BytesLike>]): string;
-    decodeFunctionResult(functionFragment: "contenthash", data: BytesLike): Result;
-    events: {
-        "ContenthashChanged(bytes32,bytes)": EventFragment;
-    };
+import type { BaseContract, BytesLike, FunctionFragment, Result, Interface, EventFragment, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../../common";
+export interface IContentHashResolverInterface extends Interface {
+    getFunction(nameOrSignature: "contenthash"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "ContenthashChanged"): EventFragment;
+    encodeFunctionData(functionFragment: "contenthash", values: [BytesLike]): string;
+    decodeFunctionResult(functionFragment: "contenthash", data: BytesLike): Result;
 }
-export interface ContenthashChangedEventObject {
-    node: string;
-    hash: string;
+export declare namespace ContenthashChangedEvent {
+    type InputTuple = [node: BytesLike, hash: BytesLike];
+    type OutputTuple = [node: string, hash: string];
+    interface OutputObject {
+        node: string;
+        hash: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ContenthashChangedEvent = TypedEvent<[
-    string,
-    string
-], ContenthashChangedEventObject>;
-export declare type ContenthashChangedEventFilter = TypedEventFilter<ContenthashChangedEvent>;
 export interface IContentHashResolver extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IContentHashResolver;
+    waitForDeployment(): Promise<this>;
     interface: IContentHashResolverInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        contenthash(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-    };
-    contenthash(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    callStatic: {
-        contenthash(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    contenthash: TypedContractMethod<[node: BytesLike], [string], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "contenthash"): TypedContractMethod<[node: BytesLike], [string], "view">;
+    getEvent(key: "ContenthashChanged"): TypedContractEvent<ContenthashChangedEvent.InputTuple, ContenthashChangedEvent.OutputTuple, ContenthashChangedEvent.OutputObject>;
     filters: {
-        "ContenthashChanged(bytes32,bytes)"(node?: PromiseOrValue<BytesLike> | null, hash?: null): ContenthashChangedEventFilter;
-        ContenthashChanged(node?: PromiseOrValue<BytesLike> | null, hash?: null): ContenthashChangedEventFilter;
-    };
-    estimateGas: {
-        contenthash(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        contenthash(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "ContenthashChanged(bytes32,bytes)": TypedContractEvent<ContenthashChangedEvent.InputTuple, ContenthashChangedEvent.OutputTuple, ContenthashChangedEvent.OutputObject>;
+        ContenthashChanged: TypedContractEvent<ContenthashChangedEvent.InputTuple, ContenthashChangedEvent.OutputTuple, ContenthashChangedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=IContentHashResolver.d.ts.map

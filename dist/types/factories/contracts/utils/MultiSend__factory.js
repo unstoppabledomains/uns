@@ -31,23 +31,20 @@ class MultiSend__factory extends ethers_1.ContractFactory {
             super(_abi, _bytecode, args[0]);
         }
     }
-    deploy(accounts, values, overrides) {
-        return super.deploy(accounts, values, overrides || {});
-    }
     getDeployTransaction(accounts, values, overrides) {
         return super.getDeployTransaction(accounts, values, overrides || {});
     }
-    attach(address) {
-        return super.attach(address);
+    deploy(accounts, values, overrides) {
+        return super.deploy(accounts, values, overrides || {});
     }
-    connect(signer) {
-        return super.connect(signer);
+    connect(runner) {
+        return super.connect(runner);
     }
     static createInterface() {
-        return new ethers_1.utils.Interface(_abi);
+        return new ethers_1.Interface(_abi);
     }
-    static connect(address, signerOrProvider) {
-        return new ethers_1.Contract(address, _abi, signerOrProvider);
+    static connect(address, runner) {
+        return new ethers_1.Contract(address, _abi, runner);
     }
 }
 exports.MultiSend__factory = MultiSend__factory;

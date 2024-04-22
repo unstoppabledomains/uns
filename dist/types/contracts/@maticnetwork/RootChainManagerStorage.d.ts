@@ -1,51 +1,30 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
-export interface RootChainManagerStorageInterface extends utils.Interface {
-    functions: {
-        "tokenToType(address)": FunctionFragment;
-        "typeToPredicate(bytes32)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "tokenToType" | "typeToPredicate"): FunctionFragment;
-    encodeFunctionData(functionFragment: "tokenToType", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "typeToPredicate", values: [PromiseOrValue<BytesLike>]): string;
+import type { BaseContract, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../common";
+export interface RootChainManagerStorageInterface extends Interface {
+    getFunction(nameOrSignature: "tokenToType" | "typeToPredicate"): FunctionFragment;
+    encodeFunctionData(functionFragment: "tokenToType", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "typeToPredicate", values: [BytesLike]): string;
     decodeFunctionResult(functionFragment: "tokenToType", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "typeToPredicate", data: BytesLike): Result;
-    events: {};
 }
 export interface RootChainManagerStorage extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): RootChainManagerStorage;
+    waitForDeployment(): Promise<this>;
     interface: RootChainManagerStorageInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        tokenToType(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[string]>;
-        typeToPredicate(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-    };
-    tokenToType(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-    typeToPredicate(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    callStatic: {
-        tokenToType(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        typeToPredicate(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    tokenToType: TypedContractMethod<[arg0: AddressLike], [string], "view">;
+    typeToPredicate: TypedContractMethod<[arg0: BytesLike], [string], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "tokenToType"): TypedContractMethod<[arg0: AddressLike], [string], "view">;
+    getFunction(nameOrSignature: "typeToPredicate"): TypedContractMethod<[arg0: BytesLike], [string], "view">;
     filters: {};
-    estimateGas: {
-        tokenToType(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        typeToPredicate(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        tokenToType(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        typeToPredicate(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-    };
 }
 //# sourceMappingURL=RootChainManagerStorage.d.ts.map

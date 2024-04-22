@@ -132,23 +132,20 @@ class FreeMinter__factory extends ethers_1.ContractFactory {
             super(_abi, _bytecode, args[0]);
         }
     }
-    deploy(mintingController, resolver, registry, overrides) {
-        return super.deploy(mintingController, resolver, registry, overrides || {});
-    }
     getDeployTransaction(mintingController, resolver, registry, overrides) {
         return super.getDeployTransaction(mintingController, resolver, registry, overrides || {});
     }
-    attach(address) {
-        return super.attach(address);
+    deploy(mintingController, resolver, registry, overrides) {
+        return super.deploy(mintingController, resolver, registry, overrides || {});
     }
-    connect(signer) {
-        return super.connect(signer);
+    connect(runner) {
+        return super.connect(runner);
     }
     static createInterface() {
-        return new ethers_1.utils.Interface(_abi);
+        return new ethers_1.Interface(_abi);
     }
-    static connect(address, signerOrProvider) {
-        return new ethers_1.Contract(address, _abi, signerOrProvider);
+    static connect(address, runner) {
+        return new ethers_1.Contract(address, _abi, runner);
     }
 }
 exports.FreeMinter__factory = FreeMinter__factory;

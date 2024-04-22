@@ -1,50 +1,36 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../common";
 export declare namespace IForwarder {
     type ForwardRequestStruct = {
-        from: PromiseOrValue<string>;
-        nonce: PromiseOrValue<BigNumberish>;
-        tokenId: PromiseOrValue<BigNumberish>;
-        data: PromiseOrValue<BytesLike>;
+        from: AddressLike;
+        nonce: BigNumberish;
+        tokenId: BigNumberish;
+        data: BytesLike;
     };
     type ForwardRequestStructOutput = [
-        string,
-        BigNumber,
-        BigNumber,
-        string
+        from: string,
+        nonce: bigint,
+        tokenId: bigint,
+        data: string
     ] & {
         from: string;
-        nonce: BigNumber;
-        tokenId: BigNumber;
+        nonce: bigint;
+        tokenId: bigint;
         data: string;
     };
 }
-export interface BaseRoutingForwarderMockInterface extends utils.Interface {
-    functions: {
-        "buildRouteData((address,uint256,uint256,bytes),bytes)": FunctionFragment;
-        "execute((address,uint256,uint256,bytes),bytes)": FunctionFragment;
-        "nonceOf(uint256)": FunctionFragment;
-        "putString(string)": FunctionFragment;
-        "putStringFor(string,bytes)": FunctionFragment;
-        "putUint(uint256)": FunctionFragment;
-        "putUintArr(uint256[])": FunctionFragment;
-        "putUintArrFor(uint256[],bytes)": FunctionFragment;
-        "putUintFor(uint256,bytes)": FunctionFragment;
-        "verify((address,uint256,uint256,bytes),bytes)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "buildRouteData" | "execute" | "nonceOf" | "putString" | "putStringFor" | "putUint" | "putUintArr" | "putUintArrFor" | "putUintFor" | "verify"): FunctionFragment;
-    encodeFunctionData(functionFragment: "buildRouteData", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "execute", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "nonceOf", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "putString", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "putStringFor", values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "putUint", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "putUintArr", values: [PromiseOrValue<BigNumberish>[]]): string;
-    encodeFunctionData(functionFragment: "putUintArrFor", values: [PromiseOrValue<BigNumberish>[], PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "putUintFor", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "verify", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
+export interface BaseRoutingForwarderMockInterface extends Interface {
+    getFunction(nameOrSignature: "buildRouteData" | "execute" | "nonceOf" | "putString" | "putStringFor" | "putUint" | "putUintArr" | "putUintArrFor" | "putUintFor" | "verify"): FunctionFragment;
+    encodeFunctionData(functionFragment: "buildRouteData", values: [IForwarder.ForwardRequestStruct, BytesLike]): string;
+    encodeFunctionData(functionFragment: "execute", values: [IForwarder.ForwardRequestStruct, BytesLike]): string;
+    encodeFunctionData(functionFragment: "nonceOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "putString", values: [string]): string;
+    encodeFunctionData(functionFragment: "putStringFor", values: [string, BytesLike]): string;
+    encodeFunctionData(functionFragment: "putUint", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "putUintArr", values: [BigNumberish[]]): string;
+    encodeFunctionData(functionFragment: "putUintArrFor", values: [BigNumberish[], BytesLike]): string;
+    encodeFunctionData(functionFragment: "putUintFor", values: [BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "verify", values: [IForwarder.ForwardRequestStruct, BytesLike]): string;
     decodeFunctionResult(functionFragment: "buildRouteData", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "nonceOf", data: BytesLike): Result;
@@ -55,80 +41,91 @@ export interface BaseRoutingForwarderMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "putUintArrFor", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "putUintFor", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "verify", data: BytesLike): Result;
-    events: {};
 }
 export interface BaseRoutingForwarderMock extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): BaseRoutingForwarderMock;
+    waitForDeployment(): Promise<this>;
     interface: BaseRoutingForwarderMockInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        buildRouteData(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        execute(arg0: IForwarder.ForwardRequestStruct, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        nonceOf(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        putString(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[void]>;
-        putStringFor(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[void]>;
-        putUint(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[void]>;
-        putUintArr(arg0: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[void]>;
-        putUintArrFor(arg0: PromiseOrValue<BigNumberish>[], arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[void]>;
-        putUintFor(arg0: PromiseOrValue<BigNumberish>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[void]>;
-        verify(arg0: IForwarder.ForwardRequestStruct, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-    };
-    buildRouteData(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    execute(arg0: IForwarder.ForwardRequestStruct, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    nonceOf(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    putString(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-    putStringFor(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-    putUint(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-    putUintArr(arg0: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<void>;
-    putUintArrFor(arg0: PromiseOrValue<BigNumberish>[], arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-    putUintFor(arg0: PromiseOrValue<BigNumberish>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-    verify(arg0: IForwarder.ForwardRequestStruct, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    callStatic: {
-        buildRouteData(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        execute(arg0: IForwarder.ForwardRequestStruct, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        nonceOf(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        putString(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        putStringFor(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        putUint(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        putUintArr(arg0: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<void>;
-        putUintArrFor(arg0: PromiseOrValue<BigNumberish>[], arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        putUintFor(arg0: PromiseOrValue<BigNumberish>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        verify(arg0: IForwarder.ForwardRequestStruct, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    buildRouteData: TypedContractMethod<[
+        req: IForwarder.ForwardRequestStruct,
+        signature: BytesLike
+    ], [
+        string
+    ], "view">;
+    execute: TypedContractMethod<[
+        arg0: IForwarder.ForwardRequestStruct,
+        arg1: BytesLike
+    ], [
+        string
+    ], "view">;
+    nonceOf: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+    putString: TypedContractMethod<[arg0: string], [void], "view">;
+    putStringFor: TypedContractMethod<[
+        arg0: string,
+        arg1: BytesLike
+    ], [
+        void
+    ], "view">;
+    putUint: TypedContractMethod<[arg0: BigNumberish], [void], "view">;
+    putUintArr: TypedContractMethod<[arg0: BigNumberish[]], [void], "view">;
+    putUintArrFor: TypedContractMethod<[
+        arg0: BigNumberish[],
+        arg1: BytesLike
+    ], [
+        void
+    ], "view">;
+    putUintFor: TypedContractMethod<[
+        arg0: BigNumberish,
+        arg1: BytesLike
+    ], [
+        void
+    ], "view">;
+    verify: TypedContractMethod<[
+        arg0: IForwarder.ForwardRequestStruct,
+        arg1: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "buildRouteData"): TypedContractMethod<[
+        req: IForwarder.ForwardRequestStruct,
+        signature: BytesLike
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "execute"): TypedContractMethod<[
+        arg0: IForwarder.ForwardRequestStruct,
+        arg1: BytesLike
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "nonceOf"): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+    getFunction(nameOrSignature: "putString"): TypedContractMethod<[arg0: string], [void], "view">;
+    getFunction(nameOrSignature: "putStringFor"): TypedContractMethod<[arg0: string, arg1: BytesLike], [void], "view">;
+    getFunction(nameOrSignature: "putUint"): TypedContractMethod<[arg0: BigNumberish], [void], "view">;
+    getFunction(nameOrSignature: "putUintArr"): TypedContractMethod<[arg0: BigNumberish[]], [void], "view">;
+    getFunction(nameOrSignature: "putUintArrFor"): TypedContractMethod<[
+        arg0: BigNumberish[],
+        arg1: BytesLike
+    ], [
+        void
+    ], "view">;
+    getFunction(nameOrSignature: "putUintFor"): TypedContractMethod<[arg0: BigNumberish, arg1: BytesLike], [void], "view">;
+    getFunction(nameOrSignature: "verify"): TypedContractMethod<[
+        arg0: IForwarder.ForwardRequestStruct,
+        arg1: BytesLike
+    ], [
+        boolean
+    ], "view">;
     filters: {};
-    estimateGas: {
-        buildRouteData(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        execute(arg0: IForwarder.ForwardRequestStruct, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        nonceOf(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        putString(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        putStringFor(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        putUint(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        putUintArr(arg0: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
-        putUintArrFor(arg0: PromiseOrValue<BigNumberish>[], arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        putUintFor(arg0: PromiseOrValue<BigNumberish>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        verify(arg0: IForwarder.ForwardRequestStruct, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        buildRouteData(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        execute(arg0: IForwarder.ForwardRequestStruct, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        nonceOf(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        putString(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        putStringFor(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        putUint(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        putUintArr(arg0: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        putUintArrFor(arg0: PromiseOrValue<BigNumberish>[], arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        putUintFor(arg0: PromiseOrValue<BigNumberish>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        verify(arg0: IForwarder.ForwardRequestStruct, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-    };
 }
 //# sourceMappingURL=BaseRoutingForwarderMock.d.ts.map

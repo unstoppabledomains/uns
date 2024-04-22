@@ -1,89 +1,54 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
 export declare namespace IForwarder {
     type ForwardRequestStruct = {
-        from: PromiseOrValue<string>;
-        nonce: PromiseOrValue<BigNumberish>;
-        tokenId: PromiseOrValue<BigNumberish>;
-        data: PromiseOrValue<BytesLike>;
+        from: AddressLike;
+        nonce: BigNumberish;
+        tokenId: BigNumberish;
+        data: BytesLike;
     };
     type ForwardRequestStructOutput = [
-        string,
-        BigNumber,
-        BigNumber,
-        string
+        from: string,
+        nonce: bigint,
+        tokenId: bigint,
+        data: string
     ] & {
         from: string;
-        nonce: BigNumber;
-        tokenId: BigNumber;
+        nonce: bigint;
+        tokenId: bigint;
         data: string;
     };
 }
 export declare namespace ZilliqaRecover {
     type MintingTokenStruct = {
-        zilOwner: PromiseOrValue<string>;
-        label: PromiseOrValue<string>;
+        zilOwner: AddressLike;
+        label: string;
     };
-    type MintingTokenStructOutput = [string, string] & {
+    type MintingTokenStructOutput = [zilOwner: string, label: string] & {
         zilOwner: string;
         label: string;
     };
 }
-export interface ZilliqaRecoverInterface extends utils.Interface {
-    functions: {
-        "ZIL_NODE()": FunctionFragment;
-        "claim(uint256,bytes32,bytes32,address)": FunctionFragment;
-        "claimAll(uint256[],bytes32,bytes32,address)": FunctionFragment;
-        "ethAddress(bytes32,bytes32)": FunctionFragment;
-        "execute((address,uint256,uint256,bytes),bytes)": FunctionFragment;
-        "initialize(address,address)": FunctionFragment;
-        "isOwnedBy(address,uint256[])": FunctionFragment;
-        "isTrustedForwarder(address)": FunctionFragment;
-        "mint(string,address)": FunctionFragment;
-        "mintAll((address,string)[])": FunctionFragment;
-        "mintingManager()": FunctionFragment;
-        "nonceOf(uint256)": FunctionFragment;
-        "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
-        "registry()": FunctionFragment;
-        "verify((address,uint256,uint256,bytes),bytes)": FunctionFragment;
-        "zilAddress(bytes32,bytes32)": FunctionFragment;
-        "znsOwnerOf(uint256)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "ZIL_NODE" | "claim" | "claimAll" | "ethAddress" | "execute" | "initialize" | "isOwnedBy" | "isTrustedForwarder" | "mint" | "mintAll" | "mintingManager" | "nonceOf" | "onERC721Received" | "registry" | "verify" | "zilAddress" | "znsOwnerOf"): FunctionFragment;
+export interface ZilliqaRecoverInterface extends Interface {
+    getFunction(nameOrSignature: "ZIL_NODE" | "claim" | "claimAll" | "ethAddress" | "execute" | "initialize" | "isOwnedBy" | "isTrustedForwarder" | "mint" | "mintAll" | "mintingManager" | "nonceOf" | "onERC721Received" | "registry" | "verify" | "zilAddress" | "znsOwnerOf"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "Initialized" | "ZnsTokenClaimed" | "ZnsTokenMinted"): EventFragment;
     encodeFunctionData(functionFragment: "ZIL_NODE", values?: undefined): string;
-    encodeFunctionData(functionFragment: "claim", values: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "claimAll", values: [
-        PromiseOrValue<BigNumberish>[],
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "ethAddress", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "execute", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "initialize", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "isOwnedBy", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>[]]): string;
-    encodeFunctionData(functionFragment: "isTrustedForwarder", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "mint", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "claim", values: [BigNumberish, BytesLike, BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "claimAll", values: [BigNumberish[], BytesLike, BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "ethAddress", values: [BytesLike, BytesLike]): string;
+    encodeFunctionData(functionFragment: "execute", values: [IForwarder.ForwardRequestStruct, BytesLike]): string;
+    encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "isOwnedBy", values: [AddressLike, BigNumberish[]]): string;
+    encodeFunctionData(functionFragment: "isTrustedForwarder", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "mint", values: [string, AddressLike]): string;
     encodeFunctionData(functionFragment: "mintAll", values: [ZilliqaRecover.MintingTokenStruct[]]): string;
     encodeFunctionData(functionFragment: "mintingManager", values?: undefined): string;
-    encodeFunctionData(functionFragment: "nonceOf", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "onERC721Received", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
+    encodeFunctionData(functionFragment: "nonceOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "onERC721Received", values: [AddressLike, AddressLike, BigNumberish, BytesLike]): string;
     encodeFunctionData(functionFragment: "registry", values?: undefined): string;
-    encodeFunctionData(functionFragment: "verify", values: [IForwarder.ForwardRequestStruct, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "zilAddress", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "znsOwnerOf", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "verify", values: [IForwarder.ForwardRequestStruct, BytesLike]): string;
+    encodeFunctionData(functionFragment: "zilAddress", values: [BytesLike, BytesLike]): string;
+    encodeFunctionData(functionFragment: "znsOwnerOf", values: [BigNumberish]): string;
     decodeFunctionResult(functionFragment: "ZIL_NODE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimAll", data: BytesLike): Result;
@@ -101,204 +66,242 @@ export interface ZilliqaRecoverInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "verify", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "zilAddress", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "znsOwnerOf", data: BytesLike): Result;
-    events: {
-        "Initialized(uint8)": EventFragment;
-        "ZnsTokenClaimed(uint256,address,address)": EventFragment;
-        "ZnsTokenMinted(uint256,address,string)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "ZnsTokenClaimed"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "ZnsTokenMinted"): EventFragment;
 }
-export interface InitializedEventObject {
-    version: number;
+export declare namespace InitializedEvent {
+    type InputTuple = [version: BigNumberish];
+    type OutputTuple = [version: bigint];
+    interface OutputObject {
+        version: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
-export declare type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
-export interface ZnsTokenClaimedEventObject {
-    tokenId: BigNumber;
-    oldAddress: string;
-    newAddress: string;
+export declare namespace ZnsTokenClaimedEvent {
+    type InputTuple = [
+        tokenId: BigNumberish,
+        oldAddress: AddressLike,
+        newAddress: AddressLike
+    ];
+    type OutputTuple = [
+        tokenId: bigint,
+        oldAddress: string,
+        newAddress: string
+    ];
+    interface OutputObject {
+        tokenId: bigint;
+        oldAddress: string;
+        newAddress: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ZnsTokenClaimedEvent = TypedEvent<[
-    BigNumber,
-    string,
-    string
-], ZnsTokenClaimedEventObject>;
-export declare type ZnsTokenClaimedEventFilter = TypedEventFilter<ZnsTokenClaimedEvent>;
-export interface ZnsTokenMintedEventObject {
-    tokenId: BigNumber;
-    zilAddress: string;
-    label: string;
+export declare namespace ZnsTokenMintedEvent {
+    type InputTuple = [
+        tokenId: BigNumberish,
+        zilAddress: AddressLike,
+        label: string
+    ];
+    type OutputTuple = [
+        tokenId: bigint,
+        zilAddress: string,
+        label: string
+    ];
+    interface OutputObject {
+        tokenId: bigint;
+        zilAddress: string;
+        label: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ZnsTokenMintedEvent = TypedEvent<[
-    BigNumber,
-    string,
-    string
-], ZnsTokenMintedEventObject>;
-export declare type ZnsTokenMintedEventFilter = TypedEventFilter<ZnsTokenMintedEvent>;
 export interface ZilliqaRecover extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): ZilliqaRecover;
+    waitForDeployment(): Promise<this>;
     interface: ZilliqaRecoverInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        ZIL_NODE(overrides?: CallOverrides): Promise<[BigNumber]>;
-        claim(tokenId: PromiseOrValue<BigNumberish>, publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, newOwnerAddress: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        claimAll(tokenIds: PromiseOrValue<BigNumberish>[], publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, newOwnerAddress: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        ethAddress(publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        initialize(registry_: PromiseOrValue<string>, mintingManager_: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        isOwnedBy(_zilAddress: PromiseOrValue<string>, tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[boolean]>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        mint(label: PromiseOrValue<string>, zilOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        mintAll(tokens: ZilliqaRecover.MintingTokenStruct[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        mintingManager(overrides?: CallOverrides): Promise<[string]>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        onERC721Received(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        registry(overrides?: CallOverrides): Promise<[string]>;
-        verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-        zilAddress(publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        znsOwnerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-    };
-    ZIL_NODE(overrides?: CallOverrides): Promise<BigNumber>;
-    claim(tokenId: PromiseOrValue<BigNumberish>, publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, newOwnerAddress: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    claimAll(tokenIds: PromiseOrValue<BigNumberish>[], publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, newOwnerAddress: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    ethAddress(publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    initialize(registry_: PromiseOrValue<string>, mintingManager_: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    isOwnedBy(_zilAddress: PromiseOrValue<string>, tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<boolean>;
-    isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    mint(label: PromiseOrValue<string>, zilOwner: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    mintAll(tokens: ZilliqaRecover.MintingTokenStruct[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    mintingManager(overrides?: CallOverrides): Promise<string>;
-    nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    onERC721Received(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    registry(overrides?: CallOverrides): Promise<string>;
-    verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    zilAddress(publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    znsOwnerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    callStatic: {
-        ZIL_NODE(overrides?: CallOverrides): Promise<BigNumber>;
-        claim(tokenId: PromiseOrValue<BigNumberish>, publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, newOwnerAddress: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        claimAll(tokenIds: PromiseOrValue<BigNumberish>[], publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, newOwnerAddress: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        ethAddress(publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        initialize(registry_: PromiseOrValue<string>, mintingManager_: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        isOwnedBy(_zilAddress: PromiseOrValue<string>, tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<boolean>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        mint(label: PromiseOrValue<string>, zilOwner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        mintAll(tokens: ZilliqaRecover.MintingTokenStruct[], overrides?: CallOverrides): Promise<void>;
-        mintingManager(overrides?: CallOverrides): Promise<string>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        onERC721Received(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        registry(overrides?: CallOverrides): Promise<string>;
-        verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-        zilAddress(publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        znsOwnerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    ZIL_NODE: TypedContractMethod<[], [bigint], "view">;
+    claim: TypedContractMethod<[
+        tokenId: BigNumberish,
+        publicKeyX: BytesLike,
+        publicKeyY: BytesLike,
+        newOwnerAddress: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    claimAll: TypedContractMethod<[
+        tokenIds: BigNumberish[],
+        publicKeyX: BytesLike,
+        publicKeyY: BytesLike,
+        newOwnerAddress: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    ethAddress: TypedContractMethod<[
+        publicKeyX: BytesLike,
+        publicKeyY: BytesLike
+    ], [
+        string
+    ], "view">;
+    execute: TypedContractMethod<[
+        req: IForwarder.ForwardRequestStruct,
+        signature: BytesLike
+    ], [
+        string
+    ], "nonpayable">;
+    initialize: TypedContractMethod<[
+        registry_: AddressLike,
+        mintingManager_: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    isOwnedBy: TypedContractMethod<[
+        _zilAddress: AddressLike,
+        tokenIds: BigNumberish[]
+    ], [
+        boolean
+    ], "view">;
+    isTrustedForwarder: TypedContractMethod<[
+        forwarder: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    mint: TypedContractMethod<[
+        label: string,
+        zilOwner: AddressLike
+    ], [
+        bigint
+    ], "nonpayable">;
+    mintAll: TypedContractMethod<[
+        tokens: ZilliqaRecover.MintingTokenStruct[]
+    ], [
+        void
+    ], "nonpayable">;
+    mintingManager: TypedContractMethod<[], [string], "view">;
+    nonceOf: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+    onERC721Received: TypedContractMethod<[
+        arg0: AddressLike,
+        arg1: AddressLike,
+        tokenId: BigNumberish,
+        arg3: BytesLike
+    ], [
+        string
+    ], "view">;
+    registry: TypedContractMethod<[], [string], "view">;
+    verify: TypedContractMethod<[
+        req: IForwarder.ForwardRequestStruct,
+        signature: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    zilAddress: TypedContractMethod<[
+        publicKeyX: BytesLike,
+        publicKeyY: BytesLike
+    ], [
+        string
+    ], "view">;
+    znsOwnerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "ZIL_NODE"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "claim"): TypedContractMethod<[
+        tokenId: BigNumberish,
+        publicKeyX: BytesLike,
+        publicKeyY: BytesLike,
+        newOwnerAddress: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "claimAll"): TypedContractMethod<[
+        tokenIds: BigNumberish[],
+        publicKeyX: BytesLike,
+        publicKeyY: BytesLike,
+        newOwnerAddress: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "ethAddress"): TypedContractMethod<[
+        publicKeyX: BytesLike,
+        publicKeyY: BytesLike
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "execute"): TypedContractMethod<[
+        req: IForwarder.ForwardRequestStruct,
+        signature: BytesLike
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "initialize"): TypedContractMethod<[
+        registry_: AddressLike,
+        mintingManager_: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "isOwnedBy"): TypedContractMethod<[
+        _zilAddress: AddressLike,
+        tokenIds: BigNumberish[]
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "isTrustedForwarder"): TypedContractMethod<[forwarder: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "mint"): TypedContractMethod<[
+        label: string,
+        zilOwner: AddressLike
+    ], [
+        bigint
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "mintAll"): TypedContractMethod<[
+        tokens: ZilliqaRecover.MintingTokenStruct[]
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "mintingManager"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "nonceOf"): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+    getFunction(nameOrSignature: "onERC721Received"): TypedContractMethod<[
+        arg0: AddressLike,
+        arg1: AddressLike,
+        tokenId: BigNumberish,
+        arg3: BytesLike
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "registry"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "verify"): TypedContractMethod<[
+        req: IForwarder.ForwardRequestStruct,
+        signature: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "zilAddress"): TypedContractMethod<[
+        publicKeyX: BytesLike,
+        publicKeyY: BytesLike
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "znsOwnerOf"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+    getEvent(key: "ZnsTokenClaimed"): TypedContractEvent<ZnsTokenClaimedEvent.InputTuple, ZnsTokenClaimedEvent.OutputTuple, ZnsTokenClaimedEvent.OutputObject>;
+    getEvent(key: "ZnsTokenMinted"): TypedContractEvent<ZnsTokenMintedEvent.InputTuple, ZnsTokenMintedEvent.OutputTuple, ZnsTokenMintedEvent.OutputObject>;
     filters: {
-        "Initialized(uint8)"(version?: null): InitializedEventFilter;
-        Initialized(version?: null): InitializedEventFilter;
-        "ZnsTokenClaimed(uint256,address,address)"(tokenId?: PromiseOrValue<BigNumberish> | null, oldAddress?: PromiseOrValue<string> | null, newAddress?: PromiseOrValue<string> | null): ZnsTokenClaimedEventFilter;
-        ZnsTokenClaimed(tokenId?: PromiseOrValue<BigNumberish> | null, oldAddress?: PromiseOrValue<string> | null, newAddress?: PromiseOrValue<string> | null): ZnsTokenClaimedEventFilter;
-        "ZnsTokenMinted(uint256,address,string)"(tokenId?: PromiseOrValue<BigNumberish> | null, zilAddress?: PromiseOrValue<string> | null, label?: null): ZnsTokenMintedEventFilter;
-        ZnsTokenMinted(tokenId?: PromiseOrValue<BigNumberish> | null, zilAddress?: PromiseOrValue<string> | null, label?: null): ZnsTokenMintedEventFilter;
-    };
-    estimateGas: {
-        ZIL_NODE(overrides?: CallOverrides): Promise<BigNumber>;
-        claim(tokenId: PromiseOrValue<BigNumberish>, publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, newOwnerAddress: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        claimAll(tokenIds: PromiseOrValue<BigNumberish>[], publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, newOwnerAddress: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        ethAddress(publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        initialize(registry_: PromiseOrValue<string>, mintingManager_: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        isOwnedBy(_zilAddress: PromiseOrValue<string>, tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        mint(label: PromiseOrValue<string>, zilOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        mintAll(tokens: ZilliqaRecover.MintingTokenStruct[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        mintingManager(overrides?: CallOverrides): Promise<BigNumber>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        onERC721Received(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        registry(overrides?: CallOverrides): Promise<BigNumber>;
-        verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        zilAddress(publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        znsOwnerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        ZIL_NODE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        claim(tokenId: PromiseOrValue<BigNumberish>, publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, newOwnerAddress: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        claimAll(tokenIds: PromiseOrValue<BigNumberish>[], publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, newOwnerAddress: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        ethAddress(publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        execute(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        initialize(registry_: PromiseOrValue<string>, mintingManager_: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        isOwnedBy(_zilAddress: PromiseOrValue<string>, tokenIds: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        mint(label: PromiseOrValue<string>, zilOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        mintAll(tokens: ZilliqaRecover.MintingTokenStruct[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        mintingManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        nonceOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        onERC721Received(arg0: PromiseOrValue<string>, arg1: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, arg3: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        registry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        verify(req: IForwarder.ForwardRequestStruct, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        zilAddress(publicKeyX: PromiseOrValue<BytesLike>, publicKeyY: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        znsOwnerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "Initialized(uint8)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        "ZnsTokenClaimed(uint256,address,address)": TypedContractEvent<ZnsTokenClaimedEvent.InputTuple, ZnsTokenClaimedEvent.OutputTuple, ZnsTokenClaimedEvent.OutputObject>;
+        ZnsTokenClaimed: TypedContractEvent<ZnsTokenClaimedEvent.InputTuple, ZnsTokenClaimedEvent.OutputTuple, ZnsTokenClaimedEvent.OutputObject>;
+        "ZnsTokenMinted(uint256,address,string)": TypedContractEvent<ZnsTokenMintedEvent.InputTuple, ZnsTokenMintedEvent.OutputTuple, ZnsTokenMintedEvent.OutputObject>;
+        ZnsTokenMinted: TypedContractEvent<ZnsTokenMintedEvent.InputTuple, ZnsTokenMintedEvent.OutputTuple, ZnsTokenMintedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=ZilliqaRecover.d.ts.map

@@ -1,23 +1,22 @@
-import { Signer } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { type ContractRunner } from "ethers";
 import type { PublicSuffixList, PublicSuffixListInterface } from "../../../../../contracts/@ens/dnssec/interfaces/PublicSuffixList";
 export declare class PublicSuffixList__factory {
-    static readonly abi: {
-        inputs: {
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        name: string;
-        outputs: {
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        stateMutability: string;
-        type: string;
-    }[];
+    static readonly abi: readonly [{
+        readonly inputs: readonly [{
+            readonly internalType: "bytes";
+            readonly name: "name";
+            readonly type: "bytes";
+        }];
+        readonly name: "isPublicSuffix";
+        readonly outputs: readonly [{
+            readonly internalType: "bool";
+            readonly name: "";
+            readonly type: "bool";
+        }];
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }];
     static createInterface(): PublicSuffixListInterface;
-    static connect(address: string, signerOrProvider: Signer | Provider): PublicSuffixList;
+    static connect(address: string, runner?: ContractRunner | null): PublicSuffixList;
 }
 //# sourceMappingURL=PublicSuffixList__factory.d.ts.map

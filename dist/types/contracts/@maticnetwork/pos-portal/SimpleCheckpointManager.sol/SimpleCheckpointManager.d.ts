@@ -1,130 +1,113 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../common";
-export interface SimpleCheckpointManagerInterface extends utils.Interface {
-    functions: {
-        "currentCheckpointNumber()": FunctionFragment;
-        "headerBlocks(uint256)": FunctionFragment;
-        "setCheckpoint(bytes32,uint256,uint256)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "currentCheckpointNumber" | "headerBlocks" | "setCheckpoint"): FunctionFragment;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../common";
+export interface SimpleCheckpointManagerInterface extends Interface {
+    getFunction(nameOrSignature: "currentCheckpointNumber" | "headerBlocks" | "setCheckpoint"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "NewHeaderBlock"): EventFragment;
     encodeFunctionData(functionFragment: "currentCheckpointNumber", values?: undefined): string;
-    encodeFunctionData(functionFragment: "headerBlocks", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "setCheckpoint", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
+    encodeFunctionData(functionFragment: "headerBlocks", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setCheckpoint", values: [BytesLike, BigNumberish, BigNumberish]): string;
     decodeFunctionResult(functionFragment: "currentCheckpointNumber", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "headerBlocks", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setCheckpoint", data: BytesLike): Result;
-    events: {
-        "NewHeaderBlock(address,uint256,uint256,uint256,uint256,bytes32)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "NewHeaderBlock"): EventFragment;
 }
-export interface NewHeaderBlockEventObject {
-    proposer: string;
-    headerBlockId: BigNumber;
-    reward: BigNumber;
-    start: BigNumber;
-    end: BigNumber;
-    root: string;
-}
-export declare type NewHeaderBlockEvent = TypedEvent<[
-    string,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    string
-], NewHeaderBlockEventObject>;
-export declare type NewHeaderBlockEventFilter = TypedEventFilter<NewHeaderBlockEvent>;
-export interface SimpleCheckpointManager extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
-    interface: SimpleCheckpointManagerInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        currentCheckpointNumber(overrides?: CallOverrides): Promise<[BigNumber]>;
-        headerBlocks(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[
-            string,
-            BigNumber,
-            BigNumber,
-            BigNumber,
-            string
-        ] & {
-            root: string;
-            start: BigNumber;
-            end: BigNumber;
-            createdAt: BigNumber;
-            proposer: string;
-        }>;
-        setCheckpoint(rootHash: PromiseOrValue<BytesLike>, start: PromiseOrValue<BigNumberish>, end: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    currentCheckpointNumber(overrides?: CallOverrides): Promise<BigNumber>;
-    headerBlocks(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[
-        string,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        string
-    ] & {
-        root: string;
-        start: BigNumber;
-        end: BigNumber;
-        createdAt: BigNumber;
+export declare namespace NewHeaderBlockEvent {
+    type InputTuple = [
+        proposer: AddressLike,
+        headerBlockId: BigNumberish,
+        reward: BigNumberish,
+        start: BigNumberish,
+        end: BigNumberish,
+        root: BytesLike
+    ];
+    type OutputTuple = [
+        proposer: string,
+        headerBlockId: bigint,
+        reward: bigint,
+        start: bigint,
+        end: bigint,
+        root: string
+    ];
+    interface OutputObject {
         proposer: string;
-    }>;
-    setCheckpoint(rootHash: PromiseOrValue<BytesLike>, start: PromiseOrValue<BigNumberish>, end: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        currentCheckpointNumber(overrides?: CallOverrides): Promise<BigNumber>;
-        headerBlocks(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[
+        headerBlockId: bigint;
+        reward: bigint;
+        start: bigint;
+        end: bigint;
+        root: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
+}
+export interface SimpleCheckpointManager extends BaseContract {
+    connect(runner?: ContractRunner | null): SimpleCheckpointManager;
+    waitForDeployment(): Promise<this>;
+    interface: SimpleCheckpointManagerInterface;
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    currentCheckpointNumber: TypedContractMethod<[], [bigint], "view">;
+    headerBlocks: TypedContractMethod<[
+        arg0: BigNumberish
+    ], [
+        [
             string,
-            BigNumber,
-            BigNumber,
-            BigNumber,
+            bigint,
+            bigint,
+            bigint,
             string
         ] & {
             root: string;
-            start: BigNumber;
-            end: BigNumber;
-            createdAt: BigNumber;
+            start: bigint;
+            end: bigint;
+            createdAt: bigint;
             proposer: string;
-        }>;
-        setCheckpoint(rootHash: PromiseOrValue<BytesLike>, start: PromiseOrValue<BigNumberish>, end: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-    };
+        }
+    ], "view">;
+    setCheckpoint: TypedContractMethod<[
+        rootHash: BytesLike,
+        start: BigNumberish,
+        end: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "currentCheckpointNumber"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "headerBlocks"): TypedContractMethod<[
+        arg0: BigNumberish
+    ], [
+        [
+            string,
+            bigint,
+            bigint,
+            bigint,
+            string
+        ] & {
+            root: string;
+            start: bigint;
+            end: bigint;
+            createdAt: bigint;
+            proposer: string;
+        }
+    ], "view">;
+    getFunction(nameOrSignature: "setCheckpoint"): TypedContractMethod<[
+        rootHash: BytesLike,
+        start: BigNumberish,
+        end: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getEvent(key: "NewHeaderBlock"): TypedContractEvent<NewHeaderBlockEvent.InputTuple, NewHeaderBlockEvent.OutputTuple, NewHeaderBlockEvent.OutputObject>;
     filters: {
-        "NewHeaderBlock(address,uint256,uint256,uint256,uint256,bytes32)"(proposer?: PromiseOrValue<string> | null, headerBlockId?: PromiseOrValue<BigNumberish> | null, reward?: PromiseOrValue<BigNumberish> | null, start?: null, end?: null, root?: null): NewHeaderBlockEventFilter;
-        NewHeaderBlock(proposer?: PromiseOrValue<string> | null, headerBlockId?: PromiseOrValue<BigNumberish> | null, reward?: PromiseOrValue<BigNumberish> | null, start?: null, end?: null, root?: null): NewHeaderBlockEventFilter;
-    };
-    estimateGas: {
-        currentCheckpointNumber(overrides?: CallOverrides): Promise<BigNumber>;
-        headerBlocks(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        setCheckpoint(rootHash: PromiseOrValue<BytesLike>, start: PromiseOrValue<BigNumberish>, end: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        currentCheckpointNumber(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        headerBlocks(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        setCheckpoint(rootHash: PromiseOrValue<BytesLike>, start: PromiseOrValue<BigNumberish>, end: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "NewHeaderBlock(address,uint256,uint256,uint256,uint256,bytes32)": TypedContractEvent<NewHeaderBlockEvent.InputTuple, NewHeaderBlockEvent.OutputTuple, NewHeaderBlockEvent.OutputObject>;
+        NewHeaderBlock: TypedContractEvent<NewHeaderBlockEvent.InputTuple, NewHeaderBlockEvent.OutputTuple, NewHeaderBlockEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=SimpleCheckpointManager.d.ts.map

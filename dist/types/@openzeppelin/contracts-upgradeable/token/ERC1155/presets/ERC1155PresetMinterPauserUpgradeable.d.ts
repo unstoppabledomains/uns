@@ -1,93 +1,40 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
-export interface ERC1155PresetMinterPauserUpgradeableInterface extends utils.Interface {
-    functions: {
-        "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-        "MINTER_ROLE()": FunctionFragment;
-        "PAUSER_ROLE()": FunctionFragment;
-        "balanceOf(address,uint256)": FunctionFragment;
-        "balanceOfBatch(address[],uint256[])": FunctionFragment;
-        "burn(address,uint256,uint256)": FunctionFragment;
-        "burnBatch(address,uint256[],uint256[])": FunctionFragment;
-        "getRoleAdmin(bytes32)": FunctionFragment;
-        "getRoleMember(bytes32,uint256)": FunctionFragment;
-        "getRoleMemberCount(bytes32)": FunctionFragment;
-        "grantRole(bytes32,address)": FunctionFragment;
-        "hasRole(bytes32,address)": FunctionFragment;
-        "initialize(string)": FunctionFragment;
-        "isApprovedForAll(address,address)": FunctionFragment;
-        "mint(address,uint256,uint256,bytes)": FunctionFragment;
-        "mintBatch(address,uint256[],uint256[],bytes)": FunctionFragment;
-        "pause()": FunctionFragment;
-        "paused()": FunctionFragment;
-        "renounceRole(bytes32,address)": FunctionFragment;
-        "revokeRole(bytes32,address)": FunctionFragment;
-        "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
-        "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
-        "setApprovalForAll(address,bool)": FunctionFragment;
-        "supportsInterface(bytes4)": FunctionFragment;
-        "unpause()": FunctionFragment;
-        "uri(uint256)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "PAUSER_ROLE" | "balanceOf" | "balanceOfBatch" | "burn" | "burnBatch" | "getRoleAdmin" | "getRoleMember" | "getRoleMemberCount" | "grantRole" | "hasRole" | "initialize" | "isApprovedForAll" | "mint" | "mintBatch" | "pause" | "paused" | "renounceRole" | "revokeRole" | "safeBatchTransferFrom" | "safeTransferFrom" | "setApprovalForAll" | "supportsInterface" | "unpause" | "uri"): FunctionFragment;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../../common";
+export interface ERC1155PresetMinterPauserUpgradeableInterface extends Interface {
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "PAUSER_ROLE" | "balanceOf" | "balanceOfBatch" | "burn" | "burnBatch" | "getRoleAdmin" | "getRoleMember" | "getRoleMemberCount" | "grantRole" | "hasRole" | "initialize" | "isApprovedForAll" | "mint" | "mintBatch" | "pause" | "paused" | "renounceRole" | "revokeRole" | "safeBatchTransferFrom" | "safeTransferFrom" | "setApprovalForAll" | "supportsInterface" | "unpause" | "uri"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "ApprovalForAll" | "Initialized" | "Paused" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "TransferBatch" | "TransferSingle" | "URI" | "Unpaused"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "PAUSER_ROLE", values?: undefined): string;
-    encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "balanceOfBatch", values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]): string;
-    encodeFunctionData(functionFragment: "burn", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "burnBatch", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>[],
-        PromiseOrValue<BigNumberish>[]
-    ]): string;
-    encodeFunctionData(functionFragment: "getRoleAdmin", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "getRoleMember", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getRoleMemberCount", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "grantRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "hasRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "initialize", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "isApprovedForAll", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "mint", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
-    encodeFunctionData(functionFragment: "mintBatch", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>[],
-        PromiseOrValue<BigNumberish>[],
-        PromiseOrValue<BytesLike>
-    ]): string;
+    encodeFunctionData(functionFragment: "balanceOf", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "balanceOfBatch", values: [AddressLike[], BigNumberish[]]): string;
+    encodeFunctionData(functionFragment: "burn", values: [AddressLike, BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "burnBatch", values: [AddressLike, BigNumberish[], BigNumberish[]]): string;
+    encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "getRoleMember", values: [BytesLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getRoleMemberCount", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "initialize", values: [string]): string;
+    encodeFunctionData(functionFragment: "isApprovedForAll", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "mint", values: [AddressLike, BigNumberish, BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "mintBatch", values: [AddressLike, BigNumberish[], BigNumberish[], BytesLike]): string;
     encodeFunctionData(functionFragment: "pause", values?: undefined): string;
     encodeFunctionData(functionFragment: "paused", values?: undefined): string;
-    encodeFunctionData(functionFragment: "renounceRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "revokeRole", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "renounceRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "revokeRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "safeBatchTransferFrom", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>[],
-        PromiseOrValue<BigNumberish>[],
-        PromiseOrValue<BytesLike>
+        AddressLike,
+        AddressLike,
+        BigNumberish[],
+        BigNumberish[],
+        BytesLike
     ]): string;
-    encodeFunctionData(functionFragment: "safeTransferFrom", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
-    encodeFunctionData(functionFragment: "setApprovalForAll", values: [PromiseOrValue<string>, PromiseOrValue<boolean>]): string;
-    encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
+    encodeFunctionData(functionFragment: "safeTransferFrom", values: [AddressLike, AddressLike, BigNumberish, BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "setApprovalForAll", values: [AddressLike, boolean]): string;
+    encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
-    encodeFunctionData(functionFragment: "uri", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
     decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "MINTER_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "PAUSER_ROLE", data: BytesLike): Result;
@@ -114,401 +61,457 @@ export interface ERC1155PresetMinterPauserUpgradeableInterface extends utils.Int
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
-    events: {
-        "ApprovalForAll(address,address,bool)": EventFragment;
-        "Initialized(uint8)": EventFragment;
-        "Paused(address)": EventFragment;
-        "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
-        "RoleGranted(bytes32,address,address)": EventFragment;
-        "RoleRevoked(bytes32,address,address)": EventFragment;
-        "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
-        "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
-        "URI(string,uint256)": EventFragment;
-        "Unpaused(address)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
-export interface ApprovalForAllEventObject {
-    account: string;
-    operator: string;
-    approved: boolean;
+export declare namespace ApprovalForAllEvent {
+    type InputTuple = [
+        account: AddressLike,
+        operator: AddressLike,
+        approved: boolean
+    ];
+    type OutputTuple = [
+        account: string,
+        operator: string,
+        approved: boolean
+    ];
+    interface OutputObject {
+        account: string;
+        operator: string;
+        approved: boolean;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ApprovalForAllEvent = TypedEvent<[
-    string,
-    string,
-    boolean
-], ApprovalForAllEventObject>;
-export declare type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
-export interface InitializedEventObject {
-    version: number;
+export declare namespace InitializedEvent {
+    type InputTuple = [version: BigNumberish];
+    type OutputTuple = [version: bigint];
+    interface OutputObject {
+        version: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
-export declare type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
-export interface PausedEventObject {
-    account: string;
+export declare namespace PausedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type PausedEvent = TypedEvent<[string], PausedEventObject>;
-export declare type PausedEventFilter = TypedEventFilter<PausedEvent>;
-export interface RoleAdminChangedEventObject {
-    role: string;
-    previousAdminRole: string;
-    newAdminRole: string;
+export declare namespace RoleAdminChangedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        previousAdminRole: BytesLike,
+        newAdminRole: BytesLike
+    ];
+    type OutputTuple = [
+        role: string,
+        previousAdminRole: string,
+        newAdminRole: string
+    ];
+    interface OutputObject {
+        role: string;
+        previousAdminRole: string;
+        newAdminRole: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RoleAdminChangedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], RoleAdminChangedEventObject>;
-export declare type RoleAdminChangedEventFilter = TypedEventFilter<RoleAdminChangedEvent>;
-export interface RoleGrantedEventObject {
-    role: string;
-    account: string;
-    sender: string;
+export declare namespace RoleGrantedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        account: AddressLike,
+        sender: AddressLike
+    ];
+    type OutputTuple = [role: string, account: string, sender: string];
+    interface OutputObject {
+        role: string;
+        account: string;
+        sender: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RoleGrantedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], RoleGrantedEventObject>;
-export declare type RoleGrantedEventFilter = TypedEventFilter<RoleGrantedEvent>;
-export interface RoleRevokedEventObject {
-    role: string;
-    account: string;
-    sender: string;
+export declare namespace RoleRevokedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        account: AddressLike,
+        sender: AddressLike
+    ];
+    type OutputTuple = [role: string, account: string, sender: string];
+    interface OutputObject {
+        role: string;
+        account: string;
+        sender: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RoleRevokedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], RoleRevokedEventObject>;
-export declare type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
-export interface TransferBatchEventObject {
-    operator: string;
-    from: string;
-    to: string;
-    ids: BigNumber[];
-    values: BigNumber[];
+export declare namespace TransferBatchEvent {
+    type InputTuple = [
+        operator: AddressLike,
+        from: AddressLike,
+        to: AddressLike,
+        ids: BigNumberish[],
+        values: BigNumberish[]
+    ];
+    type OutputTuple = [
+        operator: string,
+        from: string,
+        to: string,
+        ids: bigint[],
+        values: bigint[]
+    ];
+    interface OutputObject {
+        operator: string;
+        from: string;
+        to: string;
+        ids: bigint[];
+        values: bigint[];
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type TransferBatchEvent = TypedEvent<[
-    string,
-    string,
-    string,
-    BigNumber[],
-    BigNumber[]
-], TransferBatchEventObject>;
-export declare type TransferBatchEventFilter = TypedEventFilter<TransferBatchEvent>;
-export interface TransferSingleEventObject {
-    operator: string;
-    from: string;
-    to: string;
-    id: BigNumber;
-    value: BigNumber;
+export declare namespace TransferSingleEvent {
+    type InputTuple = [
+        operator: AddressLike,
+        from: AddressLike,
+        to: AddressLike,
+        id: BigNumberish,
+        value: BigNumberish
+    ];
+    type OutputTuple = [
+        operator: string,
+        from: string,
+        to: string,
+        id: bigint,
+        value: bigint
+    ];
+    interface OutputObject {
+        operator: string;
+        from: string;
+        to: string;
+        id: bigint;
+        value: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type TransferSingleEvent = TypedEvent<[
-    string,
-    string,
-    string,
-    BigNumber,
-    BigNumber
-], TransferSingleEventObject>;
-export declare type TransferSingleEventFilter = TypedEventFilter<TransferSingleEvent>;
-export interface URIEventObject {
-    value: string;
-    id: BigNumber;
+export declare namespace URIEvent {
+    type InputTuple = [value: string, id: BigNumberish];
+    type OutputTuple = [value: string, id: bigint];
+    interface OutputObject {
+        value: string;
+        id: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type URIEvent = TypedEvent<[string, BigNumber], URIEventObject>;
-export declare type URIEventFilter = TypedEventFilter<URIEvent>;
-export interface UnpausedEventObject {
-    account: string;
+export declare namespace UnpausedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type UnpausedEvent = TypedEvent<[string], UnpausedEventObject>;
-export declare type UnpausedEventFilter = TypedEventFilter<UnpausedEvent>;
 export interface ERC1155PresetMinterPauserUpgradeable extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): ERC1155PresetMinterPauserUpgradeable;
+    waitForDeployment(): Promise<this>;
     interface: ERC1155PresetMinterPauserUpgradeableInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
-        MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
-        PAUSER_ROLE(overrides?: CallOverrides): Promise<[string]>;
-        balanceOf(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        balanceOfBatch(accounts: PromiseOrValue<string>[], ids: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[BigNumber[]]>;
-        burn(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, value: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        burnBatch(account: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], values: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        getRoleMember(role: PromiseOrValue<BytesLike>, index: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        getRoleMemberCount(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        initialize(uri: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        isApprovedForAll(account: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        mint(to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        mintBatch(to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        pause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        paused(overrides?: CallOverrides): Promise<[boolean]>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        safeBatchTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        safeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-        unpause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        uri(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-    };
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-    MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
-    PAUSER_ROLE(overrides?: CallOverrides): Promise<string>;
-    balanceOf(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    balanceOfBatch(accounts: PromiseOrValue<string>[], ids: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber[]>;
-    burn(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, value: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    burnBatch(account: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], values: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    getRoleMember(role: PromiseOrValue<BytesLike>, index: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    getRoleMemberCount(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    initialize(uri: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    isApprovedForAll(account: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    mint(to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    mintBatch(to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    pause(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    paused(overrides?: CallOverrides): Promise<boolean>;
-    renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    safeBatchTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    safeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    unpause(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    uri(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    callStatic: {
-        DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-        MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
-        PAUSER_ROLE(overrides?: CallOverrides): Promise<string>;
-        balanceOf(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        balanceOfBatch(accounts: PromiseOrValue<string>[], ids: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber[]>;
-        burn(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, value: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        burnBatch(account: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], values: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<void>;
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        getRoleMember(role: PromiseOrValue<BytesLike>, index: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        getRoleMemberCount(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        initialize(uri: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        isApprovedForAll(account: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        mint(to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        mintBatch(to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        pause(overrides?: CallOverrides): Promise<void>;
-        paused(overrides?: CallOverrides): Promise<boolean>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        safeBatchTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        safeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-        unpause(overrides?: CallOverrides): Promise<void>;
-        uri(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    DEFAULT_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
+    MINTER_ROLE: TypedContractMethod<[], [string], "view">;
+    PAUSER_ROLE: TypedContractMethod<[], [string], "view">;
+    balanceOf: TypedContractMethod<[
+        account: AddressLike,
+        id: BigNumberish
+    ], [
+        bigint
+    ], "view">;
+    balanceOfBatch: TypedContractMethod<[
+        accounts: AddressLike[],
+        ids: BigNumberish[]
+    ], [
+        bigint[]
+    ], "view">;
+    burn: TypedContractMethod<[
+        account: AddressLike,
+        id: BigNumberish,
+        value: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    burnBatch: TypedContractMethod<[
+        account: AddressLike,
+        ids: BigNumberish[],
+        values: BigNumberish[]
+    ], [
+        void
+    ], "nonpayable">;
+    getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
+    getRoleMember: TypedContractMethod<[
+        role: BytesLike,
+        index: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getRoleMemberCount: TypedContractMethod<[role: BytesLike], [bigint], "view">;
+    grantRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    hasRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    initialize: TypedContractMethod<[uri: string], [void], "nonpayable">;
+    isApprovedForAll: TypedContractMethod<[
+        account: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    mint: TypedContractMethod<[
+        to: AddressLike,
+        id: BigNumberish,
+        amount: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    mintBatch: TypedContractMethod<[
+        to: AddressLike,
+        ids: BigNumberish[],
+        amounts: BigNumberish[],
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    pause: TypedContractMethod<[], [void], "nonpayable">;
+    paused: TypedContractMethod<[], [boolean], "view">;
+    renounceRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    revokeRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    safeBatchTransferFrom: TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        ids: BigNumberish[],
+        amounts: BigNumberish[],
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    safeTransferFrom: TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        id: BigNumberish,
+        amount: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    setApprovalForAll: TypedContractMethod<[
+        operator: AddressLike,
+        approved: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    supportsInterface: TypedContractMethod<[
+        interfaceId: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    unpause: TypedContractMethod<[], [void], "nonpayable">;
+    uri: TypedContractMethod<[arg0: BigNumberish], [string], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "MINTER_ROLE"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "PAUSER_ROLE"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "balanceOf"): TypedContractMethod<[
+        account: AddressLike,
+        id: BigNumberish
+    ], [
+        bigint
+    ], "view">;
+    getFunction(nameOrSignature: "balanceOfBatch"): TypedContractMethod<[
+        accounts: AddressLike[],
+        ids: BigNumberish[]
+    ], [
+        bigint[]
+    ], "view">;
+    getFunction(nameOrSignature: "burn"): TypedContractMethod<[
+        account: AddressLike,
+        id: BigNumberish,
+        value: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "burnBatch"): TypedContractMethod<[
+        account: AddressLike,
+        ids: BigNumberish[],
+        values: BigNumberish[]
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "getRoleAdmin"): TypedContractMethod<[role: BytesLike], [string], "view">;
+    getFunction(nameOrSignature: "getRoleMember"): TypedContractMethod<[
+        role: BytesLike,
+        index: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "getRoleMemberCount"): TypedContractMethod<[role: BytesLike], [bigint], "view">;
+    getFunction(nameOrSignature: "grantRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "hasRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "initialize"): TypedContractMethod<[uri: string], [void], "nonpayable">;
+    getFunction(nameOrSignature: "isApprovedForAll"): TypedContractMethod<[
+        account: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "mint"): TypedContractMethod<[
+        to: AddressLike,
+        id: BigNumberish,
+        amount: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "mintBatch"): TypedContractMethod<[
+        to: AddressLike,
+        ids: BigNumberish[],
+        amounts: BigNumberish[],
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "pause"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "paused"): TypedContractMethod<[], [boolean], "view">;
+    getFunction(nameOrSignature: "renounceRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "revokeRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "safeBatchTransferFrom"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        ids: BigNumberish[],
+        amounts: BigNumberish[],
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "safeTransferFrom"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        id: BigNumberish,
+        amount: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setApprovalForAll"): TypedContractMethod<[
+        operator: AddressLike,
+        approved: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
+    getFunction(nameOrSignature: "unpause"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "uri"): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
+    getEvent(key: "ApprovalForAll"): TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+    getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+    getEvent(key: "Paused"): TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
+    getEvent(key: "RoleAdminChanged"): TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+    getEvent(key: "RoleGranted"): TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+    getEvent(key: "RoleRevoked"): TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+    getEvent(key: "TransferBatch"): TypedContractEvent<TransferBatchEvent.InputTuple, TransferBatchEvent.OutputTuple, TransferBatchEvent.OutputObject>;
+    getEvent(key: "TransferSingle"): TypedContractEvent<TransferSingleEvent.InputTuple, TransferSingleEvent.OutputTuple, TransferSingleEvent.OutputObject>;
+    getEvent(key: "URI"): TypedContractEvent<URIEvent.InputTuple, URIEvent.OutputTuple, URIEvent.OutputObject>;
+    getEvent(key: "Unpaused"): TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
     filters: {
-        "ApprovalForAll(address,address,bool)"(account?: PromiseOrValue<string> | null, operator?: PromiseOrValue<string> | null, approved?: null): ApprovalForAllEventFilter;
-        ApprovalForAll(account?: PromiseOrValue<string> | null, operator?: PromiseOrValue<string> | null, approved?: null): ApprovalForAllEventFilter;
-        "Initialized(uint8)"(version?: null): InitializedEventFilter;
-        Initialized(version?: null): InitializedEventFilter;
-        "Paused(address)"(account?: null): PausedEventFilter;
-        Paused(account?: null): PausedEventFilter;
-        "RoleAdminChanged(bytes32,bytes32,bytes32)"(role?: PromiseOrValue<BytesLike> | null, previousAdminRole?: PromiseOrValue<BytesLike> | null, newAdminRole?: PromiseOrValue<BytesLike> | null): RoleAdminChangedEventFilter;
-        RoleAdminChanged(role?: PromiseOrValue<BytesLike> | null, previousAdminRole?: PromiseOrValue<BytesLike> | null, newAdminRole?: PromiseOrValue<BytesLike> | null): RoleAdminChangedEventFilter;
-        "RoleGranted(bytes32,address,address)"(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleGrantedEventFilter;
-        RoleGranted(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleGrantedEventFilter;
-        "RoleRevoked(bytes32,address,address)"(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleRevokedEventFilter;
-        RoleRevoked(role?: PromiseOrValue<BytesLike> | null, account?: PromiseOrValue<string> | null, sender?: PromiseOrValue<string> | null): RoleRevokedEventFilter;
-        "TransferBatch(address,address,address,uint256[],uint256[])"(operator?: PromiseOrValue<string> | null, from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, ids?: null, values?: null): TransferBatchEventFilter;
-        TransferBatch(operator?: PromiseOrValue<string> | null, from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, ids?: null, values?: null): TransferBatchEventFilter;
-        "TransferSingle(address,address,address,uint256,uint256)"(operator?: PromiseOrValue<string> | null, from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, id?: null, value?: null): TransferSingleEventFilter;
-        TransferSingle(operator?: PromiseOrValue<string> | null, from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, id?: null, value?: null): TransferSingleEventFilter;
-        "URI(string,uint256)"(value?: null, id?: PromiseOrValue<BigNumberish> | null): URIEventFilter;
-        URI(value?: null, id?: PromiseOrValue<BigNumberish> | null): URIEventFilter;
-        "Unpaused(address)"(account?: null): UnpausedEventFilter;
-        Unpaused(account?: null): UnpausedEventFilter;
-    };
-    estimateGas: {
-        DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-        MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-        PAUSER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-        balanceOf(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        balanceOfBatch(accounts: PromiseOrValue<string>[], ids: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
-        burn(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, value: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        burnBatch(account: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], values: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        getRoleMember(role: PromiseOrValue<BytesLike>, index: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getRoleMemberCount(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        initialize(uri: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        isApprovedForAll(account: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        mint(to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        mintBatch(to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        pause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        paused(overrides?: CallOverrides): Promise<BigNumber>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        safeBatchTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        safeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        unpause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        uri(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        PAUSER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        balanceOf(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        balanceOfBatch(accounts: PromiseOrValue<string>[], ids: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        burn(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, value: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        burnBatch(account: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], values: PromiseOrValue<BigNumberish>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        getRoleAdmin(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getRoleMember(role: PromiseOrValue<BytesLike>, index: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getRoleMemberCount(role: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        grantRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        hasRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        initialize(uri: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        isApprovedForAll(account: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        mint(to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        mintBatch(to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        pause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        renounceRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        revokeRole(role: PromiseOrValue<BytesLike>, account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        safeBatchTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        safeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        unpause(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        uri(arg0: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "ApprovalForAll(address,address,bool)": TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+        ApprovalForAll: TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+        "Initialized(uint8)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        "Paused(address)": TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
+        Paused: TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
+        "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+        RoleAdminChanged: TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+        "RoleGranted(bytes32,address,address)": TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+        RoleGranted: TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+        "RoleRevoked(bytes32,address,address)": TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+        RoleRevoked: TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+        "TransferBatch(address,address,address,uint256[],uint256[])": TypedContractEvent<TransferBatchEvent.InputTuple, TransferBatchEvent.OutputTuple, TransferBatchEvent.OutputObject>;
+        TransferBatch: TypedContractEvent<TransferBatchEvent.InputTuple, TransferBatchEvent.OutputTuple, TransferBatchEvent.OutputObject>;
+        "TransferSingle(address,address,address,uint256,uint256)": TypedContractEvent<TransferSingleEvent.InputTuple, TransferSingleEvent.OutputTuple, TransferSingleEvent.OutputObject>;
+        TransferSingle: TypedContractEvent<TransferSingleEvent.InputTuple, TransferSingleEvent.OutputTuple, TransferSingleEvent.OutputObject>;
+        "URI(string,uint256)": TypedContractEvent<URIEvent.InputTuple, URIEvent.OutputTuple, URIEvent.OutputObject>;
+        URI: TypedContractEvent<URIEvent.InputTuple, URIEvent.OutputTuple, URIEvent.OutputObject>;
+        "Unpaused(address)": TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
+        Unpaused: TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=ERC1155PresetMinterPauserUpgradeable.d.ts.map

@@ -1,60 +1,62 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
-export interface IInterfaceResolverInterface extends utils.Interface {
-    functions: {
-        "interfaceImplementer(bytes32,bytes4)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "interfaceImplementer"): FunctionFragment;
-    encodeFunctionData(functionFragment: "interfaceImplementer", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BytesLike>]): string;
-    decodeFunctionResult(functionFragment: "interfaceImplementer", data: BytesLike): Result;
-    events: {
-        "InterfaceChanged(bytes32,bytes4,address)": EventFragment;
-    };
+import type { BaseContract, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../../common";
+export interface IInterfaceResolverInterface extends Interface {
+    getFunction(nameOrSignature: "interfaceImplementer"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "InterfaceChanged"): EventFragment;
+    encodeFunctionData(functionFragment: "interfaceImplementer", values: [BytesLike, BytesLike]): string;
+    decodeFunctionResult(functionFragment: "interfaceImplementer", data: BytesLike): Result;
 }
-export interface InterfaceChangedEventObject {
-    node: string;
-    interfaceID: string;
-    implementer: string;
+export declare namespace InterfaceChangedEvent {
+    type InputTuple = [
+        node: BytesLike,
+        interfaceID: BytesLike,
+        implementer: AddressLike
+    ];
+    type OutputTuple = [
+        node: string,
+        interfaceID: string,
+        implementer: string
+    ];
+    interface OutputObject {
+        node: string;
+        interfaceID: string;
+        implementer: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type InterfaceChangedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], InterfaceChangedEventObject>;
-export declare type InterfaceChangedEventFilter = TypedEventFilter<InterfaceChangedEvent>;
 export interface IInterfaceResolver extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IInterfaceResolver;
+    waitForDeployment(): Promise<this>;
     interface: IInterfaceResolverInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        interfaceImplementer(node: PromiseOrValue<BytesLike>, interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-    };
-    interfaceImplementer(node: PromiseOrValue<BytesLike>, interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    callStatic: {
-        interfaceImplementer(node: PromiseOrValue<BytesLike>, interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    interfaceImplementer: TypedContractMethod<[
+        node: BytesLike,
+        interfaceID: BytesLike
+    ], [
+        string
+    ], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "interfaceImplementer"): TypedContractMethod<[
+        node: BytesLike,
+        interfaceID: BytesLike
+    ], [
+        string
+    ], "view">;
+    getEvent(key: "InterfaceChanged"): TypedContractEvent<InterfaceChangedEvent.InputTuple, InterfaceChangedEvent.OutputTuple, InterfaceChangedEvent.OutputObject>;
     filters: {
-        "InterfaceChanged(bytes32,bytes4,address)"(node?: PromiseOrValue<BytesLike> | null, interfaceID?: PromiseOrValue<BytesLike> | null, implementer?: null): InterfaceChangedEventFilter;
-        InterfaceChanged(node?: PromiseOrValue<BytesLike> | null, interfaceID?: PromiseOrValue<BytesLike> | null, implementer?: null): InterfaceChangedEventFilter;
-    };
-    estimateGas: {
-        interfaceImplementer(node: PromiseOrValue<BytesLike>, interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        interfaceImplementer(node: PromiseOrValue<BytesLike>, interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "InterfaceChanged(bytes32,bytes4,address)": TypedContractEvent<InterfaceChangedEvent.InputTuple, InterfaceChangedEvent.OutputTuple, InterfaceChangedEvent.OutputObject>;
+        InterfaceChanged: TypedContractEvent<InterfaceChangedEvent.InputTuple, InterfaceChangedEvent.OutputTuple, InterfaceChangedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=IInterfaceResolver.d.ts.map

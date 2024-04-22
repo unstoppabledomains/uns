@@ -1,69 +1,58 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
-export interface IPubkeyResolverInterface extends utils.Interface {
-    functions: {
-        "pubkey(bytes32)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "pubkey"): FunctionFragment;
-    encodeFunctionData(functionFragment: "pubkey", values: [PromiseOrValue<BytesLike>]): string;
-    decodeFunctionResult(functionFragment: "pubkey", data: BytesLike): Result;
-    events: {
-        "PubkeyChanged(bytes32,bytes32,bytes32)": EventFragment;
-    };
+import type { BaseContract, BytesLike, FunctionFragment, Result, Interface, EventFragment, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../../common";
+export interface IPubkeyResolverInterface extends Interface {
+    getFunction(nameOrSignature: "pubkey"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "PubkeyChanged"): EventFragment;
+    encodeFunctionData(functionFragment: "pubkey", values: [BytesLike]): string;
+    decodeFunctionResult(functionFragment: "pubkey", data: BytesLike): Result;
 }
-export interface PubkeyChangedEventObject {
-    node: string;
-    x: string;
-    y: string;
-}
-export declare type PubkeyChangedEvent = TypedEvent<[
-    string,
-    string,
-    string
-], PubkeyChangedEventObject>;
-export declare type PubkeyChangedEventFilter = TypedEventFilter<PubkeyChangedEvent>;
-export interface IPubkeyResolver extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
-    interface: IPubkeyResolverInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        pubkey(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string, string] & {
-            x: string;
-            y: string;
-        }>;
-    };
-    pubkey(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string, string] & {
+export declare namespace PubkeyChangedEvent {
+    type InputTuple = [node: BytesLike, x: BytesLike, y: BytesLike];
+    type OutputTuple = [node: string, x: string, y: string];
+    interface OutputObject {
+        node: string;
         x: string;
         y: string;
-    }>;
-    callStatic: {
-        pubkey(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string, string] & {
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
+}
+export interface IPubkeyResolver extends BaseContract {
+    connect(runner?: ContractRunner | null): IPubkeyResolver;
+    waitForDeployment(): Promise<this>;
+    interface: IPubkeyResolverInterface;
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    pubkey: TypedContractMethod<[
+        node: BytesLike
+    ], [
+        [string, string] & {
             x: string;
             y: string;
-        }>;
-    };
+        }
+    ], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "pubkey"): TypedContractMethod<[
+        node: BytesLike
+    ], [
+        [string, string] & {
+            x: string;
+            y: string;
+        }
+    ], "view">;
+    getEvent(key: "PubkeyChanged"): TypedContractEvent<PubkeyChangedEvent.InputTuple, PubkeyChangedEvent.OutputTuple, PubkeyChangedEvent.OutputObject>;
     filters: {
-        "PubkeyChanged(bytes32,bytes32,bytes32)"(node?: PromiseOrValue<BytesLike> | null, x?: null, y?: null): PubkeyChangedEventFilter;
-        PubkeyChanged(node?: PromiseOrValue<BytesLike> | null, x?: null, y?: null): PubkeyChangedEventFilter;
-    };
-    estimateGas: {
-        pubkey(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        pubkey(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "PubkeyChanged(bytes32,bytes32,bytes32)": TypedContractEvent<PubkeyChangedEvent.InputTuple, PubkeyChangedEvent.OutputTuple, PubkeyChangedEvent.OutputObject>;
+        PubkeyChanged: TypedContractEvent<PubkeyChangedEvent.InputTuple, PubkeyChangedEvent.OutputTuple, PubkeyChangedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=IPubkeyResolver.d.ts.map

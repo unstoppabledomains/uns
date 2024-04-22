@@ -1,58 +1,51 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../common";
-export interface INameWrapperUpgradeInterface extends utils.Interface {
-    functions: {
-        "wrapFromUpgrade(bytes,address,uint32,uint64,address,bytes)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "wrapFromUpgrade"): FunctionFragment;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../../../common";
+export interface INameWrapperUpgradeInterface extends Interface {
+    getFunction(nameOrSignature: "wrapFromUpgrade"): FunctionFragment;
     encodeFunctionData(functionFragment: "wrapFromUpgrade", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BytesLike>
+        BytesLike,
+        AddressLike,
+        BigNumberish,
+        BigNumberish,
+        AddressLike,
+        BytesLike
     ]): string;
     decodeFunctionResult(functionFragment: "wrapFromUpgrade", data: BytesLike): Result;
-    events: {};
 }
 export interface INameWrapperUpgrade extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): INameWrapperUpgrade;
+    waitForDeployment(): Promise<this>;
     interface: INameWrapperUpgradeInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        wrapFromUpgrade(name: PromiseOrValue<BytesLike>, wrappedOwner: PromiseOrValue<string>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, approved: PromiseOrValue<string>, extraData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    wrapFromUpgrade(name: PromiseOrValue<BytesLike>, wrappedOwner: PromiseOrValue<string>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, approved: PromiseOrValue<string>, extraData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        wrapFromUpgrade(name: PromiseOrValue<BytesLike>, wrappedOwner: PromiseOrValue<string>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, approved: PromiseOrValue<string>, extraData: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    wrapFromUpgrade: TypedContractMethod<[
+        name: BytesLike,
+        wrappedOwner: AddressLike,
+        fuses: BigNumberish,
+        expiry: BigNumberish,
+        approved: AddressLike,
+        extraData: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "wrapFromUpgrade"): TypedContractMethod<[
+        name: BytesLike,
+        wrappedOwner: AddressLike,
+        fuses: BigNumberish,
+        expiry: BigNumberish,
+        approved: AddressLike,
+        extraData: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
     filters: {};
-    estimateGas: {
-        wrapFromUpgrade(name: PromiseOrValue<BytesLike>, wrappedOwner: PromiseOrValue<string>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, approved: PromiseOrValue<string>, extraData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        wrapFromUpgrade(name: PromiseOrValue<BytesLike>, wrappedOwner: PromiseOrValue<string>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, approved: PromiseOrValue<string>, extraData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-    };
 }
 //# sourceMappingURL=INameWrapperUpgrade.d.ts.map

@@ -1,34 +1,14 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../common";
-export interface IReverseRegistrarInterface extends utils.Interface {
-    functions: {
-        "claim(address)": FunctionFragment;
-        "claimForAddr(address,address,address)": FunctionFragment;
-        "claimWithResolver(address,address)": FunctionFragment;
-        "node(address)": FunctionFragment;
-        "setDefaultResolver(address)": FunctionFragment;
-        "setName(string)": FunctionFragment;
-        "setNameForAddr(address,address,address,string)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "claim" | "claimForAddr" | "claimWithResolver" | "node" | "setDefaultResolver" | "setName" | "setNameForAddr"): FunctionFragment;
-    encodeFunctionData(functionFragment: "claim", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "claimForAddr", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "claimWithResolver", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "node", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "setDefaultResolver", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "setName", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "setNameForAddr", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>
-    ]): string;
+import type { BaseContract, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../../../common";
+export interface IReverseRegistrarInterface extends Interface {
+    getFunction(nameOrSignature: "claim" | "claimForAddr" | "claimWithResolver" | "node" | "setDefaultResolver" | "setName" | "setNameForAddr"): FunctionFragment;
+    encodeFunctionData(functionFragment: "claim", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "claimForAddr", values: [AddressLike, AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "claimWithResolver", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "node", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "setDefaultResolver", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "setName", values: [string]): string;
+    encodeFunctionData(functionFragment: "setNameForAddr", values: [AddressLike, AddressLike, AddressLike, string]): string;
     decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimForAddr", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimWithResolver", data: BytesLike): Result;
@@ -36,113 +16,75 @@ export interface IReverseRegistrarInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "setDefaultResolver", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setName", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setNameForAddr", data: BytesLike): Result;
-    events: {};
 }
 export interface IReverseRegistrar extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IReverseRegistrar;
+    waitForDeployment(): Promise<this>;
     interface: IReverseRegistrarInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        claim(owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        claimForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        claimWithResolver(owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        node(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[string]>;
-        setDefaultResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setName(name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setNameForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    claim(owner: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    claimForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    claimWithResolver(owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    node(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-    setDefaultResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setName(name: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setNameForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, name: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        claim(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        claimForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        claimWithResolver(owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        node(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        setDefaultResolver(resolver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        setName(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        setNameForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    claim: TypedContractMethod<[owner: AddressLike], [string], "nonpayable">;
+    claimForAddr: TypedContractMethod<[
+        addr: AddressLike,
+        owner: AddressLike,
+        resolver: AddressLike
+    ], [
+        string
+    ], "nonpayable">;
+    claimWithResolver: TypedContractMethod<[
+        owner: AddressLike,
+        resolver: AddressLike
+    ], [
+        string
+    ], "nonpayable">;
+    node: TypedContractMethod<[addr: AddressLike], [string], "view">;
+    setDefaultResolver: TypedContractMethod<[
+        resolver: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    setName: TypedContractMethod<[name: string], [string], "nonpayable">;
+    setNameForAddr: TypedContractMethod<[
+        addr: AddressLike,
+        owner: AddressLike,
+        resolver: AddressLike,
+        name: string
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "claim"): TypedContractMethod<[owner: AddressLike], [string], "nonpayable">;
+    getFunction(nameOrSignature: "claimForAddr"): TypedContractMethod<[
+        addr: AddressLike,
+        owner: AddressLike,
+        resolver: AddressLike
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "claimWithResolver"): TypedContractMethod<[
+        owner: AddressLike,
+        resolver: AddressLike
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "node"): TypedContractMethod<[addr: AddressLike], [string], "view">;
+    getFunction(nameOrSignature: "setDefaultResolver"): TypedContractMethod<[resolver: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "setName"): TypedContractMethod<[name: string], [string], "nonpayable">;
+    getFunction(nameOrSignature: "setNameForAddr"): TypedContractMethod<[
+        addr: AddressLike,
+        owner: AddressLike,
+        resolver: AddressLike,
+        name: string
+    ], [
+        string
+    ], "nonpayable">;
     filters: {};
-    estimateGas: {
-        claim(owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        claimForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        claimWithResolver(owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        node(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        setDefaultResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setName(name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setNameForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        claim(owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        claimForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        claimWithResolver(owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        node(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        setDefaultResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setName(name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setNameForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-    };
 }
 //# sourceMappingURL=IReverseRegistrar.d.ts.map

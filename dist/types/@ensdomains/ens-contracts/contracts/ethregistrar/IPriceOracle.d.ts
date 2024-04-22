@@ -1,57 +1,48 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../common";
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../../../common";
 export declare namespace IPriceOracle {
     type PriceStruct = {
-        base: PromiseOrValue<BigNumberish>;
-        premium: PromiseOrValue<BigNumberish>;
+        base: BigNumberish;
+        premium: BigNumberish;
     };
-    type PriceStructOutput = [BigNumber, BigNumber] & {
-        base: BigNumber;
-        premium: BigNumber;
+    type PriceStructOutput = [base: bigint, premium: bigint] & {
+        base: bigint;
+        premium: bigint;
     };
 }
-export interface IPriceOracleInterface extends utils.Interface {
-    functions: {
-        "price(string,uint256,uint256)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "price"): FunctionFragment;
-    encodeFunctionData(functionFragment: "price", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
+export interface IPriceOracleInterface extends Interface {
+    getFunction(nameOrSignature: "price"): FunctionFragment;
+    encodeFunctionData(functionFragment: "price", values: [string, BigNumberish, BigNumberish]): string;
     decodeFunctionResult(functionFragment: "price", data: BytesLike): Result;
-    events: {};
 }
 export interface IPriceOracle extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IPriceOracle;
+    waitForDeployment(): Promise<this>;
     interface: IPriceOracleInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        price(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[IPriceOracle.PriceStructOutput]>;
-    };
-    price(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<IPriceOracle.PriceStructOutput>;
-    callStatic: {
-        price(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<IPriceOracle.PriceStructOutput>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    price: TypedContractMethod<[
+        name: string,
+        expires: BigNumberish,
+        duration: BigNumberish
+    ], [
+        IPriceOracle.PriceStructOutput
+    ], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "price"): TypedContractMethod<[
+        name: string,
+        expires: BigNumberish,
+        duration: BigNumberish
+    ], [
+        IPriceOracle.PriceStructOutput
+    ], "view">;
     filters: {};
-    estimateGas: {
-        price(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        price(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-    };
 }
 //# sourceMappingURL=IPriceOracle.d.ts.map

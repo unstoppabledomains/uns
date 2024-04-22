@@ -1,152 +1,61 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../common";
-export interface INameWrapperInterface extends utils.Interface {
-    functions: {
-        "allFusesBurned(bytes32,uint32)": FunctionFragment;
-        "approve(address,uint256)": FunctionFragment;
-        "balanceOf(address,uint256)": FunctionFragment;
-        "balanceOfBatch(address[],uint256[])": FunctionFragment;
-        "canModifyName(bytes32,address)": FunctionFragment;
-        "ens()": FunctionFragment;
-        "extendExpiry(bytes32,bytes32,uint64)": FunctionFragment;
-        "getApproved(uint256)": FunctionFragment;
-        "getData(uint256)": FunctionFragment;
-        "isApprovedForAll(address,address)": FunctionFragment;
-        "isWrapped(bytes32,bytes32)": FunctionFragment;
-        "isWrapped(bytes32)": FunctionFragment;
-        "metadataService()": FunctionFragment;
-        "name()": FunctionFragment;
-        "names(bytes32)": FunctionFragment;
-        "ownerOf(uint256)": FunctionFragment;
-        "registerAndWrapETH2LD(string,address,uint256,address,uint16)": FunctionFragment;
-        "registrar()": FunctionFragment;
-        "renew(uint256,uint256)": FunctionFragment;
-        "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
-        "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
-        "setApprovalForAll(address,bool)": FunctionFragment;
-        "setChildFuses(bytes32,bytes32,uint32,uint64)": FunctionFragment;
-        "setFuses(bytes32,uint16)": FunctionFragment;
-        "setMetadataService(address)": FunctionFragment;
-        "setRecord(bytes32,address,address,uint64)": FunctionFragment;
-        "setResolver(bytes32,address)": FunctionFragment;
-        "setSubnodeOwner(bytes32,string,address,uint32,uint64)": FunctionFragment;
-        "setSubnodeRecord(bytes32,string,address,address,uint64,uint32,uint64)": FunctionFragment;
-        "setTTL(bytes32,uint64)": FunctionFragment;
-        "setUpgradeContract(address)": FunctionFragment;
-        "supportsInterface(bytes4)": FunctionFragment;
-        "unwrap(bytes32,bytes32,address)": FunctionFragment;
-        "unwrapETH2LD(bytes32,address,address)": FunctionFragment;
-        "upgrade(bytes,bytes)": FunctionFragment;
-        "upgradeContract()": FunctionFragment;
-        "uri(uint256)": FunctionFragment;
-        "wrap(bytes,address,address)": FunctionFragment;
-        "wrapETH2LD(string,address,uint16,address)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "allFusesBurned" | "approve" | "balanceOf" | "balanceOfBatch" | "canModifyName" | "ens" | "extendExpiry" | "getApproved" | "getData" | "isApprovedForAll" | "isWrapped(bytes32,bytes32)" | "isWrapped(bytes32)" | "metadataService" | "name" | "names" | "ownerOf" | "registerAndWrapETH2LD" | "registrar" | "renew" | "safeBatchTransferFrom" | "safeTransferFrom" | "setApprovalForAll" | "setChildFuses" | "setFuses" | "setMetadataService" | "setRecord" | "setResolver" | "setSubnodeOwner" | "setSubnodeRecord" | "setTTL" | "setUpgradeContract" | "supportsInterface" | "unwrap" | "unwrapETH2LD" | "upgrade" | "upgradeContract" | "uri" | "wrap" | "wrapETH2LD"): FunctionFragment;
-    encodeFunctionData(functionFragment: "allFusesBurned", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "approve", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "balanceOfBatch", values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]): string;
-    encodeFunctionData(functionFragment: "canModifyName", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../common";
+export interface INameWrapperInterface extends Interface {
+    getFunction(nameOrSignature: "allFusesBurned" | "approve" | "balanceOf" | "balanceOfBatch" | "canModifyName" | "ens" | "extendExpiry" | "getApproved" | "getData" | "isApprovedForAll" | "isWrapped(bytes32,bytes32)" | "isWrapped(bytes32)" | "metadataService" | "name" | "names" | "ownerOf" | "registerAndWrapETH2LD" | "registrar" | "renew" | "safeBatchTransferFrom" | "safeTransferFrom" | "setApprovalForAll" | "setChildFuses" | "setFuses" | "setMetadataService" | "setRecord" | "setResolver" | "setSubnodeOwner" | "setSubnodeRecord" | "setTTL" | "setUpgradeContract" | "supportsInterface" | "unwrap" | "unwrapETH2LD" | "upgrade" | "upgradeContract" | "uri" | "wrap" | "wrapETH2LD"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "ApprovalForAll" | "ExpiryExtended" | "FusesSet" | "NameUnwrapped" | "NameWrapped" | "TransferBatch" | "TransferSingle" | "URI"): EventFragment;
+    encodeFunctionData(functionFragment: "allFusesBurned", values: [BytesLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "approve", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "balanceOf", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "balanceOfBatch", values: [AddressLike[], BigNumberish[]]): string;
+    encodeFunctionData(functionFragment: "canModifyName", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "ens", values?: undefined): string;
-    encodeFunctionData(functionFragment: "extendExpiry", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "getApproved", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "getData", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "isApprovedForAll", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "isWrapped(bytes32,bytes32)", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "isWrapped(bytes32)", values: [PromiseOrValue<BytesLike>]): string;
+    encodeFunctionData(functionFragment: "extendExpiry", values: [BytesLike, BytesLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getApproved", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getData", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "isApprovedForAll", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "isWrapped(bytes32,bytes32)", values: [BytesLike, BytesLike]): string;
+    encodeFunctionData(functionFragment: "isWrapped(bytes32)", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "metadataService", values?: undefined): string;
     encodeFunctionData(functionFragment: "name", values?: undefined): string;
-    encodeFunctionData(functionFragment: "names", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "ownerOf", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "registerAndWrapETH2LD", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
+    encodeFunctionData(functionFragment: "names", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "ownerOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "registerAndWrapETH2LD", values: [string, AddressLike, BigNumberish, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "registrar", values?: undefined): string;
-    encodeFunctionData(functionFragment: "renew", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "renew", values: [BigNumberish, BigNumberish]): string;
     encodeFunctionData(functionFragment: "safeBatchTransferFrom", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>[],
-        PromiseOrValue<BigNumberish>[],
-        PromiseOrValue<BytesLike>
+        AddressLike,
+        AddressLike,
+        BigNumberish[],
+        BigNumberish[],
+        BytesLike
     ]): string;
-    encodeFunctionData(functionFragment: "safeTransferFrom", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
-    encodeFunctionData(functionFragment: "setApprovalForAll", values: [PromiseOrValue<string>, PromiseOrValue<boolean>]): string;
-    encodeFunctionData(functionFragment: "setChildFuses", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "setFuses", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "setMetadataService", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "setRecord", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "setResolver", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "setSubnodeOwner", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
+    encodeFunctionData(functionFragment: "safeTransferFrom", values: [AddressLike, AddressLike, BigNumberish, BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "setApprovalForAll", values: [AddressLike, boolean]): string;
+    encodeFunctionData(functionFragment: "setChildFuses", values: [BytesLike, BytesLike, BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setFuses", values: [BytesLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setMetadataService", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "setRecord", values: [BytesLike, AddressLike, AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setResolver", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "setSubnodeOwner", values: [BytesLike, string, AddressLike, BigNumberish, BigNumberish]): string;
     encodeFunctionData(functionFragment: "setSubnodeRecord", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
+        BytesLike,
+        string,
+        AddressLike,
+        AddressLike,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish
     ]): string;
-    encodeFunctionData(functionFragment: "setTTL", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "setUpgradeContract", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "unwrap", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "unwrapETH2LD", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "upgrade", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BytesLike>]): string;
+    encodeFunctionData(functionFragment: "setTTL", values: [BytesLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setUpgradeContract", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "unwrap", values: [BytesLike, BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "unwrapETH2LD", values: [BytesLike, AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "upgrade", values: [BytesLike, BytesLike]): string;
     encodeFunctionData(functionFragment: "upgradeContract", values?: undefined): string;
-    encodeFunctionData(functionFragment: "uri", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "wrap", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "wrapETH2LD", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>
-    ]): string;
+    encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "wrap", values: [BytesLike, AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "wrapETH2LD", values: [string, AddressLike, BigNumberish, AddressLike]): string;
     decodeFunctionResult(functionFragment: "allFusesBurned", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -186,515 +95,597 @@ export interface INameWrapperInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "wrap", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "wrapETH2LD", data: BytesLike): Result;
-    events: {
-        "ApprovalForAll(address,address,bool)": EventFragment;
-        "ExpiryExtended(bytes32,uint64)": EventFragment;
-        "FusesSet(bytes32,uint32)": EventFragment;
-        "NameUnwrapped(bytes32,address)": EventFragment;
-        "NameWrapped(bytes32,bytes,address,uint32,uint64)": EventFragment;
-        "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
-        "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
-        "URI(string,uint256)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "ExpiryExtended"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "FusesSet"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NameUnwrapped"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NameWrapped"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
 }
-export interface ApprovalForAllEventObject {
-    account: string;
-    operator: string;
-    approved: boolean;
+export declare namespace ApprovalForAllEvent {
+    type InputTuple = [
+        account: AddressLike,
+        operator: AddressLike,
+        approved: boolean
+    ];
+    type OutputTuple = [
+        account: string,
+        operator: string,
+        approved: boolean
+    ];
+    interface OutputObject {
+        account: string;
+        operator: string;
+        approved: boolean;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ApprovalForAllEvent = TypedEvent<[
-    string,
-    string,
-    boolean
-], ApprovalForAllEventObject>;
-export declare type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
-export interface ExpiryExtendedEventObject {
-    node: string;
-    expiry: BigNumber;
+export declare namespace ExpiryExtendedEvent {
+    type InputTuple = [node: BytesLike, expiry: BigNumberish];
+    type OutputTuple = [node: string, expiry: bigint];
+    interface OutputObject {
+        node: string;
+        expiry: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ExpiryExtendedEvent = TypedEvent<[
-    string,
-    BigNumber
-], ExpiryExtendedEventObject>;
-export declare type ExpiryExtendedEventFilter = TypedEventFilter<ExpiryExtendedEvent>;
-export interface FusesSetEventObject {
-    node: string;
-    fuses: number;
+export declare namespace FusesSetEvent {
+    type InputTuple = [node: BytesLike, fuses: BigNumberish];
+    type OutputTuple = [node: string, fuses: bigint];
+    interface OutputObject {
+        node: string;
+        fuses: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type FusesSetEvent = TypedEvent<[string, number], FusesSetEventObject>;
-export declare type FusesSetEventFilter = TypedEventFilter<FusesSetEvent>;
-export interface NameUnwrappedEventObject {
-    node: string;
-    owner: string;
+export declare namespace NameUnwrappedEvent {
+    type InputTuple = [node: BytesLike, owner: AddressLike];
+    type OutputTuple = [node: string, owner: string];
+    interface OutputObject {
+        node: string;
+        owner: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NameUnwrappedEvent = TypedEvent<[
-    string,
-    string
-], NameUnwrappedEventObject>;
-export declare type NameUnwrappedEventFilter = TypedEventFilter<NameUnwrappedEvent>;
-export interface NameWrappedEventObject {
-    node: string;
-    name: string;
-    owner: string;
-    fuses: number;
-    expiry: BigNumber;
+export declare namespace NameWrappedEvent {
+    type InputTuple = [
+        node: BytesLike,
+        name: BytesLike,
+        owner: AddressLike,
+        fuses: BigNumberish,
+        expiry: BigNumberish
+    ];
+    type OutputTuple = [
+        node: string,
+        name: string,
+        owner: string,
+        fuses: bigint,
+        expiry: bigint
+    ];
+    interface OutputObject {
+        node: string;
+        name: string;
+        owner: string;
+        fuses: bigint;
+        expiry: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NameWrappedEvent = TypedEvent<[
-    string,
-    string,
-    string,
-    number,
-    BigNumber
-], NameWrappedEventObject>;
-export declare type NameWrappedEventFilter = TypedEventFilter<NameWrappedEvent>;
-export interface TransferBatchEventObject {
-    operator: string;
-    from: string;
-    to: string;
-    ids: BigNumber[];
-    values: BigNumber[];
+export declare namespace TransferBatchEvent {
+    type InputTuple = [
+        operator: AddressLike,
+        from: AddressLike,
+        to: AddressLike,
+        ids: BigNumberish[],
+        values: BigNumberish[]
+    ];
+    type OutputTuple = [
+        operator: string,
+        from: string,
+        to: string,
+        ids: bigint[],
+        values: bigint[]
+    ];
+    interface OutputObject {
+        operator: string;
+        from: string;
+        to: string;
+        ids: bigint[];
+        values: bigint[];
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type TransferBatchEvent = TypedEvent<[
-    string,
-    string,
-    string,
-    BigNumber[],
-    BigNumber[]
-], TransferBatchEventObject>;
-export declare type TransferBatchEventFilter = TypedEventFilter<TransferBatchEvent>;
-export interface TransferSingleEventObject {
-    operator: string;
-    from: string;
-    to: string;
-    id: BigNumber;
-    value: BigNumber;
+export declare namespace TransferSingleEvent {
+    type InputTuple = [
+        operator: AddressLike,
+        from: AddressLike,
+        to: AddressLike,
+        id: BigNumberish,
+        value: BigNumberish
+    ];
+    type OutputTuple = [
+        operator: string,
+        from: string,
+        to: string,
+        id: bigint,
+        value: bigint
+    ];
+    interface OutputObject {
+        operator: string;
+        from: string;
+        to: string;
+        id: bigint;
+        value: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type TransferSingleEvent = TypedEvent<[
-    string,
-    string,
-    string,
-    BigNumber,
-    BigNumber
-], TransferSingleEventObject>;
-export declare type TransferSingleEventFilter = TypedEventFilter<TransferSingleEvent>;
-export interface URIEventObject {
-    value: string;
-    id: BigNumber;
+export declare namespace URIEvent {
+    type InputTuple = [value: string, id: BigNumberish];
+    type OutputTuple = [value: string, id: bigint];
+    interface OutputObject {
+        value: string;
+        id: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type URIEvent = TypedEvent<[string, BigNumber], URIEventObject>;
-export declare type URIEventFilter = TypedEventFilter<URIEvent>;
 export interface INameWrapper extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): INameWrapper;
+    waitForDeployment(): Promise<this>;
     interface: INameWrapperInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        allFusesBurned(node: PromiseOrValue<BytesLike>, fuseMask: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        balanceOf(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        balanceOfBatch(accounts: PromiseOrValue<string>[], ids: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<[BigNumber[]]>;
-        canModifyName(node: PromiseOrValue<BytesLike>, addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        ens(overrides?: CallOverrides): Promise<[string]>;
-        extendExpiry(node: PromiseOrValue<BytesLike>, labelhash: PromiseOrValue<BytesLike>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        getData(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, number, BigNumber]>;
-        isApprovedForAll(account: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        "isWrapped(bytes32,bytes32)"(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-        "isWrapped(bytes32)"(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-        metadataService(overrides?: CallOverrides): Promise<[string]>;
-        name(overrides?: CallOverrides): Promise<[string]>;
-        names(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        ownerOf(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string] & {
-            owner: string;
-        }>;
-        registerAndWrapETH2LD(label: PromiseOrValue<string>, wrappedOwner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, resolver: PromiseOrValue<string>, ownerControlledFuses: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        registrar(overrides?: CallOverrides): Promise<[string]>;
-        renew(labelHash: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        safeBatchTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        safeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setChildFuses(parentNode: PromiseOrValue<BytesLike>, labelhash: PromiseOrValue<BytesLike>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setFuses(node: PromiseOrValue<BytesLike>, ownerControlledFuses: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setMetadataService(_metadataService: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setRecord(node: PromiseOrValue<BytesLike>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, ttl: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setResolver(node: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setSubnodeOwner(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<string>, newOwner: PromiseOrValue<string>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setSubnodeRecord(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, ttl: PromiseOrValue<BigNumberish>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setTTL(node: PromiseOrValue<BytesLike>, ttl: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setUpgradeContract(_upgradeAddress: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-        unwrap(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<BytesLike>, owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        unwrapETH2LD(label: PromiseOrValue<BytesLike>, newRegistrant: PromiseOrValue<string>, newController: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        upgrade(name: PromiseOrValue<BytesLike>, extraData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        upgradeContract(overrides?: CallOverrides): Promise<[string]>;
-        uri(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        wrap(name: PromiseOrValue<BytesLike>, wrappedOwner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        wrapETH2LD(label: PromiseOrValue<string>, wrappedOwner: PromiseOrValue<string>, ownerControlledFuses: PromiseOrValue<BigNumberish>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    allFusesBurned(node: PromiseOrValue<BytesLike>, fuseMask: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-    approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    balanceOf(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    balanceOfBatch(accounts: PromiseOrValue<string>[], ids: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber[]>;
-    canModifyName(node: PromiseOrValue<BytesLike>, addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    ens(overrides?: CallOverrides): Promise<string>;
-    extendExpiry(node: PromiseOrValue<BytesLike>, labelhash: PromiseOrValue<BytesLike>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    getData(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, number, BigNumber]>;
-    isApprovedForAll(account: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    "isWrapped(bytes32,bytes32)"(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    "isWrapped(bytes32)"(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    metadataService(overrides?: CallOverrides): Promise<string>;
-    name(overrides?: CallOverrides): Promise<string>;
-    names(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    ownerOf(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    registerAndWrapETH2LD(label: PromiseOrValue<string>, wrappedOwner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, resolver: PromiseOrValue<string>, ownerControlledFuses: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    registrar(overrides?: CallOverrides): Promise<string>;
-    renew(labelHash: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    safeBatchTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    safeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setChildFuses(parentNode: PromiseOrValue<BytesLike>, labelhash: PromiseOrValue<BytesLike>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setFuses(node: PromiseOrValue<BytesLike>, ownerControlledFuses: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setMetadataService(_metadataService: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setRecord(node: PromiseOrValue<BytesLike>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, ttl: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setResolver(node: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setSubnodeOwner(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<string>, newOwner: PromiseOrValue<string>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setSubnodeRecord(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, ttl: PromiseOrValue<BigNumberish>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setTTL(node: PromiseOrValue<BytesLike>, ttl: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setUpgradeContract(_upgradeAddress: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    unwrap(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<BytesLike>, owner: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    unwrapETH2LD(label: PromiseOrValue<BytesLike>, newRegistrant: PromiseOrValue<string>, newController: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    upgrade(name: PromiseOrValue<BytesLike>, extraData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    upgradeContract(overrides?: CallOverrides): Promise<string>;
-    uri(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    wrap(name: PromiseOrValue<BytesLike>, wrappedOwner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    wrapETH2LD(label: PromiseOrValue<string>, wrappedOwner: PromiseOrValue<string>, ownerControlledFuses: PromiseOrValue<BigNumberish>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        allFusesBurned(node: PromiseOrValue<BytesLike>, fuseMask: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        balanceOf(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        balanceOfBatch(accounts: PromiseOrValue<string>[], ids: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber[]>;
-        canModifyName(node: PromiseOrValue<BytesLike>, addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        ens(overrides?: CallOverrides): Promise<string>;
-        extendExpiry(node: PromiseOrValue<BytesLike>, labelhash: PromiseOrValue<BytesLike>, expiry: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        getData(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string, number, BigNumber]>;
-        isApprovedForAll(account: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        "isWrapped(bytes32,bytes32)"(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-        "isWrapped(bytes32)"(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-        metadataService(overrides?: CallOverrides): Promise<string>;
-        name(overrides?: CallOverrides): Promise<string>;
-        names(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        ownerOf(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        registerAndWrapETH2LD(label: PromiseOrValue<string>, wrappedOwner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, resolver: PromiseOrValue<string>, ownerControlledFuses: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        registrar(overrides?: CallOverrides): Promise<string>;
-        renew(labelHash: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        safeBatchTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        safeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        setChildFuses(parentNode: PromiseOrValue<BytesLike>, labelhash: PromiseOrValue<BytesLike>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        setFuses(node: PromiseOrValue<BytesLike>, ownerControlledFuses: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<number>;
-        setMetadataService(_metadataService: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        setRecord(node: PromiseOrValue<BytesLike>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, ttl: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        setResolver(node: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        setSubnodeOwner(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<string>, newOwner: PromiseOrValue<string>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        setSubnodeRecord(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, ttl: PromiseOrValue<BigNumberish>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        setTTL(node: PromiseOrValue<BytesLike>, ttl: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        setUpgradeContract(_upgradeAddress: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-        unwrap(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<BytesLike>, owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        unwrapETH2LD(label: PromiseOrValue<BytesLike>, newRegistrant: PromiseOrValue<string>, newController: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        upgrade(name: PromiseOrValue<BytesLike>, extraData: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        upgradeContract(overrides?: CallOverrides): Promise<string>;
-        uri(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        wrap(name: PromiseOrValue<BytesLike>, wrappedOwner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        wrapETH2LD(label: PromiseOrValue<string>, wrappedOwner: PromiseOrValue<string>, ownerControlledFuses: PromiseOrValue<BigNumberish>, resolver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    allFusesBurned: TypedContractMethod<[
+        node: BytesLike,
+        fuseMask: BigNumberish
+    ], [
+        boolean
+    ], "view">;
+    approve: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    balanceOf: TypedContractMethod<[
+        account: AddressLike,
+        id: BigNumberish
+    ], [
+        bigint
+    ], "view">;
+    balanceOfBatch: TypedContractMethod<[
+        accounts: AddressLike[],
+        ids: BigNumberish[]
+    ], [
+        bigint[]
+    ], "view">;
+    canModifyName: TypedContractMethod<[
+        node: BytesLike,
+        addr: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    ens: TypedContractMethod<[], [string], "view">;
+    extendExpiry: TypedContractMethod<[
+        node: BytesLike,
+        labelhash: BytesLike,
+        expiry: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    getApproved: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getData: TypedContractMethod<[
+        id: BigNumberish
+    ], [
+        [string, bigint, bigint]
+    ], "view">;
+    isApprovedForAll: TypedContractMethod<[
+        account: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    "isWrapped(bytes32,bytes32)": TypedContractMethod<[
+        arg0: BytesLike,
+        arg1: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    "isWrapped(bytes32)": TypedContractMethod<[
+        arg0: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    metadataService: TypedContractMethod<[], [string], "view">;
+    name: TypedContractMethod<[], [string], "view">;
+    names: TypedContractMethod<[arg0: BytesLike], [string], "view">;
+    ownerOf: TypedContractMethod<[id: BigNumberish], [string], "view">;
+    registerAndWrapETH2LD: TypedContractMethod<[
+        label: string,
+        wrappedOwner: AddressLike,
+        duration: BigNumberish,
+        resolver: AddressLike,
+        ownerControlledFuses: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    registrar: TypedContractMethod<[], [string], "view">;
+    renew: TypedContractMethod<[
+        labelHash: BigNumberish,
+        duration: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    safeBatchTransferFrom: TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        ids: BigNumberish[],
+        amounts: BigNumberish[],
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    safeTransferFrom: TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        id: BigNumberish,
+        amount: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    setApprovalForAll: TypedContractMethod<[
+        operator: AddressLike,
+        approved: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    setChildFuses: TypedContractMethod<[
+        parentNode: BytesLike,
+        labelhash: BytesLike,
+        fuses: BigNumberish,
+        expiry: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    setFuses: TypedContractMethod<[
+        node: BytesLike,
+        ownerControlledFuses: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    setMetadataService: TypedContractMethod<[
+        _metadataService: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    setRecord: TypedContractMethod<[
+        node: BytesLike,
+        owner: AddressLike,
+        resolver: AddressLike,
+        ttl: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    setResolver: TypedContractMethod<[
+        node: BytesLike,
+        resolver: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    setSubnodeOwner: TypedContractMethod<[
+        node: BytesLike,
+        label: string,
+        newOwner: AddressLike,
+        fuses: BigNumberish,
+        expiry: BigNumberish
+    ], [
+        string
+    ], "nonpayable">;
+    setSubnodeRecord: TypedContractMethod<[
+        node: BytesLike,
+        label: string,
+        owner: AddressLike,
+        resolver: AddressLike,
+        ttl: BigNumberish,
+        fuses: BigNumberish,
+        expiry: BigNumberish
+    ], [
+        string
+    ], "nonpayable">;
+    setTTL: TypedContractMethod<[
+        node: BytesLike,
+        ttl: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    setUpgradeContract: TypedContractMethod<[
+        _upgradeAddress: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    supportsInterface: TypedContractMethod<[
+        interfaceID: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    unwrap: TypedContractMethod<[
+        node: BytesLike,
+        label: BytesLike,
+        owner: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    unwrapETH2LD: TypedContractMethod<[
+        label: BytesLike,
+        newRegistrant: AddressLike,
+        newController: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    upgrade: TypedContractMethod<[
+        name: BytesLike,
+        extraData: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    upgradeContract: TypedContractMethod<[], [string], "view">;
+    uri: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    wrap: TypedContractMethod<[
+        name: BytesLike,
+        wrappedOwner: AddressLike,
+        resolver: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    wrapETH2LD: TypedContractMethod<[
+        label: string,
+        wrappedOwner: AddressLike,
+        ownerControlledFuses: BigNumberish,
+        resolver: AddressLike
+    ], [
+        bigint
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "allFusesBurned"): TypedContractMethod<[
+        node: BytesLike,
+        fuseMask: BigNumberish
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "approve"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "balanceOf"): TypedContractMethod<[
+        account: AddressLike,
+        id: BigNumberish
+    ], [
+        bigint
+    ], "view">;
+    getFunction(nameOrSignature: "balanceOfBatch"): TypedContractMethod<[
+        accounts: AddressLike[],
+        ids: BigNumberish[]
+    ], [
+        bigint[]
+    ], "view">;
+    getFunction(nameOrSignature: "canModifyName"): TypedContractMethod<[
+        node: BytesLike,
+        addr: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "ens"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "extendExpiry"): TypedContractMethod<[
+        node: BytesLike,
+        labelhash: BytesLike,
+        expiry: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "getApproved"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "getData"): TypedContractMethod<[
+        id: BigNumberish
+    ], [
+        [string, bigint, bigint]
+    ], "view">;
+    getFunction(nameOrSignature: "isApprovedForAll"): TypedContractMethod<[
+        account: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "isWrapped(bytes32,bytes32)"): TypedContractMethod<[arg0: BytesLike, arg1: BytesLike], [boolean], "view">;
+    getFunction(nameOrSignature: "isWrapped(bytes32)"): TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
+    getFunction(nameOrSignature: "metadataService"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "name"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "names"): TypedContractMethod<[arg0: BytesLike], [string], "view">;
+    getFunction(nameOrSignature: "ownerOf"): TypedContractMethod<[id: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "registerAndWrapETH2LD"): TypedContractMethod<[
+        label: string,
+        wrappedOwner: AddressLike,
+        duration: BigNumberish,
+        resolver: AddressLike,
+        ownerControlledFuses: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "registrar"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "renew"): TypedContractMethod<[
+        labelHash: BigNumberish,
+        duration: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "safeBatchTransferFrom"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        ids: BigNumberish[],
+        amounts: BigNumberish[],
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "safeTransferFrom"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        id: BigNumberish,
+        amount: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setApprovalForAll"): TypedContractMethod<[
+        operator: AddressLike,
+        approved: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setChildFuses"): TypedContractMethod<[
+        parentNode: BytesLike,
+        labelhash: BytesLike,
+        fuses: BigNumberish,
+        expiry: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setFuses"): TypedContractMethod<[
+        node: BytesLike,
+        ownerControlledFuses: BigNumberish
+    ], [
+        bigint
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setMetadataService"): TypedContractMethod<[_metadataService: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "setRecord"): TypedContractMethod<[
+        node: BytesLike,
+        owner: AddressLike,
+        resolver: AddressLike,
+        ttl: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setResolver"): TypedContractMethod<[
+        node: BytesLike,
+        resolver: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setSubnodeOwner"): TypedContractMethod<[
+        node: BytesLike,
+        label: string,
+        newOwner: AddressLike,
+        fuses: BigNumberish,
+        expiry: BigNumberish
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setSubnodeRecord"): TypedContractMethod<[
+        node: BytesLike,
+        label: string,
+        owner: AddressLike,
+        resolver: AddressLike,
+        ttl: BigNumberish,
+        fuses: BigNumberish,
+        expiry: BigNumberish
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setTTL"): TypedContractMethod<[
+        node: BytesLike,
+        ttl: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setUpgradeContract"): TypedContractMethod<[_upgradeAddress: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceID: BytesLike], [boolean], "view">;
+    getFunction(nameOrSignature: "unwrap"): TypedContractMethod<[
+        node: BytesLike,
+        label: BytesLike,
+        owner: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "unwrapETH2LD"): TypedContractMethod<[
+        label: BytesLike,
+        newRegistrant: AddressLike,
+        newController: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "upgrade"): TypedContractMethod<[
+        name: BytesLike,
+        extraData: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "upgradeContract"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "uri"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "wrap"): TypedContractMethod<[
+        name: BytesLike,
+        wrappedOwner: AddressLike,
+        resolver: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "wrapETH2LD"): TypedContractMethod<[
+        label: string,
+        wrappedOwner: AddressLike,
+        ownerControlledFuses: BigNumberish,
+        resolver: AddressLike
+    ], [
+        bigint
+    ], "nonpayable">;
+    getEvent(key: "ApprovalForAll"): TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+    getEvent(key: "ExpiryExtended"): TypedContractEvent<ExpiryExtendedEvent.InputTuple, ExpiryExtendedEvent.OutputTuple, ExpiryExtendedEvent.OutputObject>;
+    getEvent(key: "FusesSet"): TypedContractEvent<FusesSetEvent.InputTuple, FusesSetEvent.OutputTuple, FusesSetEvent.OutputObject>;
+    getEvent(key: "NameUnwrapped"): TypedContractEvent<NameUnwrappedEvent.InputTuple, NameUnwrappedEvent.OutputTuple, NameUnwrappedEvent.OutputObject>;
+    getEvent(key: "NameWrapped"): TypedContractEvent<NameWrappedEvent.InputTuple, NameWrappedEvent.OutputTuple, NameWrappedEvent.OutputObject>;
+    getEvent(key: "TransferBatch"): TypedContractEvent<TransferBatchEvent.InputTuple, TransferBatchEvent.OutputTuple, TransferBatchEvent.OutputObject>;
+    getEvent(key: "TransferSingle"): TypedContractEvent<TransferSingleEvent.InputTuple, TransferSingleEvent.OutputTuple, TransferSingleEvent.OutputObject>;
+    getEvent(key: "URI"): TypedContractEvent<URIEvent.InputTuple, URIEvent.OutputTuple, URIEvent.OutputObject>;
     filters: {
-        "ApprovalForAll(address,address,bool)"(account?: PromiseOrValue<string> | null, operator?: PromiseOrValue<string> | null, approved?: null): ApprovalForAllEventFilter;
-        ApprovalForAll(account?: PromiseOrValue<string> | null, operator?: PromiseOrValue<string> | null, approved?: null): ApprovalForAllEventFilter;
-        "ExpiryExtended(bytes32,uint64)"(node?: PromiseOrValue<BytesLike> | null, expiry?: null): ExpiryExtendedEventFilter;
-        ExpiryExtended(node?: PromiseOrValue<BytesLike> | null, expiry?: null): ExpiryExtendedEventFilter;
-        "FusesSet(bytes32,uint32)"(node?: PromiseOrValue<BytesLike> | null, fuses?: null): FusesSetEventFilter;
-        FusesSet(node?: PromiseOrValue<BytesLike> | null, fuses?: null): FusesSetEventFilter;
-        "NameUnwrapped(bytes32,address)"(node?: PromiseOrValue<BytesLike> | null, owner?: null): NameUnwrappedEventFilter;
-        NameUnwrapped(node?: PromiseOrValue<BytesLike> | null, owner?: null): NameUnwrappedEventFilter;
-        "NameWrapped(bytes32,bytes,address,uint32,uint64)"(node?: PromiseOrValue<BytesLike> | null, name?: null, owner?: null, fuses?: null, expiry?: null): NameWrappedEventFilter;
-        NameWrapped(node?: PromiseOrValue<BytesLike> | null, name?: null, owner?: null, fuses?: null, expiry?: null): NameWrappedEventFilter;
-        "TransferBatch(address,address,address,uint256[],uint256[])"(operator?: PromiseOrValue<string> | null, from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, ids?: null, values?: null): TransferBatchEventFilter;
-        TransferBatch(operator?: PromiseOrValue<string> | null, from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, ids?: null, values?: null): TransferBatchEventFilter;
-        "TransferSingle(address,address,address,uint256,uint256)"(operator?: PromiseOrValue<string> | null, from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, id?: null, value?: null): TransferSingleEventFilter;
-        TransferSingle(operator?: PromiseOrValue<string> | null, from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, id?: null, value?: null): TransferSingleEventFilter;
-        "URI(string,uint256)"(value?: null, id?: PromiseOrValue<BigNumberish> | null): URIEventFilter;
-        URI(value?: null, id?: PromiseOrValue<BigNumberish> | null): URIEventFilter;
-    };
-    estimateGas: {
-        allFusesBurned(node: PromiseOrValue<BytesLike>, fuseMask: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        balanceOf(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        balanceOfBatch(accounts: PromiseOrValue<string>[], ids: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<BigNumber>;
-        canModifyName(node: PromiseOrValue<BytesLike>, addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        ens(overrides?: CallOverrides): Promise<BigNumber>;
-        extendExpiry(node: PromiseOrValue<BytesLike>, labelhash: PromiseOrValue<BytesLike>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        getData(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        isApprovedForAll(account: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        "isWrapped(bytes32,bytes32)"(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        "isWrapped(bytes32)"(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        metadataService(overrides?: CallOverrides): Promise<BigNumber>;
-        name(overrides?: CallOverrides): Promise<BigNumber>;
-        names(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        ownerOf(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        registerAndWrapETH2LD(label: PromiseOrValue<string>, wrappedOwner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, resolver: PromiseOrValue<string>, ownerControlledFuses: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        registrar(overrides?: CallOverrides): Promise<BigNumber>;
-        renew(labelHash: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        safeBatchTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        safeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setChildFuses(parentNode: PromiseOrValue<BytesLike>, labelhash: PromiseOrValue<BytesLike>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setFuses(node: PromiseOrValue<BytesLike>, ownerControlledFuses: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setMetadataService(_metadataService: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setRecord(node: PromiseOrValue<BytesLike>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, ttl: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setResolver(node: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setSubnodeOwner(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<string>, newOwner: PromiseOrValue<string>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setSubnodeRecord(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, ttl: PromiseOrValue<BigNumberish>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setTTL(node: PromiseOrValue<BytesLike>, ttl: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setUpgradeContract(_upgradeAddress: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        unwrap(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<BytesLike>, owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        unwrapETH2LD(label: PromiseOrValue<BytesLike>, newRegistrant: PromiseOrValue<string>, newController: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        upgrade(name: PromiseOrValue<BytesLike>, extraData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        upgradeContract(overrides?: CallOverrides): Promise<BigNumber>;
-        uri(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        wrap(name: PromiseOrValue<BytesLike>, wrappedOwner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        wrapETH2LD(label: PromiseOrValue<string>, wrappedOwner: PromiseOrValue<string>, ownerControlledFuses: PromiseOrValue<BigNumberish>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        allFusesBurned(node: PromiseOrValue<BytesLike>, fuseMask: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        balanceOf(account: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        balanceOfBatch(accounts: PromiseOrValue<string>[], ids: PromiseOrValue<BigNumberish>[], overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        canModifyName(node: PromiseOrValue<BytesLike>, addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        ens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        extendExpiry(node: PromiseOrValue<BytesLike>, labelhash: PromiseOrValue<BytesLike>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getData(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isApprovedForAll(account: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        "isWrapped(bytes32,bytes32)"(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        "isWrapped(bytes32)"(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        metadataService(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        names(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        ownerOf(id: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        registerAndWrapETH2LD(label: PromiseOrValue<string>, wrappedOwner: PromiseOrValue<string>, duration: PromiseOrValue<BigNumberish>, resolver: PromiseOrValue<string>, ownerControlledFuses: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        registrar(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        renew(labelHash: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        safeBatchTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, ids: PromiseOrValue<BigNumberish>[], amounts: PromiseOrValue<BigNumberish>[], data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        safeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, id: PromiseOrValue<BigNumberish>, amount: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setApprovalForAll(operator: PromiseOrValue<string>, approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setChildFuses(parentNode: PromiseOrValue<BytesLike>, labelhash: PromiseOrValue<BytesLike>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setFuses(node: PromiseOrValue<BytesLike>, ownerControlledFuses: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setMetadataService(_metadataService: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setRecord(node: PromiseOrValue<BytesLike>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, ttl: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setResolver(node: PromiseOrValue<BytesLike>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setSubnodeOwner(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<string>, newOwner: PromiseOrValue<string>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setSubnodeRecord(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, ttl: PromiseOrValue<BigNumberish>, fuses: PromiseOrValue<BigNumberish>, expiry: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setTTL(node: PromiseOrValue<BytesLike>, ttl: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setUpgradeContract(_upgradeAddress: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        unwrap(node: PromiseOrValue<BytesLike>, label: PromiseOrValue<BytesLike>, owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        unwrapETH2LD(label: PromiseOrValue<BytesLike>, newRegistrant: PromiseOrValue<string>, newController: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        upgrade(name: PromiseOrValue<BytesLike>, extraData: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        upgradeContract(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        uri(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        wrap(name: PromiseOrValue<BytesLike>, wrappedOwner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        wrapETH2LD(label: PromiseOrValue<string>, wrappedOwner: PromiseOrValue<string>, ownerControlledFuses: PromiseOrValue<BigNumberish>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "ApprovalForAll(address,address,bool)": TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+        ApprovalForAll: TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+        "ExpiryExtended(bytes32,uint64)": TypedContractEvent<ExpiryExtendedEvent.InputTuple, ExpiryExtendedEvent.OutputTuple, ExpiryExtendedEvent.OutputObject>;
+        ExpiryExtended: TypedContractEvent<ExpiryExtendedEvent.InputTuple, ExpiryExtendedEvent.OutputTuple, ExpiryExtendedEvent.OutputObject>;
+        "FusesSet(bytes32,uint32)": TypedContractEvent<FusesSetEvent.InputTuple, FusesSetEvent.OutputTuple, FusesSetEvent.OutputObject>;
+        FusesSet: TypedContractEvent<FusesSetEvent.InputTuple, FusesSetEvent.OutputTuple, FusesSetEvent.OutputObject>;
+        "NameUnwrapped(bytes32,address)": TypedContractEvent<NameUnwrappedEvent.InputTuple, NameUnwrappedEvent.OutputTuple, NameUnwrappedEvent.OutputObject>;
+        NameUnwrapped: TypedContractEvent<NameUnwrappedEvent.InputTuple, NameUnwrappedEvent.OutputTuple, NameUnwrappedEvent.OutputObject>;
+        "NameWrapped(bytes32,bytes,address,uint32,uint64)": TypedContractEvent<NameWrappedEvent.InputTuple, NameWrappedEvent.OutputTuple, NameWrappedEvent.OutputObject>;
+        NameWrapped: TypedContractEvent<NameWrappedEvent.InputTuple, NameWrappedEvent.OutputTuple, NameWrappedEvent.OutputObject>;
+        "TransferBatch(address,address,address,uint256[],uint256[])": TypedContractEvent<TransferBatchEvent.InputTuple, TransferBatchEvent.OutputTuple, TransferBatchEvent.OutputObject>;
+        TransferBatch: TypedContractEvent<TransferBatchEvent.InputTuple, TransferBatchEvent.OutputTuple, TransferBatchEvent.OutputObject>;
+        "TransferSingle(address,address,address,uint256,uint256)": TypedContractEvent<TransferSingleEvent.InputTuple, TransferSingleEvent.OutputTuple, TransferSingleEvent.OutputObject>;
+        TransferSingle: TypedContractEvent<TransferSingleEvent.InputTuple, TransferSingleEvent.OutputTuple, TransferSingleEvent.OutputObject>;
+        "URI(string,uint256)": TypedContractEvent<URIEvent.InputTuple, URIEvent.OutputTuple, URIEvent.OutputObject>;
+        URI: TypedContractEvent<URIEvent.InputTuple, URIEvent.OutputTuple, URIEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=INameWrapper.d.ts.map

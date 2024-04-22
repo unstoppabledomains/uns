@@ -25,10 +25,10 @@ const _abi = [
 ];
 class IERC165Upgradeable__factory {
     static createInterface() {
-        return new ethers_1.utils.Interface(_abi);
+        return new ethers_1.Interface(_abi);
     }
-    static connect(address, signerOrProvider) {
-        return new ethers_1.Contract(address, _abi, signerOrProvider);
+    static connect(address, runner) {
+        return new ethers_1.Contract(address, _abi, runner);
     }
 }
 exports.IERC165Upgradeable__factory = IERC165Upgradeable__factory;

@@ -1,29 +1,15 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
-export interface AddrResolverInterface extends utils.Interface {
-    functions: {
-        "addr(bytes32)": FunctionFragment;
-        "addr(bytes32,uint256)": FunctionFragment;
-        "clearRecords(bytes32)": FunctionFragment;
-        "recordVersions(bytes32)": FunctionFragment;
-        "setAddr(bytes32,uint256,bytes)": FunctionFragment;
-        "setAddr(bytes32,address)": FunctionFragment;
-        "supportsInterface(bytes4)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "addr(bytes32)" | "addr(bytes32,uint256)" | "clearRecords" | "recordVersions" | "setAddr(bytes32,uint256,bytes)" | "setAddr(bytes32,address)" | "supportsInterface"): FunctionFragment;
-    encodeFunctionData(functionFragment: "addr(bytes32)", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "addr(bytes32,uint256)", values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "clearRecords", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "recordVersions", values: [PromiseOrValue<BytesLike>]): string;
-    encodeFunctionData(functionFragment: "setAddr(bytes32,uint256,bytes)", values: [
-        PromiseOrValue<BytesLike>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
-    encodeFunctionData(functionFragment: "setAddr(bytes32,address)", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../../common";
+export interface AddrResolverInterface extends Interface {
+    getFunction(nameOrSignature: "addr(bytes32)" | "addr(bytes32,uint256)" | "clearRecords" | "recordVersions" | "setAddr(bytes32,uint256,bytes)" | "setAddr(bytes32,address)" | "supportsInterface"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "AddrChanged" | "AddressChanged" | "VersionChanged"): EventFragment;
+    encodeFunctionData(functionFragment: "addr(bytes32)", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "addr(bytes32,uint256)", values: [BytesLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "clearRecords", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "recordVersions", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "setAddr(bytes32,uint256,bytes)", values: [BytesLike, BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "setAddr(bytes32,address)", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     decodeFunctionResult(functionFragment: "addr(bytes32)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addr(bytes32,uint256)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "clearRecords", data: BytesLike): Result;
@@ -31,132 +17,126 @@ export interface AddrResolverInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "setAddr(bytes32,uint256,bytes)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setAddr(bytes32,address)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
-    events: {
-        "AddrChanged(bytes32,address)": EventFragment;
-        "AddressChanged(bytes32,uint256,bytes)": EventFragment;
-        "VersionChanged(bytes32,uint64)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "AddrChanged"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "AddressChanged"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "VersionChanged"): EventFragment;
 }
-export interface AddrChangedEventObject {
-    node: string;
-    a: string;
+export declare namespace AddrChangedEvent {
+    type InputTuple = [node: BytesLike, a: AddressLike];
+    type OutputTuple = [node: string, a: string];
+    interface OutputObject {
+        node: string;
+        a: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type AddrChangedEvent = TypedEvent<[
-    string,
-    string
-], AddrChangedEventObject>;
-export declare type AddrChangedEventFilter = TypedEventFilter<AddrChangedEvent>;
-export interface AddressChangedEventObject {
-    node: string;
-    coinType: BigNumber;
-    newAddress: string;
+export declare namespace AddressChangedEvent {
+    type InputTuple = [
+        node: BytesLike,
+        coinType: BigNumberish,
+        newAddress: BytesLike
+    ];
+    type OutputTuple = [
+        node: string,
+        coinType: bigint,
+        newAddress: string
+    ];
+    interface OutputObject {
+        node: string;
+        coinType: bigint;
+        newAddress: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type AddressChangedEvent = TypedEvent<[
-    string,
-    BigNumber,
-    string
-], AddressChangedEventObject>;
-export declare type AddressChangedEventFilter = TypedEventFilter<AddressChangedEvent>;
-export interface VersionChangedEventObject {
-    node: string;
-    newVersion: BigNumber;
+export declare namespace VersionChangedEvent {
+    type InputTuple = [node: BytesLike, newVersion: BigNumberish];
+    type OutputTuple = [node: string, newVersion: bigint];
+    interface OutputObject {
+        node: string;
+        newVersion: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type VersionChangedEvent = TypedEvent<[
-    string,
-    BigNumber
-], VersionChangedEventObject>;
-export declare type VersionChangedEventFilter = TypedEventFilter<VersionChangedEvent>;
 export interface AddrResolver extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): AddrResolver;
+    waitForDeployment(): Promise<this>;
     interface: AddrResolverInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        "addr(bytes32)"(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[string]>;
-        "addr(bytes32,uint256)"(node: PromiseOrValue<BytesLike>, coinType: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        clearRecords(node: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        recordVersions(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        "setAddr(bytes32,uint256,bytes)"(node: PromiseOrValue<BytesLike>, coinType: PromiseOrValue<BigNumberish>, a: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "setAddr(bytes32,address)"(node: PromiseOrValue<BytesLike>, a: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-    };
-    "addr(bytes32)"(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-    "addr(bytes32,uint256)"(node: PromiseOrValue<BytesLike>, coinType: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    clearRecords(node: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    recordVersions(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    "setAddr(bytes32,uint256,bytes)"(node: PromiseOrValue<BytesLike>, coinType: PromiseOrValue<BigNumberish>, a: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "setAddr(bytes32,address)"(node: PromiseOrValue<BytesLike>, a: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    callStatic: {
-        "addr(bytes32)"(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<string>;
-        "addr(bytes32,uint256)"(node: PromiseOrValue<BytesLike>, coinType: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        clearRecords(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        recordVersions(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        "setAddr(bytes32,uint256,bytes)"(node: PromiseOrValue<BytesLike>, coinType: PromiseOrValue<BigNumberish>, a: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        "setAddr(bytes32,address)"(node: PromiseOrValue<BytesLike>, a: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    "addr(bytes32)": TypedContractMethod<[node: BytesLike], [string], "view">;
+    "addr(bytes32,uint256)": TypedContractMethod<[
+        node: BytesLike,
+        coinType: BigNumberish
+    ], [
+        string
+    ], "view">;
+    clearRecords: TypedContractMethod<[node: BytesLike], [void], "nonpayable">;
+    recordVersions: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+    "setAddr(bytes32,uint256,bytes)": TypedContractMethod<[
+        node: BytesLike,
+        coinType: BigNumberish,
+        a: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    "setAddr(bytes32,address)": TypedContractMethod<[
+        node: BytesLike,
+        a: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    supportsInterface: TypedContractMethod<[
+        interfaceID: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "addr(bytes32)"): TypedContractMethod<[node: BytesLike], [string], "view">;
+    getFunction(nameOrSignature: "addr(bytes32,uint256)"): TypedContractMethod<[
+        node: BytesLike,
+        coinType: BigNumberish
+    ], [
+        string
+    ], "view">;
+    getFunction(nameOrSignature: "clearRecords"): TypedContractMethod<[node: BytesLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "recordVersions"): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+    getFunction(nameOrSignature: "setAddr(bytes32,uint256,bytes)"): TypedContractMethod<[
+        node: BytesLike,
+        coinType: BigNumberish,
+        a: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setAddr(bytes32,address)"): TypedContractMethod<[
+        node: BytesLike,
+        a: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceID: BytesLike], [boolean], "view">;
+    getEvent(key: "AddrChanged"): TypedContractEvent<AddrChangedEvent.InputTuple, AddrChangedEvent.OutputTuple, AddrChangedEvent.OutputObject>;
+    getEvent(key: "AddressChanged"): TypedContractEvent<AddressChangedEvent.InputTuple, AddressChangedEvent.OutputTuple, AddressChangedEvent.OutputObject>;
+    getEvent(key: "VersionChanged"): TypedContractEvent<VersionChangedEvent.InputTuple, VersionChangedEvent.OutputTuple, VersionChangedEvent.OutputObject>;
     filters: {
-        "AddrChanged(bytes32,address)"(node?: PromiseOrValue<BytesLike> | null, a?: null): AddrChangedEventFilter;
-        AddrChanged(node?: PromiseOrValue<BytesLike> | null, a?: null): AddrChangedEventFilter;
-        "AddressChanged(bytes32,uint256,bytes)"(node?: PromiseOrValue<BytesLike> | null, coinType?: null, newAddress?: null): AddressChangedEventFilter;
-        AddressChanged(node?: PromiseOrValue<BytesLike> | null, coinType?: null, newAddress?: null): AddressChangedEventFilter;
-        "VersionChanged(bytes32,uint64)"(node?: PromiseOrValue<BytesLike> | null, newVersion?: null): VersionChangedEventFilter;
-        VersionChanged(node?: PromiseOrValue<BytesLike> | null, newVersion?: null): VersionChangedEventFilter;
-    };
-    estimateGas: {
-        "addr(bytes32)"(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        "addr(bytes32,uint256)"(node: PromiseOrValue<BytesLike>, coinType: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        clearRecords(node: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        recordVersions(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        "setAddr(bytes32,uint256,bytes)"(node: PromiseOrValue<BytesLike>, coinType: PromiseOrValue<BigNumberish>, a: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "setAddr(bytes32,address)"(node: PromiseOrValue<BytesLike>, a: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        "addr(bytes32)"(node: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        "addr(bytes32,uint256)"(node: PromiseOrValue<BytesLike>, coinType: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        clearRecords(node: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        recordVersions(arg0: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        "setAddr(bytes32,uint256,bytes)"(node: PromiseOrValue<BytesLike>, coinType: PromiseOrValue<BigNumberish>, a: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "setAddr(bytes32,address)"(node: PromiseOrValue<BytesLike>, a: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "AddrChanged(bytes32,address)": TypedContractEvent<AddrChangedEvent.InputTuple, AddrChangedEvent.OutputTuple, AddrChangedEvent.OutputObject>;
+        AddrChanged: TypedContractEvent<AddrChangedEvent.InputTuple, AddrChangedEvent.OutputTuple, AddrChangedEvent.OutputObject>;
+        "AddressChanged(bytes32,uint256,bytes)": TypedContractEvent<AddressChangedEvent.InputTuple, AddressChangedEvent.OutputTuple, AddressChangedEvent.OutputObject>;
+        AddressChanged: TypedContractEvent<AddressChangedEvent.InputTuple, AddressChangedEvent.OutputTuple, AddressChangedEvent.OutputObject>;
+        "VersionChanged(bytes32,uint64)": TypedContractEvent<VersionChangedEvent.InputTuple, VersionChangedEvent.OutputTuple, VersionChangedEvent.OutputObject>;
+        VersionChanged: TypedContractEvent<VersionChangedEvent.InputTuple, VersionChangedEvent.OutputTuple, VersionChangedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=AddrResolver.d.ts.map

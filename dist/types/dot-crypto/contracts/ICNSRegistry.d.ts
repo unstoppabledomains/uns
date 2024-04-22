@@ -1,115 +1,37 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
-export interface ICNSRegistryInterface extends utils.Interface {
-    functions: {
-        "approve(address,uint256)": FunctionFragment;
-        "balanceOf(address)": FunctionFragment;
-        "burnChild(uint256,string)": FunctionFragment;
-        "childIdOf(uint256,string)": FunctionFragment;
-        "controlledBurn(uint256)": FunctionFragment;
-        "controlledMintChild(address,uint256,string)": FunctionFragment;
-        "controlledResolveTo(address,uint256)": FunctionFragment;
-        "controlledSafeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
-        "controlledSetTokenURIPrefix(string)": FunctionFragment;
-        "controlledTransferFrom(address,address,uint256)": FunctionFragment;
-        "getApproved(uint256)": FunctionFragment;
-        "isApprovedForAll(address,address)": FunctionFragment;
-        "isApprovedOrOwner(address,uint256)": FunctionFragment;
-        "mintChild(address,uint256,string)": FunctionFragment;
-        "name()": FunctionFragment;
-        "ownerOf(uint256)": FunctionFragment;
-        "resolveTo(address,uint256)": FunctionFragment;
-        "resolverOf(uint256)": FunctionFragment;
-        "safeTransferFrom(address,address,uint256)": FunctionFragment;
-        "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
-        "safeTransferFromChild(address,address,uint256,string)": FunctionFragment;
-        "safeTransferFromChild(address,address,uint256,string,bytes)": FunctionFragment;
-        "setApprovalForAll(address,bool)": FunctionFragment;
-        "setOwner(address,uint256)": FunctionFragment;
-        "supportsInterface(bytes4)": FunctionFragment;
-        "symbol()": FunctionFragment;
-        "tokenURI(uint256)": FunctionFragment;
-        "transferFrom(address,address,uint256)": FunctionFragment;
-        "transferFromChild(address,address,uint256,string)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "approve" | "balanceOf" | "burnChild" | "childIdOf" | "controlledBurn" | "controlledMintChild" | "controlledResolveTo" | "controlledSafeTransferFrom" | "controlledSetTokenURIPrefix" | "controlledTransferFrom" | "getApproved" | "isApprovedForAll" | "isApprovedOrOwner" | "mintChild" | "name" | "ownerOf" | "resolveTo" | "resolverOf" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "safeTransferFromChild(address,address,uint256,string)" | "safeTransferFromChild(address,address,uint256,string,bytes)" | "setApprovalForAll" | "setOwner" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "transferFromChild"): FunctionFragment;
-    encodeFunctionData(functionFragment: "approve", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "burnChild", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "childIdOf", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "controlledBurn", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "controlledMintChild", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "controlledResolveTo", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "controlledSafeTransferFrom", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
-    encodeFunctionData(functionFragment: "controlledSetTokenURIPrefix", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "controlledTransferFrom", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "getApproved", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "isApprovedForAll", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "isApprovedOrOwner", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "mintChild", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>
-    ]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
+export interface ICNSRegistryInterface extends Interface {
+    getFunction(nameOrSignature: "approve" | "balanceOf" | "burnChild" | "childIdOf" | "controlledBurn" | "controlledMintChild" | "controlledResolveTo" | "controlledSafeTransferFrom" | "controlledSetTokenURIPrefix" | "controlledTransferFrom" | "getApproved" | "isApprovedForAll" | "isApprovedOrOwner" | "mintChild" | "name" | "ownerOf" | "resolveTo" | "resolverOf" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "safeTransferFromChild(address,address,uint256,string)" | "safeTransferFromChild(address,address,uint256,string,bytes)" | "setApprovalForAll" | "setOwner" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "transferFromChild"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "Approval" | "ApprovalForAll" | "NewURI" | "NewURIPrefix" | "Resolve" | "Sync" | "Transfer"): EventFragment;
+    encodeFunctionData(functionFragment: "approve", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "balanceOf", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "burnChild", values: [BigNumberish, string]): string;
+    encodeFunctionData(functionFragment: "childIdOf", values: [BigNumberish, string]): string;
+    encodeFunctionData(functionFragment: "controlledBurn", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "controlledMintChild", values: [AddressLike, BigNumberish, string]): string;
+    encodeFunctionData(functionFragment: "controlledResolveTo", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "controlledSafeTransferFrom", values: [AddressLike, AddressLike, BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "controlledSetTokenURIPrefix", values: [string]): string;
+    encodeFunctionData(functionFragment: "controlledTransferFrom", values: [AddressLike, AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getApproved", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "isApprovedForAll", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "isApprovedOrOwner", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "mintChild", values: [AddressLike, BigNumberish, string]): string;
     encodeFunctionData(functionFragment: "name", values?: undefined): string;
-    encodeFunctionData(functionFragment: "ownerOf", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "resolveTo", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "resolverOf", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256)", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256,bytes)", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
-    ]): string;
-    encodeFunctionData(functionFragment: "safeTransferFromChild(address,address,uint256,string)", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "safeTransferFromChild(address,address,uint256,string,bytes)", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BytesLike>
-    ]): string;
-    encodeFunctionData(functionFragment: "setApprovalForAll", values: [PromiseOrValue<string>, PromiseOrValue<boolean>]): string;
-    encodeFunctionData(functionFragment: "setOwner", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
+    encodeFunctionData(functionFragment: "ownerOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "resolveTo", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "resolverOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256)", values: [AddressLike, AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256,bytes)", values: [AddressLike, AddressLike, BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "safeTransferFromChild(address,address,uint256,string)", values: [AddressLike, AddressLike, BigNumberish, string]): string;
+    encodeFunctionData(functionFragment: "safeTransferFromChild(address,address,uint256,string,bytes)", values: [AddressLike, AddressLike, BigNumberish, string, BytesLike]): string;
+    encodeFunctionData(functionFragment: "setApprovalForAll", values: [AddressLike, boolean]): string;
+    encodeFunctionData(functionFragment: "setOwner", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
-    encodeFunctionData(functionFragment: "tokenURI", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "transferFrom", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "transferFromChild", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>
-    ]): string;
+    encodeFunctionData(functionFragment: "tokenURI", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "transferFrom", values: [AddressLike, AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "transferFromChild", values: [AddressLike, AddressLike, BigNumberish, string]): string;
     decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "burnChild", data: BytesLike): Result;
@@ -139,416 +61,446 @@ export interface ICNSRegistryInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferFrom", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferFromChild", data: BytesLike): Result;
-    events: {
-        "Approval(address,address,uint256)": EventFragment;
-        "ApprovalForAll(address,address,bool)": EventFragment;
-        "NewURI(uint256,string)": EventFragment;
-        "NewURIPrefix(string)": EventFragment;
-        "Resolve(uint256,address)": EventFragment;
-        "Sync(address,uint256,uint256)": EventFragment;
-        "Transfer(address,address,uint256)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NewURI"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NewURIPrefix"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Resolve"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Sync"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
-export interface ApprovalEventObject {
-    owner: string;
-    approved: string;
-    tokenId: BigNumber;
+export declare namespace ApprovalEvent {
+    type InputTuple = [
+        owner: AddressLike,
+        approved: AddressLike,
+        tokenId: BigNumberish
+    ];
+    type OutputTuple = [owner: string, approved: string, tokenId: bigint];
+    interface OutputObject {
+        owner: string;
+        approved: string;
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ApprovalEvent = TypedEvent<[
-    string,
-    string,
-    BigNumber
-], ApprovalEventObject>;
-export declare type ApprovalEventFilter = TypedEventFilter<ApprovalEvent>;
-export interface ApprovalForAllEventObject {
-    owner: string;
-    operator: string;
-    approved: boolean;
+export declare namespace ApprovalForAllEvent {
+    type InputTuple = [
+        owner: AddressLike,
+        operator: AddressLike,
+        approved: boolean
+    ];
+    type OutputTuple = [
+        owner: string,
+        operator: string,
+        approved: boolean
+    ];
+    interface OutputObject {
+        owner: string;
+        operator: string;
+        approved: boolean;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ApprovalForAllEvent = TypedEvent<[
-    string,
-    string,
-    boolean
-], ApprovalForAllEventObject>;
-export declare type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
-export interface NewURIEventObject {
-    tokenId: BigNumber;
-    uri: string;
+export declare namespace NewURIEvent {
+    type InputTuple = [tokenId: BigNumberish, uri: string];
+    type OutputTuple = [tokenId: bigint, uri: string];
+    interface OutputObject {
+        tokenId: bigint;
+        uri: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NewURIEvent = TypedEvent<[BigNumber, string], NewURIEventObject>;
-export declare type NewURIEventFilter = TypedEventFilter<NewURIEvent>;
-export interface NewURIPrefixEventObject {
-    prefix: string;
+export declare namespace NewURIPrefixEvent {
+    type InputTuple = [prefix: string];
+    type OutputTuple = [prefix: string];
+    interface OutputObject {
+        prefix: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NewURIPrefixEvent = TypedEvent<[string], NewURIPrefixEventObject>;
-export declare type NewURIPrefixEventFilter = TypedEventFilter<NewURIPrefixEvent>;
-export interface ResolveEventObject {
-    tokenId: BigNumber;
-    to: string;
+export declare namespace ResolveEvent {
+    type InputTuple = [tokenId: BigNumberish, to: AddressLike];
+    type OutputTuple = [tokenId: bigint, to: string];
+    interface OutputObject {
+        tokenId: bigint;
+        to: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ResolveEvent = TypedEvent<[BigNumber, string], ResolveEventObject>;
-export declare type ResolveEventFilter = TypedEventFilter<ResolveEvent>;
-export interface SyncEventObject {
-    resolver: string;
-    updateId: BigNumber;
-    tokenId: BigNumber;
+export declare namespace SyncEvent {
+    type InputTuple = [
+        resolver: AddressLike,
+        updateId: BigNumberish,
+        tokenId: BigNumberish
+    ];
+    type OutputTuple = [
+        resolver: string,
+        updateId: bigint,
+        tokenId: bigint
+    ];
+    interface OutputObject {
+        resolver: string;
+        updateId: bigint;
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type SyncEvent = TypedEvent<[
-    string,
-    BigNumber,
-    BigNumber
-], SyncEventObject>;
-export declare type SyncEventFilter = TypedEventFilter<SyncEvent>;
-export interface TransferEventObject {
-    from: string;
-    to: string;
-    tokenId: BigNumber;
+export declare namespace TransferEvent {
+    type InputTuple = [
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ];
+    type OutputTuple = [from: string, to: string, tokenId: bigint];
+    interface OutputObject {
+        from: string;
+        to: string;
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type TransferEvent = TypedEvent<[
-    string,
-    string,
-    BigNumber
-], TransferEventObject>;
-export declare type TransferEventFilter = TypedEventFilter<TransferEvent>;
 export interface ICNSRegistry extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): ICNSRegistry;
+    waitForDeployment(): Promise<this>;
     interface: ICNSRegistryInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber] & {
-            balance: BigNumber;
-        }>;
-        burnChild(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        childIdOf(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        controlledBurn(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        controlledMintChild(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        controlledResolveTo(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        controlledSafeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, _data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        controlledSetTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        controlledTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string] & {
-            operator: string;
-        }>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
-        mintChild(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        name(overrides?: CallOverrides): Promise<[string]>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string] & {
-            owner: string;
-        }>;
-        resolveTo(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "safeTransferFrom(address,address,uint256,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "safeTransferFromChild(address,address,uint256,string)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "safeTransferFromChild(address,address,uint256,string,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, _data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setApprovalForAll(operator: PromiseOrValue<string>, _approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-        symbol(overrides?: CallOverrides): Promise<[string]>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        transferFromChild(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-    burnChild(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    childIdOf(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-    controlledBurn(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    controlledMintChild(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    controlledResolveTo(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    controlledSafeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, _data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    controlledSetTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    controlledTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-    mintChild(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    name(overrides?: CallOverrides): Promise<string>;
-    ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    resolveTo(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "safeTransferFrom(address,address,uint256,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "safeTransferFromChild(address,address,uint256,string)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "safeTransferFromChild(address,address,uint256,string,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, _data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setApprovalForAll(operator: PromiseOrValue<string>, _approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    symbol(overrides?: CallOverrides): Promise<string>;
-    tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    transferFromChild(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        burnChild(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        childIdOf(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        controlledBurn(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        controlledMintChild(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        controlledResolveTo(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        controlledSafeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, _data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        controlledSetTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        controlledTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-        mintChild(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        name(overrides?: CallOverrides): Promise<string>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        resolveTo(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        "safeTransferFrom(address,address,uint256,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        "safeTransferFromChild(address,address,uint256,string)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        "safeTransferFromChild(address,address,uint256,string,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, _data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        setApprovalForAll(operator: PromiseOrValue<string>, _approved: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-        symbol(overrides?: CallOverrides): Promise<string>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        transferFromChild(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    approve: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    balanceOf: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+    burnChild: TypedContractMethod<[
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    childIdOf: TypedContractMethod<[
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        bigint
+    ], "view">;
+    controlledBurn: TypedContractMethod<[
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    controlledMintChild: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    controlledResolveTo: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    controlledSafeTransferFrom: TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        _data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    controlledSetTokenURIPrefix: TypedContractMethod<[
+        prefix: string
+    ], [
+        void
+    ], "nonpayable">;
+    controlledTransferFrom: TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getApproved: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    isApprovedForAll: TypedContractMethod<[
+        owner: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    isApprovedOrOwner: TypedContractMethod<[
+        spender: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        boolean
+    ], "view">;
+    mintChild: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    name: TypedContractMethod<[], [string], "view">;
+    ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    resolveTo: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    resolverOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    "safeTransferFrom(address,address,uint256)": TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    "safeTransferFrom(address,address,uint256,bytes)": TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    "safeTransferFromChild(address,address,uint256,string)": TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    "safeTransferFromChild(address,address,uint256,string,bytes)": TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        label: string,
+        _data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    setApprovalForAll: TypedContractMethod<[
+        operator: AddressLike,
+        _approved: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    setOwner: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    supportsInterface: TypedContractMethod<[
+        interfaceId: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    symbol: TypedContractMethod<[], [string], "view">;
+    tokenURI: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    transferFrom: TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    transferFromChild: TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "approve"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "balanceOf"): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+    getFunction(nameOrSignature: "burnChild"): TypedContractMethod<[
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "childIdOf"): TypedContractMethod<[
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        bigint
+    ], "view">;
+    getFunction(nameOrSignature: "controlledBurn"): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    getFunction(nameOrSignature: "controlledMintChild"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "controlledResolveTo"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "controlledSafeTransferFrom"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        _data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "controlledSetTokenURIPrefix"): TypedContractMethod<[prefix: string], [void], "nonpayable">;
+    getFunction(nameOrSignature: "controlledTransferFrom"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "getApproved"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "isApprovedForAll"): TypedContractMethod<[
+        owner: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "isApprovedOrOwner"): TypedContractMethod<[
+        spender: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "mintChild"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "name"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "ownerOf"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "resolveTo"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "resolverOf"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "safeTransferFrom(address,address,uint256)"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "safeTransferFrom(address,address,uint256,bytes)"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "safeTransferFromChild(address,address,uint256,string)"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "safeTransferFromChild(address,address,uint256,string,bytes)"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        label: string,
+        _data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setApprovalForAll"): TypedContractMethod<[
+        operator: AddressLike,
+        _approved: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setOwner"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
+    getFunction(nameOrSignature: "symbol"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "tokenURI"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "transferFrom"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "transferFromChild"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    getEvent(key: "Approval"): TypedContractEvent<ApprovalEvent.InputTuple, ApprovalEvent.OutputTuple, ApprovalEvent.OutputObject>;
+    getEvent(key: "ApprovalForAll"): TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+    getEvent(key: "NewURI"): TypedContractEvent<NewURIEvent.InputTuple, NewURIEvent.OutputTuple, NewURIEvent.OutputObject>;
+    getEvent(key: "NewURIPrefix"): TypedContractEvent<NewURIPrefixEvent.InputTuple, NewURIPrefixEvent.OutputTuple, NewURIPrefixEvent.OutputObject>;
+    getEvent(key: "Resolve"): TypedContractEvent<ResolveEvent.InputTuple, ResolveEvent.OutputTuple, ResolveEvent.OutputObject>;
+    getEvent(key: "Sync"): TypedContractEvent<SyncEvent.InputTuple, SyncEvent.OutputTuple, SyncEvent.OutputObject>;
+    getEvent(key: "Transfer"): TypedContractEvent<TransferEvent.InputTuple, TransferEvent.OutputTuple, TransferEvent.OutputObject>;
     filters: {
-        "Approval(address,address,uint256)"(owner?: PromiseOrValue<string> | null, approved?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): ApprovalEventFilter;
-        Approval(owner?: PromiseOrValue<string> | null, approved?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): ApprovalEventFilter;
-        "ApprovalForAll(address,address,bool)"(owner?: PromiseOrValue<string> | null, operator?: PromiseOrValue<string> | null, approved?: null): ApprovalForAllEventFilter;
-        ApprovalForAll(owner?: PromiseOrValue<string> | null, operator?: PromiseOrValue<string> | null, approved?: null): ApprovalForAllEventFilter;
-        "NewURI(uint256,string)"(tokenId?: PromiseOrValue<BigNumberish> | null, uri?: null): NewURIEventFilter;
-        NewURI(tokenId?: PromiseOrValue<BigNumberish> | null, uri?: null): NewURIEventFilter;
-        "NewURIPrefix(string)"(prefix?: null): NewURIPrefixEventFilter;
-        NewURIPrefix(prefix?: null): NewURIPrefixEventFilter;
-        "Resolve(uint256,address)"(tokenId?: PromiseOrValue<BigNumberish> | null, to?: PromiseOrValue<string> | null): ResolveEventFilter;
-        Resolve(tokenId?: PromiseOrValue<BigNumberish> | null, to?: PromiseOrValue<string> | null): ResolveEventFilter;
-        "Sync(address,uint256,uint256)"(resolver?: PromiseOrValue<string> | null, updateId?: PromiseOrValue<BigNumberish> | null, tokenId?: PromiseOrValue<BigNumberish> | null): SyncEventFilter;
-        Sync(resolver?: PromiseOrValue<string> | null, updateId?: PromiseOrValue<BigNumberish> | null, tokenId?: PromiseOrValue<BigNumberish> | null): SyncEventFilter;
-        "Transfer(address,address,uint256)"(from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): TransferEventFilter;
-        Transfer(from?: PromiseOrValue<string> | null, to?: PromiseOrValue<string> | null, tokenId?: PromiseOrValue<BigNumberish> | null): TransferEventFilter;
-    };
-    estimateGas: {
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        burnChild(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        childIdOf(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        controlledBurn(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        controlledMintChild(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        controlledResolveTo(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        controlledSafeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, _data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        controlledSetTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        controlledTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        mintChild(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        name(overrides?: CallOverrides): Promise<BigNumber>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        resolveTo(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "safeTransferFrom(address,address,uint256,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "safeTransferFromChild(address,address,uint256,string)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "safeTransferFromChild(address,address,uint256,string,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, _data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setApprovalForAll(operator: PromiseOrValue<string>, _approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        symbol(overrides?: CallOverrides): Promise<BigNumber>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        transferFromChild(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        approve(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        burnChild(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        childIdOf(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        controlledBurn(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        controlledMintChild(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        controlledResolveTo(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        controlledSafeTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, _data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        controlledSetTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        controlledTransferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        mintChild(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        resolveTo(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        "safeTransferFrom(address,address,uint256)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "safeTransferFrom(address,address,uint256,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "safeTransferFromChild(address,address,uint256,string)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "safeTransferFromChild(address,address,uint256,string,bytes)"(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, _data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setApprovalForAll(operator: PromiseOrValue<string>, _approved: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setOwner(to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        supportsInterface(interfaceId: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        transferFrom(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        transferFromChild(from: PromiseOrValue<string>, to: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "Approval(address,address,uint256)": TypedContractEvent<ApprovalEvent.InputTuple, ApprovalEvent.OutputTuple, ApprovalEvent.OutputObject>;
+        Approval: TypedContractEvent<ApprovalEvent.InputTuple, ApprovalEvent.OutputTuple, ApprovalEvent.OutputObject>;
+        "ApprovalForAll(address,address,bool)": TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+        ApprovalForAll: TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+        "NewURI(uint256,string)": TypedContractEvent<NewURIEvent.InputTuple, NewURIEvent.OutputTuple, NewURIEvent.OutputObject>;
+        NewURI: TypedContractEvent<NewURIEvent.InputTuple, NewURIEvent.OutputTuple, NewURIEvent.OutputObject>;
+        "NewURIPrefix(string)": TypedContractEvent<NewURIPrefixEvent.InputTuple, NewURIPrefixEvent.OutputTuple, NewURIPrefixEvent.OutputObject>;
+        NewURIPrefix: TypedContractEvent<NewURIPrefixEvent.InputTuple, NewURIPrefixEvent.OutputTuple, NewURIPrefixEvent.OutputObject>;
+        "Resolve(uint256,address)": TypedContractEvent<ResolveEvent.InputTuple, ResolveEvent.OutputTuple, ResolveEvent.OutputObject>;
+        Resolve: TypedContractEvent<ResolveEvent.InputTuple, ResolveEvent.OutputTuple, ResolveEvent.OutputObject>;
+        "Sync(address,uint256,uint256)": TypedContractEvent<SyncEvent.InputTuple, SyncEvent.OutputTuple, SyncEvent.OutputObject>;
+        Sync: TypedContractEvent<SyncEvent.InputTuple, SyncEvent.OutputTuple, SyncEvent.OutputObject>;
+        "Transfer(address,address,uint256)": TypedContractEvent<TransferEvent.InputTuple, TransferEvent.OutputTuple, TransferEvent.OutputObject>;
+        Transfer: TypedContractEvent<TransferEvent.InputTuple, TransferEvent.OutputTuple, TransferEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=ICNSRegistry.d.ts.map

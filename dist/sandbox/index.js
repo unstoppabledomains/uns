@@ -21,7 +21,7 @@ const bip39_1 = require("bip39");
 const secp256k1_1 = __importDefault(require("secp256k1"));
 const keccak_1 = __importDefault(require("keccak"));
 const debug_1 = __importDefault(require("debug"));
-const helpers_1 = require("../src/helpers");
+const utils_1 = require("../src/utils");
 const ganache_service_1 = require("./ganache-service");
 const log = (0, debug_1.default)('UNS:sandbox');
 const DEFAULT_SERVER_CONFIG = {
@@ -49,7 +49,7 @@ class Sandbox {
         this.provider = service.provider;
         this.snapshotId = undefined;
         this.version = '0.6';
-        const accounts = this.getAccounts((0, helpers_1.unwrap)(this.options, 'network'));
+        const accounts = this.getAccounts((0, utils_1.unwrap)(this.options, 'network'));
         this.accounts || (this.accounts = {
             owner: accounts[0],
             minter: accounts[1],

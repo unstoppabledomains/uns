@@ -1,27 +1,15 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../common";
-export interface BulkWhitelistedRoleInterface extends utils.Interface {
-    functions: {
-        "addWhitelistAdmin(address)": FunctionFragment;
-        "addWhitelisted(address)": FunctionFragment;
-        "bulkAddWhitelisted(address[])": FunctionFragment;
-        "bulkRemoveWhitelisted(address[])": FunctionFragment;
-        "isWhitelistAdmin(address)": FunctionFragment;
-        "isWhitelisted(address)": FunctionFragment;
-        "removeWhitelisted(address)": FunctionFragment;
-        "renounceWhitelistAdmin()": FunctionFragment;
-        "renounceWhitelisted()": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "addWhitelistAdmin" | "addWhitelisted" | "bulkAddWhitelisted" | "bulkRemoveWhitelisted" | "isWhitelistAdmin" | "isWhitelisted" | "removeWhitelisted" | "renounceWhitelistAdmin" | "renounceWhitelisted"): FunctionFragment;
-    encodeFunctionData(functionFragment: "addWhitelistAdmin", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "addWhitelisted", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "bulkAddWhitelisted", values: [PromiseOrValue<string>[]]): string;
-    encodeFunctionData(functionFragment: "bulkRemoveWhitelisted", values: [PromiseOrValue<string>[]]): string;
-    encodeFunctionData(functionFragment: "isWhitelistAdmin", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "isWhitelisted", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "removeWhitelisted", values: [PromiseOrValue<string>]): string;
+import type { BaseContract, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../common";
+export interface BulkWhitelistedRoleInterface extends Interface {
+    getFunction(nameOrSignature: "addWhitelistAdmin" | "addWhitelisted" | "bulkAddWhitelisted" | "bulkRemoveWhitelisted" | "isWhitelistAdmin" | "isWhitelisted" | "removeWhitelisted" | "renounceWhitelistAdmin" | "renounceWhitelisted"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "WhitelistAdminAdded" | "WhitelistAdminRemoved" | "WhitelistedAdded" | "WhitelistedRemoved"): EventFragment;
+    encodeFunctionData(functionFragment: "addWhitelistAdmin", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "addWhitelisted", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "bulkAddWhitelisted", values: [AddressLike[]]): string;
+    encodeFunctionData(functionFragment: "bulkRemoveWhitelisted", values: [AddressLike[]]): string;
+    encodeFunctionData(functionFragment: "isWhitelistAdmin", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "isWhitelisted", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "removeWhitelisted", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "renounceWhitelistAdmin", values?: undefined): string;
     encodeFunctionData(functionFragment: "renounceWhitelisted", values?: undefined): string;
     decodeFunctionResult(functionFragment: "addWhitelistAdmin", data: BytesLike): Result;
@@ -33,177 +21,120 @@ export interface BulkWhitelistedRoleInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "removeWhitelisted", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceWhitelistAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceWhitelisted", data: BytesLike): Result;
-    events: {
-        "WhitelistAdminAdded(address)": EventFragment;
-        "WhitelistAdminRemoved(address)": EventFragment;
-        "WhitelistedAdded(address)": EventFragment;
-        "WhitelistedRemoved(address)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "WhitelistAdminAdded"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "WhitelistAdminRemoved"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "WhitelistedAdded"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "WhitelistedRemoved"): EventFragment;
 }
-export interface WhitelistAdminAddedEventObject {
-    account: string;
+export declare namespace WhitelistAdminAddedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type WhitelistAdminAddedEvent = TypedEvent<[
-    string
-], WhitelistAdminAddedEventObject>;
-export declare type WhitelistAdminAddedEventFilter = TypedEventFilter<WhitelistAdminAddedEvent>;
-export interface WhitelistAdminRemovedEventObject {
-    account: string;
+export declare namespace WhitelistAdminRemovedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type WhitelistAdminRemovedEvent = TypedEvent<[
-    string
-], WhitelistAdminRemovedEventObject>;
-export declare type WhitelistAdminRemovedEventFilter = TypedEventFilter<WhitelistAdminRemovedEvent>;
-export interface WhitelistedAddedEventObject {
-    account: string;
+export declare namespace WhitelistedAddedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type WhitelistedAddedEvent = TypedEvent<[
-    string
-], WhitelistedAddedEventObject>;
-export declare type WhitelistedAddedEventFilter = TypedEventFilter<WhitelistedAddedEvent>;
-export interface WhitelistedRemovedEventObject {
-    account: string;
+export declare namespace WhitelistedRemovedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type WhitelistedRemovedEvent = TypedEvent<[
-    string
-], WhitelistedRemovedEventObject>;
-export declare type WhitelistedRemovedEventFilter = TypedEventFilter<WhitelistedRemovedEvent>;
 export interface BulkWhitelistedRole extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): BulkWhitelistedRole;
+    waitForDeployment(): Promise<this>;
     interface: BulkWhitelistedRoleInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        addWhitelistAdmin(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        addWhitelisted(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        bulkAddWhitelisted(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        bulkRemoveWhitelisted(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        isWhitelistAdmin(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        isWhitelisted(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        removeWhitelisted(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        renounceWhitelistAdmin(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        renounceWhitelisted(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    addWhitelistAdmin(account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    addWhitelisted(account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    bulkAddWhitelisted(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    bulkRemoveWhitelisted(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    isWhitelistAdmin(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    isWhitelisted(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    removeWhitelisted(account: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    renounceWhitelistAdmin(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    renounceWhitelisted(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        addWhitelistAdmin(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        addWhitelisted(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        bulkAddWhitelisted(accounts: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
-        bulkRemoveWhitelisted(accounts: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
-        isWhitelistAdmin(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        isWhitelisted(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        removeWhitelisted(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        renounceWhitelistAdmin(overrides?: CallOverrides): Promise<void>;
-        renounceWhitelisted(overrides?: CallOverrides): Promise<void>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    addWhitelistAdmin: TypedContractMethod<[
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    addWhitelisted: TypedContractMethod<[
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    bulkAddWhitelisted: TypedContractMethod<[
+        accounts: AddressLike[]
+    ], [
+        void
+    ], "nonpayable">;
+    bulkRemoveWhitelisted: TypedContractMethod<[
+        accounts: AddressLike[]
+    ], [
+        void
+    ], "nonpayable">;
+    isWhitelistAdmin: TypedContractMethod<[
+        account: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    isWhitelisted: TypedContractMethod<[account: AddressLike], [boolean], "view">;
+    removeWhitelisted: TypedContractMethod<[
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    renounceWhitelistAdmin: TypedContractMethod<[], [void], "nonpayable">;
+    renounceWhitelisted: TypedContractMethod<[], [void], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "addWhitelistAdmin"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "addWhitelisted"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "bulkAddWhitelisted"): TypedContractMethod<[accounts: AddressLike[]], [void], "nonpayable">;
+    getFunction(nameOrSignature: "bulkRemoveWhitelisted"): TypedContractMethod<[accounts: AddressLike[]], [void], "nonpayable">;
+    getFunction(nameOrSignature: "isWhitelistAdmin"): TypedContractMethod<[account: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "isWhitelisted"): TypedContractMethod<[account: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "removeWhitelisted"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "renounceWhitelistAdmin"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "renounceWhitelisted"): TypedContractMethod<[], [void], "nonpayable">;
+    getEvent(key: "WhitelistAdminAdded"): TypedContractEvent<WhitelistAdminAddedEvent.InputTuple, WhitelistAdminAddedEvent.OutputTuple, WhitelistAdminAddedEvent.OutputObject>;
+    getEvent(key: "WhitelistAdminRemoved"): TypedContractEvent<WhitelistAdminRemovedEvent.InputTuple, WhitelistAdminRemovedEvent.OutputTuple, WhitelistAdminRemovedEvent.OutputObject>;
+    getEvent(key: "WhitelistedAdded"): TypedContractEvent<WhitelistedAddedEvent.InputTuple, WhitelistedAddedEvent.OutputTuple, WhitelistedAddedEvent.OutputObject>;
+    getEvent(key: "WhitelistedRemoved"): TypedContractEvent<WhitelistedRemovedEvent.InputTuple, WhitelistedRemovedEvent.OutputTuple, WhitelistedRemovedEvent.OutputObject>;
     filters: {
-        "WhitelistAdminAdded(address)"(account?: PromiseOrValue<string> | null): WhitelistAdminAddedEventFilter;
-        WhitelistAdminAdded(account?: PromiseOrValue<string> | null): WhitelistAdminAddedEventFilter;
-        "WhitelistAdminRemoved(address)"(account?: PromiseOrValue<string> | null): WhitelistAdminRemovedEventFilter;
-        WhitelistAdminRemoved(account?: PromiseOrValue<string> | null): WhitelistAdminRemovedEventFilter;
-        "WhitelistedAdded(address)"(account?: PromiseOrValue<string> | null): WhitelistedAddedEventFilter;
-        WhitelistedAdded(account?: PromiseOrValue<string> | null): WhitelistedAddedEventFilter;
-        "WhitelistedRemoved(address)"(account?: PromiseOrValue<string> | null): WhitelistedRemovedEventFilter;
-        WhitelistedRemoved(account?: PromiseOrValue<string> | null): WhitelistedRemovedEventFilter;
-    };
-    estimateGas: {
-        addWhitelistAdmin(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        addWhitelisted(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        bulkAddWhitelisted(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        bulkRemoveWhitelisted(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        isWhitelistAdmin(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        isWhitelisted(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        removeWhitelisted(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        renounceWhitelistAdmin(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        renounceWhitelisted(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        addWhitelistAdmin(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        addWhitelisted(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        bulkAddWhitelisted(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        bulkRemoveWhitelisted(accounts: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        isWhitelistAdmin(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isWhitelisted(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        removeWhitelisted(account: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        renounceWhitelistAdmin(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        renounceWhitelisted(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "WhitelistAdminAdded(address)": TypedContractEvent<WhitelistAdminAddedEvent.InputTuple, WhitelistAdminAddedEvent.OutputTuple, WhitelistAdminAddedEvent.OutputObject>;
+        WhitelistAdminAdded: TypedContractEvent<WhitelistAdminAddedEvent.InputTuple, WhitelistAdminAddedEvent.OutputTuple, WhitelistAdminAddedEvent.OutputObject>;
+        "WhitelistAdminRemoved(address)": TypedContractEvent<WhitelistAdminRemovedEvent.InputTuple, WhitelistAdminRemovedEvent.OutputTuple, WhitelistAdminRemovedEvent.OutputObject>;
+        WhitelistAdminRemoved: TypedContractEvent<WhitelistAdminRemovedEvent.InputTuple, WhitelistAdminRemovedEvent.OutputTuple, WhitelistAdminRemovedEvent.OutputObject>;
+        "WhitelistedAdded(address)": TypedContractEvent<WhitelistedAddedEvent.InputTuple, WhitelistedAddedEvent.OutputTuple, WhitelistedAddedEvent.OutputObject>;
+        WhitelistedAdded: TypedContractEvent<WhitelistedAddedEvent.InputTuple, WhitelistedAddedEvent.OutputTuple, WhitelistedAddedEvent.OutputObject>;
+        "WhitelistedRemoved(address)": TypedContractEvent<WhitelistedRemovedEvent.InputTuple, WhitelistedRemovedEvent.OutputTuple, WhitelistedRemovedEvent.OutputObject>;
+        WhitelistedRemoved: TypedContractEvent<WhitelistedRemovedEvent.InputTuple, WhitelistedRemovedEvent.OutputTuple, WhitelistedRemovedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=BulkWhitelistedRole.d.ts.map

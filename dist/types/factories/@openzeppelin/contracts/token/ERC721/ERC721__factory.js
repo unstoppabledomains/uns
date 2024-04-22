@@ -361,23 +361,20 @@ class ERC721__factory extends ethers_1.ContractFactory {
             super(_abi, _bytecode, args[0]);
         }
     }
-    deploy(name_, symbol_, overrides) {
-        return super.deploy(name_, symbol_, overrides || {});
-    }
     getDeployTransaction(name_, symbol_, overrides) {
         return super.getDeployTransaction(name_, symbol_, overrides || {});
     }
-    attach(address) {
-        return super.attach(address);
+    deploy(name_, symbol_, overrides) {
+        return super.deploy(name_, symbol_, overrides || {});
     }
-    connect(signer) {
-        return super.connect(signer);
+    connect(runner) {
+        return super.connect(runner);
     }
     static createInterface() {
-        return new ethers_1.utils.Interface(_abi);
+        return new ethers_1.Interface(_abi);
     }
-    static connect(address, signerOrProvider) {
-        return new ethers_1.Contract(address, _abi, signerOrProvider);
+    static connect(address, runner) {
+        return new ethers_1.Contract(address, _abi, runner);
     }
 }
 exports.ERC721__factory = ERC721__factory;

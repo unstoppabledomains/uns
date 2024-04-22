@@ -1,4 +1,4 @@
-import { HttpNetworkUserConfig } from 'hardhat/types';
+import type { HttpNetworkUserConfig } from 'hardhat/types';
 import { GanacheService } from './ganache-service';
 export declare type SandboxNetworkOptions = {
     url: string;

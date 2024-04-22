@@ -1,19 +1,18 @@
-import { Signer } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { type ContractRunner } from "ethers";
 import type { IURIPrefixController, IURIPrefixControllerInterface } from "../../../contracts/cns/IURIPrefixController";
 export declare class IURIPrefixController__factory {
-    static readonly abi: {
-        inputs: {
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        name: string;
-        outputs: never[];
-        stateMutability: string;
-        type: string;
-    }[];
+    static readonly abi: readonly [{
+        readonly inputs: readonly [{
+            readonly internalType: "string";
+            readonly name: "prefix";
+            readonly type: "string";
+        }];
+        readonly name: "setTokenURIPrefix";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }];
     static createInterface(): IURIPrefixControllerInterface;
-    static connect(address: string, signerOrProvider: Signer | Provider): IURIPrefixController;
+    static connect(address: string, runner?: ContractRunner | null): IURIPrefixController;
 }
 //# sourceMappingURL=IURIPrefixController__factory.d.ts.map

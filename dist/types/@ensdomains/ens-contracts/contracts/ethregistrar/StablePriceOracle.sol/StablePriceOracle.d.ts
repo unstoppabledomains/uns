@@ -1,46 +1,26 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../../common";
 export declare namespace IPriceOracle {
     type PriceStruct = {
-        base: PromiseOrValue<BigNumberish>;
-        premium: PromiseOrValue<BigNumberish>;
+        base: BigNumberish;
+        premium: BigNumberish;
     };
-    type PriceStructOutput = [BigNumber, BigNumber] & {
-        base: BigNumber;
-        premium: BigNumber;
+    type PriceStructOutput = [base: bigint, premium: bigint] & {
+        base: bigint;
+        premium: bigint;
     };
 }
-export interface StablePriceOracleInterface extends utils.Interface {
-    functions: {
-        "premium(string,uint256,uint256)": FunctionFragment;
-        "price(string,uint256,uint256)": FunctionFragment;
-        "price1Letter()": FunctionFragment;
-        "price2Letter()": FunctionFragment;
-        "price3Letter()": FunctionFragment;
-        "price4Letter()": FunctionFragment;
-        "price5Letter()": FunctionFragment;
-        "supportsInterface(bytes4)": FunctionFragment;
-        "usdOracle()": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "premium" | "price" | "price1Letter" | "price2Letter" | "price3Letter" | "price4Letter" | "price5Letter" | "supportsInterface" | "usdOracle"): FunctionFragment;
-    encodeFunctionData(functionFragment: "premium", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
-    encodeFunctionData(functionFragment: "price", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-    ]): string;
+export interface StablePriceOracleInterface extends Interface {
+    getFunction(nameOrSignature: "premium" | "price" | "price1Letter" | "price2Letter" | "price3Letter" | "price4Letter" | "price5Letter" | "supportsInterface" | "usdOracle"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "RentPriceChanged"): EventFragment;
+    encodeFunctionData(functionFragment: "premium", values: [string, BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "price", values: [string, BigNumberish, BigNumberish]): string;
     encodeFunctionData(functionFragment: "price1Letter", values?: undefined): string;
     encodeFunctionData(functionFragment: "price2Letter", values?: undefined): string;
     encodeFunctionData(functionFragment: "price3Letter", values?: undefined): string;
     encodeFunctionData(functionFragment: "price4Letter", values?: undefined): string;
     encodeFunctionData(functionFragment: "price5Letter", values?: undefined): string;
-    encodeFunctionData(functionFragment: "supportsInterface", values: [PromiseOrValue<BytesLike>]): string;
+    encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "usdOracle", values?: undefined): string;
     decodeFunctionResult(functionFragment: "premium", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "price", data: BytesLike): Result;
@@ -51,88 +31,82 @@ export interface StablePriceOracleInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "price5Letter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "usdOracle", data: BytesLike): Result;
-    events: {
-        "RentPriceChanged(uint256[])": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "RentPriceChanged"): EventFragment;
 }
-export interface RentPriceChangedEventObject {
-    prices: BigNumber[];
+export declare namespace RentPriceChangedEvent {
+    type InputTuple = [prices: BigNumberish[]];
+    type OutputTuple = [prices: bigint[]];
+    interface OutputObject {
+        prices: bigint[];
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RentPriceChangedEvent = TypedEvent<[
-    BigNumber[]
-], RentPriceChangedEventObject>;
-export declare type RentPriceChangedEventFilter = TypedEventFilter<RentPriceChangedEvent>;
 export interface StablePriceOracle extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): StablePriceOracle;
+    waitForDeployment(): Promise<this>;
     interface: StablePriceOracleInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        premium(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        price(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[IPriceOracle.PriceStructOutput]>;
-        price1Letter(overrides?: CallOverrides): Promise<[BigNumber]>;
-        price2Letter(overrides?: CallOverrides): Promise<[BigNumber]>;
-        price3Letter(overrides?: CallOverrides): Promise<[BigNumber]>;
-        price4Letter(overrides?: CallOverrides): Promise<[BigNumber]>;
-        price5Letter(overrides?: CallOverrides): Promise<[BigNumber]>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean]>;
-        usdOracle(overrides?: CallOverrides): Promise<[string]>;
-    };
-    premium(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    price(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<IPriceOracle.PriceStructOutput>;
-    price1Letter(overrides?: CallOverrides): Promise<BigNumber>;
-    price2Letter(overrides?: CallOverrides): Promise<BigNumber>;
-    price3Letter(overrides?: CallOverrides): Promise<BigNumber>;
-    price4Letter(overrides?: CallOverrides): Promise<BigNumber>;
-    price5Letter(overrides?: CallOverrides): Promise<BigNumber>;
-    supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-    usdOracle(overrides?: CallOverrides): Promise<string>;
-    callStatic: {
-        premium(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        price(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<IPriceOracle.PriceStructOutput>;
-        price1Letter(overrides?: CallOverrides): Promise<BigNumber>;
-        price2Letter(overrides?: CallOverrides): Promise<BigNumber>;
-        price3Letter(overrides?: CallOverrides): Promise<BigNumber>;
-        price4Letter(overrides?: CallOverrides): Promise<BigNumber>;
-        price5Letter(overrides?: CallOverrides): Promise<BigNumber>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<boolean>;
-        usdOracle(overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    premium: TypedContractMethod<[
+        name: string,
+        expires: BigNumberish,
+        duration: BigNumberish
+    ], [
+        bigint
+    ], "view">;
+    price: TypedContractMethod<[
+        name: string,
+        expires: BigNumberish,
+        duration: BigNumberish
+    ], [
+        IPriceOracle.PriceStructOutput
+    ], "view">;
+    price1Letter: TypedContractMethod<[], [bigint], "view">;
+    price2Letter: TypedContractMethod<[], [bigint], "view">;
+    price3Letter: TypedContractMethod<[], [bigint], "view">;
+    price4Letter: TypedContractMethod<[], [bigint], "view">;
+    price5Letter: TypedContractMethod<[], [bigint], "view">;
+    supportsInterface: TypedContractMethod<[
+        interfaceID: BytesLike
+    ], [
+        boolean
+    ], "view">;
+    usdOracle: TypedContractMethod<[], [string], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "premium"): TypedContractMethod<[
+        name: string,
+        expires: BigNumberish,
+        duration: BigNumberish
+    ], [
+        bigint
+    ], "view">;
+    getFunction(nameOrSignature: "price"): TypedContractMethod<[
+        name: string,
+        expires: BigNumberish,
+        duration: BigNumberish
+    ], [
+        IPriceOracle.PriceStructOutput
+    ], "view">;
+    getFunction(nameOrSignature: "price1Letter"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "price2Letter"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "price3Letter"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "price4Letter"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "price5Letter"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceID: BytesLike], [boolean], "view">;
+    getFunction(nameOrSignature: "usdOracle"): TypedContractMethod<[], [string], "view">;
+    getEvent(key: "RentPriceChanged"): TypedContractEvent<RentPriceChangedEvent.InputTuple, RentPriceChangedEvent.OutputTuple, RentPriceChangedEvent.OutputObject>;
     filters: {
-        "RentPriceChanged(uint256[])"(prices?: null): RentPriceChangedEventFilter;
-        RentPriceChanged(prices?: null): RentPriceChangedEventFilter;
-    };
-    estimateGas: {
-        premium(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        price(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        price1Letter(overrides?: CallOverrides): Promise<BigNumber>;
-        price2Letter(overrides?: CallOverrides): Promise<BigNumber>;
-        price3Letter(overrides?: CallOverrides): Promise<BigNumber>;
-        price4Letter(overrides?: CallOverrides): Promise<BigNumber>;
-        price5Letter(overrides?: CallOverrides): Promise<BigNumber>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<BigNumber>;
-        usdOracle(overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        premium(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        price(name: PromiseOrValue<string>, expires: PromiseOrValue<BigNumberish>, duration: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        price1Letter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        price2Letter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        price3Letter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        price4Letter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        price5Letter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        supportsInterface(interfaceID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        usdOracle(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "RentPriceChanged(uint256[])": TypedContractEvent<RentPriceChangedEvent.InputTuple, RentPriceChangedEvent.OutputTuple, RentPriceChangedEvent.OutputObject>;
+        RentPriceChanged: TypedContractEvent<RentPriceChangedEvent.InputTuple, RentPriceChangedEvent.OutputTuple, RentPriceChangedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=StablePriceOracle.d.ts.map

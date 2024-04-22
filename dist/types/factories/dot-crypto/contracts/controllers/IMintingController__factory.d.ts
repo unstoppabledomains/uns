@@ -1,21 +1,60 @@
-import { Signer } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { type ContractRunner } from "ethers";
 import type { IMintingController, IMintingControllerInterface } from "../../../../dot-crypto/contracts/controllers/IMintingController";
 export declare class IMintingController__factory {
-    static readonly abi: {
-        constant: boolean;
-        inputs: {
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        name: string;
-        outputs: never[];
-        payable: boolean;
-        stateMutability: string;
-        type: string;
-    }[];
+    static readonly abi: readonly [{
+        readonly constant: false;
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "to";
+            readonly type: "address";
+        }, {
+            readonly internalType: "string";
+            readonly name: "label";
+            readonly type: "string";
+        }];
+        readonly name: "mintSLD";
+        readonly outputs: readonly [];
+        readonly payable: false;
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly constant: false;
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "to";
+            readonly type: "address";
+        }, {
+            readonly internalType: "string";
+            readonly name: "label";
+            readonly type: "string";
+        }];
+        readonly name: "safeMintSLD";
+        readonly outputs: readonly [];
+        readonly payable: false;
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly constant: false;
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "to";
+            readonly type: "address";
+        }, {
+            readonly internalType: "string";
+            readonly name: "label";
+            readonly type: "string";
+        }, {
+            readonly internalType: "bytes";
+            readonly name: "_data";
+            readonly type: "bytes";
+        }];
+        readonly name: "safeMintSLD";
+        readonly outputs: readonly [];
+        readonly payable: false;
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }];
     static createInterface(): IMintingControllerInterface;
-    static connect(address: string, signerOrProvider: Signer | Provider): IMintingController;
+    static connect(address: string, runner?: ContractRunner | null): IMintingController;
 }
 //# sourceMappingURL=IMintingController__factory.d.ts.map

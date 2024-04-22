@@ -1,79 +1,39 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, ContractTransaction, Overrides, PayableOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../common";
-export interface IMintingManagerInterface extends utils.Interface {
-    functions: {
-        "addTld(string,bool)": FunctionFragment;
-        "buy(address,string[],string[],string[],uint64,uint256,bytes)": FunctionFragment;
-        "buyForErc20(address,string[],string[],string[],uint64,address,uint256,bytes)": FunctionFragment;
-        "claim(uint256,string)": FunctionFragment;
-        "claimTo(address,uint256,string)": FunctionFragment;
-        "claimToWithRecords(address,uint256,string,string[],string[])": FunctionFragment;
-        "issueExpirableWithRecords(address,string[],string[],string[],uint64,bool)": FunctionFragment;
-        "issueWithRecords(address,string[],string[],string[],bool)": FunctionFragment;
-        "removeTld(uint256)": FunctionFragment;
-        "renew(uint64,uint256)": FunctionFragment;
-        "revoke(uint256)": FunctionFragment;
-        "setTokenURIPrefix(string)": FunctionFragment;
-        "withdraw(address)": FunctionFragment;
-        "withdraw(address,address)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "issueExpirableWithRecords" | "issueWithRecords" | "removeTld" | "renew" | "revoke" | "setTokenURIPrefix" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
-    encodeFunctionData(functionFragment: "addTld", values: [PromiseOrValue<string>, PromiseOrValue<boolean>]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../common";
+export interface IMintingManagerInterface extends Interface {
+    getFunction(nameOrSignature: "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "issueExpirableWithRecords" | "issueWithRecords" | "removeTld" | "renew" | "revoke" | "setTokenURIPrefix" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "AdminChanged" | "DomainPurchase" | "NewTld" | "RemoveTld" | "Upgraded" | "Withdrawal"): EventFragment;
+    encodeFunctionData(functionFragment: "addTld", values: [string, boolean]): string;
     encodeFunctionData(functionFragment: "buy", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
+        AddressLike,
+        string[],
+        string[],
+        string[],
+        BigNumberish,
+        BigNumberish,
+        BytesLike
     ]): string;
     encodeFunctionData(functionFragment: "buyForErc20", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BytesLike>
+        AddressLike,
+        string[],
+        string[],
+        string[],
+        BigNumberish,
+        AddressLike,
+        BigNumberish,
+        BytesLike
     ]): string;
-    encodeFunctionData(functionFragment: "claim", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "claimTo", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "claimToWithRecords", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[]
-    ]): string;
-    encodeFunctionData(functionFragment: "issueExpirableWithRecords", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<boolean>
-    ]): string;
-    encodeFunctionData(functionFragment: "issueWithRecords", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<string>[],
-        PromiseOrValue<boolean>
-    ]): string;
-    encodeFunctionData(functionFragment: "removeTld", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "renew", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "revoke", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "setTokenURIPrefix", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "withdraw(address)", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "withdraw(address,address)", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "claim", values: [BigNumberish, string]): string;
+    encodeFunctionData(functionFragment: "claimTo", values: [AddressLike, BigNumberish, string]): string;
+    encodeFunctionData(functionFragment: "claimToWithRecords", values: [AddressLike, BigNumberish, string, string[], string[]]): string;
+    encodeFunctionData(functionFragment: "issueExpirableWithRecords", values: [AddressLike, string[], string[], string[], BigNumberish, boolean]): string;
+    encodeFunctionData(functionFragment: "issueWithRecords", values: [AddressLike, string[], string[], string[], boolean]): string;
+    encodeFunctionData(functionFragment: "removeTld", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "renew", values: [BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "revoke", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setTokenURIPrefix", values: [string]): string;
+    encodeFunctionData(functionFragment: "withdraw(address)", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "withdraw(address,address)", values: [AddressLike, AddressLike]): string;
     decodeFunctionResult(functionFragment: "addTld", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "buyForErc20", data: BytesLike): Result;
@@ -88,289 +48,310 @@ export interface IMintingManagerInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "setTokenURIPrefix", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw(address)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw(address,address)", data: BytesLike): Result;
-    events: {
-        "AdminChanged(address,address)": EventFragment;
-        "DomainPurchase(uint256,address,address,uint256,address)": EventFragment;
-        "NewTld(uint256,string)": EventFragment;
-        "RemoveTld(uint256)": EventFragment;
-        "Upgraded(address)": EventFragment;
-        "Withdrawal(address,uint256,address)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "AdminChanged"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "DomainPurchase"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "NewTld"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "RemoveTld"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "Withdrawal"): EventFragment;
 }
-export interface AdminChangedEventObject {
-    previousAdmin: string;
-    newAdmin: string;
+export declare namespace AdminChangedEvent {
+    type InputTuple = [previousAdmin: AddressLike, newAdmin: AddressLike];
+    type OutputTuple = [previousAdmin: string, newAdmin: string];
+    interface OutputObject {
+        previousAdmin: string;
+        newAdmin: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type AdminChangedEvent = TypedEvent<[
-    string,
-    string
-], AdminChangedEventObject>;
-export declare type AdminChangedEventFilter = TypedEventFilter<AdminChangedEvent>;
-export interface DomainPurchaseEventObject {
-    tokenId: BigNumber;
-    sender: string;
-    owner: string;
-    price: BigNumber;
-    token: string;
+export declare namespace DomainPurchaseEvent {
+    type InputTuple = [
+        tokenId: BigNumberish,
+        sender: AddressLike,
+        owner: AddressLike,
+        price: BigNumberish,
+        token: AddressLike
+    ];
+    type OutputTuple = [
+        tokenId: bigint,
+        sender: string,
+        owner: string,
+        price: bigint,
+        token: string
+    ];
+    interface OutputObject {
+        tokenId: bigint;
+        sender: string;
+        owner: string;
+        price: bigint;
+        token: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type DomainPurchaseEvent = TypedEvent<[
-    BigNumber,
-    string,
-    string,
-    BigNumber,
-    string
-], DomainPurchaseEventObject>;
-export declare type DomainPurchaseEventFilter = TypedEventFilter<DomainPurchaseEvent>;
-export interface NewTldEventObject {
-    tokenId: BigNumber;
-    tld: string;
+export declare namespace NewTldEvent {
+    type InputTuple = [tokenId: BigNumberish, tld: string];
+    type OutputTuple = [tokenId: bigint, tld: string];
+    interface OutputObject {
+        tokenId: bigint;
+        tld: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type NewTldEvent = TypedEvent<[BigNumber, string], NewTldEventObject>;
-export declare type NewTldEventFilter = TypedEventFilter<NewTldEvent>;
-export interface RemoveTldEventObject {
-    tokenId: BigNumber;
+export declare namespace RemoveTldEvent {
+    type InputTuple = [tokenId: BigNumberish];
+    type OutputTuple = [tokenId: bigint];
+    interface OutputObject {
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type RemoveTldEvent = TypedEvent<[BigNumber], RemoveTldEventObject>;
-export declare type RemoveTldEventFilter = TypedEventFilter<RemoveTldEvent>;
-export interface UpgradedEventObject {
-    implementation: string;
+export declare namespace UpgradedEvent {
+    type InputTuple = [implementation: AddressLike];
+    type OutputTuple = [implementation: string];
+    interface OutputObject {
+        implementation: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type UpgradedEvent = TypedEvent<[string], UpgradedEventObject>;
-export declare type UpgradedEventFilter = TypedEventFilter<UpgradedEvent>;
-export interface WithdrawalEventObject {
-    recepient: string;
-    value: BigNumber;
-    token: string;
+export declare namespace WithdrawalEvent {
+    type InputTuple = [
+        recepient: AddressLike,
+        value: BigNumberish,
+        token: AddressLike
+    ];
+    type OutputTuple = [recepient: string, value: bigint, token: string];
+    interface OutputObject {
+        recepient: string;
+        value: bigint;
+        token: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type WithdrawalEvent = TypedEvent<[
-    string,
-    BigNumber,
-    string
-], WithdrawalEventObject>;
-export declare type WithdrawalEventFilter = TypedEventFilter<WithdrawalEvent>;
 export interface IMintingManager extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IMintingManager;
+    waitForDeployment(): Promise<this>;
     interface: IMintingManagerInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        removeTld(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    removeTld(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
-        claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: CallOverrides): Promise<void>;
-        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        removeTld(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
-        setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    addTld: TypedContractMethod<[
+        tld: string,
+        isExpirable: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    buy: TypedContractMethod<[
+        owner: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        price: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "payable">;
+    buyForErc20: TypedContractMethod<[
+        owner: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        token: AddressLike,
+        price: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    claim: TypedContractMethod<[
+        tld: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    claimTo: TypedContractMethod<[
+        to: AddressLike,
+        tld: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    claimToWithRecords: TypedContractMethod<[
+        to: AddressLike,
+        tld: BigNumberish,
+        label: string,
+        keys: string[],
+        values: string[]
+    ], [
+        void
+    ], "nonpayable">;
+    issueExpirableWithRecords: TypedContractMethod<[
+        to: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        withReverse: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    issueWithRecords: TypedContractMethod<[
+        to: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        withReverse: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    removeTld: TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    renew: TypedContractMethod<[
+        expiry: BigNumberish,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    revoke: TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    setTokenURIPrefix: TypedContractMethod<[
+        prefix: string
+    ], [
+        void
+    ], "nonpayable">;
+    "withdraw(address)": TypedContractMethod<[
+        recepient: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    "withdraw(address,address)": TypedContractMethod<[
+        token: AddressLike,
+        recepient: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "addTld"): TypedContractMethod<[
+        tld: string,
+        isExpirable: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "buy"): TypedContractMethod<[
+        owner: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        price: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "payable">;
+    getFunction(nameOrSignature: "buyForErc20"): TypedContractMethod<[
+        owner: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        token: AddressLike,
+        price: BigNumberish,
+        signature: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "claim"): TypedContractMethod<[
+        tld: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "claimTo"): TypedContractMethod<[
+        to: AddressLike,
+        tld: BigNumberish,
+        label: string
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "claimToWithRecords"): TypedContractMethod<[
+        to: AddressLike,
+        tld: BigNumberish,
+        label: string,
+        keys: string[],
+        values: string[]
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "issueExpirableWithRecords"): TypedContractMethod<[
+        to: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        withReverse: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "issueWithRecords"): TypedContractMethod<[
+        to: AddressLike,
+        labels: string[],
+        keys: string[],
+        values: string[],
+        withReverse: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "removeTld"): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    getFunction(nameOrSignature: "renew"): TypedContractMethod<[
+        expiry: BigNumberish,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "revoke"): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    getFunction(nameOrSignature: "setTokenURIPrefix"): TypedContractMethod<[prefix: string], [void], "nonpayable">;
+    getFunction(nameOrSignature: "withdraw(address)"): TypedContractMethod<[recepient: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "withdraw(address,address)"): TypedContractMethod<[
+        token: AddressLike,
+        recepient: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getEvent(key: "AdminChanged"): TypedContractEvent<AdminChangedEvent.InputTuple, AdminChangedEvent.OutputTuple, AdminChangedEvent.OutputObject>;
+    getEvent(key: "DomainPurchase"): TypedContractEvent<DomainPurchaseEvent.InputTuple, DomainPurchaseEvent.OutputTuple, DomainPurchaseEvent.OutputObject>;
+    getEvent(key: "NewTld"): TypedContractEvent<NewTldEvent.InputTuple, NewTldEvent.OutputTuple, NewTldEvent.OutputObject>;
+    getEvent(key: "RemoveTld"): TypedContractEvent<RemoveTldEvent.InputTuple, RemoveTldEvent.OutputTuple, RemoveTldEvent.OutputObject>;
+    getEvent(key: "Upgraded"): TypedContractEvent<UpgradedEvent.InputTuple, UpgradedEvent.OutputTuple, UpgradedEvent.OutputObject>;
+    getEvent(key: "Withdrawal"): TypedContractEvent<WithdrawalEvent.InputTuple, WithdrawalEvent.OutputTuple, WithdrawalEvent.OutputObject>;
     filters: {
-        "AdminChanged(address,address)"(previousAdmin?: null, newAdmin?: null): AdminChangedEventFilter;
-        AdminChanged(previousAdmin?: null, newAdmin?: null): AdminChangedEventFilter;
-        "DomainPurchase(uint256,address,address,uint256,address)"(tokenId?: PromiseOrValue<BigNumberish> | null, sender?: PromiseOrValue<string> | null, owner?: PromiseOrValue<string> | null, price?: null, token?: null): DomainPurchaseEventFilter;
-        DomainPurchase(tokenId?: PromiseOrValue<BigNumberish> | null, sender?: PromiseOrValue<string> | null, owner?: PromiseOrValue<string> | null, price?: null, token?: null): DomainPurchaseEventFilter;
-        "NewTld(uint256,string)"(tokenId?: PromiseOrValue<BigNumberish> | null, tld?: null): NewTldEventFilter;
-        NewTld(tokenId?: PromiseOrValue<BigNumberish> | null, tld?: null): NewTldEventFilter;
-        "RemoveTld(uint256)"(tokenId?: PromiseOrValue<BigNumberish> | null): RemoveTldEventFilter;
-        RemoveTld(tokenId?: PromiseOrValue<BigNumberish> | null): RemoveTldEventFilter;
-        "Upgraded(address)"(implementation?: PromiseOrValue<string> | null): UpgradedEventFilter;
-        Upgraded(implementation?: PromiseOrValue<string> | null): UpgradedEventFilter;
-        "Withdrawal(address,uint256,address)"(recepient?: null, value?: null, token?: null): WithdrawalEventFilter;
-        Withdrawal(recepient?: null, value?: null, token?: null): WithdrawalEventFilter;
-    };
-    estimateGas: {
-        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        removeTld(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        addTld(tld: PromiseOrValue<string>, isExpirable: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        buy(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        buyForErc20(owner: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, token: PromiseOrValue<string>, price: PromiseOrValue<BigNumberish>, signature: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        claim(tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        claimTo(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        claimToWithRecords(to: PromiseOrValue<string>, tld: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        issueExpirableWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], expiry: PromiseOrValue<BigNumberish>, withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        issueWithRecords(to: PromiseOrValue<string>, labels: PromiseOrValue<string>[], keys: PromiseOrValue<string>[], values: PromiseOrValue<string>[], withReverse: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        removeTld(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        renew(expiry: PromiseOrValue<BigNumberish>, tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        revoke(tokenId: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setTokenURIPrefix(prefix: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "withdraw(address)"(recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        "withdraw(address,address)"(token: PromiseOrValue<string>, recepient: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "AdminChanged(address,address)": TypedContractEvent<AdminChangedEvent.InputTuple, AdminChangedEvent.OutputTuple, AdminChangedEvent.OutputObject>;
+        AdminChanged: TypedContractEvent<AdminChangedEvent.InputTuple, AdminChangedEvent.OutputTuple, AdminChangedEvent.OutputObject>;
+        "DomainPurchase(uint256,address,address,uint256,address)": TypedContractEvent<DomainPurchaseEvent.InputTuple, DomainPurchaseEvent.OutputTuple, DomainPurchaseEvent.OutputObject>;
+        DomainPurchase: TypedContractEvent<DomainPurchaseEvent.InputTuple, DomainPurchaseEvent.OutputTuple, DomainPurchaseEvent.OutputObject>;
+        "NewTld(uint256,string)": TypedContractEvent<NewTldEvent.InputTuple, NewTldEvent.OutputTuple, NewTldEvent.OutputObject>;
+        NewTld: TypedContractEvent<NewTldEvent.InputTuple, NewTldEvent.OutputTuple, NewTldEvent.OutputObject>;
+        "RemoveTld(uint256)": TypedContractEvent<RemoveTldEvent.InputTuple, RemoveTldEvent.OutputTuple, RemoveTldEvent.OutputObject>;
+        RemoveTld: TypedContractEvent<RemoveTldEvent.InputTuple, RemoveTldEvent.OutputTuple, RemoveTldEvent.OutputObject>;
+        "Upgraded(address)": TypedContractEvent<UpgradedEvent.InputTuple, UpgradedEvent.OutputTuple, UpgradedEvent.OutputObject>;
+        Upgraded: TypedContractEvent<UpgradedEvent.InputTuple, UpgradedEvent.OutputTuple, UpgradedEvent.OutputObject>;
+        "Withdrawal(address,uint256,address)": TypedContractEvent<WithdrawalEvent.InputTuple, WithdrawalEvent.OutputTuple, WithdrawalEvent.OutputObject>;
+        Withdrawal: TypedContractEvent<WithdrawalEvent.InputTuple, WithdrawalEvent.OutputTuple, WithdrawalEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=IMintingManager.d.ts.map

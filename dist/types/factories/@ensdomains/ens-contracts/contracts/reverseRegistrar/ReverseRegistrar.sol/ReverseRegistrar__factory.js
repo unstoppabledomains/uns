@@ -349,23 +349,20 @@ class ReverseRegistrar__factory extends ethers_1.ContractFactory {
             super(_abi, _bytecode, args[0]);
         }
     }
-    deploy(ensAddr, overrides) {
-        return super.deploy(ensAddr, overrides || {});
-    }
     getDeployTransaction(ensAddr, overrides) {
         return super.getDeployTransaction(ensAddr, overrides || {});
     }
-    attach(address) {
-        return super.attach(address);
+    deploy(ensAddr, overrides) {
+        return super.deploy(ensAddr, overrides || {});
     }
-    connect(signer) {
-        return super.connect(signer);
+    connect(runner) {
+        return super.connect(runner);
     }
     static createInterface() {
-        return new ethers_1.utils.Interface(_abi);
+        return new ethers_1.Interface(_abi);
     }
-    static connect(address, signerOrProvider) {
-        return new ethers_1.Contract(address, _abi, signerOrProvider);
+    static connect(address, runner) {
+        return new ethers_1.Contract(address, _abi, runner);
     }
 }
 exports.ReverseRegistrar__factory = ReverseRegistrar__factory;

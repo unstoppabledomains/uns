@@ -1,46 +1,139 @@
-import { Signer, ContractFactory, Overrides } from "ethers";
-import type { Provider, TransactionRequest } from "@ethersproject/providers";
-import type { PromiseOrValue } from "../../../common";
+import { ContractFactory, ContractTransactionResponse } from "ethers";
+import type { Signer, ContractDeployTransaction, ContractRunner } from "ethers";
+import type { NonPayableOverrides } from "../../../common";
 import type { BaseForwarderMock, BaseForwarderMockInterface } from "../../../contracts/mocks/BaseForwarderMock";
 declare type BaseForwarderMockConstructorParams = [signer?: Signer] | ConstructorParameters<typeof ContractFactory>;
 export declare class BaseForwarderMock__factory extends ContractFactory {
     constructor(...args: BaseForwarderMockConstructorParams);
-    deploy(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<BaseForwarderMock>;
-    getDeployTransaction(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): TransactionRequest;
-    attach(address: string): BaseForwarderMock;
-    connect(signer: Signer): BaseForwarderMock__factory;
+    getDeployTransaction(overrides?: NonPayableOverrides & {
+        from?: string;
+    }): Promise<ContractDeployTransaction>;
+    deploy(overrides?: NonPayableOverrides & {
+        from?: string;
+    }): Promise<BaseForwarderMock & {
+        deploymentTransaction(): ContractTransactionResponse;
+    }>;
+    connect(runner: ContractRunner | null): BaseForwarderMock__factory;
     static readonly bytecode = "0x608060405234801561001057600080fd5b50610c30806100206000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80636ccbae5f1161005b5780636ccbae5f146100bd578063716ac80f146100eb578063a4247400146100f3578063a567fb471461011657600080fd5b80631bf7e13e146100825780634167168d146100ab5780635b2dd100146100b5575b600080fd5b610095610090366004610857565b610142565b6040516100a29190610946565b60405180910390f35b6100b3600080fd5b005b6100b361024e565b6100dd6100cb366004610959565b60009081526020819052604090205490565b6040519081526020016100a2565b6100b361027f565b610106610101366004610857565b6102b6565b60405190151581526020016100a2565b61010661012436600461098e565b6001600160a01b031660009081526001602052604090205460ff1690565b606060005a90506101548585856102b6565b6101b15760405162461bcd60e51b8152602060048201526024808201527f42617365466f727761726465724d6f636b3a205349474e41545552455f494e566044820152631053125160e21b60648201526084015b60405180910390fd5b6102436101c1602087018761098e565b306040880135846101d560608b018b6109a9565b8080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525050604080516020601f8e018190048102820181019092528c815292508c91508b908190840183828082843760009201919091525061030992505050565b9150505b9392505050565b60405162461bcd60e51b815260206004820152600660248201526541414141414160d01b60448201526064016101a8565b600180600061028c6103ea565b6001600160a01b031681526020810191909152604001600020805460ff1916911515919091179055565b60006103016102c485610a60565b3085858080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525061040592505050565b949350505050565b60606103148561054e565b600080876001600160a01b03168661032e8b8a898961057a565b60405161033b9190610b21565b60006040518083038160008787f1925050503d8060008114610379576040519150601f19603f3d011682016040523d82523d6000602084013e61037e565b606091505b50909250905061038f603f87610b3d565b5a1161039d5761039d610b5f565b6103dd82826040518060400160405280601a81526020017f42617365466f727761726465723a2043414c4c5f4641494c45440000000000008152506105aa565b9998505050505050505050565b6000303303610400575060331936013560601c90565b503390565b6040838101519051636ccbae5f60e01b8152600481019190915260009081903090636ccbae5f90602401602060405180830381865afa15801561044c573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906104709190610b75565b9050600061051e8660600151805190602001208688602001516040516020016104be9392919092835260609190911b6bffffffffffffffffffffffff19166020830152603482015260540190565b60408051601f1981840301815282825280516020918201207f19457468657265756d205369676e6564204d6573736167653a0a33320000000084830152603c8085019190915282518085039091018152605c909301909152815191012090565b905081866020015114801561054457508551610544906001600160a01b031682866105e3565b9695505050505050565b600081815260208190526040902054610568906001610b8e565b60009182526020829052604090912055565b606082858560405160200161059193929190610bb5565b6040516020818303038152906040529050949350505050565b606083156105b9575081610247565b8251156105c95782518084602001fd5b8160405162461bcd60e51b81526004016101a89190610946565b60008060006105f28585610725565b9092509050600081600481111561060b5761060b610bf4565b1480156106295750856001600160a01b0316826001600160a01b0316145b1561063957600192505050610247565b600080876001600160a01b0316631626ba7e60e01b8888604051602401610661929190610c0a565b60408051601f198184030181529181526020820180516001600160e01b03166001600160e01b031990941693909317909252905161069f9190610b21565b600060405180830381855afa9150503d80600081146106da576040519150601f19603f3d011682016040523d82523d6000602084013e6106df565b606091505b50915091508180156106f2575080516020145b801561071957508051630b135d3f60e11b906107179083016020908101908401610b75565b145b98975050505050505050565b600080825160410361075b5760208301516040840151606085015160001a61074f8782858561076a565b94509450505050610763565b506000905060025b9250929050565b6000807f7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a08311156107a1575060009050600361084e565b8460ff16601b141580156107b957508460ff16601c14155b156107ca575060009050600461084e565b6040805160008082526020820180845289905260ff881692820192909252606081018690526080810185905260019060a0016020604051602081039080840390855afa15801561081e573d6000803e3d6000fd5b5050604051601f1901519150506001600160a01b0381166108475760006001925092505061084e565b9150600090505b94509492505050565b60008060006040848603121561086c57600080fd5b833567ffffffffffffffff8082111561088457600080fd5b908501906080828803121561089857600080fd5b909350602085013590808211156108ae57600080fd5b818601915086601f8301126108c257600080fd5b8135818111156108d157600080fd5b8760208285010111156108e357600080fd5b6020830194508093505050509250925092565b60005b838110156109115781810151838201526020016108f9565b50506000910152565b600081518084526109328160208601602086016108f6565b601f01601f19169290920160200192915050565b602081526000610247602083018461091a565b60006020828403121561096b57600080fd5b5035919050565b80356001600160a01b038116811461098957600080fd5b919050565b6000602082840312156109a057600080fd5b61024782610972565b6000808335601e198436030181126109c057600080fd5b83018035915067ffffffffffffffff8211156109db57600080fd5b60200191503681900382131561076357600080fd5b634e487b7160e01b600052604160045260246000fd5b6040516080810167ffffffffffffffff81118282101715610a2957610a296109f0565b60405290565b604051601f8201601f1916810167ffffffffffffffff81118282101715610a5857610a586109f0565b604052919050565b600060808236031215610a7257600080fd5b610a7a610a06565b610a8383610972565b81526020808401358183015260408401356040830152606084013567ffffffffffffffff80821115610ab457600080fd5b9085019036601f830112610ac757600080fd5b813581811115610ad957610ad96109f0565b610aeb601f8201601f19168501610a2f565b91508082523684828501011115610b0157600080fd5b808484018584013760009082019093019290925250606082015292915050565b60008251610b338184602087016108f6565b9190910192915050565b600082610b5a57634e487b7160e01b600052601260045260246000fd5b500490565b634e487b7160e01b600052600160045260246000fd5b600060208284031215610b8757600080fd5b5051919050565b80820180821115610baf57634e487b7160e01b600052601160045260246000fd5b92915050565b60008451610bc78184602089016108f6565b60609490941b6bffffffffffffffffffffffff191691909301908152601481019190915260340192915050565b634e487b7160e01b600052602160045260246000fd5b828152604060208201526000610301604083018461091a56fea164736f6c6343000811000a";
-    static readonly abi: {
-        inputs: ({
-            components: {
-                internalType: string;
-                name: string;
-                type: string;
-            }[];
-            internalType: string;
-            name: string;
-            type: string;
-        } | {
-            internalType: string;
-            name: string;
-            type: string;
-            components?: undefined;
-        })[];
-        name: string;
-        outputs: {
-            internalType: string;
-            name: string;
-            type: string;
-        }[];
-        stateMutability: string;
-        type: string;
-    }[];
+    static readonly abi: readonly [{
+        readonly inputs: readonly [{
+            readonly components: readonly [{
+                readonly internalType: "address";
+                readonly name: "from";
+                readonly type: "address";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "nonce";
+                readonly type: "uint256";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "tokenId";
+                readonly type: "uint256";
+            }, {
+                readonly internalType: "bytes";
+                readonly name: "data";
+                readonly type: "bytes";
+            }];
+            readonly internalType: "struct IForwarder.ForwardRequest";
+            readonly name: "req";
+            readonly type: "tuple";
+        }, {
+            readonly internalType: "bytes";
+            readonly name: "signature";
+            readonly type: "bytes";
+        }];
+        readonly name: "execute";
+        readonly outputs: readonly [{
+            readonly internalType: "bytes";
+            readonly name: "";
+            readonly type: "bytes";
+        }];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "addr";
+            readonly type: "address";
+        }];
+        readonly name: "hasAsset";
+        readonly outputs: readonly [{
+            readonly internalType: "bool";
+            readonly name: "";
+            readonly type: "bool";
+        }];
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "mintAsset";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "tokenId";
+            readonly type: "uint256";
+        }];
+        readonly name: "nonceOf";
+        readonly outputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "";
+            readonly type: "uint256";
+        }];
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "revertWithReason";
+        readonly outputs: readonly [];
+        readonly stateMutability: "pure";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "revertWithoutReason";
+        readonly outputs: readonly [];
+        readonly stateMutability: "pure";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly components: readonly [{
+                readonly internalType: "address";
+                readonly name: "from";
+                readonly type: "address";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "nonce";
+                readonly type: "uint256";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "tokenId";
+                readonly type: "uint256";
+            }, {
+                readonly internalType: "bytes";
+                readonly name: "data";
+                readonly type: "bytes";
+            }];
+            readonly internalType: "struct IForwarder.ForwardRequest";
+            readonly name: "req";
+            readonly type: "tuple";
+        }, {
+            readonly internalType: "bytes";
+            readonly name: "signature";
+            readonly type: "bytes";
+        }];
+        readonly name: "verify";
+        readonly outputs: readonly [{
+            readonly internalType: "bool";
+            readonly name: "";
+            readonly type: "bool";
+        }];
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }];
     static createInterface(): BaseForwarderMockInterface;
-    static connect(address: string, signerOrProvider: Signer | Provider): BaseForwarderMock;
+    static connect(address: string, runner?: ContractRunner | null): BaseForwarderMock;
 }
 export {};
 //# sourceMappingURL=BaseForwarderMock__factory.d.ts.map

@@ -1,20 +1,11 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
-export interface ERC2771RegistryContextMockInterface extends utils.Interface {
-    functions: {
-        "execute(bytes)": FunctionFragment;
-        "initialize()": FunctionFragment;
-        "isTrustedForwarder(address)": FunctionFragment;
-        "msgData()": FunctionFragment;
-        "msgSender()": FunctionFragment;
-        "msgToken()": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "execute" | "initialize" | "isTrustedForwarder" | "msgData" | "msgSender" | "msgToken"): FunctionFragment;
-    encodeFunctionData(functionFragment: "execute", values: [PromiseOrValue<BytesLike>]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
+export interface ERC2771RegistryContextMockInterface extends Interface {
+    getFunction(nameOrSignature: "execute" | "initialize" | "isTrustedForwarder" | "msgData" | "msgSender" | "msgToken"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
+    encodeFunctionData(functionFragment: "execute", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "initialize", values?: undefined): string;
-    encodeFunctionData(functionFragment: "isTrustedForwarder", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "isTrustedForwarder", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "msgData", values?: undefined): string;
     encodeFunctionData(functionFragment: "msgSender", values?: undefined): string;
     encodeFunctionData(functionFragment: "msgToken", values?: undefined): string;
@@ -24,87 +15,56 @@ export interface ERC2771RegistryContextMockInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "msgData", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "msgSender", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "msgToken", data: BytesLike): Result;
-    events: {
-        "Initialized(uint8)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
 }
-export interface InitializedEventObject {
-    version: number;
+export declare namespace InitializedEvent {
+    type InputTuple = [version: BigNumberish];
+    type OutputTuple = [version: bigint];
+    interface OutputObject {
+        version: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
-export declare type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
 export interface ERC2771RegistryContextMock extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): ERC2771RegistryContextMock;
+    waitForDeployment(): Promise<this>;
     interface: ERC2771RegistryContextMockInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        execute(data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        initialize(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        msgData(overrides?: CallOverrides): Promise<[string]>;
-        msgSender(overrides?: CallOverrides): Promise<[string]>;
-        msgToken(overrides?: CallOverrides): Promise<[BigNumber]>;
-    };
-    execute(data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    initialize(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    msgData(overrides?: CallOverrides): Promise<string>;
-    msgSender(overrides?: CallOverrides): Promise<string>;
-    msgToken(overrides?: CallOverrides): Promise<BigNumber>;
-    callStatic: {
-        execute(data: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<[boolean, string]>;
-        initialize(overrides?: CallOverrides): Promise<void>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        msgData(overrides?: CallOverrides): Promise<string>;
-        msgSender(overrides?: CallOverrides): Promise<string>;
-        msgToken(overrides?: CallOverrides): Promise<BigNumber>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    execute: TypedContractMethod<[
+        data: BytesLike
+    ], [
+        [boolean, string]
+    ], "nonpayable">;
+    initialize: TypedContractMethod<[], [void], "nonpayable">;
+    isTrustedForwarder: TypedContractMethod<[
+        forwarder: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    msgData: TypedContractMethod<[], [string], "view">;
+    msgSender: TypedContractMethod<[], [string], "view">;
+    msgToken: TypedContractMethod<[], [bigint], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "execute"): TypedContractMethod<[data: BytesLike], [[boolean, string]], "nonpayable">;
+    getFunction(nameOrSignature: "initialize"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "isTrustedForwarder"): TypedContractMethod<[forwarder: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "msgData"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "msgSender"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "msgToken"): TypedContractMethod<[], [bigint], "view">;
+    getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     filters: {
-        "Initialized(uint8)"(version?: null): InitializedEventFilter;
-        Initialized(version?: null): InitializedEventFilter;
-    };
-    estimateGas: {
-        execute(data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        initialize(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        msgData(overrides?: CallOverrides): Promise<BigNumber>;
-        msgSender(overrides?: CallOverrides): Promise<BigNumber>;
-        msgToken(overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        execute(data: PromiseOrValue<BytesLike>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        initialize(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        isTrustedForwarder(forwarder: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        msgData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        msgSender(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        msgToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        "Initialized(uint8)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=ERC2771RegistryContextMock.d.ts.map

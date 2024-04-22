@@ -1,35 +1,19 @@
-import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../common";
-export interface IRegistryReaderInterface extends utils.Interface {
-    functions: {
-        "balanceOf(address)": FunctionFragment;
-        "childIdOf(uint256,string)": FunctionFragment;
-        "getApproved(uint256)": FunctionFragment;
-        "isApprovedForAll(address,address)": FunctionFragment;
-        "isApprovedOrOwner(address,uint256)": FunctionFragment;
-        "isController(address)": FunctionFragment;
-        "name()": FunctionFragment;
-        "ownerOf(uint256)": FunctionFragment;
-        "resolverOf(uint256)": FunctionFragment;
-        "root()": FunctionFragment;
-        "symbol()": FunctionFragment;
-        "tokenURI(uint256)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "balanceOf" | "childIdOf" | "getApproved" | "isApprovedForAll" | "isApprovedOrOwner" | "isController" | "name" | "ownerOf" | "resolverOf" | "root" | "symbol" | "tokenURI"): FunctionFragment;
-    encodeFunctionData(functionFragment: "balanceOf", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "childIdOf", values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "getApproved", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "isApprovedForAll", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "isApprovedOrOwner", values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "isController", values: [PromiseOrValue<string>]): string;
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../common";
+export interface IRegistryReaderInterface extends Interface {
+    getFunction(nameOrSignature: "balanceOf" | "childIdOf" | "getApproved" | "isApprovedForAll" | "isApprovedOrOwner" | "isController" | "name" | "ownerOf" | "resolverOf" | "root" | "symbol" | "tokenURI"): FunctionFragment;
+    encodeFunctionData(functionFragment: "balanceOf", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "childIdOf", values: [BigNumberish, string]): string;
+    encodeFunctionData(functionFragment: "getApproved", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "isApprovedForAll", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "isApprovedOrOwner", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "isController", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "name", values?: undefined): string;
-    encodeFunctionData(functionFragment: "ownerOf", values: [PromiseOrValue<BigNumberish>]): string;
-    encodeFunctionData(functionFragment: "resolverOf", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "ownerOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "resolverOf", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "root", values?: undefined): string;
     encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
-    encodeFunctionData(functionFragment: "tokenURI", values: [PromiseOrValue<BigNumberish>]): string;
+    encodeFunctionData(functionFragment: "tokenURI", values: [BigNumberish]): string;
     decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "childIdOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getApproved", data: BytesLike): Result;
@@ -42,90 +26,75 @@ export interface IRegistryReaderInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "root", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
-    events: {};
 }
 export interface IRegistryReader extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): IRegistryReader;
+    waitForDeployment(): Promise<this>;
     interface: IRegistryReaderInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        childIdOf(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber]>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[boolean]>;
-        isController(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        name(overrides?: CallOverrides): Promise<[string]>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-        root(overrides?: CallOverrides): Promise<[BigNumber]>;
-        symbol(overrides?: CallOverrides): Promise<[string]>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<[string]>;
-    };
-    balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-    childIdOf(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-    getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-    isController(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    name(overrides?: CallOverrides): Promise<string>;
-    ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    root(overrides?: CallOverrides): Promise<BigNumber>;
-    symbol(overrides?: CallOverrides): Promise<string>;
-    tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    callStatic: {
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        childIdOf(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<boolean>;
-        isController(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        name(overrides?: CallOverrides): Promise<string>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-        root(overrides?: CallOverrides): Promise<BigNumber>;
-        symbol(overrides?: CallOverrides): Promise<string>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<string>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    balanceOf: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+    childIdOf: TypedContractMethod<[
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        bigint
+    ], "view">;
+    getApproved: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    isApprovedForAll: TypedContractMethod<[
+        owner: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    isApprovedOrOwner: TypedContractMethod<[
+        spender: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        boolean
+    ], "view">;
+    isController: TypedContractMethod<[account: AddressLike], [boolean], "view">;
+    name: TypedContractMethod<[], [string], "view">;
+    ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    resolverOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    root: TypedContractMethod<[], [bigint], "view">;
+    symbol: TypedContractMethod<[], [string], "view">;
+    tokenURI: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "balanceOf"): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+    getFunction(nameOrSignature: "childIdOf"): TypedContractMethod<[
+        tokenId: BigNumberish,
+        label: string
+    ], [
+        bigint
+    ], "view">;
+    getFunction(nameOrSignature: "getApproved"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "isApprovedForAll"): TypedContractMethod<[
+        owner: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "isApprovedOrOwner"): TypedContractMethod<[
+        spender: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "isController"): TypedContractMethod<[account: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "name"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "ownerOf"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "resolverOf"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "root"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "symbol"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "tokenURI"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
     filters: {};
-    estimateGas: {
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        childIdOf(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        isController(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        name(overrides?: CallOverrides): Promise<BigNumber>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-        root(overrides?: CallOverrides): Promise<BigNumber>;
-        symbol(overrides?: CallOverrides): Promise<BigNumber>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        balanceOf(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        childIdOf(tokenId: PromiseOrValue<BigNumberish>, label: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getApproved(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isApprovedForAll(owner: PromiseOrValue<string>, operator: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isApprovedOrOwner(spender: PromiseOrValue<string>, tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        isController(account: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        ownerOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        resolverOf(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        root(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        tokenURI(tokenId: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-    };
 }
 //# sourceMappingURL=IRegistryReader.d.ts.map

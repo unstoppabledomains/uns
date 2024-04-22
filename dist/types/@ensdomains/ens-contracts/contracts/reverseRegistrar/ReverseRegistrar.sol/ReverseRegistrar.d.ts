@@ -1,48 +1,22 @@
-import type { BaseContract, BigNumber, BytesLike, CallOverrides, ContractTransaction, Overrides, PopulatedTransaction, Signer, utils } from "ethers";
-import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
-import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent, PromiseOrValue } from "../../../../../common";
-export interface ReverseRegistrarInterface extends utils.Interface {
-    functions: {
-        "claim(address)": FunctionFragment;
-        "claimForAddr(address,address,address)": FunctionFragment;
-        "claimWithResolver(address,address)": FunctionFragment;
-        "controllers(address)": FunctionFragment;
-        "defaultResolver()": FunctionFragment;
-        "ens()": FunctionFragment;
-        "node(address)": FunctionFragment;
-        "owner()": FunctionFragment;
-        "renounceOwnership()": FunctionFragment;
-        "setController(address,bool)": FunctionFragment;
-        "setDefaultResolver(address)": FunctionFragment;
-        "setName(string)": FunctionFragment;
-        "setNameForAddr(address,address,address,string)": FunctionFragment;
-        "transferOwnership(address)": FunctionFragment;
-    };
-    getFunction(nameOrSignatureOrTopic: "claim" | "claimForAddr" | "claimWithResolver" | "controllers" | "defaultResolver" | "ens" | "node" | "owner" | "renounceOwnership" | "setController" | "setDefaultResolver" | "setName" | "setNameForAddr" | "transferOwnership"): FunctionFragment;
-    encodeFunctionData(functionFragment: "claim", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "claimForAddr", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "claimWithResolver", values: [PromiseOrValue<string>, PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "controllers", values: [PromiseOrValue<string>]): string;
+import type { BaseContract, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../../../common";
+export interface ReverseRegistrarInterface extends Interface {
+    getFunction(nameOrSignature: "claim" | "claimForAddr" | "claimWithResolver" | "controllers" | "defaultResolver" | "ens" | "node" | "owner" | "renounceOwnership" | "setController" | "setDefaultResolver" | "setName" | "setNameForAddr" | "transferOwnership"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "ControllerChanged" | "DefaultResolverChanged" | "OwnershipTransferred" | "ReverseClaimed"): EventFragment;
+    encodeFunctionData(functionFragment: "claim", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "claimForAddr", values: [AddressLike, AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "claimWithResolver", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "controllers", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "defaultResolver", values?: undefined): string;
     encodeFunctionData(functionFragment: "ens", values?: undefined): string;
-    encodeFunctionData(functionFragment: "node", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "node", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
-    encodeFunctionData(functionFragment: "setController", values: [PromiseOrValue<string>, PromiseOrValue<boolean>]): string;
-    encodeFunctionData(functionFragment: "setDefaultResolver", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "setName", values: [PromiseOrValue<string>]): string;
-    encodeFunctionData(functionFragment: "setNameForAddr", values: [
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>,
-        PromiseOrValue<string>
-    ]): string;
-    encodeFunctionData(functionFragment: "transferOwnership", values: [PromiseOrValue<string>]): string;
+    encodeFunctionData(functionFragment: "setController", values: [AddressLike, boolean]): string;
+    encodeFunctionData(functionFragment: "setDefaultResolver", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "setName", values: [string]): string;
+    encodeFunctionData(functionFragment: "setNameForAddr", values: [AddressLike, AddressLike, AddressLike, string]): string;
+    encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
     decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimForAddr", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "claimWithResolver", data: BytesLike): Result;
@@ -57,224 +31,163 @@ export interface ReverseRegistrarInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "setName", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setNameForAddr", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
-    events: {
-        "ControllerChanged(address,bool)": EventFragment;
-        "DefaultResolverChanged(address)": EventFragment;
-        "OwnershipTransferred(address,address)": EventFragment;
-        "ReverseClaimed(address,bytes32)": EventFragment;
-    };
-    getEvent(nameOrSignatureOrTopic: "ControllerChanged"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "DefaultResolverChanged"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-    getEvent(nameOrSignatureOrTopic: "ReverseClaimed"): EventFragment;
 }
-export interface ControllerChangedEventObject {
-    controller: string;
-    enabled: boolean;
+export declare namespace ControllerChangedEvent {
+    type InputTuple = [controller: AddressLike, enabled: boolean];
+    type OutputTuple = [controller: string, enabled: boolean];
+    interface OutputObject {
+        controller: string;
+        enabled: boolean;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ControllerChangedEvent = TypedEvent<[
-    string,
-    boolean
-], ControllerChangedEventObject>;
-export declare type ControllerChangedEventFilter = TypedEventFilter<ControllerChangedEvent>;
-export interface DefaultResolverChangedEventObject {
-    resolver: string;
+export declare namespace DefaultResolverChangedEvent {
+    type InputTuple = [resolver: AddressLike];
+    type OutputTuple = [resolver: string];
+    interface OutputObject {
+        resolver: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type DefaultResolverChangedEvent = TypedEvent<[
-    string
-], DefaultResolverChangedEventObject>;
-export declare type DefaultResolverChangedEventFilter = TypedEventFilter<DefaultResolverChangedEvent>;
-export interface OwnershipTransferredEventObject {
-    previousOwner: string;
-    newOwner: string;
+export declare namespace OwnershipTransferredEvent {
+    type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
+    type OutputTuple = [previousOwner: string, newOwner: string];
+    interface OutputObject {
+        previousOwner: string;
+        newOwner: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type OwnershipTransferredEvent = TypedEvent<[
-    string,
-    string
-], OwnershipTransferredEventObject>;
-export declare type OwnershipTransferredEventFilter = TypedEventFilter<OwnershipTransferredEvent>;
-export interface ReverseClaimedEventObject {
-    addr: string;
-    node: string;
+export declare namespace ReverseClaimedEvent {
+    type InputTuple = [addr: AddressLike, node: BytesLike];
+    type OutputTuple = [addr: string, node: string];
+    interface OutputObject {
+        addr: string;
+        node: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
-export declare type ReverseClaimedEvent = TypedEvent<[
-    string,
-    string
-], ReverseClaimedEventObject>;
-export declare type ReverseClaimedEventFilter = TypedEventFilter<ReverseClaimedEvent>;
 export interface ReverseRegistrar extends BaseContract {
-    connect(signerOrProvider: Signer | Provider | string): this;
-    attach(addressOrName: string): this;
-    deployed(): Promise<this>;
+    connect(runner?: ContractRunner | null): ReverseRegistrar;
+    waitForDeployment(): Promise<this>;
     interface: ReverseRegistrarInterface;
-    queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
-    listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
-    listeners(eventName?: string): Array<Listener>;
-    removeAllListeners<TEvent extends TypedEvent>(eventFilter: TypedEventFilter<TEvent>): this;
-    removeAllListeners(eventName?: string): this;
-    off: OnEvent<this>;
-    on: OnEvent<this>;
-    once: OnEvent<this>;
-    removeListener: OnEvent<this>;
-    functions: {
-        claim(owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        claimForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        claimWithResolver(owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        controllers(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[boolean]>;
-        defaultResolver(overrides?: CallOverrides): Promise<[string]>;
-        ens(overrides?: CallOverrides): Promise<[string]>;
-        node(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[string]>;
-        owner(overrides?: CallOverrides): Promise<[string]>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setController(controller: PromiseOrValue<string>, enabled: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setDefaultResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setName(name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        setNameForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<ContractTransaction>;
-    };
-    claim(owner: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    claimForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    claimWithResolver(owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    controllers(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-    defaultResolver(overrides?: CallOverrides): Promise<string>;
-    ens(overrides?: CallOverrides): Promise<string>;
-    node(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-    owner(overrides?: CallOverrides): Promise<string>;
-    renounceOwnership(overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setController(controller: PromiseOrValue<string>, enabled: PromiseOrValue<boolean>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setDefaultResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setName(name: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    setNameForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, name: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-        from?: PromiseOrValue<string>;
-    }): Promise<ContractTransaction>;
-    callStatic: {
-        claim(owner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        claimForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        claimWithResolver(owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        controllers(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<boolean>;
-        defaultResolver(overrides?: CallOverrides): Promise<string>;
-        ens(overrides?: CallOverrides): Promise<string>;
-        node(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        owner(overrides?: CallOverrides): Promise<string>;
-        renounceOwnership(overrides?: CallOverrides): Promise<void>;
-        setController(controller: PromiseOrValue<string>, enabled: PromiseOrValue<boolean>, overrides?: CallOverrides): Promise<void>;
-        setDefaultResolver(resolver: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-        setName(name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        setNameForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, name: PromiseOrValue<string>, overrides?: CallOverrides): Promise<string>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-    };
+    queryFilter<TCEvent extends TypedContractEvent>(event: TCEvent, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TypedEventLog<TCEvent>>>;
+    on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(filter: TypedDeferredTopicFilter<TCEvent>, listener: TypedListener<TCEvent>): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    claim: TypedContractMethod<[owner: AddressLike], [string], "nonpayable">;
+    claimForAddr: TypedContractMethod<[
+        addr: AddressLike,
+        owner: AddressLike,
+        resolver: AddressLike
+    ], [
+        string
+    ], "nonpayable">;
+    claimWithResolver: TypedContractMethod<[
+        owner: AddressLike,
+        resolver: AddressLike
+    ], [
+        string
+    ], "nonpayable">;
+    controllers: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+    defaultResolver: TypedContractMethod<[], [string], "view">;
+    ens: TypedContractMethod<[], [string], "view">;
+    node: TypedContractMethod<[addr: AddressLike], [string], "view">;
+    owner: TypedContractMethod<[], [string], "view">;
+    renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+    setController: TypedContractMethod<[
+        controller: AddressLike,
+        enabled: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    setDefaultResolver: TypedContractMethod<[
+        resolver: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    setName: TypedContractMethod<[name: string], [string], "nonpayable">;
+    setNameForAddr: TypedContractMethod<[
+        addr: AddressLike,
+        owner: AddressLike,
+        resolver: AddressLike,
+        name: string
+    ], [
+        string
+    ], "nonpayable">;
+    transferOwnership: TypedContractMethod<[
+        newOwner: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "claim"): TypedContractMethod<[owner: AddressLike], [string], "nonpayable">;
+    getFunction(nameOrSignature: "claimForAddr"): TypedContractMethod<[
+        addr: AddressLike,
+        owner: AddressLike,
+        resolver: AddressLike
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "claimWithResolver"): TypedContractMethod<[
+        owner: AddressLike,
+        resolver: AddressLike
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "controllers"): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "defaultResolver"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "ens"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "node"): TypedContractMethod<[addr: AddressLike], [string], "view">;
+    getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "renounceOwnership"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "setController"): TypedContractMethod<[
+        controller: AddressLike,
+        enabled: boolean
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setDefaultResolver"): TypedContractMethod<[resolver: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "setName"): TypedContractMethod<[name: string], [string], "nonpayable">;
+    getFunction(nameOrSignature: "setNameForAddr"): TypedContractMethod<[
+        addr: AddressLike,
+        owner: AddressLike,
+        resolver: AddressLike,
+        name: string
+    ], [
+        string
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+    getEvent(key: "ControllerChanged"): TypedContractEvent<ControllerChangedEvent.InputTuple, ControllerChangedEvent.OutputTuple, ControllerChangedEvent.OutputObject>;
+    getEvent(key: "DefaultResolverChanged"): TypedContractEvent<DefaultResolverChangedEvent.InputTuple, DefaultResolverChangedEvent.OutputTuple, DefaultResolverChangedEvent.OutputObject>;
+    getEvent(key: "OwnershipTransferred"): TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+    getEvent(key: "ReverseClaimed"): TypedContractEvent<ReverseClaimedEvent.InputTuple, ReverseClaimedEvent.OutputTuple, ReverseClaimedEvent.OutputObject>;
     filters: {
-        "ControllerChanged(address,bool)"(controller?: PromiseOrValue<string> | null, enabled?: null): ControllerChangedEventFilter;
-        ControllerChanged(controller?: PromiseOrValue<string> | null, enabled?: null): ControllerChangedEventFilter;
-        "DefaultResolverChanged(address)"(resolver?: PromiseOrValue<string> | null): DefaultResolverChangedEventFilter;
-        DefaultResolverChanged(resolver?: PromiseOrValue<string> | null): DefaultResolverChangedEventFilter;
-        "OwnershipTransferred(address,address)"(previousOwner?: PromiseOrValue<string> | null, newOwner?: PromiseOrValue<string> | null): OwnershipTransferredEventFilter;
-        OwnershipTransferred(previousOwner?: PromiseOrValue<string> | null, newOwner?: PromiseOrValue<string> | null): OwnershipTransferredEventFilter;
-        "ReverseClaimed(address,bytes32)"(addr?: PromiseOrValue<string> | null, node?: PromiseOrValue<BytesLike> | null): ReverseClaimedEventFilter;
-        ReverseClaimed(addr?: PromiseOrValue<string> | null, node?: PromiseOrValue<BytesLike> | null): ReverseClaimedEventFilter;
-    };
-    estimateGas: {
-        claim(owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        claimForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        claimWithResolver(owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        controllers(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        defaultResolver(overrides?: CallOverrides): Promise<BigNumber>;
-        ens(overrides?: CallOverrides): Promise<BigNumber>;
-        node(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
-        owner(overrides?: CallOverrides): Promise<BigNumber>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setController(controller: PromiseOrValue<string>, enabled: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setDefaultResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setName(name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        setNameForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<BigNumber>;
-    };
-    populateTransaction: {
-        claim(owner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        claimForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        claimWithResolver(owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        controllers(arg0: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        defaultResolver(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        ens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        node(addr: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        renounceOwnership(overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setController(controller: PromiseOrValue<string>, enabled: PromiseOrValue<boolean>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setDefaultResolver(resolver: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setName(name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        setNameForAddr(addr: PromiseOrValue<string>, owner: PromiseOrValue<string>, resolver: PromiseOrValue<string>, name: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
-        transferOwnership(newOwner: PromiseOrValue<string>, overrides?: Overrides & {
-            from?: PromiseOrValue<string>;
-        }): Promise<PopulatedTransaction>;
+        "ControllerChanged(address,bool)": TypedContractEvent<ControllerChangedEvent.InputTuple, ControllerChangedEvent.OutputTuple, ControllerChangedEvent.OutputObject>;
+        ControllerChanged: TypedContractEvent<ControllerChangedEvent.InputTuple, ControllerChangedEvent.OutputTuple, ControllerChangedEvent.OutputObject>;
+        "DefaultResolverChanged(address)": TypedContractEvent<DefaultResolverChangedEvent.InputTuple, DefaultResolverChangedEvent.OutputTuple, DefaultResolverChangedEvent.OutputObject>;
+        DefaultResolverChanged: TypedContractEvent<DefaultResolverChangedEvent.InputTuple, DefaultResolverChangedEvent.OutputTuple, DefaultResolverChangedEvent.OutputObject>;
+        "OwnershipTransferred(address,address)": TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+        OwnershipTransferred: TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+        "ReverseClaimed(address,bytes32)": TypedContractEvent<ReverseClaimedEvent.InputTuple, ReverseClaimedEvent.OutputTuple, ReverseClaimedEvent.OutputObject>;
+        ReverseClaimed: TypedContractEvent<ReverseClaimedEvent.InputTuple, ReverseClaimedEvent.OutputTuple, ReverseClaimedEvent.OutputObject>;
     };
 }
 //# sourceMappingURL=ReverseRegistrar.d.ts.map
