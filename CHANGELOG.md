@@ -1,3 +1,7 @@
+## v0.9.11
+
+- Switched verification scripts to use Polygonscan for Amoy
+
 ## v0.9.10
 
 - Migrated to `ethers@6`, updated other dependencies
