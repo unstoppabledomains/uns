@@ -1,3 +1,7 @@
+## v0.9.12
+
+- Upgraded `UNSRegistry` and `MintingManager` on Polygon Mainnet
+
 ## v0.9.11
 
 - Switched verification scripts to use Polygonscan for Amoy
