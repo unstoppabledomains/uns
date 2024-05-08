@@ -1,5 +1,5 @@
 {
-    "version": "0.9.1",
+    "version": "0.9.2",
     "networks": {
         "1": {
             "contracts": {
@@ -125,7 +125,7 @@
             "contracts": {
                 "UNSRegistry": {
                     "address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
-                    "implementation": "0xC4999E1daef4ecBd4E0F71A00B4a78B53e617922",
+                    "implementation": "0x11227E54F19934164A81d5aDd1ce5825D46B2271",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272eb5",
                     "forwarder": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f"
@@ -138,7 +138,7 @@
                 },
                 "MintingManager": {
                     "address": "0x7be83293BeeDc9Eba1bd76c66A65F10F3efaeC26",
-                    "implementation": "0x1FF7fC4473E3CDA0428830a1bc96028A0C12244C",
+                    "implementation": "0x8Efbe119357753c5d12f078AC081E37a5AFACf33",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272f41",
                     "forwarder": "0xC37d3c4326ab0E1D2b9D8b916bBdf5715f780fcF"
