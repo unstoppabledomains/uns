@@ -1,0 +1,43 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "FulfillmentApplicationErrors",
+  "sourceName": "seaport-types/src/interfaces/FulfillmentApplicationErrors.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "InvalidFulfillmentComponentData",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "fulfillmentIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "MismatchedFulfillmentOfferAndConsiderationComponents",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum Side",
+          "name": "side",
+          "type": "uint8"
+        }
+      ],
+      "name": "MissingFulfillmentComponentOnAggregation",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "OfferAndConsiderationRequiredOnFulfillment",
+      "type": "error"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

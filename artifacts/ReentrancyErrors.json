@@ -1,0 +1,31 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ReentrancyErrors",
+  "sourceName": "seaport-types/src/interfaces/ReentrancyErrors.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "NoReentrantCalls",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "TStoreAlreadyActivated",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "TStoreNotSupported",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "TloadTestContractDeploymentFailed",
+      "type": "error"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

@@ -1214,6 +1214,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opensea/seaport-js@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@opensea/seaport-js@npm:4.0.0"
+  dependencies:
+    ethers: ^6.9.0
+    merkletreejs: ^0.3.11
+  checksum: dcc921db35818da0111c7884e7aeb26a3b2e1909ad9395fd467ae429dbdca319e4673115d91c378fc7b6bf422c80fb0f56477813c7c45c3f0d66e7dfbc0ad02b
+  languageName: node
+  linkType: hard
+
 "@openzeppelin/contracts-2.3@npm:@openzeppelin/contracts@2.3.0":
   version: 2.3.0
   resolution: "@openzeppelin/contracts@npm:2.3.0"
@@ -2891,6 +2901,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bignumber.js@npm:^9.0.1":
+  version: 9.1.2
+  resolution: "bignumber.js@npm:9.1.2"
+  checksum: 582c03af77ec9cb0ebd682a373ee6c66475db94a4325f92299621d544aa4bd45cb45fd60001610e94aef8ae98a0905fa538241d9638d4422d57abbeeac6fadaf
+  languageName: node
+  linkType: hard
+
 "binary-extensions@npm:^2.0.0":
   version: 2.2.0
   resolution: "binary-extensions@npm:2.2.0"
@@ -3125,6 +3142,13 @@ __metadata:
   version: 1.1.2
   resolution: "buffer-from@npm:1.1.2"
   checksum: 0448524a562b37d4d7ed9efd91685a5b77a50672c556ea254ac9a6d30e3403a517d8981f10e565db24e8339413b43c97ca2951f10e399c6125a0d8911f5679bb
+  languageName: node
+  linkType: hard
+
+"buffer-reverse@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "buffer-reverse@npm:1.0.1"
+  checksum: e350872a89b17af0a7e1bd7a73239a535164f3f010b0800add44f2e52bd0511548dc5b96c20309effba969868c385023d2d02a0add6155f6a76da7b3073b77bd
   languageName: node
   linkType: hard
 
@@ -3966,6 +3990,13 @@ __metadata:
     randombytes: ^2.0.0
     randomfill: ^1.0.3
   checksum: c1609af82605474262f3eaa07daa0b2140026bd264ab316d4bf1170272570dbe02f0c49e29407fe0d3634f96c507c27a19a6765fb856fed854a625f9d15618e2
+  languageName: node
+  linkType: hard
+
+"crypto-js@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "crypto-js@npm:4.2.0"
+  checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
   languageName: node
   linkType: hard
 
@@ -5339,9 +5370,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^6.1.0":
-  version: 6.12.0
-  resolution: "ethers@npm:6.12.0"
+"ethers@npm:^6.11.1, ethers@npm:^6.9.0":
+  version: 6.12.1
+  resolution: "ethers@npm:6.12.1"
   dependencies:
     "@adraffy/ens-normalize": 1.10.1
     "@noble/curves": 1.2.0
@@ -5350,7 +5381,7 @@ __metadata:
     aes-js: 4.0.0-beta.5
     tslib: 2.4.0
     ws: 8.5.0
-  checksum: a9fa6937f57be00f217cac045752113f0be6ecbef77b90d653202f4127930023e86d20f06631cc4114bdbcf28fcb7dcb5244a88e2e430df1dfcb623e93c23366
+  checksum: ddf398c91f584b9e643740ec17a9c82b4a1c4ea3fb6efd00f1a043b89d1ec6f9427aa80894f75850ee805722e91b8d054bce18579a2c621226302c096774df90
   languageName: node
   linkType: hard
 
@@ -8227,6 +8258,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"merkletreejs@npm:^0.3.11":
+  version: 0.3.11
+  resolution: "merkletreejs@npm:0.3.11"
+  dependencies:
+    bignumber.js: ^9.0.1
+    buffer-reverse: ^1.0.1
+    crypto-js: ^4.2.0
+    treeify: ^1.1.0
+    web3-utils: ^1.3.4
+  checksum: 93edb8ec66aa6c9f59aa0902e675590e3791692893bb3e8c1018f758367ded1bf7d6b1057ccde3729b283ca946a316838a631a922960b76889b3be528c43ef4e
+  languageName: node
+  linkType: hard
+
 "methods@npm:~1.1.2":
   version: 1.1.2
   resolution: "methods@npm:1.1.2"
@@ -10172,6 +10216,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"seaport-core@npm:1.6.4":
+  version: 1.6.4
+  resolution: "seaport-core@npm:1.6.4"
+  dependencies:
+    seaport-types: 1.6.2
+  checksum: cb505249c6b771532cc175cdac7db0b05014c56d1274cf12396c5c0734483e230b18caed52156536b9d2d17da094e60826a4b75f499dba5f4579399531e45039
+  languageName: node
+  linkType: hard
+
+"seaport-types@npm:1.6.2":
+  version: 1.6.2
+  resolution: "seaport-types@npm:1.6.2"
+  checksum: 9fb3546a9a6af324cd509380aa68abc255a1199a401c066c143136b5c09d1df0ae49bd1844828414e7482d7b8fd13abd7f144fa22b44be8309fe8ead9fc98715
+  languageName: node
+  linkType: hard
+
+"seaport-types@npm:1.6.3":
+  version: 1.6.3
+  resolution: "seaport-types@npm:1.6.3"
+  checksum: 456407167efca1c01b977da4738689816e85e6a6e7bf8e6c10d1991df04a2801fa4cc389260cc675992451cc9a28f37dc5ed2b1ab794a9842142b9ee72cbf059
+  languageName: node
+  linkType: hard
+
 "secp256k1@npm:4.0.3, secp256k1@npm:^4.0.0, secp256k1@npm:^4.0.1":
   version: 4.0.3
   resolution: "secp256k1@npm:4.0.3"
@@ -11167,6 +11234,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"treeify@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "treeify@npm:1.1.0"
+  checksum: aa00dded220c1dd052573bd6fc2c52862f09870851a284f0d3650d72bf913ba9b4f6b824f4f1ab81899bae29375f4266b07fe47cbf82343a1efa13cc09ce87af
+  languageName: node
+  linkType: hard
+
 "ts-command-line-args@npm:^2.2.0":
   version: 2.3.1
   resolution: "ts-command-line-args@npm:2.3.1"
@@ -11632,6 +11706,7 @@ __metadata:
     "@nomicfoundation/hardhat-ethers": ^3.0.0
     "@nomicfoundation/hardhat-verify": ^1.1.0
     "@nomiclabs/hardhat-solhint": ^3.0.1
+    "@opensea/seaport-js": ^4.0.0
     "@openzeppelin/contracts-upgradeable": ^4.7.3
     "@openzeppelin/hardhat-upgrades": ^2.0.0
     "@openzeppelin/upgrades-core": ^1.32.5
@@ -11665,7 +11740,7 @@ __metadata:
     ethereumjs-common: ^1.5.2
     ethereumjs-tx: ^1.3.7
     ethereumjs-util: ^7.1.0
-    ethers: ^6.1.0
+    ethers: ^6.11.1
     ganache: ^7.9.1
     hardhat: ~2.20.0
     hardhat-abi-exporter: ^2.2.1
@@ -11679,6 +11754,8 @@ __metadata:
     mocha: ^10.0.0
     prettier: ^2.3.0
     prettier-plugin-solidity: ^1.3.1
+    seaport-core: 1.6.4
+    seaport-types: 1.6.3
     solhint: ^3.3.7
     solidity-coverage: ^0.8.4
     tar: ^6.1.9
@@ -12111,6 +12188,22 @@ __metadata:
     randombytes: ^2.1.0
     utf8: 3.0.0
   checksum: 08bb2df9cd19672f034bb82a27b857e0571b836a620f83de2214377457c6e52446e8dedcf916f8f10a13c86b5a02674dd4f45c60c45698b388368601cce9cf5e
+  languageName: node
+  linkType: hard
+
+"web3-utils@npm:^1.3.4":
+  version: 1.10.4
+  resolution: "web3-utils@npm:1.10.4"
+  dependencies:
+    "@ethereumjs/util": ^8.1.0
+    bn.js: ^5.2.1
+    ethereum-bloom-filters: ^1.0.6
+    ethereum-cryptography: ^2.1.2
+    ethjs-unit: 0.1.6
+    number-to-bn: 1.7.0
+    randombytes: ^2.1.0
+    utf8: 3.0.0
+  checksum: a1535817a4653f1b5cc868aa19305158122379078a41e13642e1ba64803f6f8e5dd2fb8c45c033612b8f52dde42d8008afce85296c0608276fe1513dece66a49
   languageName: node
   linkType: hard
 
