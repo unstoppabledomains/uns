@@ -63,7 +63,6 @@ contract SeaportProxyBuyer is
         bytes32 fulfillerConduitKey,
         address recipient
     ) external override onlyMinter nonReentrant whenNotPaused returns (bool fulfilled) {
-        // todo put TokenId in extradata to use protectTokenOperation ? - clarify
         if (recipient == address(0)) {
             revert RecipientIsZeroAddress();
         }
@@ -86,5 +85,5 @@ contract SeaportProxyBuyer is
         _unpause();
     }
 
-    uint256[47] __gap;
+    uint256[48] __gap;
 }

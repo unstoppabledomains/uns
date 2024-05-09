@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat';
+import { ethers, upgrades } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { Seaport as seaportjs } from '@opensea/seaport-js';
@@ -18,14 +18,15 @@ import { ERC20Mock } from '../../types/contracts/mocks/ERC20Mock';
 import { TLD, ZERO_ADDRESS } from '../helpers/constants';
 import { deployProxy } from '../../src/helpers';
 import { OrderStruct } from '../../types/seaport-core/src/Seaport';
-
+import { ExecuteFunc, buildExecuteFunc } from '../helpers/metatx';
 
 describe('SeaportProxyBuyer', async () => {
   let unsRegistry: UNSRegistry,
     seaportProxyBuyer: SeaportProxyBuyer,
     seaportContract: SeaportContract,
     conduitController: ConduitController,
-    usdcMock: ERC20Mock;
+    usdcMock: ERC20Mock,
+    seaportProxyBuyerFactory: SeaportProxyBuyer__factory;
 
   let signers: SignerWithAddress[],
     coinbase: SignerWithAddress,
@@ -54,10 +55,15 @@ describe('SeaportProxyBuyer', async () => {
     seaportContract = await new SeaportContract__factory(coinbase).deploy(await conduitController.getAddress());
     usdcMock = await new ERC20Mock__factory(coinbase).deploy();
 
-    seaportProxyBuyer = (await deployProxy(new SeaportProxyBuyer__factory(coinbase), [
+    seaportProxyBuyerFactory = new SeaportProxyBuyer__factory(coinbase);
+    seaportProxyBuyer = (await deployProxy<SeaportProxyBuyer>(seaportProxyBuyerFactory, [
       await seaportContract.getAddress(),
       await usdcMock.getAddress(),
-    ])) as SeaportProxyBuyer;
+    ], { initializer: false })) as SeaportProxyBuyer;
+    await seaportProxyBuyer.initialize(
+      await seaportContract.getAddress(),
+      await usdcMock.getAddress(),
+    );
     await seaportProxyBuyer.addMinter(coinbase.address);
     seaportSdk = new seaportjs(seller, {
       overrides: {
@@ -73,114 +79,274 @@ describe('SeaportProxyBuyer', async () => {
     try { await seaportProxyBuyer.connect(coinbase).unpause(); } catch {}
   });
 
-  it('should execute Seaport order via Proxy', async () => {
-    const priceToSell = BigInt(ethers.parseUnits('100', 6));
-    const recipientFeesBasisPoints = BigInt(50); // 0.5%
-    const feesAmount = priceToSell * recipientFeesBasisPoints / BigInt(10000);
-    const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+  describe('Regular tranactions', async () => {
+    it('should execute Seaport order via Proxy', async () => {
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50); // 0.5%
+      const feesAmount = priceToSell * recipientFeesBasisPoints / BigInt(10000);
+      const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
 
-    const initialProxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
-    await (await seaportProxyBuyer.connect(coinbase).fulfillAdvancedOrder(
-      { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
-    )).wait();
+      const initialProxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      const initialSellerBalance = await usdcMock.balanceOf(seller.address);
+      const initialFeesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+      await (await seaportProxyBuyer.connect(coinbase).fulfillAdvancedOrder(
+        { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
+      )).wait();
 
-    const sellerBalance = await usdcMock.balanceOf(seller.address);
-    const proxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
-    const domainOwner = await unsRegistry.ownerOf(tokenIdToSell);
-    const feesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+      const sellerBalance = await usdcMock.balanceOf(seller.address);
+      const proxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      const domainOwner = await unsRegistry.ownerOf(tokenIdToSell);
+      const feesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
 
-    expect(sellerBalance).to.be.eq(priceToSell - feesAmount);
-    expect(feesRecipientBalance).to.be.eq(feesAmount);
-    expect(proxyBalance).to.be.eq(initialProxyBalance - priceToSell);
-    expect(domainOwner).to.be.eq(buyer.address);
+      expect(sellerBalance).to.be.eq(initialSellerBalance + priceToSell - feesAmount);
+      expect(feesRecipientBalance).to.be.eq(initialFeesRecipientBalance + feesAmount);
+      expect(proxyBalance).to.be.eq(initialProxyBalance - priceToSell);
+      expect(domainOwner).to.be.eq(buyer.address);
+    });
+
+    it('should not execute Seaport order from non-minter', async () => {
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50);
+      const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+
+      await expect(seaportProxyBuyer.connect(buyer).fulfillAdvancedOrder(
+        { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
+      )).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+    });
+
+    it('should withdraw USDC from Proxy', async () => {
+      const amountToWithdraw = BigInt(ethers.parseUnits('100', 6));
+      const initialProxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      const initialRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+      await seaportProxyBuyer.connect(coinbase).withdraw(feesRecipient.address, amountToWithdraw);
+
+      const recipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+      const proxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      expect(recipientBalance).to.be.eq(initialRecipientBalance + amountToWithdraw);
+      expect(proxyBalance).to.be.eq(initialProxyBalance - amountToWithdraw);
+    });
+
+    it('should not withdraw USDC from Proxy by non-owner', async () => {
+      const amountToWithdraw = BigInt(ethers.parseUnits('100', 6));
+      await expect(
+        seaportProxyBuyer.connect(buyer).withdraw(feesRecipient.address, amountToWithdraw),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+
+    it('should not execute Seaport order with zero recipient address', async () => {
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50);
+      const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+
+      await expect(seaportProxyBuyer.connect(coinbase).fulfillAdvancedOrder(
+        { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, ZERO_ADDRESS,
+      )).to.be.revertedWithCustomError(seaportProxyBuyer, 'RecipientIsZeroAddress');
+    });
+
+    it('should not execute Seaport order if contract is paused', async () => {
+      await seaportProxyBuyer.connect(coinbase).pause();
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50);
+      const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+
+      await expect(seaportProxyBuyer.connect(coinbase).fulfillAdvancedOrder(
+        { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
+      )).to.be.revertedWith('Pausable: paused');
+    });
+
+    it('should not withdraw USDC from Proxy if contract is paused', async () => {
+      await seaportProxyBuyer.connect(coinbase).pause();
+      const amountToWithdraw = BigInt(ethers.parseUnits('100', 6));
+      await expect(
+        seaportProxyBuyer.connect(coinbase).withdraw(feesRecipient.address, amountToWithdraw),
+      ).to.be.revertedWith('Pausable: paused');
+    });
+
+    it('should unpause contract', async () => {
+      await seaportProxyBuyer.connect(coinbase).pause();
+      await seaportProxyBuyer.connect(coinbase).unpause();
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50);
+      const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+
+      await seaportProxyBuyer.connect(coinbase).fulfillAdvancedOrder(
+        { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
+      );
+    });
+
+    it('should not pause if paused', async () => {
+      await seaportProxyBuyer.connect(coinbase).pause();
+      await expect(seaportProxyBuyer.connect(coinbase).pause()).to.be.revertedWith('Pausable: paused');
+    });
+
+    it('should not unpause if not paused', async () => {
+      await expect(seaportProxyBuyer.connect(coinbase).unpause()).to.be.revertedWith('Pausable: not paused');
+    });
+
+    it('should not pause by non-owner', async () => {
+      await expect(seaportProxyBuyer.connect(buyer).pause()).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+
+    it('should not unpause by non-owner', async () => {
+      await seaportProxyBuyer.connect(coinbase).pause();
+      await expect(seaportProxyBuyer.connect(buyer).unpause()).to.be.revertedWith('Ownable: caller is not the owner');
+    });
   });
 
-  it('should not execute Seaport order from non-minter', async () => {
-    const priceToSell = BigInt(ethers.parseUnits('100', 6));
-    const recipientFeesBasisPoints = BigInt(50);
-    const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+  describe('Meta transactions', async () => {
+    let buildExecuteParams: ExecuteFunc;
 
-    await expect(seaportProxyBuyer.connect(buyer).fulfillAdvancedOrder(
-      { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
-    )).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+    before(async () => {
+      buildExecuteParams = buildExecuteFunc(
+        seaportProxyBuyer.interface,
+        await seaportProxyBuyer.getAddress(),
+        seaportProxyBuyer,
+      );
+    });
+
+    it('should execute Seaport order via Proxy', async () => {
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50);
+      const feesAmount = priceToSell * recipientFeesBasisPoints / BigInt(10000);
+      const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+
+      const initialProxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      const initialSellerBalance = await usdcMock.balanceOf(seller.address);
+      const initialFeesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+      const { req, signature } = await buildExecuteParams(
+        'fulfillAdvancedOrder',
+        [{ ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address],
+        coinbase,
+        0,
+      );
+      await (await seaportProxyBuyer.connect(seller).execute(req, signature)).wait();
+
+      const sellerBalance = await usdcMock.balanceOf(seller.address);
+      const proxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      const domainOwner = await unsRegistry.ownerOf(tokenIdToSell);
+      const feesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+
+      expect(sellerBalance).to.be.eq(initialSellerBalance + priceToSell - feesAmount);
+      expect(feesRecipientBalance).to.be.eq(initialFeesRecipientBalance + feesAmount);
+      expect(proxyBalance).to.be.eq(initialProxyBalance - priceToSell);
+      expect(domainOwner).to.be.eq(buyer.address);
+    });
+
+    it('should not execute Seaport order from non-minter', async () => {
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50);
+      const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+
+      const { req, signature } = await buildExecuteParams(
+        'fulfillAdvancedOrder',
+        [{ ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address],
+        buyer,
+        0,
+      );
+      await expect(
+        seaportProxyBuyer.connect(coinbase).execute(req, signature),
+      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+    });
+
+    it('should withdraw USDC from Proxy', async () => {
+      const amountToWithdraw = BigInt(ethers.parseUnits('100', 6));
+      const initialProxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      const initialRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+      const { req, signature } = await buildExecuteParams(
+        'withdraw',
+        [feesRecipient.address, amountToWithdraw],
+        coinbase,
+        0,
+      );
+      await seaportProxyBuyer.connect(coinbase).execute(req, signature);
+
+      const recipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+      const proxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      expect(recipientBalance).to.be.eq(initialRecipientBalance + amountToWithdraw);
+      expect(proxyBalance).to.be.eq(initialProxyBalance - amountToWithdraw);
+    });
+
+    it('should not withdraw USDC from Proxy by non-owner', async () => {
+      const amountToWithdraw = BigInt(ethers.parseUnits('100', 6));
+      const { req, signature } = await buildExecuteParams(
+        'withdraw',
+        [feesRecipient.address, amountToWithdraw],
+        buyer,
+        0,
+      );
+      await expect(
+        seaportProxyBuyer.connect(coinbase).execute(req, signature),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
   });
 
-  it('should withdraw USDC from Proxy', async () => {
-    const amountToWithdraw = BigInt(ethers.parseUnits('100', 6));
-    const initialProxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
-    const initialRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
-    await seaportProxyBuyer.connect(coinbase).withdraw(feesRecipient.address, amountToWithdraw);
+  describe('Contract upgrades', async () => {
+    it('should keep USDC balance after upgrade', async () => {
+      const balanceBefore = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      seaportProxyBuyer =
+      (await upgrades.upgradeProxy(
+        await seaportProxyBuyer.getAddress(), seaportProxyBuyerFactory,
+      )) as unknown as SeaportProxyBuyer;
+      const balanceAfter = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      expect(balanceAfter).to.be.eq(balanceBefore);
+    });
 
-    const recipientBalance = await usdcMock.balanceOf(feesRecipient.address);
-    const proxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
-    expect(recipientBalance).to.be.eq(initialRecipientBalance + amountToWithdraw);
-    expect(proxyBalance).to.be.eq(initialProxyBalance - amountToWithdraw);
-  });
+    it('should execute Seaport order after upgrade', async () => {
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50);
+      const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+      seaportProxyBuyer =
+        (await upgrades.upgradeProxy(
+          await seaportProxyBuyer.getAddress(), seaportProxyBuyerFactory,
+        )) as unknown as SeaportProxyBuyer;
+      (await seaportProxyBuyer.connect(coinbase).fulfillAdvancedOrder(
+        { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
+      )).wait();
 
-  it('should not withdraw USDC from Proxy by non-owner', async () => {
-    const amountToWithdraw = BigInt(ethers.parseUnits('100', 6));
-    await expect(
-      seaportProxyBuyer.connect(buyer).withdraw(feesRecipient.address, amountToWithdraw),
-    ).to.be.revertedWith('Ownable: caller is not the owner');
-  });
+      const domainOwner = await unsRegistry.ownerOf(tokenIdToSell);
+      expect(domainOwner).to.be.eq(buyer.address);
+    });
 
-  it('should not execute Seaport order with zero recipient address', async () => {
-    const priceToSell = BigInt(ethers.parseUnits('100', 6));
-    const recipientFeesBasisPoints = BigInt(50);
-    const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+    it('should withdraw USDC after upgrade', async () => {
+      const amountToWithdraw = BigInt(ethers.parseUnits('100', 6));
+      const initialProxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      const initialRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+      seaportProxyBuyer =
+        (await upgrades.upgradeProxy(
+          await seaportProxyBuyer.getAddress(), seaportProxyBuyerFactory,
+        )) as unknown as SeaportProxyBuyer;
+      await seaportProxyBuyer.connect(coinbase).withdraw(feesRecipient.address, amountToWithdraw);
 
-    await expect(seaportProxyBuyer.connect(coinbase).fulfillAdvancedOrder(
-      { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, ZERO_ADDRESS,
-    )).to.be.revertedWithCustomError(seaportProxyBuyer, 'RecipientIsZeroAddress');
-  });
+      const recipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+      const proxyBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      expect(recipientBalance).to.be.eq(initialRecipientBalance + amountToWithdraw);
+      expect(proxyBalance).to.be.eq(initialProxyBalance - amountToWithdraw);
+    });
 
-  it('should not execute Seaport order if contract is paused', async () => {
-    await seaportProxyBuyer.connect(coinbase).pause();
-    const priceToSell = BigInt(ethers.parseUnits('100', 6));
-    const recipientFeesBasisPoints = BigInt(50);
-    const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+    it('should not withdraw USDC after upgrade by non-owner', async () => {
+      const amountToWithdraw = BigInt(ethers.parseUnits('100', 6));
+      seaportProxyBuyer =
+        (await upgrades.upgradeProxy(
+          await seaportProxyBuyer.getAddress(), seaportProxyBuyerFactory,
+        )) as unknown as SeaportProxyBuyer;
+      await expect(
+        seaportProxyBuyer.connect(buyer).withdraw(feesRecipient.address, amountToWithdraw),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
 
-    await expect(seaportProxyBuyer.connect(coinbase).fulfillAdvancedOrder(
-      { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
-    )).to.be.revertedWith('Pausable: paused');
-  });
+    it('should not execute Seaport order after upgrade by non-minter', async () => {
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50);
+      const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
+      seaportProxyBuyer =
+        (await upgrades.upgradeProxy(
+          await seaportProxyBuyer.getAddress(), seaportProxyBuyerFactory,
+        )) as unknown as SeaportProxyBuyer;
 
-  it('should not withdraw USDC from Proxy if contract is paused', async () => {
-    await seaportProxyBuyer.connect(coinbase).pause();
-    const amountToWithdraw = BigInt(ethers.parseUnits('100', 6));
-    await expect(
-      seaportProxyBuyer.connect(coinbase).withdraw(feesRecipient.address, amountToWithdraw),
-    ).to.be.revertedWith('Pausable: paused');
-  });
-
-  it('should unpause contract', async () => {
-    await seaportProxyBuyer.connect(coinbase).pause();
-    await seaportProxyBuyer.connect(coinbase).unpause();
-    const priceToSell = BigInt(ethers.parseUnits('100', 6));
-    const recipientFeesBasisPoints = BigInt(50);
-    const { fulfillOrderData, numerator, denominator } = await createOrder(priceToSell, recipientFeesBasisPoints);
-
-    await seaportProxyBuyer.connect(coinbase).fulfillAdvancedOrder(
-      { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
-    );
-  });
-
-  it('should not pause if paused', async () => {
-    await seaportProxyBuyer.connect(coinbase).pause();
-    await expect(seaportProxyBuyer.connect(coinbase).pause()).to.be.revertedWith('Pausable: paused');
-  });
-
-  it('should not unpause if not paused', async () => {
-    await expect(seaportProxyBuyer.connect(coinbase).unpause()).to.be.revertedWith('Pausable: not paused');
-  });
-
-  it('should not pause by non-owner', async () => {
-    await expect(seaportProxyBuyer.connect(buyer).pause()).to.be.revertedWith('Ownable: caller is not the owner');
-  });
-
-  it('should not unpause by non-owner', async () => {
-    await seaportProxyBuyer.connect(coinbase).pause();
-    await expect(seaportProxyBuyer.connect(buyer).unpause()).to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(seaportProxyBuyer.connect(buyer).fulfillAdvancedOrder(
+        { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
+      )).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+    });
   });
 
   const createOrder = async (priceToSell: bigint, recipientFeesBasisPoints: bigint) => {
