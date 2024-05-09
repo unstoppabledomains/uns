@@ -1,3 +1,8 @@
+## v0.9.13
+
+- Added `USDT` MATIC token to resolver list
+- Added `WETH` token to resolver list
+
 ## v0.9.12
 
 - Upgraded `UNSRegistry` and `MintingManager` on Polygon Mainnet
@@ -139,7 +144,7 @@
 
 ## v0.8.28
 
-- ENSCustody@0.1.3 - Added `owner` parameter into `data` when depositing into custody 
+- ENSCustody@0.1.3 - Added `owner` parameter into `data` when depositing into custody
 
 ## v0.8.27
 
