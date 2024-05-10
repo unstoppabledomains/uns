@@ -1,5 +1,5 @@
 {
-  "version": "2.1.32",
+  "version": "2.1.33",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -511,8 +511,28 @@
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     },
+    "crypto.WETH.version.ERC20.address": {
+      "deprecatedKeyName": "WETH_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.WETH.version.MATIC.address": {
+      "deprecatedKeyName": "WETH_MATIC",
+      "deprecated": false,
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "crypto.WETH.version.BEP20.address": {
+      "deprecatedKeyName": "WETH_BEP20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
     "crypto.USDT.version.ERC20.address": {
       "deprecatedKeyName": "USDT_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.USDT.version.MATIC.address": {
+      "deprecatedKeyName": "USDT_MATIC",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     },
