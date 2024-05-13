@@ -10,7 +10,7 @@
  * npx dotenv-cli -y -- yarn hardhat run --network <network> scripts/util/deploy_ERC1271SimpleWallet.ts
  *
  * Running without using a .env file:
- * 1. Set env vars or include a the beginning of the command then run:
+ * 1. Set env vars or include at the beginning of the command then run:
  * yarn hardhat run --network <network> scripts/util/deploy_ERC1271SimpleWallet.ts
  *
  */
