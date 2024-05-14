@@ -1,3 +1,7 @@
+## v0.9.14
+
+- Added `scripts/util/deploy_ERC1271SimpleWallet.ts` utility script
+
 ## v0.9.13
 
 - Added `USDT` MATIC token to resolver list
