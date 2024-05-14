@@ -25,8 +25,6 @@ async function main () {
 
   const factory = await ethers.getContractFactory('ERC1271SimpleWallet', signer);
 
-  ethers.deployContract('ERC1271SimpleWallet', [walletOwnerAddress], signer);
-
   const result = await factory.deploy(
     walletOwnerAddress,
   );
