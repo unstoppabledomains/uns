@@ -1,7 +1,7 @@
 /**
  * Pre-req:
  * - Run: "yarn compile"
- * - If you want to wrap an address that isn't the deployer, update the `wrappedAddress` below
+ * - If you want to wrap an address that isn't the deployer, update the `walletOwnerAddress` below
  *
  * Running using a .env file:
  * 1. Create .env
@@ -21,18 +21,20 @@ async function main () {
   const [signer] = await ethers.getSigners();
 
   // wallet owner (defaults to signer)
-  const wrappedAddress = signer.address;
+  const walletOwnerAddress = signer.address;
 
   const factory = await ethers.getContractFactory('ERC1271SimpleWallet', signer);
 
+  ethers.deployContract('ERC1271SimpleWallet', [walletOwnerAddress], signer);
+
   const result = await factory.deploy(
-    wrappedAddress,
+    walletOwnerAddress,
   );
 
   await result.waitForDeployment();
 
   console.log('Deployed ERC1271SimpleWallet address:', await result.getAddress());
-  console.log('ERC1271 wrapped address:', wrappedAddress);
+  console.log('ERC1271 owner address:', walletOwnerAddress);
 }
 
 
