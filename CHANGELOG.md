@@ -1,3 +1,7 @@
+## v0.9.14
+
+- Add `.witg` TLD
+
 ## v0.9.13
 
 - Added `USDT` MATIC token to resolver list

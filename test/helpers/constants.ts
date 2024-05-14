@@ -36,6 +36,7 @@ export const TLD = {
   BITGET: BigInt('0xbf2121df4e351413ea6788cb220e735378a753cec288cb22644340d58d597b23'),
   POG: BigInt('0xe76cc52c68a868af0cba676c92337a921cc721b45b6630e47f7ecb78e3e0edcc'),
   CLAY: BigInt('0x58872a8ca9414ae0f3ab850f51efaf4c77b647d903f9ec89a03d3018bb42e4fa'),
+  WITG: BigInt('0xf72e00036d7ef2d56e70c6df1d619bcccb64c93ea5b96305e7d7f24c47b4b563'),
 
   // Expirable
   COM: BigInt('0xac2c11ea5d4a4826f418d3befbf0537de7f13572d2a433edfe4a7314ea5dc896'),
