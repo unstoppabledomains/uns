@@ -6,6 +6,19 @@
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "approve",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "components": [
             {
               "components": [
@@ -223,6 +236,11 @@
     },
     {
       "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
         {
           "internalType": "address",
           "name": "recipient",

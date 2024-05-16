@@ -1,12 +1,13 @@
 // @author Unstoppable Domains, Inc.
 // @date April 25th, 2024
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.24;
 
 import {AdvancedOrder, CriteriaResolver} from 'seaport-types/src/lib/ConsiderationStructs.sol';
 
 error OrderIsNotFulfiled();
 error RecipientIsZeroAddress();
+error InvalidZone();
 
 interface ISeaportProxyBuyer {
     /**
@@ -59,10 +60,18 @@ interface ISeaportProxyBuyer {
     /**
      * @dev Withdraw USDC from the contract balance.
      *
+     * @param token               Token to withdraw
      * @param recipient           Recipient of the USDC on contract balance
      * @param amount              Amount of USDC to withdraw
      */
-    function withdraw(address recipient, uint256 amount) external;
+    function withdraw(address token, address recipient, uint256 amount) external;
+
+    /**
+     * @dev Approve USDC for the contract.
+     *
+     * @param token               Token to approve
+     */
+    function approve(address token) external;
 
     /**
      * @dev Pause the contract.
