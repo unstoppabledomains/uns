@@ -18,18 +18,23 @@ export async function getAnvilCommand (): Promise<string> {
 }
 
 /**
- * Executes `foundryup`
+ * Executes `foundryup` to install `anvil` RPC server
  */
-export async function installFoundry (): Promise<boolean> {
-  const foundryUpPath = foundryUpBinPath();
-  const checkCommandCli = `${foundryUpPath} --version`;
-  const commandExists = await checkCommand(checkCommandCli);
-  if (!commandExists) {
-    if (!(await runFoundryInstaller())) {
-      throw new Error('Failed to install Foundry');
+export async function installAnvil (): Promise<void> {
+  const checkAnvilCommandCli = `${foundryAnvilBinPath()} --version`;
+  if (!(await checkCommand(checkAnvilCommandCli))) {
+    if (!(await checkCommand(`${foundryUpBinPath()} --version`))) {
+      if (!(await downloadFoundryUp())) {
+        throw new Error('Failed to download foundryup');
+      }
+    }
+    if (!(await runFoundryUp())) {
+      throw new Error('Failed to install anvil');
+    }
+    if (!(await checkCommand(checkAnvilCommandCli))) {
+      throw new Error('Failed to install anvil');
     }
   }
-  return checkCommand(checkCommandCli);
 }
 
 /**
@@ -45,10 +50,10 @@ async function checkCommand (cmd: string): Promise<boolean> {
       if (code !== 0) {
         console.error(
           'Command failed. Is Foundry not installed? Consider installing ' +
-          'via `curl -L https://foundry.paradigm.xyz | bash` and then running' +
-          ' `foundryup` on a new terminal. ' +
-          'For more context, check the installation instructions ' +
-          'in the book: https://book.getfoundry.sh/getting-started/installation.html.',
+            'via `curl -L https://foundry.paradigm.xyz | bash` and then running' +
+            ' `foundryup` on a new terminal. ' +
+            'For more context, check the installation instructions ' +
+            'in the book: https://book.getfoundry.sh/getting-started/installation.html.',
         );
       }
       resolve(code === 0);
@@ -57,11 +62,25 @@ async function checkCommand (cmd: string): Promise<boolean> {
 }
 
 /**
- * Installs foundryup via subprocess
+ * Downloads foundryup via subprocess
  */
-async function runFoundryInstaller (): Promise<boolean> {
+async function downloadFoundryUp (): Promise<boolean> {
   return new Promise((resolve) => {
     const process = spawn('/bin/bash', ['-c', FOUNDRYUP_INSTALLER], {
+      stdio: 'inherit',
+    });
+    process.on('exit', (code) => {
+      resolve(code === 0);
+    });
+  });
+}
+
+/**
+ * Runs foundryup via subprocess
+ */
+async function runFoundryUp (): Promise<boolean> {
+  return new Promise((resolve) => {
+    const process = spawn(foundryUpBinPath(), [], {
       stdio: 'inherit',
     });
     process.on('exit', (code) => {
