@@ -1,7 +1,7 @@
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import debug from 'debug';
 import _ from 'lodash';
-import { getAnvilCommand, checkAnvil } from './foundry-cli';
+import { getAnvilCommand } from './foundry-cli';
 import { run as installFoundry } from './foundry-cli';
 
 const log = debug('UNS:sandbox');
@@ -50,7 +50,7 @@ export class AnvilServer {
 
   public static async launch (options: Partial<AnvilServerOptions>, inherit = false): Promise<AnvilServer> {
     try {
-      if (!(await checkAnvil())) {
+      if (!(await getAnvilCommand())) {
         throw new Error('Foundry not found');
       }
     } catch (e) {

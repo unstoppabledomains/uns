@@ -1,4 +1,3 @@
-import { getAnvilCommand, run as installFoundry } from '@foundry-rs/easy-foundryup';
 import { NameService, mergeNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
 import { Sandbox } from './index';
