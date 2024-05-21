@@ -79,7 +79,6 @@ contract SeaportProxyBuyer is
         if (!fulfilled) {
             revert OrderIsNotFulfiled();
         }
-        return fulfilled;
     }
 
     function approve(address token) external onlyOwner nonReentrant whenNotPaused {
@@ -114,5 +113,5 @@ contract SeaportProxyBuyer is
         }
     }
 
-    uint256[50] __gap;
+    uint256[50] private __gap;
 }
