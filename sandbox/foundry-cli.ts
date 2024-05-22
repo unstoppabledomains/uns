@@ -1,8 +1,5 @@
-import { exec, spawn } from 'child_process';
-import os from 'os';
+import { exec, execSync, spawn } from 'child_process';
 import path from 'path';
-
-const FOUNDRYUP_INSTALLER = 'curl -L "https://foundry.paradigm.xyz" | bash';
 
 /**
  * @returns the path to the anvil path to use, if `anvil` is in path then this will be returned
@@ -23,11 +20,6 @@ export async function getAnvilCommand (): Promise<string> {
 export async function installAnvil (): Promise<void> {
   const checkAnvilCommandCli = `${foundryAnvilBinPath()} --version`;
   if (!(await checkCommand(checkAnvilCommandCli))) {
-    if (!(await checkCommand(`${foundryUpBinPath()} --version`))) {
-      if (!(await downloadFoundryUp())) {
-        throw new Error('Failed to download foundryup');
-      }
-    }
     if (!(await runFoundryUp())) {
       throw new Error('Failed to install anvil');
     }
@@ -47,29 +39,6 @@ async function checkCommand (cmd: string): Promise<boolean> {
   return new Promise((resolve) => {
     const process = exec(cmd);
     process.on('exit', (code) => {
-      if (code !== 0) {
-        console.error(
-          'Command failed. Is Foundry not installed? Consider installing ' +
-            'via `curl -L https://foundry.paradigm.xyz | bash` and then running' +
-            ' `foundryup` on a new terminal. ' +
-            'For more context, check the installation instructions ' +
-            'in the book: https://book.getfoundry.sh/getting-started/installation.html.',
-        );
-      }
-      resolve(code === 0);
-    });
-  });
-}
-
-/**
- * Downloads foundryup via subprocess
- */
-async function downloadFoundryUp (): Promise<boolean> {
-  return new Promise((resolve) => {
-    const process = spawn('/bin/bash', ['-c', FOUNDRYUP_INSTALLER], {
-      stdio: 'inherit',
-    });
-    process.on('exit', (code) => {
       resolve(code === 0);
     });
   });
@@ -80,39 +49,44 @@ async function downloadFoundryUp (): Promise<boolean> {
  */
 async function runFoundryUp (): Promise<boolean> {
   return new Promise((resolve) => {
-    const process = spawn(foundryUpBinPath(), [], {
+    execSync(`chmod +x ${foundryUpBinPath()}`);
+    const p = spawn('/bin/bash', ['-c', foundryUpBinPath()], {
       stdio: 'inherit',
+      env: {
+        ...process.env,
+        FOUNDRY_DIR: foundryDir(),
+      },
     });
-    process.on('exit', (code) => {
+    p.on('exit', (code) => {
       resolve(code === 0);
     });
   });
 }
 
 /**
- * @returns the path to the foundry directory: `$HOME/.foundry`
+ * @returns the path to the foundry directory
  */
 function foundryDir (): string {
-  return path.join(os.homedir(), '.foundry');
+  return path.join(__dirname, 'foundry');
 }
 
 /**
- * @returns the path to the foundry directory that stores the tool binaries: `$HOME/.foundry/bin`
+ * @returns the path to the foundry bin directory
  */
 function foundryBinDir (): string {
   return path.join(foundryDir(), 'bin');
 }
 
 /**
- * @returns the path to the anvil binary in the foundry dir: `$HOME/.foundry/bin/anvil`
+ * @returns the path to the anvil binary in the foundry dir
  */
 function foundryAnvilBinPath (): string {
   return path.join(foundryBinDir(), 'anvil');
 }
 
 /**
- * @returns the path to the cast binary in the foundry dir: `$HOME/.foundry/bin/cast`
+ * @returns the path to the cast binary in the foundry dir
  */
 function foundryUpBinPath (): string {
-  return path.join(foundryBinDir(), 'foundryup');
+  return path.join(foundryDir(), 'foundryup.sh');
 }
