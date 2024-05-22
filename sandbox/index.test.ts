@@ -70,7 +70,7 @@ describe('Sandbox', async () => {
   });
 
   after(async () => {
-    await sandbox.stop();
+    sandbox.stop();
   });
 
   describe('UNS', () => {
