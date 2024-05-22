@@ -125,7 +125,6 @@ main() {
     # Compute the URL of the release tarball in the Foundry repository.
     RELEASE_URL="https://github.com/${FOUNDRYUP_REPO}/releases/download/${FOUNDRYUP_TAG}/"
     BIN_ARCHIVE_URL="${RELEASE_URL}foundry_${FOUNDRYUP_VERSION}_${PLATFORM}_${ARCHITECTURE}.$EXT"
-    MAN_TARBALL_URL="${RELEASE_URL}foundry_man_${FOUNDRYUP_VERSION}.tar.gz"
 
     # Download and extract the binaries archive
     say "downloading latest forge, cast, anvil, and chisel"
