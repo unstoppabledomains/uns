@@ -10,7 +10,7 @@
     "compile": "hardhat compile --force;",
     "build:package": "yarn compile; rm -Rf dist/*; tsc --project tsconfig.build.json",
     "build:ci": "yarn build:package && yarn rebuild:sandbox && yarn copy:assets",
-    "copy:assets": "mkdir -p dist/sandbox/foundry/bin; cp sandbox/state.json dist/sandbox/; cp sandbox/foundry/foundryup.sh dist/sandbox/foundry; cp uns-config.json dist/; cp ens-config.json dist/;",
+    "copy:assets": "mkdir -p dist/sandbox/foundry/bin; cp sandbox/foundry/bin/.gitignore dist/sandbox/foundry/bin; cp sandbox/state.json dist/sandbox/; cp sandbox/foundry/foundryup.sh dist/sandbox/foundry; cp uns-config.json dist/; cp ens-config.json dist/;",
     "compile:size": "env ENABLE_CONTRACT_SIZER=true yarn compile",
     "coverage": "hardhat coverage",
     "test": "yarn test:sol && yarn test:sandbox",
