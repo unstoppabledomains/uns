@@ -1,4 +1,4 @@
-pragma solidity >=0.4.24;
+pragma solidity >=0.4.24 <=0.8.17;
 
 interface LegacyENS {
     // Logged when the owner of a node assigns a new owner to a subnode.

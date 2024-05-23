@@ -29,6 +29,12 @@
     "./sandbox/**/*.ts",
     "./src/*.ts",
     "./scripts/**/*.ts",
-    "./test/**/*.ts"
-  ]
+    "./test/**/*.ts",
+  ],
+  "exclude": [
+    "./sandbox/foundry/bin/anvil",
+    "./sandbox/foundry/bin/cast",
+    "./sandbox/foundry/bin/chisel",
+    "./sandbox/foundry/bin/forge",
+  ],
 }

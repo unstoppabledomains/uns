@@ -1,7 +1,7 @@
 import { exec, execSync, spawn } from 'child_process';
 import path from 'path';
 
-const FOUNDRY_VERSION = 'nightly-23700c9233314e06ba65be4522daf3aa89130dc0';
+const FOUNDRY_VERSION = 'nightly-de33b6af53005037b463318d2628b5cfcaf39916';
 
 /**
  * @returns the path to the anvil path to use, if `anvil` is in path then this will be returned

@@ -38,6 +38,8 @@ const ANVIL_ARGUMENTS_MAP: Record<Exclude<keyof AnvilServerOptions, 'anvilCliPat
   silent: '--silent',
 };
 
+const BLOCKS_TO_KEEP = 100;
+
 export class AnvilServer {
   readonly options: Partial<AnvilServerOptions>;
   private readonly _anvil: ChildProcessWithoutNullStreams;
@@ -72,6 +74,10 @@ export class AnvilServer {
         }
       }
     }
+    args.push('--disable-default-create2-deployer');
+    args.push('--prune-history', BLOCKS_TO_KEEP);
+    args.push('--order', 'fifo');
+    args.push('--transaction-block-keeper', BLOCKS_TO_KEEP);
 
     const opts = inherit ? { stdio: 'inherit' } : {};
 
