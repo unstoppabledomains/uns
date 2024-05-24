@@ -199,16 +199,6 @@ describe('SeaportProxyBuyer', async () => {
       await seaportProxyBuyer.connect(coinbase).unpause();
     });
 
-    it('should not withdraw USDC from Proxy if contract is paused', async () => {
-      await seaportProxyBuyer.connect(coinbase).pause();
-      const amountToWithdraw = BigInt(ethers.parseUnits('100', 6));
-      await expect(
-        seaportProxyBuyer.connect(coinbase)
-          .withdraw(await usdcMock.getAddress(), feesRecipient.address, amountToWithdraw),
-      ).to.be.revertedWith('Pausable: paused');
-      await seaportProxyBuyer.connect(coinbase).unpause();
-    });
-
     it('should unpause contract', async () => {
       await seaportProxyBuyer.connect(coinbase).pause();
       await seaportProxyBuyer.connect(coinbase).unpause();
@@ -279,14 +269,6 @@ describe('SeaportProxyBuyer', async () => {
       const erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
       await expect(seaportProxyBuyer.connect(buyer).approve(await erc20Mock.getAddress()))
         .to.be.revertedWith('Ownable: caller is not the owner');
-    });
-
-    it('should not approve ERC20 spending to Seaport contract if contract is paused', async () => {
-      const erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
-      await seaportProxyBuyer.connect(coinbase).pause();
-      await expect(seaportProxyBuyer.connect(coinbase).approve(await erc20Mock.getAddress()))
-        .to.be.revertedWith('Pausable: paused');
-      await seaportProxyBuyer.connect(coinbase).unpause();
     });
   });
 

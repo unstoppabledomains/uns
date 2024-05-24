@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# foundryup - Foundry Installer
+# Readme: https://github.com/foundry-rs/foundry/blob/master/foundryup/README.md
+# Source: https://github.com/foundry-rs/foundry/blob/master/foundryup/foundryup
+
 set -eo pipefail
 
 BASE_DIR=${XDG_CONFIG_HOME:-$HOME}

@@ -26,7 +26,7 @@ contract SeaportProxyBuyer is
     ISeaportProxyBuyer
 {
     string public constant NAME = 'Seaport Proxy Buyer';
-    string public constant VERSION = '0.0.1';
+    string public constant VERSION = '0.1.0';
 
     ConsiderationInterface private _seaport;
 
@@ -60,20 +60,25 @@ contract SeaportProxyBuyer is
             revert InvalidZone();
         }
 
-        OrderComponents memory orderComponents;
-        orderComponents.offerer = advancedOrder.parameters.offerer;
-        orderComponents.zone = advancedOrder.parameters.zone;
-        orderComponents.offer = advancedOrder.parameters.offer;
-        orderComponents.consideration = advancedOrder.parameters.consideration;
-        orderComponents.orderType = advancedOrder.parameters.orderType;
-        orderComponents.startTime = advancedOrder.parameters.startTime;
-        orderComponents.endTime = advancedOrder.parameters.endTime;
-        orderComponents.zoneHash = advancedOrder.parameters.zoneHash;
-        orderComponents.salt = advancedOrder.parameters.salt;
-        orderComponents.conduitKey = advancedOrder.parameters.conduitKey;
-        orderComponents.counter = _seaport.getCounter(orderComponents.offerer);
-
-        _protectTokenOperation(uint256(_seaport.getOrderHash(orderComponents)));
+        _protectTokenOperation(
+            uint256(
+                _seaport.getOrderHash(
+                    OrderComponents({
+                        offerer: advancedOrder.parameters.offerer,
+                        zone: advancedOrder.parameters.zone,
+                        offer: advancedOrder.parameters.offer,
+                        consideration: advancedOrder.parameters.consideration,
+                        orderType: advancedOrder.parameters.orderType,
+                        startTime: advancedOrder.parameters.startTime,
+                        endTime: advancedOrder.parameters.endTime,
+                        zoneHash: advancedOrder.parameters.zoneHash,
+                        salt: advancedOrder.parameters.salt,
+                        conduitKey: advancedOrder.parameters.conduitKey,
+                        counter: _seaport.getCounter(advancedOrder.parameters.offerer)
+                    })
+                )
+            )
+        );
 
         fulfilled = _seaport.fulfillAdvancedOrder(advancedOrder, criteriaResolvers, fulfillerConduitKey, recipient);
         if (!fulfilled) {
@@ -81,11 +86,11 @@ contract SeaportProxyBuyer is
         }
     }
 
-    function approve(address token) external onlyOwner nonReentrant whenNotPaused {
+    function approve(address token) external onlyOwner nonReentrant {
         IERC20(token).approve(address(_seaport), type(uint256).max);
     }
 
-    function withdraw(address token, address recipient, uint256 amount) external onlyOwner nonReentrant whenNotPaused {
+    function withdraw(address token, address recipient, uint256 amount) external onlyOwner nonReentrant {
         IERC20(token).transfer(recipient, amount);
     }
 

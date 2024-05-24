@@ -115,15 +115,15 @@
                     ]
                 },
                 "ProxyAdmin": {
-                    "address": "0x3198fc981626687F4B5BDf0fbEABB0a5E0489C03",
+                    "address": "0x4e44E79e0cEc05D9e62e952B2088c02A3C450aeC",
                     "deploymentBlock": "0x36",
                     "legacyAddresses": []
                 },
                 "ENSCustody": {
-                    "address": "0x951c830a0471C04DCB60Ce244DEe38eE4b0609ec",
-                    "deploymentBlock": "0x5c",
+                    "address": "0x3198fc981626687F4B5BDf0fbEABB0a5E0489C03",
+                    "deploymentBlock": "0x5b",
                     "implementation": "0xc2110388dd54228aE0A834119457edE938BF0B57",
-                    "forwarder": "0x951c830a0471C04DCB60Ce244DEe38eE4b0609ec",
+                    "forwarder": "0x3198fc981626687F4B5BDf0fbEABB0a5E0489C03",
                     "legacyAddresses": []
                 },
                 "LegacyENSRegistry": {
