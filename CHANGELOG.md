@@ -1,3 +1,9 @@
+## v0.9.15
+
+- Add SeaportProxyBuyer contract
+- Update sandbox RPC server to Foundry Anvil to support cancun hardfork
+- Add Seaport contracts to sandbox
+
 ## v0.9.14
 
 - Added `scripts/util/deploy_ERC1271SimpleWallet.ts` utility script

@@ -29,6 +29,9 @@
     "./sandbox/**/*.ts",
     "./src/*.ts",
     "./scripts/**/*.ts",
-    "./test/**/*.ts"
-  ]
+    "./test/**/*.ts",
+  ],
+  "exclude": [
+    "./sandbox/foundry/bin/*",
+  ],
 }

@@ -1,43 +1,35 @@
-import fs from 'fs';
 import path from 'path';
-import tar from 'tar';
+import fs from 'fs';
 import HDKey from 'hdkey';
 import { mnemonicToSeedSync } from 'bip39';
 import secp256k1 from 'secp256k1';
 import createKeccakHash from 'keccak';
 import debug from 'debug';
-import { EthereumProvider } from 'ganache';
 import type { HttpNetworkUserConfig } from 'hardhat/types';
+import { JsonRpcProvider } from 'ethers';
 import { unwrap } from '../src/utils';
-import { GanacheService } from './ganache-service';
+import { AnvilServerOptions } from './anvil-server';
+import AnvilService from './anvil-service';
 
 const log = debug('UNS:sandbox');
 
 export type SandboxNetworkOptions = {
-  url: string;
-  port?: number;
-  hostname?: string;
+  port: number;
+  hostIpAddress: string;
   chainId: number;
   hardfork: string;
   gasPrice: number;
   gasLimit: number;
-  allowUnlimitedContractSize: boolean;
-  locked: boolean;
   mnemonic: string;
   hdPath: string;
   totalAccounts: number;
   defaultBalanceEther: number;
-  dbPath: string;
-  snapshotPath: string;
-  keepAliveTimeout: number;
-  vmErrorsOnRpcResponse: boolean;
-  logger: { log: (message: string) => void };
+  statePath: string;
 };
 
 export type SandboxOptions = {
   verbose?: boolean;
-  clean?: boolean;
-  extract?: boolean;
+  rebuild?: boolean;
   network?: Partial<SandboxNetworkOptions>;
 };
 
@@ -51,28 +43,31 @@ export type SandboxAccount = {
 };
 
 const DEFAULT_SERVER_CONFIG: SandboxNetworkOptions = {
-  url: 'http://localhost:7545',
+  hostIpAddress: '127.0.0.1',
+  port: 7545,
   gasPrice: 20000000000,
   gasLimit: 6721975,
   defaultBalanceEther: 1000,
   totalAccounts: 10,
-  hardfork: 'london',
-  allowUnlimitedContractSize: false,
-  locked: false,
+  hardfork: 'cancun',
   hdPath: 'm/44\'/60\'/0\'/0/',
-  keepAliveTimeout: 5000,
   mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
   chainId: 1337,
-  dbPath: './.sandbox',
-  snapshotPath: path.join(__dirname, 'db.tgz'),
-  vmErrorsOnRpcResponse: true,
-  logger: { log: () => {} },
+  statePath: path.join(__dirname, 'state.json'),
 };
 
 export class Sandbox {
+  version: string;
+  public accounts: Record<string, SandboxAccount>;
+  public options: SandboxOptions;
+
+  private anvilService: AnvilService;
+  private provider: JsonRpcProvider;
+  private snapshotId?: string;
+
   static defaultNetworkOptions (): HttpNetworkUserConfig {
     return {
-      url: DEFAULT_SERVER_CONFIG.url,
+      url: `http://${DEFAULT_SERVER_CONFIG.hostIpAddress}:${DEFAULT_SERVER_CONFIG.port}`,
       chainId: DEFAULT_SERVER_CONFIG.chainId,
       accounts: {
         mnemonic: DEFAULT_SERVER_CONFIG.mnemonic,
@@ -90,53 +85,48 @@ export class Sandbox {
 
   static async create (options: SandboxOptions): Promise<Sandbox> {
     options = {
-      clean: true,
-      extract: true,
+      rebuild: false,
       verbose: false,
       ...options,
     };
+
     const networkOptions: SandboxNetworkOptions = {
       ...DEFAULT_SERVER_CONFIG,
       ...options.network,
     };
 
+    const anvilOptions: Partial<AnvilServerOptions> = {
+      ...networkOptions,
+    };
+
     if (options.verbose) {
       debug.enable('UNS:sandbox*');
+      anvilOptions.silent = false;
+    } else {
+      anvilOptions.silent = true;
     }
 
-    const { dbPath, snapshotPath } = networkOptions;
-
-    if (options.clean) {
-      if (fs.existsSync(dbPath)) {
-        fs.rmdirSync(dbPath, { recursive: true });
+    if (options.rebuild) {
+      if (fs.existsSync(networkOptions.statePath)) {
+        fs.rmSync(networkOptions.statePath);
       }
-      fs.mkdirSync(dbPath, { recursive: true });
-      log(`Cleaned sandbox database. Path: ${dbPath}`);
+      anvilOptions.dumpStatePath = networkOptions.statePath;
+      anvilOptions.loadStatePath = '';
+    } else {
+      anvilOptions.dumpStatePath = '';
+      anvilOptions.loadStatePath = networkOptions.statePath;
     }
 
-    if (options.extract) {
-      await tar.extract({ cwd: dbPath, file: snapshotPath });
-      log(`Prepared sandbox database. [Source: ${snapshotPath}, TargetDir: ${dbPath}]`);
-    }
-
-    const service = new GanacheService({ ...networkOptions });
+    const service = new AnvilService(anvilOptions);
     return new Sandbox(service, { ...options, network: networkOptions });
   }
 
-  version: string;
-  public accounts: Record<string, SandboxAccount>;
-  public options: SandboxOptions;
-
-  private ganacheService: GanacheService;
-  private provider: EthereumProvider;
-  private snapshotId?: string;
-
-  constructor (service: GanacheService, options: SandboxOptions = {}) {
-    this.ganacheService = service;
+  constructor (service: AnvilService, options: SandboxOptions = {}) {
+    this.anvilService = service;
     this.options = options;
-    this.provider = service.provider;
+    this.provider = this.anvilService.provider;
     this.snapshotId = undefined;
-    this.version = '0.6';
+    this.version = '1.0';
 
     const accounts = this.getAccounts(unwrap(this.options, 'network'));
 
@@ -157,7 +147,7 @@ export class Sandbox {
   }
 
   async start (options: SandboxStartOptions = { noSnapshot: false }): Promise<void> {
-    await this.ganacheService.startServer();
+    await this.anvilService.startServer();
     log('Started sandbox');
 
     if (options.noSnapshot) return;
@@ -166,9 +156,9 @@ export class Sandbox {
     log('Created snapshot', this.snapshotId);
   }
 
-  async stop (): Promise<void> {
+  stop (): void {
     try {
-      await this.ganacheService.stopServer();
+      this.anvilService.stopServer();
       log('Stopped sandbox');
     } catch (e: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (e.message.includes('Server is not running')) {
@@ -191,7 +181,7 @@ export class Sandbox {
   }
 
   private async snapshot (): Promise<string> {
-    return await this.provider.send('evm_snapshot');
+    return await this.provider.send('evm_snapshot', []);
   }
 
   private async revert (snapshotId: string): Promise<boolean> {

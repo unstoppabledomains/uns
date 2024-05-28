@@ -1,7 +1,7 @@
 // @author Unstoppable Domains, Inc.
 // @date May 30th, 2023
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.17;
 
 import {IPriceOracle} from '@ensdomains/ens-contracts/contracts/ethregistrar/IPriceOracle.sol';
 import {IETHRegistrarController} from '@ensdomains/ens-contracts/contracts/ethregistrar/IETHRegistrarController.sol';

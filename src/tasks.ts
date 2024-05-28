@@ -1,9 +1,17 @@
 import { network, upgrades, ethers, defender } from 'hardhat';
-import { Contract, keccak256, namehash, parseEther } from 'ethers';
+import { Contract, keccak256, namehash, parseEther, parseUnits } from 'ethers';
 import { merge } from 'lodash';
 import { getContractAddress } from '@openzeppelin/hardhat-upgrades/dist/utils';
 import { ZERO_ADDRESS, ZERO_WORD } from '../test/helpers/constants';
-import { ENSCustody, MintingManager, ProxyReader, UNSOperator, UNSRegistry, ZilliqaRecover } from '../types';
+import {
+  ENSCustody,
+  MintingManager,
+  ProxyReader,
+  UNSOperator,
+  UNSRegistry,
+  ZilliqaRecover,
+  SeaportProxyBuyer,
+} from '../types';
 import { Deployer } from './deployer';
 import { ArtifactName, DependenciesMap, EnsContractName, UnsContractName, NsNetworkConfig } from './types';
 import verify from './verify';
@@ -1061,6 +1069,100 @@ const fundENSCustodyTask: Task = {
   },
 };
 
+const deploySeaportTask: Task = {
+  tags: ['seaport', 'full'],
+  priority: 10,
+  run: async (ctx: Deployer) => {
+    const { owner } = ctx.accounts;
+
+    if (!isSandbox) {
+      throw new Error('This task is only available for sandbox');
+    }
+
+    const conduitController = await ethers.deployContract(ArtifactName.ConduitController, [], owner);
+    const seaport = await ethers.deployContract(ArtifactName.Seaport, [await conduitController.getAddress()], owner);
+    await seaport.waitForDeployment();
+    await ctx.saveContractConfig(UnsContractName.Seaport, seaport);
+  },
+  ensureDependencies: () => ({}),
+};
+
+const deployUsdcMockTask: Task = {
+  tags: ['erc20_mock', 'full'],
+  priority: 10,
+  run: async (ctx: Deployer) => {
+    const { owner } = ctx.accounts;
+
+    if (!isSandbox) {
+      throw new Error('This task is only available for sandbox');
+    }
+
+    const usdcMock = await ethers.deployContract(ArtifactName.ERC20Mock, [], owner);
+    await usdcMock.waitForDeployment();
+    await ctx.saveContractConfig(UnsContractName.ERC20Mock, usdcMock);
+  },
+  ensureDependencies: () => ({}),
+};
+
+const deploySeaportProxyBuyerTask: Task = {
+  tags: ['seaport_proxy_buyer', 'full'],
+  priority: 25,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const { owner } = ctx.accounts;
+    const [Seaport] = unwrapDependencies(dependencies, [UnsContractName.Seaport]);
+    const seaportProxyBuyer = await deployProxy<SeaportProxyBuyer>(
+      await ethers.getContractFactory(ArtifactName.SeaportProxyBuyer, owner),
+      [Seaport.address],
+    );
+    await seaportProxyBuyer.waitForDeployment();
+    const proxyAdmin = await upgrades.admin.getInstance();
+    const seaportProxyBuyerImpl = await proxyAdmin.getProxyImplementation.staticCall(
+      await seaportProxyBuyer.getAddress(),
+    );
+    await ctx.saveContractConfig(
+      UnsContractName.SeaportProxyBuyer,
+      seaportProxyBuyer,
+      seaportProxyBuyerImpl,
+      seaportProxyBuyer,
+    );
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    return ensureDeployed(config, UnsContractName.Seaport);
+  },
+};
+
+const fundSeaportProxyBuyerTask: Task = {
+  tags: ['fund_seaport_proxy_buyer', 'full'],
+  priority: 30,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const { owner } = ctx.accounts;
+
+    if (!isSandbox) {
+      throw new Error('This task is only available for sandbox');
+    }
+
+    const [SeaportProxyBuyer, ERC20Mock] = unwrapDependencies(dependencies, [
+      UnsContractName.SeaportProxyBuyer,
+      UnsContractName.ERC20Mock,
+    ]);
+    const erc20MockContract = await ethers.getContractAt(UnsContractName.ERC20Mock, ERC20Mock.address, owner);
+    await erc20MockContract.mint(SeaportProxyBuyer.address, parseUnits('1000000', 6)); // 1M USDC
+    const seaportProxyBuyerContract = await ethers.getContractAt(
+      UnsContractName.SeaportProxyBuyer,
+      SeaportProxyBuyer.address,
+      owner,
+    );
+    await seaportProxyBuyerContract.approve(ERC20Mock.address);
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    return ensureDeployed(config, UnsContractName.SeaportProxyBuyer, UnsContractName.ERC20Mock);
+  },
+};
+
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -1085,4 +1187,8 @@ export const tasks: Task[] = [
   proposeENSCustodyTask,
   fundENSCustodyTask,
   deployZilliqaRecoverTask,
+  deploySeaportTask,
+  deploySeaportProxyBuyerTask,
+  deployUsdcMockTask,
+  fundSeaportProxyBuyerTask,
 ];
