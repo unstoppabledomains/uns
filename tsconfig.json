@@ -32,9 +32,6 @@
     "./test/**/*.ts",
   ],
   "exclude": [
-    "./sandbox/foundry/bin/anvil",
-    "./sandbox/foundry/bin/cast",
-    "./sandbox/foundry/bin/chisel",
-    "./sandbox/foundry/bin/forge",
+    "./sandbox/foundry/bin/*",
   ],
 }

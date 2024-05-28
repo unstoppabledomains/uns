@@ -1,7 +1,7 @@
 // @author Unstoppable Domains, Inc.
 // @date April 25th, 2024
 
-pragma solidity 0.8.24;
+pragma solidity ^0.8.24;
 
 import {Initializable} from '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import {ContextUpgradeable} from '@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol';

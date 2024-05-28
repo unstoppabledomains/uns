@@ -38,7 +38,7 @@ const ANVIL_ARGUMENTS_MAP: Record<Exclude<keyof AnvilServerOptions, 'anvilCliPat
   silent: '--silent',
 };
 
-const BLOCKS_TO_KEEP = 100;
+const BLOCKS_TO_KEEP = 500;
 
 export class AnvilServer {
   readonly options: Partial<AnvilServerOptions>;
