@@ -54,7 +54,7 @@ jobs:
         with:
           commit_message: Automatic release ${{ env.PACKAGE_VERSION }}
           commit_options: '--no-verify'
-          file_pattern: 'artifacts/* dist/* sandbox/db.tgz uns-config.json'
+          file_pattern: 'artifacts/* dist/* sandbox/state.json sandbox/foundry/foundryup.sh uns-config.json ens-config.json'
           commit_user_name: UNS Release Bot
           commit_user_email: release@unstoppabledomains.com
           commit_author: UNS Release bot <release@unstoppabledomains.com>

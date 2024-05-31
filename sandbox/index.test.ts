@@ -4,7 +4,7 @@ import { ethers, network } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { AbiCoder } from 'ethers';
 import { NameService, getNetworkConfig } from '../src/config';
-import { MintingManager, UNSRegistry } from '../types/contracts';
+import { MintingManager, UNSRegistry } from '../types';
 import { unwrap } from '../src/utils';
 import { BUFFERED_REGISTRATION_COST, REGISTRATION_TIME, TLD, ZERO_ADDRESS } from '../test/helpers/constants';
 import {
@@ -70,7 +70,7 @@ describe('Sandbox', async () => {
   });
 
   after(async () => {
-    await sandbox.stop();
+    sandbox.stop();
   });
 
   describe('UNS', () => {
@@ -174,8 +174,9 @@ describe('Sandbox', async () => {
       );
 
       let tx = await ethRegistrarController.commit(commitment);
+      const blockNumber = unwrap(await tx.wait() ?? {}, 'blockNumber');
       const block = await ethers.provider.getBlock(
-        unwrap(tx, 'blockNumber'),
+        blockNumber,
       );
 
       expect(await ethRegistrarController.commitments(commitment)).to.equal(block?.timestamp);
@@ -220,7 +221,8 @@ describe('Sandbox', async () => {
         selfCustody,
       );
       const commitTx = await custody.connect(minter).commit(commitment);
-      const block = await ethers.provider.getBlock(unwrap(commitTx, 'blockNumber'));
+      const blockNumber = unwrap(await commitTx.wait() ?? {}, 'blockNumber');
+      const block = await ethers.provider.getBlock(blockNumber);
       const timestamp = block?.timestamp;
       expect(await ethRegistrarController.commitments(commitment)).to.equal(timestamp);
 
@@ -265,11 +267,10 @@ describe('Sandbox (multiple instances)', async () => {
     const sandbox = await Sandbox.start({
       verbose: true,
       network: {
-        url: 'http://localhost:7546',
+        port: 7546,
         chainId: 1338,
-        dbPath: './.sandbox/_l2',
       },
     });
-    await sandbox.stop();
+    sandbox.stop();
   });
 });

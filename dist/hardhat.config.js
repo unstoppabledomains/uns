@@ -73,6 +73,12 @@ const config = {
                         bytecodeHash: 'none',
                     } }),
             },
+            {
+                version: '0.8.24',
+                settings: Object.assign(Object.assign({}, settings), { metadata: {
+                        bytecodeHash: 'none',
+                    }, evmVersion: 'cancun' }),
+            },
         ],
     },
     paths: {
@@ -83,7 +89,7 @@ const config = {
         hardhat: {
             blockGasLimit: 10000000,
             initialBaseFeePerGas: 0,
-            hardfork: 'merge',
+            hardfork: 'cancun',
         },
         localhost: {
             url: 'http://localhost:8545',

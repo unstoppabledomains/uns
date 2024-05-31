@@ -1,7 +1,7 @@
 // @author Unstoppable Domains, Inc.
 // @date August 12th, 2021
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.17;
 
 import './IForwarder.sol';
 import './BaseRoutingForwarder.sol';

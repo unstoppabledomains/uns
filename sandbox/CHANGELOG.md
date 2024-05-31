@@ -1,3 +1,6 @@
+## v1.0
+- Migrate sandbox RPC to Foundry Anvil server
+
 ## v0.6
 - Rebuild sandbox (UNS v0.6.0)
 

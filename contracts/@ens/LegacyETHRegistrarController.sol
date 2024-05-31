@@ -2,7 +2,7 @@
 
 // File: @ensdomains/ethregistrar/contracts/PriceOracle.sol
 
-pragma solidity >=0.4.24;
+pragma solidity >=0.4.24 <=0.8.17;
 
 interface PriceOracle {
     /**

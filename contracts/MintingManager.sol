@@ -1,7 +1,7 @@
 // @author Unstoppable Domains, Inc.
 // @date June 16th, 2021
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.17;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';

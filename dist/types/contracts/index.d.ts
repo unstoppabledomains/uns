@@ -8,6 +8,8 @@ import type * as custody from "./custody";
 export type { custody };
 import type * as history from "./history";
 export type { history };
+import type * as marketplace from "./marketplace";
+export type { marketplace };
 import type * as metatx from "./metatx";
 export type { metatx };
 import type * as mocks from "./mocks";

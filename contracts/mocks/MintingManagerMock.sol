@@ -1,7 +1,7 @@
 // @author Unstoppable Domains, Inc.
 // @date May 8th, 2023
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.17;
 
 import '../MintingManager.sol';
 import './UNSRegistryMock.sol';

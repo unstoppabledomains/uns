@@ -1,31 +1,21 @@
 import type { HttpNetworkUserConfig } from 'hardhat/types';
-import { GanacheService } from './ganache-service';
+import AnvilService from './anvil-service';
 export declare type SandboxNetworkOptions = {
-    url: string;
-    port?: number;
-    hostname?: string;
+    port: number;
+    hostIpAddress: string;
     chainId: number;
     hardfork: string;
     gasPrice: number;
     gasLimit: number;
-    allowUnlimitedContractSize: boolean;
-    locked: boolean;
     mnemonic: string;
     hdPath: string;
     totalAccounts: number;
     defaultBalanceEther: number;
-    dbPath: string;
-    snapshotPath: string;
-    keepAliveTimeout: number;
-    vmErrorsOnRpcResponse: boolean;
-    logger: {
-        log: (message: string) => void;
-    };
+    statePath: string;
 };
 export declare type SandboxOptions = {
     verbose?: boolean;
-    clean?: boolean;
-    extract?: boolean;
+    rebuild?: boolean;
     network?: Partial<SandboxNetworkOptions>;
 };
 export declare type SandboxStartOptions = {
@@ -36,18 +26,18 @@ export declare type SandboxAccount = {
     privateKey: string;
 };
 export declare class Sandbox {
-    static defaultNetworkOptions(): HttpNetworkUserConfig;
-    static start(options?: SandboxOptions): Promise<Sandbox>;
-    static create(options: SandboxOptions): Promise<Sandbox>;
     version: string;
     accounts: Record<string, SandboxAccount>;
     options: SandboxOptions;
-    private ganacheService;
+    private anvilService;
     private provider;
     private snapshotId?;
-    constructor(service: GanacheService, options?: SandboxOptions);
+    static defaultNetworkOptions(): HttpNetworkUserConfig;
+    static start(options?: SandboxOptions): Promise<Sandbox>;
+    static create(options: SandboxOptions): Promise<Sandbox>;
+    constructor(service: AnvilService, options?: SandboxOptions);
     start(options?: SandboxStartOptions): Promise<void>;
-    stop(): Promise<void>;
+    stop(): void;
     reset(): Promise<void>;
     private snapshot;
     private revert;

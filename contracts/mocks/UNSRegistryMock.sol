@@ -1,7 +1,7 @@
 // @author Unstoppable Domains, Inc.
 // @date November 10th, 2022
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.17;
 
 import '../UNSRegistry.sol';
 

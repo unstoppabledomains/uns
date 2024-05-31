@@ -1,0 +1,1 @@
+[{"inputs":[],"name":"NoReentrantCalls","type":"error"},{"inputs":[],"name":"TStoreAlreadyActivated","type":"error"},{"inputs":[],"name":"TStoreNotSupported","type":"error"},{"inputs":[],"name":"TloadTestContractDeploymentFailed","type":"error"}]

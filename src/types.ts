@@ -21,6 +21,10 @@ export enum ArtifactName {
   RootChainManager = 'RootChainManager',
   DotCoinBurner = 'DotCoinBurner',
   ZilliqaRecover = 'ZilliqaRecover',
+  Seaport = 'Seaport',
+  SeaportProxyBuyer = 'SeaportProxyBuyer',
+  ConduitController = 'ConduitController',
+  ERC20Mock = 'ERC20Mock',
 
   // ENS
   ENSRegistry = 'ENSRegistry',
@@ -64,6 +68,9 @@ export enum UnsContractName {
   RootChainManager = 'RootChainManager',
   DotCoinBurner = 'DotCoinBurner',
   ZilliqaRecover = 'ZilliqaRecover',
+  Seaport = 'Seaport',
+  SeaportProxyBuyer = 'SeaportProxyBuyer',
+  ERC20Mock = 'ERC20Mock',
 }
 
 export enum EnsContractName {

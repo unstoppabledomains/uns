@@ -17,6 +17,10 @@ export declare enum ArtifactName {
     RootChainManager = "RootChainManager",
     DotCoinBurner = "DotCoinBurner",
     ZilliqaRecover = "ZilliqaRecover",
+    Seaport = "Seaport",
+    SeaportProxyBuyer = "SeaportProxyBuyer",
+    ConduitController = "ConduitController",
+    ERC20Mock = "ERC20Mock",
     ENSRegistry = "ENSRegistry",
     BaseRegistrarImplementation = "BaseRegistrarImplementation",
     ReverseRegistrar = "ReverseRegistrar",
@@ -56,7 +60,10 @@ export declare enum UnsContractName {
     MintableERC721Predicate = "MintableERC721Predicate",
     RootChainManager = "RootChainManager",
     DotCoinBurner = "DotCoinBurner",
-    ZilliqaRecover = "ZilliqaRecover"
+    ZilliqaRecover = "ZilliqaRecover",
+    Seaport = "Seaport",
+    SeaportProxyBuyer = "SeaportProxyBuyer",
+    ERC20Mock = "ERC20Mock"
 }
 export declare enum EnsContractName {
     ENSRegistry = "ENSRegistry",

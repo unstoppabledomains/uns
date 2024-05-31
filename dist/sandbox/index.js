@@ -13,42 +13,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Sandbox = void 0;
-const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const tar_1 = __importDefault(require("tar"));
+const fs_1 = __importDefault(require("fs"));
 const hdkey_1 = __importDefault(require("hdkey"));
 const bip39_1 = require("bip39");
 const secp256k1_1 = __importDefault(require("secp256k1"));
 const keccak_1 = __importDefault(require("keccak"));
 const debug_1 = __importDefault(require("debug"));
 const utils_1 = require("../src/utils");
-const ganache_service_1 = require("./ganache-service");
+const anvil_service_1 = __importDefault(require("./anvil-service"));
 const log = (0, debug_1.default)('UNS:sandbox');
 const DEFAULT_SERVER_CONFIG = {
-    url: 'http://localhost:7545',
+    hostIpAddress: '127.0.0.1',
+    port: 7545,
     gasPrice: 20000000000,
     gasLimit: 6721975,
     defaultBalanceEther: 1000,
     totalAccounts: 10,
-    hardfork: 'london',
-    allowUnlimitedContractSize: false,
-    locked: false,
+    hardfork: 'cancun',
     hdPath: 'm/44\'/60\'/0\'/0/',
-    keepAliveTimeout: 5000,
     mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
     chainId: 1337,
-    dbPath: './.sandbox',
-    snapshotPath: path_1.default.join(__dirname, 'db.tgz'),
-    vmErrorsOnRpcResponse: true,
-    logger: { log: () => { } },
+    statePath: path_1.default.join(__dirname, 'state.json'),
 };
 class Sandbox {
     constructor(service, options = {}) {
-        this.ganacheService = service;
+        this.anvilService = service;
         this.options = options;
-        this.provider = service.provider;
+        this.provider = this.anvilService.provider;
         this.snapshotId = undefined;
-        this.version = '0.6';
+        this.version = '1.0';
         const accounts = this.getAccounts((0, utils_1.unwrap)(this.options, 'network'));
         this.accounts || (this.accounts = {
             owner: accounts[0],
@@ -65,7 +59,7 @@ class Sandbox {
     }
     static defaultNetworkOptions() {
         return {
-            url: DEFAULT_SERVER_CONFIG.url,
+            url: `http://${DEFAULT_SERVER_CONFIG.hostIpAddress}:${DEFAULT_SERVER_CONFIG.port}`,
             chainId: DEFAULT_SERVER_CONFIG.chainId,
             accounts: {
                 mnemonic: DEFAULT_SERVER_CONFIG.mnemonic,
@@ -83,30 +77,34 @@ class Sandbox {
     }
     static create(options) {
         return __awaiter(this, void 0, void 0, function* () {
-            options = Object.assign({ clean: true, extract: true, verbose: false }, options);
+            options = Object.assign({ rebuild: false, verbose: false }, options);
             const networkOptions = Object.assign(Object.assign({}, DEFAULT_SERVER_CONFIG), options.network);
+            const anvilOptions = Object.assign({}, networkOptions);
             if (options.verbose) {
                 debug_1.default.enable('UNS:sandbox*');
+                anvilOptions.silent = false;
             }
-            const { dbPath, snapshotPath } = networkOptions;
-            if (options.clean) {
-                if (fs_1.default.existsSync(dbPath)) {
-                    fs_1.default.rmdirSync(dbPath, { recursive: true });
+            else {
+                anvilOptions.silent = true;
+            }
+            if (options.rebuild) {
+                if (fs_1.default.existsSync(networkOptions.statePath)) {
+                    fs_1.default.rmSync(networkOptions.statePath);
                 }
-                fs_1.default.mkdirSync(dbPath, { recursive: true });
-                log(`Cleaned sandbox database. Path: ${dbPath}`);
+                anvilOptions.dumpStatePath = networkOptions.statePath;
+                anvilOptions.loadStatePath = '';
             }
-            if (options.extract) {
-                yield tar_1.default.extract({ cwd: dbPath, file: snapshotPath });
-                log(`Prepared sandbox database. [Source: ${snapshotPath}, TargetDir: ${dbPath}]`);
+            else {
+                anvilOptions.dumpStatePath = '';
+                anvilOptions.loadStatePath = networkOptions.statePath;
             }
-            const service = new ganache_service_1.GanacheService(Object.assign({}, networkOptions));
+            const service = new anvil_service_1.default(anvilOptions);
             return new Sandbox(service, Object.assign(Object.assign({}, options), { network: networkOptions }));
         });
     }
     start(options = { noSnapshot: false }) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.ganacheService.startServer();
+            yield this.anvilService.startServer();
             log('Started sandbox');
             if (options.noSnapshot)
                 return;
@@ -115,18 +113,16 @@ class Sandbox {
         });
     }
     stop() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                yield this.ganacheService.stopServer();
-                log('Stopped sandbox');
+        try {
+            this.anvilService.stopServer();
+            log('Stopped sandbox');
+        }
+        catch (e) {
+            if (e.message.includes('Server is not running')) {
+                return;
             }
-            catch (e) {
-                if (e.message.includes('Server is not running')) {
-                    return;
-                }
-                throw e;
-            }
-        });
+            throw e;
+        }
     }
     reset() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -141,7 +137,7 @@ class Sandbox {
     }
     snapshot() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.provider.send('evm_snapshot');
+            return yield this.provider.send('evm_snapshot', []);
         });
     }
     revert(snapshotId) {

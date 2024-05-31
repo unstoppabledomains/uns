@@ -1,5 +1,5 @@
 import { Contract, BigNumberish, Signer, Interface, solidityPackedKeccak256, keccak256, getBytes } from 'ethers';
-import type { BaseRoutingForwarderMock, MintingManagerForwarder, UNSRegistry } from '../../types';
+import type { BaseRoutingForwarderMock, MintingManagerForwarder, SeaportProxyBuyer, UNSRegistry } from '../../types';
 
 export async function sign (
   data: string,
@@ -33,7 +33,7 @@ type ISignerWithAddress = Signer & {address: string};
 export function buildExecuteFunc (
   iface: Interface,
   toAddress: string,
-  forwarder: Contract | MintingManagerForwarder | UNSRegistry | BaseRoutingForwarderMock,
+  forwarder: Contract | MintingManagerForwarder | UNSRegistry | BaseRoutingForwarderMock | SeaportProxyBuyer,
 ): ExecuteFunc {
   return async (
     selector: string,
