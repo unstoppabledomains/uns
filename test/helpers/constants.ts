@@ -37,6 +37,9 @@ export const TLD = {
   POG: BigInt('0xe76cc52c68a868af0cba676c92337a921cc721b45b6630e47f7ecb78e3e0edcc'),
   CLAY: BigInt('0x58872a8ca9414ae0f3ab850f51efaf4c77b647d903f9ec89a03d3018bb42e4fa'),
   WITG: BigInt('0xf72e00036d7ef2d56e70c6df1d619bcccb64c93ea5b96305e7d7f24c47b4b563'),
+  METROPOLIS: BigInt('0x46a29e7d78413806ab5b6e30bc360bbff329e7bec2fc3ddf6f62d8c6c17c45b6'),
+  WRKX: BigInt('0xacf08822cf871e802cb23fdb2224cb924878985b866b92e55aaae8c0a8a898eb'),
+  SECRET: BigInt('0x335f1d8a43ebd6d9277127e859f502a14bbe3ccbe2d3f89be38fd0086da4c396'),
 
   // Expirable
   COM: BigInt('0xac2c11ea5d4a4826f418d3befbf0537de7f13572d2a433edfe4a7314ea5dc896'),

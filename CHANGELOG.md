@@ -1,7 +1,9 @@
 ## v0.9.16
 
 - Add `.witg` TLD
-- TBD
+- Add `.metropolis` TLD
+- Add `.wrkx` TLD
+- Add `.secret` TLD
 
 ## v0.9.15
 
