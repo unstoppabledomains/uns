@@ -1,3 +1,7 @@
+## v0.9.17
+
+- Add minter to `SeaportProxyBuyer` contract in sandbox
+
 ## v0.9.16
 
 - Add `.witg` TLD

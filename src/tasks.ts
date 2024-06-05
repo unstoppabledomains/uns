@@ -1115,6 +1115,17 @@ const deploySeaportProxyBuyerTask: Task = {
       [Seaport.address],
     );
     await seaportProxyBuyer.waitForDeployment();
+    if (ctx.minters.length) {
+      const chunkSize = 100;
+      for (let i = 0, j = ctx.minters.length; i < j; i += chunkSize) {
+        const array = ctx.minters.slice(i, i + chunkSize);
+
+        ctx.log('Adding minters...', array);
+        const addMintersTx = await seaportProxyBuyer.connect(owner).addMinters(array);
+        await addMintersTx.wait();
+        ctx.log(`Added ${array.length} minters`);
+      }
+    }
     const proxyAdmin = await upgrades.admin.getInstance();
     const seaportProxyBuyerImpl = await proxyAdmin.getProxyImplementation.staticCall(
       await seaportProxyBuyer.getAddress(),
