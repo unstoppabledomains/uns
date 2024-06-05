@@ -1,5 +1,5 @@
 {
-    "version": "0.9.3",
+    "version": "0.9.4",
     "networks": {
         "1": {
             "contracts": {
@@ -359,16 +359,16 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x4Eb9dE1Fc0d800e941F326d6699E9E11969557ea",
+                    "address": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x31"
+                    "deploymentBlock": "0x32"
                 },
                 "ZilliqaRecover": {
-                    "address": "0x00e39A5004299871aB3b00FeD5A39a715F181d02",
-                    "deploymentBlock": "0x2c",
-                    "implementation": "0xD178b720229c39De617846F84cf9c8D32a63a23D",
+                    "address": "0xf6b7c221342BC966f4396790895530bF4E9799eB",
+                    "deploymentBlock": "0x2d",
+                    "implementation": "0x00e39A5004299871aB3b00FeD5A39a715F181d02",
                     "legacyAddresses": [],
-                    "forwarder": "0x00e39A5004299871aB3b00FeD5A39a715F181d02"
+                    "forwarder": "0xf6b7c221342BC966f4396790895530bF4E9799eB"
                 },
                 "Seaport": {
                     "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
