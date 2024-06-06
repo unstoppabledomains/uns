@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UNSRegistryMock__factory = exports.UNSRegistryForwarderMock__factory = exports.MintingManagerMock__factory = exports.MinterRoleMock__factory = exports.ERC721ReceiverMock__factory = exports.ERC721Mock__factory = exports.ERC2771RegistryContextMock__factory = exports.ERC2771ContextMock__factory = exports.ERC20UnsafeMock__factory = exports.ERC20Mock__factory = exports.ERC1155Mock__factory = exports.BaseRoutingForwarderMock__factory = exports.BaseForwarderMock__factory = void 0;
+exports.USDC__factory = exports.UNSRegistryMock__factory = exports.UNSRegistryForwarderMock__factory = exports.MintingManagerMock__factory = exports.MinterRoleMock__factory = exports.ERC721ReceiverMock__factory = exports.ERC721Mock__factory = exports.ERC2771RegistryContextMock__factory = exports.ERC2771ContextMock__factory = exports.ERC20UnsafeMock__factory = exports.ERC20Mock__factory = exports.ERC1155Mock__factory = exports.BaseRoutingForwarderMock__factory = exports.BaseForwarderMock__factory = void 0;
 var BaseForwarderMock__factory_1 = require("./BaseForwarderMock__factory");
 Object.defineProperty(exports, "BaseForwarderMock__factory", { enumerable: true, get: function () { return BaseForwarderMock__factory_1.BaseForwarderMock__factory; } });
 var BaseRoutingForwarderMock__factory_1 = require("./BaseRoutingForwarderMock__factory");
@@ -27,3 +27,5 @@ var UNSRegistryForwarderMock__factory_1 = require("./UNSRegistryForwarderMock__f
 Object.defineProperty(exports, "UNSRegistryForwarderMock__factory", { enumerable: true, get: function () { return UNSRegistryForwarderMock__factory_1.UNSRegistryForwarderMock__factory; } });
 var UNSRegistryMock__factory_1 = require("./UNSRegistryMock__factory");
 Object.defineProperty(exports, "UNSRegistryMock__factory", { enumerable: true, get: function () { return UNSRegistryMock__factory_1.UNSRegistryMock__factory; } });
+var USDC__factory_1 = require("./USDC__factory");
+Object.defineProperty(exports, "USDC__factory", { enumerable: true, get: function () { return USDC__factory_1.USDC__factory; } });

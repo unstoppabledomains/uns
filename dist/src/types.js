@@ -24,7 +24,7 @@ var ArtifactName;
     ArtifactName["Seaport"] = "Seaport";
     ArtifactName["SeaportProxyBuyer"] = "SeaportProxyBuyer";
     ArtifactName["ConduitController"] = "ConduitController";
-    ArtifactName["ERC20Mock"] = "ERC20Mock";
+    ArtifactName["USDC"] = "USDC";
     ArtifactName["ENSRegistry"] = "ENSRegistry";
     ArtifactName["BaseRegistrarImplementation"] = "BaseRegistrarImplementation";
     ArtifactName["ReverseRegistrar"] = "ReverseRegistrar";
@@ -68,7 +68,7 @@ var UnsContractName;
     UnsContractName["ZilliqaRecover"] = "ZilliqaRecover";
     UnsContractName["Seaport"] = "Seaport";
     UnsContractName["SeaportProxyBuyer"] = "SeaportProxyBuyer";
-    UnsContractName["ERC20Mock"] = "ERC20Mock";
+    UnsContractName["USDC"] = "USDC";
 })(UnsContractName = exports.UnsContractName || (exports.UnsContractName = {}));
 var EnsContractName;
 (function (EnsContractName) {
