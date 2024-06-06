@@ -1088,7 +1088,7 @@ const deploySeaportTask: Task = {
 };
 
 const deployUsdcMockTask: Task = {
-  tags: ['erc20_mock', 'full'],
+  tags: ['usdc_mock', 'full'],
   priority: 10,
   run: async (ctx: Deployer) => {
     const { owner } = ctx.accounts;
@@ -1097,9 +1097,9 @@ const deployUsdcMockTask: Task = {
       throw new Error('This task is only available for sandbox');
     }
 
-    const usdcMock = await ethers.deployContract(ArtifactName.ERC20Mock, [], owner);
+    const usdcMock = await ethers.deployContract(ArtifactName.USDC, [], owner);
     await usdcMock.waitForDeployment();
-    await ctx.saveContractConfig(UnsContractName.ERC20Mock, usdcMock);
+    await ctx.saveContractConfig(UnsContractName.USDC, usdcMock);
   },
   ensureDependencies: () => ({}),
 };
@@ -1154,23 +1154,23 @@ const fundSeaportProxyBuyerTask: Task = {
       throw new Error('This task is only available for sandbox');
     }
 
-    const [SeaportProxyBuyer, ERC20Mock] = unwrapDependencies(dependencies, [
+    const [SeaportProxyBuyer, USDCMock] = unwrapDependencies(dependencies, [
       UnsContractName.SeaportProxyBuyer,
-      UnsContractName.ERC20Mock,
+      UnsContractName.USDC,
     ]);
-    const erc20MockContract = await ethers.getContractAt(UnsContractName.ERC20Mock, ERC20Mock.address, owner);
-    await erc20MockContract.mint(SeaportProxyBuyer.address, parseUnits('1000000', 6)); // 1M USDC
+    const usdcMockContract = await ethers.getContractAt(UnsContractName.USDC, USDCMock.address, owner);
+    await usdcMockContract.mint(SeaportProxyBuyer.address, parseUnits('1000000', 6)); // 1M USDC
     const seaportProxyBuyerContract = await ethers.getContractAt(
       UnsContractName.SeaportProxyBuyer,
       SeaportProxyBuyer.address,
       owner,
     );
-    await seaportProxyBuyerContract.approve(ERC20Mock.address);
+    await seaportProxyBuyerContract.approve(USDCMock.address);
   },
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
-    return ensureDeployed(config, UnsContractName.SeaportProxyBuyer, UnsContractName.ERC20Mock);
+    return ensureDeployed(config, UnsContractName.SeaportProxyBuyer, UnsContractName.USDC);
   },
 };
 
