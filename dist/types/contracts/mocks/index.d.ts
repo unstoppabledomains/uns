@@ -11,4 +11,5 @@ export type { MinterRoleMock } from "./MinterRoleMock";
 export type { MintingManagerMock } from "./MintingManagerMock";
 export type { UNSRegistryForwarderMock } from "./UNSRegistryForwarderMock";
 export type { UNSRegistryMock } from "./UNSRegistryMock";
+export type { USDC } from "./USDC";
 //# sourceMappingURL=index.d.ts.map

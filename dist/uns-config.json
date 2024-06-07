@@ -1,5 +1,5 @@
 {
-    "version": "0.9.3",
+    "version": "0.9.5",
     "networks": {
         "1": {
             "contracts": {
@@ -123,15 +123,15 @@
                     "address": "0x0000000000000068F116a894984e2DB1123eB395",
                     "deploymentBlock": "0x0"
                 },
-                "ERC20Mock": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "deploymentBlock": "0x0"
-                },
                 "SeaportProxyBuyer": {
                     "address": "0x0000000000000000000000000000000000000000",
                     "deploymentBlock": "0x0",
                     "implementation": "0x0000000000000000000000000000000000000000",
                     "forwarder": "0x0000000000000000000000000000000000000000"
+                },
+                "USDC": {
+                    "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -251,15 +251,15 @@
                     "address": "0x0000000000000068F116a894984e2DB1123eB395",
                     "deploymentBlock": "0x0"
                 },
-                "ERC20Mock": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "deploymentBlock": "0x0"
-                },
                 "SeaportProxyBuyer": {
                     "address": "0x0000000000000000000000000000000000000000",
                     "deploymentBlock": "0x0",
                     "implementation": "0x0000000000000000000000000000000000000000",
                     "forwarder": "0x0000000000000000000000000000000000000000"
+                },
+                "USDC": {
+                    "address": "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359",
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -359,30 +359,30 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x4Eb9dE1Fc0d800e941F326d6699E9E11969557ea",
+                    "address": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x31"
+                    "deploymentBlock": "0x32"
                 },
                 "ZilliqaRecover": {
-                    "address": "0x00e39A5004299871aB3b00FeD5A39a715F181d02",
-                    "deploymentBlock": "0x2c",
-                    "implementation": "0xD178b720229c39De617846F84cf9c8D32a63a23D",
+                    "address": "0xf6b7c221342BC966f4396790895530bF4E9799eB",
+                    "deploymentBlock": "0x2d",
+                    "implementation": "0x00e39A5004299871aB3b00FeD5A39a715F181d02",
                     "legacyAddresses": [],
-                    "forwarder": "0x00e39A5004299871aB3b00FeD5A39a715F181d02"
+                    "forwarder": "0xf6b7c221342BC966f4396790895530bF4E9799eB"
                 },
                 "Seaport": {
                     "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
                     "deploymentBlock": "0x1f"
-                },
-                "ERC20Mock": {
-                    "address": "0xDa9E1b3e395bFb0A45F03C7F615146B9d896c959",
-                    "deploymentBlock": "0x20"
                 },
                 "SeaportProxyBuyer": {
                     "address": "0x24F45688D421f46cca60734BdC648ad192dB0f2E",
                     "deploymentBlock": "0x28",
                     "implementation": "0x54563a9e1cD2dCBD0BCA90D3CFA4A647e02C404a",
                     "forwarder": "0x24F45688D421f46cca60734BdC648ad192dB0f2E"
+                },
+                "USDC": {
+                    "address": "0xDa9E1b3e395bFb0A45F03C7F615146B9d896c959",
+                    "deploymentBlock": "0x20"
                 }
             }
         },
@@ -497,15 +497,15 @@
                     "address": "0x0000000000000068F116a894984e2DB1123eB395",
                     "deploymentBlock": "0x0"
                 },
-                "ERC20Mock": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "deploymentBlock": "0x0"
-                },
                 "SeaportProxyBuyer": {
                     "address": "0x0000000000000000000000000000000000000000",
                     "deploymentBlock": "0x0",
                     "implementation": "0x0000000000000000000000000000000000000000",
                     "forwarder": "0x0000000000000000000000000000000000000000"
+                },
+                "USDC": {
+                    "address": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -625,15 +625,15 @@
                     "address": "0x0000000000000068F116a894984e2DB1123eB395",
                     "deploymentBlock": "0x0"
                 },
-                "ERC20Mock": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "deploymentBlock": "0x0"
-                },
                 "SeaportProxyBuyer": {
                     "address": "0x0000000000000000000000000000000000000000",
                     "deploymentBlock": "0x0",
                     "implementation": "0x0000000000000000000000000000000000000000",
                     "forwarder": "0x0000000000000000000000000000000000000000"
+                },
+                "USDC": {
+                    "address": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+                    "deploymentBlock": "0x0"
                 }
             }
         }

@@ -20,7 +20,7 @@ export declare enum ArtifactName {
     Seaport = "Seaport",
     SeaportProxyBuyer = "SeaportProxyBuyer",
     ConduitController = "ConduitController",
-    ERC20Mock = "ERC20Mock",
+    USDC = "USDC",
     ENSRegistry = "ENSRegistry",
     BaseRegistrarImplementation = "BaseRegistrarImplementation",
     ReverseRegistrar = "ReverseRegistrar",
@@ -63,7 +63,7 @@ export declare enum UnsContractName {
     ZilliqaRecover = "ZilliqaRecover",
     Seaport = "Seaport",
     SeaportProxyBuyer = "SeaportProxyBuyer",
-    ERC20Mock = "ERC20Mock"
+    USDC = "USDC"
 }
 export declare enum EnsContractName {
     ENSRegistry = "ENSRegistry",

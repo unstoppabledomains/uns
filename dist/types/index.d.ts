@@ -361,6 +361,8 @@ export type { UNSRegistryForwarderMock } from "./contracts/mocks/UNSRegistryForw
 export { UNSRegistryForwarderMock__factory } from "./factories/contracts/mocks/UNSRegistryForwarderMock__factory";
 export type { UNSRegistryMock } from "./contracts/mocks/UNSRegistryMock";
 export { UNSRegistryMock__factory } from "./factories/contracts/mocks/UNSRegistryMock__factory";
+export type { USDC } from "./contracts/mocks/USDC";
+export { USDC__factory } from "./factories/contracts/mocks/USDC__factory";
 export type { ProxyReader } from "./contracts/ProxyReader";
 export { ProxyReader__factory } from "./factories/contracts/ProxyReader__factory";
 export type { RecordStorage } from "./contracts/RecordStorage";
