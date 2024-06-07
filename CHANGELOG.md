@@ -1,3 +1,8 @@
+## v0.9.17
+
+- Add minter to `SeaportProxyBuyer` contract in sandbox
+- Add USDC addresses to `uns-config.json`
+
 ## v0.9.16
 
 - Add `.witg` TLD
