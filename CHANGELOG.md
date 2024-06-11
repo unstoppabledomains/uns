@@ -1,3 +1,7 @@
+## v0.9.18
+
+- Deploy `SeaportProxyBuyer@0.1.0` contract to `Amoy` testnet
+
 ## v0.9.17
 
 - Add minter to `SeaportProxyBuyer` contract in sandbox

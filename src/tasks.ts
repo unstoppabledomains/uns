@@ -1,4 +1,4 @@
-import { network, upgrades, ethers, defender } from 'hardhat';
+import { defender, ethers, network, upgrades } from 'hardhat';
 import { Contract, keccak256, namehash, parseEther, parseUnits } from 'ethers';
 import { merge } from 'lodash';
 import { getContractAddress } from '@openzeppelin/hardhat-upgrades/dist/utils';
@@ -7,15 +7,15 @@ import {
   ENSCustody,
   MintingManager,
   ProxyReader,
+  SeaportProxyBuyer,
   UNSOperator,
   UNSRegistry,
   ZilliqaRecover,
-  SeaportProxyBuyer,
 } from '../types';
 import { Deployer } from './deployer';
-import { ArtifactName, DependenciesMap, EnsContractName, UnsContractName, NsNetworkConfig } from './types';
+import { ArtifactName, DependenciesMap, EnsContractName, NsNetworkConfig, UnsContractName } from './types';
 import verify from './verify';
-import { unwrap, unwrapDependencies, notNullSha } from './utils';
+import { notNullSha, unwrap, unwrapDependencies } from './utils';
 import { deployProxy, ensureDeployed, ensureUpgradable } from './helpers';
 
 export type Task = {
@@ -26,6 +26,7 @@ export type Task = {
 };
 
 const isSandbox = network.config.chainId === 1337;
+const isTestnet = network.config.chainId === 80002 || network.config.chainId === 11155111;
 
 export const deployCNSTask: Task = {
   tags: ['cns', 'full'],
@@ -1093,13 +1094,14 @@ const deployUsdcMockTask: Task = {
   run: async (ctx: Deployer) => {
     const { owner } = ctx.accounts;
 
-    if (!isSandbox) {
-      throw new Error('This task is only available for sandbox');
+    if (!isSandbox && !isTestnet) {
+      throw new Error('This task is only available for sandbox or testnet');
     }
 
     const usdcMock = await ethers.deployContract(ArtifactName.USDC, [], owner);
     await usdcMock.waitForDeployment();
     await ctx.saveContractConfig(UnsContractName.USDC, usdcMock);
+    await verify(ctx, await usdcMock.getAddress(), [], 'contracts/mocks/USDC.sol:USDC');
   },
   ensureDependencies: () => ({}),
 };
@@ -1136,6 +1138,7 @@ const deploySeaportProxyBuyerTask: Task = {
       seaportProxyBuyerImpl,
       seaportProxyBuyer,
     );
+    await verify(ctx, seaportProxyBuyerImpl, []);
   },
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
@@ -1150,8 +1153,8 @@ const fundSeaportProxyBuyerTask: Task = {
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const { owner } = ctx.accounts;
 
-    if (!isSandbox) {
-      throw new Error('This task is only available for sandbox');
+    if (!isSandbox && !isTestnet) {
+      throw new Error('This task is only available for sandbox or testnet');
     }
 
     const [SeaportProxyBuyer, USDCMock] = unwrapDependencies(dependencies, [
