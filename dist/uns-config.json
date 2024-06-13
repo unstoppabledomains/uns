@@ -498,14 +498,14 @@
                     "deploymentBlock": "0x0"
                 },
                 "SeaportProxyBuyer": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "deploymentBlock": "0x0",
-                    "implementation": "0x0000000000000000000000000000000000000000",
-                    "forwarder": "0x0000000000000000000000000000000000000000"
+                    "address": "0x4FF860525ccb6E992E0A4579860465f7EF581aed",
+                    "deploymentBlock": "0x7c4d06",
+                    "implementation": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "forwarder": "0x4FF860525ccb6E992E0A4579860465f7EF581aed"
                 },
                 "USDC": {
-                    "address": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
-                    "deploymentBlock": "0x0"
+                    "address": "0x6694CfD96d7fD80041062895B49f768081CA96f2",
+                    "deploymentBlock": "0x7c62a5"
                 }
             }
         },
