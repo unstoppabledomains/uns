@@ -1,5 +1,5 @@
 import { network } from 'hardhat';
-import { NameService, getNetworkConfig, mergeNetworkConfig } from '../src/config';
+import { NameService, getNetworkConfig } from '../src/config';
 import { Deployer } from '../src/deployer';
 import { unwrap } from '../src/utils';
 
@@ -7,7 +7,7 @@ async function main () {
   console.log('Network:', network.name);
 
   const chainId: number = unwrap(network.config, 'chainId');
-  if (![137, 80002].includes(chainId)) {
+  if (![80002].includes(chainId)) {
     throw new Error(`Unsupported network ${chainId}`);
   }
 
@@ -18,10 +18,9 @@ async function main () {
   }
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['seaport_proxy_buyer'], config);
-  mergeNetworkConfig(deployConfig, NameService.UNS);
+  await deployer.execute(['fund_seaport_proxy_buyer'], config);
 
-  console.log('Deployed!');
+  console.log('Funded!');
 }
 
 main()

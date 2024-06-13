@@ -7,7 +7,7 @@ async function main () {
   console.log('Network:', network.name);
 
   const chainId: number = unwrap(network.config, 'chainId');
-  if (![137, 80002].includes(chainId)) {
+  if (![80002].includes(chainId)) {
     throw new Error(`Unsupported network ${chainId}`);
   }
 
@@ -18,7 +18,7 @@ async function main () {
   }
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['seaport_proxy_buyer'], config);
+  const deployConfig = await deployer.execute(['usdc_mock'], config);
   mergeNetworkConfig(deployConfig, NameService.UNS);
 
   console.log('Deployed!');
