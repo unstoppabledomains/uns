@@ -1,5 +1,5 @@
 {
-    "version": "0.9.5",
+    "version": "0.9.6",
     "networks": {
         "1": {
             "contracts": {
@@ -252,10 +252,10 @@
                     "deploymentBlock": "0x0"
                 },
                 "SeaportProxyBuyer": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "deploymentBlock": "0x0",
-                    "implementation": "0x0000000000000000000000000000000000000000",
-                    "forwarder": "0x0000000000000000000000000000000000000000"
+                    "address": "0x8b031F472F7f90ac1fAE1616Ddf1283CDDe084bF",
+                    "deploymentBlock": "0x037b22db",
+                    "implementation": "0xceEE7A3D7bEb72e4C62820416808D3a226356a5e",
+                    "forwarder": "0x8b031F472F7f90ac1fAE1616Ddf1283CDDe084bF"
                 },
                 "USDC": {
                     "address": "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359",
