@@ -1,3 +1,7 @@
+## v0.9.19
+
+- Deploy `SeaportProxyBuyer@0.1.0` contract to `Polygon` mainnet 
+
 ## v0.9.18
 
 - Deploy `SeaportProxyBuyer@0.1.0` contract to `Amoy` testnet
