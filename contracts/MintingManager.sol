@@ -139,7 +139,10 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             _addTld(tlds[i], false);
         }
 
-        _addTld('com', true);
+        string[2] memory expirableTlds = ['com', 'ca'];
+        for (uint256 i = 0; i < expirableTlds.length; i++) {
+            _addTld(expirableTlds[i], true);
+        }
     }
 
     function addTld(string calldata tld, bool isExpirable) external override onlyOwner {

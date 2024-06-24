@@ -1,3 +1,7 @@
+## v0.9.20
+
+- Add `.ca` TLD
+
 ## v0.9.19
 
 - Deploy `SeaportProxyBuyer@0.1.0` contract to `Polygon` mainnet 
