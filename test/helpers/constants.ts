@@ -43,8 +43,10 @@ export const TLD = {
 
   // Expirable
   COM: BigInt('0xac2c11ea5d4a4826f418d3befbf0537de7f13572d2a433edfe4a7314ea5dc896'),
+  CA: BigInt('0xc9dca3620bc4f436a4161d86f335af2a8f7eb7bae05865a71e18fc617ef98c4e'),
 };
 
 export const EXPIRABLE_TLDS = [
   'COM',
+  'CA',
 ];
