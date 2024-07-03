@@ -25,6 +25,7 @@ export enum ArtifactName {
   SeaportProxyBuyer = 'SeaportProxyBuyer',
   ConduitController = 'ConduitController',
   USDC = 'USDC',
+  Recover = 'Recover',
 
   // ENS
   ENSRegistry = 'ENSRegistry',

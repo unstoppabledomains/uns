@@ -1177,6 +1177,36 @@ const fundSeaportProxyBuyerTask: Task = {
   },
 };
 
+const deployRecoveryTask: Task = {
+  tags: ['deploy_recovery'],
+  priority: 10,
+  run: async (ctx: Deployer) => {
+    const { owner } = ctx.accounts;
+
+    const recovery = await ethers.deployContract(ArtifactName.Recover, [], owner);
+    await recovery.waitForDeployment();
+    console.log('Recovery deployed at:', await recovery.getAddress());
+  },
+  ensureDependencies: () => ({}),
+};
+
+const recoverFundsTask: Task = {
+  tags: ['recover_usdc'],
+  priority: 10,
+  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
+    const { owner } = ctx.accounts;
+    const expectedContractAddress = '0x8b031F472F7f90ac1fAE1616Ddf1283CDDe084bF';
+    const usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
+
+    const recovery = await ethers.getContractAt(ArtifactName.Recover, expectedContractAddress, owner);
+    const usdcContract = await ethers.getContractAt(ArtifactName.USDC, usdcAddress, owner);
+    console.log('Balance before:', await usdcContract.balanceOf(owner.address));
+    await recovery.recoverERC20(usdcAddress);
+    console.log('Balance after:', await usdcContract.balanceOf(owner.address));
+  },
+  ensureDependencies: () => ({}),
+};
+
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -1205,4 +1235,6 @@ export const tasks: Task[] = [
   deploySeaportProxyBuyerTask,
   deployUsdcMockTask,
   fundSeaportProxyBuyerTask,
+  deployRecoveryTask,
+  recoverFundsTask,
 ];

@@ -168,6 +168,12 @@ const config: HardhatUserConfig = {
       accounts: process.env.POLYGON_UNS_PRIVATE_KEY ? [process.env.POLYGON_UNS_PRIVATE_KEY] : undefined,
       loggingEnabled: true,
     },
+    recoveryfork: {
+      url: 'http://127.0.0.1:8545',
+      chainId: 1,
+      accounts: process.env.MAINNET_UNS_PRIVATE_KEY ? [process.env.MAINNET_UNS_PRIVATE_KEY] : undefined,
+      loggingEnabled: true,
+    },
   },
   typechain: {
     outDir: 'types',
