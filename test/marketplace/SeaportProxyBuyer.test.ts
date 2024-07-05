@@ -4,6 +4,7 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { Seaport as seaportjs } from '@opensea/seaport-js';
 import { getAdvancedOrderNumeratorDenominator } from '@opensea/seaport-js/lib/utils/fulfill';
 import { ItemType } from '@opensea/seaport-js/lib/constants';
+import { CreateOrderInput } from '@opensea/seaport-js/lib/types';
 import { mintRandomDomain } from '../helpers/registry';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
@@ -78,15 +79,20 @@ describe('SeaportProxyBuyer', async () => {
     tokenIdToSell = await mintRandomDomain({ unsRegistry, owner: seller.address, tld: 'crypto' });
   });
 
-  const createOrder = async (priceToSell: bigint, recipientFeesBasisPoints: bigint, zone?: string) => {
-    const order = await seaportSdk.createOrder({
-      zone: zone,
+  const generateOrderInputData = async (
+    tokenIdentifier: bigint,
+    priceToSell: bigint,
+    recipientFeesBasisPoints: bigint,
+    zone?: string,
+  ): Promise<CreateOrderInput> => {
+    return {
+      zone,
       restrictedByZone: true,
       offer: [
         {
           token: await unsRegistry.getAddress(),
           itemType: ItemType.ERC721,
-          identifier: tokenIdToSell.toString(),
+          identifier: tokenIdentifier.toString(),
         },
       ],
       consideration: [
@@ -101,7 +107,14 @@ describe('SeaportProxyBuyer', async () => {
           basisPoints: Number(recipientFeesBasisPoints),
         },
       ],
-    }, seller.address);
+    };
+  };
+
+  const createOrder = async (priceToSell: bigint, recipientFeesBasisPoints: bigint, zone?: string) => {
+    const order = await seaportSdk.createOrder(
+      await generateOrderInputData(tokenIdToSell, priceToSell, recipientFeesBasisPoints, zone),
+      seller.address,
+    );
     const seaportOrderData = await order.executeAllActions();
     const fulfillOrderData: OrderStruct = {
       ...seaportOrderData,
@@ -117,7 +130,103 @@ describe('SeaportProxyBuyer', async () => {
     return { fulfillOrderData, numerator, denominator, hash };
   };
 
-  describe('Regular tranactions', async () => {
+  const createBulkOrders = async (
+    priceToSell: bigint,
+    recipientFeesBasisPoints: bigint,
+    zone?: string,
+    domainsAmount = 10,
+  ) => {
+    const mintingPromises = Array.from({ length: domainsAmount }, async () => {
+      return await mintRandomDomain({ unsRegistry, owner: seller.address, tld: 'x' });
+    });
+    const mintedTokenIds = await Promise.all(mintingPromises);
+    const orderInputDataPromises = mintedTokenIds.map(async (tokenId) => {
+      return await generateOrderInputData(tokenId, priceToSell, recipientFeesBasisPoints, zone);
+    });
+    const orderInputData = await Promise.all(orderInputDataPromises);
+    const bulkOrder = await seaportSdk.createBulkOrders(orderInputData, seller.address);
+    const seaportBulkOrderData = await bulkOrder.executeAllActions();
+    const bulksFullfillOrdersData:
+      {fulfillOrderData: OrderStruct, numerator: bigint, denominator: bigint, hash: bigint, tokenId: string}[] =
+        seaportBulkOrderData.map((orderData) => {
+          const fulfillOrderData: OrderStruct = {
+            ...orderData,
+            parameters: {
+              ...orderData.parameters,
+              consideration: orderData.parameters.consideration,
+              totalOriginalConsiderationItems: orderData.parameters.consideration.length,
+            },
+          };
+          const { numerator, denominator } = getAdvancedOrderNumeratorDenominator(orderData);
+          const hash = ethers.toBigInt(seaportSdk.getOrderHash(orderData.parameters));
+          return {
+            fulfillOrderData,
+            numerator,
+            denominator,
+            hash,
+            tokenId: orderData.parameters.offer[0].identifierOrCriteria,
+          };
+        });
+
+    return bulksFullfillOrdersData;
+  };
+
+  describe('Regular transactions', async () => {
+    it('should execute single order from batch orders via Proxy', async () => {
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50); // 0.5%
+      const feesAmount = priceToSell * recipientFeesBasisPoints / BigInt(10000);
+      const orders = await createBulkOrders(priceToSell, recipientFeesBasisPoints, proxyBuyerAddress);
+      const { fulfillOrderData, numerator, denominator, tokenId } = orders[0];
+
+      const initialProxyBalance = await usdcMock.balanceOf(proxyBuyerAddress);
+      const initialSellerBalance = await usdcMock.balanceOf(seller.address);
+      const initialFeesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+      await (await seaportProxyBuyer.connect(coinbase).fulfillAdvancedOrder(
+        { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
+      )).wait();
+
+      const sellerBalance = await usdcMock.balanceOf(seller.address);
+      const proxyBalance = await usdcMock.balanceOf(proxyBuyerAddress);
+      const domainOwner = await unsRegistry.ownerOf(tokenId);
+      const feesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+
+      expect(sellerBalance).to.be.eq(initialSellerBalance + priceToSell - feesAmount);
+      expect(feesRecipientBalance).to.be.eq(initialFeesRecipientBalance + feesAmount);
+      expect(proxyBalance).to.be.eq(initialProxyBalance - priceToSell);
+      expect(domainOwner).to.be.eq(buyer.address);
+    });
+
+    it('should execute multiple orders from batch orders via Proxy', async () => {
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50); // 0.5%
+      const feesAmount = priceToSell * recipientFeesBasisPoints / BigInt(10000);
+      const orders = await createBulkOrders(priceToSell, recipientFeesBasisPoints, proxyBuyerAddress, 3);
+      const initialProxyBalance = await usdcMock.balanceOf(proxyBuyerAddress);
+      const initialSellerBalance = await usdcMock.balanceOf(seller.address);
+      const initialFeesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+
+      expect(orders.length).to.be.eq(3);
+      for (const order of orders) {
+        const { fulfillOrderData, numerator, denominator, tokenId } = order;
+        await (await seaportProxyBuyer.connect(coinbase).fulfillAdvancedOrder(
+          { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address,
+        )).wait();
+        const domainOwner = await unsRegistry.ownerOf(tokenId);
+        expect(domainOwner).to.be.eq(buyer.address);
+      }
+
+      const sellerBalance = await usdcMock.balanceOf(seller.address);
+      const proxyBalance = await usdcMock.balanceOf(proxyBuyerAddress);
+      const feesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+
+      expect(sellerBalance).to.be.eq(initialSellerBalance + priceToSell * BigInt(3) - feesAmount * BigInt(3));
+      expect(feesRecipientBalance).to.be.eq(initialFeesRecipientBalance + feesAmount * BigInt(3));
+      expect(proxyBalance).to.be.eq(initialProxyBalance - priceToSell * BigInt(3));
+    });
+
+    // todo add test for multiple orders
+
     it('should execute Seaport order via Proxy', async () => {
       const priceToSell = BigInt(ethers.parseUnits('100', 6));
       const recipientFeesBasisPoints = BigInt(50); // 0.5%
@@ -281,6 +390,67 @@ describe('SeaportProxyBuyer', async () => {
         await seaportProxyBuyer.getAddress(),
         seaportProxyBuyer,
       );
+    });
+
+    it('should execute multiple orders from batch orders via Proxy', async () => {
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50); // 0.5%
+      const feesAmount = priceToSell * recipientFeesBasisPoints / BigInt(10000);
+      const orders = await createBulkOrders(priceToSell, recipientFeesBasisPoints, proxyBuyerAddress, 3);
+      const initialProxyBalance = await usdcMock.balanceOf(proxyBuyerAddress);
+      const initialSellerBalance = await usdcMock.balanceOf(seller.address);
+      const initialFeesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+
+      expect(orders.length).to.be.eq(3);
+      for (const order of orders) {
+        const { fulfillOrderData, numerator, denominator, tokenId } = order;
+        const { req, signature } = await buildExecuteParams(
+          'fulfillAdvancedOrder',
+          [{ ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address],
+          coinbase,
+          order.hash,
+        );
+        await (await seaportProxyBuyer.connect(seller).execute(req, signature)).wait();
+        const domainOwner = await unsRegistry.ownerOf(tokenId);
+        expect(domainOwner).to.be.eq(buyer.address);
+      }
+
+      const sellerBalance = await usdcMock.balanceOf(seller.address);
+      const proxyBalance = await usdcMock.balanceOf(proxyBuyerAddress);
+      const feesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+
+      expect(sellerBalance).to.be.eq(initialSellerBalance + priceToSell * BigInt(3) - feesAmount * BigInt(3));
+      expect(feesRecipientBalance).to.be.eq(initialFeesRecipientBalance + feesAmount * BigInt(3));
+      expect(proxyBalance).to.be.eq(initialProxyBalance - priceToSell * BigInt(3));
+    });
+
+    it('should execute single order from batch orders via Proxy', async () => {
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const recipientFeesBasisPoints = BigInt(50); // 0.5%
+      const feesAmount = priceToSell * recipientFeesBasisPoints / BigInt(10000);
+      const orders = await createBulkOrders(priceToSell, recipientFeesBasisPoints, proxyBuyerAddress);
+      const { fulfillOrderData, numerator, denominator, hash, tokenId } = orders[0];
+
+      const initialProxyBalance = await usdcMock.balanceOf(proxyBuyerAddress);
+      const initialSellerBalance = await usdcMock.balanceOf(seller.address);
+      const initialFeesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+      const { req, signature } = await buildExecuteParams(
+        'fulfillAdvancedOrder',
+        [{ ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address],
+        coinbase,
+        hash,
+      );
+      await (await seaportProxyBuyer.connect(seller).execute(req, signature)).wait();
+
+      const sellerBalance = await usdcMock.balanceOf(seller.address);
+      const proxyBalance = await usdcMock.balanceOf(proxyBuyerAddress);
+      const domainOwner = await unsRegistry.ownerOf(tokenId);
+      const feesRecipientBalance = await usdcMock.balanceOf(feesRecipient.address);
+
+      expect(sellerBalance).to.be.eq(initialSellerBalance + priceToSell - feesAmount);
+      expect(feesRecipientBalance).to.be.eq(initialFeesRecipientBalance + feesAmount);
+      expect(proxyBalance).to.be.eq(initialProxyBalance - priceToSell);
+      expect(domainOwner).to.be.eq(buyer.address);
     });
 
     it('should execute Seaport order via Proxy', async () => {
