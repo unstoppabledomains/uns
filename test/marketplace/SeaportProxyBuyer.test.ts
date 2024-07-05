@@ -225,8 +225,6 @@ describe('SeaportProxyBuyer', async () => {
       expect(proxyBalance).to.be.eq(initialProxyBalance - priceToSell * BigInt(3));
     });
 
-    // todo add test for multiple orders
-
     it('should execute Seaport order via Proxy', async () => {
       const priceToSell = BigInt(ethers.parseUnits('100', 6));
       const recipientFeesBasisPoints = BigInt(50); // 0.5%

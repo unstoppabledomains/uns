@@ -1,3 +1,8 @@
+## v0.9.21
+
+- Verify bulks signatures support for Seaport orders
+- Add gas estimations for bulk orders fullfillment
+
 ## v0.9.20
 
 - Add `.ca` TLD
