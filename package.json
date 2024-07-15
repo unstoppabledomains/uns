@@ -90,7 +90,7 @@
     "seaport-types": "1.6.3",
     "solhint": "^3.3.7",
     "solidity-coverage": "^0.8.4",
-    "tar": "^6.1.9",
+    "tar": "^6.2.1",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.1",
     "typechain": "^8.3.2",
