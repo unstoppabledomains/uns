@@ -1,3 +1,8 @@
+## v0.9.22
+
+- Add `.raiin` TLD
+- Add `.stepn` TLD
+
 ## v0.9.21
 
 - Verify bulks signatures support for Seaport orders

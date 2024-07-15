@@ -40,6 +40,8 @@ export const TLD = {
   METROPOLIS: BigInt('0x46a29e7d78413806ab5b6e30bc360bbff329e7bec2fc3ddf6f62d8c6c17c45b6'),
   WRKX: BigInt('0xacf08822cf871e802cb23fdb2224cb924878985b866b92e55aaae8c0a8a898eb'),
   SECRET: BigInt('0x335f1d8a43ebd6d9277127e859f502a14bbe3ccbe2d3f89be38fd0086da4c396'),
+  RAIIN: BigInt('0x2418c6dc1c5996890c54f1b197ce3d5f255b857445bce309215d0751b56fcd65'),
+  STEPN: BigInt('0x05cb1b6d0e0a38c2fdeacf5d8383eea8f73d8fdeca1e4cc99a0e202f68d5b7df'),
 
   // Expirable
   COM: BigInt('0xac2c11ea5d4a4826f418d3befbf0537de7f13572d2a433edfe4a7314ea5dc896'),
