@@ -1,7 +1,11 @@
 import { defender, ethers, network, upgrades } from 'hardhat';
-import { Contract, keccak256, namehash, parseEther, parseUnits } from 'ethers';
+import { Contract, ContractFactory, keccak256, namehash, parseEther, parseUnits, Signer } from 'ethers';
 import { merge } from 'lodash';
-import { getContractAddress } from '@openzeppelin/hardhat-upgrades/dist/utils';
+import hre from 'hardhat';
+import { attachProxyAdminV4, deploy, DeployProxyOptions, getContractAddress, getSigner } from '@openzeppelin/hardhat-upgrades/dist/utils';
+import { fetchOrDeployAdmin, getAdminAddress, getImplementationAddress } from '@openzeppelin/upgrades-core';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import ProxyAdmin from '@openzeppelin/upgrades-core/artifacts/@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol/ProxyAdmin.json';
 import { ZERO_ADDRESS, ZERO_WORD } from '../test/helpers/constants';
 import {
   ENSCustody,
@@ -27,6 +31,77 @@ export type Task = {
 
 const isSandbox = network.config.chainId === 1337;
 const isTestnet = network.config.chainId === 80002 || network.config.chainId === 11155111;
+
+export const deployCreate2Task: Task = {
+  tags: ['testcreate2'],
+  priority: -1,
+  run: async (ctx: Deployer) => {
+    const { owner } = ctx.accounts;
+    // const admin = getProxyAdminInstance(ctx);
+    // if (!proxyAdmin) {
+    //   throw new Error('ProxyAdmin not found');
+    // }
+    // console.log('proxyAdmin', proxyAdmin);
+    const sepoliaRelayer = '0xAef2c366FFC28f00edcdE94C90bED2c1f31e279d';
+
+
+    const unsRegistry = await deployProxy(await ethers.getContractFactory(ArtifactName.TestContract, owner), [], {
+      salt: '12341234123412312345',
+      useDefenderDeploy: true,
+      // relayerId: 'df919237-20e7-424d-a504-eec243224a1a', // amoy
+      relayerId: '15aa54e0-0cb9-484d-92b1-fbc3cdeb32cd', // sepolia
+      timeout: 0,
+      initialOwner: '0xAef2c366FFC28f00edcdE94C90bED2c1f31e279d',
+      verifySourceCode: true,
+    });
+    console.log('TestContract deployed at:', unsRegistry);
+
+    console.log('proxy admin instance', await getProxyAdminInstance(ctx, await unsRegistry.getAddress()));
+    console.log('proxy admin instance2', await getProxyAdminInstance(ctx, unsRegistry.target as string));
+
+
+    const unsRegistry1 = await deployProxy(await ethers.getContractFactory(ArtifactName.TestContract, owner), [], {
+      salt: '1234123412341231234',
+      useDefenderDeploy: true,
+      // relayerId: 'df919237-20e7-424d-a504-eec243224a1a', // amoy
+      relayerId: '15aa54e0-0cb9-484d-92b1-fbc3cdeb32cd', // sepolia
+      timeout: 0,
+      initialOwner: '0xAef2c366FFC28f00edcdE94C90bED2c1f31e279d',
+      verifySourceCode: true,
+    });
+    console.log('TestContract deployed at:', unsRegistry);
+
+    console.log('new proxy admin instance', await getProxyAdminInstance(ctx, await unsRegistry1.getAddress()));
+    console.log('new proxy admin instance2', await getProxyAdminInstance(ctx, unsRegistry1.target as string));
+  },
+
+  ensureDependencies: () => ({}),
+  //   config = merge(ctx.getDeployConfig(), config);
+  //
+  //   ensureUpgradable(config);
+  //
+  //   return {};
+  // },
+};
+
+async function getProxyAdminFactory (hre: HardhatRuntimeEnvironment, signer?: Signer): Promise<ContractFactory> {
+  return hre.ethers.getContractFactory(ProxyAdmin.abi, ProxyAdmin.bytecode, signer);
+}
+
+// deploys or fetches existing ProxyAdmin
+async function deployProxyAdmin (
+  ImplFactory: ContractFactory,
+  args: unknown[] | DeployProxyOptions = [],
+  opts: DeployProxyOptions = {},
+
+) {
+  const signer = getSigner(ImplFactory.runner);
+
+  const { provider } = hre.network;
+
+  const AdminFactory = await getProxyAdminFactory(hre, signer);
+  return await fetchOrDeployAdmin(provider, () => deploy(hre, opts, AdminFactory), opts);
+}
 
 export const deployCNSTask: Task = {
   tags: ['cns', 'full'],
@@ -139,6 +214,16 @@ export const deployCNSForwardersTask: Task = {
   },
 };
 
+const getProxyAdminInstance = async (ctx: Deployer, proxyAddress: string) => {
+  // const proxyAddress = ctx.getNetworkConfig() as unknown as string;
+  // console.log('proxyAddress', proxyAddress);
+
+  const proxyAdminAddress = await getAdminAddress(hre.network.provider, proxyAddress);
+  // Only compatible with v4 admins
+  const admin = await attachProxyAdminV4(hre, proxyAdminAddress);
+  return admin;
+};
+
 const deployUNSTask = {
   tags: ['uns', 'full'],
   priority: 10,
@@ -176,18 +261,21 @@ const deployUNSTask = {
 
       unsOperator = await deployProxy(await ethers.getContractFactory(ArtifactName.UNSOperator, owner));
 
-      proxyAdmin = await upgrades.admin.getInstance();
+      proxyAdmin = await getProxyAdminInstance(ctx, await unsOperator.getAddress());
       await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
 
-      unsRegistryImpl = await proxyAdmin.getProxyImplementation.staticCall(await unsRegistry.getAddress());
+      const addr = await getImplementationAddress(hre.network.provider, await unsRegistry.getAddress());
+
+
+      unsRegistryImpl = await getImplementationAddress(hre.network.provider, await unsRegistry.getAddress());
       await ctx.saveContractConfig(UnsContractName.UNSRegistry, unsRegistry, unsRegistryImpl, unsRegistry);
       await verify(ctx, unsRegistryImpl, []);
 
-      mintingManagerImpl = await proxyAdmin.getProxyImplementation.staticCall(await mintingManager.getAddress());
+      mintingManagerImpl = await getImplementationAddress(hre.network.provider, await mintingManager.getAddress());
       await ctx.saveContractConfig(UnsContractName.MintingManager, mintingManager, mintingManagerImpl);
       await verify(ctx, mintingManagerImpl, []);
 
-      unsOperatorImpl = await proxyAdmin.getProxyImplementation.staticCall(await unsOperator.getAddress());
+      unsOperatorImpl = await getImplementationAddress(hre.network.provider, await unsOperator.getAddress());
       await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);
       await verify(ctx, unsOperatorImpl, []);
     } else {
@@ -279,10 +367,10 @@ const deployUNSProxyReaderTask: Task = {
     );
     await proxyReader.waitForDeployment();
 
-    const proxyAdmin = await upgrades.admin.getInstance();
+    const proxyAdmin = await getProxyAdminInstance(ctx, await proxyReader.target as string);
     await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
 
-    const proxyReaderImpl = await proxyAdmin.getProxyImplementation.staticCall(await getContractAddress(proxyReader));
+    const proxyReaderImpl = await getImplementationAddress(hre.network.provider, await getContractAddress(proxyReader));
     await ctx.saveContractConfig(UnsContractName.ProxyReader, proxyReader, proxyReaderImpl);
     await verify(ctx, proxyReaderImpl, []);
 
@@ -394,10 +482,10 @@ const deployUNSOperatorTask: Task = {
     );
     await unsOperator.waitForDeployment();
 
-    const proxyAdmin = await upgrades.admin.getInstance();
+    const proxyAdmin = await getProxyAdminInstance(ctx, await unsOperator.getAddress());
     await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
 
-    const unsOperatorImpl = await proxyAdmin.getProxyImplementation.staticCall(unsOperator.address);
+    const unsOperatorImpl = await getImplementationAddress(hre.network.provider, await unsOperator.getAddress());
     await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);
     await verify(ctx, unsOperatorImpl, []);
   },
@@ -432,8 +520,8 @@ const deployZilliqaRecoverTask: Task = {
       await mintingManager.addMinter(await zilliqaRecover.getAddress());
     }
 
-    const proxyAdmin = await upgrades.admin.getInstance();
-    const zilliqaRecoverImpl = await proxyAdmin.getProxyImplementation.staticCall(await zilliqaRecover.getAddress());
+    const proxyAdmin = await getProxyAdminInstance(ctx, await zilliqaRecover.getAddress());
+    const zilliqaRecoverImpl = await getImplementationAddress(hre.network.provider, await zilliqaRecover.getAddress());
 
     await ctx.saveContractConfig(UnsContractName.ZilliqaRecover, zilliqaRecover, zilliqaRecoverImpl, zilliqaRecover);
     await verify(ctx, zilliqaRecoverImpl, []);
@@ -458,10 +546,10 @@ const upgradeUNSRegistryTask: Task = {
     );
     await unsRegistry.waitForDeployment();
 
-    const proxyAdmin = await upgrades.admin.getInstance();
+    const proxyAdmin = await getProxyAdminInstance(ctx, await unsRegistry.getAddress());
     await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
 
-    const unsRegistryImpl = await proxyAdmin.getProxyImplementation.staticCall(unsRegistry.address);
+    const unsRegistryImpl = await getImplementationAddress(hre.network.provider, await unsRegistry.getAddress());
     await ctx.saveContractConfig(UnsContractName.UNSRegistry, unsRegistry, unsRegistryImpl, unsRegistry);
     await verify(ctx, unsRegistryImpl, []);
   },
@@ -486,10 +574,10 @@ const upgradeMintingManagerTask: Task = {
     );
     await mintingManager.waitForDeployment();
 
-    const proxyAdmin = await upgrades.admin.getInstance();
+    const proxyAdmin = await getProxyAdminInstance(ctx, await mintingManager.getAddress());
     await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
 
-    const mintingManagerImpl = await proxyAdmin.getProxyImplementation.staticCall(mintingManager.address);
+    const mintingManagerImpl = await getImplementationAddress(hre.network.provider, await mintingManager.getAddress());
     await ctx.saveContractConfig(UnsContractName.MintingManager, mintingManager, mintingManagerImpl);
     await verify(ctx, mintingManagerImpl, []);
   },
@@ -515,10 +603,10 @@ const upgradeProxyReaderTask: Task = {
     );
     await proxyReader.waitForDeployment();
 
-    const proxyAdmin = await upgrades.admin.getInstance();
+    const proxyAdmin = await getProxyAdminInstance(ctx, await proxyReader.getAddress());
     await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
 
-    const proxyReaderImpl = await proxyAdmin.getProxyImplementation.staticCall(proxyReader.address);
+    const proxyReaderImpl = await getImplementationAddress(hre.network.provider, await proxyReader.getAddress());
 
     await ctx.saveContractConfig(UnsContractName.ProxyReader, proxyReader, proxyReaderImpl);
     await verify(ctx, proxyReaderImpl, []);
@@ -543,10 +631,10 @@ const upgradeUNSOperatorTask: Task = {
     );
     await unsOperator.waitForDeployment();
 
-    const proxyAdmin = await upgrades.admin.getInstance();
+    const proxyAdmin = await getProxyAdminInstance(ctx, await unsOperator.getAddress());
     await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
 
-    const unsOperatorImpl = await proxyAdmin.getProxyImplementation.staticCall(unsOperator.address);
+    const unsOperatorImpl = await getImplementationAddress(hre.network.provider, await unsOperator.getAddress());
 
     await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);
     await verify(ctx, unsOperatorImpl, []);
@@ -975,10 +1063,10 @@ const deployENSCustodyTask: Task = {
     ]);
     await custody.waitForDeployment();
 
-    const proxyAdmin = await upgrades.admin.getInstance();
+    const proxyAdmin = await getProxyAdminInstance(ctx, await custody.getAddress());
     await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
 
-    const custodyImpl = await proxyAdmin.getProxyImplementation.staticCall(await custody.getAddress());
+    const custodyImpl = await getImplementationAddress(hre.network.provider, await custody.getAddress());
     await ctx.saveContractConfig(EnsContractName.ENSCustody, custody, custodyImpl, custody);
     await verify(ctx, custodyImpl, []);
 
@@ -1128,8 +1216,8 @@ const deploySeaportProxyBuyerTask: Task = {
         ctx.log(`Added ${array.length} minters`);
       }
     }
-    const proxyAdmin = await upgrades.admin.getInstance();
-    const seaportProxyBuyerImpl = await proxyAdmin.getProxyImplementation.staticCall(
+    const seaportProxyBuyerImpl = await getImplementationAddress(
+      hre.network.provider,
       await seaportProxyBuyer.getAddress(),
     );
     await ctx.saveContractConfig(
@@ -1178,6 +1266,7 @@ const fundSeaportProxyBuyerTask: Task = {
 };
 
 export const tasks: Task[] = [
+  deployCreate2Task,
   deployCNSTask,
   deployCNSForwardersTask,
   deployUNSTask,
