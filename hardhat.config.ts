@@ -231,8 +231,15 @@ const config: HardhatUserConfig = {
     },
   },
   defender: {
-    apiKey: process.env.DEFENDER_API_KEY || '',
-    apiSecret: process.env.DEFENDER_API_SECRET || '',
+    // defender api key
+    apiKey: '7wzKbxmmhiXScEma3YtkNMRkKqURDji6',
+    apiSecret: '5ZuH11VUqe8fS2t3UcyuNj3JdwocWNTWas23xtUQ8Y5LuSgdU3tKppd34pTmy3jn',
+    //relayer api key
+    // apiKey: 'EY2FptEy734PeWmkBbVtc7CEyHg5zBhs',
+    // apiSecret: 'QkBkG7zLGbiqxLwwjm5roYohqHgMuscbdSspTC2HrjZPPugHyESumANwpXgJDihs',
+    // apiKey: process.env.DEFENDER_API_KEY || '',
+    // apiSecret: process.env.DEFENDER_API_SECRET || '',
+    // useDefenderDeploy: true,
   },
 };
 

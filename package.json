@@ -45,7 +45,7 @@
     "@nomiclabs/hardhat-solhint": "^3.0.1",
     "@opensea/seaport-js": "^4.0.0",
     "@openzeppelin/contracts-upgradeable": "^4.7.3",
-    "@openzeppelin/hardhat-upgrades": "^2.0.0",
+    "@openzeppelin/hardhat-upgrades": "^3.2.0",
     "@openzeppelin/upgrades-core": "^1.32.5",
     "@typechain/ethers-v6": "^0.5.0",
     "@typechain/hardhat": "^9.1.0",

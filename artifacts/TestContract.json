@@ -1,0 +1,50 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "TestContract",
+  "sourceName": "contracts/TestContract.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "getValue",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "setValue",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "value",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561000f575f80fd5b50608e8061001c5f395ff3fe6080604052348015600e575f80fd5b5060043610603a575f3560e01c80632096525514603e5780633fa4f2451460535780635524107714605a575b5f80fd5b5f545b60405190815260200160405180910390f35b60415f5481565b60696065366004606b565b5f55565b005b5f60208284031215607a575f80fd5b503591905056fea164736f6c6343000818000a",
+  "deployedBytecode": "0x6080604052348015600e575f80fd5b5060043610603a575f3560e01c80632096525514603e5780633fa4f2451460535780635524107714605a575b5f80fd5b5f545b60405190815260200160405180910390f35b60415f5481565b60696065366004606b565b5f55565b005b5f60208284031215607a575f80fd5b503591905056fea164736f6c6343000818000a",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

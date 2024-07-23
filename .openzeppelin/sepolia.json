@@ -29,6 +29,36 @@
       "address": "0x880F7D37E9E4EB6868F92F4bB9C8C0995178fdA9",
       "txHash": "0xb0b572cb5550908681a4937f3032d74e807e4749e076e7a2369a9f6a6287fb89",
       "kind": "transparent"
+    },
+    {
+      "address": "0xb423121CcdaE68f2Fde964e3D3137931005dEcec",
+      "txHash": "0x2fb79a076351c6d7e36cf6b5f458634ea4c5da803b05f1be709ed98400d1c128",
+      "remoteDeploymentId": "68137174-15d7-415b-a371-3a4af7b5dd3b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x01892a42e2C1c3008BD3c4D9d3dDBe4303690ee6",
+      "txHash": "0xa7e36fac8b4a8272aeed6a28e4959348b46c1f8581b2b2d9f7279b1889e5fe77",
+      "remoteDeploymentId": "0730eae4-16de-4721-923c-4b8c91be37b3",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x92501B454B90d15104b3ffb01D91B02d47BC3d82",
+      "txHash": "0x27ebbe81a9b9160fea699038dd43cc465c804f0e4f27f2583afc54ae5e1f922c",
+      "remoteDeploymentId": "1952b394-1278-4fb0-b968-23258347bb79",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe43ebB9a5Ce41fa96Bea7017955062848312Bade",
+      "txHash": "0xf2d7ec5ecdc665132f994b9bbeebf59ee0e7468d9d1ed2b34c46181822ba3842",
+      "remoteDeploymentId": "e5333af4-4bc6-4407-bcac-9443b1e2e7fb",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9c0EfaDB3C9eB20f39AC965c68f79E47f3E0a002",
+      "txHash": "0x375ecbc59073a8feb3551633fedca68515b1e4f42f99cb8465a95daec1574552",
+      "remoteDeploymentId": "79691ea8-3a45-418d-9517-b1dc12e766c2",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -984,6 +1014,31 @@
             "numberOfBytes": "1"
           }
         }
+      }
+    },
+    "d3aa8e7452952928b0040dfdb8ce166b4002a9f4e0fa984d1d53a16ffea79313": {
+      "address": "0x12E2Aa169A432A8AA32777e975F89fAFc37FedE5",
+      "txHash": "0x90fcb8a22026f8f73446455aa061602a607391680f78cc0bd097e4ec664af492",
+      "remoteDeploymentId": "21b460e6-5b29-4799-b2e6-2a02b514d401",
+      "layout": {
+        "solcVersion": "0.8.24",
+        "storage": [
+          {
+            "label": "value",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256",
+            "contract": "TestContract",
+            "src": "contracts/TestContract.sol:4"
+          }
+        ],
+        "types": {
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        "namespaces": {}
       }
     }
   }

@@ -3,6 +3,7 @@
  * values are paths the specific contracts
  */
 export enum ArtifactName {
+  TestContract = 'TestContract',
   CNSRegistry = 'CNSRegistry',
   CNSRegistryForwarder = 'CNSRegistryForwarder',
   SignatureController = 'SignatureController',
