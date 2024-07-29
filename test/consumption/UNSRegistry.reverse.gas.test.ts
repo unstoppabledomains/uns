@@ -22,7 +22,7 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
 
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistry.mintTLD(TLD.X, 'x');
+    await unsRegistry.mintTLD(TLD.x.hash, 'x');
 
     buildExecuteParams = buildExecuteFunc(unsRegistry.interface, await unsRegistry.getAddress(), unsRegistry);
   });

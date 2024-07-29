@@ -43,7 +43,7 @@ describe('SeaportProxyBuyer (consumption)', () => {
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
     await unsRegistry.addProxyReader(reader.address);
 

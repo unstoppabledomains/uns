@@ -28,8 +28,8 @@ describe('ProxyReader (UNS only)', () => {
     await unsRegistry.setTokenURIPrefix('/');
 
     // mint TLDs
-    await unsRegistry.mintTLD(TLD.WALLET, 'wallet');
-    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistry.mintTLD(TLD.wallet.hash, 'wallet');
+    await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
 
     // mint .wallet
     walletTokenId = await mintDomain({
@@ -307,11 +307,11 @@ describe('ProxyReader (UNS only)', () => {
       });
 
       it('should return true for .crypto TLD', async () => {
-        expect(await proxyReader.exists(TLD.CRYPTO)).to.be.equal(true);
+        expect(await proxyReader.exists(TLD.crypto.hash)).to.be.equal(true);
       });
 
       it('should return true for .wallet TLD', async () => {
-        expect(await proxyReader.exists(TLD.WALLET)).to.be.equal(true);
+        expect(await proxyReader.exists(TLD.wallet.hash)).to.be.equal(true);
       });
     });
 
@@ -970,12 +970,12 @@ describe('ProxyReader (UNS only)', () => {
     });
 
     it('should return value for .crypto TLD', async () => {
-      const address = await proxyReader.registryOf(TLD.CRYPTO);
+      const address = await proxyReader.registryOf(TLD.crypto.hash);
       expect(address).to.be.equal(await unsRegistry.getAddress());
     });
 
     it('should return value for .wallet TLD', async () => {
-      const address = await proxyReader.registryOf(TLD.WALLET);
+      const address = await proxyReader.registryOf(TLD.wallet.hash);
       expect(address).to.be.equal(await unsRegistry.getAddress());
     });
   });

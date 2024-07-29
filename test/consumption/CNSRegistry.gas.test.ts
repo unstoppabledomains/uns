@@ -24,7 +24,7 @@ describe('CNSRegistry (consumption)', () => {
 
   const mintDomain = async (label: string, owner: string) => {
     await mintingController.mintSLD(owner, label);
-    return await registry.childIdOf(TLD.CRYPTO, label);
+    return await registry.childIdOf(TLD.crypto.hash, label);
   };
 
   before(async () => {

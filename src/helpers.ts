@@ -3,9 +3,17 @@ import {
   DeployProxyOptions,
   UpgradeProxyOptions,
 } from '@openzeppelin/hardhat-upgrades/dist/utils';
-import type { BaseContract, ContractFactory } from 'ethers';
+import { BaseContract, ContractFactory, ethers } from 'ethers';
 import { network, upgrades } from 'hardhat';
-import { DependenciesMap, ContractName, NsNetworkConfig } from './types';
+import { MintingManager } from '../types';
+import { NetworkChainIds, TLD, TLDConfig } from '../test/helpers/constants';
+import { ContractName, DependenciesMap, NsNetworkConfig } from './types';
+import { NameService } from './config';
+
+export const isSandbox = network.config.chainId === 1337 || network.config.chainId === 31337;
+export const isTestnet = network.config.chainId === 80002 ||
+  network.config.chainId === 11155111 ||
+  network.config.chainId === 84532;
 
 export const ensureDeployed = (config: NsNetworkConfig, ...contracts: ContractName[]): DependenciesMap => {
   return contracts
@@ -55,3 +63,36 @@ export const upgradeProxy = async <T extends BaseContract>(
 export const getContractAddress = async (contract: BaseContract): Promise<string> => {
   return contract.getAddress();
 };
+
+export const mintUnsTlds = async (mintingManager: MintingManager, owner: ethers.Signer) => {
+  const tlds = Object.entries(TLD)
+    .filter(([, config]) => config.nameServices.includes(NameService.UNS))
+    .filter(([, tldConfig]) => applyfilterTldsByChainId(tldConfig));
+
+  for (const [tldName, tldConfig] of tlds) {
+    const correctTldName = tldName.toLowerCase();
+    const mintTx = await mintingManager.connect(owner).addTld(correctTldName, tldConfig.expirable ?? false);
+    await mintTx.wait();
+  }
+};
+
+export function getExpirableTlds (): string[] {
+  return Object.entries(TLD)
+    .filter(([, tldConfig]) => tldConfig.expirable)
+    .filter(([, tldConfig]) => applyfilterTldsByChainId(tldConfig))
+    .map(([tld]) => tld);
+}
+
+function applyfilterTldsByChainId (tldConfig: TLDConfig): boolean {
+  const chainId = network.config.chainId!;
+  if (tldConfig.chainIds.length === 0) {
+    return false;
+  }
+  if (isSandbox) {
+    return true;
+  }
+
+  return tldConfig.chainIds
+    .flatMap((n) => NetworkChainIds[n])
+    .includes(chainId);
+}

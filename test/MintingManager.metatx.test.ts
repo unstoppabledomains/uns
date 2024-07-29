@@ -7,7 +7,7 @@ import { MintingManagerForwarder } from '../types/contracts/metatx';
 import { MintingManager__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { MintingManagerForwarder__factory } from '../types/factories/contracts/metatx';
 import { ERC20Mock, ERC20Mock__factory } from '../types';
-import { deployProxy } from '../src/helpers';
+import { deployProxy, mintUnsTlds } from '../src/helpers';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 import { ZERO_ADDRESS } from './helpers/constants';
 import { getLatestBlockTimestamp } from './helpers/utils';
@@ -42,6 +42,7 @@ describe('MintingManager (metatx)', () => {
     );
     await mintingManager.addMinter(await coinbase.getAddress());
     await mintingManager.setTokenURIPrefix('/');
+    await mintUnsTlds(mintingManager, coinbase);
 
     buildExecuteParams = buildExecuteFunc(mintingManager.interface, await mintingManager.getAddress(), forwarder);
   });

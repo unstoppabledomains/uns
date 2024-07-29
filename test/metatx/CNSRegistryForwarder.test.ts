@@ -26,7 +26,7 @@ describe('CNSRegistryForwarder', () => {
 
   const mintDomain = async (label: string, owner: string) => {
     await mintingController.mintSLD(owner, label);
-    return await registry.childIdOf(TLD.CRYPTO, label);
+    return await registry.childIdOf(TLD.crypto.hash, label);
   };
 
   const buildTransfer = async (from: SignerWithAddress, toAddress: string, tokenId: BigNumberish) => {

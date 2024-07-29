@@ -22,7 +22,7 @@ describe('BaseRoutingForwarder', () => {
 
   const mintDomain = async (label: string, owner: string) => {
     await mintingController.mintSLD(owner, label);
-    return await registry.childIdOf(TLD.CRYPTO, label);
+    return await registry.childIdOf(TLD.crypto.hash, label);
   };
 
   let buildExecuteParams: ExecuteFunc, buildExecuteRoutingParams: ExecuteFunc;
@@ -54,7 +54,7 @@ describe('BaseRoutingForwarder', () => {
   });
 
   it('should build valid `transferFrom` route calldata', async () => {
-    const tokenId = await registry.childIdOf(TLD.CRYPTO, 'test_foob_1');
+    const tokenId = await registry.childIdOf(TLD.crypto.hash, 'test_foob_1');
     const { req, signature } = await buildTransfer(owner, receiver.address, tokenId);
 
     const expectedData = signatureController.interface.encodeFunctionData('transferFromFor', [
@@ -69,7 +69,7 @@ describe('BaseRoutingForwarder', () => {
   });
 
   it('should build valid `putString(string)` route calldata', async () => {
-    const tokenId = await registry.childIdOf(TLD.CRYPTO, 'test_foob_3');
+    const tokenId = await registry.childIdOf(TLD.crypto.hash, 'test_foob_3');
     const { req, signature } = await buildExecuteRoutingParams('putString(string)', ['vv'], owner, tokenId);
 
     const expectedData = forwarder.interface.encodeFunctionData('putStringFor', ['vv', signature]);
@@ -79,7 +79,7 @@ describe('BaseRoutingForwarder', () => {
   });
 
   it('should build valid `putUint(uint)` route calldata', async () => {
-    const tokenId = await registry.childIdOf(TLD.CRYPTO, 'test_foob_4');
+    const tokenId = await registry.childIdOf(TLD.crypto.hash, 'test_foob_4');
     const { req, signature } = await buildExecuteRoutingParams('putUint(uint256)', [1], owner, tokenId);
 
     const expectedData = forwarder.interface.encodeFunctionData('putUintFor', [1, signature]);
@@ -89,7 +89,7 @@ describe('BaseRoutingForwarder', () => {
   });
 
   it('should build valid `putUintArr(uint256[])` route calldata', async () => {
-    const tokenId = await registry.childIdOf(TLD.CRYPTO, 'test_foob_5');
+    const tokenId = await registry.childIdOf(TLD.crypto.hash, 'test_foob_5');
     const { req, signature } = await buildExecuteRoutingParams('putUintArr(uint256[])', [[1, 2]], owner, tokenId);
 
     const expectedData = forwarder.interface.encodeFunctionData('putUintArrFor', [[1, 2], signature]);

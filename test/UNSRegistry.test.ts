@@ -6,7 +6,8 @@ import { UNSRegistry } from '../types/contracts';
 import { UNSRegistryMock } from '../types/contracts/mocks';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { UNSRegistryMock__factory } from '../types/factories/contracts/mocks';
-import { EXPIRABLE_TLDS, TLD, ZERO_ADDRESS } from './helpers/constants';
+import { getExpirableTlds } from '../src/helpers';
+import { TLD, ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain, mintRandomDomain } from './helpers/registry';
 import { getLatestBlockTimestamp, increaseTimeBy } from './helpers/utils';
 
@@ -32,14 +33,14 @@ describe('UNSRegistry', () => {
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
 
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
     await unsRegistry.addProxyReader(reader.address);
 
     // mock
     unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
     await unsRegistryMock.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistryMock.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistryMock.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistryMock.setTokenURIPrefix('/');
     await unsRegistryMock.addProxyReader(reader.address);
   });
@@ -65,18 +66,18 @@ describe('UNSRegistry', () => {
     });
 
     it('should set URI prefix', async () => {
-      expect(await unsRegistry.tokenURI(TLD.CRYPTO)).to.be.equal(`/${TLD.CRYPTO}`);
+      expect(await unsRegistry.tokenURI(TLD.crypto.hash)).to.be.equal(`/${TLD.crypto.hash}`);
 
       await unsRegistry.setTokenURIPrefix('prefix-');
-      expect(await unsRegistry.tokenURI(TLD.CRYPTO)).to.be.equal(`prefix-${TLD.CRYPTO}`);
+      expect(await unsRegistry.tokenURI(TLD.crypto.hash)).to.be.equal(`prefix-${TLD.crypto.hash}`);
 
       await unsRegistry.setTokenURIPrefix('/');
-      expect(await unsRegistry.tokenURI(TLD.CRYPTO)).to.be.equal(`/${TLD.CRYPTO}`);
+      expect(await unsRegistry.tokenURI(TLD.crypto.hash)).to.be.equal(`/${TLD.crypto.hash}`);
     });
 
-    for (const key of Object.keys(TLD)) {
+    for (const key in TLD) {
       it(`should be possible to mint .${key} domain`, async () => {
-        const expiry = EXPIRABLE_TLDS.includes(key) ? latestBlockTimestamp + 60 * 60 * 24 : 0;
+        const expiry = getExpirableTlds().includes(key) ? latestBlockTimestamp + 60 * 60 * 24 : 0;
 
         const tokenId = await mintDomain({
           unsRegistry,

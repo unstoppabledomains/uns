@@ -39,7 +39,7 @@ describe('ProxyReader (proxy)', () => {
     );
 
     // add TLD
-    await unsRegistry.mintTLD(TLD.WALLET, 'wallet');
+    await unsRegistry.mintTLD(TLD.wallet.hash, 'wallet');
 
     // mint domain
     walletTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: ['test-proxy-proxy-reader', 'wallet'] });

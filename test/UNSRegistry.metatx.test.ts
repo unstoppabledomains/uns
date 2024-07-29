@@ -29,7 +29,7 @@ describe('UNSRegistry (metatx)', () => {
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
 
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
 
     buildExecuteParams = buildExecuteFunc(unsRegistry.interface, await unsRegistry.getAddress(), unsRegistry);
@@ -554,7 +554,7 @@ describe('UNSRegistry (metatx)', () => {
       ];
 
       before(async () => {
-        paramValueMap.tld = TLD.CRYPTO;
+        paramValueMap.tld = TLD.crypto.hash;
         paramValueMap.account = accessControl.address;
         paramValueMap.to = owner.address;
         paramValueMap.operator = operator.address;

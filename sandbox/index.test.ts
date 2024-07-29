@@ -6,7 +6,12 @@ import { AbiCoder } from 'ethers';
 import { NameService, getNetworkConfig } from '../src/config';
 import { MintingManager, UNSRegistry } from '../types';
 import { unwrap } from '../src/utils';
-import { BUFFERED_REGISTRATION_COST, REGISTRATION_TIME, TLD, ZERO_ADDRESS } from '../test/helpers/constants';
+import {
+  BUFFERED_REGISTRATION_COST,
+  REGISTRATION_TIME,
+  TLD,
+  ZERO_ADDRESS,
+} from '../test/helpers/constants';
 import {
   CNSRegistry,
   CNSRegistry__factory,
@@ -74,6 +79,15 @@ describe('Sandbox', async () => {
   });
 
   describe('UNS', () => {
+    it('should mint all TLDs', async () => {
+      const unsTlds = Object.entries(TLD)
+        .filter(([, tldConfig]) => tldConfig.nameServices.includes(NameService.UNS));
+
+      for (const [, config] of unsTlds) {
+        expect(await unsRegistry.exists(config.hash)).to.be.true;
+      }
+    });
+
     it('should mint a token', async () => {
       const labels = [`${domainPrefix}-wallet-0`, 'wallet'];
 
@@ -100,13 +114,13 @@ describe('Sandbox', async () => {
       const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], [], false);
       await tx.wait();
 
-      const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, domainPrefix);
+      const tokenId = await cnsRegistry.childIdOf(TLD.crypto.hash, domainPrefix);
       expect(await cnsRegistry.ownerOf(tokenId)).to.be.eq(owner.address);
     });
 
     it('should migrate token from CNS to UNS', async () => {
       const labels = [domainPrefix, 'crypto'];
-      const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, domainPrefix);
+      const tokenId = await cnsRegistry.childIdOf(TLD.crypto.hash, domainPrefix);
 
       const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], [], false);
       await tx.wait();
@@ -128,7 +142,7 @@ describe('Sandbox', async () => {
 
     it('should migrate token from CNS to UNS L2', async () => {
       const labels = [domainPrefix, 'crypto'];
-      const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, domainPrefix);
+      const tokenId = await cnsRegistry.childIdOf(TLD.crypto.hash, domainPrefix);
 
       const tx = await mintingManager.connect(minter).issueWithRecords(owner.address, labels, [], [], false);
       await tx.wait();
@@ -144,7 +158,7 @@ describe('Sandbox', async () => {
       // Somehow error cannot be decoded automatically here, used try...catch
       try {
         await cnsRegistry.ownerOf.staticCall(tokenId);
-        assert.fail('Error is ecpected');
+        assert.fail('Error is expected');
       } catch (error) {}
     });
 
@@ -152,7 +166,7 @@ describe('Sandbox', async () => {
       const tx = await zilliqaRecover.connect(minter).mint(domainPrefix, owner.address);
       await tx.wait();
 
-      const tokenId = await cnsRegistry.childIdOf(TLD.ZIL, domainPrefix);
+      const tokenId = await cnsRegistry.childIdOf(TLD.zil.hash, domainPrefix);
       expect(await unsRegistry.ownerOf(tokenId)).to.be.eq(await zilliqaRecover.getAddress());
       expect(await zilliqaRecover.znsOwnerOf(tokenId)).to.be.eq(owner.address);
     });

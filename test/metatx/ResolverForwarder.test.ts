@@ -26,12 +26,12 @@ describe('ResolverForwarder', () => {
   const mintDomain = async (label: string, owner: string, resolverAddress?: string): Promise<bigint> => {
     await mintingController.mintSLDWithResolver(owner, label, resolverAddress ?? (await resolver.getAddress()));
 
-    return await registry.childIdOf(TLD.CRYPTO, label);
+    return await registry.childIdOf(TLD.crypto.hash, label);
   };
 
   const mintDomainWithoutResolver = async (label: string, owner: string): Promise<bigint> => {
     await mintingController.mintSLD(owner, label);
-    return await registry.childIdOf(TLD.CRYPTO, label);
+    return await registry.childIdOf(TLD.crypto.hash, label);
   };
 
   before(async () => {
