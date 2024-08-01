@@ -509,6 +509,53 @@
                 }
             }
         },
+        "84532": {
+            "contracts": {
+                "Seaport": {
+                    "address": "0x0000000000000068F116a894984e2DB1123eB395",
+                    "deploymentBlock": "0x0",
+                    "legacyAddresses": []
+                },
+                "ProxyAdmin": {
+                    "address": "0xd57f8F7be4BaE8f2bf24792Fec2Ca06513c83c1D",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0xcbf182"
+                },
+                "UNSRegistry": {
+                    "address": "0xEc353DCE22C2B97814608A6b2e44889506A4Aabf",
+                    "deploymentBlock": "0xcbf184",
+                    "implementation": "0xD0AB7f2490736c60575123aF2Ce0D2D6b13D5490",
+                    "forwarder": "0xEc353DCE22C2B97814608A6b2e44889506A4Aabf",
+                    "legacyAddresses": []
+                },
+                "MintingManager": {
+                    "address": "0x050Ceb85167D510558E793a483b479f2917B4b9b",
+                    "deploymentBlock": "0xcbf18d",
+                    "implementation": "0x6B5F9068Aa94eFf728585665244cb5AB8735E71A",
+                    "forwarder": "0xEa5AE30C714ccd63Fca6D791Eea1E26CB1be0c1d",
+                    "legacyAddresses": []
+                },
+                "UNSOperator": {
+                    "address": "0x99d55A02f5d9c76d31C6Ff57cc36A7862D5E1029",
+                    "deploymentBlock": "0xcbf193",
+                    "implementation": "0x3a2Ad968667a8214BEAe6AfA45192DD24109a3e7",
+                    "legacyAddresses": []
+                },
+                "ProxyReader": {
+                    "address": "0x8Fc4DBA4A6F5AE8992E8f9B64D6d995BD3AfE2c4",
+                    "deploymentBlock": "0xcbf1a9",
+                    "implementation": "0x37e22Fd398B8c95128f5235e991682cF6e9F5d9c",
+                    "legacyAddresses": []
+                },
+                "SeaportProxyBuyer": {
+                    "address": "0x78c4B414e1AbdF0dE267deDa01DFFd4cd0817A16",
+                    "deploymentBlock": "0xcbf1b5",
+                    "implementation": "0x6C95A12CcEA79971C51b16f707D8CdDd7d1b5033",
+                    "forwarder": "0x78c4B414e1AbdF0dE267deDa01DFFd4cd0817A16",
+                    "legacyAddresses": []
+                }
+            }
+        },
         "11155111": {
             "contracts": {
                 "ProxyAdmin": {
