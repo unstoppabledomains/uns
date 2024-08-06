@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { BigNumberish } from 'ethers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ExecuteFunc, buildExecuteFunc, sign } from '../helpers/metatx';
-import { TLD } from '../helpers/constants';
+import { TLD } from '../../src/tlds';
 import { CNSRegistry } from '../../types/dot-crypto/contracts';
 import { MintingController, SignatureController } from '../../types/dot-crypto/contracts/controllers';
 import { CNSRegistry__factory } from '../../types/factories/dot-crypto/contracts';

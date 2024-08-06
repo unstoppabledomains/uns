@@ -4,8 +4,9 @@ import { BigNumberish, FunctionFragment, id, Fragment, BaseContract, solidityPac
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
+import { TLD } from '../src/tlds';
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain, mintRandomDomain } from './helpers/registry';
 import { getFuncSignature } from './helpers/proxy';
 import { getLatestBlockTimestamp, increaseTimeBy } from './helpers/utils';

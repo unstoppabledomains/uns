@@ -9,7 +9,6 @@ import { unwrap } from '../src/utils';
 import {
   BUFFERED_REGISTRATION_COST,
   REGISTRATION_TIME,
-  TLD,
   ZERO_ADDRESS,
 } from '../test/helpers/constants';
 import {
@@ -25,6 +24,7 @@ import {
   ZilliqaRecover__factory,
 } from '../types';
 import { increaseTimeBy } from '../test/helpers/utils';
+import { TLD } from '../src/tlds';
 import { Sandbox } from '.';
 
 describe('Sandbox', async () => {

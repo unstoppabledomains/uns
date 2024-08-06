@@ -7,7 +7,8 @@ import { UNSRegistryMock } from '../types/contracts/mocks';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { UNSRegistryMock__factory } from '../types/factories/contracts/mocks';
 import { getExpirableTlds } from '../src/helpers';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { TLD } from '../src/tlds';
+import { ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain, mintRandomDomain } from './helpers/registry';
 import { getLatestBlockTimestamp, increaseTimeBy } from './helpers/utils';
 

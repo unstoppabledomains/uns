@@ -4,9 +4,10 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { id } from 'ethers';
 import { ProxyReader, UNSRegistry } from '../types/contracts';
 import { ProxyReader__factory, UNSRegistry__factory } from '../types/factories/contracts';
+import { TLD } from '../src/tlds';
 import { getInterfaceId } from './helpers/proxy';
 import { mintDomain } from './helpers/registry';
-import { ZERO_ADDRESS, TLD } from './helpers/constants';
+import { ZERO_ADDRESS } from './helpers/constants';
 
 describe('ProxyReader (UNS only)', () => {
   const domainName = 'test_42';

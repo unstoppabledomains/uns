@@ -6,8 +6,9 @@ import { UNSRegistry } from '../types/contracts';
 import { UNSRegistryMock } from '../types/contracts/mocks';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { UNSRegistryMock__factory } from '../types/factories/contracts/mocks';
+import { TLD } from '../src/tlds';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain } from './helpers/registry';
 
 describe('UNSRegistry (reverse)', () => {

@@ -2,7 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
-import { TLD } from '../helpers/constants';
+import { TLD } from '../../src/tlds';
 import { ResolverForwarder } from '../../types/contracts/metatx';
 import { CNSRegistry, Resolver } from '../../types/dot-crypto/contracts';
 import { MintingController, SignatureController } from '../../types/dot-crypto/contracts/controllers';
