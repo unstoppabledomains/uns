@@ -6,8 +6,9 @@ import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { UNSRegistryV07__factory } from '../types';
 import { deployProxy, upgradeProxy } from '../src/helpers';
+import { TLD } from '../src/tlds';
 import { mintDomain } from './helpers/registry';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { ZERO_ADDRESS } from './helpers/constants';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 
 describe('UNSRegistry (proxy)', () => {

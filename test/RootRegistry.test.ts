@@ -23,9 +23,10 @@ import { MintableERC721Predicate } from '../types/contracts/@maticnetwork/pos-po
 import { DummyStateSender } from '../types/contracts/@maticnetwork/pos-portal/DummyStateSender.sol';
 import { SimpleCheckpointManager } from '../types/contracts/@maticnetwork/pos-portal/SimpleCheckpointManager.sol';
 import { mintUnsTlds } from '../src/helpers';
+import { TLD } from '../src/tlds';
 import { buildPredicateExitInput, writeCheckpoint, buildExitInput } from './helpers/polygon';
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { ZERO_ADDRESS } from './helpers/constants';
 import { getLatestBlockTimestamp } from './helpers/utils';
 
 describe('RootRegistry', () => {

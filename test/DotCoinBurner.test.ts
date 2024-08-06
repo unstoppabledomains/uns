@@ -5,7 +5,8 @@ import { solidityPackedKeccak256 } from 'ethers';
 import { DotCoinBurner__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { DotCoinBurner, UNSRegistry } from '../types/contracts';
 import { getExpirableTlds } from '../src/helpers';
-import { TLD, DEAD_ADDRESS, ZERO_ADDRESS } from './helpers/constants';
+import { TLD } from '../src/tlds';
+import { DEAD_ADDRESS, ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain } from './helpers/registry';
 import { getLatestBlockTimestamp } from './helpers/utils';
 

@@ -9,8 +9,9 @@ import { MintingController } from '../types/dot-crypto/contracts/controllers';
 import { CNSRegistry__factory, Resolver__factory } from '../types/factories/dot-crypto/contracts';
 import { MintingController__factory } from '../types/factories/dot-crypto/contracts/controllers';
 import { getContractAddress } from '../src/helpers';
+import { TLD } from '../src/tlds';
 import { mintDomain } from './helpers/registry';
-import { DEAD_ADDRESS, ZERO_ADDRESS, TLD } from './helpers/constants';
+import { DEAD_ADDRESS, ZERO_ADDRESS } from './helpers/constants';
 import { getInterfaceId } from './helpers/proxy';
 
 describe('ProxyReader', () => {

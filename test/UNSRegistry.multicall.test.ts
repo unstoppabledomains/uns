@@ -2,7 +2,8 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { UNSRegistry, UNSRegistry__factory } from '../types';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { TLD } from '../src/tlds';
+import { ZERO_ADDRESS } from './helpers/constants';
 
 describe('UNSRegistry (multicall)', () => {
   let unsRegistry: UNSRegistry;

@@ -24,7 +24,8 @@ import {
 } from '../types/factories/dot-crypto/contracts/controllers';
 import { ERC20UnsafeMock__factory } from '../types';
 import { mintUnsTlds } from '../src/helpers';
-import { ZERO_ADDRESS, TLD } from './helpers/constants';
+import { TLD } from '../src/tlds';
+import { ZERO_ADDRESS } from './helpers/constants';
 import { getLatestBlockTimestamp, increaseTimeBy } from './helpers/utils';
 
 describe('MintingManager', () => {

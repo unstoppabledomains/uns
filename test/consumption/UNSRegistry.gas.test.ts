@@ -3,7 +3,8 @@ import { ContractTransactionReceipt, id } from 'ethers';
 import { ethers } from 'hardhat';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
-import { TLD, ZERO_ADDRESS } from '../helpers/constants';
+import { ZERO_ADDRESS } from '../helpers/constants';
+import { TLD } from '../../src/tlds';
 import { percDiff } from '../helpers/consumption';
 
 describe('UNSRegistry (consumption)', () => {

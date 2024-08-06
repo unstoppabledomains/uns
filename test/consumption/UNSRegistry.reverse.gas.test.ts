@@ -4,7 +4,8 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
-import { TLD, ZERO_ADDRESS } from '../helpers/constants';
+import { ZERO_ADDRESS } from '../helpers/constants';
+import { TLD } from '../../src/tlds';
 import { mintDomain } from '../helpers/registry';
 
 describe('UNSRegistry Set Reverse (consumption)', () => {

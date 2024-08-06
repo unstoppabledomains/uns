@@ -9,9 +9,9 @@ import {
   MintingController__factory,
   SignatureController__factory,
 } from '../../types/factories/dot-crypto/contracts/controllers';
-import { TLD } from '../helpers/constants';
 import { percDiff } from '../helpers/consumption';
 import { sign, buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
+import { TLD } from '../../src/tlds';
 
 describe('CNSRegistry (consumption)', () => {
   let forwarder: CNSRegistryForwarder,
