@@ -6,14 +6,15 @@ import {
 import { BaseContract, ContractFactory, ethers } from 'ethers';
 import { network, upgrades } from 'hardhat';
 import { MintingManager } from '../types';
-import { NetworkChainIds, TLD, TLDConfig } from '../test/helpers/constants';
 import { ContractName, DependenciesMap, NsNetworkConfig } from './types';
 import { NameService } from './config';
+import { NetworkChainIds, TLD, TLDConfig } from './tlds';
 
-export const isSandbox = network.config.chainId === 1337 || network.config.chainId === 31337;
-export const isTestnet = network.config.chainId === 80002 ||
-  network.config.chainId === 11155111 ||
-  network.config.chainId === 84532;
+export const SANDBOX_NETWORK_IDS = [1337, 31337];
+export const TESTNET_NETWORK_IDS = [80002, 11155111, 84532];
+
+export const isSandbox = SANDBOX_NETWORK_IDS.includes(network.config.chainId ?? 0);
+export const isTestnet = TESTNET_NETWORK_IDS.includes(network.config.chainId ?? 0);
 
 export const ensureDeployed = (config: NsNetworkConfig, ...contracts: ContractName[]): DependenciesMap => {
   return contracts
@@ -67,7 +68,7 @@ export const getContractAddress = async (contract: BaseContract): Promise<string
 export const mintUnsTlds = async (mintingManager: MintingManager, owner: ethers.Signer) => {
   const tlds = Object.entries(TLD)
     .filter(([, config]) => config.nameServices.includes(NameService.UNS))
-    .filter(([, tldConfig]) => applyfilterTldsByChainId(tldConfig));
+    .filter(([, tldConfig]) => filterTldsByChainId(tldConfig));
 
   for (const [tldName, tldConfig] of tlds) {
     const correctTldName = tldName.toLowerCase();
@@ -79,20 +80,20 @@ export const mintUnsTlds = async (mintingManager: MintingManager, owner: ethers.
 export function getExpirableTlds (): string[] {
   return Object.entries(TLD)
     .filter(([, tldConfig]) => tldConfig.expirable)
-    .filter(([, tldConfig]) => applyfilterTldsByChainId(tldConfig))
+    .filter(([, tldConfig]) => filterTldsByChainId(tldConfig))
     .map(([tld]) => tld);
 }
 
-function applyfilterTldsByChainId (tldConfig: TLDConfig): boolean {
+function filterTldsByChainId (tldConfig: TLDConfig): boolean {
   const chainId = network.config.chainId!;
-  if (tldConfig.chainIds.length === 0) {
+  if (tldConfig.networks.length === 0) {
     return false;
   }
   if (isSandbox) {
     return true;
   }
 
-  return tldConfig.chainIds
+  return tldConfig.networks
     .flatMap((n) => NetworkChainIds[n])
     .includes(chainId);
 }
