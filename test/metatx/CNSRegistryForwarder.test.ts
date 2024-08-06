@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { BigNumberish } from 'ethers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
-import { TLD } from '../helpers/constants';
+import { TLD } from '../../src/tlds';
 import { CNSRegistry__factory, Resolver__factory } from '../../types/factories/dot-crypto/contracts';
 import {
   MintingController__factory,
@@ -26,7 +26,7 @@ describe('CNSRegistryForwarder', () => {
 
   const mintDomain = async (label: string, owner: string) => {
     await mintingController.mintSLD(owner, label);
-    return await registry.childIdOf(TLD.CRYPTO, label);
+    return await registry.childIdOf(TLD.crypto.hash, label);
   };
 
   const buildTransfer = async (from: SignerWithAddress, toAddress: string, tokenId: BigNumberish) => {

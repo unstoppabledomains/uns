@@ -23,7 +23,9 @@ import {
   URIPrefixController__factory,
 } from '../types/factories/dot-crypto/contracts/controllers';
 import { ERC20UnsafeMock__factory } from '../types';
-import { ZERO_ADDRESS, TLD } from './helpers/constants';
+import { mintUnsTlds } from '../src/helpers';
+import { TLD } from '../src/tlds';
+import { ZERO_ADDRESS } from './helpers/constants';
 import { getLatestBlockTimestamp, increaseTimeBy } from './helpers/utils';
 
 describe('MintingManager', () => {
@@ -73,6 +75,7 @@ describe('MintingManager', () => {
         ZERO_ADDRESS,
         ZERO_ADDRESS,
       );
+      await mintUnsTlds(mintingManager, coinbase);
     });
 
     it('should transfer ownership', async () => {
@@ -109,6 +112,7 @@ describe('MintingManager', () => {
         ZERO_ADDRESS,
       );
       await mintingManagerMock.addMinter(coinbase.address);
+      await mintUnsTlds(mintingManagerMock, coinbase);
 
       proxyReader = await new ProxyReader__factory(coinbase).deploy();
       await proxyReader.initialize(await unsRegistryMock.getAddress(), await cnsRegistry.getAddress());
@@ -167,6 +171,7 @@ describe('MintingManager', () => {
         ZERO_ADDRESS,
       );
       await mintingManager.addMinter(coinbase.address);
+      await mintUnsTlds(mintingManager, coinbase);
     });
 
     it('saves UNSOperator address', async () => {
@@ -209,6 +214,7 @@ describe('MintingManager', () => {
         ZERO_ADDRESS,
       );
       await mintingManager.addMinter(coinbase.address);
+      await mintUnsTlds(mintingManager, coinbase);
     });
 
     describe('addTld', async () => {
@@ -252,7 +258,7 @@ describe('MintingManager', () => {
 
       it('should have all supported tlds minted', async () => {
         for (const key of Object.keys(TLD)) {
-          expect(await unsRegistry.ownerOf(TLD[key])).to.be.equal(await mintingManager.getAddress());
+          expect(await unsRegistry.ownerOf(TLD[key].hash)).to.be.equal(await mintingManager.getAddress());
         }
       });
     });
@@ -306,6 +312,7 @@ describe('MintingManager', () => {
         ZERO_ADDRESS,
       );
       await mintingManager.setTokenURIPrefix('/');
+      await mintUnsTlds(mintingManager, coinbase);
     });
 
     beforeEach(() => {
@@ -314,14 +321,14 @@ describe('MintingManager', () => {
 
     describe('claim(uint256,string)', () => {
       it('should mint prefixed domain', async () => {
-        await mintingManager.connect(developer).claim(TLD.WALLET, domainSuffix);
+        await mintingManager.connect(developer).claim(TLD.wallet.hash, domainSuffix);
         const tokenId = await unsRegistry.namehash([`${DomainNamePrefix}${domainSuffix}`, 'wallet']);
 
         expect(await unsRegistry.tokenURI(tokenId)).to.be.equal(`/${tokenId}`);
       });
 
       it('should send domain to requester', async () => {
-        await mintingManager.connect(developer).claim(TLD.WALLET, domainSuffix);
+        await mintingManager.connect(developer).claim(TLD.wallet.hash, domainSuffix);
         const tokenId = await unsRegistry.namehash([`${DomainNamePrefix}${domainSuffix}`, 'wallet']);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(developer.address);
@@ -329,19 +336,20 @@ describe('MintingManager', () => {
 
       it('should revert minting same domain twice', async () => {
         const minter = mintingManager.connect(developer);
-        await minter.claim(TLD.WALLET, domainSuffix);
+        await minter.claim(TLD.wallet.hash, domainSuffix);
 
-        await expect(minter.claim(TLD.WALLET, domainSuffix)).to.be.revertedWith('MintingManager: TOKEN_BLOCKED');
+        await expect(minter.claim(TLD.wallet.hash, domainSuffix)).to.be.revertedWith('MintingManager: TOKEN_BLOCKED');
       });
 
       it('should revert minting legacy CNS free domains', async () => {
-        await expect(mintingManager.connect(developer).claim(TLD.WALLET, 'udtestdev-t1')).to.be.revertedWith(
+        await expect(mintingManager.connect(developer).claim(TLD.wallet.hash, 'udtestdev-t1')).to.be.revertedWith(
           'MintingManager: TOKEN_LABEL_PROHIBITED',
         );
       });
 
       it('should revert minting an expirable domain', async () => {
-        await expect(mintingManager.connect(developer).claim(TLD.COM, 'udtestdev-t1-expirable')).to.be.revertedWith(
+        await expect(mintingManager.connect(developer)
+          .claim(TLD.com.hash, 'udtestdev-t1-expirable')).to.be.revertedWith(
           'MintingManager: TLD_EXPIRABLE_MISMATCH',
         );
       });
@@ -349,7 +357,7 @@ describe('MintingManager', () => {
 
     describe('claimTo(address,uint256,string)', () => {
       it('should mint domain to receiver', async () => {
-        await mintingManager.connect(developer).claimTo(receiver.address, TLD.WALLET, domainSuffix);
+        await mintingManager.connect(developer).claimTo(receiver.address, TLD.wallet.hash, domainSuffix);
         const tokenId = await unsRegistry.namehash([`${DomainNamePrefix}${domainSuffix}`, 'wallet']);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
@@ -357,13 +365,13 @@ describe('MintingManager', () => {
 
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
-          mintingManager.connect(developer).claimTo(receiver.address, TLD.CRYPTO, 'udtestdev-t2'),
+          mintingManager.connect(developer).claimTo(receiver.address, TLD.crypto.hash, 'udtestdev-t2'),
         ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
 
       it('should revert minting an expirable domain', async () => {
         await expect(
-          mintingManager.connect(developer).claimTo(receiver.address, TLD.COM, 'udtestdev-t2-expirable'),
+          mintingManager.connect(developer).claimTo(receiver.address, TLD.com.hash, 'udtestdev-t2-expirable'),
         ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
       });
     });
@@ -371,7 +379,7 @@ describe('MintingManager', () => {
     describe('claimToWithRecords(address,uint256,string,string[],string[])', () => {
       it('should mint domain to receiver with predefined keys', async () => {
         const minter = mintingManager.connect(developer);
-        await minter.claimToWithRecords(receiver.address, TLD.WALLET, domainSuffix, ['key'], ['value']);
+        await minter.claimToWithRecords(receiver.address, TLD.wallet.hash, domainSuffix, ['key'], ['value']);
         const tokenId = await unsRegistry.namehash([`${DomainNamePrefix}${domainSuffix}`, 'wallet']);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
@@ -380,7 +388,7 @@ describe('MintingManager', () => {
 
       it('should mint domain with empty keys', async () => {
         const minter = mintingManager.connect(developer);
-        await minter.claimToWithRecords(receiver.address, TLD.WALLET, domainSuffix, [], []);
+        await minter.claimToWithRecords(receiver.address, TLD.wallet.hash, domainSuffix, [], []);
         const tokenId = await unsRegistry.namehash([`${DomainNamePrefix}${domainSuffix}`, 'wallet']);
 
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(receiver.address);
@@ -389,13 +397,15 @@ describe('MintingManager', () => {
 
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
-          mintingManager.connect(developer).claimToWithRecords(receiver.address, TLD.CRYPTO, 'udtestdev-t3', [], []),
+          mintingManager.connect(developer)
+            .claimToWithRecords(receiver.address, TLD.crypto.hash, 'udtestdev-t3', [], []),
         ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
 
       it('should revert minting an expirable domain', async () => {
         await expect(
-          mintingManager.connect(developer).claimTo(receiver.address, TLD.COM, 'udtestdev-t2-expirable'),
+          mintingManager.connect(developer)
+            .claimTo(receiver.address, TLD.com.hash, 'udtestdev-t2-expirable'),
         ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
       });
     });
@@ -421,6 +431,7 @@ describe('MintingManager', () => {
       );
       await mintingManager.addMinter(await coinbase.getAddress());
       await mintingManager.setTokenURIPrefix('/');
+      await mintUnsTlds(mintingManager, coinbase);
 
       mintingManagerMock = await new MintingManagerMock__factory(coinbase).deploy();
       unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
@@ -436,6 +447,8 @@ describe('MintingManager', () => {
       );
 
       await mintingManagerMock.addMinter(coinbase.address);
+
+      await mintUnsTlds(mintingManagerMock, coinbase);
     });
 
     describe('mint second level domain', () => {
@@ -648,13 +661,14 @@ describe('MintingManager', () => {
               mintingManager.issueWithRecords(coinbase.address, [label, 'test1', 'x'], [], [], true),
             ).to.be.revertedWith('MintingManager: LABEL_INVALID');
           }
-          await expect(mintingManager.claim(TLD.X, label)).to.be.revertedWith('MintingManager: LABEL_INVALID');
-          await expect(mintingManager.claimTo(coinbase.address, TLD.X, label)).to.be.revertedWith(
+          await expect(mintingManager.claim(TLD.x.hash, label)).to.be.revertedWith('MintingManager: LABEL_INVALID');
+          await expect(mintingManager.claimTo(coinbase.address, TLD.x.hash, label)).to.be.revertedWith(
             'MintingManager: LABEL_INVALID',
           );
-          await expect(mintingManager.claimToWithRecords(coinbase.address, TLD.X, label, [], [])).to.be.revertedWith(
-            'MintingManager: LABEL_INVALID',
-          );
+          await expect(mintingManager.claimToWithRecords(coinbase.address, TLD.x.hash, label, [], []))
+            .to.be.revertedWith(
+              'MintingManager: LABEL_INVALID',
+            );
         }
       });
 
@@ -701,6 +715,7 @@ describe('MintingManager', () => {
 
       await mintingManager.addMinter(await coinbase.getAddress());
       await mintingManager.setTokenURIPrefix('/');
+      await mintUnsTlds(mintingManager, coinbase);
     });
 
     beforeEach(async () => {
@@ -1078,6 +1093,7 @@ describe('MintingManager', () => {
         );
         await anotherMintingManager.addMinter(coinbase.address);
         await anotherMintingManager.setTokenURIPrefix('/');
+        await mintUnsTlds(anotherMintingManager, coinbase);
 
         const expiry = latestBlockTimestamp + 24 * 60 * 60;
         const price = ethers.parseEther('1');
@@ -1643,6 +1659,7 @@ describe('MintingManager', () => {
         );
         await anotherMintingManager.addMinter(coinbase.address);
         await anotherMintingManager.setTokenURIPrefix('/');
+        await mintUnsTlds(anotherMintingManager, coinbase);
 
         const expiry = latestBlockTimestamp + 24 * 60 * 60;
         const price = ethers.parseEther('1');
@@ -1776,19 +1793,20 @@ describe('MintingManager', () => {
       );
       await mintingManager.addMinter(coinbase.address);
       await mintingManager.setTokenURIPrefix('/');
+      await mintUnsTlds(mintingManager, coinbase);
     });
 
     it('should have registered all tlds', async () => {
       Object.values(TLD).forEach(async (tld) => {
-        expect(await unsRegistry.exists(tld)).to.be.equal(true);
+        expect(await unsRegistry.exists(tld.hash)).to.be.equal(true);
       });
     });
 
     describe('claim(uint256,string)', () => {
       it('should claim .crypto domain in CNS registry', async () => {
-        await mintingManager['claim(uint256,string)'](TLD.CRYPTO, 'test-c221');
+        await mintingManager['claim(uint256,string)'](TLD.crypto.hash, 'test-c221');
 
-        const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, `${DomainNamePrefix}test-c221`);
+        const tokenId = await cnsRegistry.childIdOf(TLD.crypto.hash, `${DomainNamePrefix}test-c221`);
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: invalid token ID');
 
@@ -1797,9 +1815,9 @@ describe('MintingManager', () => {
       });
 
       it('should claim .wallet domain in UNS registry', async () => {
-        await mintingManager['claim(uint256,string)'](TLD.WALLET, 'test-c029');
+        await mintingManager['claim(uint256,string)'](TLD.wallet.hash, 'test-c029');
 
-        const tokenId = await cnsRegistry.childIdOf(TLD.WALLET, `${DomainNamePrefix}test-c029`);
+        const tokenId = await cnsRegistry.childIdOf(TLD.wallet.hash, `${DomainNamePrefix}test-c029`);
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
@@ -1809,9 +1827,9 @@ describe('MintingManager', () => {
 
     describe('claimTo(address,uint256,string)', () => {
       it('should claim .crypto domain in CNS registry', async () => {
-        await mintingManager['claimTo(address,uint256,string)'](coinbase.address, TLD.CRYPTO, 'test-cd983');
+        await mintingManager['claimTo(address,uint256,string)'](coinbase.address, TLD.crypto.hash, 'test-cd983');
 
-        const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, `${DomainNamePrefix}test-cd983`);
+        const tokenId = await cnsRegistry.childIdOf(TLD.crypto.hash, `${DomainNamePrefix}test-cd983`);
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: invalid token ID');
 
@@ -1819,9 +1837,9 @@ describe('MintingManager', () => {
       });
 
       it('should claim .wallet domain in UNS registry', async () => {
-        await mintingManager['claimTo(address,uint256,string)'](coinbase.address, TLD.WALLET, 'test-cdsi47');
+        await mintingManager['claimTo(address,uint256,string)'](coinbase.address, TLD.wallet.hash, 'test-cdsi47');
 
-        const tokenId = await cnsRegistry.childIdOf(TLD.WALLET, `${DomainNamePrefix}test-cdsi47`);
+        const tokenId = await cnsRegistry.childIdOf(TLD.wallet.hash, `${DomainNamePrefix}test-cdsi47`);
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
       });
@@ -1831,9 +1849,9 @@ describe('MintingManager', () => {
       const selector = 'claimToWithRecords(address,uint256,string,string[],string[])';
 
       it('should mint with records .crypto domain in CNS registry', async () => {
-        await mintingManager[selector](coinbase.address, TLD.CRYPTO, 'test-c039', ['key1'], ['value3']);
+        await mintingManager[selector](coinbase.address, TLD.crypto.hash, 'test-c039', ['key1'], ['value3']);
 
-        const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, `${DomainNamePrefix}test-c039`);
+        const tokenId = await cnsRegistry.childIdOf(TLD.crypto.hash, `${DomainNamePrefix}test-c039`);
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: invalid token ID');
 
@@ -1842,9 +1860,9 @@ describe('MintingManager', () => {
       });
 
       it('should claim with records .wallet domain in UNS registry', async () => {
-        await mintingManager[selector](coinbase.address, TLD.WALLET, 'test-c846', ['key9'], ['value2']);
+        await mintingManager[selector](coinbase.address, TLD.wallet.hash, 'test-c846', ['key9'], ['value2']);
 
-        const tokenId = await cnsRegistry.childIdOf(TLD.WALLET, `${DomainNamePrefix}test-c846`);
+        const tokenId = await cnsRegistry.childIdOf(TLD.wallet.hash, `${DomainNamePrefix}test-c846`);
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
@@ -1856,7 +1874,7 @@ describe('MintingManager', () => {
       it('should mint with records .crypto domain in CNS registry', async () => {
         await mintingManager.issueWithRecords(coinbase.address, ['test-m110-2', 'crypto'], ['key1'], ['value1'], true);
 
-        const tokenId = await cnsRegistry.childIdOf(TLD.CRYPTO, 'test-m110-2');
+        const tokenId = await cnsRegistry.childIdOf(TLD.crypto.hash, 'test-m110-2');
         expect(await cnsRegistry.ownerOf(tokenId)).to.be.eql(coinbase.address);
         await expect(unsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: invalid token ID');
 
@@ -1873,7 +1891,7 @@ describe('MintingManager', () => {
           true,
         );
 
-        const tokenId = await cnsRegistry.childIdOf(TLD.WALLET, 'test-mcm332-2');
+        const tokenId = await cnsRegistry.childIdOf(TLD.wallet.hash, 'test-mcm332-2');
         expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(coinbase.address);
         await expect(cnsRegistry.ownerOf(tokenId)).to.be.revertedWith('ERC721: owner query for nonexistent token');
 
@@ -2163,6 +2181,7 @@ describe('MintingManager', () => {
         ZERO_ADDRESS,
         ZERO_ADDRESS,
       );
+      await mintUnsTlds(mintingManager, coinbase);
     });
 
     it('should return zero resolver when initialized by zero address', async () => {
@@ -2187,6 +2206,7 @@ describe('MintingManager', () => {
         ZERO_ADDRESS,
       );
       await mintingManager.addMinter(coinbase.address);
+      await mintUnsTlds(mintingManager, coinbase);
     });
 
     it('should renew an expirable domain', async () => {
@@ -2277,6 +2297,7 @@ describe('MintingManager', () => {
         ZERO_ADDRESS,
       );
       await mintingManager.addMinter(coinbase.address);
+      await mintUnsTlds(mintingManager, coinbase);
     });
 
     it('should revoke an expirable domain', async () => {
@@ -2337,6 +2358,7 @@ describe('MintingManager', () => {
           ZERO_ADDRESS,
         );
         await mintingManager.addMinter(coinbase.address);
+        await mintUnsTlds(mintingManager, coinbase);
       });
 
       it('should block token after mint', async () => {
@@ -2379,26 +2401,26 @@ describe('MintingManager', () => {
       });
 
       it('should revert claim when blocked', async () => {
-        await mintingManager.claim(TLD.WALLET, 'test-block-90dh');
+        await mintingManager.claim(TLD.wallet.hash, 'test-block-90dh');
 
-        await expect(mintingManager.claim(TLD.WALLET, 'test-block-90dh')).to.be.revertedWith(
+        await expect(mintingManager.claim(TLD.wallet.hash, 'test-block-90dh')).to.be.revertedWith(
           'MintingManager: TOKEN_BLOCKED',
         );
       });
 
       it('should revert claimTo when blocked', async () => {
-        await mintingManager.claimTo(coinbase.address, TLD.WALLET, 'test-block-8fdb');
+        await mintingManager.claimTo(coinbase.address, TLD.wallet.hash, 'test-block-8fdb');
 
-        await expect(mintingManager.claimTo(coinbase.address, TLD.WALLET, 'test-block-8fdb')).to.be.revertedWith(
+        await expect(mintingManager.claimTo(coinbase.address, TLD.wallet.hash, 'test-block-8fdb')).to.be.revertedWith(
           'MintingManager: TOKEN_BLOCKED',
         );
       });
 
       it('should revert claim with records when blocked', async () => {
-        await mintingManager.claimToWithRecords(coinbase.address, TLD.WALLET, 'test-block-u4nf', [], []);
+        await mintingManager.claimToWithRecords(coinbase.address, TLD.wallet.hash, 'test-block-u4nf', [], []);
 
         await expect(
-          mintingManager.claimToWithRecords(coinbase.address, TLD.WALLET, 'test-block-u4nf', [], []),
+          mintingManager.claimToWithRecords(coinbase.address, TLD.wallet.hash, 'test-block-u4nf', [], []),
         ).to.be.revertedWith('MintingManager: TOKEN_BLOCKED');
       });
 
@@ -2432,25 +2454,26 @@ describe('MintingManager', () => {
         );
 
         await mintingManager.addMinter(coinbase.address);
+        await mintUnsTlds(mintingManager, coinbase);
         await mintingManager.pause();
       });
 
       it('should revert claim when paused', async () => {
-        await expect(mintingManager['claim(uint256,string)'](TLD.WALLET, 'test-paused-mint')).to.be.revertedWith(
+        await expect(mintingManager['claim(uint256,string)'](TLD.wallet.hash, 'test-paused-mint')).to.be.revertedWith(
           'Pausable: PAUSED',
         );
       });
 
       it('should revert claimTo when paused', async () => {
         await expect(
-          mintingManager['claimTo(address,uint256,string)'](coinbase.address, TLD.WALLET, 'test-paused-mint'),
+          mintingManager['claimTo(address,uint256,string)'](coinbase.address, TLD.wallet.hash, 'test-paused-mint'),
         ).to.be.revertedWith('Pausable: PAUSED');
       });
 
       it('should revert claim with resords when paused', async () => {
         const selector = 'claimToWithRecords(address,uint256,string,string[],string[])';
         await expect(
-          mintingManager[selector](coinbase.address, TLD.WALLET, 'test-paused-mint', [], []),
+          mintingManager[selector](coinbase.address, TLD.wallet.hash, 'test-paused-mint', [], []),
         ).to.be.revertedWith('Pausable: PAUSED');
       });
 
@@ -2517,6 +2540,7 @@ describe('MintingManager', () => {
           ZERO_ADDRESS,
         );
         await mintingManager.addMinter(coinbase.address);
+        await mintUnsTlds(mintingManager, coinbase);
       });
 
       it('should revert pausing when called by non-owner', async () => {
@@ -2575,6 +2599,7 @@ describe('MintingManager', () => {
       );
 
       await mintingManager.addMinter(coinbase.address);
+      await mintUnsTlds(mintingManager, coinbase);
     });
 
     describe('withdraw(address recepient)', () => {

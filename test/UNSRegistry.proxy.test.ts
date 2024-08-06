@@ -6,8 +6,9 @@ import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { UNSRegistryV07__factory } from '../types';
 import { deployProxy, upgradeProxy } from '../src/helpers';
+import { TLD } from '../src/tlds';
 import { mintDomain } from './helpers/registry';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { ZERO_ADDRESS } from './helpers/constants';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 
 describe('UNSRegistry (proxy)', () => {
@@ -31,7 +32,7 @@ describe('UNSRegistry (proxy)', () => {
       unsafeAllow: ['delegatecall'],
     })) as unknown as UNSRegistry;
 
-    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
 
     buildExecuteParams = buildExecuteFunc(unsRegistry.interface, await unsRegistry.getAddress(), unsRegistry);
@@ -39,7 +40,7 @@ describe('UNSRegistry (proxy)', () => {
 
   describe('Registry', () => {
     it('should construct itself correctly', async () => {
-      expect(TLD.CRYPTO).to.be.equal('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
+      expect(TLD.crypto.hash).to.be.equal('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
     });
 
     it('should resolve properly', async () => {
@@ -51,7 +52,7 @@ describe('UNSRegistry (proxy)', () => {
     });
 
     it('should set URI prefix', async () => {
-      const tokenId = TLD.CRYPTO;
+      const tokenId = TLD.crypto.hash;
       expect(await unsRegistry.tokenURI(tokenId)).to.be.equal(`/${tokenId}`);
 
       await unsRegistry.setTokenURIPrefix('prefix-');

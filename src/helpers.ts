@@ -3,9 +3,18 @@ import {
   DeployProxyOptions,
   UpgradeProxyOptions,
 } from '@openzeppelin/hardhat-upgrades/dist/utils';
-import type { BaseContract, ContractFactory } from 'ethers';
+import { BaseContract, ContractFactory, ethers } from 'ethers';
 import { network, upgrades } from 'hardhat';
-import { DependenciesMap, ContractName, NsNetworkConfig } from './types';
+import { MintingManager } from '../types';
+import { ContractName, DependenciesMap, NsNetworkConfig } from './types';
+import { NameService } from './config';
+import { NetworkChainIds, TLD, TLDConfig } from './tlds';
+
+export const SANDBOX_NETWORK_IDS = [1337, 31337];
+export const TESTNET_NETWORK_IDS = [80002, 11155111, 84532];
+
+export const isSandbox = SANDBOX_NETWORK_IDS.includes(network.config.chainId ?? 0);
+export const isTestnet = TESTNET_NETWORK_IDS.includes(network.config.chainId ?? 0);
 
 export const ensureDeployed = (config: NsNetworkConfig, ...contracts: ContractName[]): DependenciesMap => {
   return contracts
@@ -55,3 +64,36 @@ export const upgradeProxy = async <T extends BaseContract>(
 export const getContractAddress = async (contract: BaseContract): Promise<string> => {
   return contract.getAddress();
 };
+
+export const mintUnsTlds = async (mintingManager: MintingManager, owner: ethers.Signer) => {
+  const tlds = Object.entries(TLD)
+    .filter(([, config]) => config.nameServices.includes(NameService.UNS))
+    .filter(([, tldConfig]) => filterTldsByChainId(tldConfig));
+
+  for (const [tldName, tldConfig] of tlds) {
+    const correctTldName = tldName.toLowerCase();
+    const mintTx = await mintingManager.connect(owner).addTld(correctTldName, tldConfig.expirable ?? false);
+    await mintTx.wait();
+  }
+};
+
+export function getExpirableTlds (): string[] {
+  return Object.entries(TLD)
+    .filter(([, tldConfig]) => tldConfig.expirable)
+    .filter(([, tldConfig]) => filterTldsByChainId(tldConfig))
+    .map(([tld]) => tld);
+}
+
+function filterTldsByChainId (tldConfig: TLDConfig): boolean {
+  const chainId = network.config.chainId!;
+  if (tldConfig.networks.length === 0) {
+    return false;
+  }
+  if (isSandbox) {
+    return true;
+  }
+
+  return tldConfig.networks
+    .flatMap((n) => NetworkChainIds[n])
+    .includes(chainId);
+}

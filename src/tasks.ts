@@ -16,7 +16,7 @@ import { Deployer } from './deployer';
 import { ArtifactName, DependenciesMap, EnsContractName, NsNetworkConfig, UnsContractName } from './types';
 import verify from './verify';
 import { notNullSha, unwrap, unwrapDependencies } from './utils';
-import { deployProxy, ensureDeployed, ensureUpgradable } from './helpers';
+import { deployProxy, ensureDeployed, ensureUpgradable, isSandbox, isTestnet, mintUnsTlds } from './helpers';
 
 export type Task = {
   tags: string[];
@@ -25,8 +25,6 @@ export type Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => DependenciesMap;
 };
 
-const isSandbox = network.config.chainId === 1337;
-const isTestnet = network.config.chainId === 80002 || network.config.chainId === 11155111;
 
 export const deployCNSTask: Task = {
   tags: ['cns', 'full'],
@@ -556,6 +554,29 @@ const upgradeUNSOperatorTask: Task = {
 
     ensureUpgradable(config);
     return ensureDeployed(config, UnsContractName.UNSOperator);
+  },
+};
+
+const mintUnsTldsTask: Task = {
+  tags: ['min_uns_tlds', 'uns', 'full'],
+  priority: 110,
+  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
+    const { owner } = ctx.accounts;
+    if(!isSandbox){
+      throw new Error('This task is only available for sandbox');
+    }
+
+    const mintingManagerAddr = ctx.getNetworkConfig()
+      .networks[network.config.chainId!]
+      .contracts[UnsContractName.MintingManager].address;
+
+    const mintingManager = await ethers.getContractAt(ArtifactName.MintingManager, mintingManagerAddr, owner);
+    await mintUnsTlds(mintingManager, owner);
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    return ensureDeployed(config, UnsContractName.MintingManager);
   },
 };
 
@@ -1205,4 +1226,5 @@ export const tasks: Task[] = [
   deploySeaportProxyBuyerTask,
   deployUsdcMockTask,
   fundSeaportProxyBuyerTask,
+  mintUnsTldsTask,
 ];

@@ -2,7 +2,8 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { UNSRegistry, UNSRegistry__factory } from '../types';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { TLD } from '../src/tlds';
+import { ZERO_ADDRESS } from './helpers/constants';
 
 describe('UNSRegistry (multicall)', () => {
   let unsRegistry: UNSRegistry;
@@ -14,7 +15,7 @@ describe('UNSRegistry (multicall)', () => {
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
   });
 

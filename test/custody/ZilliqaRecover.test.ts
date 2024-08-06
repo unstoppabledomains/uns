@@ -8,7 +8,7 @@ import { custody, UNSRegistry__factory, MintingManager__factory } from '../../ty
 import { MintingManager, UNSRegistry, ZilliqaRecover } from '../../types';
 import { ZERO_ADDRESS } from '../helpers/constants';
 import { buildExecuteFunc } from '../helpers/metatx';
-import { deployProxy } from '../../src/helpers';
+import { deployProxy, mintUnsTlds } from '../../src/helpers';
 
 const ZilKey: KeystoreV3 = JSON.parse(
   readFileSync(`${__dirname}/zil18k3cvzg379g02et9fg2ga395r027jx5jggzvh5.json`).toString(),
@@ -70,6 +70,7 @@ describe('ZilliqaRecover', () => {
       ZERO_ADDRESS,
     );
     await mintingManager.addMinters([await zilliqaRecover.getAddress(), coinbase.address]);
+    await mintUnsTlds(mintingManager, coinbase);
   });
 
   describe('ethAddress', async () => {

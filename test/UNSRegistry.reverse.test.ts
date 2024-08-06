@@ -6,8 +6,9 @@ import { UNSRegistry } from '../types/contracts';
 import { UNSRegistryMock } from '../types/contracts/mocks';
 import { UNSRegistry__factory } from '../types/factories/contracts';
 import { UNSRegistryMock__factory } from '../types/factories/contracts/mocks';
+import { TLD } from '../src/tlds';
 import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain } from './helpers/registry';
 
 describe('UNSRegistry (reverse)', () => {
@@ -30,8 +31,8 @@ describe('UNSRegistry (reverse)', () => {
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
 
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
-    await unsRegistry.mintTLD(TLD.X, 'x');
+    await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
+    await unsRegistry.mintTLD(TLD.x.hash, 'x');
     await unsRegistry.setTokenURIPrefix('/');
 
     buildExecuteParams = buildExecuteFunc(unsRegistry.interface, await unsRegistry.getAddress(), unsRegistry);
@@ -41,8 +42,8 @@ describe('UNSRegistry (reverse)', () => {
     // mock
     unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
     await unsRegistryMock.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistryMock.mintTLD(TLD.CRYPTO, 'crypto');
-    await unsRegistryMock.mintTLD(TLD.X, 'x');
+    await unsRegistryMock.mintTLD(TLD.crypto.hash, 'crypto');
+    await unsRegistryMock.mintTLD(TLD.x.hash, 'x');
     await unsRegistryMock.setTokenURIPrefix('/');
     await unsRegistryMock.addProxyReader(reader.address);
   });
