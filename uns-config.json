@@ -616,7 +616,7 @@
                     "forwarder": "0x78c4B414e1AbdF0dE267deDa01DFFd4cd0817A16",
                     "legacyAddresses": []
                 },
-                "DotCoinBurner":  {
+                "DotCoinBurner": {
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
@@ -626,7 +626,7 @@
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
                 },
-                "USDC":  {
+                "USDC": {
                     "address": "0x5dEaC602762362FE5f135FA5904351916053cF70",
                     "deploymentBlock": "0x48D95B"
                 }
