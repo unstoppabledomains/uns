@@ -168,6 +168,18 @@ const config: HardhatUserConfig = {
       accounts: process.env.POLYGON_UNS_PRIVATE_KEY ? [process.env.POLYGON_UNS_PRIVATE_KEY] : undefined,
       loggingEnabled: true,
     },
+    base: {
+      url: `https://base-mainnet.infura.io/v3/${process.env.BASE_INFURA_KEY}`,
+      chainId: 8453,
+      accounts: process.env.BASE_UNS_PRIVATE_KEY ? [process.env.BASE_UNS_PRIVATE_KEY] : undefined,
+      loggingEnabled: true,
+    },
+    baseSepolia: {
+      url: `https://base-sepolia.infura.io/v3/${process.env.BASE_INFURA_KEY}`,
+      chainId: 84532,
+      accounts: process.env.BASE_UNS_PRIVATE_KEY ? [process.env.BASE_UNS_PRIVATE_KEY] : undefined,
+      loggingEnabled: true,
+    },
   },
   typechain: {
     outDir: 'types',
@@ -194,6 +206,8 @@ const config: HardhatUserConfig = {
       sepolia: process.env.ETHERSCAN_API_KEY,
       polygon: process.env.POLYGONSCAN_API_KEY,
       polygonAmoy: process.env.POLYGONSCAN_API_KEY,
+      base: process.env.BASESCAN_API_KEY,
+      baseSepolia: process.env.BASESCAN_API_KEY,
     }) as Record<string, string>,
     customChains: [
       {
@@ -202,6 +216,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api-amoy.polygonscan.com/api',
           browserURL: 'https://amoy.polygonscan.com/',
+        },
+      },
+      {
+        network: 'baseSepolia',
+        chainId: 84532,
+        urls: {
+          apiURL: 'https://api-sepolia.basescan.org/api',
+          browserURL: 'https://sepolia.basescan.org/',
         },
       },
     ],
