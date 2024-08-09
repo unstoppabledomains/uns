@@ -1,3 +1,7 @@
+## v0.9.23
+
+- Add `FARMS` MATIC token to resolver list
+
 ## v0.9.22
 
 - Add `.raiin` TLD
