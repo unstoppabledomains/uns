@@ -505,7 +505,7 @@
                 },
                 "USDC": {
                     "address": "0x6694CfD96d7fD80041062895B49f768081CA96f2",
-                    "deploymentBlock": "0x7c62a5"
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -628,7 +628,7 @@
                 },
                 "USDC": {
                     "address": "0x5dEaC602762362FE5f135FA5904351916053cF70",
-                    "deploymentBlock": "0x48D95B"
+                    "deploymentBlock": "0x0"
                 }
             }
         },
