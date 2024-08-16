@@ -260,6 +260,54 @@ export const TLD: Record<string, TLDConfig> = {
     ],
     hash: BigInt('0x05cb1b6d0e0a38c2fdeacf5d8383eea8f73d8fdeca1e4cc99a0e202f68d5b7df'),
   },
+  kryptic: {
+    nameServices: [NameService.UNS],
+    networks: [
+      Network.POLYGON,
+      Network.ETHEREUM,
+    ],
+    hash: BigInt('0x5e0664fb4fc872470219240d9272bd532629149e28b8ceed74f00d9e7314abb4'),
+  },
+  ubu: {
+    nameServices: [NameService.UNS],
+    networks: [
+      Network.POLYGON,
+      Network.ETHEREUM,
+    ],
+    hash: BigInt('0x0adc8e928b9a2309a49011aae110462d6f3642f8b8b0602ccd9a14763ba2f283'),
+  },
+  tball: {
+    nameServices: [NameService.UNS],
+    networks: [
+      Network.POLYGON,
+      Network.ETHEREUM,
+    ],
+    hash: BigInt('0x241cdd75e86f1a1da99d0321ae7d8e31cdf7c71a31d68b44d8f6f20dfafa9db6'),
+  },
+  pw: {
+    nameServices: [NameService.UNS],
+    networks: [
+      Network.POLYGON,
+      Network.ETHEREUM,
+    ],
+    hash: BigInt('0x664762df8e3be902c3ad74d28b175ee867db0c563d649d3583cef4f5e5a4449d'),
+  },
+  farms: {
+    nameServices: [NameService.UNS],
+    networks: [
+      Network.POLYGON,
+      Network.ETHEREUM,
+    ],
+    hash: BigInt('0xd75c01499ad11caab105cfefbf62ed6f0c7208f8de3fa293f01c209b37a1d036'),
+  },
+  dfz: {
+    nameServices: [NameService.UNS],
+    networks: [
+      Network.POLYGON,
+      Network.ETHEREUM,
+    ],
+    hash: BigInt('0x3b270f4d000c6046ee64e8c025ad8cff71e728b275a81bf53a060442fe9f9766'),
+  },
   zil: {
     nameServices: [NameService.UNS],
     networks: [
