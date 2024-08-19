@@ -56,6 +56,11 @@
       "deprecated": false,
       "validationRegex": "^0x[a-fA-F0-9]{40}$"
     },
+    "crypto.FARMS.version.MATIC.address": {
+      "deprecatedKeyName": "FARMS_MATIC",
+      "deprecated": false,
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
     "crypto.USDC.address": {
       "deprecatedKeyName": "USDC",
       "deprecated": true,

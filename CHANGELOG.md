@@ -1,8 +1,12 @@
-## v0.9.23
+## v0.9.24
 
 - Tld config removed from the Minting manager
 - Tld config introduced in the uns repo, constants.ts
 - Added a deployment task that mints all TLDs from the TLD config
+
+## v0.9.23
+
+- Add `FARMS` MATIC token to resolver list
 
 ## v0.9.22
 

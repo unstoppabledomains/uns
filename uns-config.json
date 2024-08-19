@@ -1,5 +1,5 @@
 {
-    "version": "0.9.6",
+    "version": "0.9.7",
     "networks": {
         "1": {
             "contracts": {
@@ -359,9 +359,9 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x287DeE389Caaa49edc112888f2BcFD927b472e25",
+                    "address": "0x01C6B02809c2375B5fcF13c79c4c2De22788953c",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x54"
+                    "deploymentBlock": "0x59"
                 },
                 "ZilliqaRecover": {
                     "address": "0xf6b7c221342BC966f4396790895530bF4E9799eB",
