@@ -351,4 +351,13 @@ export const TLD: Record<string, TLDConfig> = {
     hash: BigInt('0xac2c11ea5d4a4826f418d3befbf0537de7f13572d2a433edfe4a7314ea5dc896'),
     expirable: true,
   },
+
+  // BASE
+  udtest: {
+    nameServices: [NameService.UNS],
+    networks: [
+      Network.BASE,
+    ],
+    hash: BigInt('0xe1fcc786688c3e9242130dc114f8907dfd657ff4136158359d984ea697413c33'),
+  },
 };

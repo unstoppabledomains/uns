@@ -1,3 +1,8 @@
+## v0.9.25
+
+- Deploy uns to base-sepolia chain
+- Add `.udtest` TLD on base chain
+
 ## v0.9.24
 
 - Tld config removed from the Minting manager

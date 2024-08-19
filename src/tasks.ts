@@ -231,7 +231,7 @@ const deployUNSTask = {
       );
     await mintingManagerInitTx.wait();
 
-    if (ctx.minters.length) {
+    if (ctx.minters?.length) {
       const chunkSize = 100;
       for (let i = 0, j = ctx.minters.length; i < j; i += chunkSize) {
         const array = ctx.minters.slice(i, i + chunkSize);

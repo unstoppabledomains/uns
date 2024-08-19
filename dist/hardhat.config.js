@@ -119,6 +119,18 @@ const config = {
             accounts: process.env.POLYGON_UNS_PRIVATE_KEY ? [process.env.POLYGON_UNS_PRIVATE_KEY] : undefined,
             loggingEnabled: true,
         },
+        base: {
+            url: `https://base-mainnet.infura.io/v3/${process.env.BASE_INFURA_KEY}`,
+            chainId: 8453,
+            accounts: process.env.BASE_UNS_PRIVATE_KEY ? [process.env.BASE_UNS_PRIVATE_KEY] : undefined,
+            loggingEnabled: true,
+        },
+        baseSepolia: {
+            url: `https://base-sepolia.infura.io/v3/${process.env.BASE_INFURA_KEY}`,
+            chainId: 84532,
+            accounts: process.env.BASE_UNS_PRIVATE_KEY ? [process.env.BASE_UNS_PRIVATE_KEY] : undefined,
+            loggingEnabled: true,
+        },
     },
     typechain: {
         outDir: 'types',
@@ -145,6 +157,8 @@ const config = {
             sepolia: process.env.ETHERSCAN_API_KEY,
             polygon: process.env.POLYGONSCAN_API_KEY,
             polygonAmoy: process.env.POLYGONSCAN_API_KEY,
+            base: process.env.BASESCAN_API_KEY,
+            baseSepolia: process.env.BASESCAN_API_KEY,
         }),
         customChains: [
             {
@@ -153,6 +167,14 @@ const config = {
                 urls: {
                     apiURL: 'https://api-amoy.polygonscan.com/api',
                     browserURL: 'https://amoy.polygonscan.com/',
+                },
+            },
+            {
+                network: 'baseSepolia',
+                chainId: 84532,
+                urls: {
+                    apiURL: 'https://api-sepolia.basescan.org/api',
+                    browserURL: 'https://sepolia.basescan.org/',
                 },
             },
         ],
@@ -173,12 +195,14 @@ const config = {
             amoy: ['0x31df70766e92c0a69ada7ecb6dc1634d64748be2'],
             mainnet: ['0x5465c72ce00196550d6f89c40830f6bc81599f4f'],
             polygon: ['0x58cb2542a5b3b0999d41de59ad03331bbfb4dda3'],
+            baseSepolia: ['0x1eE5eee9D19A8923443FfC57ED2754f02cef5959'],
         },
         multisig: {
             mainnet: '0x6bEca92600be24179ae70A430AEF4aE632fddDc8',
             polygon: '0xC8E1B5c41c42ad1cE8336714cA2b2f2588F0a337',
             sepolia: '0x1197C09C38d460584473e8837D79c14343f24890',
             amoy: '0x458adB6cce7D9984b74bC83c6F71Fbd1fd16085e',
+            baseSepolia: '0x22fDBFdD0FE93865F0213E5437931223B2E3F198',
         },
     },
     defender: {

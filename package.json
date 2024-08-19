@@ -1,6 +1,6 @@
 {
   "name": "uns",
-  "version": "0.9.24",
+  "version": "0.9.25",
   "description": "UNS contracts and tools",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "main": "./dist/index.js",
@@ -47,6 +47,7 @@
     "@openzeppelin/contracts-upgradeable": "^4.7.3",
     "@openzeppelin/hardhat-upgrades": "^2.0.0",
     "@openzeppelin/upgrades-core": "^1.32.5",
+    "@safe-global/protocol-kit": "^4.0.3",
     "@typechain/ethers-v6": "^0.5.0",
     "@typechain/hardhat": "^9.1.0",
     "@types/bip39": "^3.0.0",
