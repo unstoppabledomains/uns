@@ -4,8 +4,9 @@ import { BigNumberish, FunctionFragment, id, Fragment, BaseContract, solidityPac
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { UNSRegistry } from '../types/contracts';
 import { UNSRegistry__factory } from '../types/factories/contracts';
+import { TLD } from '../src/tlds';
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain, mintRandomDomain } from './helpers/registry';
 import { getFuncSignature } from './helpers/proxy';
 import { getLatestBlockTimestamp, increaseTimeBy } from './helpers/utils';
@@ -29,7 +30,7 @@ describe('UNSRegistry (metatx)', () => {
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
 
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
 
     buildExecuteParams = buildExecuteFunc(unsRegistry.interface, await unsRegistry.getAddress(), unsRegistry);
@@ -554,7 +555,7 @@ describe('UNSRegistry (metatx)', () => {
       ];
 
       before(async () => {
-        paramValueMap.tld = TLD.CRYPTO;
+        paramValueMap.tld = TLD.crypto.hash;
         paramValueMap.account = accessControl.address;
         paramValueMap.to = owner.address;
         paramValueMap.operator = operator.address;

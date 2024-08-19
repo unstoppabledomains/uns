@@ -8,8 +8,9 @@ import { ProxyReader__factory, UNSRegistry__factory } from '../types/factories/c
 import { CNSRegistry__factory } from '../types/factories/dot-crypto/contracts';
 import { ProxyReaderV04__factory } from '../types/factories/contracts/history';
 import { deployProxy } from '../src/helpers';
+import { TLD } from '../src/tlds';
 import { mintDomain } from './helpers/registry';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { ZERO_ADDRESS } from './helpers/constants';
 
 describe('ProxyReader (proxy)', () => {
   let unsRegistry: UNSRegistry, cnsRegistry: CNSRegistry, proxyReader: ProxyReader;
@@ -39,7 +40,7 @@ describe('ProxyReader (proxy)', () => {
     );
 
     // add TLD
-    await unsRegistry.mintTLD(TLD.WALLET, 'wallet');
+    await unsRegistry.mintTLD(TLD.wallet.hash, 'wallet');
 
     // mint domain
     walletTokenId = await mintDomain({ unsRegistry, owner: coinbase, labels: ['test-proxy-proxy-reader', 'wallet'] });

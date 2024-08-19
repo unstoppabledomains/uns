@@ -2,7 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
-import { TLD } from '../helpers/constants';
+import { TLD } from '../../src/tlds';
 import { ResolverForwarder } from '../../types/contracts/metatx';
 import { CNSRegistry, Resolver } from '../../types/dot-crypto/contracts';
 import { MintingController, SignatureController } from '../../types/dot-crypto/contracts/controllers';
@@ -26,12 +26,12 @@ describe('ResolverForwarder', () => {
   const mintDomain = async (label: string, owner: string, resolverAddress?: string): Promise<bigint> => {
     await mintingController.mintSLDWithResolver(owner, label, resolverAddress ?? (await resolver.getAddress()));
 
-    return await registry.childIdOf(TLD.CRYPTO, label);
+    return await registry.childIdOf(TLD.crypto.hash, label);
   };
 
   const mintDomainWithoutResolver = async (label: string, owner: string): Promise<bigint> => {
     await mintingController.mintSLD(owner, label);
-    return await registry.childIdOf(TLD.CRYPTO, label);
+    return await registry.childIdOf(TLD.crypto.hash, label);
   };
 
   before(async () => {

@@ -3,7 +3,8 @@ import { ContractTransactionReceipt, Interface } from 'ethers';
 import { ethers } from 'hardhat';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
-import { TLD, ZERO_ADDRESS } from '../helpers/constants';
+import { ZERO_ADDRESS } from '../helpers/constants';
+import { TLD } from '../../src/tlds';
 import { percDiff } from '../helpers/consumption';
 
 describe('UNSRegistry Multicall (consumption)', () => {
@@ -41,7 +42,7 @@ describe('UNSRegistry Multicall (consumption)', () => {
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
   });
 

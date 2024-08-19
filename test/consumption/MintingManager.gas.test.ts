@@ -10,6 +10,7 @@ import { ZERO_ADDRESS } from '../helpers/constants';
 import { percDiff } from '../helpers/consumption';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 import { getLatestBlockTimestamp, increaseTimeBy } from '../helpers/utils';
+import { mintUnsTlds } from '../../src/helpers';
 
 describe('MintingManager (consumption)', () => {
   let unsRegistry: UNSRegistry, mintingManager: MintingManager, forwarder: MintingManagerForwarder;
@@ -53,6 +54,7 @@ describe('MintingManager (consumption)', () => {
     await mintingManager.setForwarder(await forwarder.getAddress());
 
     buildExecuteParams = buildExecuteFunc(mintingManager.interface, await mintingManager.getAddress(), forwarder);
+    await mintUnsTlds(mintingManager, coinbase);
   });
 
   beforeEach(async () => {

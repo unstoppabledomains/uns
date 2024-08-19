@@ -9,9 +9,9 @@ import {
   MintingController__factory,
   SignatureController__factory,
 } from '../../types/factories/dot-crypto/contracts/controllers';
-import { TLD } from '../helpers/constants';
 import { percDiff } from '../helpers/consumption';
 import { sign, buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
+import { TLD } from '../../src/tlds';
 
 describe('CNSRegistry (consumption)', () => {
   let forwarder: CNSRegistryForwarder,
@@ -24,7 +24,7 @@ describe('CNSRegistry (consumption)', () => {
 
   const mintDomain = async (label: string, owner: string) => {
     await mintingController.mintSLD(owner, label);
-    return await registry.childIdOf(TLD.CRYPTO, label);
+    return await registry.childIdOf(TLD.crypto.hash, label);
   };
 
   before(async () => {

@@ -103,48 +103,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         __MinterRole_init_unchained();
         __ERC2771Context_init_unchained(forwarder);
         __Pausable_init_unchained();
-
-        string[31] memory tlds = [
-            'crypto',
-            'wallet',
-            'x',
-            'nft',
-            'blockchain',
-            'bitcoin',
-            '888',
-            'dao',
-            'zil',
-            'polygon',
-            'unstoppable',
-            'klever',
-            'hi',
-            'kresus',
-            'anime',
-            'manga',
-            'binanceus',
-            'realm',
-            'go',
-            'altimist',
-            'pudgy',
-            'austin',
-            'bitget',
-            'pog',
-            'clay',
-            'witg',
-            'metropolis',
-            'wrkx',
-            'secret',
-            'raiin',
-            'stepn'
-        ];
-        for (uint256 i = 0; i < tlds.length; i++) {
-            _addTld(tlds[i], false);
-        }
-
-        string[2] memory expirableTlds = ['com', 'ca'];
-        for (uint256 i = 0; i < expirableTlds.length; i++) {
-            _addTld(expirableTlds[i], true);
-        }
     }
 
     function addTld(string calldata tld, bool isExpirable) external override onlyOwner {

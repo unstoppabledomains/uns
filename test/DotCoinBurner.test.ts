@@ -4,7 +4,9 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { solidityPackedKeccak256 } from 'ethers';
 import { DotCoinBurner__factory, UNSRegistry__factory } from '../types/factories/contracts';
 import { DotCoinBurner, UNSRegistry } from '../types/contracts';
-import { TLD, DEAD_ADDRESS, ZERO_ADDRESS, EXPIRABLE_TLDS } from './helpers/constants';
+import { getExpirableTlds } from '../src/helpers';
+import { TLD } from '../src/tlds';
+import { DEAD_ADDRESS, ZERO_ADDRESS } from './helpers/constants';
 import { mintDomain } from './helpers/registry';
 import { getLatestBlockTimestamp } from './helpers/utils';
 
@@ -86,7 +88,7 @@ describe('DotCoinBurner', () => {
 
   it('should fail if domain has incorrect extension', async () => {
     await unsRegistry.setApprovalForAll(await dotCoinBurner.getAddress(), true);
-    expect(TLD).to.be.not.empty;
+    expect(Object.entries(TLD)).to.be.not.empty;
 
     for (const tokenId in TLD) {
       const extension = tokenId.toLowerCase();
@@ -97,7 +99,7 @@ describe('DotCoinBurner', () => {
         unsRegistry,
         owner: coinbase,
         labels: [label, extension],
-        expiry: EXPIRABLE_TLDS.includes(extension) ? (await getLatestBlockTimestamp()) + 60 * 60 * 24 : 0,
+        expiry: getExpirableTlds().includes(extension) ? (await getLatestBlockTimestamp()) + 60 * 60 * 24 : 0,
       });
 
       await expect(dotCoinBurner.burnAll([labelHash])).to.be.revertedWith('ERC721: invalid token ID');

@@ -22,9 +22,11 @@ import { RootChainManager } from '../types/contracts/@maticnetwork/pos-portal/Ro
 import { MintableERC721Predicate } from '../types/contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol';
 import { DummyStateSender } from '../types/contracts/@maticnetwork/pos-portal/DummyStateSender.sol';
 import { SimpleCheckpointManager } from '../types/contracts/@maticnetwork/pos-portal/SimpleCheckpointManager.sol';
+import { mintUnsTlds } from '../src/helpers';
+import { TLD } from '../src/tlds';
 import { buildPredicateExitInput, writeCheckpoint, buildExitInput } from './helpers/polygon';
 import { sign, buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
-import { TLD, ZERO_ADDRESS } from './helpers/constants';
+import { ZERO_ADDRESS } from './helpers/constants';
 import { getLatestBlockTimestamp } from './helpers/utils';
 
 describe('RootRegistry', () => {
@@ -126,7 +128,7 @@ describe('RootRegistry', () => {
       ZERO_ADDRESS,
       await registryOwner.getAddress(),
     );
-    await l2UnsRegistry.mintTLD(TLD.WALLET, 'wallet');
+    await l2UnsRegistry.mintTLD(TLD.wallet.hash, 'wallet');
 
     await mintingManager.initialize(
       await l1UnsRegistry.getAddress(),
@@ -145,6 +147,7 @@ describe('RootRegistry', () => {
       cnsForwarder,
     );
     buildExecuteUnsParams = buildExecuteFunc(l1UnsRegistry.interface, await l1UnsRegistry.getAddress(), l1UnsRegistry);
+    await mintUnsTlds(mintingManager, registryOwner);
   });
 
   describe('Deposit', () => {
@@ -336,8 +339,8 @@ describe('RootRegistry', () => {
 
       it('should revert when UNS registry receives token from random ERC721', async () => {
         const randomERC721 = await new CNSRegistry__factory(registryOwner).deploy();
-        await randomERC721.controlledMintChild(owner.address, TLD.CRYPTO, 'fake-cns-uns-te1');
-        const tokenId = await randomERC721.childIdOf(TLD.CRYPTO, 'fake-cns-uns-te1');
+        await randomERC721.controlledMintChild(owner.address, TLD.crypto.hash, 'fake-cns-uns-te1');
+        const tokenId = await randomERC721.childIdOf(TLD.crypto.hash, 'fake-cns-uns-te1');
 
         await expect(
           randomERC721

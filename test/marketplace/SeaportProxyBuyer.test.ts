@@ -16,7 +16,8 @@ import { SeaportProxyBuyer } from '../../types/contracts/marketplace';
 import { Seaport as SeaportContract } from '../../types/seaport-core/src';
 import { ConduitController } from '../../types/seaport-core/src/conduit';
 import { ERC20Mock } from '../../types/contracts/mocks/ERC20Mock';
-import { TLD, ZERO_ADDRESS } from '../helpers/constants';
+import { ZERO_ADDRESS } from '../helpers/constants';
+import { TLD } from '../../src/tlds';
 import { deployProxy } from '../../src/helpers';
 import { OrderStruct } from '../../types/seaport-core/src/Seaport';
 import { ExecuteFunc, buildExecuteFunc } from '../helpers/metatx';
@@ -47,7 +48,7 @@ describe('SeaportProxyBuyer', async () => {
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistry.mintTLD(TLD.CRYPTO, 'crypto');
+    await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
     await unsRegistry.addProxyReader(reader.address);
 

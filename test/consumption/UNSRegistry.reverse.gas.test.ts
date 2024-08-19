@@ -4,7 +4,8 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
 import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
-import { TLD, ZERO_ADDRESS } from '../helpers/constants';
+import { ZERO_ADDRESS } from '../helpers/constants';
+import { TLD } from '../../src/tlds';
 import { mintDomain } from '../helpers/registry';
 
 describe('UNSRegistry Set Reverse (consumption)', () => {
@@ -22,7 +23,7 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
 
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
-    await unsRegistry.mintTLD(TLD.X, 'x');
+    await unsRegistry.mintTLD(TLD.x.hash, 'x');
 
     buildExecuteParams = buildExecuteFunc(unsRegistry.interface, await unsRegistry.getAddress(), unsRegistry);
   });
