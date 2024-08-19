@@ -3,11 +3,6 @@ import Safe, { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit'
 
 async function createSafe () {
   const owners = [
-    '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
-    '0xc0354e4E83Cc214b402A5063e2C90e0e5C18cC87',
-    '0xECE49066537d1816915cBe2312D7BBeF0647b820',
-    '0x0e5DFb1569602d0dcFCb4287Fe53c28FAC1Ea1bE',
-    '0xEe203ec04a5F635A78414466883cffB24B669B2C',
   ];
 
   const threshold = 2;
