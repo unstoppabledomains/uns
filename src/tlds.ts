@@ -284,14 +284,6 @@ export const TLD: Record<string, TLDConfig> = {
     ],
     hash: BigInt('0x241cdd75e86f1a1da99d0321ae7d8e31cdf7c71a31d68b44d8f6f20dfafa9db6'),
   },
-  pw: {
-    nameServices: [NameService.UNS],
-    networks: [
-      Network.POLYGON,
-      Network.ETHEREUM,
-    ],
-    hash: BigInt('0x664762df8e3be902c3ad74d28b175ee867db0c563d649d3583cef4f5e5a4449d'),
-  },
   farms: {
     nameServices: [NameService.UNS],
     networks: [
@@ -339,6 +331,15 @@ export const TLD: Record<string, TLDConfig> = {
       Network.ETHEREUM,
     ],
     hash: BigInt('0xc9dca3620bc4f436a4161d86f335af2a8f7eb7bae05865a71e18fc617ef98c4e'),
+    expirable: true,
+  },
+  pw: {
+    nameServices: [NameService.UNS],
+    networks: [
+      Network.POLYGON,
+      Network.ETHEREUM,
+    ],
+    hash: BigInt('0x664762df8e3be902c3ad74d28b175ee867db0c563d649d3583cef4f5e5a4449d'),
     expirable: true,
   },
 
