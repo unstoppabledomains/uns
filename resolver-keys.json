@@ -1,5 +1,5 @@
 {
-  "version": "2.1.33",
+  "version": "2.1.34",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -200,6 +200,11 @@
       "deprecatedKeyName": "WAVES",
       "deprecated": false,
       "validationRegex": "^3[a-km-zA-HJ-NP-Z1-9]{34}$"
+    },
+    "crypto.KDA.address": {
+      "deprecatedKeyName": "KDA",
+      "deprecated": false,
+      "validationRegex": "^(k:[a-f0-9]{64}|c:[A-Za-z0-9]{43})$"
     },
     "crypto.KMD.address": {
       "deprecatedKeyName": "KMD",

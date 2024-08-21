@@ -1,3 +1,7 @@
+## v0.9.27
+
+- Add `KDA` native token to resolver list
+
 ## v0.9.26
 
 - Fix `.pw` TLD config, make it expirable
