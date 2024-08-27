@@ -1,6 +1,10 @@
-## v0.9.26
+## v0.9.27
 
 - Deploy uns to base chain
+
+## v0.9.26
+
+- Fix `.pw` TLD config, make it expirable
 
 ## v0.9.25
 

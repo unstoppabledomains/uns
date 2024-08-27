@@ -496,8 +496,8 @@
                     "legacyAddresses": []
                 },
                 "ProxyReader": {
-                    "address": "0x050Ceb85167D510558E793a483b479f2917B4b9b",
-                    "deploymentBlock": "0x01215b1a",
+                    "address": "0x78c4b414e1abdf0de267deda01dffd4cd0817a16",
+                    "deploymentBlock": "0x1219245",
                     "implementation": "0x6B5F9068Aa94eFf728585665244cb5AB8735E71A",
                     "legacyAddresses": []
                 },
