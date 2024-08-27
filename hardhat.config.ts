@@ -245,6 +245,7 @@ const config: HardhatUserConfig = {
       mainnet: ['0x5465c72ce00196550d6f89c40830f6bc81599f4f'],
       polygon: ['0x58cb2542a5b3b0999d41de59ad03331bbfb4dda3'],
       baseSepolia: ['0x1eE5eee9D19A8923443FfC57ED2754f02cef5959'],
+      base: [], // TODO: add base minter
     },
     multisig: {
       mainnet: '0x6bEca92600be24179ae70A430AEF4aE632fddDc8',
@@ -252,6 +253,7 @@ const config: HardhatUserConfig = {
       sepolia: '0x1197C09C38d460584473e8837D79c14343f24890',
       amoy: '0x458adB6cce7D9984b74bC83c6F71Fbd1fd16085e',
       baseSepolia: '0x22fDBFdD0FE93865F0213E5437931223B2E3F198',
+      base: '0xfEc540DfD4e9929d6c29ceA92fc88F1abF2d772C',
     },
   },
   defender: {

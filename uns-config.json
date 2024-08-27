@@ -1,5 +1,5 @@
 {
-    "version": "0.9.8",
+    "version": "0.9.9",
     "networks": {
         "1": {
             "contracts": {
@@ -383,6 +383,130 @@
                 "USDC": {
                     "address": "0xDa9E1b3e395bFb0A45F03C7F615146B9d896c959",
                     "deploymentBlock": "0x20"
+                }
+            }
+        },
+        "8453": {
+            "contracts": {
+                "CNSRegistry": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "forwarder": "0x0000000000000000000000000000000000000000"
+                },
+                "SignatureController": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "MintingController": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "WhitelistedMinter": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "URIPrefixController": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "DomainZoneController": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "Resolver": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "forwarder": "0x0000000000000000000000000000000000000000"
+                },
+                "TwitterValidationOperator": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "FreeMinter": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "MintableERC721Predicate": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "RootChainManager": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "Seaport": {
+                    "address": "0x0000000000000068F116a894984e2DB1123eB395",
+                    "deploymentBlock": "0x0",
+                    "legacyAddresses": []
+                },
+                "DotCoinBurner": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "ZilliqaRecover": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "USDC": {
+                    "address": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+                    "deploymentBlock": "0x0",
+                    "legacyAddresses": []
+                },
+                "ProxyAdmin": {
+                    "address": "0x03EBd257caDe479638c9f1Dc69d1ECbbF98e301C",
+                    "deploymentBlock": "0x1215A51",
+                    "legacyAddresses": []
+                },
+                "UNSRegistry": {
+                    "address": "0xF6c1b83977DE3dEffC476f5048A0a84d3375d498",
+                    "deploymentBlock": "0x01215a53",
+                    "implementation": "0xE0F063F1e63E8Ac83118B08b03603d7826C718bb",
+                    "forwarder": "0xF6c1b83977DE3dEffC476f5048A0a84d3375d498",
+                    "legacyAddresses": []
+                },
+                "MintingManager": {
+                    "address": "0xe56D6aa367B7a16385Ea867F556339bbC361F983",
+                    "deploymentBlock": "0x01215a5c",
+                    "implementation": "0xd30b3cB992777134E2a338BcF422a311339E75b1",
+                    "forwarder": "0xd57f8F7be4BaE8f2bf24792Fec2Ca06513c83c1D",
+                    "legacyAddresses": []
+                },
+                "UNSOperator": {
+                    "address": "0x1E2A1f502fbe0018ED1a019D9c874e21d0a66Cb3",
+                    "deploymentBlock": "0x01215a62",
+                    "implementation": "0x9fd7AF306e76DCf7CF41D5c9bFbc55BA33C962B1",
+                    "legacyAddresses": []
+                },
+                "ProxyReader": {
+                    "address": "0x78c4b414e1abdf0de267deda01dffd4cd0817a16",
+                    "deploymentBlock": "0x1219245",
+                    "implementation": "0x6B5F9068Aa94eFf728585665244cb5AB8735E71A",
+                    "legacyAddresses": []
+                },
+                "SeaportProxyBuyer": {
+                    "address": "0x19d40e8b3338669BfC40747F5D5bDb8a14422Fdb",
+                    "deploymentBlock": "0x01215b4f",
+                    "implementation": "0x99d55A02f5d9c76d31C6Ff57cc36A7862D5E1029",
+                    "forwarder": "0x19d40e8b3338669BfC40747F5D5bDb8a14422Fdb",
+                    "legacyAddresses": []
                 }
             }
         },
