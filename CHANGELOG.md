@@ -1,3 +1,7 @@
+## v0.9.26
+
+- Deploy uns to base chain
+
 ## v0.9.25
 
 - Deploy uns to base-sepolia chain

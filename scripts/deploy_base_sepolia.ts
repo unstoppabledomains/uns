@@ -23,7 +23,6 @@ async function main () {
   if (!config) {
     throw new Error(`Config not found for network ${chainId}`);
   }
-  // before running this script, remove only sandbox verification in seaport_proxy_buyer
   // and check if min_uns_tlds task should be included
 
   const deployer = await Deployer.create();
