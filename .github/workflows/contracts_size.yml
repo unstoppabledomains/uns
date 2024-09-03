@@ -44,7 +44,7 @@ jobs:
           key: uns-yarn-${{ hashFiles('**/yarn.lock') }}
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true'
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: hardhat-contract-sizer-output
           path: cache/
