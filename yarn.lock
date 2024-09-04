@@ -814,6 +814,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noble/hashes@npm:^1.3.3":
+  version: 1.5.0
+  resolution: "@noble/hashes@npm:1.5.0"
+  checksum: 9cc031d5c888c455bfeef76af649b87f75380a4511405baea633c1e4912fd84aff7b61e99716f0231d244c9cfeda1fafd7d718963e6a0c674ed705e9b1b4f76b
+  languageName: node
+  linkType: hard
+
 "@noble/secp256k1@npm:1.6.3, @noble/secp256k1@npm:~1.6.0":
   version: 1.6.3
   resolution: "@noble/secp256k1@npm:1.6.3"
@@ -1342,6 +1349,47 @@ __metadata:
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
   checksum: 6ad6a00fc4f2f2cfc6bff76fb1d88b8ee20bc0601e18ebb01b6d4be583733a860239a521a7fbca73b612e66705078809483549d2b18f370eb346c5155c8e4a0f
+  languageName: node
+  linkType: hard
+
+"@safe-global/protocol-kit@npm:^4.0.3":
+  version: 4.1.0
+  resolution: "@safe-global/protocol-kit@npm:4.1.0"
+  dependencies:
+    "@noble/hashes": ^1.3.3
+    "@safe-global/safe-core-sdk-types": ^5.1.0
+    "@safe-global/safe-deployments": ^1.37.3
+    "@safe-global/safe-modules-deployments": ^2.2.1
+    abitype: ^1.0.2
+    ethereumjs-util: ^7.1.5
+    ethers: ^6.13.1
+    semver: ^7.6.2
+  checksum: 8897684f99f28f86641927a01c1b77a1594656c0848e1a81c30422e694d6ddc6a966fef7c8d1d3b955b1698c06b05c7fa91a1df3a8ca2f7d40b959869f7c98c0
+  languageName: node
+  linkType: hard
+
+"@safe-global/safe-core-sdk-types@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "@safe-global/safe-core-sdk-types@npm:5.1.0"
+  dependencies:
+    abitype: ^1.0.2
+  checksum: 35c34b3d6ea389d4e318a55c94afe2abe657e4f3d8645f75834c7dcad89963813e2c13e6e74c9e31b4db0adb6fe5ef99890a61c4c74a4a55d3f95e59e3651b81
+  languageName: node
+  linkType: hard
+
+"@safe-global/safe-deployments@npm:^1.37.3":
+  version: 1.37.3
+  resolution: "@safe-global/safe-deployments@npm:1.37.3"
+  dependencies:
+    semver: ^7.6.2
+  checksum: 8c83944822aea1468fc51944edb964a050065f0f7404ee138a34d74228d7f5113102ec4e10f1866798969624193a072f6d65f2b6c8b79dc76f03081cefc5f06a
+  languageName: node
+  linkType: hard
+
+"@safe-global/safe-modules-deployments@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "@safe-global/safe-modules-deployments@npm:2.2.1"
+  checksum: 1214f82bfb31307daf0f56b5c8a8fd5c640c8a9f090189997421065f68637a5c44ce4dc5201d32c92d8e8be15b0e82636fdd71cdec9faadf9a7bb60bb02ae0e8
   languageName: node
   linkType: hard
 
@@ -2143,6 +2191,21 @@ __metadata:
     zod:
       optional: true
   checksum: ea2c0548c3ba58c37a6de7483d63389074da498e63d803b742bbe94eb4eaa1f51a35d000c424058b2583aef56698cf07c696eb3bc4dd0303bc20c6f0826a241a
+  languageName: node
+  linkType: hard
+
+"abitype@npm:^1.0.2":
+  version: 1.0.6
+  resolution: "abitype@npm:1.0.6"
+  peerDependencies:
+    typescript: ">=5.0.4"
+    zod: ^3 >=3.22.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+    zod:
+      optional: true
+  checksum: 0bf6ed5ec785f372746c3ec5d6c87bf4d8cf0b6db30867b8d24e86fbc66d9f6599ae3d463ccd49817e67eedec6deba7cdae317bcf4da85b02bc48009379b9f84
   languageName: node
   linkType: hard
 
@@ -5287,6 +5350,21 @@ __metadata:
     tslib: 2.4.0
     ws: 8.5.0
   checksum: ddf398c91f584b9e643740ec17a9c82b4a1c4ea3fb6efd00f1a043b89d1ec6f9427aa80894f75850ee805722e91b8d054bce18579a2c621226302c096774df90
+  languageName: node
+  linkType: hard
+
+"ethers@npm:^6.13.1":
+  version: 6.13.2
+  resolution: "ethers@npm:6.13.2"
+  dependencies:
+    "@adraffy/ens-normalize": 1.10.1
+    "@noble/curves": 1.2.0
+    "@noble/hashes": 1.3.2
+    "@types/node": 18.15.13
+    aes-js: 4.0.0-beta.5
+    tslib: 2.4.0
+    ws: 8.17.1
+  checksum: 981860c736c7ae121774ad38ea07e3611ce524a77d2fcb77db499b65afe0cbe8f344cd5204d94b68b316349ff770fd2a7d9c8b2039da41c072f98d9864099925
   languageName: node
   linkType: hard
 
@@ -10110,6 +10188,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"semver@npm:^7.6.2":
+  version: 7.6.3
+  resolution: "semver@npm:7.6.3"
+  bin:
+    semver: bin/semver.js
+  checksum: 4110ec5d015c9438f322257b1c51fe30276e5f766a3f64c09edd1d7ea7118ecbc3f379f3b69032bacf13116dc7abc4ad8ce0d7e2bd642e26b0d271b56b61a7d8
+  languageName: node
+  linkType: hard
+
 "semver@npm:~5.4.1":
   version: 5.4.1
   resolution: "semver@npm:5.4.1"
@@ -11515,6 +11602,7 @@ __metadata:
     "@openzeppelin/contracts-upgradeable": ^4.7.3
     "@openzeppelin/hardhat-upgrades": ^2.0.0
     "@openzeppelin/upgrades-core": ^1.32.5
+    "@safe-global/protocol-kit": ^4.0.3
     "@typechain/ethers-v6": ^0.5.0
     "@typechain/hardhat": ^9.1.0
     "@types/bip39": ^3.0.0
@@ -12266,6 +12354,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 53e991bbf928faf5dc6efac9b8eb9ab6497c69feeb94f963d648b7a3530a720b19ec2e0ec037344257e05a4f35bd9ad04d9de6f289615ffb133282031b18c61c
+  languageName: node
+  linkType: hard
+
+"ws@npm:8.17.1":
+  version: 8.17.1
+  resolution: "ws@npm:8.17.1"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 442badcce1f1178ec87a0b5372ae2e9771e07c4929a3180321901f226127f252441e8689d765aa5cfba5f50ac60dd830954afc5aeae81609aefa11d3ddf5cecf
   languageName: node
   linkType: hard
 

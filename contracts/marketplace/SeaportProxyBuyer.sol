@@ -13,7 +13,7 @@ import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
 import {ISeaportProxyBuyer, OrderIsNotFulfiled, RecipientIsZeroAddress, InvalidZone} from './ISeaportProxyBuyer.sol';
 import {ConsiderationInterface} from 'seaport-types/src/interfaces/ConsiderationInterface.sol';
-import {AdvancedOrder, CriteriaResolver, OrderComponents, OrderParameters} from 'seaport-types/src/lib/ConsiderationStructs.sol';
+import {AdvancedOrder, CriteriaResolver, OrderComponents, OrderParameters, ZoneParameters} from 'seaport-types/src/lib/ConsiderationStructs.sol';
 
 contract SeaportProxyBuyer is
     Initializable,
@@ -84,6 +84,10 @@ contract SeaportProxyBuyer is
         if (!fulfilled) {
             revert OrderIsNotFulfiled();
         }
+    }
+
+    function validateOrder(ZoneParameters calldata) external view override whenNotPaused returns (bytes4 validOrderMagicValue) {
+        validOrderMagicValue = ISeaportProxyBuyer.validateOrder.selector;
     }
 
     function approve(address token) external onlyOwner nonReentrant {

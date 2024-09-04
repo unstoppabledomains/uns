@@ -237,6 +237,126 @@
     {
       "inputs": [
         {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "orderHash",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "address",
+              "name": "fulfiller",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "offerer",
+              "type": "address"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "enum ItemType",
+                  "name": "itemType",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "identifier",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct SpentItem[]",
+              "name": "offer",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "enum ItemType",
+                  "name": "itemType",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "identifier",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address payable",
+                  "name": "recipient",
+                  "type": "address"
+                }
+              ],
+              "internalType": "struct ReceivedItem[]",
+              "name": "consideration",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "bytes",
+              "name": "extraData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes32[]",
+              "name": "orderHashes",
+              "type": "bytes32[]"
+            },
+            {
+              "internalType": "uint256",
+              "name": "startTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "zoneHash",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct ZoneParameters",
+          "name": "zoneParameters",
+          "type": "tuple"
+        }
+      ],
+      "name": "validateOrder",
+      "outputs": [
+        {
+          "internalType": "bytes4",
+          "name": "validOrderMagicValue",
+          "type": "bytes4"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
           "name": "token",
           "type": "address"
