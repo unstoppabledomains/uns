@@ -71,6 +71,7 @@ export enum UnsContractName {
   Seaport = 'Seaport',
   SeaportProxyBuyer = 'SeaportProxyBuyer',
   USDC = 'USDC',
+  L1GasPriceOracle = 'L1GasPriceOracle',
 }
 
 export enum EnsContractName {

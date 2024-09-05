@@ -1,3 +1,7 @@
+## v0.9.28
+
+- Added `L1GasPriceOracle` ABI and addresses for base
+
 ## v0.9.27
 
 - Deploy uns to base chain
