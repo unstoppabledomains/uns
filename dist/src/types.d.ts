@@ -63,7 +63,8 @@ export declare enum UnsContractName {
     ZilliqaRecover = "ZilliqaRecover",
     Seaport = "Seaport",
     SeaportProxyBuyer = "SeaportProxyBuyer",
-    USDC = "USDC"
+    USDC = "USDC",
+    L1GasPriceOracle = "L1GasPriceOracle"
 }
 export declare enum EnsContractName {
     ENSRegistry = "ENSRegistry",

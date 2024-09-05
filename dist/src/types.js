@@ -69,6 +69,7 @@ var UnsContractName;
     UnsContractName["Seaport"] = "Seaport";
     UnsContractName["SeaportProxyBuyer"] = "SeaportProxyBuyer";
     UnsContractName["USDC"] = "USDC";
+    UnsContractName["L1GasPriceOracle"] = "L1GasPriceOracle";
 })(UnsContractName = exports.UnsContractName || (exports.UnsContractName = {}));
 var EnsContractName;
 (function (EnsContractName) {
