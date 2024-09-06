@@ -21,6 +21,8 @@
     "lint:fix": "yarn lint:ts:fix && yarn lint:sol:fix",
     "lint:ts": "eslint --ignore-path .gitignore .",
     "lint:ts:fix": "eslint --ignore-path .gitignore . --fix",
+    "prettier:ts:check": "prettier --check --config ./.prettierrc --ignore-path ./.prettierignore \"test/**/*.ts\"",
+    "prettier:ts:fix": "prettier --write -l --config ./.prettierrc --ignore-path ./.prettierignore \"test/marketplace/SeaportProxyBuyer.test.ts\"",
     "lint:sol": "solhint 'contracts/**/*.sol' && prettier -c 'contracts/**/*.sol'",
     "lint:sol:fix": "prettier --write \"contracts/**/*.sol\"",
     "deploy:localhost": "hardhat run --network localhost scripts/deploy.ts",

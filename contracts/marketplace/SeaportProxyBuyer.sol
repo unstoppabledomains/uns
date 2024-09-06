@@ -86,6 +86,10 @@ contract SeaportProxyBuyer is
         }
     }
 
+    function authorizeOrder(ZoneParameters calldata) external view override whenNotPaused returns (bytes4 authorizedOrderMagicValue) {
+        authorizedOrderMagicValue = ISeaportProxyBuyer.authorizeOrder.selector;
+    }
+
     function validateOrder(ZoneParameters calldata) external view override whenNotPaused returns (bytes4 validOrderMagicValue) {
         validOrderMagicValue = ISeaportProxyBuyer.validateOrder.selector;
     }

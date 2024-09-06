@@ -58,6 +58,17 @@ interface ISeaportProxyBuyer {
     ) external returns (bool fulfilled);
 
     /**
+     * @dev Authorizes an order.
+     *
+     * @param zoneParameters The context about the order fulfillment and any
+     *                       supplied extraData.
+     *
+     * @return authorizedOrderMagicValue The magic value that indicates a valid
+     *                                   order.
+     */
+    function authorizeOrder(ZoneParameters calldata zoneParameters) external view returns (bytes4 authorizedOrderMagicValue);
+
+    /**
      * @dev Validates an order.
      *
      * @param zoneParameters The context about the order fulfillment and any
