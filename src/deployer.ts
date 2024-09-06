@@ -25,7 +25,7 @@ type DeployedContract = {
   implementation: string;
   forwarder: string;
   transaction: TransactionResponse;
-}
+};
 
 type DeployConfig = {
   contracts: {
@@ -62,12 +62,7 @@ export class Deployer {
     );
   }
 
-  constructor (
-    options: DeployerOptions,
-    accounts: AccountsMap,
-    minters: string[],
-    multisig: string,
-  ) {
+  constructor (options: DeployerOptions, accounts: AccountsMap, minters: string[], multisig: string) {
     this.options = {
       ...DEFAULT_OPTIONS,
       ...options,
@@ -163,8 +158,8 @@ export class Deployer {
         [name]: {
           address: await contract.getAddress(),
           implementation: implAddress,
-          transaction: (await contract.deploymentTransaction()?.wait()),
-          forwarder: forwarder && await forwarder.getAddress(),
+          transaction: await contract.deploymentTransaction()?.wait(),
+          forwarder: forwarder && (await forwarder.getAddress()),
         },
       },
     });
@@ -172,10 +167,7 @@ export class Deployer {
     this._saveConfig(_config);
   }
 
-  async saveContractLegacyAddresses (
-    name: ContractName,
-    legacyAddresses: string[] = [],
-  ): Promise<void> {
+  async saveContractLegacyAddresses (name: ContractName, legacyAddresses: string[] = []): Promise<void> {
     const config = this.getDeployConfig();
 
     const _config = merge(config, {

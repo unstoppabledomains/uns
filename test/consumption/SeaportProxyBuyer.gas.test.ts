@@ -53,13 +53,12 @@ describe('SeaportProxyBuyer (consumption)', () => {
     usdcMock = await new ERC20Mock__factory(coinbase).deploy();
 
     seaportProxyBuyerFactory = new SeaportProxyBuyer__factory(coinbase);
-    seaportProxyBuyer = (await deployProxy<SeaportProxyBuyer>(seaportProxyBuyerFactory, [
-      await seaportContract.getAddress(),
-      await usdcMock.getAddress(),
-    ], { initializer: false })) as SeaportProxyBuyer;
-    await seaportProxyBuyer.initialize(
-      await seaportContract.getAddress(),
-    );
+    seaportProxyBuyer = (await deployProxy<SeaportProxyBuyer>(
+      seaportProxyBuyerFactory,
+      [await seaportContract.getAddress(), await usdcMock.getAddress()],
+      { initializer: false },
+    )) as SeaportProxyBuyer;
+    await seaportProxyBuyer.initialize(await seaportContract.getAddress());
     await seaportProxyBuyer.connect(coinbase).approve(await usdcMock.getAddress());
     await seaportProxyBuyer.addMinter(coinbase.address);
     seaportSdk = new seaportjs(seller, {
@@ -142,27 +141,31 @@ describe('SeaportProxyBuyer (consumption)', () => {
     const orderInputData = await Promise.all(orderInputDataPromises);
     const bulkOrder = await seaportSdk.createBulkOrders(orderInputData, seller.address);
     const seaportBulkOrderData = await bulkOrder.executeAllActions();
-    const bulksFullfillOrdersData:
-      {fulfillOrderData: OrderStruct, numerator: bigint, denominator: bigint, hash: bigint, tokenId: string}[] =
-        seaportBulkOrderData.map((orderData) => {
-          const fulfillOrderData: OrderStruct = {
-            ...orderData,
-            parameters: {
-              ...orderData.parameters,
-              consideration: orderData.parameters.consideration,
-              totalOriginalConsiderationItems: orderData.parameters.consideration.length,
-            },
-          };
-          const { numerator, denominator } = getAdvancedOrderNumeratorDenominator(orderData);
-          const hash = ethers.toBigInt(seaportSdk.getOrderHash(orderData.parameters));
-          return {
-            fulfillOrderData,
-            numerator,
-            denominator,
-            hash,
-            tokenId: orderData.parameters.offer[0].identifierOrCriteria,
-          };
-        });
+    const bulksFullfillOrdersData: {
+      fulfillOrderData: OrderStruct;
+      numerator: bigint;
+      denominator: bigint;
+      hash: bigint;
+      tokenId: string;
+    }[] = seaportBulkOrderData.map((orderData) => {
+      const fulfillOrderData: OrderStruct = {
+        ...orderData,
+        parameters: {
+          ...orderData.parameters,
+          consideration: orderData.parameters.consideration,
+          totalOriginalConsiderationItems: orderData.parameters.consideration.length,
+        },
+      };
+      const { numerator, denominator } = getAdvancedOrderNumeratorDenominator(orderData);
+      const hash = ethers.toBigInt(seaportSdk.getOrderHash(orderData.parameters));
+      return {
+        fulfillOrderData,
+        numerator,
+        denominator,
+        hash,
+        tokenId: orderData.parameters.offer[0].identifierOrCriteria,
+      };
+    });
 
     return bulksFullfillOrdersData;
   };
@@ -178,15 +181,13 @@ describe('SeaportProxyBuyer (consumption)', () => {
       );
     });
 
-    const executeOrder = async (
-      order: {
-        fulfillOrderData: OrderStruct,
-        numerator: bigint,
-        denominator: bigint,
-        hash: bigint,
-        tokenId: string
-      },
-    ) => {
+    const executeOrder = async (order: {
+      fulfillOrderData: OrderStruct;
+      numerator: bigint;
+      denominator: bigint;
+      hash: bigint;
+      tokenId: string;
+    }) => {
       const { fulfillOrderData, numerator, denominator, hash } = order;
       const { req, signature } = await buildExecuteParams(
         'fulfillAdvancedOrder',
@@ -210,16 +211,18 @@ describe('SeaportProxyBuyer (consumption)', () => {
       const priceToSell = BigInt(ethers.parseUnits('100', 6));
       const recipientFeesBasisPoints = BigInt(50); // 0.5%
       const zone = await seaportProxyBuyer.getAddress();
-      const receiptPromises: Promise<{ordersAmount: number; gasUsed: string | undefined}>[] = [];
+      const receiptPromises: Promise<{ ordersAmount: number; gasUsed: string | undefined }>[] = [];
       for (const i of [1, 10, 50, 100]) {
         const orders = await createBulkOrders(priceToSell, recipientFeesBasisPoints, zone, i);
-        receiptPromises.push((async () => {
-          const receipt = await executeOrder(orders[0]);
-          return {
-            ordersAmount: i,
-            gasUsed: receipt?.gasUsed.toString(),
-          };
-        })());
+        receiptPromises.push(
+          (async () => {
+            const receipt = await executeOrder(orders[0]);
+            return {
+              ordersAmount: i,
+              gasUsed: receipt?.gasUsed.toString(),
+            };
+          })(),
+        );
       }
       const result = await Promise.all(receiptPromises);
       console.table(result);

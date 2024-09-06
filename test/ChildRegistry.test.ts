@@ -47,7 +47,10 @@ describe('ChildRegistry', () => {
     rootChainManager = (await new RootChainManager__factory(registryOwner).deploy()).connect(rcmOwner);
     await rootChainManager.initialize(rcmOwner.address);
     await rootChainManager.setStateSender(await stateSender.getAddress());
-    await rootChainManager.registerPredicate(keccak256(await l1UnsRegistry.getAddress()), await predicate.getAddress());
+    await rootChainManager.registerPredicate(
+      keccak256(await l1UnsRegistry.getAddress()),
+      await predicate.getAddress(),
+    );
     await rootChainManager.mapToken(
       await l1UnsRegistry.getAddress(),
       await l2UnsRegistry.getAddress(),

@@ -18,13 +18,13 @@ function readCsv () {
 function getNetworkFamiles (csv: string[][]) {
   const result = {};
 
-  for(const row of csv) {
+  for (const row of csv) {
     const [, family, network, ,] = row;
 
-    if(!result[network]) {
+    if (!result[network]) {
       result[network] = family;
     } else {
-      if(result[network] !== family) {
+      if (result[network] !== family) {
         throw new Error(`Network ${network} can only have one family: ${result[network]} or ${family}`);
       }
     }
@@ -36,7 +36,7 @@ function getNetworkFamiles (csv: string[][]) {
 function getLegacyKeys (csv: string[][]) {
   const result = {};
 
-  for(const row of csv) {
+  for (const row of csv) {
     const [legacyKey, family, network, token] = row;
 
     const tokenKey = `token.${family}.${network}.${token}.address`;
@@ -71,13 +71,10 @@ async function uploadLegacyKeys (proxyReader: ProxyReader) {
 
   console.log(`Found ${Object.keys(legacyKeys).length} keys`);
 
-  for(const keysChunk of chunk(Object.keys(legacyKeys), CHUNK_SIZE)) {
+  for (const keysChunk of chunk(Object.keys(legacyKeys), CHUNK_SIZE)) {
     console.log(`Uploading chunk of legacy keys with size ${CHUNK_SIZE}`);
 
-    const tx = await proxyReader.addLegacyRecords(
-      keysChunk,
-      at(legacyKeys, keysChunk),
-    );
+    const tx = await proxyReader.addLegacyRecords(keysChunk, at(legacyKeys, keysChunk));
 
     console.log(`TX hash: ${tx.hash}`);
 
@@ -115,4 +112,3 @@ main()
     console.error(error);
     process.exit(1);
   });
-

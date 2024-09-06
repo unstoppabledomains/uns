@@ -457,16 +457,12 @@ describe('SeaportProxyBuyer', async () => {
     });
 
     it('should not pause by non-owner', async () => {
-      await expect(seaportProxyBuyer.connect(buyer).pause()).to.be.revertedWith(
-        'Ownable: caller is not the owner',
-      );
+      await expect(seaportProxyBuyer.connect(buyer).pause()).to.be.revertedWith('Ownable: caller is not the owner');
     });
 
     it('should not unpause by non-owner', async () => {
       await seaportProxyBuyer.connect(coinbase).pause();
-      await expect(seaportProxyBuyer.connect(buyer).unpause()).to.be.revertedWith(
-        'Ownable: caller is not the owner',
-      );
+      await expect(seaportProxyBuyer.connect(buyer).unpause()).to.be.revertedWith('Ownable: caller is not the owner');
       await seaportProxyBuyer.connect(coinbase).unpause();
     });
 
@@ -513,10 +509,7 @@ describe('SeaportProxyBuyer', async () => {
 
     it('should approve ERC20 spending to Seaport contract', async () => {
       const erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
-      const initialAllowaneAmount = await erc20Mock.allowance(
-        proxyBuyerAddress,
-        await seaportContract.getAddress(),
-      );
+      const initialAllowaneAmount = await erc20Mock.allowance(proxyBuyerAddress, await seaportContract.getAddress());
       expect(initialAllowaneAmount).to.be.eq(0);
       await seaportProxyBuyer.connect(coinbase).approve(await erc20Mock.getAddress());
       const allowanceAmount = await erc20Mock.allowance(proxyBuyerAddress, await seaportContract.getAddress());
@@ -737,10 +730,7 @@ describe('SeaportProxyBuyer', async () => {
 
     it('should approve ERC20 spending to Seaport contract', async () => {
       const erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
-      const initialAllowaneAmount = await erc20Mock.allowance(
-        proxyBuyerAddress,
-        await seaportContract.getAddress(),
-      );
+      const initialAllowaneAmount = await erc20Mock.allowance(proxyBuyerAddress, await seaportContract.getAddress());
       expect(initialAllowaneAmount).to.be.eq(0);
       const { req, signature } = await buildExecuteParams('approve', [await erc20Mock.getAddress()], coinbase, 0);
       await seaportProxyBuyer.connect(coinbase).execute(req, signature);
@@ -759,11 +749,7 @@ describe('SeaportProxyBuyer', async () => {
 
       await usdcMock.mint(buyer.address, price);
 
-      const sellOrder = await createSellOrder(
-        price,
-        recipientFeesBasisPoints,
-        await seaportProxyBuyer.getAddress(),
-      );
+      const sellOrder = await createSellOrder(price, recipientFeesBasisPoints, await seaportProxyBuyer.getAddress());
       const buyOrder = await createBuyOrder(price, recipientFeesBasisPoints, await seaportProxyBuyer.getAddress());
 
       const orders: AdvancedOrderStruct[] = [
@@ -812,73 +798,72 @@ describe('SeaportProxyBuyer', async () => {
       expect(readerBalance).to.be.eq(0);
     });
 
-    it('should match 2 fullfiling orders from a random caller using ProxyBuyer as a zone with a price leftover'
-      , async () => {
-        await usdcMock.connect(buyer).approve(await seaportContract.getAddress(), ethers.MaxUint256);
-        await unsRegistry.connect(seller).setApprovalForAll(await seaportContract.getAddress(), true);
+    it('should match 2 fullfiling orders from a random caller using ProxyBuyer as a zone with a price leftover', async () => {
+      await usdcMock.connect(buyer).approve(await seaportContract.getAddress(), ethers.MaxUint256);
+      await unsRegistry.connect(seller).setApprovalForAll(await seaportContract.getAddress(), true);
 
-        const priceToSell = BigInt(ethers.parseUnits('100', 6));
-        const priceToBuy = BigInt(ethers.parseUnits('200', 6));
-        const recipientFeesBasisPoints = BigInt(0);
+      const priceToSell = BigInt(ethers.parseUnits('100', 6));
+      const priceToBuy = BigInt(ethers.parseUnits('200', 6));
+      const recipientFeesBasisPoints = BigInt(0);
 
-        await usdcMock.mint(buyer.address, priceToBuy);
+      await usdcMock.mint(buyer.address, priceToBuy);
 
-        const sellOrder = await createSellOrder(
-          priceToSell,
-          recipientFeesBasisPoints,
-          await seaportProxyBuyer.getAddress(),
-        );
-        const buyOrder = await createBuyOrder(
-          priceToBuy,
-          recipientFeesBasisPoints,
-          await seaportProxyBuyer.getAddress(),
-        );
+      const sellOrder = await createSellOrder(
+        priceToSell,
+        recipientFeesBasisPoints,
+        await seaportProxyBuyer.getAddress(),
+      );
+      const buyOrder = await createBuyOrder(
+        priceToBuy,
+        recipientFeesBasisPoints,
+        await seaportProxyBuyer.getAddress(),
+      );
 
-        const orders: AdvancedOrderStruct[] = [
-          {
-            ...sellOrder.fulfillOrderData,
-            numerator: sellOrder.numerator,
-            denominator: sellOrder.denominator,
-            extraData: '0x',
-          },
-          {
-            ...buyOrder.fulfillOrderData,
-            numerator: buyOrder.numerator,
-            denominator: buyOrder.denominator,
-            extraData: '0x',
-          },
-        ];
-        const fulfillments: MatchOrdersFulfillment[] = [
-          {
-            offerComponents: [{ orderIndex: 0, itemIndex: 0 }],
-            considerationComponents: [{ orderIndex: 1, itemIndex: 0 }],
-          }, // NFT from Order 1 to Buyer in Order 2
-          {
-            offerComponents: [{ orderIndex: 1, itemIndex: 0 }],
-            considerationComponents: [{ orderIndex: 0, itemIndex: 0 }],
-          }, // USDC from Order 2 to Seller in Order 1
-        ];
+      const orders: AdvancedOrderStruct[] = [
+        {
+          ...sellOrder.fulfillOrderData,
+          numerator: sellOrder.numerator,
+          denominator: sellOrder.denominator,
+          extraData: '0x',
+        },
+        {
+          ...buyOrder.fulfillOrderData,
+          numerator: buyOrder.numerator,
+          denominator: buyOrder.denominator,
+          extraData: '0x',
+        },
+      ];
+      const fulfillments: MatchOrdersFulfillment[] = [
+        {
+          offerComponents: [{ orderIndex: 0, itemIndex: 0 }],
+          considerationComponents: [{ orderIndex: 1, itemIndex: 0 }],
+        }, // NFT from Order 1 to Buyer in Order 2
+        {
+          offerComponents: [{ orderIndex: 1, itemIndex: 0 }],
+          considerationComponents: [{ orderIndex: 0, itemIndex: 0 }],
+        }, // USDC from Order 2 to Seller in Order 1
+      ];
 
-        const initialBuyerBalance = await usdcMock.balanceOf(buyer.address);
-        const initialSellerBalance = await usdcMock.balanceOf(seller.address);
-        const initialSeaportProxyBuyerBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      const initialBuyerBalance = await usdcMock.balanceOf(buyer.address);
+      const initialSellerBalance = await usdcMock.balanceOf(seller.address);
+      const initialSeaportProxyBuyerBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
 
-        await seaportContract
-          .connect(reader)
-          .matchAdvancedOrders(orders, [], fulfillments, await seaportProxyBuyer.getAddress());
+      await seaportContract
+        .connect(reader)
+        .matchAdvancedOrders(orders, [], fulfillments, await seaportProxyBuyer.getAddress());
 
-        const sellerBalance = await usdcMock.balanceOf(seller.address);
-        const buyerBalance = await usdcMock.balanceOf(buyer.address);
-        const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
-        const readerBalance = await usdcMock.balanceOf(reader.address);
-        const seaportProxyBuyerBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
+      const sellerBalance = await usdcMock.balanceOf(seller.address);
+      const buyerBalance = await usdcMock.balanceOf(buyer.address);
+      const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
+      const readerBalance = await usdcMock.balanceOf(reader.address);
+      const seaportProxyBuyerBalance = await usdcMock.balanceOf(await seaportProxyBuyer.getAddress());
 
-        expect(sellerBalance).to.be.eq(initialSellerBalance + priceToSell);
-        expect(buyerBalance).to.be.eq(initialBuyerBalance - priceToBuy);
-        expect(domainOwner).to.be.eq(buyer.address);
-        expect(initialSeaportProxyBuyerBalance).to.be.eq(seaportProxyBuyerBalance - (priceToBuy - priceToSell));
-        expect(readerBalance).to.be.eq(0);
-      });
+      expect(sellerBalance).to.be.eq(initialSellerBalance + priceToSell);
+      expect(buyerBalance).to.be.eq(initialBuyerBalance - priceToBuy);
+      expect(domainOwner).to.be.eq(buyer.address);
+      expect(initialSeaportProxyBuyerBalance).to.be.eq(seaportProxyBuyerBalance - (priceToBuy - priceToSell));
+      expect(readerBalance).to.be.eq(0);
+    });
 
     it('should not allow to match orders with paused SeaportProxyBuyer', async () => {
       await usdcMock.connect(buyer).approve(await seaportContract.getAddress(), ethers.MaxUint256);
@@ -889,11 +874,7 @@ describe('SeaportProxyBuyer', async () => {
 
       await usdcMock.mint(buyer.address, price);
 
-      const sellOrder = await createSellOrder(
-        price,
-        recipientFeesBasisPoints,
-        await seaportProxyBuyer.getAddress(),
-      );
+      const sellOrder = await createSellOrder(price, recipientFeesBasisPoints, await seaportProxyBuyer.getAddress());
       const buyOrder = await createBuyOrder(price, recipientFeesBasisPoints, await seaportProxyBuyer.getAddress());
 
       const orders: AdvancedOrderStruct[] = [

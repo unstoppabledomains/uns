@@ -27,10 +27,14 @@ describe('UNSRegistry (proxy)', () => {
     unsRegistryV07Factory = new UNSRegistryV07__factory(owner);
     unsRegistryFactory = new UNSRegistry__factory(owner);
 
-    unsRegistry = (await deployProxy(unsRegistryV07Factory, [owner.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS], {
-      initializer: 'initialize',
-      unsafeAllow: ['delegatecall'],
-    })) as unknown as UNSRegistry;
+    unsRegistry = (await deployProxy(
+      unsRegistryV07Factory,
+      [owner.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS],
+      {
+        initializer: 'initialize',
+        unsafeAllow: ['delegatecall'],
+      },
+    )) as unknown as UNSRegistry;
 
     await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
@@ -207,9 +211,9 @@ describe('UNSRegistry (proxy)', () => {
       expect(await unsRegistry.get('new-key', tokenId)).to.be.equal('new-value');
 
       // should fail when trying to reconfigure non-owned domain
-      await expect(unsRegistry.connect(signers[1]).reconfigure(['new-key'], ['new-value'], tokenId)).to.be.revertedWith(
-        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
-      );
+      await expect(
+        unsRegistry.connect(signers[1]).reconfigure(['new-key'], ['new-value'], tokenId),
+      ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
     });
 
     it('should keep forwarding storage layout consistent after upgrade', async () => {

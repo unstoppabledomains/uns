@@ -28,7 +28,7 @@ export type ExecuteFunc = (
   signature: string;
 }>;
 
-type ISignerWithAddress = Signer & {address: string};
+type ISignerWithAddress = Signer & { address: string };
 
 export function buildExecuteFunc (
   iface: Interface,

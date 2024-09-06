@@ -101,7 +101,12 @@ describe('MintingManager', () => {
       unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
       mintingManagerMock = await new MintingManagerMock__factory(coinbase).deploy();
 
-      await unsRegistryMock.initialize(await mintingManagerMock.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await unsRegistryMock.initialize(
+        await mintingManagerMock.getAddress(),
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
 
       await mintingManagerMock.initialize(
         await unsRegistryMock.getAddress(),
@@ -348,10 +353,9 @@ describe('MintingManager', () => {
       });
 
       it('should revert minting an expirable domain', async () => {
-        await expect(mintingManager.connect(developer)
-          .claim(TLD.com.hash, 'udtestdev-t1-expirable')).to.be.revertedWith(
-          'MintingManager: TLD_EXPIRABLE_MISMATCH',
-        );
+        await expect(
+          mintingManager.connect(developer).claim(TLD.com.hash, 'udtestdev-t1-expirable'),
+        ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
       });
     });
 
@@ -397,15 +401,15 @@ describe('MintingManager', () => {
 
       it('should revert minting legacy CNS free domains', async () => {
         await expect(
-          mintingManager.connect(developer)
+          mintingManager
+            .connect(developer)
             .claimToWithRecords(receiver.address, TLD.crypto.hash, 'udtestdev-t3', [], []),
         ).to.be.revertedWith('MintingManager: TOKEN_LABEL_PROHIBITED');
       });
 
       it('should revert minting an expirable domain', async () => {
         await expect(
-          mintingManager.connect(developer)
-            .claimTo(receiver.address, TLD.com.hash, 'udtestdev-t2-expirable'),
+          mintingManager.connect(developer).claimTo(receiver.address, TLD.com.hash, 'udtestdev-t2-expirable'),
         ).to.be.revertedWith('MintingManager: TLD_EXPIRABLE_MISMATCH');
       });
     });
@@ -436,7 +440,12 @@ describe('MintingManager', () => {
       mintingManagerMock = await new MintingManagerMock__factory(coinbase).deploy();
       unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
 
-      await unsRegistryMock.initialize(await mintingManagerMock.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
+      await unsRegistryMock.initialize(
+        await mintingManagerMock.getAddress(),
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+        ZERO_ADDRESS,
+      );
       await mintingManagerMock.initialize(
         await unsRegistryMock.getAddress(),
         ZERO_ADDRESS,
@@ -665,10 +674,9 @@ describe('MintingManager', () => {
           await expect(mintingManager.claimTo(coinbase.address, TLD.x.hash, label)).to.be.revertedWith(
             'MintingManager: LABEL_INVALID',
           );
-          await expect(mintingManager.claimToWithRecords(coinbase.address, TLD.x.hash, label, [], []))
-            .to.be.revertedWith(
-              'MintingManager: LABEL_INVALID',
-            );
+          await expect(
+            mintingManager.claimToWithRecords(coinbase.address, TLD.x.hash, label, [], []),
+          ).to.be.revertedWith('MintingManager: LABEL_INVALID');
         }
       });
 
@@ -1148,7 +1156,15 @@ describe('MintingManager', () => {
         const purchaseHash = ethers.getBytes(
           ethers.solidityPackedKeccak256(
             ['address', 'uint256', 'address', 'uint256', 'uint64', 'uint256', 'address'],
-            [await mintingManager.getAddress(), chainId, receiver.address, tokenId, requestExpiry, price, ZERO_ADDRESS],
+            [
+              await mintingManager.getAddress(),
+              chainId,
+              receiver.address,
+              tokenId,
+              requestExpiry,
+              price,
+              ZERO_ADDRESS,
+            ],
           ),
         );
         const signature = await coinbase.signMessage(purchaseHash);
@@ -1635,7 +1651,16 @@ describe('MintingManager', () => {
         await expect(
           mintingManager
             .connect(spender)
-            .buyForErc20(spender.address, labels, [], [], expiry, await erc20UnsafeMock.getAddress(), price, signature),
+            .buyForErc20(
+              spender.address,
+              labels,
+              [],
+              [],
+              expiry,
+              await erc20UnsafeMock.getAddress(),
+              price,
+              signature,
+            ),
         ).to.be.revertedWith('ERC20: LOW_LEVEL_FAIL');
       });
 
@@ -2518,7 +2543,16 @@ describe('MintingManager', () => {
 
       it('should revert buyForErc20 if paused', async () => {
         await expect(
-          mintingManager.buyForErc20(coinbase.address, ['test-paused-purchase', 'x'], [], [], 0, ZERO_ADDRESS, 0, '0x'),
+          mintingManager.buyForErc20(
+            coinbase.address,
+            ['test-paused-purchase', 'x'],
+            [],
+            [],
+            0,
+            ZERO_ADDRESS,
+            0,
+            '0x',
+          ),
         ).to.be.revertedWith('Pausable: PAUSED');
       });
     });
@@ -2662,7 +2696,9 @@ describe('MintingManager', () => {
         await erc20Mock.mint(await mintingManager.getAddress(), value);
 
         await expect(
-          mintingManager.connect(coinbase)['withdraw(address,address)'](await erc20Mock.getAddress(), receiver.address),
+          mintingManager
+            .connect(coinbase)
+            ['withdraw(address,address)'](await erc20Mock.getAddress(), receiver.address),
         )
           .to.emit(mintingManager, 'Withdrawal')
           .withArgs(receiver.address, value, await erc20Mock.getAddress());
@@ -2683,7 +2719,9 @@ describe('MintingManager', () => {
 
       it('rejects if not owner', async () => {
         await expect(
-          mintingManager.connect(receiver)['withdraw(address,address)'](await erc20Mock.getAddress(), receiver.address),
+          mintingManager
+            .connect(receiver)
+            ['withdraw(address,address)'](await erc20Mock.getAddress(), receiver.address),
         ).to.be.revertedWith('Ownable: caller is not the owner');
       });
     });

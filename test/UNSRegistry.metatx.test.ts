@@ -81,7 +81,9 @@ describe('UNSRegistry (metatx)', () => {
         tokenId,
       );
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
 
     it('should revert meta-setOwner for expired token', async () => {
@@ -101,7 +103,9 @@ describe('UNSRegistry (metatx)', () => {
         tokenId,
       );
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
 
     it('should setApprovalForAll using meta-setApprovalForAll', async () => {
@@ -153,7 +157,9 @@ describe('UNSRegistry (metatx)', () => {
         tokenId,
       );
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
 
     it('should revert meta-transferFrom for expired token', async () => {
@@ -174,7 +180,9 @@ describe('UNSRegistry (metatx)', () => {
         tokenId,
       );
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
 
     it('should transfer using meta-safeTransferFrom', async () => {
@@ -201,7 +209,9 @@ describe('UNSRegistry (metatx)', () => {
         tokenId,
       );
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
 
     it('should revert meta-safeTransferFrom for expired token', async () => {
@@ -221,7 +231,9 @@ describe('UNSRegistry (metatx)', () => {
         tokenId,
       );
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
 
     it('should transfer using meta-safeTransferFrom with bytes', async () => {
@@ -248,7 +260,9 @@ describe('UNSRegistry (metatx)', () => {
         tokenId,
       );
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
 
     it('should revert meta-safeTransferFrom for expired token', async () => {
@@ -268,7 +282,9 @@ describe('UNSRegistry (metatx)', () => {
         tokenId,
       );
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
 
     it('should burn using meta-burn', async () => {
@@ -285,7 +301,9 @@ describe('UNSRegistry (metatx)', () => {
 
       const { req, signature } = await buildExecuteParams('burn(uint256)', [tokenId], nonOwner, tokenId);
 
-      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
+      await expect(unsRegistry.execute(req, signature)).to.be.revertedWith(
+        'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
+      );
     });
   });
 

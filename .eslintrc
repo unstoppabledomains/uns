@@ -44,7 +44,7 @@
     "generator-star-spacing": ["error", "before"],
     "indent": ["error", 2],
     "linebreak-style": ["error", "unix"],
-    "max-len": ["error", { "code": 120, "tabWidth": 2, "ignorePattern": "^import\\W.*" }],
+    "max-len": ["error", { "code": 120, "tabWidth": 2, "ignorePattern": "^import\\W.*|^\\s*(it|describe)\\s*\\(\\s*['\"`].*['\"`]" }],
     "no-debugger": "off",
     "no-dupe-args": "error",
     "no-dupe-keys": "error",

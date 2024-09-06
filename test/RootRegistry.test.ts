@@ -16,7 +16,11 @@ import { SimpleCheckpointManager__factory } from '../types/factories/contracts/@
 import { MintableERC721Predicate__factory } from '../types/factories/contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol';
 import { RootChainManager__factory } from '../types/factories/contracts/@maticnetwork/pos-portal/RootChainManager.sol';
 import { CNSRegistry, Resolver } from '../types/dot-crypto/contracts';
-import { MintingController, SignatureController, URIPrefixController } from '../types/dot-crypto/contracts/controllers';
+import {
+  MintingController,
+  SignatureController,
+  URIPrefixController,
+} from '../types/dot-crypto/contracts/controllers';
 import { CNSRegistryForwarder } from '../types/contracts/metatx';
 import { RootChainManager } from '../types/contracts/@maticnetwork/pos-portal/RootChainManager.sol';
 import { MintableERC721Predicate } from '../types/contracts/@maticnetwork/pos-portal/MintableERC721Predicate.sol';
@@ -106,7 +110,10 @@ describe('RootRegistry', () => {
     await rootChainManager.initialize(rcmOwner.address);
     await rootChainManager.setCheckpointManager(await checkpointManager.getAddress());
     await rootChainManager.setStateSender(await stateSender.getAddress());
-    await rootChainManager.registerPredicate(keccak256(await l1UnsRegistry.getAddress()), await predicate.getAddress());
+    await rootChainManager.registerPredicate(
+      keccak256(await l1UnsRegistry.getAddress()),
+      await predicate.getAddress(),
+    );
     await rootChainManager.mapToken(
       await l1UnsRegistry.getAddress(),
       await l2UnsRegistry.getAddress(),

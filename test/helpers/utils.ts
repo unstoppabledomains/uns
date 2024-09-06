@@ -8,7 +8,7 @@ export async function increaseTimeBy (seconds: number | bigint) {
 export async function getLatestBlockTimestamp (): Promise<number> {
   const block = await ethers.provider.getBlock('latest');
 
-  if(!block) throw new Error('Block not found');
+  if (!block) throw new Error('Block not found');
 
   return block.timestamp;
 }

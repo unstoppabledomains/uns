@@ -1,4 +1,3 @@
-
 /**
  * values are paths the specific contracts
  */
@@ -93,29 +92,29 @@ export enum EnsContractName {
 export type ContractName = EnsContractName | UnsContractName;
 
 export type ContractConfig = {
-  address: string,
-  legacyAddresses: string[],
-  deploymentBlock: string,
-  implementation?: string,
-  forwarder?: string,
+  address: string;
+  legacyAddresses: string[];
+  deploymentBlock: string;
+  implementation?: string;
+  forwarder?: string;
   deprecated?: boolean;
-}
+};
 
 export type NsNetworkConfig = {
-  contracts: ContractConfigMap
-}
+  contracts: ContractConfigMap;
+};
 
 export type ContractConfigMap = {
-  [k in ContractName]: ContractConfig
-}
+  [k in ContractName]: ContractConfig;
+};
 
 export type NsConfig = {
   version?: string;
   networks: {
-    [chainId: number]: NsNetworkConfig
+    [chainId: number]: NsNetworkConfig;
   };
-}
+};
 
 export type DependenciesMap = {
-  [k in ArtifactName]?: ContractConfig
-}
+  [k in ArtifactName]?: ContractConfig;
+};
