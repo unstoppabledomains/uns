@@ -27,6 +27,7 @@ const DEFAULT_SERVER_CONFIG = {
     hostIpAddress: '127.0.0.1',
     port: 7545,
     gasPrice: 20000000000,
+    baseFeePerGas: 10000000,
     gasLimit: 6721975,
     defaultBalanceEther: 1000,
     totalAccounts: 10,

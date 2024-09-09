@@ -11,6 +11,7 @@ export type AnvilServerOptions = {
   chainId: number;
   hardfork: string;
   gasPrice: number;
+  baseFeePerGas: number;
   gasLimit: number;
   mnemonic: string;
   hdPath: string;
@@ -28,6 +29,7 @@ const ANVIL_ARGUMENTS_MAP: Record<Exclude<keyof AnvilServerOptions, 'anvilCliPat
   chainId: '--chain-id',
   hardfork: '--hardfork',
   gasPrice: '--gas-price',
+  baseFeePerGas: '--block-base-fee-per-gas',
   gasLimit: '--gas-limit',
   mnemonic: '--mnemonic',
   hdPath: '--derivation-path',

@@ -19,6 +19,7 @@ export type SandboxNetworkOptions = {
   chainId: number;
   hardfork: string;
   gasPrice: number;
+  baseFeePerGas: number;
   gasLimit: number;
   mnemonic: string;
   hdPath: string;
@@ -46,6 +47,7 @@ const DEFAULT_SERVER_CONFIG: SandboxNetworkOptions = {
   hostIpAddress: '127.0.0.1',
   port: 7545,
   gasPrice: 20000000000,
+  baseFeePerGas: 10000000,
   gasLimit: 6721975,
   defaultBalanceEther: 1000,
   totalAccounts: 10,

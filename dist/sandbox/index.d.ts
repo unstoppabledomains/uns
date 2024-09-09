@@ -6,6 +6,7 @@ export declare type SandboxNetworkOptions = {
     chainId: number;
     hardfork: string;
     gasPrice: number;
+    baseFeePerGas: number;
     gasLimit: number;
     mnemonic: string;
     hdPath: string;
