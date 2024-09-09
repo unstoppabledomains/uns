@@ -26,7 +26,7 @@ contract SeaportProxyBuyer is
     ISeaportProxyBuyer
 {
     string public constant NAME = 'Seaport Proxy Buyer';
-    string public constant VERSION = '0.1.0';
+    string public constant VERSION = '0.1.1';
 
     ConsiderationInterface private _seaport;
 
