@@ -25,6 +25,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: hardhat-contract-sizer-output
+          include-hidden-files: true
           path: cache/.hardhat_contract_sizer_output.json
 
   pr-contracts-size:

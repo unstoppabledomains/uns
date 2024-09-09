@@ -5,6 +5,7 @@ import { TASK_COMPILE } from 'hardhat/builtin-tasks/task-names';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { task } from 'hardhat/config';
 import { pickBy } from 'lodash';
+import { gasPriceOracleABI } from '@eth-optimism/contracts-ts';
 
 type MintersMap = Record<string, string[]>;
 
@@ -85,6 +86,23 @@ task(
 
 // NOTE: Order matters
 import 'hardhat-abi-exporter';
+
+task(
+  TASK_COMPILE,
+  'hook after abi exporting to manually add abis not included as contract',
+  async (_, hre: HardhatRuntimeEnvironment, runSuper) => {
+    await runSuper();
+
+    const { root, flatArtifacts } = hre.config.paths;
+    const outputDir = path.resolve(root, flatArtifacts, 'abi');
+
+    const abis = [{ contract: 'L1GasPriceOracle', abi: gasPriceOracleABI }];
+
+    for (const { contract, abi } of abis) {
+      fs.writeFileSync(path.join(outputDir, `${contract}.json`), JSON.stringify(abi));
+    }
+  },
+);
 
 const settings = {
   optimizer: {

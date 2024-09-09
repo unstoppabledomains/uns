@@ -17,6 +17,7 @@ const fs_1 = __importDefault(require("fs"));
 const task_names_1 = require("hardhat/builtin-tasks/task-names");
 const config_1 = require("hardhat/config");
 const lodash_1 = require("lodash");
+const contracts_ts_1 = require("@eth-optimism/contracts-ts");
 require("@typechain/hardhat");
 require("@nomicfoundation/hardhat-ethers");
 require("@nomicfoundation/hardhat-verify");
@@ -48,6 +49,15 @@ const argv = (0, yargs_1.default)().env('').boolean('enableGasReport').boolean('
     }
 }));
 require("hardhat-abi-exporter");
+(0, config_1.task)(task_names_1.TASK_COMPILE, 'hook after abi exporting to manually add abis not included as contract', (_, hre, runSuper) => __awaiter(void 0, void 0, void 0, function* () {
+    yield runSuper();
+    const { root, flatArtifacts } = hre.config.paths;
+    const outputDir = path_1.default.resolve(root, flatArtifacts, 'abi');
+    const abis = [{ contract: 'L1GasPriceOracle', abi: contracts_ts_1.gasPriceOracleABI }];
+    for (const { contract, abi } of abis) {
+        fs_1.default.writeFileSync(path_1.default.join(outputDir, `${contract}.json`), JSON.stringify(abi));
+    }
+}));
 const settings = {
     optimizer: {
         enabled: true,

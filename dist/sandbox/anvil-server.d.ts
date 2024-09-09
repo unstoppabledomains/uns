@@ -4,6 +4,7 @@ export declare type AnvilServerOptions = {
     chainId: number;
     hardfork: string;
     gasPrice: number;
+    baseFeePerGas: number;
     gasLimit: number;
     mnemonic: string;
     hdPath: string;

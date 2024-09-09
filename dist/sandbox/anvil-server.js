@@ -24,6 +24,7 @@ const ANVIL_ARGUMENTS_MAP = {
     chainId: '--chain-id',
     hardfork: '--hardfork',
     gasPrice: '--gas-price',
+    baseFeePerGas: '--block-base-fee-per-gas',
     gasLimit: '--gas-limit',
     mnemonic: '--mnemonic',
     hdPath: '--derivation-path',
