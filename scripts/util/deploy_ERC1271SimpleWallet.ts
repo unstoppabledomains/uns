@@ -25,9 +25,7 @@ async function main () {
 
   const factory = await ethers.getContractFactory('ERC1271SimpleWallet', signer);
 
-  const result = await factory.deploy(
-    walletOwnerAddress,
-  );
+  const result = await factory.deploy(walletOwnerAddress);
 
   await result.waitForDeployment();
 
@@ -35,11 +33,12 @@ async function main () {
   console.log('ERC1271 owner address:', walletOwnerAddress);
 }
 
-
 // eslint-disable-next-line promise/catch-or-return
-main().catch((err) => {
-  console.error(err);
-  process.exitCode = 1;
-}).finally(() => {
-  process.exit();
-});
+main()
+  .catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  })
+  .finally(() => {
+    process.exit();
+  });

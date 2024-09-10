@@ -1,9 +1,7 @@
 import Safe, { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit';
 
-
 async function createSafe () {
-  const owners = [
-  ];
+  const owners = [];
 
   const threshold = 2;
   const safeAccountConfig: SafeAccountConfig = {
@@ -19,10 +17,10 @@ async function createSafe () {
 
   const safe: Safe = await safeFactory.deploySafe({ safeAccountConfig });
 
-  console.log('Is deployed: ' + await safe.isSafeDeployed());
-  console.log('Threshold: ' + await safe.getThreshold());
-  console.log('Owners: ' + await safe.getOwners());
-  console.log('Address: ' + await safe.getAddress());
+  console.log('Is deployed: ' + (await safe.isSafeDeployed()));
+  console.log('Threshold: ' + (await safe.getThreshold()));
+  console.log('Owners: ' + (await safe.getOwners()));
+  console.log('Address: ' + (await safe.getAddress()));
 }
 
 async function main () {

@@ -1355,9 +1355,11 @@ describe('ProxyReader', () => {
 
       const results: Result[] = [];
 
-      [['address'], ['string'], ['address', 'address', 'string[]'], ['address[]'], ['address']].forEach((output, i) => {
-        results.push(abiCoder.decode(output, data[i]));
-      });
+      [['address'], ['string'], ['address', 'address', 'string[]'], ['address[]'], ['address']].forEach(
+        (output, i) => {
+          results.push(abiCoder.decode(output, data[i]));
+        },
+      );
 
       expect(results).to.be.eql([
         [coinbase.address],

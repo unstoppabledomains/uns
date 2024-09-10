@@ -39,7 +39,10 @@ describe('ENSCustody (metatx)', function () {
   const secret = '0x0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF';
 
   let buildExecuteParams: ExecuteFunc;
-  let signers: SignerWithAddress[], owner: SignerWithAddress, registrant: SignerWithAddress, spender: SignerWithAddress;
+  let signers: SignerWithAddress[],
+    owner: SignerWithAddress,
+    registrant: SignerWithAddress,
+    spender: SignerWithAddress;
   let minter: Wallet;
   let ownerAddress: string, registrantAddress: string;
   let result: unknown;

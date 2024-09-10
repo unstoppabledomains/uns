@@ -93,7 +93,5 @@ function filterTldsByChainId (tldConfig: TLDConfig): boolean {
     return true;
   }
 
-  return tldConfig.networks
-    .flatMap((n) => NetworkChainIds[n])
-    .includes(chainId);
+  return tldConfig.networks.flatMap((n) => NetworkChainIds[n]).includes(chainId);
 }

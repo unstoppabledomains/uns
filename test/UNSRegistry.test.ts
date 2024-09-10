@@ -209,7 +209,11 @@ describe('UNSRegistry', () => {
       });
 
       it('should reset records on burn', async () => {
-        const tokenId = await mintDomain({ unsRegistry, owner: coinbase.address, labels: ['token-to-burn', 'crypto'] });
+        const tokenId = await mintDomain({
+          unsRegistry,
+          owner: coinbase.address,
+          labels: ['token-to-burn', 'crypto'],
+        });
         await unsRegistry.set('key_31', 'value_23', tokenId);
         expect(await unsRegistry.get('key_31', tokenId)).to.be.equal('value_23');
 
@@ -776,9 +780,9 @@ describe('UNSRegistry', () => {
       it('reverts if domain is expired', async () => {
         await increaseTimeBy(60 * 60 * 24);
 
-        await expect(unsRegistry[selector](coinbase.address, owner.address, expirableTokenId, '0x')).to.be.revertedWith(
-          'Registry: SENDER_IS_NOT_APPROVED_OR_OWNER',
-        );
+        await expect(
+          unsRegistry[selector](coinbase.address, owner.address, expirableTokenId, '0x'),
+        ).to.be.revertedWith('Registry: SENDER_IS_NOT_APPROVED_OR_OWNER');
       });
 
       it('reverts if domain is expired and sender is approved', async () => {
@@ -1280,9 +1284,9 @@ describe('UNSRegistry', () => {
         const key1Hash = await initializeKey(key1);
         const key2Hash = BigInt(id(key2));
 
-        await expect(unsRegistry.setManyByHash([key1Hash, key2Hash], ['value1', 'value2'], tokenId)).to.be.revertedWith(
-          'RecordStorage: KEY_NOT_FOUND',
-        );
+        await expect(
+          unsRegistry.setManyByHash([key1Hash, key2Hash], ['value1', 'value2'], tokenId),
+        ).to.be.revertedWith('RecordStorage: KEY_NOT_FOUND');
       });
 
       it('should not consume additional gas if key hash was set before', async () => {

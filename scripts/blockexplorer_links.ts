@@ -7,9 +7,9 @@ type ContractSetup = {
   legacyAddresses: string[];
   deprecated: boolean;
 };
-const Config = JSON.parse(
-  fs.readFileSync(`${__dirname}/../uns-config.json`).toString(),
-) as { networks: Record<string, { contracts: Record<string, ContractSetup> }> };
+const Config = JSON.parse(fs.readFileSync(`${__dirname}/../uns-config.json`).toString()) as {
+  networks: Record<string, { contracts: Record<string, ContractSetup> }>;
+};
 
 const ContractNames = Object.keys(Config.networks['1'].contracts);
 
@@ -26,11 +26,7 @@ const BlockExplorerUrls = {
 
 const Networks = Object.keys(BlockExplorerUrls);
 
-const Keys = [
-  'network',
-  'address',
-  'forwarder',
-] as const;
+const Keys = ['network', 'address', 'forwarder'] as const;
 
 const link = (network: string, address: string): string => {
   return address.toString().match(/0x[0-9a-f]{40}/i)
@@ -38,23 +34,12 @@ const link = (network: string, address: string): string => {
     : address;
 };
 
-const contractLinks = (
-  network: string,
-  address: string | string[],
-): string => {
-  const addresses =
-    address instanceof Array
-      ? address
-      : isValidAddress(address)
-        ? [address]
-        : [];
-  return addresses.length
-    ? addresses.map((a) => link(network, a)).join('<br/>')
-    : '&mdash;';
+const contractLinks = (network: string, address: string | string[]): string => {
+  const addresses = address instanceof Array ? address : isValidAddress(address) ? [address] : [];
+  return addresses.length ? addresses.map((a) => link(network, a)).join('<br/>') : '&mdash;';
 };
 
 const fragments = ContractNames.map((name) => {
-
   const deployments = Networks.map((network) => ({
     network,
     ...Config.networks[network.toString()].contracts[name],
@@ -64,9 +49,7 @@ const fragments = ContractNames.map((name) => {
   const rows = deployments
     .map(
       (config) =>
-        '<tr>'
-        + Keys.map((key) => `<td>${contractLinks(config.network, config[key])}</td>`).join('') +
-        '</tr>',
+        '<tr>' + Keys.map((key) => `<td>${contractLinks(config.network, config[key])}</td>`).join('') + '</tr>',
     )
     .join('\n\n');
 

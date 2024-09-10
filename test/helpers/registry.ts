@@ -5,20 +5,20 @@ import { UNSRegistry } from '../../types/contracts/UNSRegistry';
 const generateRandomLabel = () => 'domain-' + Buffer.from(randomBytes(16)).toString('hex');
 
 type BaseMintParams = {
-  unsRegistry: UNSRegistry,
-  owner: string | SignerWithAddress,
-  withoutReverse?: boolean,
+  unsRegistry: UNSRegistry;
+  owner: string | SignerWithAddress;
+  withoutReverse?: boolean;
   expiry?: number;
-  keys?: string[],
-  values?: string[],
+  keys?: string[];
+  values?: string[];
 };
 
 export type MintDomainParams = BaseMintParams & {
-  labels: string[],
+  labels: string[];
 };
 
 export type MintRandomDomainParams = BaseMintParams & {
-  tld: string,
+  tld: string;
 };
 
 export async function mintDomain ({
@@ -36,7 +36,7 @@ export async function mintDomain ({
   await unsRegistry.mintWithRecords(address, labels, keys, values, !withoutReverse);
 
   const tokenId = await unsRegistry.namehash(labels);
-  if(expiry > 0) {
+  if (expiry > 0) {
     await unsRegistry.setExpiry(expiry, tokenId);
   }
 
@@ -60,7 +60,7 @@ export const mintRandomDomain = async ({
   await unsRegistry.mintWithRecords(address, labels, keys, values, !withoutReverse);
 
   const tokenId = await unsRegistry.namehash(labels);
-  if(expiry > 0) {
+  if (expiry > 0) {
     await unsRegistry.setExpiry(expiry, tokenId);
   }
 

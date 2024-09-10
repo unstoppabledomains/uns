@@ -3,7 +3,7 @@
 
 pragma solidity ^0.8.24;
 
-import {AdvancedOrder, CriteriaResolver} from 'seaport-types/src/lib/ConsiderationStructs.sol';
+import {AdvancedOrder, CriteriaResolver, ZoneParameters} from 'seaport-types/src/lib/ConsiderationStructs.sol';
 
 error OrderIsNotFulfiled();
 error RecipientIsZeroAddress();
@@ -56,6 +56,28 @@ interface ISeaportProxyBuyer {
         bytes32 fulfillerConduitKey,
         address recipient
     ) external returns (bool fulfilled);
+
+    /**
+     * @dev Authorizes an order.
+     *
+     * @param zoneParameters The context about the order fulfillment and any
+     *                       supplied extraData.
+     *
+     * @return authorizedOrderMagicValue The magic value that indicates a valid
+     *                                   order.
+     */
+    function authorizeOrder(ZoneParameters calldata zoneParameters) external view returns (bytes4 authorizedOrderMagicValue);
+
+    /**
+     * @dev Validates an order.
+     *
+     * @param zoneParameters The context about the order fulfillment and any
+     *                       supplied extraData.
+     *
+     * @return validOrderMagicValue The magic value that indicates a valid
+     *                              order.
+     */
+    function validateOrder(ZoneParameters calldata zoneParameters) external returns (bytes4 validOrderMagicValue);
 
     /**
      * @dev Withdraw USDC from the contract balance.

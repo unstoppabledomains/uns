@@ -1,2 +1,27 @@
 @maticnetwork/
 @ens/
+
+.env
+.DS_Store
+package-lock.json
+
+# Dotfiles
+.*
+!.*.js
+**/*.js
+**/*.d.ts
+
+# Node modules
+node_modules
+**/node_modules
+**/@types
+types/*
+
+# Hardhat files
+cache
+artifacts
+coverage.json
+coverage
+
+# Sandbox files
+sandbox/*

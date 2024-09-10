@@ -1,9 +1,7 @@
 import { keccak256, FunctionFragment, solidityPacked, toBeHex, BaseContract } from 'ethers';
 
 export const getFuncSignature = (fragment: FunctionFragment): string => {
-  return `${fragment.name}(${fragment.inputs
-    .map((x) => `${x.type}`)
-    .join(',')})`;
+  return `${fragment.name}(${fragment.inputs.map((x) => `${x.type}`).join(',')})`;
 };
 
 export const getInterfaceId = (contract: BaseContract, functions: string[]): string => {
@@ -12,7 +10,7 @@ export const getInterfaceId = (contract: BaseContract, functions: string[]): str
   for (const functionName of functions) {
     const funcInterface = contract.interface.getFunction(functionName);
 
-    if(!funcInterface) {
+    if (!funcInterface) {
       throw new Error('getInterfaceId: could not find function with name ' + functionName);
     }
 
@@ -26,7 +24,7 @@ export const getInterfaceId = (contract: BaseContract, functions: string[]): str
     }
   }
 
-  if(!interfaceId) {
+  if (!interfaceId) {
     throw new Error('getInterfaceId: could not get interfaceId. Probably no functions supplied?');
   }
 

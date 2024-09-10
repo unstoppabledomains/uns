@@ -25,7 +25,6 @@ export type Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => DependenciesMap;
 };
 
-
 export const deployCNSTask: Task = {
   tags: ['cns', 'full'],
   priority: 0,
@@ -562,13 +561,12 @@ const mintUnsTldsTask: Task = {
   priority: 110,
   run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
     const { owner } = ctx.accounts;
-    if(!isSandbox){
+    if (!isSandbox) {
       throw new Error('This task is only available for sandbox');
     }
 
-    const mintingManagerAddr = ctx.getNetworkConfig()
-      .networks[network.config.chainId!]
-      .contracts[UnsContractName.MintingManager].address;
+    const mintingManagerAddr =
+      ctx.getNetworkConfig().networks[network.config.chainId!].contracts[UnsContractName.MintingManager].address;
 
     const mintingManager = await ethers.getContractAt(ArtifactName.MintingManager, mintingManagerAddr, owner);
     await mintUnsTlds(mintingManager, owner);
@@ -749,7 +747,11 @@ const configurePolygonPosBridgeTask: Task = {
       UnsContractName.RootChainManager,
     ]);
 
-    const rootChainManager = await ethers.getContractAt(ArtifactName.RootChainManager, RootChainManager.address, owner);
+    const rootChainManager = await ethers.getContractAt(
+      ArtifactName.RootChainManager,
+      RootChainManager.address,
+      owner,
+    );
 
     const tokenType = keccak256(UNSRegistry.address);
     await rootChainManager.registerPredicate(tokenType, MintableERC721Predicate.address);

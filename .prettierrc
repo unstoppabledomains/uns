@@ -12,7 +12,8 @@
     {
       "files": "*.ts",
       "options": {
-        "printWidth": 120
+        "printWidth": 119,
+        "tabWidth": 2
       }
     },
     {
