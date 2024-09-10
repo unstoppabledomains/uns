@@ -1200,6 +1200,49 @@ const fundSeaportProxyBuyerTask: Task = {
   },
 };
 
+const proposeSeaportProxyBuyerTask: Task = {
+  tags: ['propose_seaport_proxy_buyer'],
+  priority: 30,
+  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
+    const SeaportProxyBuyer = unwrap(dependencies, ArtifactName.SeaportProxyBuyer);
+
+    const version = params?.version;
+    if (!version) {
+      throw new Error('Version parameter is not provided');
+    }
+
+    if (!ctx.multisig) {
+      throw new Error('Multisig address is not provided');
+    }
+
+    ctx.log('Preparing proposal...');
+    const proposal = await defender.proposeUpgrade(
+      SeaportProxyBuyer.address,
+      await ethers.getContractFactory(ArtifactName.SeaportProxyBuyer),
+      {
+        title: `Propose SeaportProxyBuyer to v${version}`,
+        multisig: ctx.multisig,
+      },
+    );
+
+    if (proposal.metadata?.newImplementationAddress) {
+      await ctx.saveContractConfig(
+        UnsContractName.SeaportProxyBuyer,
+        await ethers.getContractAt(ArtifactName.SeaportProxyBuyer, SeaportProxyBuyer.address),
+        proposal.metadata.newImplementationAddress,
+      );
+      await verify(ctx, proposal.metadata.newImplementationAddress, []);
+    }
+    ctx.log('Upgrade proposal created at:', proposal.url);
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.SeaportProxyBuyer);
+  },
+};
+
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -1229,4 +1272,5 @@ export const tasks: Task[] = [
   deployUsdcMockTask,
   fundSeaportProxyBuyerTask,
   mintUnsTldsTask,
+  proposeSeaportProxyBuyerTask,
 ];
