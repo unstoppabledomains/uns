@@ -1,5 +1,77 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
+export declare type SpentItemStruct = {
+    itemType: BigNumberish;
+    token: AddressLike;
+    identifier: BigNumberish;
+    amount: BigNumberish;
+};
+export declare type SpentItemStructOutput = [
+    itemType: bigint,
+    token: string,
+    identifier: bigint,
+    amount: bigint
+] & {
+    itemType: bigint;
+    token: string;
+    identifier: bigint;
+    amount: bigint;
+};
+export declare type ReceivedItemStruct = {
+    itemType: BigNumberish;
+    token: AddressLike;
+    identifier: BigNumberish;
+    amount: BigNumberish;
+    recipient: AddressLike;
+};
+export declare type ReceivedItemStructOutput = [
+    itemType: bigint,
+    token: string,
+    identifier: bigint,
+    amount: bigint,
+    recipient: string
+] & {
+    itemType: bigint;
+    token: string;
+    identifier: bigint;
+    amount: bigint;
+    recipient: string;
+};
+export declare type ZoneParametersStruct = {
+    orderHash: BytesLike;
+    fulfiller: AddressLike;
+    offerer: AddressLike;
+    offer: SpentItemStruct[];
+    consideration: ReceivedItemStruct[];
+    extraData: BytesLike;
+    orderHashes: BytesLike[];
+    startTime: BigNumberish;
+    endTime: BigNumberish;
+    zoneHash: BytesLike;
+};
+export declare type ZoneParametersStructOutput = [
+    orderHash: string,
+    fulfiller: string,
+    offerer: string,
+    offer: SpentItemStructOutput[],
+    consideration: ReceivedItemStructOutput[],
+    extraData: string,
+    orderHashes: string[],
+    startTime: bigint,
+    endTime: bigint,
+    zoneHash: string
+] & {
+    orderHash: string;
+    fulfiller: string;
+    offerer: string;
+    offer: SpentItemStructOutput[];
+    consideration: ReceivedItemStructOutput[];
+    extraData: string;
+    orderHashes: string[];
+    startTime: bigint;
+    endTime: bigint;
+    zoneHash: string;
+};
 export declare type OfferItemStruct = {
     itemType: BigNumberish;
     token: AddressLike;
@@ -141,7 +213,7 @@ export declare namespace IForwarder {
     };
 }
 export interface SeaportProxyBuyerInterface extends Interface {
-    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "approve" | "closeMinter" | "execute" | "fulfillAdvancedOrder" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isMinter" | "isTrustedForwarder" | "nonceOf" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "supportsInterface" | "transferOwnership" | "unpause" | "verify" | "withdraw"): FunctionFragment;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "approve" | "authorizeOrder" | "closeMinter" | "execute" | "fulfillAdvancedOrder" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isMinter" | "isTrustedForwarder" | "nonceOf" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateMinter" | "supportsInterface" | "transferOwnership" | "unpause" | "validateOrder" | "verify" | "withdraw"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Initialized" | "OwnershipTransferred" | "Paused" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Unpaused"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
@@ -150,6 +222,7 @@ export interface SeaportProxyBuyerInterface extends Interface {
     encodeFunctionData(functionFragment: "addMinter", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "addMinters", values: [AddressLike[]]): string;
     encodeFunctionData(functionFragment: "approve", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "authorizeOrder", values: [ZoneParametersStruct]): string;
     encodeFunctionData(functionFragment: "closeMinter", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "execute", values: [IForwarder.ForwardRequestStruct, BytesLike]): string;
     encodeFunctionData(functionFragment: "fulfillAdvancedOrder", values: [
@@ -178,6 +251,7 @@ export interface SeaportProxyBuyerInterface extends Interface {
     encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+    encodeFunctionData(functionFragment: "validateOrder", values: [ZoneParametersStruct]): string;
     encodeFunctionData(functionFragment: "verify", values: [IForwarder.ForwardRequestStruct, BytesLike]): string;
     encodeFunctionData(functionFragment: "withdraw", values: [AddressLike, AddressLike, BigNumberish]): string;
     decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
@@ -187,6 +261,7 @@ export interface SeaportProxyBuyerInterface extends Interface {
     decodeFunctionResult(functionFragment: "addMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addMinters", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "authorizeOrder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "closeMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "fulfillAdvancedOrder", data: BytesLike): Result;
@@ -210,6 +285,7 @@ export interface SeaportProxyBuyerInterface extends Interface {
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "validateOrder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "verify", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 }
@@ -337,6 +413,11 @@ export interface SeaportProxyBuyer extends BaseContract {
         void
     ], "nonpayable">;
     approve: TypedContractMethod<[token: AddressLike], [void], "nonpayable">;
+    authorizeOrder: TypedContractMethod<[
+        arg0: ZoneParametersStruct
+    ], [
+        string
+    ], "view">;
     closeMinter: TypedContractMethod<[receiver: AddressLike], [void], "payable">;
     execute: TypedContractMethod<[
         req: IForwarder.ForwardRequestStruct,
@@ -412,6 +493,11 @@ export interface SeaportProxyBuyer extends BaseContract {
         void
     ], "nonpayable">;
     unpause: TypedContractMethod<[], [void], "nonpayable">;
+    validateOrder: TypedContractMethod<[
+        arg0: ZoneParametersStruct
+    ], [
+        string
+    ], "view">;
     verify: TypedContractMethod<[
         req: IForwarder.ForwardRequestStruct,
         signature: BytesLike
@@ -433,6 +519,7 @@ export interface SeaportProxyBuyer extends BaseContract {
     getFunction(nameOrSignature: "addMinter"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "addMinters"): TypedContractMethod<[accounts: AddressLike[]], [void], "nonpayable">;
     getFunction(nameOrSignature: "approve"): TypedContractMethod<[token: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "authorizeOrder"): TypedContractMethod<[arg0: ZoneParametersStruct], [string], "view">;
     getFunction(nameOrSignature: "closeMinter"): TypedContractMethod<[receiver: AddressLike], [void], "payable">;
     getFunction(nameOrSignature: "execute"): TypedContractMethod<[
         req: IForwarder.ForwardRequestStruct,
@@ -488,6 +575,7 @@ export interface SeaportProxyBuyer extends BaseContract {
     getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
     getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "unpause"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "validateOrder"): TypedContractMethod<[arg0: ZoneParametersStruct], [string], "view">;
     getFunction(nameOrSignature: "verify"): TypedContractMethod<[
         req: IForwarder.ForwardRequestStruct,
         signature: BytesLike

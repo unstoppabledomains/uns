@@ -14,6 +14,99 @@ export declare class ISeaportProxyBuyer__factory {
     }, {
         readonly inputs: readonly [{
             readonly components: readonly [{
+                readonly internalType: "bytes32";
+                readonly name: "orderHash";
+                readonly type: "bytes32";
+            }, {
+                readonly internalType: "address";
+                readonly name: "fulfiller";
+                readonly type: "address";
+            }, {
+                readonly internalType: "address";
+                readonly name: "offerer";
+                readonly type: "address";
+            }, {
+                readonly components: readonly [{
+                    readonly internalType: "enum ItemType";
+                    readonly name: "itemType";
+                    readonly type: "uint8";
+                }, {
+                    readonly internalType: "address";
+                    readonly name: "token";
+                    readonly type: "address";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "identifier";
+                    readonly type: "uint256";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "amount";
+                    readonly type: "uint256";
+                }];
+                readonly internalType: "struct SpentItem[]";
+                readonly name: "offer";
+                readonly type: "tuple[]";
+            }, {
+                readonly components: readonly [{
+                    readonly internalType: "enum ItemType";
+                    readonly name: "itemType";
+                    readonly type: "uint8";
+                }, {
+                    readonly internalType: "address";
+                    readonly name: "token";
+                    readonly type: "address";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "identifier";
+                    readonly type: "uint256";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "amount";
+                    readonly type: "uint256";
+                }, {
+                    readonly internalType: "address payable";
+                    readonly name: "recipient";
+                    readonly type: "address";
+                }];
+                readonly internalType: "struct ReceivedItem[]";
+                readonly name: "consideration";
+                readonly type: "tuple[]";
+            }, {
+                readonly internalType: "bytes";
+                readonly name: "extraData";
+                readonly type: "bytes";
+            }, {
+                readonly internalType: "bytes32[]";
+                readonly name: "orderHashes";
+                readonly type: "bytes32[]";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "startTime";
+                readonly type: "uint256";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "endTime";
+                readonly type: "uint256";
+            }, {
+                readonly internalType: "bytes32";
+                readonly name: "zoneHash";
+                readonly type: "bytes32";
+            }];
+            readonly internalType: "struct ZoneParameters";
+            readonly name: "zoneParameters";
+            readonly type: "tuple";
+        }];
+        readonly name: "authorizeOrder";
+        readonly outputs: readonly [{
+            readonly internalType: "bytes4";
+            readonly name: "authorizedOrderMagicValue";
+            readonly type: "bytes4";
+        }];
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly components: readonly [{
                 readonly components: readonly [{
                     readonly internalType: "address";
                     readonly name: "offerer";
@@ -180,6 +273,99 @@ export declare class ISeaportProxyBuyer__factory {
         readonly inputs: readonly [];
         readonly name: "unpause";
         readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly components: readonly [{
+                readonly internalType: "bytes32";
+                readonly name: "orderHash";
+                readonly type: "bytes32";
+            }, {
+                readonly internalType: "address";
+                readonly name: "fulfiller";
+                readonly type: "address";
+            }, {
+                readonly internalType: "address";
+                readonly name: "offerer";
+                readonly type: "address";
+            }, {
+                readonly components: readonly [{
+                    readonly internalType: "enum ItemType";
+                    readonly name: "itemType";
+                    readonly type: "uint8";
+                }, {
+                    readonly internalType: "address";
+                    readonly name: "token";
+                    readonly type: "address";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "identifier";
+                    readonly type: "uint256";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "amount";
+                    readonly type: "uint256";
+                }];
+                readonly internalType: "struct SpentItem[]";
+                readonly name: "offer";
+                readonly type: "tuple[]";
+            }, {
+                readonly components: readonly [{
+                    readonly internalType: "enum ItemType";
+                    readonly name: "itemType";
+                    readonly type: "uint8";
+                }, {
+                    readonly internalType: "address";
+                    readonly name: "token";
+                    readonly type: "address";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "identifier";
+                    readonly type: "uint256";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "amount";
+                    readonly type: "uint256";
+                }, {
+                    readonly internalType: "address payable";
+                    readonly name: "recipient";
+                    readonly type: "address";
+                }];
+                readonly internalType: "struct ReceivedItem[]";
+                readonly name: "consideration";
+                readonly type: "tuple[]";
+            }, {
+                readonly internalType: "bytes";
+                readonly name: "extraData";
+                readonly type: "bytes";
+            }, {
+                readonly internalType: "bytes32[]";
+                readonly name: "orderHashes";
+                readonly type: "bytes32[]";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "startTime";
+                readonly type: "uint256";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "endTime";
+                readonly type: "uint256";
+            }, {
+                readonly internalType: "bytes32";
+                readonly name: "zoneHash";
+                readonly type: "bytes32";
+            }];
+            readonly internalType: "struct ZoneParameters";
+            readonly name: "zoneParameters";
+            readonly type: "tuple";
+        }];
+        readonly name: "validateOrder";
+        readonly outputs: readonly [{
+            readonly internalType: "bytes4";
+            readonly name: "validOrderMagicValue";
+            readonly type: "bytes4";
+        }];
         readonly stateMutability: "nonpayable";
         readonly type: "function";
     }, {
