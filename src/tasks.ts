@@ -1223,25 +1223,20 @@ const proposeSeaportProxyBuyerTask: Task = {
       await ethers.getContractFactory(ArtifactName.SeaportProxyBuyer),
       {
         useDefenderDeploy: false,
-      }
+      },
     );
 
     const receipt = await proposal.txResponse?.wait();
-    const upgradeEvent = receipt?.logs.find(log => 
-      log.topics[0] === ethers.id("Upgraded(address)")
-    );
 
-    if (upgradeEvent) {
-      const newImplementationAddress = abiCoder.decode(
-        ['address'], upgradeEvent.topics[1]
-      ).toString();
+    console.log(receipt?.contractAddress);
 
+    if (receipt?.contractAddress  )   {
       await ctx.saveContractConfig(
         UnsContractName.SeaportProxyBuyer,
-        await ethers.getContractAt(ArtifactName.SeaportProxyBuyer, SeaportProxyBuyer.address),
-        newImplementationAddress,
+            await ethers.getContractAt(ArtifactName.SeaportProxyBuyer,                         SeaportProxyBuyer.address),
+        receipt.contractAddress,
       );
-      await verify(ctx, newImplementationAddress, []);
+      await verify(ctx, receipt.contractAddress, []);
     }
     ctx.log('Upgrade proposal created at:', proposal.url);
   },
