@@ -1,5 +1,5 @@
 import { defender, ethers, network, upgrades } from 'hardhat';
-import { Contract, keccak256, namehash, parseEther, parseUnits } from 'ethers';
+import { Contract, keccak256, namehash, parseEther, parseUnits, AbiCoder } from 'ethers';
 import { merge } from 'lodash';
 import { getContractAddress } from '@openzeppelin/hardhat-upgrades/dist/utils';
 import { ZERO_ADDRESS, ZERO_WORD } from '../test/helpers/constants';
@@ -17,6 +17,8 @@ import { ArtifactName, DependenciesMap, EnsContractName, NsNetworkConfig, UnsCon
 import verify from './verify';
 import { notNullSha, unwrap, unwrapDependencies } from './utils';
 import { deployProxy, ensureDeployed, ensureUpgradable, isSandbox, isTestnet, mintUnsTlds } from './helpers';
+
+const abiCoder = new AbiCoder();
 
 export type Task = {
   tags: string[];
@@ -1216,22 +1218,30 @@ const proposeSeaportProxyBuyerTask: Task = {
     }
 
     ctx.log('Preparing proposal...');
-    const proposal = await defender.proposeUpgrade(
+    const proposal = await defender.proposeUpgradeWithApproval(
       SeaportProxyBuyer.address,
       await ethers.getContractFactory(ArtifactName.SeaportProxyBuyer),
       {
-        title: `Propose SeaportProxyBuyer to v${version}`,
-        multisig: ctx.multisig,
-      },
+        useDefenderDeploy: false,
+      }
     );
 
-    if (proposal.metadata?.newImplementationAddress) {
+    const receipt = await proposal.txResponse?.wait();
+    const upgradeEvent = receipt?.logs.find(log => 
+      log.topics[0] === ethers.id("Upgraded(address)")
+    );
+
+    if (upgradeEvent) {
+      const newImplementationAddress = abiCoder.decode(
+        ['address'], upgradeEvent.topics[1]
+      ).toString();
+
       await ctx.saveContractConfig(
         UnsContractName.SeaportProxyBuyer,
         await ethers.getContractAt(ArtifactName.SeaportProxyBuyer, SeaportProxyBuyer.address),
-        proposal.metadata.newImplementationAddress,
+        newImplementationAddress,
       );
-      await verify(ctx, proposal.metadata.newImplementationAddress, []);
+      await verify(ctx, newImplementationAddress, []);
     }
     ctx.log('Upgrade proposal created at:', proposal.url);
   },
