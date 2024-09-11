@@ -1,5 +1,5 @@
 import { defender, ethers, network, upgrades } from 'hardhat';
-import { Contract, keccak256, namehash, parseEther, parseUnits, AbiCoder } from 'ethers';
+import { Contract, keccak256, namehash, parseEther, parseUnits } from 'ethers';
 import { merge } from 'lodash';
 import { getContractAddress } from '@openzeppelin/hardhat-upgrades/dist/utils';
 import { ZERO_ADDRESS, ZERO_WORD } from '../test/helpers/constants';
@@ -17,8 +17,6 @@ import { ArtifactName, DependenciesMap, EnsContractName, NsNetworkConfig, UnsCon
 import verify from './verify';
 import { notNullSha, unwrap, unwrapDependencies } from './utils';
 import { deployProxy, ensureDeployed, ensureUpgradable, isSandbox, isTestnet, mintUnsTlds } from './helpers';
-
-const abiCoder = new AbiCoder();
 
 export type Task = {
   tags: string[];
@@ -1230,10 +1228,10 @@ const proposeSeaportProxyBuyerTask: Task = {
 
     console.log(receipt?.contractAddress);
 
-    if (receipt?.contractAddress  )   {
+    if (receipt?.contractAddress) {
       await ctx.saveContractConfig(
         UnsContractName.SeaportProxyBuyer,
-            await ethers.getContractAt(ArtifactName.SeaportProxyBuyer,                         SeaportProxyBuyer.address),
+        await ethers.getContractAt(ArtifactName.SeaportProxyBuyer, SeaportProxyBuyer.address),
         receipt.contractAddress,
       );
       await verify(ctx, receipt.contractAddress, []);
