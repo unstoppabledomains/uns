@@ -5,4 +5,4 @@ yarn lint:fix
 
 npx hardhat clean
 yarn compile
-git add artifacts/*
+git add .
