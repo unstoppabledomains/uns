@@ -1,3 +1,7 @@
+## v0.9.30
+
+- Added permit functionality to erc20Mock and made it upgradable
+
 ## v0.9.29
 
 - Added functions for match orders zone authorization and validation on SeaportProxyBuyer
