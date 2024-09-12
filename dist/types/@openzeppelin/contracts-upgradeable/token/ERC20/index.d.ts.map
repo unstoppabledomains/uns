@@ -1,1 +1,1 @@
-{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../../../../../types/@openzeppelin/contracts-upgradeable/token/ERC20/index.ts"],"names":[],"mappings":"AAGA,YAAY,EAAE,iBAAiB,EAAE,MAAM,qBAAqB,CAAC"}
+{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../../../../../types/@openzeppelin/contracts-upgradeable/token/ERC20/index.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,KAAK,UAAU,MAAM,cAAc,CAAC;AAChD,YAAY,EAAE,UAAU,EAAE,CAAC;AAC3B,YAAY,EAAE,gBAAgB,EAAE,MAAM,oBAAoB,CAAC;AAC3D,YAAY,EAAE,iBAAiB,EAAE,MAAM,qBAAqB,CAAC"}

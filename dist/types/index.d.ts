@@ -157,6 +157,14 @@ export type { IERC1155Upgradeable } from "./@openzeppelin/contracts-upgradeable/
 export { IERC1155Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable__factory";
 export type { ERC1155PresetMinterPauserUpgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC1155/presets/ERC1155PresetMinterPauserUpgradeable";
 export { ERC1155PresetMinterPauserUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC1155/presets/ERC1155PresetMinterPauserUpgradeable__factory";
+export type { ERC20Upgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable";
+export { ERC20Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable__factory";
+export type { ERC20PermitUpgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol/ERC20PermitUpgradeable";
+export { ERC20PermitUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol/ERC20PermitUpgradeable__factory";
+export type { IERC20PermitUpgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol/IERC20PermitUpgradeable";
+export { IERC20PermitUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol/IERC20PermitUpgradeable__factory";
+export type { IERC20MetadataUpgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable";
+export { IERC20MetadataUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable__factory";
 export type { IERC20Upgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable";
 export { IERC20Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable__factory";
 export type { ERC721Upgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable";
@@ -169,6 +177,8 @@ export type { IERC721Upgradeable } from "./@openzeppelin/contracts-upgradeable/t
 export { IERC721Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable__factory";
 export type { ContextUpgradeable } from "./@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable";
 export { ContextUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable__factory";
+export type { EIP712Upgradeable } from "./@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol/EIP712Upgradeable";
+export { EIP712Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol/EIP712Upgradeable__factory";
 export type { ERC165Upgradeable } from "./@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable";
 export { ERC165Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable__factory";
 export type { IERC165Upgradeable } from "./@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable";
