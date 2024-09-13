@@ -259,7 +259,7 @@
                 "SeaportProxyBuyer": {
                     "address": "0x8b031F472F7f90ac1fAE1616Ddf1283CDDe084bF",
                     "deploymentBlock": "0x037b22db",
-                    "implementation": "0xceEE7A3D7bEb72e4C62820416808D3a226356a5e",
+                    "implementation": "0x53B01e32807127D3c2Fb6eA1A3b268753183Ed68",
                     "forwarder": "0x8b031F472F7f90ac1fAE1616Ddf1283CDDe084bF"
                 },
                 "USDC": {

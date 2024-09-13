@@ -1226,8 +1226,6 @@ const proposeSeaportProxyBuyerTask: Task = {
 
     const receipt = await proposal.txResponse?.wait();
 
-    console.log(receipt?.contractAddress);
-
     if (receipt?.contractAddress) {
       await ctx.saveContractConfig(
         UnsContractName.SeaportProxyBuyer,
