@@ -234,4 +234,9 @@ export const TLD: Record<string, TLDConfig> = {
     networks: [Network.BASE],
     hash: BigInt('0xe1fcc786688c3e9242130dc114f8907dfd657ff4136158359d984ea697413c33'),
   },
+  smobler: {
+    nameServices: [NameService.UNS],
+    networks: [Network.BASE],
+    hash: BigInt('0x670e86e82c6551930f0b729bfa9173a1bfdebc6fb08f49fb97cc0077cae611a1'),
+  },
 };
