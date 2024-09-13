@@ -1,3 +1,7 @@
+## v0.9.32
+
+- Added permit functionality to usdcMock and make it upgradable
+
 ## v0.9.31
 
 - Add `.smobler` Base TLD
