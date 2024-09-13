@@ -1,5 +1,5 @@
 {
-    "version": "0.2.4",
+    "version": "0.2.5",
     "networks": {
         "1": {
             "contracts": {
@@ -73,45 +73,45 @@
         "1337": {
             "contracts": {
                 "ENSRegistry": {
-                    "address": "0x3198fc981626687F4B5BDf0fbEABB0a5E0489C03",
-                    "deploymentBlock": "0x5b",
-                    "legacyAddresses": []
-                },
-                "BaseRegistrarImplementation": {
                     "address": "0x951c830a0471C04DCB60Ce244DEe38eE4b0609ec",
                     "deploymentBlock": "0x5c",
                     "legacyAddresses": []
                 },
-                "ReverseRegistrar": {
+                "BaseRegistrarImplementation": {
                     "address": "0x5831f0664Ee58C88DE672946678Fed9a228Eb83B",
                     "deploymentBlock": "0x5d",
                     "legacyAddresses": []
                 },
+                "ReverseRegistrar": {
+                    "address": "0x50eBEc0b0EAfc732324C1A28963C1FcB7889DA39",
+                    "deploymentBlock": "0x5e",
+                    "legacyAddresses": []
+                },
                 "NameWrapper": {
-                    "address": "0xdb787398b6595b4F0a8d6072A8AF69774D967f5F",
-                    "deploymentBlock": "0x60",
+                    "address": "0x4de18142969d365e29189e7093da83ad4FB182df",
+                    "deploymentBlock": "0x61",
                     "legacyAddresses": []
                 },
                 "DummyOracle": {
-                    "address": "0x399Da84d05f49e44338fe949D0eC54dACf7cb7F2",
-                    "deploymentBlock": "0x62",
-                    "legacyAddresses": []
-                },
-                "StablePriceOracle": {
                     "address": "0xd70Ab4F5767a8fa0e1e261A2f51189316a7C0d86",
                     "deploymentBlock": "0x63",
                     "legacyAddresses": []
                 },
-                "ETHRegistrarController": {
+                "StablePriceOracle": {
                     "address": "0x7a7d9531c7d9D270e7b12e60761546f4e432eEb3",
                     "deploymentBlock": "0x64",
                     "legacyAddresses": []
                 },
+                "ETHRegistrarController": {
+                    "address": "0x6D264795bBa755974bBBB84Ea5E66eA893BbF606",
+                    "deploymentBlock": "0x65",
+                    "legacyAddresses": []
+                },
                 "PublicResolver": {
-                    "address": "0xeA28Fff014B7B8BbB2106E543c38aE089212c0D1",
-                    "deploymentBlock": "0x6d",
+                    "address": "0xFC047CFaAb3b3a81D629f5192202756b3103987F",
+                    "deploymentBlock": "0x6e",
                     "legacyAddresses": [
-                        "0xFC047CFaAb3b3a81D629f5192202756b3103987F"
+                        "0x5481dDE809984c7F6363269F6AbE54B6F6A47a1c"
                     ]
                 },
                 "ProxyAdmin": {
@@ -120,33 +120,33 @@
                     "legacyAddresses": []
                 },
                 "ENSCustody": {
-                    "address": "0x6BeD74EA7DfA87F26ad8F64DfCaE0aa46A76Cd1c",
-                    "deploymentBlock": "0x84",
-                    "implementation": "0xa81BB2e11dB560D9aA3dc00605469B5ca0C19A2d",
-                    "forwarder": "0x6BeD74EA7DfA87F26ad8F64DfCaE0aa46A76Cd1c",
+                    "address": "0x8b302811c839b46e3a3C3907174C73A8559835bA",
+                    "deploymentBlock": "0x85",
+                    "implementation": "0x6BeD74EA7DfA87F26ad8F64DfCaE0aa46A76Cd1c",
+                    "forwarder": "0x8b302811c839b46e3a3C3907174C73A8559835bA",
                     "legacyAddresses": []
                 },
                 "LegacyENSRegistry": {
-                    "address": "0xcA8C131DC1f9f62EE54012b10BCA2DA71B8d42e7",
-                    "deploymentBlock": "0x70",
+                    "address": "0xb9025e16A304BA1604e4b93e0A5d6cc4C699a772",
+                    "deploymentBlock": "0x71",
                     "legacyAddresses": []
                 },
                 "LegacyETHRegistrarController": {
-                    "address": "0x6D264795bBa755974bBBB84Ea5E66eA893BbF606",
-                    "deploymentBlock": "0x65",
+                    "address": "0x25D0359804421aDF8E28c3629f611bfD4F04F4fD",
+                    "deploymentBlock": "0x66",
                     "legacyAddresses": []
                 },
                 "DNSSECImpl": {
-                    "address": "0x05ade0dd3865F9Ee2F74323b19504bd07F39329C",
-                    "deploymentBlock": "0x77"
+                    "address": "0xE22d997f9f86801B0405a691B28CF74285fBbC79",
+                    "deploymentBlock": "0x78"
                 },
                 "DNSRegistrar": {
-                    "address": "0xD16B320155789DB85e80e1ba25bf3123CB9bC8BD",
-                    "deploymentBlock": "0x7e"
-                },
-                "Root": {
                     "address": "0x56e87da626B8D91d93f512064400470C7Eb6f24f",
                     "deploymentBlock": "0x7f"
+                },
+                "Root": {
+                    "address": "0x0F5cF62AD1c3D5d524d9Ed283abe9554aAE181FC",
+                    "deploymentBlock": "0x80"
                 },
                 "LegacyPublicResolver": {
                     "address": "0x4fbf7B2f171336958BE5D15FF762a5CfF5363568",

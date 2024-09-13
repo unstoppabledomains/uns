@@ -1,3 +1,7 @@
+## v0.9.31
+
+- Add `.smobler` Base TLD
+
 ## v0.9.30
 
 - Added permit functionality to erc20Mock and made it upgradable
