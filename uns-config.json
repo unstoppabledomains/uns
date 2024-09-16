@@ -644,12 +644,14 @@
                 "SeaportProxyBuyer": {
                     "address": "0x4FF860525ccb6E992E0A4579860465f7EF581aed",
                     "deploymentBlock": "0x7c4d06",
-                    "implementation": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "implementation": "0xf02a5fA08b86aC35EC3D6Df6878832334696788E",
                     "forwarder": "0x4FF860525ccb6E992E0A4579860465f7EF581aed"
                 },
                 "USDC": {
-                    "address": "0x6694CfD96d7fD80041062895B49f768081CA96f2",
-                    "deploymentBlock": "0x0"
+                    "address": "0x9E85b0F8a298Eb0ACc175cFFEd0674718d552C11",
+                    "deploymentBlock": "0xb7c92b",
+                    "implementation": "0xf66A05D55F6a71E74e131b9870B9131EE56ef12E",
+                    "forwarder": "0x9E85b0F8a298Eb0ACc175cFFEd0674718d552C11"
                 },
                 "L1GasPriceOracle": {
                     "address": "0x0000000000000000000000000000000000000000",
