@@ -9,6 +9,7 @@ export { ERC721Mock__factory } from "./ERC721Mock__factory";
 export { ERC721ReceiverMock__factory } from "./ERC721ReceiverMock__factory";
 export { MinterRoleMock__factory } from "./MinterRoleMock__factory";
 export { MintingManagerMock__factory } from "./MintingManagerMock__factory";
+export { Multicall3__factory } from "./Multicall3__factory";
 export { UNSRegistryForwarderMock__factory } from "./UNSRegistryForwarderMock__factory";
 export { UNSRegistryMock__factory } from "./UNSRegistryMock__factory";
 export { USDC__factory } from "./USDC__factory";

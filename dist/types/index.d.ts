@@ -367,6 +367,8 @@ export type { MinterRoleMock } from "./contracts/mocks/MinterRoleMock";
 export { MinterRoleMock__factory } from "./factories/contracts/mocks/MinterRoleMock__factory";
 export type { MintingManagerMock } from "./contracts/mocks/MintingManagerMock";
 export { MintingManagerMock__factory } from "./factories/contracts/mocks/MintingManagerMock__factory";
+export type { Multicall3 } from "./contracts/mocks/Multicall3";
+export { Multicall3__factory } from "./factories/contracts/mocks/Multicall3__factory";
 export type { UNSRegistryForwarderMock } from "./contracts/mocks/UNSRegistryForwarderMock";
 export { UNSRegistryForwarderMock__factory } from "./factories/contracts/mocks/UNSRegistryForwarderMock__factory";
 export type { UNSRegistryMock } from "./contracts/mocks/UNSRegistryMock";

@@ -1111,6 +1111,24 @@ const deploySeaportTask: Task = {
   ensureDependencies: () => ({}),
 };
 
+const deployMulticall3SandboxTask: Task = {
+  tags: ['multicall_sandbox', 'full'],
+  priority: 10,
+  run: async (ctx: Deployer) => {
+    const { owner } = ctx.accounts;
+
+    if (!isSandbox) {
+      throw new Error('This task is only available for sandbox or testnet');
+    }
+
+    const multicall = await ethers.deployContract(ArtifactName.Muticall3, [], owner);
+    await multicall.waitForDeployment();
+    await ctx.saveContractConfig(UnsContractName.Multicall3, multicall);
+    await verify(ctx, await multicall.getAddress(), [], 'contracts/mocks/Multicall3.sol:Multicall3');
+  },
+  ensureDependencies: () => ({}),
+};
+
 const deployUsdcMockTask: Task = {
   tags: ['usdc_mock', 'full'],
   priority: 10,
@@ -1271,6 +1289,7 @@ export const tasks: Task[] = [
   deploySeaportTask,
   deploySeaportProxyBuyerTask,
   deployUsdcMockTask,
+  deployMulticall3SandboxTask,
   fundSeaportProxyBuyerTask,
   mintUnsTldsTask,
   proposeSeaportProxyBuyerTask,

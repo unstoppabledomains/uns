@@ -24,6 +24,7 @@ export enum ArtifactName {
   SeaportProxyBuyer = 'SeaportProxyBuyer',
   ConduitController = 'ConduitController',
   USDC = 'USDC',
+  Muticall3 = 'Multicall3',
 
   // ENS
   ENSRegistry = 'ENSRegistry',
@@ -70,6 +71,7 @@ export enum UnsContractName {
   Seaport = 'Seaport',
   SeaportProxyBuyer = 'SeaportProxyBuyer',
   USDC = 'USDC',
+  Multicall3 = 'Multicall3',
   L1GasPriceOracle = 'L1GasPriceOracle',
 }
 

@@ -1,5 +1,5 @@
 {
-    "version": "0.9.11",
+    "version": "0.9.12",
     "networks": {
         "1": {
             "contracts": {
@@ -137,6 +137,10 @@
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
+                },
+                "Multicall3": {
+                    "address": "0xcA11bde05977b3631167028862bE2a173976CA11",
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -259,7 +263,7 @@
                 "SeaportProxyBuyer": {
                     "address": "0x8b031F472F7f90ac1fAE1616Ddf1283CDDe084bF",
                     "deploymentBlock": "0x037b22db",
-                    "implementation": "0xceEE7A3D7bEb72e4C62820416808D3a226356a5e",
+                    "implementation": "0x53B01e32807127D3c2Fb6eA1A3b268753183Ed68",
                     "forwarder": "0x8b031F472F7f90ac1fAE1616Ddf1283CDDe084bF"
                 },
                 "USDC": {
@@ -269,6 +273,10 @@
                 "L1GasPriceOracle": {
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "Multicall3": {
+                    "address": "0xcA11bde05977b3631167028862bE2a173976CA11",
                     "deploymentBlock": "0x0"
                 }
             }
@@ -342,10 +350,10 @@
                     "forwarder": "0x11dD97b7Ca847DfB6504e61B7B9Eb30F55E554a0"
                 },
                 "ProxyReader": {
-                    "address": "0x0930ffb2c192B0C9A9dd2372Cf7f2845ef39CBb6",
-                    "implementation": "0xbE92182CAB5b84Fd18b34881A0c32771e84f5b8B",
+                    "address": "0xcd12F3f3faae97679a844aA184c0589ea8176656",
+                    "implementation": "0x0930ffb2c192B0C9A9dd2372Cf7f2845ef39CBb6",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x22"
+                    "deploymentBlock": "0x23"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",
@@ -369,26 +377,26 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x3198fc981626687F4B5BDf0fbEABB0a5E0489C03",
+                    "address": "0x951c830a0471C04DCB60Ce244DEe38eE4b0609ec",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x5b"
+                    "deploymentBlock": "0x5c"
                 },
                 "ZilliqaRecover": {
-                    "address": "0xf6b7c221342BC966f4396790895530bF4E9799eB",
-                    "deploymentBlock": "0x2d",
-                    "implementation": "0x00e39A5004299871aB3b00FeD5A39a715F181d02",
+                    "address": "0xDD622cF8306F18d736705e4Cc03f7FF83A899FD0",
+                    "deploymentBlock": "0x2e",
+                    "implementation": "0xf6b7c221342BC966f4396790895530bF4E9799eB",
                     "legacyAddresses": [],
-                    "forwarder": "0xf6b7c221342BC966f4396790895530bF4E9799eB"
+                    "forwarder": "0xDD622cF8306F18d736705e4Cc03f7FF83A899FD0"
                 },
                 "Seaport": {
                     "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
                     "deploymentBlock": "0x1f"
                 },
                 "SeaportProxyBuyer": {
-                    "address": "0x24F45688D421f46cca60734BdC648ad192dB0f2E",
-                    "deploymentBlock": "0x28",
-                    "implementation": "0x54563a9e1cD2dCBD0BCA90D3CFA4A647e02C404a",
-                    "forwarder": "0x24F45688D421f46cca60734BdC648ad192dB0f2E"
+                    "address": "0x7e76aE49D6F4c6158757693b050BF88f039DeA21",
+                    "deploymentBlock": "0x29",
+                    "implementation": "0x24F45688D421f46cca60734BdC648ad192dB0f2E",
+                    "forwarder": "0x7e76aE49D6F4c6158757693b050BF88f039DeA21"
                 },
                 "USDC": {
                     "address": "0xDa9E1b3e395bFb0A45F03C7F615146B9d896c959",
@@ -398,6 +406,10 @@
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
+                },
+                "Multicall3": {
+                    "address": "0xbE92182CAB5b84Fd18b34881A0c32771e84f5b8B",
+                    "deploymentBlock": "0x21"
                 }
             }
         },
@@ -644,7 +656,7 @@
                 "SeaportProxyBuyer": {
                     "address": "0x4FF860525ccb6E992E0A4579860465f7EF581aed",
                     "deploymentBlock": "0x7c4d06",
-                    "implementation": "0x5F5462Fc1C298ccB65dB5338f9aE90ce24Eec9d6",
+                    "implementation": "0xf02a5fA08b86aC35EC3D6Df6878832334696788E",
                     "forwarder": "0x4FF860525ccb6E992E0A4579860465f7EF581aed"
                 },
                 "USDC": {
@@ -654,6 +666,10 @@
                 "L1GasPriceOracle": {
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "Multicall3": {
+                    "address": "0xcA11bde05977b3631167028862bE2a173976CA11",
                     "deploymentBlock": "0x0"
                 }
             }
@@ -782,6 +798,10 @@
                 "L1GasPriceOracle": {
                     "address": "0x420000000000000000000000000000000000000F",
                     "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "Multicall3": {
+                    "address": "0xcA11bde05977b3631167028862bE2a173976CA11",
                     "deploymentBlock": "0x0"
                 }
             }
@@ -915,6 +935,10 @@
                 "L1GasPriceOracle": {
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "Multicall3": {
+                    "address": "0xcA11bde05977b3631167028862bE2a173976CA11",
                     "deploymentBlock": "0x0"
                 }
             }
