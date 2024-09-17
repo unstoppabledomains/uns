@@ -342,10 +342,10 @@
                     "forwarder": "0x11dD97b7Ca847DfB6504e61B7B9Eb30F55E554a0"
                 },
                 "ProxyReader": {
-                    "address": "0x0930ffb2c192B0C9A9dd2372Cf7f2845ef39CBb6",
-                    "implementation": "0xbE92182CAB5b84Fd18b34881A0c32771e84f5b8B",
+                    "address": "0xcd12F3f3faae97679a844aA184c0589ea8176656",
+                    "implementation": "0x0930ffb2c192B0C9A9dd2372Cf7f2845ef39CBb6",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x22"
+                    "deploymentBlock": "0x23"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",
@@ -369,30 +369,32 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x3198fc981626687F4B5BDf0fbEABB0a5E0489C03",
+                    "address": "0x951c830a0471C04DCB60Ce244DEe38eE4b0609ec",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x5b"
+                    "deploymentBlock": "0x5c"
                 },
                 "ZilliqaRecover": {
-                    "address": "0xf6b7c221342BC966f4396790895530bF4E9799eB",
-                    "deploymentBlock": "0x2d",
-                    "implementation": "0x00e39A5004299871aB3b00FeD5A39a715F181d02",
+                    "address": "0xDD622cF8306F18d736705e4Cc03f7FF83A899FD0",
+                    "deploymentBlock": "0x2e",
+                    "implementation": "0xf6b7c221342BC966f4396790895530bF4E9799eB",
                     "legacyAddresses": [],
-                    "forwarder": "0xf6b7c221342BC966f4396790895530bF4E9799eB"
+                    "forwarder": "0xDD622cF8306F18d736705e4Cc03f7FF83A899FD0"
                 },
                 "Seaport": {
                     "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
                     "deploymentBlock": "0x1f"
                 },
                 "SeaportProxyBuyer": {
-                    "address": "0x24F45688D421f46cca60734BdC648ad192dB0f2E",
-                    "deploymentBlock": "0x28",
-                    "implementation": "0x54563a9e1cD2dCBD0BCA90D3CFA4A647e02C404a",
-                    "forwarder": "0x24F45688D421f46cca60734BdC648ad192dB0f2E"
+                    "address": "0x7e76aE49D6F4c6158757693b050BF88f039DeA21",
+                    "deploymentBlock": "0x29",
+                    "implementation": "0x24F45688D421f46cca60734BdC648ad192dB0f2E",
+                    "forwarder": "0x7e76aE49D6F4c6158757693b050BF88f039DeA21"
                 },
                 "USDC": {
-                    "address": "0xDa9E1b3e395bFb0A45F03C7F615146B9d896c959",
-                    "deploymentBlock": "0x20"
+                    "address": "0xbE92182CAB5b84Fd18b34881A0c32771e84f5b8B",
+                    "deploymentBlock": "0x21",
+                    "implementation": "0xDa9E1b3e395bFb0A45F03C7F615146B9d896c959",
+                    "forwarder": "0xbE92182CAB5b84Fd18b34881A0c32771e84f5b8B"
                 },
                 "L1GasPriceOracle": {
                     "address": "0x0000000000000000000000000000000000000000",
@@ -648,8 +650,10 @@
                     "forwarder": "0x4FF860525ccb6E992E0A4579860465f7EF581aed"
                 },
                 "USDC": {
-                    "address": "0x6694CfD96d7fD80041062895B49f768081CA96f2",
-                    "deploymentBlock": "0x0"
+                    "address": "0x9E85b0F8a298Eb0ACc175cFFEd0674718d552C11",
+                    "deploymentBlock": "0xb7c92b",
+                    "implementation": "0xf66A05D55F6a71E74e131b9870B9131EE56ef12E",
+                    "forwarder": "0x9E85b0F8a298Eb0ACc175cFFEd0674718d552C11"
                 },
                 "L1GasPriceOracle": {
                     "address": "0x0000000000000000000000000000000000000000",
