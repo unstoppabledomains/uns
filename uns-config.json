@@ -350,10 +350,10 @@
                     "forwarder": "0x11dD97b7Ca847DfB6504e61B7B9Eb30F55E554a0"
                 },
                 "ProxyReader": {
-                    "address": "0xcd12F3f3faae97679a844aA184c0589ea8176656",
-                    "implementation": "0x0930ffb2c192B0C9A9dd2372Cf7f2845ef39CBb6",
+                    "address": "0x56b793E4aD031Dd3EFeF272dc133D212d5fBddc3",
+                    "implementation": "0xcd12F3f3faae97679a844aA184c0589ea8176656",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x23"
+                    "deploymentBlock": "0x24"
                 },
                 "TwitterValidationOperator": {
                     "address": "0x0000000000000000000000000000000000000000",
@@ -377,30 +377,32 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x951c830a0471C04DCB60Ce244DEe38eE4b0609ec",
+                    "address": "0x5831f0664Ee58C88DE672946678Fed9a228Eb83B",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x5c"
+                    "deploymentBlock": "0x5d"
                 },
                 "ZilliqaRecover": {
-                    "address": "0xDD622cF8306F18d736705e4Cc03f7FF83A899FD0",
-                    "deploymentBlock": "0x2e",
-                    "implementation": "0xf6b7c221342BC966f4396790895530bF4E9799eB",
+                    "address": "0x38Dae41aEed12884D39dabD8F8a81Bb5B4562756",
+                    "deploymentBlock": "0x2f",
+                    "implementation": "0xDD622cF8306F18d736705e4Cc03f7FF83A899FD0",
                     "legacyAddresses": [],
-                    "forwarder": "0xDD622cF8306F18d736705e4Cc03f7FF83A899FD0"
+                    "forwarder": "0x38Dae41aEed12884D39dabD8F8a81Bb5B4562756"
                 },
                 "Seaport": {
                     "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
                     "deploymentBlock": "0x1f"
                 },
                 "SeaportProxyBuyer": {
-                    "address": "0x7e76aE49D6F4c6158757693b050BF88f039DeA21",
-                    "deploymentBlock": "0x29",
-                    "implementation": "0x24F45688D421f46cca60734BdC648ad192dB0f2E",
-                    "forwarder": "0x7e76aE49D6F4c6158757693b050BF88f039DeA21"
+                    "address": "0xEE9A59532B50514d4Cb2440b19E9539b6380CEcf",
+                    "deploymentBlock": "0x2a",
+                    "implementation": "0x7e76aE49D6F4c6158757693b050BF88f039DeA21",
+                    "forwarder": "0xEE9A59532B50514d4Cb2440b19E9539b6380CEcf"
                 },
                 "USDC": {
-                    "address": "0xDa9E1b3e395bFb0A45F03C7F615146B9d896c959",
-                    "deploymentBlock": "0x20"
+                    "address": "0xbE92182CAB5b84Fd18b34881A0c32771e84f5b8B",
+                    "deploymentBlock": "0x21",
+                    "implementation": "0xDa9E1b3e395bFb0A45F03C7F615146B9d896c959",
+                    "forwarder": "0xbE92182CAB5b84Fd18b34881A0c32771e84f5b8B"
                 },
                 "L1GasPriceOracle": {
                     "address": "0x0000000000000000000000000000000000000000",
@@ -408,8 +410,8 @@
                     "deploymentBlock": "0x0"
                 },
                 "Multicall3": {
-                    "address": "0xbE92182CAB5b84Fd18b34881A0c32771e84f5b8B",
-                    "deploymentBlock": "0x21"
+                    "address": "0x0930ffb2c192B0C9A9dd2372Cf7f2845ef39CBb6",
+                    "deploymentBlock": "0x22"
                 }
             }
         },
@@ -664,8 +666,10 @@
                     "forwarder": "0x4FF860525ccb6E992E0A4579860465f7EF581aed"
                 },
                 "USDC": {
-                    "address": "0x6694CfD96d7fD80041062895B49f768081CA96f2",
-                    "deploymentBlock": "0x0"
+                    "address": "0x9E85b0F8a298Eb0ACc175cFFEd0674718d552C11",
+                    "deploymentBlock": "0xb7c92b",
+                    "implementation": "0xf66A05D55F6a71E74e131b9870B9131EE56ef12E",
+                    "forwarder": "0x9E85b0F8a298Eb0ACc175cFFEd0674718d552C11"
                 },
                 "L1GasPriceOracle": {
                     "address": "0x0000000000000000000000000000000000000000",

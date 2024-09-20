@@ -10,6 +10,7 @@ import {
   SeaportProxyBuyer,
   UNSOperator,
   UNSRegistry,
+  USDC,
   ZilliqaRecover,
 } from '../types';
 import { Deployer } from './deployer';
@@ -1139,10 +1140,14 @@ const deployUsdcMockTask: Task = {
       throw new Error('This task is only available for sandbox or testnet');
     }
 
-    const usdcMock = await ethers.deployContract(ArtifactName.USDC, [], owner);
+    const usdcMock = await deployProxy<USDC>(await ethers.getContractFactory(ArtifactName.USDC, owner), [], {
+      redeployImplementation: 'onchange',
+    });
     await usdcMock.waitForDeployment();
-    await ctx.saveContractConfig(UnsContractName.USDC, usdcMock);
-    await verify(ctx, await usdcMock.getAddress(), [], 'contracts/mocks/USDC.sol:USDC');
+    const proxyAdmin = await upgrades.admin.getInstance();
+    const usdcMockImpl = await proxyAdmin.getProxyImplementation.staticCall(await usdcMock.getAddress());
+    await ctx.saveContractConfig(UnsContractName.USDC, usdcMock, usdcMockImpl, usdcMock);
+    await verify(ctx, usdcMockImpl, []);
   },
   ensureDependencies: () => ({}),
 };
@@ -1193,6 +1198,7 @@ const fundSeaportProxyBuyerTask: Task = {
   priority: 30,
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const { owner } = ctx.accounts;
+    const amountToFund = parseUnits('1000000000', 6); // 1B USDC
 
     if (!isSandbox && !isTestnet) {
       throw new Error('This task is only available for sandbox or testnet');
@@ -1203,7 +1209,7 @@ const fundSeaportProxyBuyerTask: Task = {
       UnsContractName.USDC,
     ]);
     const usdcMockContract = await ethers.getContractAt(UnsContractName.USDC, USDCMock.address, owner);
-    await usdcMockContract.mint(SeaportProxyBuyer.address, parseUnits('1000000', 6)); // 1M USDC
+    await usdcMockContract.mint(SeaportProxyBuyer.address, amountToFund);
     const seaportProxyBuyerContract = await ethers.getContractAt(
       UnsContractName.SeaportProxyBuyer,
       SeaportProxyBuyer.address,
