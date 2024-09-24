@@ -21,6 +21,7 @@ export declare enum ArtifactName {
     SeaportProxyBuyer = "SeaportProxyBuyer",
     ConduitController = "ConduitController",
     USDC = "USDC",
+    Muticall3 = "Multicall3",
     ENSRegistry = "ENSRegistry",
     BaseRegistrarImplementation = "BaseRegistrarImplementation",
     ReverseRegistrar = "ReverseRegistrar",
@@ -64,6 +65,7 @@ export declare enum UnsContractName {
     Seaport = "Seaport",
     SeaportProxyBuyer = "SeaportProxyBuyer",
     USDC = "USDC",
+    Multicall3 = "Multicall3",
     L1GasPriceOracle = "L1GasPriceOracle"
 }
 export declare enum EnsContractName {

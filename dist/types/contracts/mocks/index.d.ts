@@ -9,6 +9,7 @@ export type { ERC721Mock } from "./ERC721Mock";
 export type { ERC721ReceiverMock } from "./ERC721ReceiverMock";
 export type { MinterRoleMock } from "./MinterRoleMock";
 export type { MintingManagerMock } from "./MintingManagerMock";
+export type { Multicall3 } from "./Multicall3";
 export type { UNSRegistryForwarderMock } from "./UNSRegistryForwarderMock";
 export type { UNSRegistryMock } from "./UNSRegistryMock";
 export type { USDC } from "./USDC";

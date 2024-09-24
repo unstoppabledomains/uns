@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.USDC__factory = exports.UNSRegistryMock__factory = exports.UNSRegistryForwarderMock__factory = exports.MintingManagerMock__factory = exports.MinterRoleMock__factory = exports.ERC721ReceiverMock__factory = exports.ERC721Mock__factory = exports.ERC2771RegistryContextMock__factory = exports.ERC2771ContextMock__factory = exports.ERC20UnsafeMock__factory = exports.ERC20Mock__factory = exports.ERC1155Mock__factory = exports.BaseRoutingForwarderMock__factory = exports.BaseForwarderMock__factory = void 0;
+exports.USDC__factory = exports.UNSRegistryMock__factory = exports.UNSRegistryForwarderMock__factory = exports.Multicall3__factory = exports.MintingManagerMock__factory = exports.MinterRoleMock__factory = exports.ERC721ReceiverMock__factory = exports.ERC721Mock__factory = exports.ERC2771RegistryContextMock__factory = exports.ERC2771ContextMock__factory = exports.ERC20UnsafeMock__factory = exports.ERC20Mock__factory = exports.ERC1155Mock__factory = exports.BaseRoutingForwarderMock__factory = exports.BaseForwarderMock__factory = void 0;
 var BaseForwarderMock__factory_1 = require("./BaseForwarderMock__factory");
 Object.defineProperty(exports, "BaseForwarderMock__factory", { enumerable: true, get: function () { return BaseForwarderMock__factory_1.BaseForwarderMock__factory; } });
 var BaseRoutingForwarderMock__factory_1 = require("./BaseRoutingForwarderMock__factory");
@@ -23,6 +23,8 @@ var MinterRoleMock__factory_1 = require("./MinterRoleMock__factory");
 Object.defineProperty(exports, "MinterRoleMock__factory", { enumerable: true, get: function () { return MinterRoleMock__factory_1.MinterRoleMock__factory; } });
 var MintingManagerMock__factory_1 = require("./MintingManagerMock__factory");
 Object.defineProperty(exports, "MintingManagerMock__factory", { enumerable: true, get: function () { return MintingManagerMock__factory_1.MintingManagerMock__factory; } });
+var Multicall3__factory_1 = require("./Multicall3__factory");
+Object.defineProperty(exports, "Multicall3__factory", { enumerable: true, get: function () { return Multicall3__factory_1.Multicall3__factory; } });
 var UNSRegistryForwarderMock__factory_1 = require("./UNSRegistryForwarderMock__factory");
 Object.defineProperty(exports, "UNSRegistryForwarderMock__factory", { enumerable: true, get: function () { return UNSRegistryForwarderMock__factory_1.UNSRegistryForwarderMock__factory; } });
 var UNSRegistryMock__factory_1 = require("./UNSRegistryMock__factory");

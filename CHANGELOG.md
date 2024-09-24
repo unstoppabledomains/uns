@@ -1,3 +1,8 @@
+## v0.9.33
+
+- Deploy `Multicall3` contract to the sandbox
+- Add `Multicall3` Addresses to the `uns-config.json`
+
 ## v0.9.32
 
 - Added permit functionality to usdcMock and make it upgradable
