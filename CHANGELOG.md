@@ -1,3 +1,7 @@
+## v0.9.34
+
+- Add `.lfg`, `.dream` Polygon TLD
+
 ## v0.9.33
 
 - Deploy `Multicall3` contract to the sandbox

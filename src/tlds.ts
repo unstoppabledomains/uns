@@ -195,6 +195,16 @@ export const TLD: Record<string, TLDConfig> = {
     networks: [Network.POLYGON, Network.ETHEREUM],
     hash: BigInt('0x3b270f4d000c6046ee64e8c025ad8cff71e728b275a81bf53a060442fe9f9766'),
   },
+  lfg: {
+    nameServices: [NameService.UNS],
+    networks: [Network.POLYGON, Network.ETHEREUM],
+    hash: BigInt('0x8a1e62a27632ec008a082a22be9aded2ff7668fdd019e4d4001a5a27c4e84f81'),
+  },
+  dream: {
+    nameServices: [NameService.UNS],
+    networks: [Network.POLYGON, Network.ETHEREUM],
+    hash: BigInt('0x30b126da528ed6a22ad6ce11ea44a16f3990a215ef04115d84bb9275b709e89c'),
+  },
   zil: {
     nameServices: [NameService.UNS],
     networks: [Network.POLYGON, Network.ETHEREUM],
