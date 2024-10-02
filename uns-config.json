@@ -1,5 +1,5 @@
 {
-    "version": "0.9.13",
+    "version": "0.9.14",
     "networks": {
         "1": {
             "contracts": {
@@ -377,16 +377,16 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0xc86965b7720a64c86263030f7B2902c752084F46",
+                    "address": "0x399Da84d05f49e44338fe949D0eC54dACf7cb7F2",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x5f"
+                    "deploymentBlock": "0x62"
                 },
                 "ZilliqaRecover": {
-                    "address": "0x38Dae41aEed12884D39dabD8F8a81Bb5B4562756",
-                    "deploymentBlock": "0x2f",
-                    "implementation": "0xDD622cF8306F18d736705e4Cc03f7FF83A899FD0",
+                    "address": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
+                    "deploymentBlock": "0x32",
+                    "implementation": "0x4Eb9dE1Fc0d800e941F326d6699E9E11969557ea",
                     "legacyAddresses": [],
-                    "forwarder": "0x38Dae41aEed12884D39dabD8F8a81Bb5B4562756"
+                    "forwarder": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9"
                 },
                 "Seaport": {
                     "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
@@ -412,6 +412,12 @@
                 "Multicall3": {
                     "address": "0x0930ffb2c192B0C9A9dd2372Cf7f2845ef39CBb6",
                     "deploymentBlock": "0x22"
+                },
+                "RegistrarCustody": {
+                    "address": "0x38Dae41aEed12884D39dabD8F8a81Bb5B4562756",
+                    "deploymentBlock": "0x2f",
+                    "implementation": "0xDD622cF8306F18d736705e4Cc03f7FF83A899FD0",
+                    "forwarder": "0x38Dae41aEed12884D39dabD8F8a81Bb5B4562756"
                 }
             }
         },
