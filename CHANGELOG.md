@@ -1,3 +1,7 @@
+## v0.9.36
+
+- Added `RegistrarCustody` contract
+
 ## v0.9.35
 
 - Added ability to internalTransfer parked domains in `ENSCustody`
