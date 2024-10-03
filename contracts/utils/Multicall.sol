@@ -12,6 +12,7 @@ import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 abstract contract Multicall {
     /**
      * @dev Receives and executes a batch of function calls on this contract.
+     * @custom:oz-upgrades-unsafe-allow-reachable delegatecall
      */
     function _multicall(bytes[] memory data) internal returns (bytes[] memory results) {
         results = new bytes[](data.length);
