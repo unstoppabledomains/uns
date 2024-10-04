@@ -1,15 +1,11 @@
 ## PR Checklist
 
 ### 1. Contracts versioning
-- [ ] Make sure that the `patch` version of the contracts is increased if changes have been made to the `UNSRegistry`, `MintingManager`, `ProxyReader`, `ENSCustody` contracts.
-- [ ] Make sure that the `minor` version of the contracts is increased if breaking changes have been made to the `UNSRegistry`, `MintingManager`, `ProxyReader`, `ENSCustody` contracts. It includes changes of interfaces.
+- [ ] Make sure that the `patch` version of the contracts is increased if changes have been made to the `UNSRegistry`, `MintingManager`, `ProxyReader`, `ENSCustody`, or `RegistrarCustody` contracts.
+- [ ] Make sure that the `minor` version of the contracts is increased if breaking changes have been made to the `UNSRegistry`, `MintingManager`, `ProxyReader`, `ENSCustody`, or `RegistrarCustody` contracts. It includes changes of interfaces.
 ### 2. Contracts licensing
-- [ ] Make sure that no **SPDX-License-Identifier** defined in contracts.
-- [ ] Make sure that the **header** is added to the new contract files.
-  ```
-  // @author Unstoppable Domains, Inc.
-  // @date {Month} {Day}(ordinal), {Year}
-  ```
+- [ ] Make sure that no **SPDX-License-Identifier** is defined in contracts.
+- [ ] Make sure that the **header** is added to the new contract files, including `RegistrarCustody`.
 ### 3. Coverage
 - [ ] Make sure that the coverage of contracts has not decreased and strive **100%**
 ### 4. Configs versioning

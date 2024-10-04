@@ -1,3 +1,7 @@
+## v0.9.35
+
+- Added `RegistrarCustody` contract
+
 ## v0.9.34
 
 - Add `.lfg`, `.dream` Polygon TLD
