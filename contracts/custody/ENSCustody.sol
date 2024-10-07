@@ -224,6 +224,32 @@ contract ENSCustody is
 
     receive() external payable {}
 
+    function parkingTransfer(address to, uint256 tokenId) external onlyTokenOwner(tokenId) {
+        _protectTokenOperation(tokenId);
+        _park(tokenId, to);
+    }
+
+    struct ExecuteData {
+        ForwardRequest req;
+        bytes signature;
+    }
+
+    function multicallExecute(ExecuteData[] calldata data) public returns (bytes[] memory results) {
+        require(!isTrustedForwarder(msg.sender), 'meta transactions are not allowed');
+
+        for (uint256 i = 0; i < data.length; i++) {
+            ExecuteData calldata d = data[i];
+            bytes4 sig = abi.decode(d.req.data[:4], (bytes4));
+            require(sig == this.parkingTransfer.selector, 'only parkingTransfer is allowed');
+        }
+
+        results = new bytes[](data.length);
+        for (uint256 i = 0; i < data.length; i++) {
+            results[i] = execute(data[i].req, data[i].signature);
+        }
+        return results;
+    }
+
     function _register(
         string calldata name,
         address owner,

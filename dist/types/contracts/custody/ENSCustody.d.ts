@@ -19,8 +19,21 @@ export declare namespace IForwarder {
         data: string;
     };
 }
+export declare namespace ENSCustody {
+    type ExecuteDataStruct = {
+        req: IForwarder.ForwardRequestStruct;
+        signature: BytesLike;
+    };
+    type ExecuteDataStructOutput = [
+        req: IForwarder.ForwardRequestStructOutput,
+        signature: string
+    ] & {
+        req: IForwarder.ForwardRequestStructOutput;
+        signature: string;
+    };
+}
 export interface ENSCustodyInterface extends Interface {
-    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "closeMinter" | "commit" | "execute" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isMinter" | "isTrustedForwarder" | "makeCommitment" | "nonceOf" | "onERC1155BatchReceived" | "onERC1155Received" | "onERC721Received" | "owner" | "ownerOf" | "register" | "removeMinter" | "removeMinters" | "renew" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "rentPrice" | "revokeRole" | "rotateMinter" | "safeTransfer" | "setBaseRegistrar" | "supportsInterface" | "transferOwnership" | "verify"): FunctionFragment;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "closeMinter" | "commit" | "execute" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isMinter" | "isTrustedForwarder" | "makeCommitment" | "multicallExecute" | "nonceOf" | "onERC1155BatchReceived" | "onERC1155Received" | "onERC721Received" | "owner" | "ownerOf" | "parkingTransfer" | "register" | "removeMinter" | "removeMinters" | "renew" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "rentPrice" | "revokeRole" | "rotateMinter" | "safeTransfer" | "setBaseRegistrar" | "supportsInterface" | "transferOwnership" | "verify"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Initialized" | "OwnershipTransferred" | "Parked" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
@@ -48,6 +61,7 @@ export interface ENSCustodyInterface extends Interface {
         BigNumberish,
         boolean
     ]): string;
+    encodeFunctionData(functionFragment: "multicallExecute", values: [ENSCustody.ExecuteDataStruct[]]): string;
     encodeFunctionData(functionFragment: "nonceOf", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "onERC1155BatchReceived", values: [
         AddressLike,
@@ -60,6 +74,7 @@ export interface ENSCustodyInterface extends Interface {
     encodeFunctionData(functionFragment: "onERC721Received", values: [AddressLike, AddressLike, BigNumberish, BytesLike]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "ownerOf", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "parkingTransfer", values: [AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "register", values: [
         string,
         AddressLike,
@@ -101,12 +116,14 @@ export interface ENSCustodyInterface extends Interface {
     decodeFunctionResult(functionFragment: "isMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isTrustedForwarder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "makeCommitment", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "multicallExecute", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "nonceOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "onERC1155BatchReceived", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "onERC1155Received", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "onERC721Received", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "parkingTransfer", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeMinters", data: BytesLike): Result;
@@ -283,6 +300,11 @@ export interface ENSCustody extends BaseContract {
     ], [
         string
     ], "view">;
+    multicallExecute: TypedContractMethod<[
+        data: ENSCustody.ExecuteDataStruct[]
+    ], [
+        string[]
+    ], "nonpayable">;
     nonceOf: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
     onERC1155BatchReceived: TypedContractMethod<[
         arg0: AddressLike,
@@ -312,6 +334,12 @@ export interface ENSCustody extends BaseContract {
     ], "nonpayable">;
     owner: TypedContractMethod<[], [string], "view">;
     ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    parkingTransfer: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
     register: TypedContractMethod<[
         name: string,
         owner: AddressLike,
@@ -439,6 +467,11 @@ export interface ENSCustody extends BaseContract {
     ], [
         string
     ], "view">;
+    getFunction(nameOrSignature: "multicallExecute"): TypedContractMethod<[
+        data: ENSCustody.ExecuteDataStruct[]
+    ], [
+        string[]
+    ], "nonpayable">;
     getFunction(nameOrSignature: "nonceOf"): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
     getFunction(nameOrSignature: "onERC1155BatchReceived"): TypedContractMethod<[
         arg0: AddressLike,
@@ -468,6 +501,12 @@ export interface ENSCustody extends BaseContract {
     ], "nonpayable">;
     getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "ownerOf"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "parkingTransfer"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
     getFunction(nameOrSignature: "register"): TypedContractMethod<[
         name: string,
         owner: AddressLike,
