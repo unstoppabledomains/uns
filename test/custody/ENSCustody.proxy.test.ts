@@ -23,6 +23,7 @@ import {
 import { REGISTRATION_TIME, ZERO_ADDRESS, ZERO_WORD } from '../helpers/constants';
 import { getLatestBlockTimestamp, increaseTimeBy } from '../helpers/utils';
 import { deployProxy } from '../../src/helpers';
+import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 
 describe('ENSCustody (proxy)', function () {
   let ens: ENSRegistry;
@@ -39,6 +40,7 @@ describe('ENSCustody (proxy)', function () {
   let signers: SignerWithAddress[], owner: SignerWithAddress, registrant: SignerWithAddress, minter: SignerWithAddress;
   let ownerAddress: string, registrantAddress: string;
   let result: unknown;
+  let buildExecuteParams: ExecuteFunc;
 
   async function registerAndParkName (
     name: string,
@@ -142,6 +144,8 @@ describe('ENSCustody (proxy)', function () {
       await baseRegistrar.getAddress(),
     );
     await custody.addMinter(minter.address);
+
+    buildExecuteParams = buildExecuteFunc(custody.interface, await custody.getAddress(), custody);
   });
 
   beforeEach(async () => {
@@ -209,5 +213,111 @@ describe('ENSCustody (proxy)', function () {
 
     await custody.connect(registrant).safeTransfer(registrantAddress, node);
     expect(await custody.nonceOf(node)).to.be.equal(2);
+  });
+
+  it('should transfer parking of a domain', async () => {
+    const name = 'ts-pd31';
+    const node = namehash(`${name}.eth`);
+    const newOwner = await owner.getAddress();
+    await topupCustody(name);
+
+    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await assertOwnership(name, registrantAddress);
+
+    await custody.connect(registrant).parkingTransfer(newOwner, node);
+
+    await assertOwnership(name, newOwner);
+  });
+
+  it('should multicall transfer parking', async () => {
+    const domainCount = 3;
+    const domains: {
+      name: string;
+      node: string;
+    }[] = [];
+    for (let i = 0; i < domainCount; i++) {
+      const name = 'ts-mpd1' + i;
+      domains.push({
+        name,
+        node: namehash(`${name}.eth`),
+      });
+      await topupCustody(name);
+
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+      await assertOwnership(name, registrantAddress);
+    }
+
+    const newOwner = await owner.getAddress();
+
+    const data = await Promise.all(
+      domains.map(
+        async ({ node }) =>
+          await buildExecuteParams(
+            'parkingTransfer(address,uint256)',
+            [newOwner, node],
+            registrant,
+            node,
+            await custody.nonceOf(node),
+          ),
+      ),
+    );
+
+    await custody.connect(minter).multicallExecute(data);
+
+    for (const { name } of domains) {
+      await assertOwnership(name, newOwner);
+    }
+  });
+
+  it('should not multicall for other functions', async () => {
+    const name = 'ts-pd32';
+    const node = namehash(`${name}.eth`);
+    await topupCustody(name);
+
+    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await assertOwnership(name, registrantAddress);
+
+    const data = [
+      await buildExecuteParams(
+        'safeTransfer(address,uint256)',
+        [await owner.getAddress(), node],
+        registrant,
+        node,
+        await custody.nonceOf(node),
+      ),
+    ];
+
+    await expect(custody.connect(minter).multicallExecute(data)).to.be.revertedWith('only parkingTransfer is allowed');
+  });
+
+  it('should not allow meta multicall', async () => {
+    const name = 'ts-pd33';
+    const node = namehash(`${name}.eth`);
+    await topupCustody(name);
+
+    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await assertOwnership(name, registrantAddress);
+
+    const data = [
+      await buildExecuteParams(
+        'safeTransfer(address,uint256)',
+        [await owner.getAddress(), node],
+        registrant,
+        node,
+        await custody.nonceOf(node),
+      ),
+    ];
+
+    const { req, signature } = await buildExecuteParams(
+      'multicallExecute(address,uint256)',
+      [data],
+      registrant,
+      node,
+      await custody.nonceOf(node),
+    );
+
+    await expect(custody.connect(minter).execute(req, signature)).to.be.revertedWith(
+      'meta transactions are not allowed',
+    );
   });
 });
