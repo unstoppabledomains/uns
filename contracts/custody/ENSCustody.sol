@@ -19,6 +19,7 @@ import {IENSCustody, Unauthorised, InvalidToken, UnknownToken, CustodyNotEnoughB
 import {InvalidForwardedToken, ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
 import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
+import {Multicall} from '../utils/Multicall.sol';
 
 contract ENSCustody is
     Initializable,
@@ -27,7 +28,8 @@ contract ENSCustody is
     ERC2771RegistryContext,
     Forwarder,
     MinterRole,
-    IENSCustody
+    IENSCustody,
+    Multicall
 {
     string public constant NAME = 'ENS Custody';
     string public constant VERSION = '0.1.3';
@@ -217,7 +219,6 @@ contract ENSCustody is
     function safeTransfer(address to, uint256 tokenId) external onlyTokenOwner(tokenId) {
         _protectTokenOperation(tokenId);
         StorageSlotUpgradeable.getAddressSlot(keccak256(abi.encodePacked(_OWNER_PREFIX_SLOT, tokenId))).value = address(0);
-
         INameWrapper _wrapper = INameWrapper(StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value);
         _wrapper.safeTransferFrom(address(this), to, tokenId, 1, '');
     }
