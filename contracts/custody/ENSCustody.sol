@@ -217,38 +217,31 @@ contract ENSCustody is
     }
 
     function safeTransfer(address to, uint256 tokenId) external onlyTokenOwner(tokenId) {
+        this.safeTransfer(to, tokenId, false);
+    }
+
+    function safeTransfer(address to, uint256 tokenId, bool internalTransfer) external onlyTokenOwner(tokenId) {
         _protectTokenOperation(tokenId);
-        StorageSlotUpgradeable.getAddressSlot(keccak256(abi.encodePacked(_OWNER_PREFIX_SLOT, tokenId))).value = address(0);
-        INameWrapper _wrapper = INameWrapper(StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value);
-        _wrapper.safeTransferFrom(address(this), to, tokenId, 1, '');
+        if (internalTransfer) {
+            _park(tokenId, to);
+        } else {
+            StorageSlotUpgradeable.getAddressSlot(keccak256(abi.encodePacked(_OWNER_PREFIX_SLOT, tokenId))).value = address(0);
+
+            INameWrapper _wrapper = INameWrapper(StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value);
+            _wrapper.safeTransferFrom(address(this), to, tokenId, 1, '');
+        }
     }
 
     receive() external payable {}
 
-    function parkingTransfer(address to, uint256 tokenId) external onlyTokenOwner(tokenId) {
-        _protectTokenOperation(tokenId);
-        _park(tokenId, to);
-    }
-
-    struct ExecuteData {
-        ForwardRequest req;
-        bytes signature;
-    }
-
-    function multicallExecute(ExecuteData[] calldata data) public returns (bytes[] memory results) {
-        require(!isTrustedForwarder(msg.sender), 'meta transactions are not allowed');
-
-        for (uint256 i = 0; i < data.length; i++) {
-            ExecuteData calldata d = data[i];
-            bytes4 sig = abi.decode(d.req.data[:4], (bytes4));
-            require(sig == this.parkingTransfer.selector, 'only parkingTransfer is allowed');
+    function multicall(bytes[] calldata data) public returns (bytes[] memory results) {
+        bytes[] memory _data = data;
+        if (isTrustedForwarder(msg.sender)) {
+            for (uint256 i = 0; i < data.length; i++) {
+                _data[i] = _buildData(_msgSender(), _msgToken(), data[i], '');
+            }
         }
-
-        results = new bytes[](data.length);
-        for (uint256 i = 0; i < data.length; i++) {
-            results[i] = execute(data[i].req, data[i].signature);
-        }
-        return results;
+        return _multicall(_data);
     }
 
     function _register(
