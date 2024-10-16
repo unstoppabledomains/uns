@@ -1,3 +1,8 @@
+## v0.9.35
+
+- Added ability to internalTransfer parked domains in `ENSCustody`
+- Added `multicall` to ENSCustody
+
 ## v0.9.34
 
 - Add `.lfg`, `.dream` Polygon TLD

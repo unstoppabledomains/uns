@@ -99,6 +99,13 @@ interface IENSCustody is IERC1155ReceiverUpgradeable {
     function safeTransfer(address to, uint256 tokenId) external;
 
     /**
+     * @dev Transfers of internal ownership of a given token ID to another address.
+     * @param to The address to receive the ownership of the given token ID
+     * @param tokenId uint256 ID of the token to transfer of
+     */
+    function internalTransfer(address to, uint256 tokenId) external;
+
+    /**
      * @dev Fallback function to receive ETH.
      */
     receive() external payable;

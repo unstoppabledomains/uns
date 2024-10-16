@@ -28,11 +28,11 @@ contract ENSCustody is
     ERC2771RegistryContext,
     Forwarder,
     MinterRole,
-    IENSCustody,
-    Multicall
+    Multicall,
+    IENSCustody
 {
     string public constant NAME = 'ENS Custody';
-    string public constant VERSION = '0.1.3';
+    string public constant VERSION = '0.1.4';
 
     bytes32 private constant _ETH_NODE = 0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
     // This is the keccak-256 hash of "ens.owner." subtracted by 1
@@ -217,30 +217,31 @@ contract ENSCustody is
     }
 
     function safeTransfer(address to, uint256 tokenId) external onlyTokenOwner(tokenId) {
-        this.safeTransfer(to, tokenId, false);
+        _protectTokenOperation(tokenId);
+
+        StorageSlotUpgradeable.getAddressSlot(keccak256(abi.encodePacked(_OWNER_PREFIX_SLOT, tokenId))).value = address(0);
+
+        INameWrapper _wrapper = INameWrapper(StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value);
+
+        _wrapper.safeTransferFrom(address(this), to, tokenId, 1, '');
     }
 
-    function safeTransfer(address to, uint256 tokenId, bool internalTransfer) external onlyTokenOwner(tokenId) {
+    function internalTransfer(address to, uint256 tokenId) external onlyTokenOwner(tokenId) {
         _protectTokenOperation(tokenId);
-        if (internalTransfer) {
-            _park(tokenId, to);
-        } else {
-            StorageSlotUpgradeable.getAddressSlot(keccak256(abi.encodePacked(_OWNER_PREFIX_SLOT, tokenId))).value = address(0);
-
-            INameWrapper _wrapper = INameWrapper(StorageSlotUpgradeable.getAddressSlot(_ENS_WRAPPER_SLOT).value);
-            _wrapper.safeTransferFrom(address(this), to, tokenId, 1, '');
-        }
+        _park(tokenId, to);
     }
 
     receive() external payable {}
 
     function multicall(bytes[] calldata data) public returns (bytes[] memory results) {
         bytes[] memory _data = data;
+
         if (isTrustedForwarder(msg.sender)) {
             for (uint256 i = 0; i < data.length; i++) {
                 _data[i] = _buildData(_msgSender(), _msgToken(), data[i], '');
             }
         }
+
         return _multicall(_data);
     }
 
