@@ -7,6 +7,7 @@ import {
   ENSCustody,
   MintingManager,
   ProxyReader,
+  RegistrarCustody,
   SeaportProxyBuyer,
   UNSOperator,
   UNSRegistry,
@@ -1268,6 +1269,51 @@ const proposeSeaportProxyBuyerTask: Task = {
   },
 };
 
+const deployRegistrarCustodyTask: Task = {
+  tags: ['registrar_custody', 'full'],
+  priority: 30,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const { owner } = ctx.accounts;
+    const [UNSRegistry, MintingManager] = unwrapDependencies(dependencies, [
+      UnsContractName.UNSRegistry,
+      UnsContractName.MintingManager,
+    ]);
+
+    const registrarCustody = await deployProxy<RegistrarCustody>(
+      await ethers.getContractFactory(ArtifactName.RegistrarCustody, owner),
+      [UNSRegistry.address, MintingManager.address],
+    );
+    await registrarCustody.waitForDeployment();
+    if (ctx.minters.length) {
+      const chunkSize = 100;
+      for (let i = 0, j = ctx.minters.length; i < j; i += chunkSize) {
+        const array = ctx.minters.slice(i, i + chunkSize);
+
+        ctx.log('Adding minters...', array);
+        const addMintersTx = await registrarCustody.connect(owner).addMinters(array);
+        await addMintersTx.wait();
+        ctx.log(`Added ${array.length} minters`);
+      }
+    }
+    const proxyAdmin = await upgrades.admin.getInstance();
+    const registrarCustodyImpl = await proxyAdmin.getProxyImplementation.staticCall(
+      await registrarCustody.getAddress(),
+    );
+    await ctx.saveContractConfig(
+      UnsContractName.RegistrarCustody,
+      registrarCustody,
+      registrarCustodyImpl,
+      registrarCustody,
+    );
+    await verify(ctx, registrarCustodyImpl, []);
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    return ensureDeployed(config, UnsContractName.UNSRegistry, UnsContractName.MintingManager);
+  },
+};
+
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -1299,4 +1345,5 @@ export const tasks: Task[] = [
   fundSeaportProxyBuyerTask,
   mintUnsTldsTask,
   proposeSeaportProxyBuyerTask,
+  deployRegistrarCustodyTask,
 ];
