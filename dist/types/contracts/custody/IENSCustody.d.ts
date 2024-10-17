@@ -1,9 +1,10 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
 export interface IENSCustodyInterface extends Interface {
-    getFunction(nameOrSignature: "commit" | "makeCommitment" | "onERC1155BatchReceived" | "onERC1155Received" | "ownerOf" | "register" | "renew" | "rentPrice" | "safeTransfer" | "supportsInterface"): FunctionFragment;
+    getFunction(nameOrSignature: "commit" | "internalTransfer" | "makeCommitment" | "onERC1155BatchReceived" | "onERC1155Received" | "ownerOf" | "register" | "renew" | "rentPrice" | "safeTransfer" | "supportsInterface"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Parked"): EventFragment;
     encodeFunctionData(functionFragment: "commit", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "internalTransfer", values: [AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "makeCommitment", values: [
         string,
         AddressLike,
@@ -40,6 +41,7 @@ export interface IENSCustodyInterface extends Interface {
     encodeFunctionData(functionFragment: "safeTransfer", values: [AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     decodeFunctionResult(functionFragment: "commit", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "internalTransfer", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "makeCommitment", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "onERC1155BatchReceived", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "onERC1155Received", data: BytesLike): Result;
@@ -76,6 +78,12 @@ export interface IENSCustody extends BaseContract {
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     commit: TypedContractMethod<[commitment: BytesLike], [void], "nonpayable">;
+    internalTransfer: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
     makeCommitment: TypedContractMethod<[
         name: string,
         owner: AddressLike,
@@ -146,6 +154,12 @@ export interface IENSCustody extends BaseContract {
     ], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "commit"): TypedContractMethod<[commitment: BytesLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "internalTransfer"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
     getFunction(nameOrSignature: "makeCommitment"): TypedContractMethod<[
         name: string,
         owner: AddressLike,

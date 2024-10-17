@@ -28,6 +28,20 @@ export declare class IENSCustody__factory {
         readonly type: "function";
     }, {
         readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "to";
+            readonly type: "address";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "tokenId";
+            readonly type: "uint256";
+        }];
+        readonly name: "internalTransfer";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
             readonly internalType: "string";
             readonly name: "name";
             readonly type: "string";

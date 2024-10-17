@@ -20,7 +20,7 @@ export declare namespace IForwarder {
     };
 }
 export interface ENSCustodyInterface extends Interface {
-    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "closeMinter" | "commit" | "execute" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isMinter" | "isTrustedForwarder" | "makeCommitment" | "multicall" | "nonceOf" | "onERC1155BatchReceived" | "onERC1155Received" | "onERC721Received" | "owner" | "ownerOf" | "register" | "removeMinter" | "removeMinters" | "renew" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "rentPrice" | "revokeRole" | "rotateMinter" | "safeTransfer(address,uint256,bool)" | "safeTransfer(address,uint256)" | "setBaseRegistrar" | "supportsInterface" | "transferOwnership" | "verify"): FunctionFragment;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "closeMinter" | "commit" | "execute" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "internalTransfer" | "isMinter" | "isTrustedForwarder" | "makeCommitment" | "multicall" | "nonceOf" | "onERC1155BatchReceived" | "onERC1155Received" | "onERC721Received" | "owner" | "ownerOf" | "register" | "removeMinter" | "removeMinters" | "renew" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "rentPrice" | "revokeRole" | "rotateMinter" | "safeTransfer" | "setBaseRegistrar" | "supportsInterface" | "transferOwnership" | "verify"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Initialized" | "OwnershipTransferred" | "Parked" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
@@ -35,6 +35,7 @@ export interface ENSCustodyInterface extends Interface {
     encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "internalTransfer", values: [AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "isMinter", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "isTrustedForwarder", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "makeCommitment", values: [
@@ -81,8 +82,7 @@ export interface ENSCustodyInterface extends Interface {
     encodeFunctionData(functionFragment: "rentPrice", values: [string, BigNumberish]): string;
     encodeFunctionData(functionFragment: "revokeRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "rotateMinter", values: [AddressLike]): string;
-    encodeFunctionData(functionFragment: "safeTransfer(address,uint256,bool)", values: [AddressLike, BigNumberish, boolean]): string;
-    encodeFunctionData(functionFragment: "safeTransfer(address,uint256)", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "safeTransfer", values: [AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "setBaseRegistrar", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
@@ -100,6 +100,7 @@ export interface ENSCustodyInterface extends Interface {
     decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "internalTransfer", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isTrustedForwarder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "makeCommitment", data: BytesLike): Result;
@@ -120,8 +121,7 @@ export interface ENSCustodyInterface extends Interface {
     decodeFunctionResult(functionFragment: "rentPrice", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "rotateMinter", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "safeTransfer(address,uint256,bool)", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "safeTransfer(address,uint256)", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "safeTransfer", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setBaseRegistrar", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
@@ -268,6 +268,12 @@ export interface ENSCustody extends BaseContract {
     ], [
         void
     ], "nonpayable">;
+    internalTransfer: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
     isMinter: TypedContractMethod<[account: AddressLike], [boolean], "view">;
     isTrustedForwarder: TypedContractMethod<[
         forwarder: AddressLike
@@ -367,14 +373,7 @@ export interface ENSCustody extends BaseContract {
         void
     ], "nonpayable">;
     rotateMinter: TypedContractMethod<[receiver: AddressLike], [void], "payable">;
-    "safeTransfer(address,uint256,bool)": TypedContractMethod<[
-        to: AddressLike,
-        tokenId: BigNumberish,
-        internalTransfer: boolean
-    ], [
-        void
-    ], "nonpayable">;
-    "safeTransfer(address,uint256)": TypedContractMethod<[
+    safeTransfer: TypedContractMethod<[
         to: AddressLike,
         tokenId: BigNumberish
     ], [
@@ -433,6 +432,12 @@ export interface ENSCustody extends BaseContract {
         controller: AddressLike,
         wrapper: AddressLike,
         registrar: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "internalTransfer"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
     ], [
         void
     ], "nonpayable">;
@@ -523,14 +528,7 @@ export interface ENSCustody extends BaseContract {
         void
     ], "nonpayable">;
     getFunction(nameOrSignature: "rotateMinter"): TypedContractMethod<[receiver: AddressLike], [void], "payable">;
-    getFunction(nameOrSignature: "safeTransfer(address,uint256,bool)"): TypedContractMethod<[
-        to: AddressLike,
-        tokenId: BigNumberish,
-        internalTransfer: boolean
-    ], [
-        void
-    ], "nonpayable">;
-    getFunction(nameOrSignature: "safeTransfer(address,uint256)"): TypedContractMethod<[
+    getFunction(nameOrSignature: "safeTransfer"): TypedContractMethod<[
         to: AddressLike,
         tokenId: BigNumberish
     ], [
