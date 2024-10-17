@@ -19,6 +19,7 @@ export declare enum ArtifactName {
     ZilliqaRecover = "ZilliqaRecover",
     Seaport = "Seaport",
     SeaportProxyBuyer = "SeaportProxyBuyer",
+    RegistrarCustody = "RegistrarCustody",
     ConduitController = "ConduitController",
     USDC = "USDC",
     Muticall3 = "Multicall3",
@@ -64,6 +65,7 @@ export declare enum UnsContractName {
     ZilliqaRecover = "ZilliqaRecover",
     Seaport = "Seaport",
     SeaportProxyBuyer = "SeaportProxyBuyer",
+    RegistrarCustody = "RegistrarCustody",
     USDC = "USDC",
     Multicall3 = "Multicall3",
     L1GasPriceOracle = "L1GasPriceOracle"

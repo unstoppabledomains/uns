@@ -156,7 +156,7 @@ const config = {
         alphaSort: true,
         runOnCompile: argv.enableContractSizer,
         disambiguatePaths: false,
-        only: ['UNSRegistry.sol', 'ProxyReader.sol', 'MintingManager.sol', 'ENSCustody.sol'],
+        only: ['UNSRegistry.sol', 'ProxyReader.sol', 'MintingManager.sol', 'ENSCustody.sol', 'RegistrarCustody.sol'],
     },
     mocha: {
         timeout: 100000,
