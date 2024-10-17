@@ -957,6 +957,199 @@ describe('ENSCustody', function () {
     });
   });
 
+  describe('safeTransfer', async () => {
+    it('should transfer parked domain', async () => {
+      const name = 'claim-test';
+      const tokenId = namehash(`${name}.eth`);
+
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+
+      await custody.connect(registrant).safeTransfer(newOwnerAddress, tokenId);
+
+      await expect(custody.ownerOf(tokenId)).to.be.revertedWithCustomError(custody, 'InvalidToken');
+
+      expect(await nameWrapper.ownerOf(tokenId)).to.be.equal(newOwnerAddress);
+    });
+
+    it('should reject if token is not registered', async () => {
+      const tokenId = namehash('not-registered.eth');
+
+      await expect(custody.connect(registrant).safeTransfer(newOwnerAddress, tokenId)).to.be.revertedWithCustomError(
+        custody,
+        'InvalidToken',
+      );
+    });
+
+    it('should reject if token is expired', async () => {
+      const name = 'claim-expired-test';
+      const tokenId = namehash(`${name}.eth`);
+
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+
+      const gracePeriod = 90 * DAY;
+      await increaseTimeBy(REGISTRATION_TIME + gracePeriod + 1);
+
+      await expect(custody.connect(registrant).safeTransfer(newOwnerAddress, tokenId)).to.be.revertedWithCustomError(
+        custody,
+        'UnknownToken',
+      );
+    });
+
+    it('should reject if sender is not owner', async () => {
+      const name = 'claim-test';
+      const tokenId = namehash(`${name}.eth`);
+
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+
+      await expect(custody.connect(minter).safeTransfer(newOwnerAddress, tokenId)).to.be.revertedWithCustomError(
+        custody,
+        'Unauthorised',
+      );
+    });
+  });
+
+  describe('internalTransfer', async () => {
+    it('should interally transfer parked domain', async () => {
+      const name = 'internal-transfer-test';
+      const tokenId = namehash(`${name}.eth`);
+
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+
+      await expect(custody.connect(registrant).internalTransfer(newOwnerAddress, tokenId))
+        .to.emit(custody, 'Parked')
+        .withArgs(tokenId, newOwnerAddress);
+
+      expect(await custody.ownerOf(tokenId)).to.be.equal(newOwnerAddress);
+      expect(await nameWrapper.ownerOf(tokenId)).to.be.equal(await custody.getAddress());
+    });
+
+    it('should reject if token is not registered', async () => {
+      const tokenId = namehash('not-registered.eth');
+
+      await expect(
+        custody.connect(registrant).internalTransfer(newOwnerAddress, tokenId),
+      ).to.be.revertedWithCustomError(custody, 'InvalidToken');
+    });
+
+    it('should reject if token is expired', async () => {
+      const name = 'internal-transfer-expired-test';
+      const tokenId = namehash(`${name}.eth`);
+
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+
+      const gracePeriod = 90 * DAY;
+      await increaseTimeBy(REGISTRATION_TIME + gracePeriod + 1);
+
+      await expect(
+        custody.connect(registrant).internalTransfer(newOwnerAddress, tokenId),
+      ).to.be.revertedWithCustomError(custody, 'UnknownToken');
+    });
+
+    it('should reject if sender is not owner', async () => {
+      const name = 'internal-transfer-test';
+      const tokenId = namehash(`${name}.eth`);
+
+      await topupCustody(name);
+      await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+
+      await expect(custody.connect(minter).internalTransfer(newOwnerAddress, tokenId)).to.be.revertedWithCustomError(
+        custody,
+        'Unauthorised',
+      );
+    });
+  });
+
+  describe('multicall', async () => {
+    it('should execute multiple transactions', async () => {
+      const name = 'multicall-test';
+      const tokenId = namehash(`${name}.eth`);
+
+      await topupCustody(name, REGISTRATION_TIME * 2);
+
+      const commitment = await custody.makeCommitment(
+        name,
+        registrantAddress,
+        REGISTRATION_TIME,
+        secret,
+        resolver,
+        [],
+        false,
+        0,
+        false,
+      );
+      await custody.connect(minter).commit(commitment);
+      await increaseTimeBy(await controller.minCommitmentAge());
+
+      const timestamp = await getLatestBlockTimestamp();
+
+      const registerTxData = custody.interface.encodeFunctionData('register', [
+        name,
+        registrantAddress,
+        REGISTRATION_TIME,
+        secret as string,
+        await resolver.getAddress(),
+        [],
+        false,
+        0,
+        false,
+      ]);
+      const renewTxData = custody.interface.encodeFunctionData('renew', [name, REGISTRATION_TIME]);
+
+      await custody.connect(minter).multicall([registerTxData, renewTxData]);
+
+      expect(await nameWrapper.ownerOf(tokenId)).to.be.equal(await custody.getAddress());
+      expect(await custody.ownerOf(tokenId)).to.be.equal(registrantAddress);
+
+      const expiry = await baseRegistrar.nameExpires(sha3(name));
+
+      expect(expiry).to.be.greaterThanOrEqual(timestamp + REGISTRATION_TIME * 2);
+    });
+
+    it('revert multicall tx when one of the internal tx reverts', async () => {
+      const name = 'multicall-revert-test';
+      const tokenId = namehash(`${name}.eth`);
+
+      await topupCustody(name);
+
+      const commitment = await custody.makeCommitment(
+        name,
+        registrantAddress,
+        REGISTRATION_TIME,
+        secret,
+        resolver,
+        [],
+        false,
+        0,
+        false,
+      );
+      await custody.connect(minter).commit(commitment);
+      await increaseTimeBy(await controller.minCommitmentAge());
+
+      const registerTxData = custody.interface.encodeFunctionData('register', [
+        name,
+        registrantAddress,
+        REGISTRATION_TIME,
+        secret as string,
+        await resolver.getAddress(),
+        [],
+        false,
+        0,
+        false,
+      ]);
+      const renewTxData = custody.interface.encodeFunctionData('safeTransfer', [registrantAddress, tokenId]);
+
+      await expect(custody.connect(minter).multicall([registerTxData, renewTxData])).to.be.revertedWithCustomError(
+        custody,
+        'Unauthorised',
+      );
+    });
+  });
+
   describe('ERC165', function () {
     const INTERFACES = {
       ERC165: ['supportsInterface(bytes4)'],

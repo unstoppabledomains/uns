@@ -1,9 +1,10 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { namehash, Wallet } from 'ethers';
+import { namehash, solidityPacked, Wallet } from 'ethers';
 import { sha3 } from 'web3-utils';
 import { HardhatEthersProvider } from '@nomicfoundation/hardhat-ethers/internal/hardhat-ethers-provider';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { recommendCommands } from 'yargs';
 import {
   BaseRegistrarImplementation,
   BaseRegistrarImplementation__factory,
@@ -50,17 +51,17 @@ describe('ENSCustody (metatx)', function () {
   async function registerAndParkName (
     name: string,
     minter: Wallet,
-    resolver = ZERO_ADDRESS,
+    virtualOwner: string = registrantAddress,
     selfCustody = false,
     txOptions = {},
   ) {
     // make commitment
     const commitment = await custody.makeCommitment(
       name,
-      registrantAddress,
+      virtualOwner,
       REGISTRATION_TIME,
       secret,
-      resolver,
+      ZERO_ADDRESS,
       [],
       false,
       0,
@@ -77,7 +78,7 @@ describe('ENSCustody (metatx)', function () {
     const tokenId = namehash(`${name}.eth`);
     const { req, signature } = await buildExecuteParams(
       'register(string,address,uint256,bytes32,address,bytes[],bool,uint16,bool)',
-      [name, registrantAddress, REGISTRATION_TIME, secret, resolver, [], false, 0, selfCustody],
+      [name, virtualOwner, REGISTRATION_TIME, secret, ZERO_ADDRESS, [], false, 0, selfCustody],
       minter,
       tokenId,
       BigInt(0),
@@ -86,8 +87,8 @@ describe('ENSCustody (metatx)', function () {
     return [commitTx, registerTx];
   }
 
-  async function topupCustody (name: string) {
-    const [base, premium] = await controller.rentPrice(name, REGISTRATION_TIME);
+  async function topupCustody (name: string, duration = REGISTRATION_TIME) {
+    const [base, premium] = await controller.rentPrice(name, duration);
     const price = base + premium;
     await owner.sendTransaction({ to: await custody.getAddress(), value: price });
     return price;
@@ -173,7 +174,7 @@ describe('ENSCustody (metatx)', function () {
     await topupCustody(name);
     expect(await custody.nonceOf(tokenId)).to.be.equal(0);
 
-    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await registerAndParkName(name, minter);
 
     await assertOwnership(name, registrantAddress);
     expect(await custody.nonceOf(tokenId)).to.be.equal(1);
@@ -184,7 +185,7 @@ describe('ENSCustody (metatx)', function () {
     const tokenId = namehash(`${name}.eth`);
     await topupCustody(name);
 
-    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await registerAndParkName(name, minter);
     await assertOwnership(name, registrantAddress);
     expect(await custody.nonceOf(tokenId)).to.be.equal(1);
 
@@ -206,7 +207,7 @@ describe('ENSCustody (metatx)', function () {
     const tokenId = namehash(`${name}.eth`);
     await topupCustody(name);
 
-    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await registerAndParkName(name, minter);
     await assertOwnership(name, registrantAddress);
 
     const { req, signature } = await buildExecuteParams(
@@ -223,12 +224,57 @@ describe('ENSCustody (metatx)', function () {
     );
   });
 
+  it('should internal transfer parked domain', async () => {
+    const name = 'mts-ck41-internal';
+    const tokenId = namehash(`${name}.eth`);
+    await topupCustody(name);
+
+    await registerAndParkName(name, minter);
+    await assertOwnership(name, registrantAddress);
+    expect(await custody.nonceOf(tokenId)).to.be.equal(1);
+
+    const { req, signature } = await buildExecuteParams(
+      'internalTransfer(address,uint256)',
+      [spender.address, tokenId],
+      registrant,
+      tokenId,
+      await custody.nonceOf(tokenId),
+    );
+    await custody.connect(spender).execute(req, signature);
+
+    await assertOwnership(name, spender.address, false);
+
+    expect(await custody.nonceOf(tokenId)).to.be.equal(2);
+  });
+
+  it('should allow internal transfer of parked domain by owner only', async () => {
+    const name = 'mts-ck42-internal';
+    const tokenId = namehash(`${name}.eth`);
+    await topupCustody(name);
+
+    await registerAndParkName(name, minter);
+    await assertOwnership(name, registrantAddress);
+    expect(await custody.nonceOf(tokenId)).to.be.equal(1);
+
+    const { req, signature } = await buildExecuteParams(
+      'internalTransfer(address,uint256)',
+      [spender.address, tokenId],
+      spender,
+      tokenId,
+      await custody.nonceOf(tokenId),
+    );
+    await expect(custody.connect(registrant).execute(req, signature)).to.be.revertedWithCustomError(
+      custody,
+      'Unauthorised',
+    );
+  });
+
   it('should revert with invalid signature error when invalid nonce', async () => {
     const name = 'mts-cw12';
     const tokenId = namehash(`${name}.eth`);
     await topupCustody(name);
 
-    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await registerAndParkName(name, minter);
     await assertOwnership(name, registrantAddress);
 
     const { req, signature } = await buildExecuteParams(
@@ -249,7 +295,7 @@ describe('ENSCustody (metatx)', function () {
     const tokenId = namehash(`${name}.eth`);
     await topupCustody(name);
 
-    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await registerAndParkName(name, minter);
     await assertOwnership(name, registrantAddress);
 
     const { req, signature } = await buildExecuteParams(
@@ -270,7 +316,7 @@ describe('ENSCustody (metatx)', function () {
     const tokenId = namehash(`${name}.eth`);
     await topupCustody(name);
 
-    await registerAndParkName(name, minter, ZERO_ADDRESS, false);
+    await registerAndParkName(name, minter);
     await assertOwnership(name, registrantAddress);
 
     const { req, signature } = await buildExecuteParams(
@@ -284,5 +330,161 @@ describe('ENSCustody (metatx)', function () {
       custody,
       'InvalidForwardedToken',
     );
+  });
+
+  describe('Multicall', () => {
+    it('should execute meta tx with multicall', async () => {
+      const name = 'multicall-meta-test';
+      const tokenId = namehash(`${name}.eth`);
+      await topupCustody(name, REGISTRATION_TIME * 2);
+
+      await registerAndParkName(name, minter, minter.address);
+      await assertOwnership(name, minter.address);
+
+      const expiry = await baseRegistrar.nameExpires(sha3(name)!);
+
+      const { req, signature } = await buildExecuteParams(
+        'multicall(bytes[])',
+        [
+          [
+            custody.interface.encodeFunctionData('renew', [name, REGISTRATION_TIME]),
+            custody.interface.encodeFunctionData('internalTransfer', [spender.address, tokenId]),
+          ],
+        ],
+        minter,
+        tokenId,
+      );
+
+      await custody.connect(spender).execute(req, signature);
+
+      await assertOwnership(name, spender.address);
+
+      expect(await baseRegistrar.nameExpires(sha3(name)!)).to.be.greaterThanOrEqual(
+        expiry + BigInt(REGISTRATION_TIME),
+      );
+    });
+
+    it('should properly revert if signer is incorrect', async () => {
+      const name = 'multicall-meta-revert-test';
+      const tokenId = namehash(`${name}.eth`);
+      await topupCustody(name, REGISTRATION_TIME);
+
+      await registerAndParkName(name, minter);
+      await assertOwnership(name, registrantAddress);
+
+      const { req, signature } = await buildExecuteParams(
+        'multicall(bytes[])',
+        [[custody.interface.encodeFunctionData('internalTransfer', [spender.address, tokenId])]],
+        spender,
+        tokenId,
+      );
+
+      await expect(custody.connect(minter).execute(req, signature)).to.be.revertedWithCustomError(
+        custody,
+        'Unauthorised',
+      );
+    });
+
+    it('should execute multiple meta txs through multicall', async () => {
+      const names = [
+        'multicall-batch-transfer-test',
+        'multicall-batch-transfer-test-2',
+        'multicall-batch-internal-transfer-test-1',
+        'multicall-batch-internal-transfer-test-2',
+      ];
+
+      const tokenIds = names.map((name) => namehash(`${name}.eth`));
+
+      for (const name of names) {
+        await topupCustody(name);
+
+        await registerAndParkName(name, minter);
+
+        await assertOwnership(name, registrantAddress);
+      }
+
+      const metaParams = await Promise.all(
+        tokenIds.map((tokenId, i) => {
+          const selector = i < 2 ? 'safeTransfer(address,uint256)' : 'internalTransfer(address,uint256)';
+
+          return buildExecuteParams(selector, [spender.address, tokenId], registrant, tokenId, BigInt(0));
+        }),
+      );
+
+      await custody.connect(spender).multicall([
+        ...metaParams.map((params) => {
+          return custody.interface.encodeFunctionData('execute', [params.req, params.signature]);
+        }),
+      ]);
+
+      for (let i = 0; i < tokenIds.length; i++) {
+        const name = names[i];
+
+        await assertOwnership(name, spender.address, i < 2);
+      }
+    });
+
+    it('should execute multiple regular and meta txs through multicall', async () => {
+      const name = 'multicall-batch-meta-test';
+      const name2 = 'multicall-batch-regular-test';
+
+      const tokenId = namehash(`${name}.eth`);
+      const tokenId2 = namehash(`${name2}.eth`);
+
+      await topupCustody(name);
+      await topupCustody(name2);
+
+      await registerAndParkName(name, minter, spender.address);
+      await registerAndParkName(name2, minter);
+
+      const metaTransfer = await buildExecuteParams(
+        'safeTransfer(address,uint256)',
+        [registrant.address, tokenId],
+        spender,
+        tokenId,
+        BigInt(0),
+      );
+
+      await custody
+        .connect(registrant)
+        .multicall([
+          custody.interface.encodeFunctionData('execute', [metaTransfer.req, metaTransfer.signature]),
+          custody.interface.encodeFunctionData('internalTransfer', [spender.address, tokenId2]),
+        ]);
+
+      await assertOwnership(name, registrant.address, true);
+      await assertOwnership(name2, spender.address, false);
+    });
+
+    it('should not allow passing malicious calldata to meta tx multicall', async () => {
+      const name = 'multicall-malicious-calldata';
+      const tokenId = namehash(`${name}.eth`);
+
+      await topupCustody(name);
+      await registerAndParkName(name, minter);
+
+      const { req, signature } = await buildExecuteParams(
+        'multicall(bytes[])',
+        [
+          [
+            solidityPacked(
+              ['bytes', 'address', 'uint256'],
+              [
+                custody.interface.encodeFunctionData('safeTransfer', [spender.address, tokenId]),
+                registrantAddress,
+                tokenId,
+              ],
+            ),
+          ],
+        ],
+        spender,
+        tokenId,
+      );
+
+      await expect(custody.connect(spender).execute(req, signature)).to.be.revertedWithCustomError(
+        custody,
+        'Unauthorised',
+      );
+    });
   });
 });
