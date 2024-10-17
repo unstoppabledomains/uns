@@ -4,6 +4,7 @@ import { namehash, solidityPacked, Wallet } from 'ethers';
 import { sha3 } from 'web3-utils';
 import { HardhatEthersProvider } from '@nomicfoundation/hardhat-ethers/internal/hardhat-ethers-provider';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { recommendCommands } from 'yargs';
 import {
   BaseRegistrarImplementation,
   BaseRegistrarImplementation__factory,
@@ -360,6 +361,27 @@ describe('ENSCustody (metatx)', function () {
 
       expect(await baseRegistrar.nameExpires(sha3(name)!)).to.be.greaterThanOrEqual(
         expiry + BigInt(REGISTRATION_TIME),
+      );
+    });
+
+    it('should properly revert if signer is incorrect', async () => {
+      const name = 'multicall-meta-revert-test';
+      const tokenId = namehash(`${name}.eth`);
+      await topupCustody(name, REGISTRATION_TIME);
+
+      await registerAndParkName(name, minter);
+      await assertOwnership(name, registrantAddress);
+
+      const { req, signature } = await buildExecuteParams(
+        'multicall(bytes[])',
+        [[custody.interface.encodeFunctionData('internalTransfer', [spender.address, tokenId])]],
+        spender,
+        tokenId,
+      );
+
+      await expect(custody.connect(minter).execute(req, signature)).to.be.revertedWithCustomError(
+        custody,
+        'Unauthorised',
       );
     });
 
