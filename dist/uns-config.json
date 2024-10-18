@@ -286,6 +286,7 @@
                 },
                 "RegistrarCustody": {
                     "address": "0x0000000000000000000000000000000000000000",
+                    "forwarder": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
                 }
@@ -564,6 +565,7 @@
                 },
                 "RegistrarCustody": {
                     "address": "0x0000000000000000000000000000000000000000",
+                    "forwarder": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
                 }
@@ -703,6 +705,7 @@
                 },
                 "RegistrarCustody": {
                     "address": "0x0000000000000000000000000000000000000000",
+                    "forwarder": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
                 }
@@ -840,6 +843,7 @@
                 },
                 "RegistrarCustody": {
                     "address": "0x0000000000000000000000000000000000000000",
+                    "forwarder": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
                 }
@@ -982,6 +986,7 @@
                 },
                 "RegistrarCustody": {
                     "address": "0x0000000000000000000000000000000000000000",
+                    "forwarder": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
                 }
