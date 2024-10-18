@@ -1,3 +1,7 @@
+## v0.9.37
+
+- Fixed `uns-config.json` for `RegistrarCustody`
+
 ## v0.9.36
 
 - Added `RegistrarCustody` contract
