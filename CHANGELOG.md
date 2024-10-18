@@ -1,3 +1,7 @@
+## v0.9.38
+
+- Upgraded `ENSCustody@0.1.4` on Sepolia and Mainnet
+
 ## v0.9.37
 
 - Fixed `uns-config.json` for `RegistrarCustody`
