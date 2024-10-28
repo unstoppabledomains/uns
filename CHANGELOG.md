@@ -1,3 +1,7 @@
+## v0.9.39
+
+- Deployed `RegistrarCustody@0.1.0` on Amoy
+
 ## v0.9.38
 
 - Upgraded `ENSCustody@0.1.4` on Sepolia and Mainnet
