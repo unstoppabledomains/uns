@@ -1047,22 +1047,23 @@ const proposeENSCustodyTask: Task = {
     }
 
     ctx.log('Preparing proposal...');
-    const proposal = await defender.proposeUpgrade(
+    const proposal = await defender.proposeUpgradeWithApproval(
       ENSCustody.address,
       await ethers.getContractFactory(ArtifactName.ENSCustody),
       {
-        title: `Propose ENSCustody to v${version}`,
-        multisig: ctx.multisig,
+        useDefenderDeploy: false,
       },
     );
 
-    if (proposal.metadata?.newImplementationAddress) {
+    const receipt = await proposal.txResponse?.wait();
+
+    if (receipt?.contractAddress) {
       await ctx.saveContractConfig(
         EnsContractName.ENSCustody,
         await ethers.getContractAt(ArtifactName.ENSCustody, ENSCustody.address),
-        proposal.metadata.newImplementationAddress,
+        receipt.contractAddress,
       );
-      await verify(ctx, proposal.metadata.newImplementationAddress, []);
+      await verify(ctx, receipt.contractAddress, []);
     }
     ctx.log('Upgrade proposal created at:', proposal.url);
   },
