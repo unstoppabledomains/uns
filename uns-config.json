@@ -1,5 +1,5 @@
 {
-    "version": "0.9.15",
+    "version": "0.9.16",
     "networks": {
         "1": {
             "contracts": {
@@ -704,10 +704,11 @@
                     "deploymentBlock": "0x0"
                 },
                 "RegistrarCustody": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "forwarder": "0x0000000000000000000000000000000000000000",
+                    "address": "0x64ED8886421Da2118f988fAC5D65d0b8f7f7fbB6",
+                    "forwarder": "0x64ED8886421Da2118f988fAC5D65d0b8f7f7fbB6",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x0"
+                    "deploymentBlock": "0xd1938c",
+                    "implementation": "0x1cd82f8bD1636D3F40435a45e9CB3effA3b30bcF"
                 }
             }
         },
