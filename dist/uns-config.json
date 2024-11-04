@@ -388,16 +388,16 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x399Da84d05f49e44338fe949D0eC54dACf7cb7F2",
+                    "address": "0xd70Ab4F5767a8fa0e1e261A2f51189316a7C0d86",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x62"
+                    "deploymentBlock": "0x63"
                 },
                 "ZilliqaRecover": {
-                    "address": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
-                    "deploymentBlock": "0x32",
-                    "implementation": "0x4Eb9dE1Fc0d800e941F326d6699E9E11969557ea",
+                    "address": "0xc965345EDaC823D56812cD20A10316233916a605",
+                    "deploymentBlock": "0x33",
+                    "implementation": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
                     "legacyAddresses": [],
-                    "forwarder": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9"
+                    "forwarder": "0xc965345EDaC823D56812cD20A10316233916a605"
                 },
                 "Seaport": {
                     "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",

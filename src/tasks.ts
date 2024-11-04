@@ -1296,6 +1296,11 @@ const deployRegistrarCustodyTask: Task = {
         ctx.log(`Added ${array.length} minters`);
       }
     }
+
+    const mintingManager = await ethers.getContractAt(ArtifactName.MintingManager, MintingManager.address, owner);
+    const addMintingRightTx = await mintingManager.addMinters([await registrarCustody.getAddress()]);
+    await addMintingRightTx.wait();
+
     const proxyAdmin = await upgrades.admin.getInstance();
     const registrarCustodyImpl = await proxyAdmin.getProxyImplementation.staticCall(
       await registrarCustody.getAddress(),
