@@ -1,3 +1,7 @@
+## v0.9.40
+
+- Fixed `RegistrarCustody` minting permissions setup in sandbox
+
 ## v0.9.39
 
 - Deployed `RegistrarCustody@0.1.0` on Amoy
