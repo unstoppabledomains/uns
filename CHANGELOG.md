@@ -1,3 +1,6 @@
+## v0.9.41
+- Added a script to batch mint TLDs proposal
+
 ## v0.9.40
 
 - Fixed `RegistrarCustody` minting permissions setup in sandbox
