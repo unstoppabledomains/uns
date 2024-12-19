@@ -22,7 +22,7 @@ jobs:
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true'
       - run: yarn compile:size
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: hardhat-contract-sizer-output
           include-hidden-files: true
@@ -45,7 +45,7 @@ jobs:
           key: uns-yarn-${{ hashFiles('**/yarn.lock') }}
       - run: yarn install
         if: steps.cache.outputs.cache-hit != 'true'
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: hardhat-contract-sizer-output
           path: cache/
