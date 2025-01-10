@@ -11,7 +11,7 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {ERC2771RegistryContext} from '../metatx/ERC2771RegistryContext.sol';
 import {Forwarder} from '../metatx/Forwarder.sol';
 import {MinterRole} from '../roles/MinterRole.sol';
-import {ISeaportProxyBuyer, OrderIsNotFulfiled, RecipientIsZeroAddress, InvalidZone} from './ISeaportProxyBuyer.sol';
+import {ISeaportProxyBuyer, OrderIsNotFulfiled, RecipientIsZeroAddress, InvalidZone, InvalidFulfiller} from './ISeaportProxyBuyer.sol';
 import {ConsiderationInterface} from 'seaport-types/src/interfaces/ConsiderationInterface.sol';
 import {AdvancedOrder, CriteriaResolver, OrderComponents, OrderParameters, ZoneParameters} from 'seaport-types/src/lib/ConsiderationStructs.sol';
 
@@ -26,7 +26,7 @@ contract SeaportProxyBuyer is
     ISeaportProxyBuyer
 {
     string public constant NAME = 'Seaport Proxy Buyer';
-    string public constant VERSION = '0.1.1';
+    string public constant VERSION = '0.1.2';
 
     ConsiderationInterface private _seaport;
 
@@ -87,11 +87,11 @@ contract SeaportProxyBuyer is
     }
 
     function authorizeOrder(ZoneParameters calldata) external view override whenNotPaused returns (bytes4 authorizedOrderMagicValue) {
-        authorizedOrderMagicValue = ISeaportProxyBuyer.authorizeOrder.selector;
+        revert InvalidFulfiller();
     }
 
     function validateOrder(ZoneParameters calldata) external view override whenNotPaused returns (bytes4 validOrderMagicValue) {
-        validOrderMagicValue = ISeaportProxyBuyer.validateOrder.selector;
+        revert InvalidFulfiller();
     }
 
     function approve(address token) external onlyOwner nonReentrant {
