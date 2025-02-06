@@ -8,6 +8,7 @@ import {AdvancedOrder, CriteriaResolver, ZoneParameters} from 'seaport-types/src
 error OrderIsNotFulfiled();
 error RecipientIsZeroAddress();
 error InvalidZone();
+error InvalidFulfiller();
 
 interface ISeaportProxyBuyer {
     /**
