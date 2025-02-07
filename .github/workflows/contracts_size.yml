@@ -7,20 +7,15 @@ jobs:
   target-contracts-size:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.ref }}
           fetch-depth: 2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: 20.x
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          path: '**/node_modules'
-          key: uns-yarn-${{ hashFiles('**/yarn.lock') }}
-      - run: yarn install
-        if: steps.cache.outputs.cache-hit != 'true'
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
       - run: yarn compile:size
       - uses: actions/upload-artifact@v4
         with:
@@ -32,19 +27,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: target-contracts-size
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: 20.x
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          path: '**/node_modules'
-          key: uns-yarn-${{ hashFiles('**/yarn.lock') }}
-      - run: yarn install
-        if: steps.cache.outputs.cache-hit != 'true'
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
       - uses: actions/download-artifact@v4
         with:
           name: hardhat-contract-sizer-output
