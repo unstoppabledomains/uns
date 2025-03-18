@@ -11,7 +11,7 @@ import { NameService } from './config';
 import { NetworkChainIds, TLD, TLDConfig } from './tlds';
 
 export const SANDBOX_NETWORK_IDS = [1337, 31337];
-export const TESTNET_NETWORK_IDS = [80002, 11155111, 84532];
+export const TESTNET_NETWORK_IDS = [80002, 11155111, 84532, 57054];
 
 export const isSandbox = SANDBOX_NETWORK_IDS.includes(network.config.chainId ?? 0);
 export const isTestnet = TESTNET_NETWORK_IDS.includes(network.config.chainId ?? 0);
