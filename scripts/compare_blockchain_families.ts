@@ -11,7 +11,7 @@ type BlockchainFamiliesState = {
 };
 
 function readCsv () {
-  const content = fs.readFileSync('./scripts/blockchain_families.csv');
+  const content = fs.readFileSync('./scripts/blockchain_families.csv', 'utf8');
   return parse(content) as string[][];
 }
 
