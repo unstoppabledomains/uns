@@ -1,6 +1,5 @@
 ## v0.9.42
-- Added scrits to manage the ProxyReader resolution schema
-
+- Added scripts to manage the ProxyReader resolution schema
 ## v0.9.41
 - Add revert if Seaport order is executed outside `SeaportProxyBuyer` contract
 - Added a script to batch mint TLDs proposal
