@@ -1,3 +1,7 @@
+## v0.9.44
+
+- Added scripts to manage the ProxyReader resolution schema
+
 ## v0.9.43
 
 - Upgraded MintingManager on Base Sepolia, Base Mainnet, Polygon Mainnet

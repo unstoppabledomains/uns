@@ -14,10 +14,6 @@ export const getSafeApiClient = (): SafeApiKit => {
 
   const config: SafeApiKitConfig = { chainId: BigInt(chainId) };
 
-  if (network.name === 'amoy') {
-    throw new Error('Amoy is not supported for now');
-  }
-
   if (txServiceUrl) {
     config.txServiceUrl = txServiceUrl;
   }
@@ -79,8 +75,12 @@ export const proposeContractUpgrade = async (
       value: '0',
     };
 
+    const nonce = await apiKit.getNextNonce(safeAddress);
     const safeTransaction = await protocolKitOwner.createTransaction({
       transactions: [safeTransactionData],
+      options: {
+        nonce: parseInt(nonce, 10),
+      },
     });
 
     const safeTxHash = await protocolKitOwner.getTransactionHash(safeTransaction);

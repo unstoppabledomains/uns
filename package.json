@@ -1,6 +1,6 @@
 {
   "name": "uns",
-  "version": "0.9.43",
+  "version": "0.9.44",
   "description": "UNS contracts and tools",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "main": "./dist/index.js",
@@ -91,6 +91,8 @@
     "lodash.merge": "^4.6.2",
     "merkle-patricia-tree": "^4.0.0",
     "mocha": "^10.0.0",
+    "p-limit": "3.1.0",
+    "p-retry": "4.6.2",
     "prettier": "^2.3.0",
     "prettier-plugin-solidity": "^1.3.1",
     "seaport-core": "1.6.4",
