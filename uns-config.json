@@ -574,7 +574,8 @@
         "57054": {
             "contracts": {
                 "ProxyAdmin": {
-                    "address": "0xc78cF52D2b42501174A006A99cb75995cc1A22ce"
+                    "address": "0xc78cF52D2b42501174A006A99cb75995cc1A22ce",
+                    "deploymentBlock": "0x0"
                 },
                 "UNSRegistry": {
                     "address": "0x97D2Ec543404f73f37E5E682E73f4aCB45cc16EF",
@@ -597,6 +598,108 @@
                     "address": "0x2E5718b4998C65E342f0151369cA4e6fA2E38eBC",
                     "deploymentBlock": "0x019c1671",
                     "implementation": "0x31005D27A0A2f73CEf0C8BC420dEB10945D8b998"
+                },
+                "CNSRegistry": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "forwarder": "0x0000000000000000000000000000000000000000"
+                },
+                "SignatureController": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "MintingController": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "WhitelistedMinter": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "URIPrefixController": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "DomainZoneController": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "Resolver": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "forwarder": "0x0000000000000000000000000000000000000000"
+                },
+                "TwitterValidationOperator": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "FreeMinter": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0",
+                    "deprecated": true
+                },
+                "MintableERC721Predicate": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "RootChainManager": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "DotCoinBurner": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "ZilliqaRecover": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "Seaport": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "SeaportProxyBuyer": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "RegistrarCustody": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "USDC": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "L1GasPriceOracle": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "Multicall3": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         },
