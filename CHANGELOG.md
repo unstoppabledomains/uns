@@ -1,3 +1,9 @@
+## v0.9.42
+
+- `MintingManager@0.6.0`: 
+  - free domains (`uns-devtest-`) are no longer allowed
+  - subdomains are no longer allowed
+
 ## v0.9.41
 - Add revert if Seaport order is executed outside `SeaportProxyBuyer` contract
 - Added a script to batch mint TLDs proposal
