@@ -25,7 +25,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     using ECDSAUpgradeable for bytes32;
 
     string public constant NAME = 'UNS: Minting Manager';
-    string public constant VERSION = '0.5.1';
+    string public constant VERSION = '0.6.0';
 
     IUNSRegistry public unsRegistry;
     IMintingController public cnsMintingController;
@@ -39,7 +39,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
      */
     mapping(uint256 => string) internal _tlds;
 
-    address public unsOperator;
+    address private _unsOperator;
 
     /**
      * @dev Mapping TLD `namehash` to whether they are expirable or not
@@ -47,41 +47,25 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
     mapping(uint256 => bool) internal _expirableTlds;
 
     /**
-     * @dev The modifier checks domain's tld and label on mint.
-     * @param tld should be registered.
-     * @param label should not have legacy CNS free domain prefix.
-     *      Legacy CNS free domain prefix is 'udtestdev-'.
-     *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
-     */
-    modifier onlyAllowedSLD(uint256 tld, string memory label) {
-        _ensureAllowed(tld, label, 0);
-        _;
-    }
-
-    /**
-     * @dev The modifier checks subdomain's labels on issue.
+     * @dev The modifier checks domains labels on issue. Only SLDs are allowed.
      * @param labels should not have legacy CNS free domain prefix.
-     *      Legacy CNS free domain prefix is 'udtestdev-'.
-     *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
      */
     modifier onlyAllowed(string[] memory labels, uint64 expiry) {
-        require(labels.length >= 2, 'MintingManager: LABELS_LENGTH_BELOW_2');
-        _ensureAllowed(_namehash(0x0, labels[labels.length - 1]), labels[0], expiry);
+        require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
+
+        (, uint256 tld) = _namehash(labels);
+
+        require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
+        require(_expirableTlds[tld] == (expiry > 0), 'MintingManager: TLD_EXPIRABLE_MISMATCH');
+
+        require(_isValidLabel(labels[0]), 'MintingManager: LABEL_INVALID');
+        require(!_isLegacyUdTestDev(labels[0]), 'MintingManager: TOKEN_LABEL_PROHIBITED');
+
         _;
     }
 
-    modifier onlyIssuer(string[] memory labels) {
-        if (labels.length == 2) {
-            require(isMinter(_msgSender()), 'MintingManager: CALLER_IS_NOT_MINTER');
-        } else {
-            (, uint256 parentId) = _namehash(labels);
-
-            require(
-                unsRegistry.isApprovedOrOwner(_msgSender(), parentId) ||
-                    (unsRegistry.isApprovedOrOwner(unsOperator, parentId) && isMinter(_msgSender())),
-                'MintingManager: SENDER_IS_NOT_APPROVED_OR_OWNER'
-            );
-        }
+    modifier onlyIssuer() {
+        require(isMinter(_msgSender()), 'MintingManager: CALLER_IS_NOT_MINTER');
         _;
     }
 
@@ -97,7 +81,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         cnsMintingController = cnsMintingController_;
         cnsURIPrefixController = cnsURIPrefixController_;
         cnsResolver = cnsResolver_;
-        unsOperator = unsOperator_;
+        _unsOperator = unsOperator_;
 
         __Ownable_init_unchained();
         __MinterRole_init_unchained();
@@ -122,7 +106,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] calldata keys,
         string[] calldata values,
         bool withReverse
-    ) external override onlyIssuer(labels) onlyAllowed(labels, 0) whenNotPaused {
+    ) external override onlyIssuer onlyAllowed(labels, 0) whenNotPaused {
         _issueWithRecords(to, labels, keys, values, 0, withReverse);
     }
 
@@ -133,9 +117,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         string[] calldata values,
         uint64 expiry,
         bool withReverse
-    ) external override onlyIssuer(labels) onlyAllowed(labels, expiry) whenNotPaused {
-        require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
-
+    ) external override onlyIssuer onlyAllowed(labels, expiry) whenNotPaused {
         _issueWithRecords(to, labels, keys, values, expiry, withReverse);
     }
 
@@ -154,27 +136,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         unsRegistry.unlock(address(this), tokenId);
     }
 
-    function claim(uint256 tld, string calldata label) external override onlyAllowedSLD(tld, label) whenNotPaused {
-        string[] memory empty;
-
-        _issueWithRecords(_msgSender(), _buildLabels(tld, _freeSLDLabel(label)), empty, empty, 0, true);
-    }
-
-    function claimTo(address to, uint256 tld, string calldata label) external override onlyAllowedSLD(tld, label) whenNotPaused {
-        string[] memory empty;
-        _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), empty, empty, 0, true);
-    }
-
-    function claimToWithRecords(
-        address to,
-        uint256 tld,
-        string calldata label,
-        string[] calldata keys,
-        string[] calldata values
-    ) external override onlyAllowedSLD(tld, label) whenNotPaused {
-        _issueWithRecords(to, _buildLabels(tld, _freeSLDLabel(label)), keys, values, 0, true);
-    }
-
     /**
      * @dev See {IMintingManager-buy(address,string[],string[],string[],uint64,uint256,bytes)}.
      */
@@ -187,8 +148,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         uint256 price,
         bytes calldata signature
     ) external payable onlyAllowed(labels, 0) whenNotPaused {
-        require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
-
         _verifyPurchaseSignature(owner, labels, expiry, price, address(0), signature);
         require(msg.value >= price, 'MintingManager: NOT_ENOUGH_FUNDS');
 
@@ -212,8 +171,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         uint256 price,
         bytes calldata signature
     ) external onlyAllowed(labels, 0) whenNotPaused {
-        require(labels.length == 2, 'MintingManager: SUBDOMAINS_NOT_ALLOWED');
-
         _verifyPurchaseSignature(owner, labels, expiry, price, token, signature);
         require(IERC20Upgradeable(token).transferFrom(_msgSender(), address(this), price), 'ERC20: LOW_LEVEL_FAIL');
 
@@ -229,10 +186,6 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
 
     function setForwarder(address forwarder) external onlyOwner {
         _setForwarder(forwarder);
-    }
-
-    function setOperator(address operator) external onlyOwner {
-        unsOperator = operator;
     }
 
     function pause() external onlyOwner {
@@ -281,13 +234,7 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         uint64 expiry,
         bool withReverse
     ) private returns (uint256) {
-        (uint256 tokenId, uint256 parentId) = _namehash(labels);
-
-        // reverse record is limited for subdomains, it is possible to set a reverse record
-        // to the same address as the parent domain owner
-        if (withReverse && labels.length > 2 && unsRegistry.ownerOf(parentId) != to) {
-            revert('MintingManager: REVERSE_RECORD_NOT_ALLOWED');
-        }
+        (uint256 tokenId, ) = _namehash(labels);
 
         if (unsRegistry.exists(tokenId) && (unsRegistry.ownerOf(tokenId) == address(this) || unsRegistry.isExpired(tokenId))) {
             if (expiry > 0) {
@@ -335,27 +282,9 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
         return super._msgData();
     }
 
-    function _freeSLDLabel(string calldata label) private pure returns (string memory) {
-        return string(abi.encodePacked('uns-devtest-', label));
-    }
-
     function _beforeTokenMint(uint256 tokenId) private {
         require(isBlocked(tokenId) == false, 'MintingManager: TOKEN_BLOCKED');
         _block(tokenId);
-    }
-
-    function _ensureAllowed(uint256 tld, string memory label, uint64 expiry) private view {
-        require(_isTld(tld), 'MintingManager: TLD_NOT_REGISTERED');
-        require(_expirableTlds[tld] == (expiry > 0), 'MintingManager: TLD_EXPIRABLE_MISMATCH');
-
-        Strings.Slice memory _label = label.toSlice();
-        if (_label._len > 10) {
-            require(
-                _label.slice(0, 10).keccak() != 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8,
-                'MintingManager: TOKEN_LABEL_PROHIBITED'
-            );
-        }
-        require(_isValidLabel(label), 'MintingManager: LABEL_INVALID');
     }
 
     /**
@@ -435,6 +364,20 @@ contract MintingManager is ERC2771Context, MinterRole, Blocklist, Pausable, IMin
             }
         }
         return true;
+    }
+
+    /**
+     * @dev Ensure the label is not CNS free domain prefix.
+     *      Legacy CNS free domain prefix is 'udtestdev-'.
+     *      keccak256('udtestdev-') = 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8
+     * @param label The label to check.
+     */
+    function _isLegacyUdTestDev(string memory label) private pure returns (bool result) {
+        Strings.Slice memory _label = label.toSlice();
+
+        if (_label._len > 10) {
+            result = _label.slice(0, 10).keccak() == 0xb551e0305c8163b812374b8e78b577c77f226f6f10c5ad03e52699578fbc34b8;
+        }
     }
 
     function _charAt(uint256 ptr, uint256 index) private pure returns (uint8) {

@@ -70,29 +70,6 @@ interface IMintingManager is IERC1967 {
     function revoke(uint256 tokenId) external;
 
     /**
-     * @dev Claims free domain. The fuction adds prefix to label.
-     * @param tld id of parent token
-     * @param label SLD label to mint
-     */
-    function claim(uint256 tld, string calldata label) external;
-
-    /**
-     * @dev Claims free domain. The fuction adds prefix to label.
-     * @param to address to mint the new SLD to
-     * @param tld id of parent token
-     * @param label SLD label to mint
-     */
-    function claimTo(address to, uint256 tld, string calldata label) external;
-
-    /**
-     * @dev Claims free domain. The fuction adds prefix to label.
-     * @param to address to mint the new SLD to
-     * @param tld id of parent token
-     * @param label SLD label to mint
-     */
-    function claimToWithRecords(address to, uint256 tld, string calldata label, string[] calldata keys, string[] calldata values) external;
-
-    /**
      * @dev Purchases a SLD using native token.
      * @param owner Address to mint the new SLD to
      * @param labels Array of SLD or subdomain name labels splitted by '.' to issue.
