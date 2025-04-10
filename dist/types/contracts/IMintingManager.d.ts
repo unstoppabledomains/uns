@@ -1,7 +1,7 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../common";
 export interface IMintingManagerInterface extends Interface {
-    getFunction(nameOrSignature: "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "issueExpirableWithRecords" | "issueWithRecords" | "removeTld" | "renew" | "revoke" | "setTokenURIPrefix" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
+    getFunction(nameOrSignature: "addTld" | "buy" | "buyForErc20" | "issueExpirableWithRecords" | "issueWithRecords" | "removeTld" | "renew" | "revoke" | "setTokenURIPrefix" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AdminChanged" | "DomainPurchase" | "NewTld" | "RemoveTld" | "Upgraded" | "Withdrawal"): EventFragment;
     encodeFunctionData(functionFragment: "addTld", values: [string, boolean]): string;
     encodeFunctionData(functionFragment: "buy", values: [
@@ -23,9 +23,6 @@ export interface IMintingManagerInterface extends Interface {
         BigNumberish,
         BytesLike
     ]): string;
-    encodeFunctionData(functionFragment: "claim", values: [BigNumberish, string]): string;
-    encodeFunctionData(functionFragment: "claimTo", values: [AddressLike, BigNumberish, string]): string;
-    encodeFunctionData(functionFragment: "claimToWithRecords", values: [AddressLike, BigNumberish, string, string[], string[]]): string;
     encodeFunctionData(functionFragment: "issueExpirableWithRecords", values: [AddressLike, string[], string[], string[], BigNumberish, boolean]): string;
     encodeFunctionData(functionFragment: "issueWithRecords", values: [AddressLike, string[], string[], string[], boolean]): string;
     encodeFunctionData(functionFragment: "removeTld", values: [BigNumberish]): string;
@@ -37,9 +34,6 @@ export interface IMintingManagerInterface extends Interface {
     decodeFunctionResult(functionFragment: "addTld", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "buyForErc20", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "claimTo", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "claimToWithRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "issueExpirableWithRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "issueWithRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeTld", data: BytesLike): Result;
@@ -181,28 +175,6 @@ export interface IMintingManager extends BaseContract {
     ], [
         void
     ], "nonpayable">;
-    claim: TypedContractMethod<[
-        tld: BigNumberish,
-        label: string
-    ], [
-        void
-    ], "nonpayable">;
-    claimTo: TypedContractMethod<[
-        to: AddressLike,
-        tld: BigNumberish,
-        label: string
-    ], [
-        void
-    ], "nonpayable">;
-    claimToWithRecords: TypedContractMethod<[
-        to: AddressLike,
-        tld: BigNumberish,
-        label: string,
-        keys: string[],
-        values: string[]
-    ], [
-        void
-    ], "nonpayable">;
     issueExpirableWithRecords: TypedContractMethod<[
         to: AddressLike,
         labels: string[],
@@ -273,28 +245,6 @@ export interface IMintingManager extends BaseContract {
         token: AddressLike,
         price: BigNumberish,
         signature: BytesLike
-    ], [
-        void
-    ], "nonpayable">;
-    getFunction(nameOrSignature: "claim"): TypedContractMethod<[
-        tld: BigNumberish,
-        label: string
-    ], [
-        void
-    ], "nonpayable">;
-    getFunction(nameOrSignature: "claimTo"): TypedContractMethod<[
-        to: AddressLike,
-        tld: BigNumberish,
-        label: string
-    ], [
-        void
-    ], "nonpayable">;
-    getFunction(nameOrSignature: "claimToWithRecords"): TypedContractMethod<[
-        to: AddressLike,
-        tld: BigNumberish,
-        label: string,
-        keys: string[],
-        values: string[]
     ], [
         void
     ], "nonpayable">;

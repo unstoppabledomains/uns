@@ -189,64 +189,6 @@ export declare class IMintingManager__factory {
         readonly type: "function";
     }, {
         readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "tld";
-            readonly type: "uint256";
-        }, {
-            readonly internalType: "string";
-            readonly name: "label";
-            readonly type: "string";
-        }];
-        readonly name: "claim";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "to";
-            readonly type: "address";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "tld";
-            readonly type: "uint256";
-        }, {
-            readonly internalType: "string";
-            readonly name: "label";
-            readonly type: "string";
-        }];
-        readonly name: "claimTo";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "to";
-            readonly type: "address";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "tld";
-            readonly type: "uint256";
-        }, {
-            readonly internalType: "string";
-            readonly name: "label";
-            readonly type: "string";
-        }, {
-            readonly internalType: "string[]";
-            readonly name: "keys";
-            readonly type: "string[]";
-        }, {
-            readonly internalType: "string[]";
-            readonly name: "values";
-            readonly type: "string[]";
-        }];
-        readonly name: "claimToWithRecords";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
             readonly internalType: "address";
             readonly name: "to";
             readonly type: "address";

@@ -1,7 +1,7 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../common";
 export interface MintingManagerInterface extends Interface {
-    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "buy" | "buyForErc20" | "claim" | "claimTo" | "claimToWithRecords" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueExpirableWithRecords" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renew" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revoke" | "revokeRole" | "rotateMinter" | "setForwarder" | "setOperator" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsOperator" | "unsRegistry" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "MINTER_ROLE" | "NAME" | "VERSION" | "addMinter" | "addMinters" | "addProxyReaders" | "addTld" | "buy" | "buyForErc20" | "closeMinter" | "cnsMintingController" | "cnsResolver" | "cnsURIPrefixController" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isBlocked" | "isMinter" | "isTrustedForwarder" | "issueExpirableWithRecords" | "issueWithRecords" | "owner" | "pause" | "paused" | "removeMinter" | "removeMinters" | "removeTld" | "renew" | "renounceMinter" | "renounceOwnership" | "renounceRole" | "revoke" | "revokeRole" | "rotateMinter" | "setForwarder" | "setTokenURIPrefix" | "supportsInterface" | "transferOwnership" | "unpause" | "unsRegistry" | "withdraw(address)" | "withdraw(address,address)"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AdminChanged" | "Blocked" | "BlocklistDisabled" | "BlocklistEnabled" | "DomainPurchase" | "Initialized" | "NewTld" | "OwnershipTransferred" | "Paused" | "RemoveTld" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Unpaused" | "Upgraded" | "Withdrawal"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "MINTER_ROLE", values?: undefined): string;
@@ -30,9 +30,6 @@ export interface MintingManagerInterface extends Interface {
         BigNumberish,
         BytesLike
     ]): string;
-    encodeFunctionData(functionFragment: "claim", values: [BigNumberish, string]): string;
-    encodeFunctionData(functionFragment: "claimTo", values: [AddressLike, BigNumberish, string]): string;
-    encodeFunctionData(functionFragment: "claimToWithRecords", values: [AddressLike, BigNumberish, string, string[], string[]]): string;
     encodeFunctionData(functionFragment: "closeMinter", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "cnsMintingController", values?: undefined): string;
     encodeFunctionData(functionFragment: "cnsResolver", values?: undefined): string;
@@ -67,12 +64,10 @@ export interface MintingManagerInterface extends Interface {
     encodeFunctionData(functionFragment: "revokeRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "rotateMinter", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "setForwarder", values: [AddressLike]): string;
-    encodeFunctionData(functionFragment: "setOperator", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "setTokenURIPrefix", values: [string]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
-    encodeFunctionData(functionFragment: "unsOperator", values?: undefined): string;
     encodeFunctionData(functionFragment: "unsRegistry", values?: undefined): string;
     encodeFunctionData(functionFragment: "withdraw(address)", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "withdraw(address,address)", values: [AddressLike, AddressLike]): string;
@@ -86,9 +81,6 @@ export interface MintingManagerInterface extends Interface {
     decodeFunctionResult(functionFragment: "addTld", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "buyForErc20", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "claimTo", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "claimToWithRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "closeMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "cnsMintingController", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "cnsResolver", data: BytesLike): Result;
@@ -116,12 +108,10 @@ export interface MintingManagerInterface extends Interface {
     decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "rotateMinter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setForwarder", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "setOperator", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setTokenURIPrefix", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "unsOperator", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unsRegistry", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw(address)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw(address,address)", data: BytesLike): Result;
@@ -406,28 +396,6 @@ export interface MintingManager extends BaseContract {
     ], [
         void
     ], "nonpayable">;
-    claim: TypedContractMethod<[
-        tld: BigNumberish,
-        label: string
-    ], [
-        void
-    ], "nonpayable">;
-    claimTo: TypedContractMethod<[
-        to: AddressLike,
-        tld: BigNumberish,
-        label: string
-    ], [
-        void
-    ], "nonpayable">;
-    claimToWithRecords: TypedContractMethod<[
-        to: AddressLike,
-        tld: BigNumberish,
-        label: string,
-        keys: string[],
-        values: string[]
-    ], [
-        void
-    ], "nonpayable">;
     closeMinter: TypedContractMethod<[receiver: AddressLike], [void], "payable">;
     cnsMintingController: TypedContractMethod<[], [string], "view">;
     cnsResolver: TypedContractMethod<[], [string], "view">;
@@ -522,11 +490,6 @@ export interface MintingManager extends BaseContract {
     ], [
         void
     ], "nonpayable">;
-    setOperator: TypedContractMethod<[
-        operator: AddressLike
-    ], [
-        void
-    ], "nonpayable">;
     setTokenURIPrefix: TypedContractMethod<[
         prefix: string
     ], [
@@ -543,7 +506,6 @@ export interface MintingManager extends BaseContract {
         void
     ], "nonpayable">;
     unpause: TypedContractMethod<[], [void], "nonpayable">;
-    unsOperator: TypedContractMethod<[], [string], "view">;
     unsRegistry: TypedContractMethod<[], [string], "view">;
     "withdraw(address)": TypedContractMethod<[
         recepient: AddressLike
@@ -590,28 +552,6 @@ export interface MintingManager extends BaseContract {
         token: AddressLike,
         price: BigNumberish,
         signature: BytesLike
-    ], [
-        void
-    ], "nonpayable">;
-    getFunction(nameOrSignature: "claim"): TypedContractMethod<[
-        tld: BigNumberish,
-        label: string
-    ], [
-        void
-    ], "nonpayable">;
-    getFunction(nameOrSignature: "claimTo"): TypedContractMethod<[
-        to: AddressLike,
-        tld: BigNumberish,
-        label: string
-    ], [
-        void
-    ], "nonpayable">;
-    getFunction(nameOrSignature: "claimToWithRecords"): TypedContractMethod<[
-        to: AddressLike,
-        tld: BigNumberish,
-        label: string,
-        keys: string[],
-        values: string[]
     ], [
         void
     ], "nonpayable">;
@@ -693,12 +633,10 @@ export interface MintingManager extends BaseContract {
     ], "nonpayable">;
     getFunction(nameOrSignature: "rotateMinter"): TypedContractMethod<[receiver: AddressLike], [void], "payable">;
     getFunction(nameOrSignature: "setForwarder"): TypedContractMethod<[forwarder: AddressLike], [void], "nonpayable">;
-    getFunction(nameOrSignature: "setOperator"): TypedContractMethod<[operator: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "setTokenURIPrefix"): TypedContractMethod<[prefix: string], [void], "nonpayable">;
     getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
     getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "unpause"): TypedContractMethod<[], [void], "nonpayable">;
-    getFunction(nameOrSignature: "unsOperator"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "unsRegistry"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "withdraw(address)"): TypedContractMethod<[recepient: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "withdraw(address,address)"): TypedContractMethod<[
