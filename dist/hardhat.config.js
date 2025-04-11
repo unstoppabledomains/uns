@@ -141,6 +141,12 @@ const config = {
             accounts: process.env.BASE_UNS_PRIVATE_KEY ? [process.env.BASE_UNS_PRIVATE_KEY] : undefined,
             loggingEnabled: true,
         },
+        sonicBlaze: {
+            url: "https://rpc.blaze.soniclabs.com",
+            chainId: 57054,
+            accounts: process.env.SONIC_BLAZE_UNS_PRIVATE_KEY ? [process.env.SONIC_BLAZE_UNS_PRIVATE_KEY] : undefined,
+            loggingEnabled: true,
+        }
     },
     typechain: {
         outDir: 'types',

@@ -198,6 +198,12 @@ const config: HardhatUserConfig = {
       accounts: process.env.BASE_UNS_PRIVATE_KEY ? [process.env.BASE_UNS_PRIVATE_KEY] : undefined,
       loggingEnabled: true,
     },
+    sonicBlaze: {
+      url: 'https://rpc.blaze.soniclabs.com',
+      chainId: 57054,
+      accounts: process.env.SONIC_BLAZE_UNS_PRIVATE_KEY ? [process.env.SONIC_BLAZE_UNS_PRIVATE_KEY] : undefined,
+      loggingEnabled: true,
+    },
   },
   typechain: {
     outDir: 'types',
@@ -226,6 +232,7 @@ const config: HardhatUserConfig = {
       polygonAmoy: process.env.POLYGONSCAN_API_KEY,
       base: process.env.BASESCAN_API_KEY,
       baseSepolia: process.env.BASESCAN_API_KEY,
+      sonicBlaze: process.env.SONICSCAN_API_KEY,
     }) as Record<string, string>,
     customChains: [
       {
@@ -242,6 +249,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api-sepolia.basescan.org/api',
           browserURL: 'https://sepolia.basescan.org/',
+        },
+      },
+      {
+        network: 'sonicBlaze',
+        chainId: 57054,
+        urls: {
+          apiURL: 'https://api-testnet.sonicscan.org/api',
+          browserURL: 'https://testnet.sonicscan.org/',
         },
       },
     ],
