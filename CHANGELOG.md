@@ -1,3 +1,8 @@
+## v0.9.43
+
+- Upgraded MintingManager on Base Sepolia, Base Mainnet, Polygon Mainnet
+- Rewrote all scripts to use gnosis safe instead of defender
+
 ## v0.9.42
 
 - `MintingManager@0.6.0`: 
