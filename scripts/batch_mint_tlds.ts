@@ -1,12 +1,11 @@
 import { ethers, network, config as hardhatConfig } from 'hardhat';
 import yargs from 'yargs';
-import { getNetworkConfig } from '../src/config';
-import { getProposalClient } from '../src/defender';
+import Safe from '@safe-global/protocol-kit';
+import { OperationType } from '@safe-global/safe-core-sdk-types';
+import { MetaTransactionData } from '@safe-global/types-kit';
 import { unwrap } from '../src/utils';
-
-const DEFENDER_NETWORK_NAME_REMAPS = {
-  polygon: 'matic',
-};
+import { getNetworkConfig } from '../src/config';
+import { getSafeApiClient, getSafeSigner } from '../src/safe';
 
 const MAX_BATCH_SIZE = 100;
 
@@ -50,40 +49,43 @@ async function main () {
   }
 
   const mintingManager = await ethers.getContractAt('MintingManager', config.contracts.MintingManager.address);
-  const addTldFunc = mintingManager.interface.getFunction('addTld');
 
-  const defenderNetworkName = DEFENDER_NETWORK_NAME_REMAPS[network.name] ?? network.name;
+  const apiKit = getSafeApiClient();
+  const safeSigner = await getSafeSigner();
 
-  const response = await getProposalClient().create({
-    proposal: {
-      contract: tlds.map(() => ({
-        name: 'MintingManager',
-        address: config.contracts.MintingManager.address,
-        network: defenderNetworkName,
-      })),
-      via: multisigAddr,
-      viaType: 'Safe',
-      title: 'Add TLDs',
-      description: tlds.join(', '),
-      type: 'batch',
-      steps: tlds.map((tld) => ({
-        contractId: [defenderNetworkName, config.contracts.MintingManager.address].join('-'),
-        type: 'custom',
-        targetFunction: {
-          name: addTldFunc.name,
-          inputs: addTldFunc.inputs.map((input) => ({
-            name: input.name,
-            type: input.type,
-            baseType: input.baseType,
-          })),
-        },
-        functionInputs: [tld, expirable],
-      })),
-      metadata: {},
-    },
+  const protocolKitOwner = await Safe.init({
+    provider: network.provider,
+    safeAddress: multisigAddr,
+    signer: await safeSigner.getAddress(),
   });
 
-  console.log('Proposal created: ', response.url);
+  const safeTransactionData: MetaTransactionData[] = tlds.map((tld) => {
+    const callData = mintingManager.interface.encodeFunctionData('addTld', [tld, expirable]);
+
+    return {
+      operation: OperationType.Call,
+      to: config.contracts.MintingManager.address,
+      data: callData,
+      value: '0',
+    };
+  });
+
+  const safeTransaction = await protocolKitOwner.createTransaction({
+    transactions: safeTransactionData,
+  });
+
+  const safeTxHash = await protocolKitOwner.getTransactionHash(safeTransaction);
+  const signature = await protocolKitOwner.signHash(safeTxHash);
+
+  await apiKit.proposeTransaction({
+    safeAddress: multisigAddr,
+    safeTransactionData: safeTransaction.data,
+    safeTxHash,
+    senderAddress: await safeSigner.getAddress(),
+    senderSignature: signature.data,
+  });
+
+  console.log('Proposal created!');
 }
 
 main()
