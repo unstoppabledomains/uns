@@ -6,6 +6,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { task } from 'hardhat/config';
 import { pickBy } from 'lodash';
 import { gasPriceOracleABI } from '@eth-optimism/contracts-ts';
+import { isAddress } from 'ethers';
 
 type MintersMap = Record<string, string[]>;
 
@@ -16,12 +17,18 @@ declare module 'hardhat/types/config' {
       minters: MintersMap;
       multisig: Record<string, string | null>;
     };
+    safe?: {
+      txServiceUrls?: Record<number, string>;
+    };
   }
 
   interface HardhatConfig {
     uns: {
       minters: MintersMap;
       multisig: Record<string, string>;
+    };
+    safe: {
+      txServiceUrls: Record<number, string>;
     };
   }
 
@@ -49,6 +56,8 @@ import 'solidity-coverage';
 
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
+import '@nomicfoundation/hardhat-ledger';
+
 import yargs from 'yargs/yargs';
 
 import { Sandbox } from './sandbox';
@@ -109,6 +118,24 @@ const settings = {
     enabled: true,
     runs: 200,
   },
+};
+
+const configureAccountsForMainnets = (privateKeyEnvVar: string | undefined) => {
+  if (!!process.env.USE_LEDGER) {
+    const ledgerAddress = process.env.USE_LEDGER;
+
+    if (!isAddress(ledgerAddress)) {
+      throw new Error(`USE_LEDGER address ${ledgerAddress} is not a valid address`);
+    }
+
+    return {
+      ledgerAccounts: [ledgerAddress],
+    };
+  }
+
+  return {
+    accounts: privateKeyEnvVar ? [privateKeyEnvVar] : undefined,
+  };
 };
 
 const config: HardhatUserConfig = {
@@ -177,25 +204,25 @@ const config: HardhatUserConfig = {
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.MAINNET_INFURA_KEY}`,
       chainId: 1,
-      accounts: process.env.MAINNET_UNS_PRIVATE_KEY ? [process.env.MAINNET_UNS_PRIVATE_KEY] : undefined,
       loggingEnabled: true,
+      ...configureAccountsForMainnets(process.env.MAINNET_UNS_PRIVATE_KEY),
     },
     polygon: {
       url: `https://polygon-mainnet.infura.io/v3/${process.env.POLYGON_INFURA_KEY}`,
       chainId: 137,
-      accounts: process.env.POLYGON_UNS_PRIVATE_KEY ? [process.env.POLYGON_UNS_PRIVATE_KEY] : undefined,
       loggingEnabled: true,
+      ...configureAccountsForMainnets(process.env.POLYGON_UNS_PRIVATE_KEY),
     },
     base: {
       url: `https://base-mainnet.infura.io/v3/${process.env.BASE_INFURA_KEY}`,
       chainId: 8453,
-      accounts: process.env.BASE_UNS_PRIVATE_KEY ? [process.env.BASE_UNS_PRIVATE_KEY] : undefined,
       loggingEnabled: true,
+      ...configureAccountsForMainnets(process.env.BASE_MAINNET_UNS_PRIVATE_KEY),
     },
     baseSepolia: {
       url: `https://base-sepolia.infura.io/v3/${process.env.BASE_INFURA_KEY}`,
       chainId: 84532,
-      accounts: process.env.BASE_UNS_PRIVATE_KEY ? [process.env.BASE_UNS_PRIVATE_KEY] : undefined,
+      accounts: process.env.BASE_SEPOLIA_UNS_PRIVATE_KEY ? [process.env.BASE_SEPOLIA_UNS_PRIVATE_KEY] : undefined,
       loggingEnabled: true,
     },
   },
@@ -263,7 +290,7 @@ const config: HardhatUserConfig = {
       mainnet: ['0x5465c72ce00196550d6f89c40830f6bc81599f4f'],
       polygon: ['0x58cb2542a5b3b0999d41de59ad03331bbfb4dda3'],
       baseSepolia: ['0x1eE5eee9D19A8923443FfC57ED2754f02cef5959'],
-      base: [], // TODO: add base minter
+      base: ['0x6ca59253ae95126d478ca625126be7c010dfe593'],
     },
     multisig: {
       mainnet: '0x6bEca92600be24179ae70A430AEF4aE632fddDc8',
@@ -274,9 +301,10 @@ const config: HardhatUserConfig = {
       base: '0xfEc540DfD4e9929d6c29ceA92fc88F1abF2d772C',
     },
   },
-  defender: {
-    apiKey: process.env.DEFENDER_API_KEY || '',
-    apiSecret: process.env.DEFENDER_API_SECRET || '',
+  safe: {
+    txServiceUrls: {
+      80002: 'SELF-HOSTED-TX-SERVICE-URL-GOES-HERE',
+    },
   },
 };
 

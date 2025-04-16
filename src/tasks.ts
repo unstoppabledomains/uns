@@ -1,4 +1,4 @@
-import { defender, ethers, network, upgrades } from 'hardhat';
+import { ethers, network, upgrades } from 'hardhat';
 import { Contract, keccak256, namehash, parseEther, parseUnits } from 'ethers';
 import { merge } from 'lodash';
 import { getContractAddress } from '@openzeppelin/hardhat-upgrades/dist/utils';
@@ -19,6 +19,7 @@ import { ArtifactName, DependenciesMap, EnsContractName, NsNetworkConfig, UnsCon
 import verify from './verify';
 import { notNullSha, unwrap, unwrapDependencies } from './utils';
 import { deployProxy, ensureDeployed, ensureUpgradable, isSandbox, isTestnet, mintUnsTlds } from './helpers';
+import { proposeContractUpgrade } from './safe';
 
 export type Task = {
   tags: string[];
@@ -595,25 +596,29 @@ const proposeUNSRegistryTask: Task = {
       throw new Error('Multisig address is not provided');
     }
 
-    ctx.log('Preparing proposal...');
-    const proposal = await defender.proposeUpgrade(
+    ctx.log('Deploying new implementation');
+
+    const newImplementationAddress = (await upgrades.prepareUpgrade(
       UNSRegistry.address,
       await ethers.getContractFactory(ArtifactName.UNSRegistry),
-      {
-        title: `Propose UNSRegistry to v${version}`,
-        multisig: ctx.multisig,
-        unsafeAllow: ['delegatecall'],
-      },
+      { unsafeAllow: ['delegatecall'] },
+    )) as string;
+
+    await verify(ctx, newImplementationAddress, []);
+
+    await ctx.saveContractConfig(
+      UnsContractName.UNSRegistry,
+      await ethers.getContractAt(ArtifactName.UNSRegistry, UNSRegistry.address),
+      newImplementationAddress,
     );
-    if (proposal.metadata?.newImplementationAddress) {
-      await ctx.saveContractConfig(
-        UnsContractName.UNSRegistry,
-        await ethers.getContractAt(ArtifactName.UNSRegistry, UNSRegistry.address),
-        proposal.metadata.newImplementationAddress,
-      );
-      await verify(ctx, proposal.metadata.newImplementationAddress, []);
-    }
-    ctx.log('Upgrade proposal created at:', proposal.url);
+
+    ctx.log('Preparing proposal...');
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+
+    await proposeContractUpgrade(UNSRegistry.address, newImplementationAddress, await proxyAdmin.getAddress());
+
+    ctx.log('Upgrade proposal created');
   },
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -638,25 +643,29 @@ const proposeMintingManagerTask: Task = {
       throw new Error('Multisig address is not provided');
     }
 
-    ctx.log('Preparing proposal...');
-    const proposal = await defender.proposeUpgrade(
+    ctx.log('Deploying new implementation');
+
+    const newImplementationAddress = (await upgrades.prepareUpgrade(
       MintingManager.address,
       await ethers.getContractFactory(ArtifactName.MintingManager),
-      {
-        title: `Propose MintingManager to v${version}`,
-        multisig: ctx.multisig,
-      },
+      { unsafeAllow: ['delegatecall'], unsafeAllowRenames: true },
+    )) as string;
+
+    await verify(ctx, newImplementationAddress, []);
+
+    await ctx.saveContractConfig(
+      UnsContractName.MintingManager,
+      await ethers.getContractAt(ArtifactName.MintingManager, MintingManager.address),
+      newImplementationAddress,
     );
 
-    if (proposal.metadata?.newImplementationAddress) {
-      await ctx.saveContractConfig(
-        UnsContractName.MintingManager,
-        await ethers.getContractAt(ArtifactName.MintingManager, MintingManager.address),
-        proposal.metadata.newImplementationAddress,
-      );
-      await verify(ctx, proposal.metadata.newImplementationAddress, []);
-    }
-    ctx.log('Upgrade proposal created at:', proposal.url);
+    ctx.log('Preparing proposal...');
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+
+    await proposeContractUpgrade(MintingManager.address, newImplementationAddress, await proxyAdmin.getAddress());
+
+    ctx.log('Upgrade proposal created');
   },
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -681,25 +690,29 @@ const proposeProxyReaderTask: Task = {
       throw new Error('Multisig address is not provided');
     }
 
-    ctx.log('Preparing proposal...');
-    const proposal = await defender.proposeUpgrade(
+    ctx.log('Deploying new implementation');
+
+    const newImplementationAddress = (await upgrades.prepareUpgrade(
       ProxyReader.address,
       await ethers.getContractFactory(ArtifactName.ProxyReader),
-      {
-        title: `Propose ProxyReader to v${version}`,
-        multisig: ctx.multisig,
-        unsafeAllow: ['delegatecall'],
-      },
+      { unsafeAllow: ['delegatecall'] },
+    )) as string;
+
+    await verify(ctx, newImplementationAddress, []);
+
+    await ctx.saveContractConfig(
+      UnsContractName.ProxyReader,
+      await ethers.getContractAt(ArtifactName.ProxyReader, ProxyReader.address),
+      newImplementationAddress,
     );
-    if (proposal.metadata?.newImplementationAddress) {
-      await ctx.saveContractConfig(
-        UnsContractName.ProxyReader,
-        await ethers.getContractAt(ArtifactName.ProxyReader, ProxyReader.address),
-        proposal.metadata.newImplementationAddress,
-      );
-      await verify(ctx, proposal.metadata.newImplementationAddress, []);
-    }
-    ctx.log('Upgrade proposal created at:', proposal.url);
+
+    ctx.log('Preparing proposal...');
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+
+    await proposeContractUpgrade(ProxyReader.address, newImplementationAddress, await proxyAdmin.getAddress());
+
+    ctx.log('Upgrade proposal created');
   },
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -1046,26 +1059,28 @@ const proposeENSCustodyTask: Task = {
       throw new Error('Multisig address is not provided');
     }
 
-    ctx.log('Preparing proposal...');
-    const proposal = await defender.proposeUpgradeWithApproval(
+    ctx.log('Deploying new implementation');
+
+    const newImplementationAddress = (await upgrades.prepareUpgrade(
       ENSCustody.address,
       await ethers.getContractFactory(ArtifactName.ENSCustody),
-      {
-        useDefenderDeploy: false,
-      },
+    )) as string;
+
+    await verify(ctx, newImplementationAddress, []);
+
+    await ctx.saveContractConfig(
+      EnsContractName.ENSCustody,
+      await ethers.getContractAt(ArtifactName.ENSCustody, ENSCustody.address),
+      newImplementationAddress,
     );
 
-    const receipt = await proposal.txResponse?.wait();
+    ctx.log('Preparing proposal...');
 
-    if (receipt?.contractAddress) {
-      await ctx.saveContractConfig(
-        EnsContractName.ENSCustody,
-        await ethers.getContractAt(ArtifactName.ENSCustody, ENSCustody.address),
-        receipt.contractAddress,
-      );
-      await verify(ctx, receipt.contractAddress, []);
-    }
-    ctx.log('Upgrade proposal created at:', proposal.url);
+    const proxyAdmin = await upgrades.admin.getInstance();
+
+    await proposeContractUpgrade(ENSCustody.address, newImplementationAddress, await proxyAdmin.getAddress());
+
+    ctx.log('Upgrade proposal created');
   },
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
@@ -1241,26 +1256,28 @@ const proposeSeaportProxyBuyerTask: Task = {
       throw new Error('Multisig address is not provided');
     }
 
-    ctx.log('Preparing proposal...');
-    const proposal = await defender.proposeUpgradeWithApproval(
+    ctx.log('Deploying new implementation');
+
+    const newImplementationAddress = (await upgrades.prepareUpgrade(
       SeaportProxyBuyer.address,
       await ethers.getContractFactory(ArtifactName.SeaportProxyBuyer),
-      {
-        useDefenderDeploy: false,
-      },
+    )) as string;
+
+    await verify(ctx, newImplementationAddress, []);
+
+    await ctx.saveContractConfig(
+      UnsContractName.SeaportProxyBuyer,
+      await ethers.getContractAt(ArtifactName.SeaportProxyBuyer, SeaportProxyBuyer.address),
+      newImplementationAddress,
     );
 
-    const receipt = await proposal.txResponse?.wait();
+    ctx.log('Preparing proposal...');
 
-    if (receipt?.contractAddress) {
-      await ctx.saveContractConfig(
-        UnsContractName.SeaportProxyBuyer,
-        await ethers.getContractAt(ArtifactName.SeaportProxyBuyer, SeaportProxyBuyer.address),
-        receipt.contractAddress,
-      );
-      await verify(ctx, receipt.contractAddress, []);
-    }
-    ctx.log('Upgrade proposal created at:', proposal.url);
+    const proxyAdmin = await upgrades.admin.getInstance();
+
+    await proposeContractUpgrade(SeaportProxyBuyer.address, newImplementationAddress, await proxyAdmin.getAddress());
+
+    ctx.log('Upgrade proposal created');
   },
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
