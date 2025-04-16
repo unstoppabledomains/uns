@@ -1,5 +1,5 @@
 {
-    "version": "0.9.16",
+    "version": "0.9.17",
     "networks": {
         "1": {
             "contracts": {
@@ -166,7 +166,7 @@
                 },
                 "MintingManager": {
                     "address": "0x7be83293BeeDc9Eba1bd76c66A65F10F3efaeC26",
-                    "implementation": "0x8Efbe119357753c5d12f078AC081E37a5AFACf33",
+                    "implementation": "0xeA7CEFF2966c24b54c7A955c25C718A9b38bb826",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x01272f41",
                     "forwarder": "0xC37d3c4326ab0E1D2b9D8b916bBdf5715f780fcF"
@@ -531,7 +531,7 @@
                 "MintingManager": {
                     "address": "0xe56D6aa367B7a16385Ea867F556339bbC361F983",
                     "deploymentBlock": "0x01215a5c",
-                    "implementation": "0xd30b3cB992777134E2a338BcF422a311339E75b1",
+                    "implementation": "0x97eD948251a5741611d2a6b9D7136782911Ff807",
                     "forwarder": "0xd57f8F7be4BaE8f2bf24792Fec2Ca06513c83c1D",
                     "legacyAddresses": []
                 },
@@ -796,7 +796,7 @@
                 "MintingManager": {
                     "address": "0x050Ceb85167D510558E793a483b479f2917B4b9b",
                     "deploymentBlock": "0xcbf18d",
-                    "implementation": "0x6B5F9068Aa94eFf728585665244cb5AB8735E71A",
+                    "implementation": "0x1c42964626C1c6B03543715F18FCF0dd086Be0ab",
                     "forwarder": "0xEa5AE30C714ccd63Fca6D791Eea1E26CB1be0c1d",
                     "legacyAddresses": []
                 },

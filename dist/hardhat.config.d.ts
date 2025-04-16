@@ -6,11 +6,17 @@ declare module 'hardhat/types/config' {
             minters: MintersMap;
             multisig: Record<string, string | null>;
         };
+        safe?: {
+            txServiceUrls?: Record<number, string>;
+        };
     }
     interface HardhatConfig {
         uns: {
             minters: MintersMap;
             multisig: Record<string, string>;
+        };
+        safe: {
+            txServiceUrls: Record<number, string>;
         };
     }
     interface ProjectPathsUserConfig {
@@ -30,6 +36,7 @@ import '@openzeppelin/hardhat-upgrades';
 import 'solidity-coverage';
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
+import '@nomicfoundation/hardhat-ledger';
 import 'hardhat-abi-exporter';
 declare const config: HardhatUserConfig;
 export default config;
