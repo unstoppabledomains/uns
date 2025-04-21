@@ -1,5 +1,5 @@
 {
-    "version": "0.9.17",
+    "version": "0.9.18",
     "networks": {
         "1": {
             "contracts": {
@@ -657,7 +657,7 @@
                     "address": "0xabec3fF0F0b6375F65CB9aEB01e8347bf697082F",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x53f770",
-                    "implementation": "0x5e6f02BA94648Fb25Ca98C6a577c04A0Db34c724",
+                    "implementation": "0x2c353e3e1feaB3d31fe43aC298531D5ec1910C42",
                     "forwarder": "0xC738bD0E31CF0f7a777D815F8cA965f3c064C012"
                 },
                 "ProxyReader": {

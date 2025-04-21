@@ -220,7 +220,8 @@ const config = {
     },
     safe: {
         txServiceUrls: {
-            80002: 'SELF-HOSTED-TX-SERVICE-URL-GOES-HERE',
+            80002: 'https://safe.ud-staging.com/txs/amoy/api',
+            57054: 'https://safe.ud-staging.com/txs/sonic-blaze/api',
         },
     },
 };
