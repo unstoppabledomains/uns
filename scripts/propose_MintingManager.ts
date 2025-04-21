@@ -13,7 +13,7 @@ async function main () {
   }
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['propose_minting_manager'], config, { version: '0.6.0' });
+  const deployConfig = await deployer.execute(['propose_minting_manager'], config, { version: '' });
   mergeNetworkConfig(deployConfig);
 }
 
