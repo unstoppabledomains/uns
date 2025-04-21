@@ -69,9 +69,13 @@ async function main () {
       value: '0',
     };
   });
+  const nonce = await apiKit.getNextNonce(multisigAddr);
 
   const safeTransaction = await protocolKitOwner.createTransaction({
     transactions: safeTransactionData,
+    options: {
+      nonce: parseInt(nonce, 10),
+    },
   });
 
   const safeTxHash = await protocolKitOwner.getTransactionHash(safeTransaction);

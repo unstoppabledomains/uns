@@ -1,3 +1,9 @@
+## v0.9.44
+
+- Added scripts to manage the ProxyReader resolution schema
+- Added custom tx service URLs, ensured nonces are working correctly when proposing gnosis safe.
+- Upgraded MintingManager on Amoy
+
 ## v0.9.43
 
 - Upgraded MintingManager on Base Sepolia, Base Mainnet, Polygon Mainnet
