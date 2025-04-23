@@ -4,12 +4,14 @@ export enum Network {
   POLYGON,
   ETHEREUM,
   BASE,
+  SONIC,
 }
 
 export const NetworkChainIds = {
   [Network.POLYGON]: [137, 80002],
   [Network.ETHEREUM]: [1, 11155111],
   [Network.BASE]: [8453, 84532],
+  [Network.SONIC]: [146, 57054],
 };
 
 export type TLDConfig = {
@@ -248,5 +250,12 @@ export const TLD: Record<string, TLDConfig> = {
     nameServices: [NameService.UNS],
     networks: [Network.BASE],
     hash: BigInt('0x670e86e82c6551930f0b729bfa9173a1bfdebc6fb08f49fb97cc0077cae611a1'),
+  },
+
+  // SONIC
+  sonic: {
+    nameServices: [NameService.UNS],
+    networks: [Network.SONIC],
+    hash: BigInt('0x71cad209db380d6249b5944b2ae72800e06e3972e9045b7da67110d9f67c4507'),
   },
 };

@@ -225,6 +225,18 @@ const config: HardhatUserConfig = {
       accounts: process.env.BASE_SEPOLIA_UNS_PRIVATE_KEY ? [process.env.BASE_SEPOLIA_UNS_PRIVATE_KEY] : undefined,
       loggingEnabled: true,
     },
+    sonic: {
+      url: `https://sonic-mainnet.g.alchemy.com/v2/${process.env.SONIC_ALCHEMY_KEY}`,
+      chainId: 146,
+      loggingEnabled: true,
+      ...configureAccountsForMainnets(process.env.SONIC_MAINNET_UNS_PRIVATE_KEY),
+    },
+    sonicBlaze: {
+      url: `https://sonic-blaze.g.alchemy.com/v2/${process.env.SONIC_BLAZE_ALCHEMY_KEY}`,
+      chainId: 57054,
+      accounts: process.env.SONIC_BLAZE_UNS_PRIVATE_KEY ? [process.env.SONIC_BLAZE_UNS_PRIVATE_KEY] : undefined,
+      loggingEnabled: true,
+    },
   },
   typechain: {
     outDir: 'types',
@@ -253,6 +265,8 @@ const config: HardhatUserConfig = {
       polygonAmoy: process.env.POLYGONSCAN_API_KEY,
       base: process.env.BASESCAN_API_KEY,
       baseSepolia: process.env.BASESCAN_API_KEY,
+      sonic: process.env.SONICSCAN_API_KEY,
+      sonicBlaze: process.env.SONICSCAN_API_KEY,
     }) as Record<string, string>,
     customChains: [
       {
@@ -269,6 +283,22 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api-sepolia.basescan.org/api',
           browserURL: 'https://sepolia.basescan.org/',
+        },
+      },
+      {
+        network: 'sonicBlaze',
+        chainId: 57054,
+        urls: {
+          apiURL: 'https://api-testnet.sonicscan.org/api',
+          browserURL: 'https://testnet.sonicscan.org/',
+        },
+      },
+      {
+        network: 'sonic',
+        chainId: 146,
+        urls: {
+          apiURL: 'https://api.sonicscan.org/api',
+          browserURL: 'https://sonicscan.org/',
         },
       },
     ],
@@ -291,6 +321,7 @@ const config: HardhatUserConfig = {
       polygon: ['0x58cb2542a5b3b0999d41de59ad03331bbfb4dda3'],
       baseSepolia: ['0x1eE5eee9D19A8923443FfC57ED2754f02cef5959'],
       base: ['0x6ca59253ae95126d478ca625126be7c010dfe593'],
+      sonicBlaze: ['0x02e0FF5D13ae7b465615acA5BBbeE2258F79d6cb'],
     },
     multisig: {
       mainnet: '0x6bEca92600be24179ae70A430AEF4aE632fddDc8',
