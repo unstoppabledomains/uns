@@ -1,6 +1,6 @@
 ## v0.9.45
 
-- Added SOnic blockchain support
+- Added Sonic blockchain support
 - Added scripts for Sonic smart contracts deployment
 - Added configs for sonic networks and contract addresses
 
