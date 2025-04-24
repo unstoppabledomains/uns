@@ -7,6 +7,9 @@ import { task } from 'hardhat/config';
 import { pickBy } from 'lodash';
 import { gasPriceOracleABI } from '@eth-optimism/contracts-ts';
 import { isAddress } from 'ethers';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 type MintersMap = Record<string, string[]>;
 

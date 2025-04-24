@@ -95,7 +95,7 @@ export class Deployer {
     this.log('Execution started');
 
     for (const task of tasks.sort((a: Task, b: Task) => a.priority - b.priority)) {
-      if (params?.exclude && task.tags.some((tag) => params.exclude.includes(tag))) {
+      if (params?.exclude && task.tags.some((tag) => tag === params.exclude)) {
         continue;
       }
 
