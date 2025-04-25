@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -19,6 +42,8 @@ const config_1 = require("hardhat/config");
 const lodash_1 = require("lodash");
 const contracts_ts_1 = require("@eth-optimism/contracts-ts");
 const ethers_1 = require("ethers");
+const dotenv = __importStar(require("dotenv"));
+dotenv.config();
 require("@typechain/hardhat");
 require("@nomicfoundation/hardhat-ethers");
 require("@nomicfoundation/hardhat-verify");
@@ -182,37 +207,37 @@ const config = {
         }),
         customChains: [
             {
-              network: 'polygonAmoy',
-              chainId: 80002,
-              urls: {
-                  apiURL: 'https://api-amoy.polygonscan.com/api',
-                  browserURL: 'https://amoy.polygonscan.com/',
-              },
+                network: 'polygonAmoy',
+                chainId: 80002,
+                urls: {
+                    apiURL: 'https://api-amoy.polygonscan.com/api',
+                    browserURL: 'https://amoy.polygonscan.com/',
+                },
             },
             {
-              network: 'baseSepolia',
-              chainId: 84532,
-              urls: {
-                apiURL: 'https://api-sepolia.basescan.org/api',
-                browserURL: 'https://sepolia.basescan.org/',
-              },
+                network: 'baseSepolia',
+                chainId: 84532,
+                urls: {
+                    apiURL: 'https://api-sepolia.basescan.org/api',
+                    browserURL: 'https://sepolia.basescan.org/',
+                },
             },
             {
-              network: 'sonicBlaze',
-              chainId: 57054,
-              urls: {
-                apiURL: 'https://api-testnet.sonicscan.org/api',
-                browserURL: 'https://testnet.sonicscan.org/',
-              },
+                network: 'sonicBlaze',
+                chainId: 57054,
+                urls: {
+                    apiURL: 'https://api-testnet.sonicscan.org/api',
+                    browserURL: 'https://testnet.sonicscan.org/',
+                },
             },
-              {
+            {
                 network: 'sonic',
                 chainId: 146,
                 urls: {
-                  apiURL: 'https://api.sonicscan.org/api',
-                  browserURL: 'https://sonicscan.org/',
+                    apiURL: 'https://api.sonicscan.org/api',
+                    browserURL: 'https://sonicscan.org/',
                 },
-              },
+            },
         ],
     },
     abiExporter: {
@@ -233,6 +258,7 @@ const config = {
             polygon: ['0x58cb2542a5b3b0999d41de59ad03331bbfb4dda3'],
             baseSepolia: ['0x1eE5eee9D19A8923443FfC57ED2754f02cef5959'],
             base: ['0x6ca59253ae95126d478ca625126be7c010dfe593'],
+            sonicBlaze: ['0x02e0FF5D13ae7b465615acA5BBbeE2258F79d6cb'],
         },
         multisig: {
             mainnet: '0x6bEca92600be24179ae70A430AEF4aE632fddDc8',
