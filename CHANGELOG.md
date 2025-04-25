@@ -1,3 +1,9 @@
+## v0.9.45
+
+- Added Sonic blockchain support
+- Added scripts for Sonic smart contracts deployment
+- Added configs for sonic networks and contract addresses
+
 ## v0.9.44
 
 - Added scripts to manage the ProxyReader resolution schema

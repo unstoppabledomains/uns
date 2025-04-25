@@ -82,7 +82,7 @@ The contract addresses are distributed via a [UNS Config File](https://github.co
 
 7. Upgradability
 
-    > By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits significantly from the technology’s immutability, still a certain degree of mutability is needed for bug fixing and potential product improvements.
+    > By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits significantly from the technology's immutability, still a certain degree of mutability is needed for bug fixing and potential product improvements.
 
     Upgradability comes from two patterns:
     1. Initializable
@@ -174,6 +174,8 @@ Polygon | POLYGON_INFURA_KEY <br /> POLYGON_UNS_PRIVATE_KEY <br /> POLYGONSCAN_A
 Amoy | AMOY_INFURA_KEY <br /> AMOY_UNS_PRIVATE_KEY <br /> POLYGONSCAN_API_KEY
 Base | BASE_INFURA_KEY <br /> BASE_UNS_PRIVATE_KEY <br /> BASESCAN_API_KEY
 Base sepolia | BASE_INFURA_KEY <br /> BASE_UNS_PRIVATE_KEY <br /> BASESCAN_API_KEY
+Sonic | SONIC_ALCHEMY_KEY <br /> SONIC_UNS_PRIVATE_KEY <br /> SONICSCAN_API_KEY
+Sonic testnet | SONIC_BLAZE_ALCHEMY_KEY <br /> SONIC_BLAZE_UNS_PRIVATE_KEY <br /> SONICSCAN_API_KEY
 
 <div id="backward-incompatibility"></div>
 

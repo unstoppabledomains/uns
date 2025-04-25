@@ -5341,6 +5341,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dotenv@npm:^16.5.0":
+  version: 16.5.0
+  resolution: "dotenv@npm:16.5.0"
+  checksum: 6543fe87b5ddf2d60dd42df6616eec99148a5fc150cb4530fef5bda655db5204a3afa0e6f25f7cd64b20657ace4d79c0ef974bec32fdb462cad18754191e7a90
+  languageName: node
+  linkType: hard
+
 "duplexer3@npm:^0.1.4":
   version: 0.1.4
   resolution: "duplexer3@npm:0.1.4"
@@ -13292,6 +13299,7 @@ __metadata:
     csv-parse: ^5.4.0
     debug: ^4.3.1
     dot-crypto: "https://github.com/unstoppabledomains/dot-crypto.git#v2.0.1"
+    dotenv: ^16.5.0
     eslint: ^8.26.0
     eslint-plugin-import: ^2.26.0
     eslint-plugin-mocha-no-only: ^1.1.1

@@ -142,6 +142,13 @@ const config = {
             accounts: process.env.BASE_SEPOLIA_UNS_PRIVATE_KEY ? [process.env.BASE_SEPOLIA_UNS_PRIVATE_KEY] : undefined,
             loggingEnabled: true,
         },
+        sonic: Object.assign({ url: `https://sonic-mainnet.g.alchemy.com/v2/${process.env.SONIC_ALCHEMY_KEY}`, chainId: 146, loggingEnabled: true }, configureAccountsForMainnets(process.env.SONIC_MAINNET_UNS_PRIVATE_KEY)),
+        sonicBlaze: {
+            url: `https://sonic-blaze.g.alchemy.com/v2/${process.env.SONIC_BLAZE_ALCHEMY_KEY}`,
+            chainId: 57054,
+            accounts: process.env.SONIC_BLAZE_UNS_PRIVATE_KEY ? [process.env.SONIC_BLAZE_UNS_PRIVATE_KEY] : undefined,
+            loggingEnabled: true,
+        },
     },
     typechain: {
         outDir: 'types',
@@ -170,24 +177,42 @@ const config = {
             polygonAmoy: process.env.POLYGONSCAN_API_KEY,
             base: process.env.BASESCAN_API_KEY,
             baseSepolia: process.env.BASESCAN_API_KEY,
+            sonic: process.env.SONICSCAN_API_KEY,
+            sonicBlaze: process.env.SONICSCAN_API_KEY,
         }),
         customChains: [
             {
-                network: 'polygonAmoy',
-                chainId: 80002,
-                urls: {
-                    apiURL: 'https://api-amoy.polygonscan.com/api',
-                    browserURL: 'https://amoy.polygonscan.com/',
-                },
+              network: 'polygonAmoy',
+              chainId: 80002,
+              urls: {
+                  apiURL: 'https://api-amoy.polygonscan.com/api',
+                  browserURL: 'https://amoy.polygonscan.com/',
+              },
             },
             {
-                network: 'baseSepolia',
-                chainId: 84532,
-                urls: {
-                    apiURL: 'https://api-sepolia.basescan.org/api',
-                    browserURL: 'https://sepolia.basescan.org/',
-                },
+              network: 'baseSepolia',
+              chainId: 84532,
+              urls: {
+                apiURL: 'https://api-sepolia.basescan.org/api',
+                browserURL: 'https://sepolia.basescan.org/',
+              },
             },
+            {
+              network: 'sonicBlaze',
+              chainId: 57054,
+              urls: {
+                apiURL: 'https://api-testnet.sonicscan.org/api',
+                browserURL: 'https://testnet.sonicscan.org/',
+              },
+            },
+              {
+                network: 'sonic',
+                chainId: 146,
+                urls: {
+                  apiURL: 'https://api.sonicscan.org/api',
+                  browserURL: 'https://sonicscan.org/',
+                },
+              },
         ],
     },
     abiExporter: {
