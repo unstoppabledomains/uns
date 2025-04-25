@@ -1,4 +1,4 @@
-## v0.9.45
+## v0.9.46
 
 - Added Sonic blockchain support
 - Added scripts for Sonic smart contracts deployment
