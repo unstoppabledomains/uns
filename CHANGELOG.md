@@ -1,3 +1,7 @@
+## v0.9.47
+
+- Added multisig and whitelisted signer addresses for Sonic
+
 ## v0.9.46
 
 - Added Sonic blockchain support
