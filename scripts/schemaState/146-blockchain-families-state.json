@@ -1,5 +1,423 @@
 {
-  "networkFamilies": {},
-  "legacyKeys": {},
-  "latestSyncedBlock": 24548283
+  "networkFamilies": {
+    "ADA": "ADA",
+    "0ZK_ETH": "0ZK",
+    "AE": "AE",
+    "AKT": "AKT",
+    "ALGO": "ALGO",
+    "APT": "APT",
+    "AR": "AR",
+    "ARDR": "ARDR",
+    "ARK": "ARK",
+    "ARRR": "ARRR",
+    "ATOM": "ATOM",
+    "BCD": "BCD",
+    "BCH": "BCH",
+    "BEAM": "BEAM",
+    "BNB": "BNB",
+    "BSV": "BSV",
+    "BTC": "BTC",
+    "BTG": "BTG",
+    "CKB": "CKB",
+    "CSPR": "CSPR",
+    "DASH": "DASH",
+    "DESO": "DESO",
+    "DGB": "DGB",
+    "DCR": "DCR",
+    "DOGE": "DOGE",
+    "EGLD": "EGLD",
+    "DOT": "DOT",
+    "ETN": "ETN",
+    "ERG": "ERG",
+    "EOSIO": "EOSIO",
+    "ARBN": "EVM",
+    "AVAX": "EVM",
+    "ARB1": "EVM",
+    "BSC": "EVM",
+    "BASE": "EVM",
+    "CELO": "EVM",
+    "CRO": "EVM",
+    "CFX": "EVM",
+    "ESC": "EVM",
+    "ETH": "EVM",
+    "FLR": "EVM",
+    "ETC": "EVM",
+    "FUSE": "EVM",
+    "FTM": "EVM",
+    "GTH": "EVM",
+    "IOTX": "EVM",
+    "HYDRA": "EVM",
+    "KLAY": "EVM",
+    "META": "EVM",
+    "MATIC": "EVM",
+    "OKB": "EVM",
+    "ONE": "EVM",
+    "OKTC": "EVM",
+    "OP": "EVM",
+    "UBQ": "EVM",
+    "RSK": "EVM",
+    "UCHAIN": "EVM",
+    "VLX": "EVM",
+    "VET": "EVM",
+    "WAN": "EVM",
+    "XDAI": "EVM",
+    "ZEN": "EVM",
+    "EWT": "EWT",
+    "FAB": "FAB",
+    "FET": "FET",
+    "FIL": "FIL",
+    "FIRO": "FIRO",
+    "FLOW": "FLOW",
+    "GRS": "GRS",
+    "GUAP": "GUAP",
+    "HBAR": "HBAR",
+    "HIVE": "HIVE",
+    "HNT": "HNT",
+    "ICP": "ICP",
+    "ICX": "ICX",
+    "IOST": "IOST",
+    "KDA": "KDA",
+    "KLV": "KLV",
+    "IOTA": "IOTA",
+    "KMD": "KMD",
+    "KSM": "KSM",
+    "LSK": "LSK",
+    "LTC": "LTC",
+    "LUNA": "LUNA",
+    "MAID": "MAID",
+    "MED": "MED",
+    "MINA": "MINA",
+    "MONA": "MONA",
+    "NANO": "NANO",
+    "NEAR": "NEAR",
+    "NEBL": "NEBL",
+    "NEO": "NEO",
+    "NIBI": "NIBI",
+    "NIMQ": "NIMQ",
+    "NKN": "NKN",
+    "OMNI": "OMNI",
+    "ONT": "ONT",
+    "PHA": "PHA",
+    "POKT": "POKT",
+    "QTUM": "QTUM",
+    "RVN": "RVN",
+    "SC": "SC",
+    "SIERRA": "SIERRA",
+    "SMART": "SMART",
+    "SOL": "SOL",
+    "STEEM": "STEEM",
+    "STX": "STX",
+    "SUI": "SUI",
+    "THOR": "THOR",
+    "TON": "TON",
+    "TPAY": "TPAY",
+    "TRX": "TRX",
+    "VSYS": "VSYS",
+    "WAVES": "WAVES",
+    "WAXP": "WAXP",
+    "XCH": "XCH",
+    "XEM": "XEM",
+    "XHV": "XHV",
+    "XLA": "XLA",
+    "XDC": "XDC",
+    "XLM": "XLM",
+    "XMR": "XMR",
+    "XPRT": "XPRT",
+    "XPM": "XPM",
+    "XRP": "XRP",
+    "XTZ": "XTZ",
+    "XST": "XST",
+    "XVG": "XVG",
+    "XZC": "XZC",
+    "YEC": "YEC",
+    "ZEC": "ZEC",
+    "ZIL": "ZIL"
+  },
+  "legacyKeys": {
+    "token.ADA.ADA.ADA.address": [
+      "crypto.ADA.address"
+    ],
+    "token.AE.AE.AE.address": [
+      "crypto.AE.address"
+    ],
+    "token.ALGO.ALGO.ALGO.address": [
+      "crypto.ALGO.address"
+    ],
+    "token.AKT.AKT.AKT.address": [
+      "crypto.AKT.address"
+    ],
+    "token.APT.APT.APT.address": [
+      "crypto.APT.address"
+    ],
+    "token.AR.AR.AR.address": [
+      "crypto.AR.address"
+    ],
+    "token.ARDR.ARDR.ARDR.address": [
+      "crypto.ARDR.address"
+    ],
+    "token.ARK.ARK.ARK.address": [
+      "crypto.ARK.address"
+    ],
+    "token.ARRR.ARRR.ARRR.address": [
+      "crypto.ARRR.address"
+    ],
+    "token.ATOM.ATOM.ATOM.address": [
+      "crypto.ATOM.address"
+    ],
+    "token.BCD.BCD.BCD.address": [
+      "crypto.BCD.address"
+    ],
+    "token.BCH.BCH.BCH.address": [
+      "crypto.BCH.address"
+    ],
+    "token.BEAM.BEAM.BEAM.address": [
+      "crypto.BEAM.address"
+    ],
+    "token.BNB.BNB.BNB.address": [
+      "crypto.BNB.address",
+      "crypto.BNB.version.BEP2.address"
+    ],
+    "token.BSV.BSV.BSV.address": [
+      "crypto.BSV.address"
+    ],
+    "token.BTC.BTC.BTC.address": [
+      "crypto.BTC.address"
+    ],
+    "token.BTG.BTG.BTG.address": [
+      "crypto.BTG.address"
+    ],
+    "token.CKB.CKB.CKB.address": [
+      "crypto.CKB.address"
+    ],
+    "token.CSPR.CSPR.CSPR.address": [
+      "crypto.CSPR.address"
+    ],
+    "token.DASH.DASH.DASH.address": [
+      "crypto.DASH.address"
+    ],
+    "token.DCR.DCR.DCR.address": [
+      "crypto.DCR.address"
+    ],
+    "token.DESO.DESO.DESO.address": [
+      "crypto.DESO.address"
+    ],
+    "token.DGB.DGB.DGB.address": [
+      "crypto.DGB.address"
+    ],
+    "token.DOGE.DOGE.DOGE.address": [
+      "crypto.DOGE.address"
+    ],
+    "token.DOT.DOT.DOT.address": [
+      "crypto.DOT.address"
+    ],
+    "token.EGLD.EGLD.EGLD.address": [
+      "crypto.EGLD.address"
+    ],
+    "token.ERG.ERG.ERG.address": [
+      "crypto.ERG.address"
+    ],
+    "token.ETN.ETN.ETN.address": [
+      "crypto.ETN.address"
+    ],
+    "token.EWT.EWT.EWT.address": [
+      "crypto.EWT.address"
+    ],
+    "token.FAB.FAB.FAB.address": [
+      "crypto.FAB.address"
+    ],
+    "token.FET.FET.FET.address": [
+      "crypto.FET.version.FETCHAI.address",
+      "crypto.FET.address"
+    ],
+    "token.FIL.FIL.FIL.address": [
+      "crypto.FIL.address"
+    ],
+    "token.FLOW.FLOW.FLOW.address": [
+      "crypto.FLOW.address"
+    ],
+    "token.FIRO.FIRO.FIRO.address": [
+      "crypto.FIRO.address"
+    ],
+    "token.GRS.GRS.GRS.address": [
+      "crypto.GRS.address"
+    ],
+    "token.GUAP.GUAP.GUAP.address": [
+      "crypto.GUAP.address"
+    ],
+    "token.HBAR.HBAR.HBAR.address": [
+      "crypto.HBAR.address"
+    ],
+    "token.HIVE.HIVE.HIVE.address": [
+      "crypto.HIVE.address"
+    ],
+    "token.HNT.HNT.HNT.address": [
+      "crypto.HNT.address"
+    ],
+    "token.ICP.ICP.ICP.address": [
+      "crypto.ICP.address"
+    ],
+    "token.ICX.ICX.ICX.address": [
+      "crypto.ICX.address"
+    ],
+    "token.IOST.IOST.IOST.address": [
+      "crypto.IOST.address"
+    ],
+    "token.IOTA.IOTA.IOTA.address": [
+      "crypto.IOTA.address"
+    ],
+    "token.KLV.KLV.KLV.address": [
+      "crypto.KLV.address"
+    ],
+    "token.KMD.KMD.KMD.address": [
+      "crypto.KMD.address"
+    ],
+    "token.KSM.KSM.KSM.address": [
+      "crypto.KSM.address"
+    ],
+    "token.LSK.LSK.LSK.address": [
+      "crypto.LSK.address"
+    ],
+    "token.LTC.LTC.LTC.address": [
+      "crypto.LTC.address"
+    ],
+    "token.LUNA.LUNA.LUNA.address": [
+      "crypto.LUNA.address"
+    ],
+    "token.MAID.MAID.MAID.address": [
+      "crypto.MAID.address"
+    ],
+    "token.MED.MED.MED.address": [
+      "crypto.MED.address"
+    ],
+    "token.MINA.MINA.MINA.address": [
+      "crypto.MINA.address"
+    ],
+    "token.MONA.MONA.MONA.address": [
+      "crypto.MONA.address"
+    ],
+    "token.NANO.NANO.NANO.address": [
+      "crypto.NANO.address"
+    ],
+    "token.NEAR.NEAR.NEAR.address": [
+      "crypto.NEAR.address"
+    ],
+    "token.NEBL.NEBL.NEBL.address": [
+      "crypto.NEBL.address"
+    ],
+    "token.NEO.NEO.NEO.address": [
+      "crypto.NEO.address"
+    ],
+    "token.NIBI.NIBI.NIBI.address": [
+      "crypto.NIBI.address"
+    ],
+    "token.NKN.NKN.NKN.address": [
+      "crypto.NKN.address"
+    ],
+    "token.ONT.ONT.ONT.address": [
+      "crypto.ONT.address"
+    ],
+    "token.PHA.PHA.PHA.address": [
+      "crypto.PHA.address"
+    ],
+    "token.POKT.POKT.POKT.address": [
+      "crypto.POKT.address"
+    ],
+    "token.QTUM.QTUM.QTUM.address": [
+      "crypto.QTUM.address"
+    ],
+    "token.RVN.RVN.RVN.address": [
+      "crypto.RVN.address"
+    ],
+    "token.SC.SC.SC.address": [
+      "crypto.SC.address"
+    ],
+    "token.SIERRA.SIERRA.SIERRA.address": [
+      "crypto.SIERRA.address"
+    ],
+    "token.SMART.SMART.SMART.address": [
+      "crypto.SMART.address"
+    ],
+    "token.SOL.SOL.SOL.address": [
+      "crypto.SOL.address"
+    ],
+    "token.STEEM.STEEM.STEEM.address": [
+      "crypto.STEEM.address"
+    ],
+    "token.STX.STX.STX.address": [
+      "crypto.STX.address"
+    ],
+    "token.SUI.SUI.SUI.address": [
+      "crypto.SUI.address"
+    ],
+    "token.TON.TON.TON.address": [
+      "crypto.TON.address"
+    ],
+    "token.TPAY.TPAY.TPAY.address": [
+      "crypto.TPAY.address"
+    ],
+    "token.TRX.TRX.TRX.address": [
+      "crypto.TRX.address"
+    ],
+    "token.WAVES.WAVES.WAVES.address": [
+      "crypto.WAVES.address"
+    ],
+    "token.VSYS.VSYS.VSYS.address": [
+      "crypto.VSYS.address"
+    ],
+    "token.XCH.XCH.XCH.address": [
+      "crypto.XCH.address"
+    ],
+    "token.XDC.XDC.XDC.address": [
+      "crypto.XDC.address"
+    ],
+    "token.WAXP.WAXP.WAXP.address": [
+      "crypto.WAXP.address"
+    ],
+    "token.XHV.XHV.XHV.address": [
+      "crypto.XHV.address"
+    ],
+    "token.XEM.XEM.XEM.address": [
+      "crypto.XEM.address"
+    ],
+    "token.XLA.XLA.XLA.address": [
+      "crypto.XLA.address"
+    ],
+    "token.XLM.XLM.XLM.address": [
+      "crypto.XLM.address"
+    ],
+    "token.XPM.XPM.XPM.address": [
+      "crypto.XPM.address"
+    ],
+    "token.XMR.XMR.XMR.address": [
+      "crypto.XMR.address"
+    ],
+    "token.XPRT.XPRT.XPRT.address": [
+      "crypto.XPRT.address"
+    ],
+    "token.XRP.XRP.XRP.address": [
+      "crypto.XRP.address"
+    ],
+    "token.XST.XST.XST.address": [
+      "crypto.XST.address"
+    ],
+    "token.XTZ.XTZ.XTZ.address": [
+      "crypto.XTZ.address"
+    ],
+    "token.XVG.XVG.XVG.address": [
+      "crypto.XVG.address"
+    ],
+    "token.XZC.XZC.XZC.address": [
+      "crypto.XZC.address"
+    ],
+    "token.YEC.YEC.YEC.address": [
+      "crypto.YEC.address"
+    ],
+    "token.ZEC.ZEC.ZEC.address": [
+      "crypto.ZEC.address"
+    ],
+    "token.ZIL.ZIL.ZIL.address": [
+      "crypto.ZIL.address"
+    ]
+  },
+  "latestSyncedBlock": 24750298
 }
