@@ -1,3 +1,7 @@
+## v0.9.48
+
+- Added blockchain families to Sonic proxyReader, updated schemaState
+
 ## v0.9.47
 
 - Added multisig and whitelisted signer addresses for Sonic
