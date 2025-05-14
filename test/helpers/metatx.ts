@@ -1,4 +1,5 @@
 import { Contract, BigNumberish, Signer, Interface, solidityPackedKeccak256, keccak256, getBytes } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import type {
   BaseRoutingForwarderMock,
   MintingManagerForwarder,
@@ -34,7 +35,7 @@ export type ExecuteFunc = (
   signature: string;
 }>;
 
-type ISignerWithAddress = Signer & { address: string };
+type ISignerWithAddress = SignerWithAddress | (Signer & { address: string });
 
 export function buildExecuteFunc (
   iface: Interface,

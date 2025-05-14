@@ -24,7 +24,7 @@ describe('ProxyReader (UNS only)', () => {
     [, ...accounts] = signers.map((s) => s.address);
 
     // deploy UNS
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.setTokenURIPrefix('/');
 
@@ -48,7 +48,7 @@ describe('ProxyReader (UNS only)', () => {
       withoutReverse: true,
     });
 
-    proxyReader = await new ProxyReader__factory(coinbase).deploy();
+    proxyReader = await new ProxyReader__factory().connect(coinbase).deploy();
     await proxyReader.initialize(unsRegistry.getAddress(), ZERO_ADDRESS);
   });
 
