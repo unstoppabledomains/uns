@@ -1,0 +1,51 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IWorkerSmartAccount",
+  "sourceName": "contracts/smartAccounts/IWorkerSmartAccount.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct ISmartAccount.Call[]",
+          "name": "calls",
+          "type": "tuple[]"
+        },
+        {
+          "internalType": "contract IUserSmartAccount",
+          "name": "userSA",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "userSignature",
+          "type": "bytes"
+        }
+      ],
+      "name": "executeAndCheckBalance",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

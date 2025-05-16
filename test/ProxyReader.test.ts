@@ -35,18 +35,19 @@ describe('ProxyReader', () => {
     [, ...accounts] = signers.map((s) => s.address);
 
     // deploy UNS
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.setTokenURIPrefix('/');
 
     // deploy CNS
-    cnsRegistry = await new CNSRegistry__factory(coinbase).deploy();
-    mintingController = await new MintingController__factory(coinbase).deploy(await cnsRegistry.getAddress());
+    cnsRegistry = await new CNSRegistry__factory().connect(coinbase).deploy();
+    mintingController = await new MintingController__factory()
+      .connect(coinbase)
+      .deploy(await cnsRegistry.getAddress());
     await cnsRegistry.addController(await mintingController.getAddress());
-    resolver = await new Resolver__factory(coinbase).deploy(
-      await cnsRegistry.getAddress(),
-      await mintingController.getAddress(),
-    );
+    resolver = await new Resolver__factory()
+      .connect(coinbase)
+      .deploy(await cnsRegistry.getAddress(), await mintingController.getAddress());
 
     // mint .wallet TLD
     await unsRegistry.mintTLD(TLD.wallet.hash, 'wallet');
@@ -58,7 +59,7 @@ describe('ProxyReader', () => {
     cryptoTokenId = await unsRegistry.namehash([domainName, 'crypto']);
     await mintingController.mintSLDWithResolver(coinbase.address, domainName, await resolver.getAddress());
 
-    proxyReader = await new ProxyReader__factory(coinbase).deploy();
+    proxyReader = await new ProxyReader__factory().connect(coinbase).deploy();
     await proxyReader.initialize(await unsRegistry.getAddress(), await cnsRegistry.getAddress());
   });
 

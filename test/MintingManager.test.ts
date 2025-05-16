@@ -61,8 +61,8 @@ describe('MintingManager', () => {
     before(async () => {
       [, , receiver] = signers;
 
-      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-      mintingManager = await new MintingManager__factory(coinbase).deploy();
+      unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+      mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
       await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
       await mintingManager.initialize(
@@ -93,11 +93,11 @@ describe('MintingManager', () => {
     before(async () => {
       [, , receiver] = signers;
 
-      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-      mintingManager = await new MintingManager__factory(coinbase).deploy();
-      cnsRegistry = await new CNSRegistry__factory(coinbase).deploy();
-      unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
-      mintingManagerMock = await new MintingManagerMock__factory(coinbase).deploy();
+      unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+      mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
+      cnsRegistry = await new CNSRegistry__factory().connect(coinbase).deploy();
+      unsRegistryMock = await new UNSRegistryMock__factory().connect(coinbase).deploy();
+      mintingManagerMock = await new MintingManagerMock__factory().connect(coinbase).deploy();
 
       await unsRegistryMock.initialize(
         await mintingManagerMock.getAddress(),
@@ -117,10 +117,10 @@ describe('MintingManager', () => {
       await mintingManagerMock.addMinter(coinbase.address);
       await mintUnsTlds(mintingManagerMock, coinbase);
 
-      proxyReader = await new ProxyReader__factory(coinbase).deploy();
+      proxyReader = await new ProxyReader__factory().connect(coinbase).deploy();
       await proxyReader.initialize(await unsRegistryMock.getAddress(), await cnsRegistry.getAddress());
 
-      proxyReader2 = await new ProxyReader__factory(coinbase).deploy();
+      proxyReader2 = await new ProxyReader__factory().connect(coinbase).deploy();
       await proxyReader2.initialize(await unsRegistryMock.getAddress(), await cnsRegistry.getAddress());
     });
 
@@ -159,8 +159,8 @@ describe('MintingManager', () => {
     before(async () => {
       [, spender] = signers;
 
-      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-      mintingManager = await new MintingManager__factory(coinbase).deploy();
+      unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+      mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
       await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
       await mintingManager.initialize(
@@ -257,9 +257,9 @@ describe('MintingManager', () => {
     before(async () => {
       [, , receiver, spender] = signers;
 
-      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-      unsOperator = await new UNSOperator__factory(coinbase).deploy();
-      mintingManager = await new MintingManager__factory(coinbase).deploy();
+      unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+      unsOperator = await new UNSOperator__factory().connect(coinbase).deploy();
+      mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
 
       await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
@@ -275,8 +275,8 @@ describe('MintingManager', () => {
       await mintingManager.setTokenURIPrefix('/');
       await mintUnsTlds(mintingManager, coinbase);
 
-      mintingManagerMock = await new MintingManagerMock__factory(coinbase).deploy();
-      unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
+      mintingManagerMock = await new MintingManagerMock__factory().connect(coinbase).deploy();
+      unsRegistryMock = await new UNSRegistryMock__factory().connect(coinbase).deploy();
 
       await unsRegistryMock.initialize(
         await mintingManagerMock.getAddress(),
@@ -396,8 +396,8 @@ describe('MintingManager', () => {
     before(async () => {
       [coinbase, spender, receiver] = signers;
 
-      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-      mintingManager = await new MintingManager__factory(coinbase).deploy();
+      unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+      mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
 
       await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.initialize(
@@ -770,8 +770,8 @@ describe('MintingManager', () => {
       });
 
       it('reverts if signed MintingManager address is wrong', async () => {
-        const anotherUnsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-        const anotherMintingManager = await new MintingManager__factory(coinbase).deploy();
+        const anotherUnsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+        const anotherMintingManager = await new MintingManager__factory().connect(coinbase).deploy();
 
         await anotherUnsRegistry.initialize(
           await anotherMintingManager.getAddress(),
@@ -870,10 +870,10 @@ describe('MintingManager', () => {
       let erc20UnsafeMock: ERC20UnsafeMock;
 
       before(async () => {
-        erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
+        erc20Mock = await new ERC20Mock__factory().connect(coinbase).deploy();
         await erc20Mock.mint(spender.address, ethers.parseEther('100'));
 
-        erc20UnsafeMock = await new ERC20UnsafeMock__factory(coinbase).deploy();
+        erc20UnsafeMock = await new ERC20UnsafeMock__factory().connect(coinbase).deploy();
         await erc20UnsafeMock.mint(spender.address, ethers.parseEther('100'));
       });
 
@@ -1353,8 +1353,8 @@ describe('MintingManager', () => {
       });
 
       it('reverts if signed MintingManager address is wrong', async () => {
-        const anotherUnsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-        const anotherMintingManager = await new MintingManager__factory(coinbase).deploy();
+        const anotherUnsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+        const anotherMintingManager = await new MintingManager__factory().connect(coinbase).deploy();
 
         await anotherUnsRegistry.initialize(
           await anotherMintingManager.getAddress(),
@@ -1476,21 +1476,24 @@ describe('MintingManager', () => {
     before(async () => {
       [coinbase, spender, receiver] = signers;
 
-      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+      unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
 
-      cnsRegistry = await new CNSRegistry__factory(coinbase).deploy();
-      mintingController = await new MintingController__factory(coinbase).deploy(await cnsRegistry.getAddress());
+      cnsRegistry = await new CNSRegistry__factory().connect(coinbase).deploy();
+      mintingController = await new MintingController__factory()
+        .connect(coinbase)
+        .deploy(await cnsRegistry.getAddress());
       await cnsRegistry.addController(await mintingController.getAddress());
 
-      resolver = await new Resolver__factory(coinbase).deploy(
-        await cnsRegistry.getAddress(),
-        await mintingController.getAddress(),
-      );
+      resolver = await new Resolver__factory()
+        .connect(coinbase)
+        .deploy(await cnsRegistry.getAddress(), await mintingController.getAddress());
 
-      uriPrefixController = await new URIPrefixController__factory(coinbase).deploy(await cnsRegistry.getAddress());
+      uriPrefixController = await new URIPrefixController__factory()
+        .connect(coinbase)
+        .deploy(await cnsRegistry.getAddress());
       await cnsRegistry.addController(await uriPrefixController.getAddress());
 
-      mintingManager = await new MintingManager__factory(coinbase).deploy();
+      mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
       await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
       await mintingController.addMinter(await mintingManager.getAddress());
@@ -1780,8 +1783,8 @@ describe('MintingManager', () => {
 
   describe('CNS Resolver management', () => {
     before(async () => {
-      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-      mintingManager = await new MintingManager__factory(coinbase).deploy();
+      unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+      mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
 
       await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.initialize(
@@ -1804,8 +1807,8 @@ describe('MintingManager', () => {
     before(async () => {
       [coinbase, receiver] = signers;
 
-      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-      mintingManager = await new MintingManager__factory(coinbase).deploy();
+      unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+      mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
 
       await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.initialize(
@@ -1895,8 +1898,8 @@ describe('MintingManager', () => {
     before(async () => {
       [coinbase, receiver] = signers;
 
-      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-      mintingManager = await new MintingManager__factory(coinbase).deploy();
+      unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+      mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
 
       await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
       await mintingManager.initialize(
@@ -1956,8 +1959,8 @@ describe('MintingManager', () => {
   describe('Blocklist', () => {
     describe('Domain blocklisting', () => {
       before(async () => {
-        unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-        mintingManager = await new MintingManager__factory(coinbase).deploy();
+        unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+        mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
         await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
         await mintingManager.initialize(
@@ -2027,8 +2030,8 @@ describe('MintingManager', () => {
   describe('Pausable', () => {
     describe('Paused minting', () => {
       before(async () => {
-        unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-        mintingManager = await new MintingManager__factory(coinbase).deploy();
+        unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+        mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
         await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
         await mintingManager.initialize(
@@ -2111,8 +2114,8 @@ describe('MintingManager', () => {
       beforeEach(async () => {
         [, developer] = signers;
 
-        unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-        mintingManager = await new MintingManager__factory(coinbase).deploy();
+        unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+        mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
         await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
         await mintingManager.initialize(
@@ -2169,8 +2172,8 @@ describe('MintingManager', () => {
     before(async () => {
       [coinbase, receiver, spender] = signers;
 
-      unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-      mintingManager = await new MintingManager__factory(coinbase).deploy();
+      unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+      mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
       await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
       await mintingManager.initialize(
@@ -2236,9 +2239,9 @@ describe('MintingManager', () => {
       let erc20UnsafeMock: ERC20UnsafeMock;
 
       before(async () => {
-        erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
+        erc20Mock = await new ERC20Mock__factory().connect(coinbase).deploy();
 
-        erc20UnsafeMock = await new ERC20UnsafeMock__factory(coinbase).deploy();
+        erc20UnsafeMock = await new ERC20UnsafeMock__factory().connect(coinbase).deploy();
       });
 
       it('allows to withdraw ERC20 tokens', async () => {
