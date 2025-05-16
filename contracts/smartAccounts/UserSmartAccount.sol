@@ -1,20 +1,17 @@
 pragma solidity ^0.8.17;
 
 import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import './IUserSmartAccount.sol';
 
-contract UserSmartAccount {
+contract UserSmartAccount is IUserSmartAccount {
     using ECDSA for bytes32;
 
     uint256 public nonce;
 
-    struct Call {
-        address to;
-        uint256 value;
-        bytes data;
+    modifier onlySelf() {
+        require(msg.sender == address(this), 'UserSmartAccount: Invalid authority');
+        _;
     }
-
-    event CallExecuted(address indexed sender, address indexed to, uint256 value, bytes data);
-    event BatchExecuted(uint256 indexed nonce, Call[] calls);
 
     function execute(Call[] calldata calls, bytes calldata signature) external payable {
         bytes memory encodedCalls;
@@ -31,14 +28,13 @@ contract UserSmartAccount {
         _executeBatch(calls);
     }
 
-    function execute(Call[] calldata calls) external payable {
-        require(msg.sender == address(this), 'Invalid authority');
+    function execute(Call[] calldata calls) external payable onlySelf {
         _executeBatch(calls);
     }
 
     function _executeBatch(Call[] calldata calls) internal {
         uint256 currentNonce = nonce;
-        nonce++; // Increment nonce to protect against replay attacks
+        nonce++;
 
         for (uint256 i = 0; i < calls.length; i++) {
             _executeCall(calls[i]);
@@ -55,4 +51,8 @@ contract UserSmartAccount {
 
     fallback() external payable {}
     receive() external payable {}
+
+    function helloEIP7702() external pure returns (string memory) {
+        return 'Hello EIP-7702';
+    }
 }

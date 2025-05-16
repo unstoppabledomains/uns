@@ -8,13 +8,13 @@ contract Faucet is IFaucet, Ownable {
 
     mapping(address => bool) authorizedWorkers;
 
-    modifier onlyAuthorizedWorkers() {
+    modifier onlyAuthorizedWorker() {
         require(authorizedWorkers[msg.sender], 'Faucet: Not an authorized worker');
         _;
     }
 
-    function withdraw() external onlyAuthorizedWorkers {
-        payable(msg.sender).transfer(1 ether);
+    function withdraw() external onlyAuthorizedWorker {
+        payable(msg.sender).transfer(0.1 ether);
     }
 
     function addAuthorizedWorkers(address[] calldata _workers) external onlyOwner {
@@ -27,6 +27,11 @@ contract Faucet is IFaucet, Ownable {
         for (uint256 i = 0; i < _workers.length; i++) {
             authorizedWorkers[_workers[i]] = false;
         }
+    }
+
+    function withdraw(uint256 _amount) external onlyOwner {
+        require(_amount <= address(this).balance, 'Faucet: Insufficient balance');
+        payable(msg.sender).transfer(_amount);
     }
 
     receive() external payable {}
