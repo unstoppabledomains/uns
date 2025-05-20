@@ -4,9 +4,13 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import './IFaucet.sol';
 
 contract Faucet is IFaucet, Ownable {
-    constructor() Ownable() {}
+    uint256 public workerFundingAmount;
 
     mapping(address => bool) authorizedWorkers;
+
+    constructor(uint256 _workerFundingAmount) Ownable() {
+        workerFundingAmount = _workerFundingAmount;
+    }
 
     modifier onlyAuthorizedWorker() {
         require(authorizedWorkers[msg.sender], 'Faucet: Not an authorized worker');
@@ -14,24 +18,33 @@ contract Faucet is IFaucet, Ownable {
     }
 
     function withdraw() external onlyAuthorizedWorker {
-        payable(msg.sender).transfer(0.1 ether);
+        (bool success, ) = payable(msg.sender).call{value: workerFundingAmount}('');
+        require(success, 'Faucet: Transfer failed');
     }
 
-    function addAuthorizedWorkers(address[] calldata _workers) external onlyOwner {
-        for (uint256 i = 0; i < _workers.length; i++) {
-            authorizedWorkers[_workers[i]] = true;
+    function addAuthorizedWorkers(address[] calldata workers) external onlyOwner {
+        for (uint256 i = 0; i < workers.length; i++) {
+            authorizedWorkers[workers[i]] = true;
         }
     }
 
-    function removeAuthorizedWorkers(address[] calldata _workers) external onlyOwner {
-        for (uint256 i = 0; i < _workers.length; i++) {
-            authorizedWorkers[_workers[i]] = false;
+    function removeAuthorizedWorkers(address[] calldata workers) external onlyOwner {
+        for (uint256 i = 0; i < workers.length; i++) {
+            authorizedWorkers[workers[i]] = false;
         }
     }
 
-    function withdraw(uint256 _amount) external onlyOwner {
-        require(_amount <= address(this).balance, 'Faucet: Insufficient balance');
-        payable(msg.sender).transfer(_amount);
+    function setWorkerFundingAmount(uint256 amount) external onlyOwner {
+        workerFundingAmount = amount;
+    }
+
+    function withdraw(uint256 amount) external onlyOwner {
+        require(amount <= address(this).balance, 'Faucet: Insufficient balance');
+        payable(msg.sender).transfer(amount);
+    }
+
+    function withdrawAll() external onlyOwner {
+        payable(msg.sender).transfer(address(this).balance);
     }
 
     receive() external payable {}

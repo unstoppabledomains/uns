@@ -33,9 +33,31 @@
           "type": "address"
         },
         {
-          "internalType": "bytes",
+          "internalType": "uint256",
+          "name": "txDeadline",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct ISmartAccount.SplitSignature",
           "name": "userSignature",
-          "type": "bytes"
+          "type": "tuple"
         }
       ],
       "name": "executeAndCheckBalance",

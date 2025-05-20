@@ -8,7 +8,7 @@ interface IUserSmartAccount is ISmartAccount {
 
     function nonce() external view returns (uint256);
 
-    function execute(Call[] calldata calls, bytes calldata signature) external payable;
+    function execute(Call[] calldata calls, uint256 deadline, SplitSignature calldata signature) external payable;
     function execute(Call[] calldata calls) external payable;
 
     function helloEIP7702() external pure returns (string memory);

@@ -6,11 +6,12 @@ import './IWorkerSmartAccount.sol';
 import './IUserSmartAccount.sol';
 
 contract WorkerSmartAccount is IWorkerSmartAccount {
-    uint256 constant BALANCE_THRESHOLD = 0.1 ether;
+    uint256 immutable BALANCE_THRESHOLD;
     IFaucet immutable faucet;
 
-    constructor(IFaucet _faucet) {
+    constructor(IFaucet _faucet, uint256 _balanceThreshold) {
         faucet = _faucet;
+        BALANCE_THRESHOLD = _balanceThreshold;
     }
 
     modifier onlySelf() {
@@ -21,9 +22,10 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
     function executeAndCheckBalance(
         Call[] calldata calls,
         IUserSmartAccount userSA,
-        bytes calldata userSignature
+        uint256 txDeadline,
+        SplitSignature calldata userSignature
     ) external payable onlySelf {
-        userSA.execute(calls, userSignature);
+        userSA.execute(calls, txDeadline, userSignature);
 
         _checkBalance();
     }

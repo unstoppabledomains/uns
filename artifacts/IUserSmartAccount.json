@@ -125,9 +125,31 @@
           "type": "tuple[]"
         },
         {
-          "internalType": "bytes",
+          "internalType": "uint256",
+          "name": "deadline",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct ISmartAccount.SplitSignature",
           "name": "signature",
-          "type": "bytes"
+          "type": "tuple"
         }
       ],
       "name": "execute",
