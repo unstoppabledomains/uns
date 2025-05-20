@@ -5,11 +5,11 @@ import {
 } from '@openzeppelin/hardhat-upgrades/dist/utils';
 import { BaseContract, ContractFactory, ethers } from 'ethers';
 import { network, upgrades } from 'hardhat';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { MintingManager } from '../types';
 import { ContractName, DependenciesMap, NsNetworkConfig } from './types';
 import { NameService } from './config';
 import { NetworkChainIds, TLD, TLDConfig } from './tlds';
-
 export const SANDBOX_NETWORK_IDS = [1337, 31337];
 export const TESTNET_NETWORK_IDS = [80002, 11155111, 84532];
 
@@ -65,7 +65,7 @@ export const getContractAddress = async (contract: BaseContract): Promise<string
   return contract.getAddress();
 };
 
-export const mintUnsTlds = async (mintingManager: MintingManager, owner: ethers.Signer) => {
+export const mintUnsTlds = async (mintingManager: MintingManager, owner: SignerWithAddress) => {
   const tlds = Object.entries(TLD)
     .filter(([, config]) => config.nameServices.includes(NameService.UNS))
     .filter(([, tldConfig]) => filterTldsByChainId(tldConfig));

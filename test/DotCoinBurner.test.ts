@@ -20,13 +20,13 @@ describe('DotCoinBurner', () => {
     [, ...accounts] = signers;
 
     // deploy UNS regisry
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
   });
 
   beforeEach(async () => {
     // deploy Dot Coin Burner
-    dotCoinBurner = await new DotCoinBurner__factory(coinbase).deploy(await unsRegistry.getAddress());
+    dotCoinBurner = await new DotCoinBurner__factory().connect(coinbase).deploy(await unsRegistry.getAddress());
   });
 
   it('should emit BatchCompleted event', async () => {

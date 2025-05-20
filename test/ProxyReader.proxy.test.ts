@@ -25,16 +25,16 @@ describe('ProxyReader (proxy)', () => {
 
   beforeEach(async () => {
     // deploy UNS
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.setTokenURIPrefix('/');
 
     // deploy CNS
-    cnsRegistry = await new CNSRegistry__factory(coinbase).deploy();
+    cnsRegistry = await new CNSRegistry__factory().connect(coinbase).deploy();
 
     // deploy ProxyReader
     proxyReader = await deployProxy(
-      new ProxyReader__factory(coinbase),
+      new ProxyReader__factory().connect(coinbase),
       [await unsRegistry.getAddress(), await cnsRegistry.getAddress()],
       { unsafeAllow: ['delegatecall'] },
     );
@@ -53,7 +53,7 @@ describe('ProxyReader (proxy)', () => {
 
   it('should keep forwarding with storage layout consistent after upgrade', async () => {
     proxyReader = await deployProxy(
-      new ProxyReaderV04__factory(coinbase),
+      new ProxyReaderV04__factory().connect(coinbase),
       [await unsRegistry.getAddress(), await cnsRegistry.getAddress()],
       { unsafeAllow: ['delegatecall'] },
     );
@@ -63,7 +63,7 @@ describe('ProxyReader (proxy)', () => {
 
     const upgradedProxyReader = await upgrades.upgradeProxy(
       await getContractAddress(proxyReader),
-      new ProxyReader__factory(coinbase),
+      new ProxyReader__factory().connect(coinbase),
       {
         unsafeAllow: ['delegatecall'],
         call: {

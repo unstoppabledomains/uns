@@ -1,0 +1,11 @@
+pragma solidity ^0.8.20;
+
+interface IFaucet {
+    function withdraw() external;
+    function addAuthorizedWorkers(address[] calldata workers) external;
+    function removeAuthorizedWorkers(address[] calldata workers) external;
+    function setWorkerFundingAmount(uint256 amount) external;
+    function withdraw(uint256 amount) external;
+    function withdrawAll() external;
+    receive() external payable;
+}

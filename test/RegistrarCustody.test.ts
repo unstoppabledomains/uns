@@ -6,7 +6,7 @@ import {
   SeaportContract,
 } from '@opensea/seaport-js/lib/types';
 import { expect } from 'chai';
-import { namehash, Signature, toBeHex, TypedDataEncoder } from 'ethers';
+import { namehash, Signature, Signer, toBeHex, TypedDataEncoder } from 'ethers';
 import { ethers } from 'hardhat';
 import { Seaport as seaportjs } from '@opensea/seaport-js';
 import { EIP_712_ORDER_TYPE, ItemType } from '@opensea/seaport-js/lib/constants';
@@ -55,8 +55,8 @@ describe('RegistrarCustody', () => {
     signers = await ethers.getSigners();
     [coinbase, minter, user, buyer, otherUser] = signers;
 
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-    mintingManager = await new MintingManager__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+    mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
     await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
     await mintingManager.initialize(
@@ -70,7 +70,7 @@ describe('RegistrarCustody', () => {
     await mintingManager.setTokenURIPrefix('/');
     await mintingManager.addTld('com', true);
 
-    registrarCustody = await deployProxy(new RegistrarCustody__factory(coinbase), [
+    registrarCustody = await deployProxy(new RegistrarCustody__factory().connect(coinbase), [
       await unsRegistry.getAddress(),
       await mintingManager.getAddress(),
     ]);
@@ -240,11 +240,13 @@ describe('RegistrarCustody', () => {
     let seaportSdk: seaportjs;
 
     beforeEach(async () => {
-      conduitController = await new ConduitController__factory(coinbase).deploy();
-      seaportContract = await new SeaportContract__factory(user).deploy(await conduitController.getAddress());
-      usdcMock = await new ERC20Mock__factory(coinbase).deploy();
+      conduitController = await new ConduitController__factory().connect(coinbase).deploy();
+      seaportContract = await new SeaportContract__factory()
+        .connect(user)
+        .deploy(await conduitController.getAddress());
+      usdcMock = await new ERC20Mock__factory().connect(coinbase).deploy();
 
-      seaportProxyBuyerFactory = new SeaportProxyBuyer__factory(coinbase);
+      seaportProxyBuyerFactory = new SeaportProxyBuyer__factory().connect(coinbase);
       seaportProxyBuyer = (await deployProxy<SeaportProxyBuyer>(
         seaportProxyBuyerFactory,
         [await seaportContract.getAddress(), await usdcMock.getAddress()],
@@ -254,7 +256,7 @@ describe('RegistrarCustody', () => {
       await seaportProxyBuyer.connect(coinbase).approve(await usdcMock.getAddress());
       await seaportProxyBuyer.addMinter(coinbase.address);
 
-      seaportSdk = new seaportjs(minter, {
+      seaportSdk = new seaportjs(minter as unknown as Signer, {
         overrides: {
           contractAddress: await seaportContract.getAddress(),
         },

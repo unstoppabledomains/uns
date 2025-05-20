@@ -35,11 +35,13 @@ describe('MintingManager (consumption)', () => {
     signers = await ethers.getSigners();
     [coinbase, , receiver, spender] = signers;
 
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-    mintingManager = await new MintingManager__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+    mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
     await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-    forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(await mintingManager.getAddress());
+    forwarder = await new MintingManagerForwarder__factory()
+      .connect(coinbase)
+      .deploy(await mintingManager.getAddress());
 
     await mintingManager.initialize(
       await unsRegistry.getAddress(),
@@ -466,7 +468,7 @@ describe('MintingManager (consumption)', () => {
     };
 
     before(async () => {
-      erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
+      erc20Mock = await new ERC20Mock__factory().connect(coinbase).deploy();
 
       await erc20Mock.mint(spender.address, parseEther('1'));
     });

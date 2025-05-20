@@ -50,7 +50,6 @@ import '@nomicfoundation/hardhat-verify';
 import '@nomicfoundation/hardhat-chai-matchers';
 
 import '@nomiclabs/hardhat-solhint';
-import 'hardhat-tracer';
 
 import '@openzeppelin/hardhat-upgrades';
 
@@ -186,7 +185,7 @@ const config: HardhatUserConfig = {
     hardhat: {
       blockGasLimit: 10000000,
       initialBaseFeePerGas: 0,
-      hardfork: 'cancun',
+      hardfork: 'prague',
     },
     localhost: {
       url: 'http://localhost:8545',

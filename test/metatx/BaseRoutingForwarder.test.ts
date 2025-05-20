@@ -40,9 +40,9 @@ describe('BaseRoutingForwarder', () => {
     signers = await ethers.getSigners();
     [owner, receiver] = signers;
 
-    registry = await new CNSRegistry__factory(owner).deploy();
-    mintingController = await new MintingController__factory(owner).deploy(await registry.getAddress());
-    signatureController = await new SignatureController__factory(owner).deploy(await registry.getAddress());
+    registry = await new CNSRegistry__factory().connect(owner).deploy();
+    mintingController = await new MintingController__factory().connect(owner).deploy(await registry.getAddress());
+    signatureController = await new SignatureController__factory().connect(owner).deploy(await registry.getAddress());
 
     await registry.addController(await mintingController.getAddress());
     await registry.addController(await signatureController.getAddress());
