@@ -1,18 +1,12 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import {
-  CreateBulkOrdersAction,
-  CreateOrderAction,
-  CreateOrderInput,
-  SeaportContract,
-} from '@opensea/seaport-js/lib/types';
+import { CreateOrderAction, CreateOrderInput, SeaportContract } from '@opensea/seaport-js/lib/types';
 import { expect } from 'chai';
-import { namehash, Signature, toBeHex, TypedDataEncoder } from 'ethers';
+import { namehash, Signature, TypedDataEncoder } from 'ethers';
 import { ethers } from 'hardhat';
 import { Seaport as seaportjs } from '@opensea/seaport-js';
 import { EIP_712_ORDER_TYPE, ItemType } from '@opensea/seaport-js/lib/constants';
 import { getAdvancedOrderNumeratorDenominator } from '@opensea/seaport-js/lib/utils/fulfill';
 import { HardhatEthersProvider } from '@nomicfoundation/hardhat-ethers/internal/hardhat-ethers-provider';
-import { omit } from 'lodash';
 import { ConduitController__factory } from '../types/factories/seaport-core/src/conduit';
 import { OrderStruct } from '../types/seaport-core/src/Seaport';
 import { Seaport__factory as SeaportContract__factory } from '../types/factories/seaport-core/src';
@@ -36,7 +30,7 @@ import { getLatestBlockTimestamp, increaseTimeBy } from './helpers/utils';
 describe('RegistrarCustody', () => {
   let signers: SignerWithAddress[],
     coinbase: SignerWithAddress,
-    minter: SignerWithAddress,
+    registrar: SignerWithAddress,
     user: SignerWithAddress,
     buyer: SignerWithAddress,
     otherUser: SignerWithAddress;
@@ -48,12 +42,13 @@ describe('RegistrarCustody', () => {
   let provider: HardhatEthersProvider;
   let latestBlockTimestamp: number;
 
-  let result: unknown;
+  const registrarId = BigInt(42);
+  let snapshotId: unknown;
 
   before(async () => {
     provider = ethers.provider;
     signers = await ethers.getSigners();
-    [coinbase, minter, user, buyer, otherUser] = signers;
+    [coinbase, registrar, user, buyer, otherUser] = signers;
 
     unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
     mintingManager = await new MintingManager__factory(coinbase).deploy();
@@ -69,163 +64,249 @@ describe('RegistrarCustody', () => {
     );
     await mintingManager.setTokenURIPrefix('/');
     await mintingManager.addTld('com', true);
+    await mintingManager.addTld('crypto', false);
 
     registrarCustody = await deployProxy(new RegistrarCustody__factory(coinbase), [
       await unsRegistry.getAddress(),
       await mintingManager.getAddress(),
     ]);
 
-    await mintingManager.addMinter(minter.address);
+    await mintingManager.addMinter(registrar.address);
     await mintingManager.addMinter(await registrarCustody.getAddress());
 
-    await registrarCustody.connect(coinbase).addMinter(minter.address);
+    await registrarCustody.connect(coinbase).addAdmin(registrar.address);
+    await registrarCustody.connect(coinbase).addRegistrar(registrarId, registrar.address);
 
     latestBlockTimestamp = await getLatestBlockTimestamp();
   });
 
   beforeEach(async () => {
-    result = await provider.send('evm_snapshot', []);
+    snapshotId = await provider.send('evm_snapshot', []);
   });
 
   afterEach(async () => {
-    await provider.send('evm_revert', [result]);
+    await provider.send('evm_revert', [snapshotId]);
   });
 
-  describe('registerDomain', () => {
-    it('should register domain and place it in custody', async () => {
-      const labels = ['test-registrar-custody', 'com'];
+  describe('tokenizeDomain', () => {
+    it('tokenizes new domain', async () => {
+      const labels = ['tokenize-new', 'com'];
       const expiry = latestBlockTimestamp + 60 * 60 * 24;
       const tokenId = await unsRegistry.namehash(labels);
 
-      const txPromsie = registrarCustody
-        .connect(minter)
-        .registerDomain(user.address, labels, ['key1'], ['value1'], expiry);
+      const tx = registrarCustody
+        .connect(registrar)
+        .tokenizeDomain(labels, ['key1'], ['value1'], expiry, registrarId, user.address);
+      await expect(tx).to.emit(registrarCustody, 'DomainTokenized').withArgs(tokenId, registrarId, user.address);
 
-      await expect(txPromsie).to.emit(registrarCustody, 'DomainLocked').withArgs(tokenId, user.address);
-
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(await registrarCustody.getAddress());
-      expect(await unsRegistry.get('key1', tokenId)).to.be.equal('value1');
-      expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
-      expect(await unsRegistry.reverseOf(user.address)).to.be.equal(0);
-
-      expect(await registrarCustody.virtualOwners(tokenId)).to.be.equal(user.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.equal(await registrarCustody.getAddress());
+      expect(await unsRegistry.get('key1', tokenId)).to.equal('value1');
+      expect(await unsRegistry.expiryOf(tokenId)).to.equal(expiry);
+      expect(await registrarCustody.userDelegations(tokenId)).to.equal(user.address);
+      expect(await registrarCustody.registrarDelegations(tokenId)).to.equal(registrarId);
     });
 
-    it('should register detokenized domain', async () => {
-      const labels = ['test-registrar-custody-detokenized', 'com'];
+    it('tokenizes detokenized domain', async () => {
+      const labels = ['tokenize-detokenized', 'com'];
       const expiry = latestBlockTimestamp + 60 * 60 * 24;
-
       const tokenId = await unsRegistry.namehash(labels);
-      await mintingManager.connect(minter).issueExpirableWithRecords(user.address, labels, [], [], expiry, false);
+
+      await mintingManager.connect(registrar).issueExpirableWithRecords(user.address, labels, [], [], expiry, false);
       await unsRegistry.connect(user).transferFrom(user.address, await mintingManager.getAddress(), tokenId);
 
       const newExpiry = expiry + 60 * 60 * 24;
 
-      const txPromsie = registrarCustody
-        .connect(minter)
-        .registerDomain(user.address, labels, ['key1'], ['value1'], newExpiry);
+      await registrarCustody
+        .connect(registrar)
+        .tokenizeDomain(labels, ['key1'], ['value1'], newExpiry, registrarId, user.address);
 
-      await expect(txPromsie).to.emit(registrarCustody, 'DomainLocked').withArgs(tokenId, user.address);
-
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(await registrarCustody.getAddress());
-      expect(await unsRegistry.get('key1', tokenId)).to.be.equal('value1');
-      expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(newExpiry);
-      expect(await unsRegistry.reverseOf(user.address)).to.be.equal(0);
-
-      expect(await registrarCustody.virtualOwners(tokenId)).to.be.equal(user.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.equal(await registrarCustody.getAddress());
+      expect(await unsRegistry.get('key1', tokenId)).to.equal('value1');
+      expect(await unsRegistry.expiryOf(tokenId)).to.equal(newExpiry);
+      expect(await registrarCustody.userDelegations(tokenId)).to.equal(user.address);
     });
 
-    it('should register and lock expired domain', async () => {
-      const labels = ['test-registrar-custody-detokenized', 'com'];
+    it('tokenizes expired domain', async () => {
+      const labels = ['tokenize-expired', 'com'];
       const expiry = latestBlockTimestamp + 60 * 60 * 24;
-
       const tokenId = await unsRegistry.namehash(labels);
-      await mintingManager.connect(minter).issueExpirableWithRecords(user.address, labels, [], [], expiry, false);
+
+      await mintingManager.connect(registrar).issueExpirableWithRecords(user.address, labels, [], [], expiry, false);
       await unsRegistry.connect(user).transferFrom(user.address, await mintingManager.getAddress(), tokenId);
 
       await increaseTimeBy(60 * 60 * 24 + 1);
       const newExpiry = expiry + 60 * 60 * 24;
 
-      const txPromsie = registrarCustody
-        .connect(minter)
-        .registerDomain(user.address, labels, ['key1'], ['value1'], newExpiry);
+      await registrarCustody
+        .connect(registrar)
+        .tokenizeDomain(labels, ['key1'], ['value1'], newExpiry, registrarId, user.address);
 
-      await expect(txPromsie).to.emit(registrarCustody, 'DomainLocked').withArgs(tokenId, user.address);
-
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(await registrarCustody.getAddress());
-      expect(await unsRegistry.get('key1', tokenId)).to.be.equal('value1');
-      expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(newExpiry);
-      expect(await unsRegistry.reverseOf(user.address)).to.be.equal(0);
-
-      expect(await registrarCustody.virtualOwners(tokenId)).to.be.equal(user.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.equal(await registrarCustody.getAddress());
+      expect(await unsRegistry.get('key1', tokenId)).to.equal('value1');
+      expect(await unsRegistry.expiryOf(tokenId)).to.equal(newExpiry);
     });
 
-    it('should reject registering domain if not minter', async () => {
-      const labels = ['test-registrar-custody', 'com'];
+    it('reverts if caller not admin', async () => {
+      const labels = ['tokenize-unauthorized', 'com'];
+      const expiry = latestBlockTimestamp + 60 * 60 * 24;
+      await expect(
+        registrarCustody.connect(user).tokenizeDomain(labels, ['key1'], ['value1'], expiry, registrarId, user.address),
+      ).to.be.revertedWithCustomError(registrarCustody, 'Unauthorized');
+    });
+
+    it('updates user delegation for an existing tokenized domain', async () => {
+      const labels = ['update-user-delegation', 'com'];
+      const expiry = latestBlockTimestamp + 60 * 60 * 24;
+      const tokenId = await unsRegistry.namehash(labels);
+
+      await registrarCustody
+        .connect(registrar)
+        .tokenizeDomain(labels, ['key1'], ['value1'], expiry, registrarId, user.address);
+
+      expect(await registrarCustody.userDelegations(tokenId)).to.equal(user.address);
+
+      await registrarCustody.connect(registrar).tokenizeDomain(labels, [], [], expiry, registrarId, otherUser.address);
+
+      expect(await registrarCustody.userDelegations(tokenId)).to.equal(otherUser.address);
+      expect(await unsRegistry.ownerOf(tokenId)).to.equal(await registrarCustody.getAddress());
+      expect(await unsRegistry.get('key1', tokenId)).to.equal('value1');
+      expect(await unsRegistry.expiryOf(tokenId)).to.equal(expiry);
+      expect(await registrarCustody.registrarDelegations(tokenId)).to.equal(registrarId);
+    });
+
+    it('updates registrar delegation for an existing tokenized domain', async () => {
+      const labels = ['update-registrar-delegation', 'com'];
+      const expiry = latestBlockTimestamp + 60 * 60 * 24;
+      const tokenId = await unsRegistry.namehash(labels);
+      const newRegistrarId = BigInt(2);
+      await registrarCustody.connect(coinbase).addRegistrar(newRegistrarId, otherUser.address);
+
+      await registrarCustody
+        .connect(registrar)
+        .tokenizeDomain(labels, ['key1'], ['value1'], expiry, registrarId, user.address);
+
+      expect(await registrarCustody.registrarDelegations(tokenId)).to.equal(registrarId);
+
+      await registrarCustody.connect(registrar).tokenizeDomain(labels, [], [], expiry, newRegistrarId, user.address);
+
+      expect(await registrarCustody.registrarDelegations(tokenId)).to.equal(newRegistrarId);
+      expect(await unsRegistry.ownerOf(tokenId)).to.equal(await registrarCustody.getAddress());
+      expect(await unsRegistry.get('key1', tokenId)).to.equal('value1');
+      expect(await unsRegistry.expiryOf(tokenId)).to.equal(expiry);
+      expect(await registrarCustody.userDelegations(tokenId)).to.equal(user.address);
+    });
+
+    it('tokenizes an existing domain owned by an EOA', async () => {
+      const labels = ['tokenize-eoa-owned', 'com'];
+      const initialExpiry = latestBlockTimestamp + 60 * 60 * 24;
+      const tokenId = await unsRegistry.namehash(labels);
+
+      await mintingManager
+        .connect(registrar)
+        .issueExpirableWithRecords(user.address, labels, ['initialKey'], ['initialValue'], initialExpiry, true);
+      expect(await unsRegistry.ownerOf(tokenId)).to.equal(user.address);
+      expect(await unsRegistry.get('initialKey', tokenId)).to.equal('initialValue');
+
+      const newExpiry = initialExpiry + 60 * 60 * 24 * 30;
+      const newKeys = ['key2', 'key3'];
+      const newValues = ['value2', 'value3'];
+
+      const tx = registrarCustody
+        .connect(registrar)
+        .tokenizeDomain(labels, newKeys, newValues, newExpiry, registrarId, otherUser.address);
+
+      await expect(tx).to.emit(registrarCustody, 'DomainTokenized').withArgs(tokenId, registrarId, otherUser.address);
+
+      expect(await unsRegistry.ownerOf(tokenId)).to.equal(await registrarCustody.getAddress());
+      expect(await unsRegistry.get('initialKey', tokenId)).to.equal('');
+      expect(await unsRegistry.get('key2', tokenId)).to.equal('value2');
+      expect(await unsRegistry.get('key3', tokenId)).to.equal('value3');
+      expect(await unsRegistry.expiryOf(tokenId)).to.equal(newExpiry);
+      expect(await registrarCustody.userDelegations(tokenId)).to.equal(otherUser.address);
+      expect(await registrarCustody.registrarDelegations(tokenId)).to.equal(registrarId);
+    });
+
+    it('reverts when trying to tokenize a non-expirable domain transferred to the contract', async () => {
+      const labels = ['tokenize-non-expirable', 'crypto'];
+      const tokenId = await unsRegistry.namehash(labels);
       const expiry = latestBlockTimestamp + 60 * 60 * 24;
 
+      await mintingManager.connect(registrar).issueWithRecords(user.address, labels, ['key1'], ['value1'], true);
+      expect(await unsRegistry.ownerOf(tokenId)).to.equal(user.address);
+      expect(await unsRegistry.expiryOf(tokenId)).to.equal(0);
+
+      await unsRegistry.connect(user).transferFrom(user.address, await registrarCustody.getAddress(), tokenId);
+      expect(await unsRegistry.ownerOf(tokenId)).to.equal(await registrarCustody.getAddress());
+
       await expect(
-        registrarCustody.connect(user).registerDomain(user.address, labels, ['key1'], ['value1'], expiry),
-      ).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
+        registrarCustody
+          .connect(registrar)
+          .tokenizeDomain(labels, ['key2'], ['value2'], expiry, registrarId, user.address),
+      ).to.be.revertedWithCustomError(registrarCustody, 'InvalidExpiry');
     });
   });
 
-  describe('safeTransfer', () => {
-    it('should transfer registered domain preserving records', async () => {
-      const labels = ['test-registrar-custody-transfer', 'com'];
+  describe('setRecords', () => {
+    let tokenId: bigint;
+
+    beforeEach(async () => {
+      const labels = ['set-records', 'com'];
       const expiry = latestBlockTimestamp + 60 * 60 * 24;
-      const tokenId = await unsRegistry.namehash(labels);
-
-      await registrarCustody.connect(minter).registerDomain(user.address, labels, ['key1'], ['value1'], expiry);
-
-      await registrarCustody.connect(minter).safeTransfer(user.address, tokenId);
-
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(user.address);
-      expect(await unsRegistry.get('key1', tokenId)).to.be.equal('value1');
-      expect(await unsRegistry.reverseOf(user.address)).to.be.equal(0);
-      expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
-
-      expect(await registrarCustody.virtualOwners(tokenId)).to.be.equal(ZERO_ADDRESS);
+      tokenId = await unsRegistry.namehash(labels);
+      await registrarCustody
+        .connect(registrar)
+        .tokenizeDomain(labels, ['key1'], ['value1'], expiry, registrarId, user.address);
     });
 
-    it('should transfer registered domain to a user that is not the virtual owner', async () => {
-      const labels = ['test-registrar-custody-transfer-other', 'com'];
-      const expiry = latestBlockTimestamp + 60 * 60 * 24;
-      const tokenId = await unsRegistry.namehash(labels);
-
-      await registrarCustody.connect(minter).registerDomain(user.address, labels, ['key1'], ['value1'], expiry);
-
-      await registrarCustody.connect(minter).safeTransfer(otherUser.address, tokenId);
-
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(otherUser.address);
-      expect(await unsRegistry.get('key1', tokenId)).to.be.equal('value1');
-      expect(await unsRegistry.reverseOf(otherUser.address)).to.be.equal(0);
-      expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
-
-      expect(await registrarCustody.virtualOwners(tokenId)).to.be.equal(ZERO_ADDRESS);
+    it('updates records by registrar', async () => {
+      await registrarCustody.connect(registrar).setRecords(['key1'], ['value2'], tokenId);
+      expect(await unsRegistry.get('key1', tokenId)).to.equal('value2');
     });
 
-    it('should revert transferring domain if not minter', async () => {
-      const labels = ['test-registrar-custody-transfer', 'com'];
-      const expiry = latestBlockTimestamp + 60 * 60 * 24;
-      const tokenId = await unsRegistry.namehash(labels);
+    it('reverts when called by user', async () => {
+      await expect(
+        registrarCustody.connect(user).setRecords(['key1'], ['value2'], tokenId),
+      ).to.be.revertedWithCustomError(registrarCustody, 'Unauthorized');
+    });
 
-      await registrarCustody.connect(minter).registerDomain(user.address, labels, ['key1'], ['value1'], expiry);
+    it('reverts when admin (not registrar) tries to set records', async () => {
+      await registrarCustody.connect(coinbase).addAdmin(coinbase.address);
+      const isCoinbaseAdmin = await registrarCustody.isAdmin(coinbase.address);
+      expect(isCoinbaseAdmin).to.be.true;
 
-      await expect(registrarCustody.connect(user).safeTransfer(otherUser.address, tokenId)).to.be.revertedWith(
-        'MinterRole: CALLER_IS_NOT_MINTER',
+      const isCoinbaseRegistrarForToken = await registrarCustody.isRegistrar(
+        await registrarCustody.registrarDelegations(tokenId),
+        coinbase.address,
       );
+      expect(isCoinbaseRegistrarForToken).to.be.false;
+
+      await expect(
+        registrarCustody.connect(coinbase).setRecords(['key1'], ['value3'], tokenId),
+      ).to.be.revertedWithCustomError(registrarCustody, 'Unauthorized');
+    });
+  });
+
+  describe('revoke', () => {
+    let tokenId: bigint;
+
+    beforeEach(async () => {
+      const labels = ['revoke-domain', 'com'];
+      const expiry = latestBlockTimestamp + 60 * 60 * 24;
+      tokenId = await unsRegistry.namehash(labels);
+      await registrarCustody
+        .connect(registrar)
+        .tokenizeDomain(labels, ['key1'], ['value1'], expiry, registrarId, user.address);
     });
 
-    it('should revert transferring domain if locked', async () => {
-      const labels = ['test-registrar-custody-transfer', 'com'];
-      const expiry = latestBlockTimestamp + 60 * 60 * 24;
-      const tokenId = await unsRegistry.namehash(labels);
+    it('revokes by registrar', async () => {
+      await registrarCustody.connect(registrar).revoke(tokenId);
+      expect(await unsRegistry.ownerOf(tokenId)).to.equal(await mintingManager.getAddress());
+    });
 
-      await registrarCustody.connect(minter).registerDomain(user.address, labels, ['key1'], ['value1'], expiry);
-
-      await expect(registrarCustody.connect(user).safeTransfer(user.address, tokenId)).to.be.revertedWith(
-        'MinterRole: CALLER_IS_NOT_MINTER',
+    it('reverts when called by user', async () => {
+      await expect(registrarCustody.connect(user).revoke(tokenId)).to.be.revertedWithCustomError(
+        registrarCustody,
+        'Unauthorized',
       );
     });
   });
@@ -254,7 +335,7 @@ describe('RegistrarCustody', () => {
       await seaportProxyBuyer.connect(coinbase).approve(await usdcMock.getAddress());
       await seaportProxyBuyer.addMinter(coinbase.address);
 
-      seaportSdk = new seaportjs(minter, {
+      seaportSdk = new seaportjs(registrar, {
         overrides: {
           contractAddress: await seaportContract.getAddress(),
         },
@@ -313,19 +394,18 @@ describe('RegistrarCustody', () => {
       return { fulfillOrderData, eip712Hash, numerator, denominator };
     };
 
-    it('is able to fullfill a seaport order', async () => {
+    it('fulfills seaport order', async () => {
       const priceToSell = BigInt(ethers.parseUnits('100', 6));
       const zone = await seaportProxyBuyer.getAddress();
 
-      const labels = ['test-registrar-custody', 'com'];
+      const labels = ['seaport-order', 'com'];
       const tokenId = await unsRegistry.namehash(labels);
       const expiry = latestBlockTimestamp + 60 * 60 * 24;
 
-      await registrarCustody.connect(minter).registerDomain(user.address, labels, ['key1'], ['value1'], expiry);
-      expect(await unsRegistry.ownerOf(namehash(labels.join('.')))).to.be.equal(await registrarCustody.getAddress());
-
-      const virtualOwner = await registrarCustody.virtualOwners(namehash(labels.join('.')));
-      expect(virtualOwner).to.be.equal(user.address);
+      await registrarCustody
+        .connect(registrar)
+        .tokenizeDomain(labels, ['key1'], ['value1'], expiry, registrarId, user.address);
+      expect(await unsRegistry.ownerOf(namehash(labels.join('.')))).to.equal(await registrarCustody.getAddress());
 
       const order = await createOrder(tokenId, priceToSell, zone);
       const { fulfillOrderData, numerator, denominator } = order;
@@ -339,30 +419,29 @@ describe('RegistrarCustody', () => {
           buyer.address,
         );
 
-      expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(buyer.address);
-      expect(await unsRegistry.get('key1', tokenId)).to.be.equal('');
+      expect(await unsRegistry.ownerOf(tokenId)).to.equal(buyer.address);
+      expect(await unsRegistry.get('key1', tokenId)).to.equal('');
     });
 
-    it('rejects fullfillment if signature is from another user', async () => {
+    it('reverts fulfillment with wrong signer', async () => {
       const priceToSell = BigInt(ethers.parseUnits('100', 6));
       const zone = await seaportProxyBuyer.getAddress();
 
-      const labels = ['test-registrar-custody2', 'com'];
+      const labels = ['seaport-order2', 'com'];
       const tokenId = await unsRegistry.namehash(labels);
       const expiry = latestBlockTimestamp + 60 * 60 * 24;
 
-      await registrarCustody.connect(minter).registerDomain(user.address, labels, ['key1'], ['value1'], expiry);
-      expect(await unsRegistry.ownerOf(namehash(labels.join('.')))).to.be.equal(await registrarCustody.getAddress());
-
-      const virtualOwner = await registrarCustody.virtualOwners(namehash(labels.join('.')));
-      expect(virtualOwner).to.be.equal(user.address);
+      await registrarCustody
+        .connect(registrar)
+        .tokenizeDomain(labels, ['key1'], ['value1'], expiry, registrarId, user.address);
+      expect(await unsRegistry.ownerOf(namehash(labels.join('.')))).to.equal(await registrarCustody.getAddress());
 
       const order = await createOrder(tokenId, priceToSell, zone);
       const { fulfillOrderData, numerator, denominator, eip712Hash } = order;
 
       const signature = await otherUser.signMessage(eip712Hash);
 
-      const result = seaportProxyBuyer
+      const tx = seaportProxyBuyer
         .connect(coinbase)
         .fulfillAdvancedOrder(
           { ...fulfillOrderData, signature, numerator, denominator, extraData: '0x' },
@@ -371,7 +450,60 @@ describe('RegistrarCustody', () => {
           buyer.address,
         );
 
-      expect(result).to.be.revertedWithCustomError(seaportContract, 'BadContractSignature');
+      await expect(tx).to.be.revertedWithCustomError(seaportContract, 'BadContractSignature');
+    });
+  });
+
+  describe('RegistrarRole', () => {
+    it('identifies contract owner as admin', async () => {
+      expect(await registrarCustody.isAdmin(coinbase.address)).to.be.true;
+    });
+
+    it('adds and removes an admin', async () => {
+      await registrarCustody.connect(coinbase).addAdmin(otherUser.address);
+      expect(await registrarCustody.isAdmin(otherUser.address)).to.be.true;
+
+      await registrarCustody.connect(coinbase).removeAdmin(otherUser.address);
+      expect(await registrarCustody.isAdmin(otherUser.address)).to.be.false;
+    });
+
+    it('allows an admin to renounce their role', async () => {
+      await registrarCustody.connect(coinbase).addAdmin(otherUser.address);
+      await registrarCustody.connect(otherUser).renounceAdmin();
+      expect(await registrarCustody.isAdmin(otherUser.address)).to.be.false;
+    });
+
+    it('rotates admin role to a new account', async () => {
+      await registrarCustody.connect(coinbase).rotateAdmin(otherUser.address);
+      expect(await registrarCustody.isAdmin(coinbase.address)).to.be.false;
+      expect(await registrarCustody.isAdmin(otherUser.address)).to.be.true;
+    });
+
+    it('reverts when non-owner attempts to add admin', async () => {
+      await expect(registrarCustody.connect(user).addAdmin(user.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
+    });
+
+    it('checks registrar role assignment', async () => {
+      expect(await registrarCustody.isRegistrar(registrarId, registrar.address)).to.be.true;
+    });
+
+    it('adds and removes registrar', async () => {
+      const newRegistrarId = BigInt(99);
+
+      await registrarCustody.connect(coinbase).addRegistrar(newRegistrarId, otherUser.address);
+      expect(await registrarCustody.isRegistrar(newRegistrarId, otherUser.address)).to.be.true;
+
+      await registrarCustody.connect(coinbase).removeRegistrar(newRegistrarId, otherUser.address);
+      expect(await registrarCustody.isRegistrar(newRegistrarId, otherUser.address)).to.be.false;
+    });
+
+    it('reverts when non-owner attempts to add registrar', async () => {
+      const newRegistrarId = BigInt(100);
+      await expect(registrarCustody.connect(user).addRegistrar(newRegistrarId, user.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
     });
   });
 });

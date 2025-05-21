@@ -1,16 +1,18 @@
 // @author Unstoppable Domains, Inc.
-// @date September 25th, 2024
+// @date May 21st, 2025
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import './metatx/ERC2771RegistryContext.sol';
 import './metatx/Forwarder.sol';
-import './roles/MinterRole.sol';
 import './IUNSRegistry.sol';
 import './IMintingManager.sol';
 import './IERC1967.sol';
+import './roles/RegistrarRole.sol';
 import './IRegistrarCustody.sol';
 
 contract RegistrarCustody is
@@ -18,21 +20,23 @@ contract RegistrarCustody is
     ERC2771RegistryContext,
     Forwarder,
     ReentrancyGuardUpgradeable,
-    MinterRole,
-    IERC1967,
+    RegistrarRole,
     IRegistrarCustody
 {
     using ECDSAUpgradeable for bytes32;
 
     string public constant NAME = 'UNS: Registrar Custody';
-    string public constant VERSION = '0.1.0';
+    string public constant VERSION = '0.2.0';
 
     bytes4 internal constant _ERC1271_MAGIC_VALUE = bytes4(keccak256('isValidSignature(bytes32,bytes)'));
 
     IUNSRegistry public unsRegistry;
     IMintingManager public mintingManager;
 
-    mapping(uint256 => address) public virtualOwners;
+    // Mapping of domain tokenId to registrarId
+    mapping(uint256 => uint256) public registrarDelegations;
+    // Mapping of domain tokenId to user address
+    mapping(uint256 => address) public userDelegations;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -47,43 +51,69 @@ contract RegistrarCustody is
         __ERC2771RegistryContext_init_unchained();
         __Forwarder_init_unchained();
         __Ownable_init_unchained();
-        __MinterRole_init_unchained();
+        __RegistrarRole_init_unchained();
     }
 
     function setApprovalForAll(address operator, bool approved) external onlyOwner {
         unsRegistry.setApprovalForAll(operator, approved);
     }
 
-    function registerDomain(
-        address virtualOwner,
+    function tokenizeDomain(
         string[] calldata labels,
         string[] calldata keys,
         string[] calldata values,
-        uint64 expiry
-    ) external onlyMinter nonReentrant {
+        uint64 expiry,
+        uint256 registrarId,
+        address userDelegation
+    ) external onlyAdmin nonReentrant {
         uint256 tokenId = unsRegistry.namehash(labels);
+        bool domainExists = unsRegistry.exists(tokenId);
 
-        _protectTokenOperation(tokenId);
+        if (domainExists && unsRegistry.ownerOf(tokenId) == address(this)) {
+            uint256 currentExpiry = unsRegistry.expiryOf(tokenId);
+            if (currentExpiry == 0) {
+                revert InvalidExpiry();
+            }
 
-        virtualOwners[tokenId] = virtualOwner;
+            if (currentExpiry < expiry) {
+                mintingManager.renew(expiry, tokenId);
+            }
 
-        mintingManager.issueExpirableWithRecords(address(this), labels, keys, values, expiry, false);
+            unsRegistry.setMany(keys, values, tokenId);
+        } else {
+            if (domainExists) {
+                mintingManager.revoke(tokenId);
+            }
 
-        emit DomainLocked(tokenId, virtualOwner);
+            mintingManager.issueExpirableWithRecords(address(this), labels, keys, values, expiry, false);
+        }
+
+        registrarDelegations[tokenId] = registrarId;
+        userDelegations[tokenId] = userDelegation;
+
+        emit DomainTokenized(tokenId, registrarId, userDelegation);
     }
 
-    function safeTransfer(address to, uint256 tokenId) external onlyMinter nonReentrant {
-        _protectTokenOperation(tokenId);
+    function setRecords(string[] calldata keys, string[] calldata values, uint256 tokenId) external {
+        if (!isRegistrar(registrarDelegations[tokenId], _msgSender()) || (userDelegations[tokenId] == _msgSender())) {
+            revert Unauthorized();
+        }
 
-        delete virtualOwners[tokenId];
+        unsRegistry.setMany(keys, values, tokenId);
+    }
 
-        unsRegistry.setOwner(to, tokenId);
+    function revoke(uint256 tokenId) external {
+        if (!isRegistrar(registrarDelegations[tokenId], _msgSender())) {
+            revert Unauthorized();
+        }
+
+        unsRegistry.transferFrom(address(this), address(mintingManager), tokenId);
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4) {
         address signer = hash.recover(signature);
 
-        if (isMinter(signer)) {
+        if (isAdmin(signer)) {
             return _ERC1271_MAGIC_VALUE;
         } else {
             return 0xffffffff;
