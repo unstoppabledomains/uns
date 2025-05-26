@@ -65,8 +65,4 @@ contract UserSmartAccount is IUserSmartAccount, EIP712 {
 
     fallback() external payable {}
     receive() external payable {}
-
-    function helloEIP7702() external pure returns (string memory) {
-        return 'Hello EIP-7702';
-    }
 }

@@ -159,19 +159,6 @@
     },
     {
       "inputs": [],
-      "name": "helloEIP7702",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "pure",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "nonce",
       "outputs": [
         {
