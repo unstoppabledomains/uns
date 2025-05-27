@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { AuthorizationRequest, Wallet, Authorization } from 'ethers';
-import { WorkerSmartAccount, Faucet, Test, UserSmartAccount } from '../../types/contracts/smartAccounts';
+import { WorkerSmartAccount, Faucet } from '../../types/contracts/smartAccounts';
 import { ERC20Mock } from '../../types/contracts/mocks';
 
 describe('Sepolia eip7702 test', () => {
