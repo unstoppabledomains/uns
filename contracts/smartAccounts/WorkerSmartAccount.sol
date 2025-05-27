@@ -16,7 +16,7 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
     }
 
     modifier onlySelf() {
-        require(msg.sender == address(this), 'WorkerSmartAccount: Invalid authority');
+        require(msg.sender == address(this), 'WorkerSmartAccount: Can be only called from self');
         _;
     }
 

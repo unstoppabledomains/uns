@@ -1,10 +1,12 @@
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { AuthorizationRequest, Wallet, Authorization } from 'ethers';
+import { expect } from 'chai';
+import { network } from 'hardhat';
 import { WorkerSmartAccount, Faucet } from '../../types/contracts/smartAccounts';
 import { ERC20Mock } from '../../types/contracts/mocks';
 
-describe('Sepolia eip7702 test', () => {
+describe('Worker Smart Account', () => {
   let signers: SignerWithAddress[], owner: SignerWithAddress;
   let faucet: Faucet;
   let workerSAImplementation: WorkerSmartAccount;
@@ -14,12 +16,13 @@ describe('Sepolia eip7702 test', () => {
   let workerWallet: Wallet;
   let txOrigin: Wallet;
 
+  let snapshotId: string;
+
   before(async () => {
     signers = await ethers.getSigners();
     [owner] = signers;
 
     const faucetFactory = await ethers.getContractFactory('Faucet');
-
     faucet = await faucetFactory.deploy(ethers.parseEther('0.1'));
 
     const workerSmartAccountFactory = await ethers.getContractFactory('WorkerSmartAccount');
@@ -28,60 +31,285 @@ describe('Sepolia eip7702 test', () => {
     const erc20Factory = await ethers.getContractFactory('ERC20Mock');
     erc20Mock = await erc20Factory.deploy();
 
-    // 0x170054D75a1288eC60C58dD12b21b0331A5b50DC
-    workerWallet = new Wallet('0x8b4768f8e54b31a275d072b4579c1c6401812f0e5b1d321dbbfdc8a117cf2d3b', ethers.provider);
-
-    // 0x6fe8D579f9Bdc96A2748F60dC3f4330fB7222A05
-    userWallet = new Wallet('0x7339d492ad0ccc89e77ed3fa3a1189f92856c6b68dffe25905d604453dd86416', ethers.provider);
-
-    // 0x2bc0B2feed78Eda6eDB57BD90117b9c74Ee85034
-    txOrigin = new Wallet('0x38cb9fcb7adda7998500defe68b425a9b8e6d839dda9691519137bd687cb8a49', ethers.provider);
+    snapshotId = await network.provider.send('evm_snapshot');
   });
 
-  it('test', async () => {
-    await owner.sendTransaction({
-      to: faucet.target,
-      value: ethers.parseEther('1'),
-    });
+  beforeEach(async () => {
+    // Using ethers wallets because hardhat signer doesn't support EIP7702 yet
+    workerWallet = new ethers.Wallet(Wallet.createRandom().privateKey, ethers.provider);
+    userWallet = new ethers.Wallet(Wallet.createRandom().privateKey, ethers.provider);
+    txOrigin = new ethers.Wallet(Wallet.createRandom().privateKey, ethers.provider);
+  });
 
-    await owner.sendTransaction({
-      to: workerWallet.address,
-      value: ethers.parseEther('0.09'),
-    });
+  afterEach(async () => {
+    await network.provider.send('evm_revert', [snapshotId]);
+  });
 
-    await faucet.addAuthorizedWorkers([workerWallet.address]);
+  describe('', async () => {
+    it('should be possible to make a random call from worker wallet through worker smart account', async () => {
+      const initialWorkerBalance = ethers.parseEther('0.09');
 
-    const authRequest: AuthorizationRequest = {
-      address: workerSAImplementation.target,
-      nonce: (await workerWallet.getNonce()) + 1,
-    };
-
-    const workerAuth: Authorization = await workerWallet.authorize(authRequest);
-
-    const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
-      'WorkerSmartAccount',
-      workerWallet.address,
-    );
-
-    await erc20Mock.mint(workerWallet.address, 200);
-
-    const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
-
-    console.log('Sending transaction with authorization...');
-    const txResponse = await workerAsContract
-      .connect(workerWallet)
-      .executeBatchAndEnsureBalance([erc20Mock.target], [erc20TransferData], [ethers.parseEther('0')], {
-        authorizationList: [workerAuth],
-        gasLimit: 200000,
+      await owner.sendTransaction({
+        to: faucet.target,
+        value: ethers.parseEther('1'),
       });
-    console.log('Transaction responce: ', txResponse);
 
-    const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
-    console.log('worker balance: ', workerBalance);
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: initialWorkerBalance,
+      });
 
-    const userBalance = await erc20Mock.balanceOf(userWallet.address);
-    console.log('user balance: ', userBalance);
+      await faucet.addAuthorizedWorkers([workerWallet.address]);
 
-    console.log('worker balance: ', await ethers.provider.getBalance(workerWallet.address));
+      const authRequest: AuthorizationRequest = {
+        address: workerSAImplementation.target,
+        nonce: (await workerWallet.getNonce()) + 1,
+      };
+
+      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
+
+      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
+        'WorkerSmartAccount',
+        workerWallet.address,
+      );
+
+      await erc20Mock.mint(workerWallet.address, 200);
+
+      const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
+
+      await workerAsContract
+        .connect(workerWallet)
+        .executeBatchAndEnsureBalance([erc20Mock.target], [erc20TransferData], [ethers.parseEther('0')], {
+          authorizationList: [workerAuth],
+          gasLimit: 200000,
+        });
+
+      const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
+      const userBalance = await erc20Mock.balanceOf(userWallet.address);
+      const workerEthBalance = await ethers.provider.getBalance(workerWallet.address);
+
+      expect(workerBalance).to.equal(BigInt(100));
+      expect(userBalance).to.equal(BigInt(100));
+      expect(workerEthBalance).to.be.gt(initialWorkerBalance);
+    });
+
+    it('should be possible to make a multicall from worker wallet through worker smart account', async () => {
+      const initialWorkerBalance = ethers.parseEther('0.09');
+
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: initialWorkerBalance,
+      });
+
+      await faucet.addAuthorizedWorkers([workerWallet.address]);
+
+      const authRequest: AuthorizationRequest = {
+        address: workerSAImplementation.target,
+        nonce: (await workerWallet.getNonce()) + 1,
+      };
+
+      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
+
+      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
+        'WorkerSmartAccount',
+        workerWallet.address,
+      );
+
+      await erc20Mock.mint(workerWallet.address, 300);
+
+      const erc20TransferData1 = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
+      const erc20TransferData2 = erc20Mock.interface.encodeFunctionData('transfer', [txOrigin.address, 150]);
+
+      await workerAsContract
+        .connect(workerWallet)
+        .executeBatch(
+          [erc20Mock.target, erc20Mock.target],
+          [erc20TransferData1, erc20TransferData2],
+          [ethers.parseEther('0'), ethers.parseEther('0')],
+          {
+            authorizationList: [workerAuth],
+            gasLimit: 200000,
+          },
+        );
+
+      const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
+      const userBalance = await erc20Mock.balanceOf(userWallet.address);
+      const txOriginBalance = await erc20Mock.balanceOf(txOrigin.address);
+      const workerEthBalance = await ethers.provider.getBalance(workerWallet.address);
+
+      expect(workerBalance).to.equal(BigInt(50));
+      expect(userBalance).to.equal(BigInt(100));
+      expect(txOriginBalance).to.equal(BigInt(150));
+    });
+
+    it('should be possible to make a multicall and add balance', async () => {
+      const initialWorkerBalance = ethers.parseEther('0.09');
+
+      await owner.sendTransaction({
+        to: faucet.target,
+        value: ethers.parseEther('1'),
+      });
+
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: initialWorkerBalance,
+      });
+
+      await faucet.addAuthorizedWorkers([workerWallet.address]);
+
+      const authRequest: AuthorizationRequest = {
+        address: workerSAImplementation.target,
+        nonce: (await workerWallet.getNonce()) + 1,
+      };
+
+      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
+
+      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
+        'WorkerSmartAccount',
+        workerWallet.address,
+      );
+
+      await erc20Mock.mint(workerWallet.address, 300);
+
+      const erc20TransferData1 = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
+      const erc20TransferData2 = erc20Mock.interface.encodeFunctionData('transfer', [txOrigin.address, 150]);
+
+      await workerAsContract
+        .connect(workerWallet)
+        .executeBatchAndEnsureBalance(
+          [erc20Mock.target, erc20Mock.target],
+          [erc20TransferData1, erc20TransferData2],
+          [ethers.parseEther('0'), ethers.parseEther('0')],
+          {
+            authorizationList: [workerAuth],
+            gasLimit: 200000,
+          },
+        );
+
+      const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
+      const userBalance = await erc20Mock.balanceOf(userWallet.address);
+      const txOriginBalance = await erc20Mock.balanceOf(txOrigin.address);
+      const workerEthBalance = await ethers.provider.getBalance(workerWallet.address);
+
+      expect(workerBalance).to.equal(BigInt(50));
+      expect(userBalance).to.equal(BigInt(100));
+      expect(txOriginBalance).to.equal(BigInt(150));
+      expect(workerEthBalance).to.be.gt(initialWorkerBalance);
+    });
+
+    it('should be possible to make a multicall to minting manager minting domains having signatures from minters', async () => {});
+
+    it('should not be possible to call worker wallet execute not from self', async () => {
+      const initialWorkerBalance = ethers.parseEther('0.09');
+
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: initialWorkerBalance,
+      });
+
+      await owner.sendTransaction({
+        to: userWallet.address,
+        value: ethers.parseEther('1'),
+      });
+
+      await faucet.addAuthorizedWorkers([workerWallet.address]);
+
+      const authRequest: AuthorizationRequest = {
+        address: workerSAImplementation.target,
+        nonce: (await workerWallet.getNonce()) + 1,
+      };
+
+      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
+
+      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
+        'WorkerSmartAccount',
+        workerWallet.address,
+      );
+
+      await erc20Mock.mint(workerWallet.address, 200);
+
+      const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
+
+      await expect(
+        workerAsContract
+          .connect(userWallet)
+          .executeBatch([erc20Mock.target], [erc20TransferData], [ethers.parseEther('0')], {
+            authorizationList: [workerAuth],
+            gasLimit: 200000,
+          }),
+      ).to.be.revertedWith('WorkerSmartAccount: Can be only called from self');
+    });
+
+    it('should not be possible to call worker wallet executeAndEnsureBalance not from self', async () => {
+      const initialWorkerBalance = ethers.parseEther('0.09');
+
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: initialWorkerBalance,
+      });
+
+      await owner.sendTransaction({
+        to: userWallet.address,
+        value: ethers.parseEther('1'),
+      });
+
+      await faucet.addAuthorizedWorkers([workerWallet.address]);
+
+      const authRequest: AuthorizationRequest = {
+        address: workerSAImplementation.target,
+        nonce: (await workerWallet.getNonce()) + 1,
+      };
+
+      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
+
+      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
+        'WorkerSmartAccount',
+        workerWallet.address,
+      );
+
+      await erc20Mock.mint(workerWallet.address, 200);
+
+      const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
+
+      await expect(
+        workerAsContract
+          .connect(userWallet)
+          .executeBatchAndEnsureBalance([erc20Mock.target], [erc20TransferData], [ethers.parseEther('0')], {
+            authorizationList: [workerAuth],
+            gasLimit: 200000,
+          }),
+      ).to.be.revertedWith('WorkerSmartAccount: Can be only called from self');
+    });
+
+    it('should not be possible to call workerSmartAccount contract at all', async () => {
+      const initialWorkerBalance = ethers.parseEther('0.09');
+
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: initialWorkerBalance,
+      });
+
+      await faucet.addAuthorizedWorkers([workerWallet.address]);
+
+      const authRequest: AuthorizationRequest = {
+        address: workerSAImplementation.target,
+        nonce: (await workerWallet.getNonce()) + 1,
+      };
+
+      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
+
+      await erc20Mock.mint(workerWallet.address, 200);
+
+      const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
+
+      await expect(
+        workerSAImplementation
+          .connect(workerWallet)
+          .executeBatch([erc20Mock.target], [erc20TransferData], [ethers.parseEther('0')], {
+            authorizationList: [workerAuth],
+            gasLimit: 200000,
+          }),
+      ).to.be.revertedWith('WorkerSmartAccount: Can be only called from self');
+    });
   });
 });
