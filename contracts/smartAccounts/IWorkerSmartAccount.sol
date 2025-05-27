@@ -1,13 +1,9 @@
 pragma solidity ^0.8.17;
 
-import './IUserSmartAccount.sol';
-import './IFaucet.sol';
+import '../metatx/IForwarder.sol';
 
-interface IWorkerSmartAccount is ISmartAccount {
-    function executeAndCheckBalance(
-        Call[] calldata calls,
-        IUserSmartAccount userSA,
-        uint256 txDeadline,
-        SplitSignature calldata userSignature
-    ) external payable;
+interface IWorkerSmartAccount {
+    function executeBatch(address[] calldata targets, bytes[] calldata datas, uint256[] calldata values) external payable;
+
+    function executeBatchAndEnsureBalance(address[] calldata targets, bytes[] calldata datas, uint256[] calldata values) external payable;
 }

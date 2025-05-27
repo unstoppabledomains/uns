@@ -4,6 +4,7 @@ import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import './IFaucet.sol';
 import './IWorkerSmartAccount.sol';
 import './IUserSmartAccount.sol';
+import '../metatx/IForwarder.sol';
 
 contract WorkerSmartAccount is IWorkerSmartAccount {
     uint256 immutable BALANCE_THRESHOLD;
@@ -19,18 +20,31 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
         _;
     }
 
-    function executeAndCheckBalance(
-        Call[] calldata calls,
-        IUserSmartAccount userSA,
-        uint256 txDeadline,
-        SplitSignature calldata userSignature
-    ) external payable onlySelf {
-        userSA.execute(calls, txDeadline, userSignature);
+    function executeBatch(address[] calldata targets, bytes[] calldata datas, uint256[] calldata values) external payable onlySelf {
+        require(targets.length == datas.length && targets.length == values.length, 'WorkerSmartAccount: Invalid transactions');
 
-        _checkBalance();
+        for (uint256 i = 0; i < targets.length; i++) {
+            (bool success, ) = targets[i].call{value: values[i]}(datas[i]);
+            require(success, 'WorkerSmartAccount: Execute failed');
+        }
     }
 
-    function _checkBalance() private {
+    function executeBatchAndEnsureBalance(
+        address[] calldata targets,
+        bytes[] calldata datas,
+        uint256[] calldata values
+    ) external payable onlySelf {
+        require(targets.length == datas.length && targets.length == values.length, 'WorkerSmartAccount: Invalid transactions');
+
+        for (uint256 i = 0; i < targets.length; i++) {
+            (bool success, ) = targets[i].call{value: values[i]}(datas[i]);
+            require(success, 'WorkerSmartAccount: Execute failed');
+        }
+
+        _ensureBalance();
+    }
+
+    function _ensureBalance() private {
         if (address(this).balance < BALANCE_THRESHOLD) {
             faucet.withdraw();
         }
@@ -38,8 +52,4 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
 
     fallback() external payable {}
     receive() external payable {}
-
-    function helloEIP7702() external pure returns (string memory) {
-        return 'Hello EIP-7702';
-    }
 }
