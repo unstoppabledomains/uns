@@ -7105,9 +7105,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hardhat@npm:latest":
-  version: 2.24.0
-  resolution: "hardhat@npm:2.24.0"
+"hardhat@npm:^2.24.1":
+  version: 2.24.1
+  resolution: "hardhat@npm:2.24.1"
   dependencies:
     "@ethereumjs/util": ^9.1.0
     "@ethersproject/abi": ^5.1.2
@@ -7160,7 +7160,7 @@ __metadata:
       optional: true
   bin:
     hardhat: internal/cli/bootstrap.js
-  checksum: 405b10e5ac074389c4b14b412b681eee04ad92451e786ea6ffe1448337c40a9b27ee4a881707f976e49bd972876e6e41933a09ded3270b35a2bcbba0d76d2326
+  checksum: 98fa6022a25986343318709e2699c0f1b1c466e68fe6074a6e838ddeddb2cb53ccb9d6f572e809513a30eefa82a00fcad2220c5e2c7f9fad4f1436c9755c01d9
   languageName: node
   linkType: hard
 
@@ -12789,7 +12789,7 @@ __metadata:
     ethereumjs-tx: ^1.3.7
     ethereumjs-util: ^7.1.0
     ethers: ^6.14.0
-    hardhat: latest
+    hardhat: ^2.24.1
     hardhat-abi-exporter: ^2.2.1
     hardhat-contract-sizer: ~2.6.0
     hardhat-gas-reporter: ^2.1.1

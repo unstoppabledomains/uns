@@ -17,6 +17,13 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "fundWorker",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address[]",
@@ -50,13 +57,6 @@
           "type": "uint256"
         }
       ],
-      "name": "withdraw",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "withdraw",
       "outputs": [],
       "stateMutability": "nonpayable",

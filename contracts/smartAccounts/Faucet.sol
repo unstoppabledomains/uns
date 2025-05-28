@@ -6,7 +6,7 @@ import './IFaucet.sol';
 contract Faucet is IFaucet, Ownable {
     uint256 public workerFundingAmount;
 
-    mapping(address => bool) authorizedWorkers;
+    mapping(address => bool) public authorizedWorkers;
 
     constructor(uint256 _workerFundingAmount) Ownable() {
         workerFundingAmount = _workerFundingAmount;
@@ -17,7 +17,7 @@ contract Faucet is IFaucet, Ownable {
         _;
     }
 
-    function withdraw() external onlyAuthorizedWorker {
+    function fundWorker() external onlyAuthorizedWorker {
         (bool success, ) = payable(msg.sender).call{value: workerFundingAmount}('');
         require(success, 'Faucet: Transfer failed');
     }

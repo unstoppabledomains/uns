@@ -1,6 +1,7 @@
 pragma solidity ^0.8.17;
 
 import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import 'hardhat/console.sol';
 import './IFaucet.sol';
 import './IWorkerSmartAccount.sol';
 import './IUserSmartAccount.sol';
@@ -46,7 +47,7 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
 
     function _ensureBalance() private {
         if (address(this).balance < BALANCE_THRESHOLD) {
-            faucet.withdraw();
+            faucet.fundWorker();
         }
     }
 
