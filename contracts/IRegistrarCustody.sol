@@ -1,23 +1,26 @@
 // @author Unstoppable Domains, Inc.
-// @date September 25th, 2024
+// @date May 21st, 2025
 pragma solidity ^0.8.0;
 
 import './IERC1967.sol';
 
-interface IRegistrarCustody is IERC1967 {
-    event DomainLocked(uint256 indexed tokenId, address indexed owner);
+error InvalidExpiry();
 
-    function registerDomain(
-        address virtualOwner,
+interface IRegistrarCustody is IERC1967 {
+    event DomainTokenized(uint256 indexed tokenId, uint256 registrarId, address userDelegation);
+
+    function tokenizeDomain(
         string[] calldata labels,
         string[] calldata keys,
         string[] calldata values,
-        uint64 expiry
+        uint64 expiry,
+        uint256 registrarId,
+        address userDelegation
     ) external;
 
-    function safeTransfer(address to, uint256 tokenId) external;
+    function setRecords(string[] calldata keys, string[] calldata values, uint256 tokenId) external;
+
+    function revoke(uint256 tokenId) external;
 
     function isValidSignature(bytes32 hash, bytes memory signature) external view returns (bytes4);
-
-    function virtualOwners(uint256 tokenId) external view returns (address);
 }

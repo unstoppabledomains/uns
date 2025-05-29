@@ -1,3 +1,7 @@
+## v0.9.49
+
+- `RegistrarCustody@0.2.0` is extended to support tokenization of other registrars
+
 ## v0.9.48
 
 - Added blockchain families to Sonic proxyReader, updated schemaState
