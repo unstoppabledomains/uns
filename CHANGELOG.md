@@ -1,3 +1,7 @@
+## v0.9.52
+
+- `RegistrarCustody@0.2.0` was deployed to amoy
+
 ## v0.9.51
 
 - Updated ethers version
