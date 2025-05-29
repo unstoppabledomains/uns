@@ -1,5 +1,5 @@
 {
-    "version": "0.9.19",
+    "version": "0.9.20",
     "networks": {
         "1": {
             "contracts": {
@@ -562,10 +562,10 @@
                     "deploymentBlock": "0x22"
                 },
                 "RegistrarCustody": {
-                    "address": "0x38Dae41aEed12884D39dabD8F8a81Bb5B4562756",
-                    "deploymentBlock": "0x2f",
-                    "implementation": "0xDD622cF8306F18d736705e4Cc03f7FF83A899FD0",
-                    "forwarder": "0x38Dae41aEed12884D39dabD8F8a81Bb5B4562756"
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "forwarder": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -978,11 +978,11 @@
                     "deploymentBlock": "0x0"
                 },
                 "RegistrarCustody": {
-                    "address": "0x64ED8886421Da2118f988fAC5D65d0b8f7f7fbB6",
-                    "forwarder": "0x64ED8886421Da2118f988fAC5D65d0b8f7f7fbB6",
+                    "address": "0x4Fc4962687FCd0B06A6395B8Ffa5955238CB51DA",
+                    "forwarder": "0x4Fc4962687FCd0B06A6395B8Ffa5955238CB51DA",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0xd1938c",
-                    "implementation": "0x1cd82f8bD1636D3F40435a45e9CB3effA3b30bcF"
+                    "deploymentBlock": "0x0153a381",
+                    "implementation": "0x1F6B4Cf625365c8B13C6b25Baa699e3f43bCC3f1"
                 }
             }
         },

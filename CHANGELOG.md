@@ -1,3 +1,7 @@
+## v0.9.50
+
+- `RegistrarCustody@0.2.0` was deployed to amoy
+
 ## v0.9.49
 
 - `RegistrarCustody@0.2.0` is extended to support tokenization of other registrars
