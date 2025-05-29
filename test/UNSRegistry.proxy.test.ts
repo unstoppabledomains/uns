@@ -24,8 +24,8 @@ describe('UNSRegistry (proxy)', () => {
     signers = await ethers.getSigners();
     [owner, receiver] = signers;
 
-    unsRegistryV07Factory = new UNSRegistryV07__factory(owner);
-    unsRegistryFactory = new UNSRegistry__factory(owner);
+    unsRegistryV07Factory = new UNSRegistryV07__factory().connect(owner);
+    unsRegistryFactory = new UNSRegistry__factory().connect(owner);
 
     unsRegistry = (await deployProxy(
       unsRegistryV07Factory,

@@ -16,7 +16,7 @@ describe('UNSOperator', () => {
 
   describe('Ownership', () => {
     before(async () => {
-      unsOperator = await new UNSOperator__factory(coinbase).deploy();
+      unsOperator = await new UNSOperator__factory().connect(coinbase).deploy();
 
       await unsOperator.initialize();
     });

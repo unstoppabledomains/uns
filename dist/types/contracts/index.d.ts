@@ -16,6 +16,8 @@ import type * as mocks from "./mocks";
 export type { mocks };
 import type * as roles from "./roles";
 export type { roles };
+import type * as smartAccounts from "./smartAccounts";
+export type { smartAccounts };
 import type * as utils from "./utils";
 export type { utils };
 export type { ChildRegistry } from "./ChildRegistry";

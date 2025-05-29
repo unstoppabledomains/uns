@@ -13,7 +13,7 @@ describe('UNSRegistry (multicall)', () => {
     signers = await ethers.getSigners();
     [coinbase, owner] = signers;
 
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');

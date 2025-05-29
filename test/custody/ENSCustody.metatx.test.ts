@@ -118,40 +118,41 @@ describe('ENSCustody (metatx)', function () {
     registrantAddress = await registrant.getAddress();
     minter = new ethers.Wallet('0x' + '1'.repeat(64), provider);
 
-    ens = await new ENSRegistry__factory(owner).deploy();
-    baseRegistrar = await new BaseRegistrarImplementation__factory(owner).deploy(
-      await ens.getAddress(),
-      namehash('eth'),
-    );
-    reverseRegistrar = await new ReverseRegistrar__factory(owner).deploy(await ens.getAddress());
+    ens = await new ENSRegistry__factory().connect(owner).deploy();
+    baseRegistrar = await new BaseRegistrarImplementation__factory()
+      .connect(owner)
+      .deploy(await ens.getAddress(), namehash('eth'));
+    reverseRegistrar = await new ReverseRegistrar__factory().connect(owner).deploy(await ens.getAddress());
 
     await ens.setSubnodeOwner(ZERO_WORD, sha3('reverse')!, ownerAddress);
     await ens.setSubnodeOwner(namehash('reverse'), sha3('addr')!, await reverseRegistrar.getAddress());
 
-    nameWrapper = await new NameWrapper__factory(owner).deploy(
-      await ens.getAddress(),
-      await baseRegistrar.getAddress(),
-      ownerAddress,
-    );
+    nameWrapper = await new NameWrapper__factory()
+      .connect(owner)
+      .deploy(await ens.getAddress(), await baseRegistrar.getAddress(), ownerAddress);
 
     await ens.setSubnodeOwner(ZERO_WORD, sha3('eth')!, await baseRegistrar.getAddress());
 
-    const dummyOracle = await new DummyOracle__factory(owner).deploy('100000000');
-    priceOracle = await new StablePriceOracle__factory(owner).deploy(await dummyOracle.getAddress(), [0, 0, 4, 2, 1]);
-    controller = await new ETHRegistrarController__factory(owner).deploy(
-      await baseRegistrar.getAddress(),
-      await priceOracle.getAddress(),
-      600,
-      86400,
-      await reverseRegistrar.getAddress(),
-      await nameWrapper.getAddress(),
-      await ens.getAddress(),
-    );
+    const dummyOracle = await new DummyOracle__factory().connect(owner).deploy('100000000');
+    priceOracle = await new StablePriceOracle__factory()
+      .connect(owner)
+      .deploy(await dummyOracle.getAddress(), [0, 0, 4, 2, 1]);
+    controller = await new ETHRegistrarController__factory()
+      .connect(owner)
+      .deploy(
+        await baseRegistrar.getAddress(),
+        await priceOracle.getAddress(),
+        600,
+        86400,
+        await reverseRegistrar.getAddress(),
+        await nameWrapper.getAddress(),
+        await ens.getAddress(),
+      );
     await nameWrapper.setController(await controller.getAddress(), true);
     await baseRegistrar.addController(await nameWrapper.getAddress());
     await reverseRegistrar.setController(await controller.getAddress(), true);
 
-    custody = await deployProxy<ENSCustody>(new ENSCustody__factory(owner), [
+    custody = await deployProxy<ENSCustody>(new ENSCustody__factory().connect(owner), [
       await controller.getAddress(),
       await nameWrapper.getAddress(),
       await baseRegistrar.getAddress(),

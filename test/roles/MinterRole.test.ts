@@ -21,7 +21,7 @@ describe('MinterRole', () => {
   });
 
   beforeEach(async () => {
-    minterRole = await new MinterRoleMock__factory(coinbase).deploy();
+    minterRole = await new MinterRoleMock__factory().connect(coinbase).deploy();
     await minterRole.initialize();
     await minterRole.addMinter(minter.address);
   });
