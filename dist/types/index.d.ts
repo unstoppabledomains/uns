@@ -383,6 +383,8 @@ export type { RecordStorage } from "./contracts/RecordStorage";
 export { RecordStorage__factory } from "./factories/contracts/RecordStorage__factory";
 export type { RegistrarCustody } from "./contracts/RegistrarCustody";
 export { RegistrarCustody__factory } from "./factories/contracts/RegistrarCustody__factory";
+export type { RegistrarRole } from "./contracts/roles/RegistrarRole";
+export { RegistrarRole__factory } from "./factories/contracts/roles/RegistrarRole__factory";
 export type { RootRegistry } from "./contracts/RootRegistry";
 export { RootRegistry__factory } from "./factories/contracts/RootRegistry__factory";
 export type { UNSOperator } from "./contracts/UNSOperator";

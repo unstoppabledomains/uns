@@ -24,12 +24,17 @@ export declare class IRegistrarCustody__factory {
             readonly name: "tokenId";
             readonly type: "uint256";
         }, {
-            readonly indexed: true;
+            readonly indexed: false;
+            readonly internalType: "uint256";
+            readonly name: "registrarId";
+            readonly type: "uint256";
+        }, {
+            readonly indexed: false;
             readonly internalType: "address";
-            readonly name: "owner";
+            readonly name: "userDelegation";
             readonly type: "address";
         }];
-        readonly name: "DomainLocked";
+        readonly name: "DomainTokenized";
         readonly type: "event";
     }, {
         readonly anonymous: false;
@@ -61,10 +66,34 @@ export declare class IRegistrarCustody__factory {
         readonly type: "function";
     }, {
         readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "virtualOwner";
-            readonly type: "address";
+            readonly internalType: "uint256";
+            readonly name: "tokenId";
+            readonly type: "uint256";
+        }];
+        readonly name: "revoke";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "string[]";
+            readonly name: "keys";
+            readonly type: "string[]";
         }, {
+            readonly internalType: "string[]";
+            readonly name: "values";
+            readonly type: "string[]";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "tokenId";
+            readonly type: "uint256";
+        }];
+        readonly name: "setRecords";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
             readonly internalType: "string[]";
             readonly name: "labels";
             readonly type: "string[]";
@@ -80,38 +109,18 @@ export declare class IRegistrarCustody__factory {
             readonly internalType: "uint64";
             readonly name: "expiry";
             readonly type: "uint64";
-        }];
-        readonly name: "registerDomain";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "to";
-            readonly type: "address";
         }, {
             readonly internalType: "uint256";
-            readonly name: "tokenId";
+            readonly name: "registrarId";
             readonly type: "uint256";
-        }];
-        readonly name: "safeTransfer";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "tokenId";
-            readonly type: "uint256";
-        }];
-        readonly name: "virtualOwners";
-        readonly outputs: readonly [{
+        }, {
             readonly internalType: "address";
-            readonly name: "";
+            readonly name: "userDelegation";
             readonly type: "address";
         }];
-        readonly stateMutability: "view";
+        readonly name: "tokenizeDomain";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
         readonly type: "function";
     }];
     static createInterface(): IRegistrarCustodyInterface;
