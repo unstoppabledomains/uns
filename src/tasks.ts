@@ -1401,8 +1401,14 @@ const deployRegistrarCustodyTask: Task = {
         const array = ctx.minters.slice(i, i + chunkSize);
 
         ctx.log('Adding minters...', array);
-        const addMintersTx = await registrarCustody.connect(owner).addMinters(array);
-        await addMintersTx.wait();
+
+        for (const minter of array) {
+          ctx.log(`Adding ${minter} as admin`);
+
+          const addMintersTx = await registrarCustody.connect(owner).addAdmin(minter);
+          await addMintersTx.wait();
+        }
+
         ctx.log(`Added ${array.length} minters`);
       }
     }

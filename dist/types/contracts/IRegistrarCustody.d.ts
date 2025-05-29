@@ -1,16 +1,23 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../common";
 export interface IRegistrarCustodyInterface extends Interface {
-    getFunction(nameOrSignature: "isValidSignature" | "registerDomain" | "safeTransfer" | "virtualOwners"): FunctionFragment;
-    getEvent(nameOrSignatureOrTopic: "AdminChanged" | "DomainLocked" | "Upgraded"): EventFragment;
+    getFunction(nameOrSignature: "isValidSignature" | "revoke" | "setRecords" | "tokenizeDomain"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "AdminChanged" | "DomainTokenized" | "Upgraded"): EventFragment;
     encodeFunctionData(functionFragment: "isValidSignature", values: [BytesLike, BytesLike]): string;
-    encodeFunctionData(functionFragment: "registerDomain", values: [AddressLike, string[], string[], string[], BigNumberish]): string;
-    encodeFunctionData(functionFragment: "safeTransfer", values: [AddressLike, BigNumberish]): string;
-    encodeFunctionData(functionFragment: "virtualOwners", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "revoke", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setRecords", values: [string[], string[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "tokenizeDomain", values: [
+        string[],
+        string[],
+        string[],
+        BigNumberish,
+        BigNumberish,
+        AddressLike
+    ]): string;
     decodeFunctionResult(functionFragment: "isValidSignature", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "registerDomain", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "safeTransfer", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "virtualOwners", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "revoke", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setRecords", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "tokenizeDomain", data: BytesLike): Result;
 }
 export declare namespace AdminChangedEvent {
     type InputTuple = [previousAdmin: AddressLike, newAdmin: AddressLike];
@@ -24,12 +31,21 @@ export declare namespace AdminChangedEvent {
     type Log = TypedEventLog<Event>;
     type LogDescription = TypedLogDescription<Event>;
 }
-export declare namespace DomainLockedEvent {
-    type InputTuple = [tokenId: BigNumberish, owner: AddressLike];
-    type OutputTuple = [tokenId: bigint, owner: string];
+export declare namespace DomainTokenizedEvent {
+    type InputTuple = [
+        tokenId: BigNumberish,
+        registrarId: BigNumberish,
+        userDelegation: AddressLike
+    ];
+    type OutputTuple = [
+        tokenId: bigint,
+        registrarId: bigint,
+        userDelegation: string
+    ];
     interface OutputObject {
         tokenId: bigint;
-        owner: string;
+        registrarId: bigint;
+        userDelegation: string;
     }
     type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
     type Filter = TypedDeferredTopicFilter<Event>;
@@ -66,22 +82,24 @@ export interface IRegistrarCustody extends BaseContract {
     ], [
         string
     ], "view">;
-    registerDomain: TypedContractMethod<[
-        virtualOwner: AddressLike,
-        labels: string[],
+    revoke: TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    setRecords: TypedContractMethod<[
         keys: string[],
         values: string[],
-        expiry: BigNumberish
-    ], [
-        void
-    ], "nonpayable">;
-    safeTransfer: TypedContractMethod<[
-        to: AddressLike,
         tokenId: BigNumberish
     ], [
         void
     ], "nonpayable">;
-    virtualOwners: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    tokenizeDomain: TypedContractMethod<[
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        registrarId: BigNumberish,
+        userDelegation: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "isValidSignature"): TypedContractMethod<[
         hash: BytesLike,
@@ -89,30 +107,32 @@ export interface IRegistrarCustody extends BaseContract {
     ], [
         string
     ], "view">;
-    getFunction(nameOrSignature: "registerDomain"): TypedContractMethod<[
-        virtualOwner: AddressLike,
-        labels: string[],
+    getFunction(nameOrSignature: "revoke"): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    getFunction(nameOrSignature: "setRecords"): TypedContractMethod<[
         keys: string[],
         values: string[],
-        expiry: BigNumberish
-    ], [
-        void
-    ], "nonpayable">;
-    getFunction(nameOrSignature: "safeTransfer"): TypedContractMethod<[
-        to: AddressLike,
         tokenId: BigNumberish
     ], [
         void
     ], "nonpayable">;
-    getFunction(nameOrSignature: "virtualOwners"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "tokenizeDomain"): TypedContractMethod<[
+        labels: string[],
+        keys: string[],
+        values: string[],
+        expiry: BigNumberish,
+        registrarId: BigNumberish,
+        userDelegation: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
     getEvent(key: "AdminChanged"): TypedContractEvent<AdminChangedEvent.InputTuple, AdminChangedEvent.OutputTuple, AdminChangedEvent.OutputObject>;
-    getEvent(key: "DomainLocked"): TypedContractEvent<DomainLockedEvent.InputTuple, DomainLockedEvent.OutputTuple, DomainLockedEvent.OutputObject>;
+    getEvent(key: "DomainTokenized"): TypedContractEvent<DomainTokenizedEvent.InputTuple, DomainTokenizedEvent.OutputTuple, DomainTokenizedEvent.OutputObject>;
     getEvent(key: "Upgraded"): TypedContractEvent<UpgradedEvent.InputTuple, UpgradedEvent.OutputTuple, UpgradedEvent.OutputObject>;
     filters: {
         "AdminChanged(address,address)": TypedContractEvent<AdminChangedEvent.InputTuple, AdminChangedEvent.OutputTuple, AdminChangedEvent.OutputObject>;
         AdminChanged: TypedContractEvent<AdminChangedEvent.InputTuple, AdminChangedEvent.OutputTuple, AdminChangedEvent.OutputObject>;
-        "DomainLocked(uint256,address)": TypedContractEvent<DomainLockedEvent.InputTuple, DomainLockedEvent.OutputTuple, DomainLockedEvent.OutputObject>;
-        DomainLocked: TypedContractEvent<DomainLockedEvent.InputTuple, DomainLockedEvent.OutputTuple, DomainLockedEvent.OutputObject>;
+        "DomainTokenized(uint256,uint256,address)": TypedContractEvent<DomainTokenizedEvent.InputTuple, DomainTokenizedEvent.OutputTuple, DomainTokenizedEvent.OutputObject>;
+        DomainTokenized: TypedContractEvent<DomainTokenizedEvent.InputTuple, DomainTokenizedEvent.OutputTuple, DomainTokenizedEvent.OutputObject>;
         "Upgraded(address)": TypedContractEvent<UpgradedEvent.InputTuple, UpgradedEvent.OutputTuple, UpgradedEvent.OutputObject>;
         Upgraded: TypedContractEvent<UpgradedEvent.InputTuple, UpgradedEvent.OutputTuple, UpgradedEvent.OutputObject>;
     };

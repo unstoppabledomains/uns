@@ -18,7 +18,7 @@ import { buildExecuteFunc, ExecuteFunc } from './helpers/metatx';
 describe('RegistrarCustody (metatx)', () => {
   let signers: SignerWithAddress[],
     coinbase: SignerWithAddress,
-    minter: SignerWithAddress,
+    registrarSigner: SignerWithAddress,
     user: SignerWithAddress,
     otherUser: SignerWithAddress;
 
@@ -31,11 +31,12 @@ describe('RegistrarCustody (metatx)', () => {
 
   let buildExecuteParams: ExecuteFunc;
   let result: unknown;
+  const metaTxRegistrarId = BigInt(99);
 
   before(async () => {
     provider = ethers.provider;
     signers = await ethers.getSigners();
-    [coinbase, minter, user, otherUser] = signers;
+    [coinbase, registrarSigner, user, otherUser] = signers;
 
     unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
     mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
@@ -57,10 +58,9 @@ describe('RegistrarCustody (metatx)', () => {
       await mintingManager.getAddress(),
     ]);
 
-    await mintingManager.addMinter(minter.address);
     await mintingManager.addMinter(await registrarCustody.getAddress());
-
-    await registrarCustody.connect(coinbase).addMinter(minter.address);
+    await registrarCustody.connect(coinbase).addAdmin(registrarSigner.address);
+    await registrarCustody.connect(coinbase).addRegistrar(metaTxRegistrarId, registrarSigner.address);
 
     latestBlockTimestamp = await getLatestBlockTimestamp();
 
@@ -79,116 +79,93 @@ describe('RegistrarCustody (metatx)', () => {
     await provider.send('evm_revert', [result]);
   });
 
-  it('should register domain and place it in custody', async () => {
-    const labels = ['test-registrar-custody-meta', 'com'];
+  it('should tokenize domain via meta-transaction', async () => {
+    const labels = ['test-custody-tokenize-meta', 'com'];
     const expiry = latestBlockTimestamp + 60 * 60 * 24;
     const tokenId = await unsRegistry.namehash(labels);
 
     const { req, signature } = await buildExecuteParams(
-      'registerDomain(address,string[],string[],string[],uint64)',
-      [user.address, labels, ['key1'], ['value1'], expiry],
-      minter,
+      'tokenizeDomain(string[],string[],string[],uint64,uint256,address)',
+      [labels, ['key1'], ['value1'], expiry, metaTxRegistrarId, user.address],
+      registrarSigner,
       tokenId,
       await registrarCustody.nonceOf(tokenId),
     );
 
     await expect(registrarCustody.execute(req, signature))
-      .to.emit(registrarCustody, 'DomainLocked')
-      .withArgs(tokenId, user.address);
+      .to.emit(registrarCustody, 'DomainTokenized')
+      .withArgs(tokenId, metaTxRegistrarId, user.address);
 
     expect(await registrarCustody.nonceOf(tokenId)).to.be.equal(1);
 
     expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(await registrarCustody.getAddress());
     expect(await unsRegistry.get('key1', tokenId)).to.be.equal('value1');
     expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
-    expect(await unsRegistry.reverseOf(user.address)).to.be.equal(0);
 
-    expect(await registrarCustody.virtualOwners(tokenId)).to.be.equal(user.address);
+    expect(await registrarCustody.userDelegations(tokenId)).to.be.equal(user.address);
+    expect(await registrarCustody.registrarDelegations(tokenId)).to.be.equal(metaTxRegistrarId);
   });
 
-  it('should reject if signer is not minter', async () => {
-    const labels = ['test-registrar-custody-meta', 'com'];
+  it('should reject tokenizeDomain if signer is not authorized', async () => {
+    const labels = ['test-custody-tokenize-unauth-meta', 'com'];
     const expiry = latestBlockTimestamp + 60 * 60 * 24;
     const tokenId = await unsRegistry.namehash(labels);
 
     const { req, signature } = await buildExecuteParams(
-      'registerDomain(address,string[],string[],string[],uint64)',
-      [user.address, labels, ['key1'], ['value1'], expiry],
-      user,
+      'tokenizeDomain(string[],string[],string[],uint64,uint256,address)',
+      [labels, ['key1'], ['value1'], expiry, metaTxRegistrarId, user.address],
+      otherUser,
       tokenId,
       await registrarCustody.nonceOf(tokenId),
     );
 
-    await expect(registrarCustody.execute(req, signature)).to.rejectedWith('MinterRole: CALLER_IS_NOT_MINTER');
+    await expect(registrarCustody.execute(req, signature)).to.be.revertedWithCustomError(
+      registrarCustody,
+      'Unauthorized',
+    );
 
     expect(await registrarCustody.nonceOf(tokenId)).to.be.equal(0);
   });
 
-  it('should be able to transfer domain', async () => {
+  it('should be able to revoke domain from custody via meta-transaction', async () => {
     const expiry = latestBlockTimestamp + 60 * 60 * 24;
-    const labels = ['test-registrar-custody-claim-meta', 'com'];
+    const labels = ['test-custody-revoke-meta', 'com'];
     const tokenId = await unsRegistry.namehash(labels);
 
-    await registrarCustody.connect(minter).registerDomain(user.address, labels, ['key1'], ['value1'], expiry);
+    await registrarCustody
+      .connect(registrarSigner)
+      .tokenizeDomain(labels, ['key1'], ['value1'], expiry, metaTxRegistrarId, user.address);
+    expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(await registrarCustody.getAddress());
 
     const nonce = await registrarCustody.nonceOf(tokenId);
-    const { req, signature } = await buildExecuteParams(
-      'safeTransfer(address,uint256)',
-      [user.address, tokenId],
-      minter,
-      tokenId,
-      nonce,
-    );
+    const { req, signature } = await buildExecuteParams('revoke(uint256)', [tokenId], registrarSigner, tokenId, nonce);
 
     await registrarCustody.execute(req, signature);
 
-    expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(user.address);
-    expect(await unsRegistry.get('key1', tokenId)).to.be.equal('value1');
-    expect(await unsRegistry.reverseOf(user.address)).to.be.equal(0);
+    expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(await mintingManager.getAddress());
+    expect(await unsRegistry.get('key1', tokenId)).to.be.equal('');
     expect(await unsRegistry.expiryOf(tokenId)).to.be.equal(expiry);
 
     expect(await registrarCustody.nonceOf(tokenId)).to.be.equal(nonce + BigInt(1));
   });
 
-  it('should revert transfering domain if not mitner', async () => {
+  it('should revert revoke if signer is not authorized', async () => {
     const expiry = latestBlockTimestamp + 60 * 60 * 24;
-    const labels = ['test-registrar-custody-claim-meta-not-owner', 'com'];
+    const labels = ['test-custody-revoke-unauth-meta', 'com'];
     const tokenId = await unsRegistry.namehash(labels);
 
-    await registrarCustody.connect(minter).registerDomain(user.address, labels, ['key1'], ['value1'], expiry);
+    await registrarCustody
+      .connect(registrarSigner)
+      .tokenizeDomain(labels, ['key1'], ['value1'], expiry, metaTxRegistrarId, user.address);
 
     const nonce = await registrarCustody.nonceOf(tokenId);
-    const { req, signature } = await buildExecuteParams(
-      'safeTransfer(address,uint256)',
-      [user.address, tokenId],
-      user,
-      tokenId,
-      nonce,
-    );
-
-    await expect(registrarCustody.execute(req, signature)).to.be.revertedWith('MinterRole: CALLER_IS_NOT_MINTER');
-
-    expect(await registrarCustody.nonceOf(tokenId)).to.be.equal(nonce);
-  });
-
-  it('should revert transferring domain if token is not valid', async () => {
-    const expiry = latestBlockTimestamp + 60 * 60 * 24;
-    const labels = ['test-registrar-custody-claim-meta-not-owner', 'com'];
-    const tokenId = await unsRegistry.namehash(labels);
-
-    await registrarCustody.connect(minter).registerDomain(user.address, labels, ['key1'], ['value1'], expiry);
-
-    const { req, signature } = await buildExecuteParams(
-      'safeTransfer(address,uint256)',
-      [user.address, tokenId],
-      minter,
-      1,
-      await registrarCustody.nonceOf(1),
-    );
+    const { req, signature } = await buildExecuteParams('revoke(uint256)', [tokenId], otherUser, tokenId, nonce);
 
     await expect(registrarCustody.execute(req, signature)).to.be.revertedWithCustomError(
       registrarCustody,
-      'InvalidForwardedToken',
+      'Unauthorized',
     );
+
+    expect(await registrarCustody.nonceOf(tokenId)).to.be.equal(nonce);
   });
 });

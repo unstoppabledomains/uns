@@ -32,13 +32,19 @@
           "type": "uint256"
         },
         {
-          "indexed": true,
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "registrarId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
           "internalType": "address",
-          "name": "owner",
+          "name": "userDelegation",
           "type": "address"
         }
       ],
-      "name": "DomainLocked",
+      "name": "DomainTokenized",
       "type": "event"
     },
     {
@@ -81,10 +87,41 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "virtualOwner",
-          "type": "address"
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "revoke",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string[]",
+          "name": "keys",
+          "type": "string[]"
         },
+        {
+          "internalType": "string[]",
+          "name": "values",
+          "type": "string[]"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "setRecords",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
         {
           "internalType": "string[]",
           "name": "labels",
@@ -104,48 +141,21 @@
           "internalType": "uint64",
           "name": "expiry",
           "type": "uint64"
-        }
-      ],
-      "name": "registerDomain",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
         },
         {
           "internalType": "uint256",
-          "name": "tokenId",
+          "name": "registrarId",
           "type": "uint256"
-        }
-      ],
-      "name": "safeTransfer",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "virtualOwners",
-      "outputs": [
+        },
         {
           "internalType": "address",
-          "name": "",
+          "name": "userDelegation",
           "type": "address"
         }
       ],
-      "stateMutability": "view",
+      "name": "tokenizeDomain",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     }
   ],

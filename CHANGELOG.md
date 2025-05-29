@@ -1,6 +1,10 @@
-## v0.9.49
+## v0.9.50
 
 - Added self sustanable workers with EIP-7702
+
+## v0.9.49
+
+- `RegistrarCustody@0.2.0` is extended to support tokenization of other registrars
 
 ## v0.9.48
 
