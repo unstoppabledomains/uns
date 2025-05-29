@@ -1,4 +1,6 @@
-pragma solidity ^0.8.17;
+// @author Unstoppable Domains, Inc.
+// @date May 29th, 2025
+pragma solidity ^0.8.20;
 
 interface ISmartAccount {
     struct Call {

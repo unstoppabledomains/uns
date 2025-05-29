@@ -7,6 +7,7 @@ export * as marketplace from "./marketplace";
 export * as metatx from "./metatx";
 export * as mocks from "./mocks";
 export * as roles from "./roles";
+export * as smartAccounts from "./smartAccounts";
 export * as utils from "./utils";
 export { ChildRegistry__factory } from "./ChildRegistry__factory";
 export { DotCoinBurner__factory } from "./DotCoinBurner__factory";

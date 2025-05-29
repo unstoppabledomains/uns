@@ -1,6 +1,6 @@
 {
   "name": "uns",
-  "version": "0.9.48",
+  "version": "0.9.49",
   "description": "UNS contracts and tools",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "main": "./dist/index.js",
@@ -12,7 +12,7 @@
     "build:ci": "yarn build:package && yarn rebuild:sandbox && yarn copy:assets",
     "copy:assets": "mkdir -p dist/sandbox/foundry/bin; cp sandbox/foundry/bin/.gitkeep dist/sandbox/foundry/bin/.gitkeep; cp sandbox/state.json dist/sandbox/; cp sandbox/foundry/foundryup.sh dist/sandbox/foundry; cp uns-config.json dist/; cp ens-config.json dist/;",
     "compile:size": "env ENABLE_CONTRACT_SIZER=true yarn compile",
-    "coverage": "hardhat coverage",
+    "coverage": "node --max-old-space-size=8192 ./node_modules/.bin/hardhat coverage",
     "test": "yarn test:sol && yarn test:sandbox",
     "test:sol": "hardhat test --typecheck",
     "test:sandbox": "env HARDHAT_NETWORK=sandbox mocha --timeout 100000 --require ts-node/register --exit ./sandbox/**/*.test.ts",

@@ -1,3 +1,7 @@
+## v0.9.49
+
+- Added self sustanable workers with EIP-7702
+
 ## v0.9.48
 
 - Added blockchain families to Sonic proxyReader, updated schemaState

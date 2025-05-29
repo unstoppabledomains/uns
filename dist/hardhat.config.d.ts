@@ -31,7 +31,6 @@ import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-verify';
 import '@nomicfoundation/hardhat-chai-matchers';
 import '@nomiclabs/hardhat-solhint';
-import 'hardhat-tracer';
 import '@openzeppelin/hardhat-upgrades';
 import 'solidity-coverage';
 import 'hardhat-gas-reporter';
