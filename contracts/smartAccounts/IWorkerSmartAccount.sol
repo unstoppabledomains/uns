@@ -8,4 +8,6 @@ interface IWorkerSmartAccount {
     function executeBatch(address[] calldata targets, bytes[] calldata datas, uint256[] calldata values) external payable;
 
     function executeBatchAndEnsureBalance(address[] calldata targets, bytes[] calldata datas, uint256[] calldata values) external payable;
+
+    function balanceThreshold() external view returns (uint256);
 }

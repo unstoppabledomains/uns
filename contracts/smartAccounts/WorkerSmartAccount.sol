@@ -9,12 +9,15 @@ import './IWorkerSmartAccount.sol';
 import '../metatx/IForwarder.sol';
 
 contract WorkerSmartAccount is IWorkerSmartAccount {
-    uint256 public immutable balanceThreshold;
+    // If contract is updated and redeployed to the same worker accounts,
+    // version V must be bumped and slot hash updated
+    // keccak256("WorkerSmartAccount.balanceThresholdV1")
+    bytes32 constant BALANCE_THRESHOLD_SLOT = 0x5b8c3d83666741a3d369e0ad33d88661dc3e95bcb194a23d030cf3d9c5bc0e91;
+
     IFaucet public immutable faucet;
 
-    constructor(IFaucet _faucet, uint256 _balanceThreshold) {
+    constructor(IFaucet _faucet) {
         faucet = _faucet;
-        balanceThreshold = _balanceThreshold;
     }
 
     modifier onlySelf() {
@@ -40,8 +43,20 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
         _ensureBalance();
     }
 
+    function setBalanceThreshold(uint256 _newThreshold) external onlySelf {
+        assembly {
+            sstore(BALANCE_THRESHOLD_SLOT, _newThreshold)
+        }
+    }
+
+    function balanceThreshold() public view returns (uint256 value) {
+        assembly {
+            value := sload(BALANCE_THRESHOLD_SLOT)
+        }
+    }
+
     function _ensureBalance() private {
-        if (address(this).balance < balanceThreshold) {
+        if (address(this).balance < balanceThreshold()) {
             faucet.fundWorker();
         }
     }

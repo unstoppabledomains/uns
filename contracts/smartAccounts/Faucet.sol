@@ -3,15 +3,17 @@
 
 pragma solidity ^0.8.20;
 
-import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import './IFaucet.sol';
 
-contract Faucet is IFaucet, Ownable {
+contract Faucet is IFaucet, Initializable, OwnableUpgradeable {
     uint256 public workerFundingAmount;
 
     mapping(address => bool) public authorizedWorkers;
 
-    constructor(uint256 _workerFundingAmount) Ownable() {
+    function initialize(uint256 _workerFundingAmount) public initializer {
+        __Ownable_init();
         workerFundingAmount = _workerFundingAmount;
     }
 
@@ -51,4 +53,6 @@ contract Faucet is IFaucet, Ownable {
     }
 
     receive() external payable {}
+
+    uint256[50] private __gap;
 }

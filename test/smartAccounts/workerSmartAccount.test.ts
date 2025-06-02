@@ -35,10 +35,10 @@ describe('Worker Smart Account', () => {
     [owner, minter, user, random] = signers;
 
     const faucetFactory = await ethers.getContractFactory('Faucet');
-    faucet = await faucetFactory.deploy(ethers.parseEther('0.1'));
+    faucet = await deployProxy(faucetFactory.connect(owner), [ethers.parseEther('0.1')]);
 
     const workerSmartAccountFactory = await ethers.getContractFactory('WorkerSmartAccount');
-    workerSAImplementation = await workerSmartAccountFactory.deploy(faucet.target, ethers.parseEther('0.1'));
+    workerSAImplementation = await workerSmartAccountFactory.deploy(faucet.target);
 
     const erc20Factory = await ethers.getContractFactory('ERC20Mock');
     erc20Mock = await erc20Factory.deploy();
@@ -81,58 +81,59 @@ describe('Worker Smart Account', () => {
     let workerWallet: Wallet;
     let txOrigin: Wallet;
 
+    let workerAsContract: WorkerSmartAccount;
+
     beforeEach(async () => {
       // Using ethers wallets because hardhat signer doesn't support EIP7702 yet
       workerWallet = new ethers.Wallet(Wallet.createRandom().privateKey, ethers.provider);
       userWallet = new ethers.Wallet(Wallet.createRandom().privateKey, ethers.provider);
       txOrigin = new ethers.Wallet(Wallet.createRandom().privateKey, ethers.provider);
+
+      await owner.sendTransaction({
+        to: faucet.target,
+        value: ethers.parseEther('10'),
+      });
+
+      await faucet.addAuthorizedWorkers([workerWallet.address]);
+
+      const workerAuth: Authorization = await workerWallet.authorize({ address: workerSAImplementation.target });
+
+      await owner.sendTransaction({
+        to: txOrigin.address,
+        value: ethers.parseEther('1'),
+      });
+
+      await txOrigin.sendTransaction({
+        to: workerWallet.address,
+        value: 0,
+        type: 4,
+        authorizationList: [workerAuth],
+        gasLimit: 50000,
+      });
+
+      workerAsContract = await ethers.getContractAt('WorkerSmartAccount', workerWallet.address);
     });
 
     it('should be possible to make a random call from worker wallet through worker smart account', async () => {
       const initialWorkerBalance = ethers.parseEther('0.09');
 
       await owner.sendTransaction({
-        to: faucet.target,
-        value: ethers.parseEther('1'),
-      });
-
-      await owner.sendTransaction({
         to: workerWallet.address,
         value: initialWorkerBalance,
       });
-
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
-
-      const authRequest: AuthorizationRequest = {
-        address: workerSAImplementation.target,
-        nonce: (await workerWallet.getNonce()) + 1,
-      };
-
-      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
-
-      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
-        'WorkerSmartAccount',
-        workerWallet.address,
-      );
+      await workerAsContract.connect(workerWallet).setBalanceThreshold(ethers.parseEther('0.1'));
 
       await erc20Mock.mint(workerWallet.address, 200);
 
       const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
 
-      await workerAsContract
-        .connect(workerWallet)
-        .executeBatchAndEnsureBalance([erc20Mock.target], [erc20TransferData], [0], {
-          authorizationList: [workerAuth],
-          gasLimit: 200000,
-        });
+      await workerAsContract.connect(workerWallet).executeBatch([erc20Mock.target], [erc20TransferData], [0]);
 
       const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
       const userBalance = await erc20Mock.balanceOf(userWallet.address);
-      const workerEthBalance = await ethers.provider.getBalance(workerWallet.address);
 
       expect(workerBalance).to.equal(BigInt(100));
       expect(userBalance).to.equal(BigInt(100));
-      expect(workerEthBalance).to.be.gt(initialWorkerBalance);
     });
 
     it('should be possible to make a multicall from worker wallet through worker smart account', async () => {
@@ -142,20 +143,7 @@ describe('Worker Smart Account', () => {
         to: workerWallet.address,
         value: initialWorkerBalance,
       });
-
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
-
-      const authRequest: AuthorizationRequest = {
-        address: workerSAImplementation.target,
-        nonce: (await workerWallet.getNonce()) + 1,
-      };
-
-      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
-
-      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
-        'WorkerSmartAccount',
-        workerWallet.address,
-      );
+      await workerAsContract.connect(workerWallet).setBalanceThreshold(ethers.parseEther('0.1'));
 
       await erc20Mock.mint(workerWallet.address, 300);
 
@@ -164,10 +152,7 @@ describe('Worker Smart Account', () => {
 
       await workerAsContract
         .connect(workerWallet)
-        .executeBatch([erc20Mock.target, erc20Mock.target], [erc20TransferData1, erc20TransferData2], [0, 0], {
-          authorizationList: [workerAuth],
-          gasLimit: 200000,
-        });
+        .executeBatch([erc20Mock.target, erc20Mock.target], [erc20TransferData1, erc20TransferData2], [0, 0]);
 
       const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
       const userBalance = await erc20Mock.balanceOf(userWallet.address);
@@ -182,28 +167,10 @@ describe('Worker Smart Account', () => {
       const initialWorkerBalance = ethers.parseEther('0.09');
 
       await owner.sendTransaction({
-        to: faucet.target,
-        value: ethers.parseEther('1'),
-      });
-
-      await owner.sendTransaction({
         to: workerWallet.address,
         value: initialWorkerBalance,
       });
-
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
-
-      const authRequest: AuthorizationRequest = {
-        address: workerSAImplementation.target,
-        nonce: (await workerWallet.getNonce()) + 1,
-      };
-
-      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
-
-      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
-        'WorkerSmartAccount',
-        workerWallet.address,
-      );
+      await workerAsContract.connect(workerWallet).setBalanceThreshold(ethers.parseEther('0.1'));
 
       await erc20Mock.mint(workerWallet.address, 300);
 
@@ -216,10 +183,6 @@ describe('Worker Smart Account', () => {
           [erc20Mock.target, erc20Mock.target],
           [erc20TransferData1, erc20TransferData2],
           [0, 0],
-          {
-            authorizationList: [workerAuth],
-            gasLimit: 200000,
-          },
         );
 
       const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
@@ -237,28 +200,10 @@ describe('Worker Smart Account', () => {
       const initialWorkerBalance = ethers.parseEther('0.9');
 
       await owner.sendTransaction({
-        to: faucet.target,
-        value: ethers.parseEther('1'),
-      });
-
-      await owner.sendTransaction({
         to: workerWallet.address,
         value: initialWorkerBalance,
       });
-
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
-
-      const authRequest: AuthorizationRequest = {
-        address: workerSAImplementation.target,
-        nonce: (await workerWallet.getNonce()) + 1,
-      };
-
-      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
-
-      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
-        'WorkerSmartAccount',
-        workerWallet.address,
-      );
+      await workerAsContract.connect(workerWallet).setBalanceThreshold(ethers.parseEther('0.1'));
 
       await erc20Mock.mint(workerWallet.address, 300);
 
@@ -271,10 +216,6 @@ describe('Worker Smart Account', () => {
           [erc20Mock.target, erc20Mock.target],
           [erc20TransferData1, erc20TransferData2],
           [0, 0],
-          {
-            authorizationList: [workerAuth],
-            gasLimit: 200000,
-          },
         );
 
       const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
@@ -289,70 +230,41 @@ describe('Worker Smart Account', () => {
     });
 
     it('should not be possible to call worker wallet executeBatch not from self', async () => {
-      const initialWorkerBalance = 0;
+      const initialWorkerBalance = ethers.parseEther('0.05');
 
       await owner.sendTransaction({
         to: workerWallet.address,
         value: initialWorkerBalance,
       });
+      await workerAsContract.connect(workerWallet).setBalanceThreshold(ethers.parseEther('0.1'));
 
       await owner.sendTransaction({
         to: userWallet.address,
         value: ethers.parseEther('0.1'),
       });
-
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
-
-      const authRequest: AuthorizationRequest = {
-        address: workerSAImplementation.target,
-        nonce: await workerWallet.getNonce(),
-      };
-
-      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
-
-      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
-        'WorkerSmartAccount',
-        workerWallet.address,
-      );
 
       await erc20Mock.mint(workerWallet.address, 200);
 
       const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
 
       await expect(
-        workerAsContract.connect(userWallet).executeBatch([erc20Mock.target], [erc20TransferData], [0], {
-          authorizationList: [workerAuth],
-          gasLimit: 200000,
-        }),
+        workerAsContract.connect(userWallet).executeBatch([erc20Mock.target], [erc20TransferData], [0]),
       ).to.be.revertedWith('WorkerSmartAccount: Can be only called from self');
     });
 
     it('should not be possible to call worker wallet executeAndEnsureBalance not from self', async () => {
-      const initialWorkerBalance = 0;
+      const initialWorkerBalance = ethers.parseEther('0.05');
 
       await owner.sendTransaction({
         to: workerWallet.address,
         value: initialWorkerBalance,
       });
+      await workerAsContract.connect(workerWallet).setBalanceThreshold(ethers.parseEther('0.1'));
 
       await owner.sendTransaction({
         to: userWallet.address,
         value: ethers.parseEther('0.1'),
       });
-
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
-
-      const authRequest: AuthorizationRequest = {
-        address: workerSAImplementation.target,
-        nonce: await workerWallet.getNonce(),
-      };
-
-      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
-
-      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
-        'WorkerSmartAccount',
-        workerWallet.address,
-      );
 
       await erc20Mock.mint(workerWallet.address, 200);
 
@@ -361,10 +273,7 @@ describe('Worker Smart Account', () => {
       await expect(
         workerAsContract
           .connect(userWallet)
-          .executeBatchAndEnsureBalance([erc20Mock.target], [erc20TransferData], [0], {
-            authorizationList: [workerAuth],
-            gasLimit: 200000,
-          }),
+          .executeBatchAndEnsureBalance([erc20Mock.target], [erc20TransferData], [0]),
       ).to.be.revertedWith('WorkerSmartAccount: Can be only called from self');
     });
 
@@ -375,25 +284,14 @@ describe('Worker Smart Account', () => {
         to: workerWallet.address,
         value: initialWorkerBalance,
       });
-
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
-
-      const authRequest: AuthorizationRequest = {
-        address: workerSAImplementation.target,
-        nonce: (await workerWallet.getNonce()) + 1,
-      };
-
-      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
+      await workerAsContract.connect(workerWallet).setBalanceThreshold(ethers.parseEther('0.1'));
 
       await erc20Mock.mint(workerWallet.address, 200);
 
       const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
 
       await expect(
-        workerSAImplementation.connect(workerWallet).executeBatch([erc20Mock.target], [erc20TransferData], [0], {
-          authorizationList: [workerAuth],
-          gasLimit: 200000,
-        }),
+        workerSAImplementation.connect(workerWallet).executeBatch([erc20Mock.target], [erc20TransferData], [0]),
       ).to.be.revertedWith('WorkerSmartAccount: Can be only called from self');
     });
 
@@ -401,28 +299,10 @@ describe('Worker Smart Account', () => {
       const initialWorkerBalance = ethers.parseEther('0.09');
 
       await owner.sendTransaction({
-        to: faucet.target,
-        value: ethers.parseEther('1'),
-      });
-
-      await owner.sendTransaction({
         to: workerWallet.address,
         value: initialWorkerBalance,
       });
-
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
-
-      const authRequest: AuthorizationRequest = {
-        address: workerSAImplementation.target,
-        nonce: (await workerWallet.getNonce()) + 1,
-      };
-
-      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
-
-      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
-        'WorkerSmartAccount',
-        workerWallet.address,
-      );
+      await workerAsContract.connect(workerWallet).setBalanceThreshold(ethers.parseEther('0.1'));
 
       await erc20Mock.mint(workerWallet.address, 200);
 
@@ -431,10 +311,7 @@ describe('Worker Smart Account', () => {
       await expect(
         workerAsContract
           .connect(workerWallet)
-          .executeBatchAndEnsureBalance([erc20Mock.target, erc20Mock.target], [erc20TransferData], [0], {
-            authorizationList: [workerAuth],
-            gasLimit: 200000,
-          }),
+          .executeBatchAndEnsureBalance([erc20Mock.target, erc20Mock.target], [erc20TransferData], [0]),
       ).to.be.revertedWith('WorkerSmartAccount: Invalid calls');
     });
 
@@ -442,28 +319,10 @@ describe('Worker Smart Account', () => {
       const initialWorkerBalance = ethers.parseEther('0.09');
 
       await owner.sendTransaction({
-        to: faucet.target,
-        value: ethers.parseEther('1'),
-      });
-
-      await owner.sendTransaction({
         to: workerWallet.address,
         value: initialWorkerBalance,
       });
-
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
-
-      const authRequest: AuthorizationRequest = {
-        address: workerSAImplementation.target,
-        nonce: (await workerWallet.getNonce()) + 1,
-      };
-
-      const workerAuth: Authorization = await workerWallet.authorize(authRequest);
-
-      const workerAsContract: WorkerSmartAccount = await ethers.getContractAt(
-        'WorkerSmartAccount',
-        workerWallet.address,
-      );
+      await workerAsContract.connect(workerWallet).setBalanceThreshold(ethers.parseEther('0.1'));
 
       await erc20Mock.mint(workerWallet.address, 200);
 
@@ -472,11 +331,50 @@ describe('Worker Smart Account', () => {
       await expect(
         workerAsContract
           .connect(workerWallet)
-          .executeBatchAndEnsureBalance([erc20Mock.target, erc20Mock.target], [erc20TransferData], [0, 0], {
-            authorizationList: [workerAuth],
-            gasLimit: 200000,
-          }),
+          .executeBatchAndEnsureBalance([erc20Mock.target, erc20Mock.target], [erc20TransferData], [0, 0]),
       ).to.be.revertedWith('WorkerSmartAccount: Invalid calls');
+    });
+
+    it('should be possible to get and set balance threshold', async () => {
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: ethers.parseEther('1'),
+      });
+
+      const initialThreshold = ethers.parseEther('0.1');
+      const newThreshold = ethers.parseEther('0.5');
+
+      await workerAsContract.connect(workerWallet).setBalanceThreshold(initialThreshold);
+      expect(await workerAsContract.balanceThreshold()).to.equal(initialThreshold);
+      await workerAsContract.connect(workerWallet).setBalanceThreshold(newThreshold);
+      expect(await workerAsContract.balanceThreshold()).to.equal(newThreshold);
+    });
+
+    it('should not be possible to set balance threshold not from self', async () => {
+      await owner.sendTransaction({
+        to: userWallet.address,
+        value: ethers.parseEther('1'),
+      });
+
+      const newThreshold = ethers.parseEther('0.5');
+
+      await expect(workerAsContract.connect(userWallet).setBalanceThreshold(newThreshold)).to.be.revertedWith(
+        'WorkerSmartAccount: Can be only called from self',
+      );
+    });
+
+    it('should maintain balance threshold after multiple updates', async () => {
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: ethers.parseEther('1'),
+      });
+
+      const thresholds = [ethers.parseEther('0.2'), ethers.parseEther('0.3'), ethers.parseEther('0.4')];
+
+      for (const threshold of thresholds) {
+        await workerAsContract.connect(workerWallet).setBalanceThreshold(threshold);
+        expect(await workerAsContract.balanceThreshold()).to.equal(threshold);
+      }
     });
   });
 
