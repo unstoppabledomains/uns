@@ -1,9 +1,9 @@
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { network } from 'hardhat';
 import { Faucet } from '../../types/contracts/smartAccounts';
 import { Reverter } from '../helpers/reverter';
+import { deployProxy } from '../../src/helpers';
 
 describe('Faucet', () => {
   const reverter: Reverter = new Reverter();
@@ -16,13 +16,14 @@ describe('Faucet', () => {
   let faucet: Faucet;
 
   const WORKER_FUNDING_AMOUNT = ethers.parseEther('0.1');
+  const WORKER_BALANCE_THRESHOLD = WORKER_FUNDING_AMOUNT;
 
   before(async () => {
     signers = await ethers.getSigners();
     [owner, worker1, worker2, random] = signers;
 
     const faucetFactory = await ethers.getContractFactory('Faucet');
-    faucet = await faucetFactory.deploy(WORKER_FUNDING_AMOUNT);
+    faucet = await deployProxy(faucetFactory, [WORKER_FUNDING_AMOUNT, WORKER_BALANCE_THRESHOLD]);
 
     await reverter.snapshot();
   });
@@ -36,6 +37,12 @@ describe('Faucet', () => {
 
     it('should set the deployer as owner', async () => {
       expect(await faucet.owner()).to.equal(owner.address);
+    });
+
+    it('should not allow reinitialization', async () => {
+      await expect(faucet.initialize(WORKER_FUNDING_AMOUNT, WORKER_BALANCE_THRESHOLD)).to.be.revertedWith(
+        'Initializable: contract is already initialized',
+      );
     });
   });
 
@@ -163,6 +170,24 @@ describe('Faucet', () => {
 
     it('should not allow non-owner to set worker funding amount', async () => {
       await expect(faucet.connect(random).setWorkerFundingAmount(ethers.parseEther('0.2'))).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
+    });
+  });
+
+  describe('worker balance threshold management', () => {
+    it('should set the correct worker balance threshold in constructor', async () => {
+      expect(await faucet.workerBalanceThreshold()).to.equal(WORKER_BALANCE_THRESHOLD);
+    });
+
+    it('should allow owner to set worker balance threshold', async () => {
+      const newThreshold = ethers.parseEther('0.3');
+      await faucet.connect(owner).setWorkerBalanceThreshold(newThreshold);
+      expect(await faucet.workerBalanceThreshold()).to.equal(newThreshold);
+    });
+
+    it('should not allow non-owner to set worker balance threshold', async () => {
+      await expect(faucet.connect(random).setWorkerBalanceThreshold(ethers.parseEther('0.3'))).to.be.revertedWith(
         'Ownable: caller is not the owner',
       );
     });

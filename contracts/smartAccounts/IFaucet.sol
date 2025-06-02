@@ -9,5 +9,7 @@ interface IFaucet {
     function setWorkerFundingAmount(uint256 amount) external;
     function withdraw(uint256 amount) external;
     function withdrawAll() external;
+    function setWorkerBalanceThreshold(uint256 threshold) external;
+    function workerBalanceThreshold() external view returns (uint256);
     receive() external payable;
 }

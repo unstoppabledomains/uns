@@ -8,13 +8,15 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import './IFaucet.sol';
 
 contract Faucet is IFaucet, Initializable, OwnableUpgradeable {
+    uint256 public workerBalanceThreshold;
     uint256 public workerFundingAmount;
 
     mapping(address => bool) public authorizedWorkers;
 
-    function initialize(uint256 _workerFundingAmount) public initializer {
+    function initialize(uint256 _workerFundingAmount, uint256 _workerBalanceThreshold) public initializer {
         __Ownable_init();
         workerFundingAmount = _workerFundingAmount;
+        workerBalanceThreshold = _workerBalanceThreshold;
     }
 
     modifier onlyAuthorizedWorker() {
@@ -41,6 +43,10 @@ contract Faucet is IFaucet, Initializable, OwnableUpgradeable {
 
     function setWorkerFundingAmount(uint256 amount) external onlyOwner {
         workerFundingAmount = amount;
+    }
+
+    function setWorkerBalanceThreshold(uint256 threshold) external onlyOwner {
+        workerBalanceThreshold = threshold;
     }
 
     function withdraw(uint256 amount) external onlyOwner {

@@ -1,12 +1,10 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../common";
 export interface WorkerSmartAccountInterface extends Interface {
-    getFunction(nameOrSignature: "balanceThreshold" | "executeBatch" | "executeBatchAndEnsureBalance" | "faucet"): FunctionFragment;
-    encodeFunctionData(functionFragment: "balanceThreshold", values?: undefined): string;
+    getFunction(nameOrSignature: "executeBatch" | "executeBatchAndEnsureBalance" | "faucet"): FunctionFragment;
     encodeFunctionData(functionFragment: "executeBatch", values: [AddressLike[], BytesLike[], BigNumberish[]]): string;
     encodeFunctionData(functionFragment: "executeBatchAndEnsureBalance", values: [AddressLike[], BytesLike[], BigNumberish[]]): string;
     encodeFunctionData(functionFragment: "faucet", values?: undefined): string;
-    decodeFunctionResult(functionFragment: "balanceThreshold", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "executeBatch", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "executeBatchAndEnsureBalance", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "faucet", data: BytesLike): Result;
@@ -24,7 +22,6 @@ export interface WorkerSmartAccount extends BaseContract {
     listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
-    balanceThreshold: TypedContractMethod<[], [bigint], "view">;
     executeBatch: TypedContractMethod<[
         targets: AddressLike[],
         datas: BytesLike[],
@@ -41,7 +38,6 @@ export interface WorkerSmartAccount extends BaseContract {
     ], "payable">;
     faucet: TypedContractMethod<[], [string], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
-    getFunction(nameOrSignature: "balanceThreshold"): TypedContractMethod<[], [bigint], "view">;
     getFunction(nameOrSignature: "executeBatch"): TypedContractMethod<[
         targets: AddressLike[],
         datas: BytesLike[],

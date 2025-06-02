@@ -9,11 +9,6 @@ import './IWorkerSmartAccount.sol';
 import '../metatx/IForwarder.sol';
 
 contract WorkerSmartAccount is IWorkerSmartAccount {
-    // If contract is updated and redeployed to the same worker accounts,
-    // version V must be bumped and slot hash updated
-    // keccak256("WorkerSmartAccount.balanceThresholdV1")
-    bytes32 constant BALANCE_THRESHOLD_SLOT = 0x5b8c3d83666741a3d369e0ad33d88661dc3e95bcb194a23d030cf3d9c5bc0e91;
-
     IFaucet public immutable faucet;
 
     constructor(IFaucet _faucet) {
@@ -25,6 +20,22 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
         _;
     }
 
+    /**
+     * @dev Executes a batch of transactions on behalf of the worker account.
+     * This function is a general-purpose worker account executor that can:
+     * 1. Execute multiple transactions in a single call
+     * 2. Be used in conjunction with user signatures to execute actions on their behalf
+     * 3. Particularly useful for executing operations through the mintingManager
+     *
+     * This contract is designed to be delegated to worker accounts.
+     * A calldata for the calls can be generated with arguments of
+     * forwarder contracts along with signatures, so the worker
+     * can perform a multicall to execute meta transactions.
+     *
+     * @param targets Array of target addresses to call
+     * @param datas Array of calldata for each call
+     * @param values Array of ETH values to send with each call
+     */
     function executeBatch(address[] calldata targets, bytes[] calldata datas, uint256[] calldata values) public payable onlySelf {
         require(targets.length == datas.length && targets.length == values.length, 'WorkerSmartAccount: Invalid calls');
 
@@ -34,6 +45,14 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
         }
     }
 
+    /**
+     * @dev Same as executeBatch, but also ensures the contract maintains a worker minimum balance,
+     * this way workers become self-sustaining.
+     *
+     * @param targets Array of target addresses to call
+     * @param datas Array of calldata for each call
+     * @param values Array of ETH values to send with each call
+     */
     function executeBatchAndEnsureBalance(
         address[] calldata targets,
         bytes[] calldata datas,
@@ -43,20 +62,8 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
         _ensureBalance();
     }
 
-    function setBalanceThreshold(uint256 _newThreshold) external onlySelf {
-        assembly {
-            sstore(BALANCE_THRESHOLD_SLOT, _newThreshold)
-        }
-    }
-
-    function balanceThreshold() public view returns (uint256 value) {
-        assembly {
-            value := sload(BALANCE_THRESHOLD_SLOT)
-        }
-    }
-
     function _ensureBalance() private {
-        if (address(this).balance < balanceThreshold()) {
+        if (address(this).balance < faucet.workerBalanceThreshold()) {
             faucet.fundWorker();
         }
     }

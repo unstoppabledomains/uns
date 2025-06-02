@@ -30,6 +30,16 @@ export declare class IFaucet__factory {
     }, {
         readonly inputs: readonly [{
             readonly internalType: "uint256";
+            readonly name: "threshold";
+            readonly type: "uint256";
+        }];
+        readonly name: "setWorkerBalanceThreshold";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "uint256";
             readonly name: "amount";
             readonly type: "uint256";
         }];
@@ -52,6 +62,16 @@ export declare class IFaucet__factory {
         readonly name: "withdrawAll";
         readonly outputs: readonly [];
         readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "workerBalanceThreshold";
+        readonly outputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "";
+            readonly type: "uint256";
+        }];
+        readonly stateMutability: "view";
         readonly type: "function";
     }, {
         readonly stateMutability: "payable";
