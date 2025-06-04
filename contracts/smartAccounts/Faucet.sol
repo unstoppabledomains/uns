@@ -20,13 +20,13 @@ contract Faucet is IFaucet, Initializable, OwnableUpgradeable {
     }
 
     modifier onlyAuthorizedWorker() {
-        require(authorizedWorkers[msg.sender], 'Faucet: Not an authorized worker');
+        if (!authorizedWorkers[msg.sender]) revert NotAuthorizedWorker();
         _;
     }
 
     function fundWorker() external onlyAuthorizedWorker {
         (bool success, ) = payable(msg.sender).call{value: workerFundingAmount}('');
-        require(success, 'Faucet: Transfer failed');
+        if (!success) revert TransferFailed();
     }
 
     function addAuthorizedWorkers(address[] calldata workers) external onlyOwner {
@@ -50,7 +50,7 @@ contract Faucet is IFaucet, Initializable, OwnableUpgradeable {
     }
 
     function withdraw(uint256 amount) external onlyOwner {
-        require(amount <= address(this).balance, 'Faucet: Insufficient balance');
+        if (amount > address(this).balance) revert InsufficientBalance();
         payable(msg.sender).transfer(amount);
     }
 

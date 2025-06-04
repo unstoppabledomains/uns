@@ -5,7 +5,15 @@ pragma solidity ^0.8.20;
 import '../metatx/IForwarder.sol';
 
 interface IWorkerSmartAccount {
-    function executeBatch(address[] calldata targets, bytes[] calldata datas, uint256[] calldata values) external payable;
+    struct Call {
+        address target;
+        bytes data;
+        uint256 value;
+    }
 
-    function executeBatchAndEnsureBalance(address[] calldata targets, bytes[] calldata datas, uint256[] calldata values) external payable;
+    function executeBatch(Call[] calldata calls) external payable;
+    function executeBatchAndEnsureBalance(Call[] calldata calls) external payable;
+
+    error NotSelf();
+    error ExecuteFailed();
 }

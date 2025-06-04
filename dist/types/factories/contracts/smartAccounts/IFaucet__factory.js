@@ -4,6 +4,21 @@ exports.IFaucet__factory = void 0;
 const ethers_1 = require("ethers");
 const _abi = [
     {
+        inputs: [],
+        name: "InsufficientBalance",
+        type: "error",
+    },
+    {
+        inputs: [],
+        name: "NotAuthorizedWorker",
+        type: "error",
+    },
+    {
+        inputs: [],
+        name: "TransferFailed",
+        type: "error",
+    },
+    {
         inputs: [
             {
                 internalType: "address[]",

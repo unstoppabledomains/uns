@@ -1,9 +1,25 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../common";
+export declare namespace IWorkerSmartAccount {
+    type CallStruct = {
+        target: AddressLike;
+        data: BytesLike;
+        value: BigNumberish;
+    };
+    type CallStructOutput = [
+        target: string,
+        data: string,
+        value: bigint
+    ] & {
+        target: string;
+        data: string;
+        value: bigint;
+    };
+}
 export interface WorkerSmartAccountInterface extends Interface {
     getFunction(nameOrSignature: "executeBatch" | "executeBatchAndEnsureBalance" | "faucet"): FunctionFragment;
-    encodeFunctionData(functionFragment: "executeBatch", values: [AddressLike[], BytesLike[], BigNumberish[]]): string;
-    encodeFunctionData(functionFragment: "executeBatchAndEnsureBalance", values: [AddressLike[], BytesLike[], BigNumberish[]]): string;
+    encodeFunctionData(functionFragment: "executeBatch", values: [IWorkerSmartAccount.CallStruct[]]): string;
+    encodeFunctionData(functionFragment: "executeBatchAndEnsureBalance", values: [IWorkerSmartAccount.CallStruct[]]): string;
     encodeFunctionData(functionFragment: "faucet", values?: undefined): string;
     decodeFunctionResult(functionFragment: "executeBatch", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "executeBatchAndEnsureBalance", data: BytesLike): Result;
@@ -23,32 +39,24 @@ export interface WorkerSmartAccount extends BaseContract {
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     executeBatch: TypedContractMethod<[
-        targets: AddressLike[],
-        datas: BytesLike[],
-        values: BigNumberish[]
+        calls: IWorkerSmartAccount.CallStruct[]
     ], [
         void
     ], "payable">;
     executeBatchAndEnsureBalance: TypedContractMethod<[
-        targets: AddressLike[],
-        datas: BytesLike[],
-        values: BigNumberish[]
+        calls: IWorkerSmartAccount.CallStruct[]
     ], [
         void
     ], "payable">;
     faucet: TypedContractMethod<[], [string], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "executeBatch"): TypedContractMethod<[
-        targets: AddressLike[],
-        datas: BytesLike[],
-        values: BigNumberish[]
+        calls: IWorkerSmartAccount.CallStruct[]
     ], [
         void
     ], "payable">;
     getFunction(nameOrSignature: "executeBatchAndEnsureBalance"): TypedContractMethod<[
-        targets: AddressLike[],
-        datas: BytesLike[],
-        values: BigNumberish[]
+        calls: IWorkerSmartAccount.CallStruct[]
     ], [
         void
     ], "payable">;

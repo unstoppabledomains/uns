@@ -4,21 +4,38 @@ exports.IWorkerSmartAccount__factory = void 0;
 const ethers_1 = require("ethers");
 const _abi = [
     {
+        inputs: [],
+        name: "ExecuteFailed",
+        type: "error",
+    },
+    {
+        inputs: [],
+        name: "NotSelf",
+        type: "error",
+    },
+    {
         inputs: [
             {
-                internalType: "address[]",
-                name: "targets",
-                type: "address[]",
-            },
-            {
-                internalType: "bytes[]",
-                name: "datas",
-                type: "bytes[]",
-            },
-            {
-                internalType: "uint256[]",
-                name: "values",
-                type: "uint256[]",
+                components: [
+                    {
+                        internalType: "address",
+                        name: "target",
+                        type: "address",
+                    },
+                    {
+                        internalType: "bytes",
+                        name: "data",
+                        type: "bytes",
+                    },
+                    {
+                        internalType: "uint256",
+                        name: "value",
+                        type: "uint256",
+                    },
+                ],
+                internalType: "struct IWorkerSmartAccount.Call[]",
+                name: "calls",
+                type: "tuple[]",
             },
         ],
         name: "executeBatch",
@@ -29,19 +46,26 @@ const _abi = [
     {
         inputs: [
             {
-                internalType: "address[]",
-                name: "targets",
-                type: "address[]",
-            },
-            {
-                internalType: "bytes[]",
-                name: "datas",
-                type: "bytes[]",
-            },
-            {
-                internalType: "uint256[]",
-                name: "values",
-                type: "uint256[]",
+                components: [
+                    {
+                        internalType: "address",
+                        name: "target",
+                        type: "address",
+                    },
+                    {
+                        internalType: "bytes",
+                        name: "data",
+                        type: "bytes",
+                    },
+                    {
+                        internalType: "uint256",
+                        name: "value",
+                        type: "uint256",
+                    },
+                ],
+                internalType: "struct IWorkerSmartAccount.Call[]",
+                name: "calls",
+                type: "tuple[]",
             },
         ],
         name: "executeBatchAndEnsureBalance",

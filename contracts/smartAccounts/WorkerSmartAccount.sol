@@ -3,7 +3,6 @@
 pragma solidity ^0.8.20;
 
 import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
-import 'hardhat/console.sol';
 import './IFaucet.sol';
 import './IWorkerSmartAccount.sol';
 import '../metatx/IForwarder.sol';
@@ -16,7 +15,7 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
     }
 
     modifier onlySelf() {
-        require(msg.sender == address(this), 'WorkerSmartAccount: Can be only called from self');
+        if (msg.sender != address(this)) revert NotSelf();
         _;
     }
 
@@ -32,16 +31,12 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
      * forwarder contracts along with signatures, so the worker
      * can perform a multicall to execute meta transactions.
      *
-     * @param targets Array of target addresses to call
-     * @param datas Array of calldata for each call
-     * @param values Array of ETH values to send with each call
+     * @param calls Array of calls to execute
      */
-    function executeBatch(address[] calldata targets, bytes[] calldata datas, uint256[] calldata values) public payable onlySelf {
-        require(targets.length == datas.length && targets.length == values.length, 'WorkerSmartAccount: Invalid calls');
-
-        for (uint256 i = 0; i < targets.length; i++) {
-            (bool success, ) = targets[i].call{value: values[i]}(datas[i]);
-            require(success, 'WorkerSmartAccount: Execute failed');
+    function executeBatch(Call[] calldata calls) public payable onlySelf {
+        for (uint256 i = 0; i < calls.length; i++) {
+            (bool success, ) = calls[i].target.call{value: calls[i].value}(calls[i].data);
+            if (!success) revert ExecuteFailed();
         }
     }
 
@@ -49,16 +44,10 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
      * @dev Same as executeBatch, but also ensures the contract maintains a worker minimum balance,
      * this way workers become self-sustaining.
      *
-     * @param targets Array of target addresses to call
-     * @param datas Array of calldata for each call
-     * @param values Array of ETH values to send with each call
+     * @param calls Array of calls to execute
      */
-    function executeBatchAndEnsureBalance(
-        address[] calldata targets,
-        bytes[] calldata datas,
-        uint256[] calldata values
-    ) external payable onlySelf {
-        executeBatch(targets, datas, values);
+    function executeBatchAndEnsureBalance(Call[] calldata calls) external payable onlySelf {
+        executeBatch(calls);
         _ensureBalance();
     }
 

@@ -2,6 +2,18 @@ import { type ContractRunner } from "ethers";
 import type { IFaucet, IFaucetInterface } from "../../../contracts/smartAccounts/IFaucet";
 export declare class IFaucet__factory {
     static readonly abi: readonly [{
+        readonly inputs: readonly [];
+        readonly name: "InsufficientBalance";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "NotAuthorizedWorker";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "TransferFailed";
+        readonly type: "error";
+    }, {
         readonly inputs: readonly [{
             readonly internalType: "address[]";
             readonly name: "workers";

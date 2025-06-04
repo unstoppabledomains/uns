@@ -3372,7 +3372,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bindings@npm:^1.5.0":
+"bindings@npm:^1.3.1, bindings@npm:^1.5.0":
   version: 1.5.0
   resolution: "bindings@npm:1.5.0"
   dependencies:
@@ -4882,6 +4882,17 @@ __metadata:
     detect: ./bin/detect-port
     detect-port: ./bin/detect-port
   checksum: 93c40febe714f56711d1fedc2b7a9cc4cbaa0fcddec0509876c46b9dd6099ed6bfd6662a4f35e5fa0301660f48ed516829253ab0fc90b9e79b823dd77786b379
+  languageName: node
+  linkType: hard
+
+"dev@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "dev@npm:0.1.3"
+  dependencies:
+    inotify: ">= 0.1.6"
+  bin:
+    node-dev: ./node-dev.sh
+  checksum: a28f822a98386e534828c8800b413bd6fa7cd307cf614d0967e96a515ec9dfa36e8a3b170bfa8bfa1341bf69e620c18dd56ad136fe6ca5a07c5dbb0637bbebcd
   languageName: node
   linkType: hard
 
@@ -7105,9 +7116,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hardhat@npm:^2.24.1":
-  version: 2.24.1
-  resolution: "hardhat@npm:2.24.1"
+"hardhat-tracer@npm:^3.2.1":
+  version: 3.2.1
+  resolution: "hardhat-tracer@npm:3.2.1"
+  dependencies:
+    chalk: ^4.1.2
+    debug: ^4.3.4
+    ethers: ^5.6.1
+    semver: ^7.6.2
+  peerDependencies:
+    chai: 4.x
+    hardhat: ">=2.22.5 <3.x"
+  checksum: b963bb68e44e96395a42a0a5de48489d01a3971e744c619aa2d740d19f11ecdeba2cd2bafabdec3184b32e69a4a8db96861c1f6f6b83cdcd6109927ec5c409f4
+  languageName: node
+  linkType: hard
+
+"hardhat@npm:^2.24.2":
+  version: 2.24.2
+  resolution: "hardhat@npm:2.24.2"
   dependencies:
     "@ethereumjs/util": ^9.1.0
     "@ethersproject/abi": ^5.1.2
@@ -7160,7 +7186,7 @@ __metadata:
       optional: true
   bin:
     hardhat: internal/cli/bootstrap.js
-  checksum: 98fa6022a25986343318709e2699c0f1b1c466e68fe6074a6e838ddeddb2cb53ccb9d6f572e809513a30eefa82a00fcad2220c5e2c7f9fad4f1436c9755c01d9
+  checksum: 476ee13e564ba155f3e5ce1d6f575758e9ca14c023b4cf0c173bff8a3adfcaaa01df411f80782ae673bc74ace496ec4c4ca3056a4f0140f2e714cdec8bb526dc
   languageName: node
   linkType: hard
 
@@ -7584,6 +7610,18 @@ __metadata:
   version: 1.3.8
   resolution: "ini@npm:1.3.8"
   checksum: dfd98b0ca3a4fc1e323e38a6c8eb8936e31a97a918d3b377649ea15bdb15d481207a0dda1021efbd86b464cae29a0d33c1d7dcaf6c5672bee17fa849bc50a1b3
+  languageName: node
+  linkType: hard
+
+"inotify@npm:>= 0.1.6":
+  version: 1.4.6
+  resolution: "inotify@npm:1.4.6"
+  dependencies:
+    bindings: ^1.3.1
+    nan: ^2.12.1
+    node-gyp: latest
+  checksum: c210db40456c01abec84b4a0c239f7c833d8e20480c863d553b1456d1c251f67dab21f6ce00ca1c56c76214636a0506934cb8dcec8817619bda1f74db41a646a
+  conditions: os=linux
   languageName: node
   linkType: hard
 
@@ -9416,6 +9454,15 @@ __metadata:
   version: 0.0.7
   resolution: "mute-stream@npm:0.0.7"
   checksum: a9d4772c1c84206aa37c218ed4751cd060239bf1d678893124f51e037f6f22f4a159b2918c030236c93252638a74beb29c9b1fd3267c9f24d4b3253cf1eaa86f
+  languageName: node
+  linkType: hard
+
+"nan@npm:^2.12.1":
+  version: 2.22.2
+  resolution: "nan@npm:2.22.2"
+  dependencies:
+    node-gyp: latest
+  checksum: efa1ac78012ccd5e7cb7fe96141b7b0886ae88775dde7977fdc12236d090a9bf76b89744152b1e804824f33b2b0059f22ce9d01e04005701e78b7e7c817af1ac
   languageName: node
   linkType: hard
 
@@ -12777,6 +12824,7 @@ __metadata:
     chai: ^4.3.6
     csv-parse: ^5.4.0
     debug: ^4.3.1
+    dev: ^0.1.3
     dot-crypto: "https://github.com/unstoppabledomains/dot-crypto.git#v2.0.1"
     dotenv: ^16.5.0
     eslint: ^8.26.0
@@ -12789,10 +12837,11 @@ __metadata:
     ethereumjs-tx: ^1.3.7
     ethereumjs-util: ^7.1.0
     ethers: ^6.14.3
-    hardhat: ^2.24.1
+    hardhat: ^2.24.2
     hardhat-abi-exporter: ^2.2.1
     hardhat-contract-sizer: ~2.6.0
     hardhat-gas-reporter: ^2.1.1
+    hardhat-tracer: ^3.2.1
     hdkey: ^2.0.1
     husky: ^8.0.1
     lodash.merge: ^4.6.2

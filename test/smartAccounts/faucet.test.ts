@@ -98,12 +98,12 @@ describe('Faucet', () => {
     it('should not allow unauthorized worker to withdraw', async () => {
       expect(await faucet.authorizedWorkers(worker2.address)).to.be.false;
 
-      await expect(faucet.connect(worker2).fundWorker()).to.be.revertedWith('Faucet: Not an authorized worker');
+      await expect(faucet.connect(worker2).fundWorker()).to.be.revertedWithCustomError(faucet, 'NotAuthorizedWorker');
     });
 
     it('should fail if contract has insufficient balance', async () => {
       await faucet.connect(owner).withdrawAll();
-      await expect(faucet.connect(worker1).fundWorker()).to.be.revertedWith('Faucet: Transfer failed');
+      await expect(faucet.connect(worker1).fundWorker()).to.be.revertedWithCustomError(faucet, 'TransferFailed');
     });
   });
 
@@ -155,8 +155,9 @@ describe('Faucet', () => {
 
     it('should fail if trying to withdraw more than balance', async () => {
       const contractBalance = await ethers.provider.getBalance(faucet.target);
-      await expect(faucet.connect(owner).withdraw(contractBalance + BigInt(1))).to.be.revertedWith(
-        'Faucet: Insufficient balance',
+      await expect(faucet.connect(owner).withdraw(contractBalance + BigInt(1))).to.be.revertedWithCustomError(
+        faucet,
+        'InsufficientBalance',
       );
     });
   });

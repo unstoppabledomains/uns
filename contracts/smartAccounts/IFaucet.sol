@@ -12,4 +12,8 @@ interface IFaucet {
     function setWorkerBalanceThreshold(uint256 threshold) external;
     function workerBalanceThreshold() external view returns (uint256);
     receive() external payable;
+
+    error NotAuthorizedWorker();
+    error TransferFailed();
+    error InsufficientBalance();
 }

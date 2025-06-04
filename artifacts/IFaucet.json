@@ -4,6 +4,21 @@
   "sourceName": "contracts/smartAccounts/IFaucet.sol",
   "abi": [
     {
+      "inputs": [],
+      "name": "InsufficientBalance",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotAuthorizedWorker",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "TransferFailed",
+      "type": "error"
+    },
+    {
       "inputs": [
         {
           "internalType": "address[]",
