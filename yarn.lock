@@ -1689,9 +1689,9 @@ __metadata:
   linkType: hard
 
 "@scure/base@npm:~1.2.5":
-  version: 1.2.5
-  resolution: "@scure/base@npm:1.2.5"
-  checksum: 79f76781d4f55fa2ce36e4d6f950a76234a81f81c9f5f33794ee82077e5c8005e84a1491684a0643e77734e3dd1cd8367930d2a165a9c0af4d3c526ffe7407f8
+  version: 1.2.6
+  resolution: "@scure/base@npm:1.2.6"
+  checksum: 1058cb26d5e4c1c46c9cc0ae0b67cc66d306733baf35d6ebdd8ddaba242b80c3807b726e3b48cb0411bb95ec10d37764969063ea62188f86ae9315df8ea6b325
   languageName: node
   linkType: hard
 
@@ -3372,7 +3372,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bindings@npm:^1.3.1, bindings@npm:^1.5.0":
+"bindings@npm:^1.5.0":
   version: 1.5.0
   resolution: "bindings@npm:1.5.0"
   dependencies:
@@ -4885,17 +4885,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dev@npm:^0.1.3":
-  version: 0.1.3
-  resolution: "dev@npm:0.1.3"
-  dependencies:
-    inotify: ">= 0.1.6"
-  bin:
-    node-dev: ./node-dev.sh
-  checksum: a28f822a98386e534828c8800b413bd6fa7cd307cf614d0967e96a515ec9dfa36e8a3b170bfa8bfa1341bf69e620c18dd56ad136fe6ca5a07c5dbb0637bbebcd
-  languageName: node
-  linkType: hard
-
 "diff@npm:3.5.0, diff@npm:^3.1.0":
   version: 3.5.0
   resolution: "diff@npm:3.5.0"
@@ -6214,14 +6203,14 @@ __metadata:
   linkType: hard
 
 "fdir@npm:^6.4.4":
-  version: 6.4.4
-  resolution: "fdir@npm:6.4.4"
+  version: 6.4.5
+  resolution: "fdir@npm:6.4.5"
   peerDependencies:
     picomatch: ^3 || ^4
   peerDependenciesMeta:
     picomatch:
       optional: true
-  checksum: 79043610236579ffbd0647c508b43bd030a2d034a17c43cf96813a00e8e92e51acdb115c6ddecef3b5812cc2692b976155b4f6413e51e3761f1e772fa019a321
+  checksum: 14efd2d6617a6f9fb314916ccff64e00bdb96216f26542ec9dfa532ed60a7ebb45463f7009aa215c14071566bf43caeb8ba268ccb52a11e6b51e4aaa8cb58d81
   languageName: node
   linkType: hard
 
@@ -7610,18 +7599,6 @@ __metadata:
   version: 1.3.8
   resolution: "ini@npm:1.3.8"
   checksum: dfd98b0ca3a4fc1e323e38a6c8eb8936e31a97a918d3b377649ea15bdb15d481207a0dda1021efbd86b464cae29a0d33c1d7dcaf6c5672bee17fa849bc50a1b3
-  languageName: node
-  linkType: hard
-
-"inotify@npm:>= 0.1.6":
-  version: 1.4.6
-  resolution: "inotify@npm:1.4.6"
-  dependencies:
-    bindings: ^1.3.1
-    nan: ^2.12.1
-    node-gyp: latest
-  checksum: c210db40456c01abec84b4a0c239f7c833d8e20480c863d553b1456d1c251f67dab21f6ce00ca1c56c76214636a0506934cb8dcec8817619bda1f74db41a646a
-  conditions: os=linux
   languageName: node
   linkType: hard
 
@@ -9454,15 +9431,6 @@ __metadata:
   version: 0.0.7
   resolution: "mute-stream@npm:0.0.7"
   checksum: a9d4772c1c84206aa37c218ed4751cd060239bf1d678893124f51e037f6f22f4a159b2918c030236c93252638a74beb29c9b1fd3267c9f24d4b3253cf1eaa86f
-  languageName: node
-  linkType: hard
-
-"nan@npm:^2.12.1":
-  version: 2.22.2
-  resolution: "nan@npm:2.22.2"
-  dependencies:
-    node-gyp: latest
-  checksum: efa1ac78012ccd5e7cb7fe96141b7b0886ae88775dde7977fdc12236d090a9bf76b89744152b1e804824f33b2b0059f22ce9d01e04005701e78b7e7c817af1ac
   languageName: node
   linkType: hard
 
@@ -12272,12 +12240,12 @@ __metadata:
   linkType: hard
 
 "tinyglobby@npm:^0.2.6":
-  version: 0.2.13
-  resolution: "tinyglobby@npm:0.2.13"
+  version: 0.2.14
+  resolution: "tinyglobby@npm:0.2.14"
   dependencies:
     fdir: ^6.4.4
     picomatch: ^4.0.2
-  checksum: 3a2e87a2518cb3616057b0aa58be4f17771ae78c6890556516ae1e631f8ce4cfee1ba1dcb62fcc54a64e2bdd6c3104f4f3d021e1a3e3f8fb0875bca380b913e5
+  checksum: 261e986e3f2062dec3a582303bad2ce31b4634b9348648b46828c000d464b012cf474e38f503312367d4117c3f2f18611992738fca684040758bba44c24de522
   languageName: node
   linkType: hard
 
@@ -12824,7 +12792,6 @@ __metadata:
     chai: ^4.3.6
     csv-parse: ^5.4.0
     debug: ^4.3.1
-    dev: ^0.1.3
     dot-crypto: "https://github.com/unstoppabledomains/dot-crypto.git#v2.0.1"
     dotenv: ^16.5.0
     eslint: ^8.26.0
