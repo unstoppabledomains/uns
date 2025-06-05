@@ -1,6 +1,7 @@
 // @author Unstoppable Domains, Inc.
 // @date May 29th, 2025
-pragma solidity ^0.8.20;
+
+pragma solidity ^0.8.24;
 
 import '../metatx/IForwarder.sol';
 
