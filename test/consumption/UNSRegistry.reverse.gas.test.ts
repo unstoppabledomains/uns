@@ -20,7 +20,7 @@ describe('UNSRegistry Set Reverse (consumption)', () => {
   });
 
   beforeEach(async () => {
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
 
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.mintTLD(TLD.x.hash, 'x');

@@ -68,45 +68,50 @@ describe('RootRegistry', () => {
   before(async () => {
     [registryOwner, rcmOwner, predicateOwner, owner, spender] = await ethers.getSigners();
 
-    l1UnsRegistry = await new UNSRegistry__factory(registryOwner).connect(registryOwner).deploy();
+    l1UnsRegistry = await new UNSRegistry__factory().connect(registryOwner).deploy();
 
-    cnsRegistry = await new CNSRegistry__factory(registryOwner).deploy();
-    mintingController = await new MintingController__factory(registryOwner).deploy(await cnsRegistry.getAddress());
+    cnsRegistry = await new CNSRegistry__factory().connect(registryOwner).deploy();
+    mintingController = await new MintingController__factory()
+      .connect(registryOwner)
+      .deploy(await cnsRegistry.getAddress());
     await cnsRegistry.addController(await mintingController.getAddress());
 
-    signatureController = await new SignatureController__factory(registryOwner).deploy(await cnsRegistry.getAddress());
+    signatureController = await new SignatureController__factory()
+      .connect(registryOwner)
+      .deploy(await cnsRegistry.getAddress());
     await cnsRegistry.addController(await signatureController.getAddress());
-    cnsForwarder = await new CNSRegistryForwarder__factory(registryOwner).deploy(
-      await signatureController.getAddress(),
-    );
+    cnsForwarder = await new CNSRegistryForwarder__factory()
+      .connect(registryOwner)
+      .deploy(await signatureController.getAddress());
 
-    resolver = await new Resolver__factory(registryOwner).deploy(
-      await cnsRegistry.getAddress(),
-      await mintingController.getAddress(),
-    );
+    resolver = await new Resolver__factory()
+      .connect(registryOwner)
+      .deploy(await cnsRegistry.getAddress(), await mintingController.getAddress());
 
-    uriPrefixController = await new URIPrefixController__factory(registryOwner).deploy(await cnsRegistry.getAddress());
+    uriPrefixController = await new URIPrefixController__factory()
+      .connect(registryOwner)
+      .deploy(await cnsRegistry.getAddress());
     await cnsRegistry.addController(await uriPrefixController.getAddress());
 
-    mintingManager = await new MintingManager__factory(registryOwner).deploy();
+    mintingManager = await new MintingManager__factory().connect(registryOwner).deploy();
 
     await mintingController.addMinter(await mintingManager.getAddress());
     await uriPrefixController.addWhitelisted(await mintingManager.getAddress());
 
-    l2UnsRegistry = await new UNSRegistry__factory(registryOwner).connect(registryOwner).deploy();
+    l2UnsRegistry = await new UNSRegistry__factory().connect(registryOwner).deploy();
 
     // deploy state sender
-    stateSender = await new DummyStateSender__factory(registryOwner).deploy();
+    stateSender = await new DummyStateSender__factory().connect(registryOwner).deploy();
 
     // deploy checkpoint manager
-    checkpointManager = await new SimpleCheckpointManager__factory(rcmOwner).deploy();
+    checkpointManager = await new SimpleCheckpointManager__factory().connect(rcmOwner).deploy();
 
     // deploy and init predicate
-    predicate = await new MintableERC721Predicate__factory(predicateOwner).connect(predicateOwner).deploy();
+    predicate = await new MintableERC721Predicate__factory().connect(predicateOwner).deploy();
     await predicate.initialize(await predicateOwner.getAddress());
 
     // deploy and setup root chain manager
-    rootChainManager = await new RootChainManager__factory(rcmOwner).connect(rcmOwner).deploy();
+    rootChainManager = await new RootChainManager__factory().connect(rcmOwner).deploy();
     await rootChainManager.initialize(rcmOwner.address);
     await rootChainManager.setCheckpointManager(await checkpointManager.getAddress());
     await rootChainManager.setStateSender(await stateSender.getAddress());
@@ -345,7 +350,7 @@ describe('RootRegistry', () => {
       });
 
       it('should revert when UNS registry receives token from random ERC721', async () => {
-        const randomERC721 = await new CNSRegistry__factory(registryOwner).deploy();
+        const randomERC721 = await new CNSRegistry__factory().connect(registryOwner).deploy();
         await randomERC721.controlledMintChild(owner.address, TLD.crypto.hash, 'fake-cns-uns-te1');
         const tokenId = await randomERC721.childIdOf(TLD.crypto.hash, 'fake-cns-uns-te1');
 

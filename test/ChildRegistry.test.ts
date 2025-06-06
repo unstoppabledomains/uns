@@ -30,21 +30,21 @@ describe('ChildRegistry', () => {
   before(async () => {
     [registryOwner, rcmOwner, predicateOwner, owner] = await ethers.getSigners();
 
-    l1UnsRegistry = (await new UNSRegistry__factory(registryOwner).deploy()).connect(registryOwner);
+    l1UnsRegistry = (await new UNSRegistry__factory().connect(registryOwner).deploy()).connect(registryOwner);
 
-    mintingManager = await new MintingManager__factory(registryOwner).deploy();
+    mintingManager = await new MintingManager__factory().connect(registryOwner).deploy();
 
-    l2UnsRegistry = (await new UNSRegistry__factory(registryOwner).deploy()).connect(registryOwner);
+    l2UnsRegistry = (await new UNSRegistry__factory().connect(registryOwner).deploy()).connect(registryOwner);
 
     // deploy state sender
-    stateSender = await new DummyStateSender__factory(registryOwner).deploy();
+    stateSender = await new DummyStateSender__factory().connect(registryOwner).deploy();
 
     // deploy and init predicate
-    predicate = (await new MintableERC721Predicate__factory(registryOwner).deploy()).connect(predicateOwner);
+    predicate = (await new MintableERC721Predicate__factory().connect(registryOwner).deploy()).connect(predicateOwner);
     await predicate.initialize(predicateOwner.address);
 
     // deploy and setup root chain manager
-    rootChainManager = (await new RootChainManager__factory(registryOwner).deploy()).connect(rcmOwner);
+    rootChainManager = (await new RootChainManager__factory().connect(registryOwner).deploy()).connect(rcmOwner);
     await rootChainManager.initialize(rcmOwner.address);
     await rootChainManager.setStateSender(await stateSender.getAddress());
     await rootChainManager.registerPredicate(
@@ -88,7 +88,7 @@ describe('ChildRegistry', () => {
     let tempL2UnsRegistry: UNSRegistry;
 
     beforeEach(async () => {
-      tempL2UnsRegistry = (await new UNSRegistry__factory(registryOwner).deploy()).connect(registryOwner);
+      tempL2UnsRegistry = (await new UNSRegistry__factory().connect(registryOwner).deploy()).connect(registryOwner);
       await tempL2UnsRegistry.initialize(registryOwner.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     });
 

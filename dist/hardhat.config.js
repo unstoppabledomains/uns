@@ -49,7 +49,6 @@ require("@nomicfoundation/hardhat-ethers");
 require("@nomicfoundation/hardhat-verify");
 require("@nomicfoundation/hardhat-chai-matchers");
 require("@nomiclabs/hardhat-solhint");
-require("hardhat-tracer");
 require("@openzeppelin/hardhat-upgrades");
 require("solidity-coverage");
 require("hardhat-gas-reporter");
@@ -140,7 +139,7 @@ const config = {
         hardhat: {
             blockGasLimit: 10000000,
             initialBaseFeePerGas: 0,
-            hardfork: 'cancun',
+            hardfork: 'prague',
         },
         localhost: {
             url: 'http://localhost:8545',
