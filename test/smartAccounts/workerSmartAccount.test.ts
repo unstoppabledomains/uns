@@ -126,13 +126,16 @@ describe('Worker Smart Account', () => {
 
       const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
 
-      await workerAsContract.connect(workerWallet).executeBatch([
-        {
-          target: erc20Mock.target,
-          data: erc20TransferData,
-          value: 0,
-        },
-      ]);
+      await workerAsContract.connect(workerWallet).executeBatch(
+        [
+          {
+            target: erc20Mock.target,
+            data: erc20TransferData,
+            value: 0,
+          },
+        ],
+        true,
+      );
 
       const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
       const userBalance = await erc20Mock.balanceOf(userWallet.address);
@@ -154,18 +157,21 @@ describe('Worker Smart Account', () => {
       const erc20TransferData1 = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
       const erc20TransferData2 = erc20Mock.interface.encodeFunctionData('transfer', [txOrigin.address, 150]);
 
-      await workerAsContract.connect(workerWallet).executeBatch([
-        {
-          target: erc20Mock.target,
-          data: erc20TransferData1,
-          value: 0,
-        },
-        {
-          target: erc20Mock.target,
-          data: erc20TransferData2,
-          value: 0,
-        },
-      ]);
+      await workerAsContract.connect(workerWallet).executeBatch(
+        [
+          {
+            target: erc20Mock.target,
+            data: erc20TransferData1,
+            value: 0,
+          },
+          {
+            target: erc20Mock.target,
+            data: erc20TransferData2,
+            value: 0,
+          },
+        ],
+        true,
+      );
 
       const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
       const userBalance = await erc20Mock.balanceOf(userWallet.address);
@@ -189,18 +195,21 @@ describe('Worker Smart Account', () => {
       const erc20TransferData1 = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
       const erc20TransferData2 = erc20Mock.interface.encodeFunctionData('transfer', [txOrigin.address, 150]);
 
-      await workerAsContract.connect(workerWallet).executeBatchAndEnsureBalance([
-        {
-          target: erc20Mock.target,
-          data: erc20TransferData1,
-          value: 0,
-        },
-        {
-          target: erc20Mock.target,
-          data: erc20TransferData2,
-          value: 0,
-        },
-      ]);
+      await workerAsContract.connect(workerWallet).executeBatchAndEnsureBalance(
+        [
+          {
+            target: erc20Mock.target,
+            data: erc20TransferData1,
+            value: 0,
+          },
+          {
+            target: erc20Mock.target,
+            data: erc20TransferData2,
+            value: 0,
+          },
+        ],
+        true,
+      );
 
       const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
       const userBalance = await erc20Mock.balanceOf(userWallet.address);
@@ -226,18 +235,21 @@ describe('Worker Smart Account', () => {
       const erc20TransferData1 = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
       const erc20TransferData2 = erc20Mock.interface.encodeFunctionData('transfer', [txOrigin.address, 150]);
 
-      await workerAsContract.connect(workerWallet).executeBatchAndEnsureBalance([
-        {
-          target: erc20Mock.target,
-          data: erc20TransferData1,
-          value: 0,
-        },
-        {
-          target: erc20Mock.target,
-          data: erc20TransferData2,
-          value: 0,
-        },
-      ]);
+      await workerAsContract.connect(workerWallet).executeBatchAndEnsureBalance(
+        [
+          {
+            target: erc20Mock.target,
+            data: erc20TransferData1,
+            value: 0,
+          },
+          {
+            target: erc20Mock.target,
+            data: erc20TransferData2,
+            value: 0,
+          },
+        ],
+        true,
+      );
 
       const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
       const userBalance = await erc20Mock.balanceOf(userWallet.address);
@@ -268,13 +280,16 @@ describe('Worker Smart Account', () => {
       const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
 
       await expect(
-        workerAsContract.connect(userWallet).executeBatch([
-          {
-            target: erc20Mock.target,
-            data: erc20TransferData,
-            value: 0,
-          },
-        ]),
+        workerAsContract.connect(userWallet).executeBatch(
+          [
+            {
+              target: erc20Mock.target,
+              data: erc20TransferData,
+              value: 0,
+            },
+          ],
+          true,
+        ),
       ).to.be.revertedWithCustomError(workerAsContract, 'NotSelf');
     });
 
@@ -296,13 +311,16 @@ describe('Worker Smart Account', () => {
       const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
 
       await expect(
-        workerAsContract.connect(userWallet).executeBatchAndEnsureBalance([
-          {
-            target: erc20Mock.target,
-            data: erc20TransferData,
-            value: 0,
-          },
-        ]),
+        workerAsContract.connect(userWallet).executeBatchAndEnsureBalance(
+          [
+            {
+              target: erc20Mock.target,
+              data: erc20TransferData,
+              value: 0,
+            },
+          ],
+          true,
+        ),
       ).to.be.revertedWithCustomError(workerAsContract, 'NotSelf');
     });
 
@@ -319,14 +337,193 @@ describe('Worker Smart Account', () => {
       const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
 
       await expect(
-        workerSAImplementation.connect(workerWallet).executeBatch([
+        workerSAImplementation.connect(workerWallet).executeBatch(
+          [
+            {
+              target: erc20Mock.target,
+              data: erc20TransferData,
+              value: 0,
+            },
+          ],
+          true,
+        ),
+      ).to.be.revertedWithCustomError(workerSAImplementation, 'NotSelf');
+    });
+
+    it('should fail with correct error if internal call error message is empty', async () => {
+      const initialWorkerBalance = ethers.parseEther('0.05');
+
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: initialWorkerBalance,
+      });
+
+      await erc20Mock.mint(workerWallet.address, 200);
+
+      await expect(
+        workerAsContract.connect(workerWallet).executeBatchAndEnsureBalance(
+          [
+            {
+              target: erc20Mock.target,
+              data: '0x1234',
+              value: 0,
+            },
+          ],
+          true,
+        ),
+      ).to.be.revertedWithCustomError(workerAsContract, 'ExecuteFailed');
+    });
+
+    it('should fail and correctly pass string error from internal call', async () => {
+      const initialWorkerBalance = ethers.parseEther('0.05');
+
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: initialWorkerBalance,
+      });
+
+      await erc20Mock.mint(workerWallet.address, 200);
+
+      const erc20TransferData = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 300]);
+
+      await expect(
+        workerAsContract.connect(workerWallet).executeBatchAndEnsureBalance(
+          [
+            {
+              target: erc20Mock.target,
+              data: erc20TransferData,
+              value: 0,
+            },
+          ],
+          true,
+        ),
+      ).to.be.revertedWith('ERC20: transfer amount exceeds balance');
+    });
+
+    it('should fail and correctly pass contract error class from internal call', async () => {
+      const initialWorkerBalance = ethers.parseEther('0.05');
+
+      const localFaucetFactory = await ethers.getContractFactory('Faucet');
+      const localFaucet = await localFaucetFactory.deploy();
+
+      await localFaucet.initialize(ethers.parseEther('0.01'), ethers.parseEther('0.01'));
+      await localFaucet.transferOwnership(workerWallet.address);
+
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: initialWorkerBalance,
+      });
+
+      const faucetWithdrawData = localFaucet.interface.encodeFunctionData('withdraw', [ethers.parseEther('1')]);
+
+      await expect(
+        workerAsContract.connect(workerWallet).executeBatch(
+          [
+            {
+              target: localFaucet.target,
+              data: faucetWithdrawData,
+              value: 0,
+            },
+          ],
+          true,
+        ),
+      ).to.be.revertedWithCustomError(localFaucet, 'InsufficientBalance');
+    });
+
+    it('should be possible to call executeBatch with one failed call and revertOnError set to false', async () => {
+      const initialWorkerBalance = ethers.parseEther('0.09');
+
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: initialWorkerBalance,
+      });
+
+      await erc20Mock.mint(workerWallet.address, 300);
+
+      const erc20TransferData1 = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
+      const erc20TransferData2 = erc20Mock.interface.encodeFunctionData('transfer', [txOrigin.address, 300]);
+
+      const result = await workerAsContract.connect(workerWallet).executeBatch(
+        [
           {
             target: erc20Mock.target,
-            data: erc20TransferData,
+            data: erc20TransferData1,
             value: 0,
           },
-        ]),
-      ).to.be.revertedWithCustomError(workerSAImplementation, 'NotSelf');
+          {
+            target: erc20Mock.target,
+            data: erc20TransferData2,
+            value: 0,
+          },
+        ],
+        false,
+      );
+
+      await expect(result)
+        .to.emit(workerAsContract, 'InternalCallFailed')
+        .withArgs(1, (data: string) => {
+          // Remove the Error(string) selector (0x08c379a0) and decode the string
+          const decodedError = ethers.AbiCoder.defaultAbiCoder().decode(['string'], '0x' + data.slice(10));
+          expect(decodedError[0]).to.equal('ERC20: transfer amount exceeds balance');
+          return true;
+        });
+
+      const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
+      const userBalance = await erc20Mock.balanceOf(userWallet.address);
+      const txOriginBalance = await erc20Mock.balanceOf(txOrigin.address);
+
+      expect(workerBalance).to.equal(BigInt(200));
+      expect(userBalance).to.equal(BigInt(100));
+      expect(txOriginBalance).to.equal(BigInt(0));
+    });
+
+    it('should be possible to call executeBatchAndEnsureBalance with one failed call and revertOnError set to false', async () => {
+      const initialWorkerBalance = ethers.parseEther('0.09');
+
+      await owner.sendTransaction({
+        to: workerWallet.address,
+        value: initialWorkerBalance,
+      });
+
+      await erc20Mock.mint(workerWallet.address, 300);
+
+      const erc20TransferData1 = erc20Mock.interface.encodeFunctionData('transfer', [userWallet.address, 100]);
+      const erc20TransferData2 = erc20Mock.interface.encodeFunctionData('transfer', [txOrigin.address, 300]);
+
+      const result = await workerAsContract.connect(workerWallet).executeBatchAndEnsureBalance(
+        [
+          {
+            target: erc20Mock.target,
+            data: erc20TransferData1,
+            value: 0,
+          },
+          {
+            target: erc20Mock.target,
+            data: erc20TransferData2,
+            value: 0,
+          },
+        ],
+        false,
+      );
+
+      await expect(result)
+        .to.emit(workerAsContract, 'InternalCallFailed')
+        .withArgs(1, (data: string) => {
+          // Remove the Error(string) selector (0x08c379a0) and decode the string
+          const decodedError = ethers.AbiCoder.defaultAbiCoder().decode(['string'], '0x' + data.slice(10));
+          expect(decodedError[0]).to.equal('ERC20: transfer amount exceeds balance');
+          return true;
+        });
+
+      const workerBalance = await erc20Mock.balanceOf(workerWallet.address);
+      const userBalance = await erc20Mock.balanceOf(userWallet.address);
+      const txOriginBalance = await erc20Mock.balanceOf(txOrigin.address);
+
+      expect(workerBalance).to.equal(BigInt(200));
+      expect(userBalance).to.equal(BigInt(100));
+      expect(txOriginBalance).to.equal(BigInt(0));
+
+      expect(await ethers.provider.getBalance(workerWallet.address)).to.be.gt(initialWorkerBalance);
     });
   });
 
@@ -485,18 +682,21 @@ describe('Worker Smart Account', () => {
 
       const mmForwarderCallData2 = mintingManagerForwarder.interface.encodeFunctionData('execute', [req2, signature2]);
 
-      await workerAsContract.connect(workerWallet).executeBatch([
-        {
-          target: mintingManagerForwarder.target,
-          data: mmForwarderCallData1,
-          value: 0,
-        },
-        {
-          target: mintingManagerForwarder.target,
-          data: mmForwarderCallData2,
-          value: 0,
-        },
-      ]);
+      await workerAsContract.connect(workerWallet).executeBatch(
+        [
+          {
+            target: mintingManagerForwarder.target,
+            data: mmForwarderCallData1,
+            value: 0,
+          },
+          {
+            target: mintingManagerForwarder.target,
+            data: mmForwarderCallData2,
+            value: 0,
+          },
+        ],
+        true,
+      );
 
       expect(await unsRegistry.ownerOf(tokenId1)).to.be.equal(user.address);
       expect(await unsRegistry.ownerOf(tokenId2)).to.be.equal(user.address);
@@ -558,18 +758,21 @@ describe('Worker Smart Account', () => {
         signatureTransfer2,
       ]);
 
-      await workerAsContract.connect(workerWallet).executeBatch([
-        {
-          target: unsRegistry.target,
-          data: unsRegistryForwarderCallData1,
-          value: 0,
-        },
-        {
-          target: unsRegistry.target,
-          data: unsRegistryForwarderCallData2,
-          value: 0,
-        },
-      ]);
+      await workerAsContract.connect(workerWallet).executeBatch(
+        [
+          {
+            target: unsRegistry.target,
+            data: unsRegistryForwarderCallData1,
+            value: 0,
+          },
+          {
+            target: unsRegistry.target,
+            data: unsRegistryForwarderCallData2,
+            value: 0,
+          },
+        ],
+        true,
+      );
 
       expect(await unsRegistry.ownerOf(tokenId1)).to.be.equal(random.address);
       expect(await unsRegistry.ownerOf(tokenId2)).to.be.equal(random.address);
@@ -621,18 +824,21 @@ describe('Worker Smart Account', () => {
         remintSignature,
       ]);
 
-      await workerAsContract.connect(workerWallet).executeBatch([
-        {
-          target: mintingManagerForwarder.target,
-          data: revokeCallData,
-          value: 0,
-        },
-        {
-          target: mintingManagerForwarder.target,
-          data: remintCallData,
-          value: 0,
-        },
-      ]);
+      await workerAsContract.connect(workerWallet).executeBatch(
+        [
+          {
+            target: mintingManagerForwarder.target,
+            data: revokeCallData,
+            value: 0,
+          },
+          {
+            target: mintingManagerForwarder.target,
+            data: remintCallData,
+            value: 0,
+          },
+        ],
+        true,
+      );
 
       expect(await unsRegistry.ownerOf(tokenId)).to.be.equal(random.address);
       expect(await unsRegistry.get('key1', tokenId)).to.be.equal('');

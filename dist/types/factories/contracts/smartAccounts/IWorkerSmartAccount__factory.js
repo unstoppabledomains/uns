@@ -14,6 +14,25 @@ const _abi = [
         type: "error",
     },
     {
+        anonymous: false,
+        inputs: [
+            {
+                indexed: true,
+                internalType: "uint256",
+                name: "callIndex",
+                type: "uint256",
+            },
+            {
+                indexed: false,
+                internalType: "bytes",
+                name: "returnData",
+                type: "bytes",
+            },
+        ],
+        name: "InternalCallFailed",
+        type: "event",
+    },
+    {
         inputs: [
             {
                 components: [
@@ -36,6 +55,11 @@ const _abi = [
                 internalType: "struct IWorkerSmartAccount.Call[]",
                 name: "calls",
                 type: "tuple[]",
+            },
+            {
+                internalType: "bool",
+                name: "revertOnError",
+                type: "bool",
             },
         ],
         name: "executeBatch",
@@ -66,6 +90,11 @@ const _abi = [
                 internalType: "struct IWorkerSmartAccount.Call[]",
                 name: "calls",
                 type: "tuple[]",
+            },
+            {
+                internalType: "bool",
+                name: "revertOnError",
+                type: "bool",
             },
         ],
         name: "executeBatchAndEnsureBalance",

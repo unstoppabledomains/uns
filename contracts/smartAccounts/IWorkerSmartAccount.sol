@@ -12,8 +12,10 @@ interface IWorkerSmartAccount {
         uint256 value;
     }
 
-    function executeBatch(Call[] calldata calls) external payable;
-    function executeBatchAndEnsureBalance(Call[] calldata calls) external payable;
+    function executeBatch(Call[] calldata calls, bool revertOnError) external payable;
+    function executeBatchAndEnsureBalance(Call[] calldata calls, bool revertOnError) external payable;
+
+    event InternalCallFailed(uint256 indexed callIndex, bytes returnData);
 
     error NotSelf();
     error ExecuteFailed();

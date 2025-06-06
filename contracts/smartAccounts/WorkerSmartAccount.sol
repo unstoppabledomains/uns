@@ -34,10 +34,20 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
      *
      * @param calls Array of calls to execute
      */
-    function executeBatch(Call[] calldata calls) public payable onlySelf {
+    function executeBatch(Call[] calldata calls, bool revertOnError) public payable onlySelf {
         for (uint256 i = 0; i < calls.length; i++) {
-            (bool success, ) = calls[i].target.call{value: calls[i].value}(calls[i].data);
-            if (!success) revert ExecuteFailed();
+            (bool success, bytes memory returnData) = calls[i].target.call{value: calls[i].value}(calls[i].data);
+
+            if (!success) {
+                if (revertOnError) {
+                    if (returnData.length == 0) revert ExecuteFailed();
+                    assembly {
+                        revert(add(returnData, 32), mload(returnData))
+                    }
+                } else {
+                    emit InternalCallFailed(i, returnData);
+                }
+            }
         }
     }
 
@@ -47,8 +57,8 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
      *
      * @param calls Array of calls to execute
      */
-    function executeBatchAndEnsureBalance(Call[] calldata calls) external payable onlySelf {
-        executeBatch(calls);
+    function executeBatchAndEnsureBalance(Call[] calldata calls, bool revertOnError) external payable onlySelf {
+        executeBatch(calls, revertOnError);
         _ensureBalance();
     }
 

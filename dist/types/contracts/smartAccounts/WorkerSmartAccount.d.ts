@@ -1,5 +1,5 @@
-import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
-import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../common";
+import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
 export declare namespace IWorkerSmartAccount {
     type CallStruct = {
         target: AddressLike;
@@ -18,12 +18,25 @@ export declare namespace IWorkerSmartAccount {
 }
 export interface WorkerSmartAccountInterface extends Interface {
     getFunction(nameOrSignature: "executeBatch" | "executeBatchAndEnsureBalance" | "faucet"): FunctionFragment;
-    encodeFunctionData(functionFragment: "executeBatch", values: [IWorkerSmartAccount.CallStruct[]]): string;
-    encodeFunctionData(functionFragment: "executeBatchAndEnsureBalance", values: [IWorkerSmartAccount.CallStruct[]]): string;
+    getEvent(nameOrSignatureOrTopic: "InternalCallFailed"): EventFragment;
+    encodeFunctionData(functionFragment: "executeBatch", values: [IWorkerSmartAccount.CallStruct[], boolean]): string;
+    encodeFunctionData(functionFragment: "executeBatchAndEnsureBalance", values: [IWorkerSmartAccount.CallStruct[], boolean]): string;
     encodeFunctionData(functionFragment: "faucet", values?: undefined): string;
     decodeFunctionResult(functionFragment: "executeBatch", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "executeBatchAndEnsureBalance", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "faucet", data: BytesLike): Result;
+}
+export declare namespace InternalCallFailedEvent {
+    type InputTuple = [callIndex: BigNumberish, returnData: BytesLike];
+    type OutputTuple = [callIndex: bigint, returnData: string];
+    interface OutputObject {
+        callIndex: bigint;
+        returnData: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
 export interface WorkerSmartAccount extends BaseContract {
     connect(runner?: ContractRunner | null): WorkerSmartAccount;
@@ -39,28 +52,36 @@ export interface WorkerSmartAccount extends BaseContract {
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     executeBatch: TypedContractMethod<[
-        calls: IWorkerSmartAccount.CallStruct[]
+        calls: IWorkerSmartAccount.CallStruct[],
+        revertOnError: boolean
     ], [
         void
     ], "payable">;
     executeBatchAndEnsureBalance: TypedContractMethod<[
-        calls: IWorkerSmartAccount.CallStruct[]
+        calls: IWorkerSmartAccount.CallStruct[],
+        revertOnError: boolean
     ], [
         void
     ], "payable">;
     faucet: TypedContractMethod<[], [string], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "executeBatch"): TypedContractMethod<[
-        calls: IWorkerSmartAccount.CallStruct[]
+        calls: IWorkerSmartAccount.CallStruct[],
+        revertOnError: boolean
     ], [
         void
     ], "payable">;
     getFunction(nameOrSignature: "executeBatchAndEnsureBalance"): TypedContractMethod<[
-        calls: IWorkerSmartAccount.CallStruct[]
+        calls: IWorkerSmartAccount.CallStruct[],
+        revertOnError: boolean
     ], [
         void
     ], "payable">;
     getFunction(nameOrSignature: "faucet"): TypedContractMethod<[], [string], "view">;
-    filters: {};
+    getEvent(key: "InternalCallFailed"): TypedContractEvent<InternalCallFailedEvent.InputTuple, InternalCallFailedEvent.OutputTuple, InternalCallFailedEvent.OutputObject>;
+    filters: {
+        "InternalCallFailed(uint256,bytes)": TypedContractEvent<InternalCallFailedEvent.InputTuple, InternalCallFailedEvent.OutputTuple, InternalCallFailedEvent.OutputObject>;
+        InternalCallFailed: TypedContractEvent<InternalCallFailedEvent.InputTuple, InternalCallFailedEvent.OutputTuple, InternalCallFailedEvent.OutputObject>;
+    };
 }
 //# sourceMappingURL=WorkerSmartAccount.d.ts.map

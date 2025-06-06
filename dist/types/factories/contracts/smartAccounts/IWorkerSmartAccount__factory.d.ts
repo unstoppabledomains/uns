@@ -10,6 +10,21 @@ export declare class IWorkerSmartAccount__factory {
         readonly name: "NotSelf";
         readonly type: "error";
     }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "uint256";
+            readonly name: "callIndex";
+            readonly type: "uint256";
+        }, {
+            readonly indexed: false;
+            readonly internalType: "bytes";
+            readonly name: "returnData";
+            readonly type: "bytes";
+        }];
+        readonly name: "InternalCallFailed";
+        readonly type: "event";
+    }, {
         readonly inputs: readonly [{
             readonly components: readonly [{
                 readonly internalType: "address";
@@ -27,6 +42,10 @@ export declare class IWorkerSmartAccount__factory {
             readonly internalType: "struct IWorkerSmartAccount.Call[]";
             readonly name: "calls";
             readonly type: "tuple[]";
+        }, {
+            readonly internalType: "bool";
+            readonly name: "revertOnError";
+            readonly type: "bool";
         }];
         readonly name: "executeBatch";
         readonly outputs: readonly [];
@@ -50,6 +69,10 @@ export declare class IWorkerSmartAccount__factory {
             readonly internalType: "struct IWorkerSmartAccount.Call[]";
             readonly name: "calls";
             readonly type: "tuple[]";
+        }, {
+            readonly internalType: "bool";
+            readonly name: "revertOnError";
+            readonly type: "bool";
         }];
         readonly name: "executeBatchAndEnsureBalance";
         readonly outputs: readonly [];
