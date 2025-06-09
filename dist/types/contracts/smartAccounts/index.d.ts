@@ -1,6 +1,6 @@
-export type { Faucet } from "./Faucet";
-export type { IFaucet } from "./IFaucet";
+export type { FaucetSA } from "./FaucetSA";
+export type { IFaucetSA } from "./IFaucetSA";
 export type { ISmartAccount } from "./ISmartAccount";
-export type { IWorkerSmartAccount } from "./IWorkerSmartAccount";
-export type { WorkerSmartAccount } from "./WorkerSmartAccount";
+export type { IWorkerSA } from "./IWorkerSA";
+export type { WorkerSA } from "./WorkerSA";
 //# sourceMappingURL=index.d.ts.map

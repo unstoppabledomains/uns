@@ -1440,6 +1440,42 @@ const deployRegistrarCustodyTask: Task = {
   },
 };
 
+const deployFaucetSAImplementationTask: Task = {
+  tags: ['faucet_sa_implementation', 'workers_set_up', 'full', 'uns'],
+  priority: 30,
+  run: async (ctx: Deployer) => {
+    const { owner } = ctx.accounts;
+
+    const FaucetSAFactory = await ethers.getContractFactory(ArtifactName.FaucetSA);
+    const FaucetSA = await FaucetSAFactory.connect(owner).deploy();
+    await FaucetSA.waitForDeployment();
+    await ctx.saveContractConfig(UnsContractName.FaucetSA, FaucetSA);
+    await verify(ctx, await FaucetSA.getAddress(), []);
+  },
+  ensureDependencies: () => ({}),
+};
+
+const deployWorkerSAImplementationTask: Task = {
+  tags: ['worker_sa_implementation', 'workers_set_up', 'full', 'uns'],
+  priority: 30,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const { owner } = ctx.accounts;
+    const [FaucetSA] = unwrapDependencies(dependencies, [UnsContractName.FaucetSA]);
+
+    const WorkerSAFactory = await ethers.getContractFactory(ArtifactName.WorkerSA);
+    const WorkerSA = await WorkerSAFactory.connect(owner).deploy(FaucetSA.address);
+    await WorkerSA.waitForDeployment();
+    await ctx.saveContractConfig(UnsContractName.WorkerSA, WorkerSA);
+    await verify(ctx, await WorkerSA.getAddress(), [FaucetSA.address]);
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.FaucetSA);
+  },
+};
+
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -1472,4 +1508,6 @@ export const tasks: Task[] = [
   mintUnsTldsTask,
   proposeSeaportProxyBuyerTask,
   deployRegistrarCustodyTask,
+  deployFaucetSAImplementationTask,
+  deployWorkerSAImplementationTask,
 ];

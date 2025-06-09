@@ -1,6 +1,6 @@
-export { Faucet__factory } from "./Faucet__factory";
-export { IFaucet__factory } from "./IFaucet__factory";
+export { FaucetSA__factory } from "./FaucetSA__factory";
+export { IFaucetSA__factory } from "./IFaucetSA__factory";
 export { ISmartAccount__factory } from "./ISmartAccount__factory";
-export { IWorkerSmartAccount__factory } from "./IWorkerSmartAccount__factory";
-export { WorkerSmartAccount__factory } from "./WorkerSmartAccount__factory";
+export { IWorkerSA__factory } from "./IWorkerSA__factory";
+export { WorkerSA__factory } from "./WorkerSA__factory";
 //# sourceMappingURL=index.d.ts.map

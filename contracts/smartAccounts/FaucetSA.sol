@@ -3,7 +3,7 @@
 
 pragma solidity ^0.8.24;
 
-import './IFaucet.sol';
+import './IFaucetSA.sol';
 
 /**
  * @title Faucet
@@ -12,16 +12,11 @@ import './IFaucet.sol';
  * If update of this contract is required make sure that storage layout is not corrupted
  * or use a new keypair for faucet wallet with clean storage before delegation.
  */
-contract Faucet is IFaucet {
+contract FaucetSA is IFaucetSA {
     uint256 public workerBalanceThreshold;
     uint256 public workerFundingAmount;
 
     mapping(address => bool) public authorizedWorkers;
-
-    constructor(uint256 _workerFundingAmount, uint256 _workerBalanceThreshold) {
-        workerFundingAmount = _workerFundingAmount;
-        workerBalanceThreshold = _workerBalanceThreshold;
-    }
 
     modifier onlySelf() {
         if (msg.sender != address(this)) revert NotSelf();

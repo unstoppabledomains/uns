@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IWorkerSmartAccount",
-  "sourceName": "contracts/smartAccounts/IWorkerSmartAccount.sol",
+  "contractName": "IWorkerSA",
+  "sourceName": "contracts/smartAccounts/IWorkerSA.sol",
   "abi": [
     {
       "inputs": [],

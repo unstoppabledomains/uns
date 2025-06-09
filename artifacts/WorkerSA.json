@@ -1,12 +1,12 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "WorkerSmartAccount",
-  "sourceName": "contracts/smartAccounts/WorkerSmartAccount.sol",
+  "contractName": "WorkerSA",
+  "sourceName": "contracts/smartAccounts/WorkerSA.sol",
   "abi": [
     {
       "inputs": [
         {
-          "internalType": "contract IFaucet",
+          "internalType": "contract IFaucetSA",
           "name": "_faucet",
           "type": "address"
         }
@@ -122,7 +122,7 @@
       "name": "faucet",
       "outputs": [
         {
-          "internalType": "contract IFaucet",
+          "internalType": "contract IFaucetSA",
           "name": "",
           "type": "address"
         }

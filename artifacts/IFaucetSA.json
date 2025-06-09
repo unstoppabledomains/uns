@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IFaucet",
-  "sourceName": "contracts/smartAccounts/IFaucet.sol",
+  "contractName": "IFaucetSA",
+  "sourceName": "contracts/smartAccounts/IFaucetSA.sol",
   "abi": [
     {
       "inputs": [],

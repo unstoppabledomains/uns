@@ -4,14 +4,14 @@
 pragma solidity ^0.8.24;
 
 import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
-import './IFaucet.sol';
-import './IWorkerSmartAccount.sol';
+import './IFaucetSA.sol';
+import './IWorkerSA.sol';
 import '../metatx/IForwarder.sol';
 
-contract WorkerSmartAccount is IWorkerSmartAccount {
-    IFaucet public immutable faucet;
+contract WorkerSA is IWorkerSA {
+    IFaucetSA public immutable faucet;
 
-    constructor(IFaucet _faucet) {
+    constructor(IFaucetSA _faucet) {
         faucet = _faucet;
     }
 

@@ -5,7 +5,7 @@ pragma solidity ^0.8.24;
 
 import './ISmartAccount.sol';
 
-interface IFaucet is ISmartAccount {
+interface IFaucetSA is ISmartAccount {
     function fundWorker() external;
     function addAuthorizedWorkers(address[] calldata workers) external;
     function removeAuthorizedWorkers(address[] calldata workers) external;

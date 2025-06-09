@@ -1,9 +1,8 @@
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { AuthorizationRequest, Wallet, Authorization } from 'ethers';
+import { Wallet, Authorization } from 'ethers';
 import { expect } from 'chai';
-import { network } from 'hardhat';
-import { WorkerSmartAccount, Faucet } from '../../types/contracts/smartAccounts';
+import { WorkerSA, FaucetSA } from '../../types/contracts/smartAccounts';
 import { MintingManager, UNSRegistry } from '../../types/contracts';
 import { MintingManagerForwarder } from '../../types/contracts/metatx';
 import { deployProxy, mintUnsTlds } from '../../src/helpers';
@@ -24,9 +23,9 @@ describe('Worker Smart Account', () => {
     user: SignerWithAddress,
     random: SignerWithAddress;
   let faucetWallet: Wallet;
-  let faucetSA: Faucet;
-  let faucet: Faucet;
-  let workerSAImplementation: WorkerSmartAccount;
+  let faucetSA: FaucetSA;
+  let faucet: FaucetSA;
+  let workerSAImplementation: WorkerSA;
   let erc20Mock: ERC20Mock;
   let mintingManager: MintingManager;
   let unsRegistry: UNSRegistry;
@@ -36,8 +35,8 @@ describe('Worker Smart Account', () => {
     signers = await ethers.getSigners();
     [owner, minter, user, random] = signers;
 
-    const faucetFactory = await ethers.getContractFactory('Faucet');
-    faucetSA = await faucetFactory.deploy(ethers.parseEther('0.1'), ethers.parseEther('0.1'));
+    const faucetFactory = await ethers.getContractFactory('FaucetSA');
+    faucetSA = await faucetFactory.deploy();
 
     faucetWallet = new ethers.Wallet(Wallet.createRandom().privateKey, ethers.provider);
 
@@ -56,12 +55,12 @@ describe('Worker Smart Account', () => {
       gasLimit: 50000,
     });
 
-    faucet = await ethers.getContractAt('Faucet', faucetWallet.address);
+    faucet = await ethers.getContractAt('FaucetSA', faucetWallet.address);
     await faucet.connect(faucetWallet).setWorkerBalanceThreshold(ethers.parseEther('0.1'));
     await faucet.connect(faucetWallet).setWorkerFundingAmount(ethers.parseEther('0.1'));
 
-    const workerSmartAccountFactory = await ethers.getContractFactory('WorkerSmartAccount');
-    workerSAImplementation = await workerSmartAccountFactory.deploy(faucet.target);
+    const workerSAFactory = await ethers.getContractFactory('WorkerSA');
+    workerSAImplementation = await workerSAFactory.deploy(faucet.target);
 
     const erc20Factory = await ethers.getContractFactory('ERC20Mock');
     erc20Mock = await erc20Factory.deploy();
@@ -104,7 +103,7 @@ describe('Worker Smart Account', () => {
     let workerWallet: Wallet;
     let txOrigin: Wallet;
 
-    let workerAsContract: WorkerSmartAccount;
+    let workerAsContract: WorkerSA;
 
     beforeEach(async () => {
       // Using ethers wallets because hardhat signer doesn't support EIP7702 yet
@@ -134,7 +133,7 @@ describe('Worker Smart Account', () => {
         gasLimit: 50000,
       });
 
-      workerAsContract = await ethers.getContractAt('WorkerSmartAccount', workerWallet.address);
+      workerAsContract = await ethers.getContractAt('WorkerSA', workerWallet.address);
     });
 
     it('should be possible to make a random call from worker wallet through worker smart account', async () => {
@@ -426,8 +425,8 @@ describe('Worker Smart Account', () => {
     it('should fail and correctly pass contract error class from internal call', async () => {
       const initialWorkerBalance = ethers.parseEther('0.05');
 
-      const localFaucetFactory = await ethers.getContractFactory('Faucet');
-      const localFaucet = await localFaucetFactory.deploy(ethers.parseEther('0.01'), ethers.parseEther('0.01'));
+      const localFaucetFactory = await ethers.getContractFactory('FaucetSA');
+      const localFaucet = await localFaucetFactory.deploy();
 
       await owner.sendTransaction({
         to: workerWallet.address,
@@ -644,7 +643,7 @@ describe('Worker Smart Account', () => {
 
   describe('complex tests', async () => {
     let workerWallet: Wallet;
-    let workerAsContract: WorkerSmartAccount;
+    let workerAsContract: WorkerSA;
 
     beforeEach(async () => {
       // Using ethers wallets because hardhat signer doesn't support EIP7702 yet
@@ -674,7 +673,7 @@ describe('Worker Smart Account', () => {
         gasLimit: 50000,
       });
 
-      workerAsContract = await ethers.getContractAt('WorkerSmartAccount', workerWallet.address);
+      workerAsContract = await ethers.getContractAt('WorkerSA', workerWallet.address);
     });
 
     it('should be possible to make a multicall to minting manager minting domains having signatures from minters', async () => {

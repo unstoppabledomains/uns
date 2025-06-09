@@ -2,9 +2,8 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { Authorization, Wallet } from 'ethers';
-import { Faucet } from '../../types/contracts/smartAccounts';
+import { FaucetSA } from '../../types/contracts/smartAccounts';
 import { Reverter } from '../helpers/reverter';
-import { deployProxy } from '../../src/helpers';
 
 describe('Faucet', () => {
   const reverter: Reverter = new Reverter();
@@ -14,19 +13,18 @@ describe('Faucet', () => {
   let worker1: SignerWithAddress;
   let worker2: SignerWithAddress;
   let random: SignerWithAddress;
-  let faucetSA: Faucet;
+  let faucetSA: FaucetSA;
   let faucetWallet: Wallet;
-  let faucet: Faucet;
+  let faucet: FaucetSA;
 
   const WORKER_FUNDING_AMOUNT = ethers.parseEther('0.1');
-  const WORKER_BALANCE_THRESHOLD = WORKER_FUNDING_AMOUNT;
 
   before(async () => {
     signers = await ethers.getSigners();
     [owner, worker1, worker2, random] = signers;
 
-    const faucetFactory = await ethers.getContractFactory('Faucet');
-    faucetSA = await faucetFactory.deploy(WORKER_FUNDING_AMOUNT, WORKER_BALANCE_THRESHOLD);
+    const faucetFactory = await ethers.getContractFactory('FaucetSA');
+    faucetSA = await faucetFactory.deploy();
 
     faucetWallet = new ethers.Wallet(Wallet.createRandom().privateKey, ethers.provider);
 
@@ -45,7 +43,7 @@ describe('Faucet', () => {
       gasLimit: 50000,
     });
 
-    faucet = await ethers.getContractAt('Faucet', faucetWallet.address);
+    faucet = await ethers.getContractAt('FaucetSA', faucetWallet.address);
 
     await faucet.connect(faucetWallet).setWorkerBalanceThreshold(ethers.parseEther('0.1'));
     await faucet.connect(faucetWallet).setWorkerFundingAmount(ethers.parseEther('0.1'));
@@ -54,13 +52,6 @@ describe('Faucet', () => {
   });
 
   afterEach(reverter.revert);
-
-  describe('constructor', () => {
-    it('should set the correct worker funding amount and threshold', async () => {
-      expect(await faucetSA.workerFundingAmount()).to.equal(WORKER_FUNDING_AMOUNT);
-      expect(await faucetSA.workerBalanceThreshold()).to.equal(WORKER_BALANCE_THRESHOLD);
-    });
-  });
 
   describe('worker authorization', () => {
     it('should allow self to add authorized workers', async () => {

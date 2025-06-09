@@ -5,7 +5,7 @@ pragma solidity ^0.8.24;
 
 import './ISmartAccount.sol';
 
-interface IWorkerSmartAccount is ISmartAccount {
+interface IWorkerSA is ISmartAccount {
     function executeBatch(Call[] calldata calls, bool revertOnError) external payable;
     function executeBatchAndEnsureBalance(Call[] calldata calls, bool revertOnError) external payable;
 
