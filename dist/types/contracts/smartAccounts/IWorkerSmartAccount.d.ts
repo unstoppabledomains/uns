@@ -1,6 +1,6 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
-export declare namespace IWorkerSmartAccount {
+export declare namespace ISmartAccount {
     type CallStruct = {
         target: AddressLike;
         data: BytesLike;
@@ -19,8 +19,8 @@ export declare namespace IWorkerSmartAccount {
 export interface IWorkerSmartAccountInterface extends Interface {
     getFunction(nameOrSignature: "executeBatch" | "executeBatchAndEnsureBalance"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "InternalCallFailed"): EventFragment;
-    encodeFunctionData(functionFragment: "executeBatch", values: [IWorkerSmartAccount.CallStruct[], boolean]): string;
-    encodeFunctionData(functionFragment: "executeBatchAndEnsureBalance", values: [IWorkerSmartAccount.CallStruct[], boolean]): string;
+    encodeFunctionData(functionFragment: "executeBatch", values: [ISmartAccount.CallStruct[], boolean]): string;
+    encodeFunctionData(functionFragment: "executeBatchAndEnsureBalance", values: [ISmartAccount.CallStruct[], boolean]): string;
     decodeFunctionResult(functionFragment: "executeBatch", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "executeBatchAndEnsureBalance", data: BytesLike): Result;
 }
@@ -50,26 +50,26 @@ export interface IWorkerSmartAccount extends BaseContract {
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     executeBatch: TypedContractMethod<[
-        calls: IWorkerSmartAccount.CallStruct[],
+        calls: ISmartAccount.CallStruct[],
         revertOnError: boolean
     ], [
         void
     ], "payable">;
     executeBatchAndEnsureBalance: TypedContractMethod<[
-        calls: IWorkerSmartAccount.CallStruct[],
+        calls: ISmartAccount.CallStruct[],
         revertOnError: boolean
     ], [
         void
     ], "payable">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "executeBatch"): TypedContractMethod<[
-        calls: IWorkerSmartAccount.CallStruct[],
+        calls: ISmartAccount.CallStruct[],
         revertOnError: boolean
     ], [
         void
     ], "payable">;
     getFunction(nameOrSignature: "executeBatchAndEnsureBalance"): TypedContractMethod<[
-        calls: IWorkerSmartAccount.CallStruct[],
+        calls: ISmartAccount.CallStruct[],
         revertOnError: boolean
     ], [
         void

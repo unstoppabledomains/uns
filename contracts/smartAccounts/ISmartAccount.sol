@@ -5,14 +5,10 @@ pragma solidity ^0.8.24;
 
 interface ISmartAccount {
     struct Call {
-        address to;
-        uint256 value;
+        address target;
         bytes data;
+        uint256 value;
     }
 
-    struct SplitSignature {
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-    }
+    error NotSelf();
 }

@@ -64,7 +64,7 @@ export declare class WorkerSmartAccount__factory extends ContractFactory {
                 readonly name: "value";
                 readonly type: "uint256";
             }];
-            readonly internalType: "struct IWorkerSmartAccount.Call[]";
+            readonly internalType: "struct ISmartAccount.Call[]";
             readonly name: "calls";
             readonly type: "tuple[]";
         }, {
@@ -91,7 +91,7 @@ export declare class WorkerSmartAccount__factory extends ContractFactory {
                 readonly name: "value";
                 readonly type: "uint256";
             }];
-            readonly internalType: "struct IWorkerSmartAccount.Call[]";
+            readonly internalType: "struct ISmartAccount.Call[]";
             readonly name: "calls";
             readonly type: "tuple[]";
         }, {

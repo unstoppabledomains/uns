@@ -391,6 +391,8 @@ export type { Faucet } from "./contracts/smartAccounts/Faucet";
 export { Faucet__factory } from "./factories/contracts/smartAccounts/Faucet__factory";
 export type { IFaucet } from "./contracts/smartAccounts/IFaucet";
 export { IFaucet__factory } from "./factories/contracts/smartAccounts/IFaucet__factory";
+export type { ISmartAccount } from "./contracts/smartAccounts/ISmartAccount";
+export { ISmartAccount__factory } from "./factories/contracts/smartAccounts/ISmartAccount__factory";
 export type { IWorkerSmartAccount } from "./contracts/smartAccounts/IWorkerSmartAccount";
 export { IWorkerSmartAccount__factory } from "./factories/contracts/smartAccounts/IWorkerSmartAccount__factory";
 export type { WorkerSmartAccount } from "./contracts/smartAccounts/WorkerSmartAccount";

@@ -23,6 +23,8 @@ describe('Worker Smart Account', () => {
     minter: SignerWithAddress,
     user: SignerWithAddress,
     random: SignerWithAddress;
+  let faucetWallet: Wallet;
+  let faucetSA: Faucet;
   let faucet: Faucet;
   let workerSAImplementation: WorkerSmartAccount;
   let erc20Mock: ERC20Mock;
@@ -35,7 +37,28 @@ describe('Worker Smart Account', () => {
     [owner, minter, user, random] = signers;
 
     const faucetFactory = await ethers.getContractFactory('Faucet');
-    faucet = await deployProxy(faucetFactory.connect(owner), [ethers.parseEther('0.1'), ethers.parseEther('0.1')]);
+    faucetSA = await faucetFactory.deploy(ethers.parseEther('0.1'), ethers.parseEther('0.1'));
+
+    faucetWallet = new ethers.Wallet(Wallet.createRandom().privateKey, ethers.provider);
+
+    const faucetAuth: Authorization = await faucetWallet.authorize({ address: faucetSA.target, nonce: 1 });
+
+    await owner.sendTransaction({
+      to: faucetWallet.address,
+      value: ethers.parseEther('10'),
+    });
+
+    await faucetWallet.sendTransaction({
+      to: faucetWallet.address,
+      value: 0,
+      type: 4,
+      authorizationList: [faucetAuth],
+      gasLimit: 50000,
+    });
+
+    faucet = await ethers.getContractAt('Faucet', faucetWallet.address);
+    await faucet.connect(faucetWallet).setWorkerBalanceThreshold(ethers.parseEther('0.1'));
+    await faucet.connect(faucetWallet).setWorkerFundingAmount(ethers.parseEther('0.1'));
 
     const workerSmartAccountFactory = await ethers.getContractFactory('WorkerSmartAccount');
     workerSAImplementation = await workerSmartAccountFactory.deploy(faucet.target);
@@ -94,7 +117,7 @@ describe('Worker Smart Account', () => {
         value: ethers.parseEther('10'),
       });
 
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([workerWallet.address]);
 
       const workerAuth: Authorization = await workerWallet.authorize({ address: workerSAImplementation.target });
 
@@ -404,17 +427,14 @@ describe('Worker Smart Account', () => {
       const initialWorkerBalance = ethers.parseEther('0.05');
 
       const localFaucetFactory = await ethers.getContractFactory('Faucet');
-      const localFaucet = await localFaucetFactory.deploy();
-
-      await localFaucet.initialize(ethers.parseEther('0.01'), ethers.parseEther('0.01'));
-      await localFaucet.transferOwnership(workerWallet.address);
+      const localFaucet = await localFaucetFactory.deploy(ethers.parseEther('0.01'), ethers.parseEther('0.01'));
 
       await owner.sendTransaction({
         to: workerWallet.address,
         value: initialWorkerBalance,
       });
 
-      const faucetWithdrawData = localFaucet.interface.encodeFunctionData('withdraw', [ethers.parseEther('1')]);
+      const faucetWithdrawData = localFaucet.interface.encodeFunctionData('fundWorker');
 
       await expect(
         workerAsContract.connect(workerWallet).executeBatch(
@@ -427,7 +447,7 @@ describe('Worker Smart Account', () => {
           ],
           true,
         ),
-      ).to.be.revertedWithCustomError(localFaucet, 'InsufficientBalance');
+      ).to.be.revertedWithCustomError(localFaucet, 'NotAuthorizedWorker');
     });
 
     it('should be possible to call executeBatch with one failed call and revertOnError set to false', async () => {
@@ -543,7 +563,7 @@ describe('Worker Smart Account', () => {
         nonce: (await workerWallet.getNonce()) + 1,
       });
 
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([workerWallet.address]);
 
       await workerWallet.sendTransaction({
         to: workerWallet.address,
@@ -645,7 +665,7 @@ describe('Worker Smart Account', () => {
         nonce: (await workerWallet.getNonce()) + 1,
       });
 
-      await faucet.addAuthorizedWorkers([workerWallet.address]);
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([workerWallet.address]);
 
       await workerWallet.sendTransaction({
         to: workerWallet.address,

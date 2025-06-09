@@ -1,22 +1,18 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../common";
 export interface IFaucetInterface extends Interface {
-    getFunction(nameOrSignature: "addAuthorizedWorkers" | "fundWorker" | "removeAuthorizedWorkers" | "setWorkerBalanceThreshold" | "setWorkerFundingAmount" | "withdraw" | "withdrawAll" | "workerBalanceThreshold"): FunctionFragment;
+    getFunction(nameOrSignature: "addAuthorizedWorkers" | "fundWorker" | "removeAuthorizedWorkers" | "setWorkerBalanceThreshold" | "setWorkerFundingAmount" | "workerBalanceThreshold"): FunctionFragment;
     encodeFunctionData(functionFragment: "addAuthorizedWorkers", values: [AddressLike[]]): string;
     encodeFunctionData(functionFragment: "fundWorker", values?: undefined): string;
     encodeFunctionData(functionFragment: "removeAuthorizedWorkers", values: [AddressLike[]]): string;
     encodeFunctionData(functionFragment: "setWorkerBalanceThreshold", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "setWorkerFundingAmount", values: [BigNumberish]): string;
-    encodeFunctionData(functionFragment: "withdraw", values: [BigNumberish]): string;
-    encodeFunctionData(functionFragment: "withdrawAll", values?: undefined): string;
     encodeFunctionData(functionFragment: "workerBalanceThreshold", values?: undefined): string;
     decodeFunctionResult(functionFragment: "addAuthorizedWorkers", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "fundWorker", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeAuthorizedWorkers", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setWorkerBalanceThreshold", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setWorkerFundingAmount", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "withdrawAll", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "workerBalanceThreshold", data: BytesLike): Result;
 }
 export interface IFaucet extends BaseContract {
@@ -53,8 +49,6 @@ export interface IFaucet extends BaseContract {
     ], [
         void
     ], "nonpayable">;
-    withdraw: TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;
-    withdrawAll: TypedContractMethod<[], [void], "nonpayable">;
     workerBalanceThreshold: TypedContractMethod<[], [bigint], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "addAuthorizedWorkers"): TypedContractMethod<[workers: AddressLike[]], [void], "nonpayable">;
@@ -62,8 +56,6 @@ export interface IFaucet extends BaseContract {
     getFunction(nameOrSignature: "removeAuthorizedWorkers"): TypedContractMethod<[workers: AddressLike[]], [void], "nonpayable">;
     getFunction(nameOrSignature: "setWorkerBalanceThreshold"): TypedContractMethod<[threshold: BigNumberish], [void], "nonpayable">;
     getFunction(nameOrSignature: "setWorkerFundingAmount"): TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;
-    getFunction(nameOrSignature: "withdraw"): TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;
-    getFunction(nameOrSignature: "withdrawAll"): TypedContractMethod<[], [void], "nonpayable">;
     getFunction(nameOrSignature: "workerBalanceThreshold"): TypedContractMethod<[], [bigint], "view">;
     filters: {};
 }

@@ -1,0 +1,16 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ISmartAccount",
+  "sourceName": "contracts/smartAccounts/ISmartAccount.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "NotSelf",
+      "type": "error"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

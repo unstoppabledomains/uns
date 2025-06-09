@@ -5,12 +5,12 @@ const ethers_1 = require("ethers");
 const _abi = [
     {
         inputs: [],
-        name: "InsufficientBalance",
+        name: "NotAuthorizedWorker",
         type: "error",
     },
     {
         inputs: [],
-        name: "NotAuthorizedWorker",
+        name: "NotSelf",
         type: "error",
     },
     {
@@ -78,26 +78,6 @@ const _abi = [
         type: "function",
     },
     {
-        inputs: [
-            {
-                internalType: "uint256",
-                name: "amount",
-                type: "uint256",
-            },
-        ],
-        name: "withdraw",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-    },
-    {
-        inputs: [],
-        name: "withdrawAll",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-    },
-    {
         inputs: [],
         name: "workerBalanceThreshold",
         outputs: [
@@ -109,10 +89,6 @@ const _abi = [
         ],
         stateMutability: "view",
         type: "function",
-    },
-    {
-        stateMutability: "payable",
-        type: "receive",
     },
 ];
 class IFaucet__factory {

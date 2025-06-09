@@ -3,20 +3,13 @@
 
 pragma solidity ^0.8.24;
 
-import '../metatx/IForwarder.sol';
+import './ISmartAccount.sol';
 
-interface IWorkerSmartAccount {
-    struct Call {
-        address target;
-        bytes data;
-        uint256 value;
-    }
-
+interface IWorkerSmartAccount is ISmartAccount {
     function executeBatch(Call[] calldata calls, bool revertOnError) external payable;
     function executeBatchAndEnsureBalance(Call[] calldata calls, bool revertOnError) external payable;
 
     event InternalCallFailed(uint256 indexed callIndex, bytes returnData);
 
-    error NotSelf();
     error ExecuteFailed();
 }

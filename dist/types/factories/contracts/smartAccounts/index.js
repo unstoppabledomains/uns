@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WorkerSmartAccount__factory = exports.IWorkerSmartAccount__factory = exports.IFaucet__factory = exports.Faucet__factory = void 0;
+exports.WorkerSmartAccount__factory = exports.IWorkerSmartAccount__factory = exports.ISmartAccount__factory = exports.IFaucet__factory = exports.Faucet__factory = void 0;
 var Faucet__factory_1 = require("./Faucet__factory");
 Object.defineProperty(exports, "Faucet__factory", { enumerable: true, get: function () { return Faucet__factory_1.Faucet__factory; } });
 var IFaucet__factory_1 = require("./IFaucet__factory");
 Object.defineProperty(exports, "IFaucet__factory", { enumerable: true, get: function () { return IFaucet__factory_1.IFaucet__factory; } });
+var ISmartAccount__factory_1 = require("./ISmartAccount__factory");
+Object.defineProperty(exports, "ISmartAccount__factory", { enumerable: true, get: function () { return ISmartAccount__factory_1.ISmartAccount__factory; } });
 var IWorkerSmartAccount__factory_1 = require("./IWorkerSmartAccount__factory");
 Object.defineProperty(exports, "IWorkerSmartAccount__factory", { enumerable: true, get: function () { return IWorkerSmartAccount__factory_1.IWorkerSmartAccount__factory; } });
 var WorkerSmartAccount__factory_1 = require("./WorkerSmartAccount__factory");

@@ -68,6 +68,6 @@ contract WorkerSmartAccount is IWorkerSmartAccount {
         }
     }
 
-    fallback() external payable {}
     receive() external payable {}
+    fallback() external payable {}
 }

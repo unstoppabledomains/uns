@@ -3,11 +3,11 @@ import type { IFaucet, IFaucetInterface } from "../../../contracts/smartAccounts
 export declare class IFaucet__factory {
     static readonly abi: readonly [{
         readonly inputs: readonly [];
-        readonly name: "InsufficientBalance";
+        readonly name: "NotAuthorizedWorker";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "NotAuthorizedWorker";
+        readonly name: "NotSelf";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
@@ -60,22 +60,6 @@ export declare class IFaucet__factory {
         readonly stateMutability: "nonpayable";
         readonly type: "function";
     }, {
-        readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "amount";
-            readonly type: "uint256";
-        }];
-        readonly name: "withdraw";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "withdrawAll";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
         readonly inputs: readonly [];
         readonly name: "workerBalanceThreshold";
         readonly outputs: readonly [{
@@ -85,9 +69,6 @@ export declare class IFaucet__factory {
         }];
         readonly stateMutability: "view";
         readonly type: "function";
-    }, {
-        readonly stateMutability: "payable";
-        readonly type: "receive";
     }];
     static createInterface(): IFaucetInterface;
     static connect(address: string, runner?: ContractRunner | null): IFaucet;

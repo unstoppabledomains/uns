@@ -3,20 +3,29 @@
 
 pragma solidity ^0.8.24;
 
-import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import './IFaucet.sol';
 
-contract Faucet is IFaucet, Initializable, OwnableUpgradeable {
+/**
+ * @title Faucet
+ * @notice A contract that funds workers and ensures they maintain a minimum balance.
+ * @dev This contract is a smart account but it is stateful.
+ * If update of this contract is required make sure that storage layout is not corrupted
+ * or use a new keypair for faucet wallet with clean storage before delegation.
+ */
+contract Faucet is IFaucet {
     uint256 public workerBalanceThreshold;
     uint256 public workerFundingAmount;
 
     mapping(address => bool) public authorizedWorkers;
 
-    function initialize(uint256 _workerFundingAmount, uint256 _workerBalanceThreshold) public initializer {
-        __Ownable_init();
+    constructor(uint256 _workerFundingAmount, uint256 _workerBalanceThreshold) {
         workerFundingAmount = _workerFundingAmount;
         workerBalanceThreshold = _workerBalanceThreshold;
+    }
+
+    modifier onlySelf() {
+        if (msg.sender != address(this)) revert NotSelf();
+        _;
     }
 
     modifier onlyAuthorizedWorker() {
@@ -29,36 +38,26 @@ contract Faucet is IFaucet, Initializable, OwnableUpgradeable {
         if (!success) revert TransferFailed();
     }
 
-    function addAuthorizedWorkers(address[] calldata workers) external onlyOwner {
+    function addAuthorizedWorkers(address[] calldata workers) external onlySelf {
         for (uint256 i = 0; i < workers.length; i++) {
             authorizedWorkers[workers[i]] = true;
         }
     }
 
-    function removeAuthorizedWorkers(address[] calldata workers) external onlyOwner {
+    function removeAuthorizedWorkers(address[] calldata workers) external onlySelf {
         for (uint256 i = 0; i < workers.length; i++) {
             authorizedWorkers[workers[i]] = false;
         }
     }
 
-    function setWorkerFundingAmount(uint256 amount) external onlyOwner {
+    function setWorkerFundingAmount(uint256 amount) external onlySelf {
         workerFundingAmount = amount;
     }
 
-    function setWorkerBalanceThreshold(uint256 threshold) external onlyOwner {
+    function setWorkerBalanceThreshold(uint256 threshold) external onlySelf {
         workerBalanceThreshold = threshold;
     }
 
-    function withdraw(uint256 amount) external onlyOwner {
-        if (amount > address(this).balance) revert InsufficientBalance();
-        payable(msg.sender).transfer(amount);
-    }
-
-    function withdrawAll() external onlyOwner {
-        payable(msg.sender).transfer(address(this).balance);
-    }
-
     receive() external payable {}
-
-    uint256[50] private __gap;
+    fallback() external payable {}
 }
