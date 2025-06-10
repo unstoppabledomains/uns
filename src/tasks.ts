@@ -1446,11 +1446,11 @@ const deployFaucetSAImplementationTask: Task = {
   run: async (ctx: Deployer) => {
     const { owner } = ctx.accounts;
 
-    const FaucetSAFactory = await ethers.getContractFactory(ArtifactName.FaucetSA);
-    const FaucetSA = await FaucetSAFactory.connect(owner).deploy();
-    await FaucetSA.waitForDeployment();
-    await ctx.saveContractConfig(UnsContractName.FaucetSA, FaucetSA);
-    await verify(ctx, await FaucetSA.getAddress(), []);
+    const FaucetFactory = await ethers.getContractFactory(ArtifactName.Faucet);
+    const Faucet = await FaucetFactory.connect(owner).deploy();
+    await Faucet.waitForDeployment();
+    await ctx.saveContractConfig(UnsContractName.Faucet, Faucet);
+    await verify(ctx, await Faucet.getAddress(), []);
   },
   ensureDependencies: () => ({}),
 };
@@ -1460,19 +1460,19 @@ const deployWorkerSAImplementationTask: Task = {
   priority: 30,
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const { owner } = ctx.accounts;
-    const [FaucetSA] = unwrapDependencies(dependencies, [UnsContractName.FaucetSA]);
+    const [Faucet] = unwrapDependencies(dependencies, [UnsContractName.Faucet]);
 
-    const WorkerSAFactory = await ethers.getContractFactory(ArtifactName.WorkerSA);
-    const WorkerSA = await WorkerSAFactory.connect(owner).deploy(FaucetSA.address);
-    await WorkerSA.waitForDeployment();
-    await ctx.saveContractConfig(UnsContractName.WorkerSA, WorkerSA);
-    await verify(ctx, await WorkerSA.getAddress(), [FaucetSA.address]);
+    const WorkerFactory = await ethers.getContractFactory(ArtifactName.Worker);
+    const Worker = await WorkerFactory.connect(owner).deploy(Faucet.address);
+    await Worker.waitForDeployment();
+    await ctx.saveContractConfig(UnsContractName.Worker, Worker);
+    await verify(ctx, await Worker.getAddress(), [Faucet.address]);
   },
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
     config = merge(ctx.getDeployConfig(), config);
 
     ensureUpgradable(config);
-    return ensureDeployed(config, UnsContractName.FaucetSA);
+    return ensureDeployed(config, UnsContractName.Faucet);
   },
 };
 
