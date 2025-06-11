@@ -1,6 +1,6 @@
 ## v0.9.50
 
-- Added self sustanable workers with EIP-7702
+- Added self sustainable workers with EIP-7702
 
 ## v0.9.49
 
