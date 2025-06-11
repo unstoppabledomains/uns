@@ -38,8 +38,8 @@ describe('RegistrarCustody (metatx)', () => {
     signers = await ethers.getSigners();
     [coinbase, registrarSigner, user, otherUser] = signers;
 
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-    mintingManager = await new MintingManager__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+    mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
     await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
     await mintingManager.initialize(
@@ -53,7 +53,7 @@ describe('RegistrarCustody (metatx)', () => {
     await mintingManager.setTokenURIPrefix('/');
     await mintingManager.addTld('com', true);
 
-    registrarCustody = await deployProxy(new RegistrarCustody__factory(coinbase), [
+    registrarCustody = await deployProxy(new RegistrarCustody__factory().connect(coinbase), [
       await unsRegistry.getAddress(),
       await mintingManager.getAddress(),
     ]);

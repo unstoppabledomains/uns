@@ -4,6 +4,7 @@ import { Seaport as seaportjs } from '@opensea/seaport-js';
 import { getAdvancedOrderNumeratorDenominator } from '@opensea/seaport-js/lib/utils/fulfill';
 import { ItemType } from '@opensea/seaport-js/lib/constants';
 import { CreateOrderInput } from '@opensea/seaport-js/lib/types';
+import { Signer } from 'ethers';
 import { mintRandomDomain } from '../helpers/registry';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
@@ -42,17 +43,19 @@ describe('SeaportProxyBuyer (consumption)', () => {
     signers = await ethers.getSigners();
     [coinbase, seller, buyer, reader, feesRecipient] = signers;
 
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
     await unsRegistry.addProxyReader(reader.address);
 
-    conduitController = await new ConduitController__factory(coinbase).deploy();
-    seaportContract = await new SeaportContract__factory(coinbase).deploy(await conduitController.getAddress());
-    usdcMock = await new ERC20Mock__factory(coinbase).deploy();
+    conduitController = await new ConduitController__factory().connect(coinbase).deploy();
+    seaportContract = await new SeaportContract__factory()
+      .connect(coinbase)
+      .deploy(await conduitController.getAddress());
+    usdcMock = await new ERC20Mock__factory().connect(coinbase).deploy();
 
-    seaportProxyBuyerFactory = new SeaportProxyBuyer__factory(coinbase);
+    seaportProxyBuyerFactory = new SeaportProxyBuyer__factory().connect(coinbase);
     seaportProxyBuyer = (await deployProxy<SeaportProxyBuyer>(
       seaportProxyBuyerFactory,
       [await seaportContract.getAddress(), await usdcMock.getAddress()],
@@ -61,7 +64,7 @@ describe('SeaportProxyBuyer (consumption)', () => {
     await seaportProxyBuyer.initialize(await seaportContract.getAddress());
     await seaportProxyBuyer.connect(coinbase).approve(await usdcMock.getAddress());
     await seaportProxyBuyer.addMinter(coinbase.address);
-    seaportSdk = new seaportjs(seller, {
+    seaportSdk = new seaportjs(seller as unknown as Signer, {
       overrides: {
         contractAddress: await seaportContract.getAddress(),
       },

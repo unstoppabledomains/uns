@@ -23,6 +23,8 @@ export declare enum ArtifactName {
     ConduitController = "ConduitController",
     USDC = "USDC",
     Muticall3 = "Multicall3",
+    Faucet = "Faucet",
+    Worker = "Worker",
     ENSRegistry = "ENSRegistry",
     BaseRegistrarImplementation = "BaseRegistrarImplementation",
     ReverseRegistrar = "ReverseRegistrar",
@@ -68,7 +70,9 @@ export declare enum UnsContractName {
     RegistrarCustody = "RegistrarCustody",
     USDC = "USDC",
     Multicall3 = "Multicall3",
-    L1GasPriceOracle = "L1GasPriceOracle"
+    L1GasPriceOracle = "L1GasPriceOracle",
+    Faucet = "Faucet",
+    Worker = "Worker"
 }
 export declare enum EnsContractName {
     ENSRegistry = "ENSRegistry",

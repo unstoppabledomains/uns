@@ -38,21 +38,19 @@ describe('ResolverForwarder', () => {
     signers = await ethers.getSigners();
     [owner] = signers;
 
-    registry = await new CNSRegistry__factory(owner).deploy();
-    mintingController = await new MintingController__factory(owner).deploy(await registry.getAddress());
-    signatureController = await new SignatureController__factory(owner).deploy(await registry.getAddress());
-    resolver = await new Resolver__factory(owner).deploy(
-      await registry.getAddress(),
-      await mintingController.getAddress(),
-    );
+    registry = await new CNSRegistry__factory().connect(owner).deploy();
+    mintingController = await new MintingController__factory().connect(owner).deploy(await registry.getAddress());
+    signatureController = await new SignatureController__factory().connect(owner).deploy(await registry.getAddress());
+    resolver = await new Resolver__factory()
+      .connect(owner)
+      .deploy(await registry.getAddress(), await mintingController.getAddress());
 
     await registry.addController(await mintingController.getAddress());
     await registry.addController(await signatureController.getAddress());
 
-    forwarder = await new ResolverForwarder__factory(owner).deploy(
-      await registry.getAddress(),
-      await resolver.getAddress(),
-    );
+    forwarder = await new ResolverForwarder__factory()
+      .connect(owner)
+      .deploy(await registry.getAddress(), await resolver.getAddress());
 
     buildExecuteParams = buildExecuteFunc(resolver.interface, await resolver.getAddress(), forwarder);
   });

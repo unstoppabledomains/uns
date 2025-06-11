@@ -1,5 +1,5 @@
 {
-    "version": "0.9.19",
+    "version": "0.9.20",
     "networks": {
         "1": {
             "contracts": {
@@ -525,16 +525,16 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x7a7d9531c7d9D270e7b12e60761546f4e432eEb3",
+                    "address": "0x25D0359804421aDF8E28c3629f611bfD4F04F4fD",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x64"
+                    "deploymentBlock": "0x66"
                 },
                 "ZilliqaRecover": {
-                    "address": "0xc965345EDaC823D56812cD20A10316233916a605",
-                    "deploymentBlock": "0x33",
-                    "implementation": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
+                    "address": "0x72FA6D0C2F56b802D762a14F1a71f9A56221cabe",
+                    "deploymentBlock": "0x35",
+                    "implementation": "0xf670681605eFc4efC804F5a9b97ee89520473d56",
                     "legacyAddresses": [],
-                    "forwarder": "0xc965345EDaC823D56812cD20A10316233916a605"
+                    "forwarder": "0x72FA6D0C2F56b802D762a14F1a71f9A56221cabe"
                 },
                 "Seaport": {
                     "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
@@ -566,6 +566,14 @@
                     "deploymentBlock": "0x2f",
                     "implementation": "0xDD622cF8306F18d736705e4Cc03f7FF83A899FD0",
                     "forwarder": "0x38Dae41aEed12884D39dabD8F8a81Bb5B4562756"
+                },
+                "Faucet": {
+                    "address": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
+                    "deploymentBlock": "0x32"
+                },
+                "Worker": {
+                    "address": "0xc965345EDaC823D56812cD20A10316233916a605",
+                    "deploymentBlock": "0x33"
                 }
             }
         },
@@ -842,6 +850,14 @@
                     "forwarder": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
+                },
+                "Faucet": {
+                    "address": "0x8c21e85d4D9a210fC6A6979852776c4eb50b9119",
+                    "deploymentBlock": "0x02b50e44"
+                },
+                "Worker": {
+                    "address": "0x22cF47f7A7a0D4D12e753f4789402215d998EE57",
+                    "deploymentBlock": "0x02b50e53"
                 }
             }
         },
@@ -983,6 +999,14 @@
                     "legacyAddresses": [],
                     "deploymentBlock": "0xd1938c",
                     "implementation": "0x1cd82f8bD1636D3F40435a45e9CB3effA3b30bcF"
+                },
+                "Faucet": {
+                    "address": "0x1DF7aa6E0b5d004AD07d5e33153C123aa872dBf0",
+                    "deploymentBlock": "0x015abb50"
+                },
+                "Worker": {
+                    "address": "0xf97E1b96d5081c715b26d6FC9Bd15b0Fee16f002",
+                    "deploymentBlock": "0x015abb53"
                 }
             }
         },
@@ -1121,6 +1145,14 @@
                     "forwarder": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
+                },
+                "Faucet": {
+                    "address": "0x6d619039a9b036daa319231E8EFFb08A7De95660",
+                    "deploymentBlock": "0x019a7fd1"
+                },
+                "Worker": {
+                    "address": "0x5f907b9412b604926e25c765da8211eE20cd2F63",
+                    "deploymentBlock": "0x019a7fe9"
                 }
             }
         },
@@ -1264,6 +1296,14 @@
                     "forwarder": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
+                },
+                "Faucet": {
+                    "address": "0x7bAB9Fa172199354A8D9BAc7BC81756abf8F0156",
+                    "deploymentBlock": "0x81ff12"
+                },
+                "Worker": {
+                    "address": "0x3Cecef6227752D30FCD185d7eA2eCe74580BfB1D",
+                    "deploymentBlock": "0x81ff16"
                 }
             }
         }

@@ -199,54 +199,57 @@ describe('ENSCustody', function () {
     registrantAddress = await registrant.getAddress();
     newOwnerAddress = await newOwner.getAddress();
 
-    ensRegistry = await new ENSRegistry__factory(owner).deploy();
-    baseRegistrar = await new BaseRegistrarImplementation__factory(owner).deploy(
-      await ensRegistry.getAddress(),
-      namehash('eth'),
-    );
-    reverseRegistrar = await new ReverseRegistrar__factory(owner).deploy(await ensRegistry.getAddress());
+    ensRegistry = await new ENSRegistry__factory().connect(owner).deploy();
+    baseRegistrar = await new BaseRegistrarImplementation__factory()
+      .connect(owner)
+      .deploy(await ensRegistry.getAddress(), namehash('eth'));
+    reverseRegistrar = await new ReverseRegistrar__factory().connect(owner).deploy(await ensRegistry.getAddress());
 
     await ensRegistry.setSubnodeOwner(ZERO_WORD, sha3('reverse'), ownerAddress);
     await ensRegistry.setSubnodeOwner(namehash('reverse'), sha3('addr'), await reverseRegistrar.getAddress());
 
-    nameWrapper = await new NameWrapper__factory(owner).deploy(
-      await ensRegistry.getAddress(),
-      await baseRegistrar.getAddress(),
-      ownerAddress,
-    );
+    nameWrapper = await new NameWrapper__factory()
+      .connect(owner)
+      .deploy(await ensRegistry.getAddress(), await baseRegistrar.getAddress(), ownerAddress);
 
     await ensRegistry.setSubnodeOwner(ZERO_WORD, sha3('eth'), await baseRegistrar.getAddress());
 
-    const dummyOracle = await new DummyOracle__factory(owner).deploy('100000000');
-    priceOracle = await new StablePriceOracle__factory(owner).deploy(await dummyOracle.getAddress(), [0, 0, 4, 2, 1]);
-    controller = await new ETHRegistrarController__factory(owner).deploy(
-      await baseRegistrar.getAddress(),
-      await priceOracle.getAddress(),
-      600,
-      86400,
-      await reverseRegistrar.getAddress(),
-      await nameWrapper.getAddress(),
-      await ensRegistry.getAddress(),
-    );
+    const dummyOracle = await new DummyOracle__factory().connect(owner).deploy('100000000');
+    priceOracle = await new StablePriceOracle__factory()
+      .connect(owner)
+      .deploy(await dummyOracle.getAddress(), [0, 0, 4, 2, 1]);
+    controller = await new ETHRegistrarController__factory()
+      .connect(owner)
+      .deploy(
+        await baseRegistrar.getAddress(),
+        await priceOracle.getAddress(),
+        600,
+        86400,
+        await reverseRegistrar.getAddress(),
+        await nameWrapper.getAddress(),
+        await ensRegistry.getAddress(),
+      );
     await nameWrapper.setController(await controller.getAddress(), true);
     await baseRegistrar.addController(await nameWrapper.getAddress());
     await reverseRegistrar.setController(await controller.getAddress(), true);
 
-    resolver = await new PublicResolver__factory(owner).deploy(
-      await ensRegistry.getAddress(),
-      await nameWrapper.getAddress(),
-      await controller.getAddress(),
-      await reverseRegistrar.getAddress(),
-    );
+    resolver = await new PublicResolver__factory()
+      .connect(owner)
+      .deploy(
+        await ensRegistry.getAddress(),
+        await nameWrapper.getAddress(),
+        await controller.getAddress(),
+        await reverseRegistrar.getAddress(),
+      );
 
-    custody = (await deployProxy(new ENSCustody__factory(owner), [
+    custody = (await deployProxy(new ENSCustody__factory().connect(owner), [
       await controller.getAddress(),
       await nameWrapper.getAddress(),
       await baseRegistrar.getAddress(),
     ])) as ENSCustody;
     await custody.addMinter(await minter.getAddress());
 
-    erc1155 = await new ERC1155Mock__factory(owner).deploy('');
+    erc1155 = await new ERC1155Mock__factory().connect(owner).deploy('');
   });
 
   beforeEach(async () => {
@@ -665,7 +668,7 @@ describe('ENSCustody', function () {
     });
 
     it('should reject transferring if called not from regisrar', async () => {
-      const erc721Mock = await new ERC721Mock__factory(owner).deploy();
+      const erc721Mock = await new ERC721Mock__factory().connect(owner).deploy();
 
       await expect(erc721Mock.mint(await custody.getAddress(), 1)).to.be.revertedWithCustomError(
         custody,

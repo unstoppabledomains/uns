@@ -15,7 +15,7 @@ describe('UNSRegistryForwarder', () => {
     signers = await ethers.getSigners();
     [owner] = signers;
 
-    forwarder = await new UNSRegistryForwarderMock__factory(owner).deploy();
+    forwarder = await new UNSRegistryForwarderMock__factory().connect(owner).deploy();
 
     await forwarder.initialize();
 

@@ -6,6 +6,7 @@ import { getAdvancedOrderNumeratorDenominator } from '@opensea/seaport-js/lib/ut
 import { ItemType } from '@opensea/seaport-js/lib/constants';
 import { CreateOrderInput, MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types';
 import { AdvancedOrderStruct } from '@opensea/seaport-js/lib/typechain-types/seaport/contracts/Seaport';
+import { Signer } from 'ethers';
 import { mintRandomDomain } from '../helpers/registry';
 import { UNSRegistry } from '../../types/contracts';
 import { UNSRegistry__factory } from '../../types/factories/contracts';
@@ -47,17 +48,19 @@ describe('SeaportProxyBuyer', async () => {
     signers = await ethers.getSigners();
     [coinbase, seller, buyer, reader, feesRecipient] = signers;
 
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistry.setTokenURIPrefix('/');
     await unsRegistry.addProxyReader(reader.address);
 
-    conduitController = await new ConduitController__factory(coinbase).deploy();
-    seaportContract = await new SeaportContract__factory(coinbase).deploy(await conduitController.getAddress());
-    usdcMock = await new ERC20Mock__factory(coinbase).deploy();
+    conduitController = await new ConduitController__factory().connect(coinbase).deploy();
+    seaportContract = await new SeaportContract__factory()
+      .connect(coinbase)
+      .deploy(await conduitController.getAddress());
+    usdcMock = await new ERC20Mock__factory().connect(coinbase).deploy();
 
-    seaportProxyBuyerFactory = new SeaportProxyBuyer__factory(coinbase);
+    seaportProxyBuyerFactory = new SeaportProxyBuyer__factory().connect(coinbase);
     seaportProxyBuyer = (await deployProxy<SeaportProxyBuyer>(
       seaportProxyBuyerFactory,
       [await seaportContract.getAddress(), await usdcMock.getAddress()],
@@ -151,7 +154,7 @@ describe('SeaportProxyBuyer', async () => {
     generateOrder: GenerateOrderInputFunction,
     zone?: string,
   ) => {
-    seaportSdk = new seaportjs(customer, {
+    seaportSdk = new seaportjs(customer as unknown as Signer, {
       overrides: {
         contractAddress: await seaportContract.getAddress(),
       },
@@ -190,7 +193,7 @@ describe('SeaportProxyBuyer', async () => {
     zone?: string,
     domainsAmount = 10,
   ) => {
-    seaportSdk = new seaportjs(seller, {
+    seaportSdk = new seaportjs(seller as unknown as Signer, {
       overrides: {
         contractAddress: await seaportContract.getAddress(),
       },
@@ -508,7 +511,7 @@ describe('SeaportProxyBuyer', async () => {
     });
 
     it('should approve ERC20 spending to Seaport contract', async () => {
-      const erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
+      const erc20Mock = await new ERC20Mock__factory().connect(coinbase).deploy();
       const initialAllowaneAmount = await erc20Mock.allowance(proxyBuyerAddress, await seaportContract.getAddress());
       expect(initialAllowaneAmount).to.be.eq(0);
       await seaportProxyBuyer.connect(coinbase).approve(await erc20Mock.getAddress());
@@ -517,7 +520,7 @@ describe('SeaportProxyBuyer', async () => {
     });
 
     it('should not approve ERC20 spending to Seaport contract by non-owner', async () => {
-      const erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
+      const erc20Mock = await new ERC20Mock__factory().connect(coinbase).deploy();
       await expect(seaportProxyBuyer.connect(buyer).approve(await erc20Mock.getAddress())).to.be.revertedWith(
         'Ownable: caller is not the owner',
       );
@@ -721,7 +724,7 @@ describe('SeaportProxyBuyer', async () => {
     });
 
     it('should not approve ERC20 spending to Seaport contract by non-owner', async () => {
-      const erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
+      const erc20Mock = await new ERC20Mock__factory().connect(coinbase).deploy();
       const { req, signature } = await buildExecuteParams('approve', [await erc20Mock.getAddress()], buyer, 0);
       await expect(seaportProxyBuyer.connect(coinbase).execute(req, signature)).to.be.revertedWith(
         'Ownable: caller is not the owner',
@@ -729,7 +732,7 @@ describe('SeaportProxyBuyer', async () => {
     });
 
     it('should approve ERC20 spending to Seaport contract', async () => {
-      const erc20Mock = await new ERC20Mock__factory(coinbase).deploy();
+      const erc20Mock = await new ERC20Mock__factory().connect(coinbase).deploy();
       const initialAllowaneAmount = await erc20Mock.allowance(proxyBuyerAddress, await seaportContract.getAddress());
       expect(initialAllowaneAmount).to.be.eq(0);
       const { req, signature } = await buildExecuteParams('approve', [await erc20Mock.getAddress()], coinbase, 0);

@@ -1,5 +1,5 @@
 import { ethers, network, upgrades } from 'hardhat';
-import { Contract, keccak256, namehash, parseEther, parseUnits } from 'ethers';
+import { Contract, keccak256, namehash, parseEther, parseUnits, Signer } from 'ethers';
 import { merge } from 'lodash';
 import { getContractAddress } from '@openzeppelin/hardhat-upgrades/dist/utils';
 import { ZERO_ADDRESS, ZERO_WORD } from '../test/helpers/constants';
@@ -34,7 +34,7 @@ export const deployCNSTask: Task = {
   run: async (ctx: Deployer) => {
     const { owner } = ctx.accounts;
     // CNS Registry
-    const cnsRegistry = await ethers.deployContract(ArtifactName.CNSRegistry, [], owner);
+    const cnsRegistry = await ethers.deployContract(ArtifactName.CNSRegistry, [], owner as unknown as Signer);
     await ctx.saveContractConfig(UnsContractName.CNSRegistry, cnsRegistry);
     await cnsRegistry.waitForDeployment();
     await verify(ctx, await cnsRegistry.getAddress(), []);
@@ -43,7 +43,7 @@ export const deployCNSTask: Task = {
     const signatureController = await ethers.deployContract(
       ArtifactName.SignatureController,
       [await cnsRegistry.getAddress()],
-      owner,
+      owner as unknown as Signer,
     );
     await ctx.saveContractConfig(UnsContractName.SignatureController, signatureController);
     await signatureController.waitForDeployment();
@@ -52,7 +52,7 @@ export const deployCNSTask: Task = {
     const mintingController = await ethers.deployContract(
       ArtifactName.MintingController,
       [await cnsRegistry.getAddress()],
-      owner,
+      owner as unknown as Signer,
     );
     await ctx.saveContractConfig(UnsContractName.MintingController, mintingController);
     await mintingController.waitForDeployment();
@@ -61,7 +61,7 @@ export const deployCNSTask: Task = {
     const uriPrefixController = await ethers.deployContract(
       ArtifactName.URIPrefixController,
       [await cnsRegistry.getAddress()],
-      owner,
+      owner as unknown as Signer,
     );
     await ctx.saveContractConfig(UnsContractName.URIPrefixController, uriPrefixController);
     await uriPrefixController.waitForDeployment();
@@ -76,7 +76,7 @@ export const deployCNSTask: Task = {
     const resolver = await ethers.deployContract(
       ArtifactName.Resolver,
       [await cnsRegistry.getAddress(), await mintingController.getAddress()],
-      owner,
+      owner as unknown as Signer,
     );
     await ctx.saveContractConfig(UnsContractName.Resolver, resolver);
     await resolver.waitForDeployment();
@@ -109,7 +109,7 @@ export const deployCNSForwardersTask: Task = {
     const cnsRegistryForwarder = await ethers.deployContract(
       ArtifactName.CNSRegistryForwarder,
       [SignatureController.address],
-      owner,
+      owner as unknown as Signer,
     );
 
     await ctx.saveForwarderConfig(UnsContractName.CNSRegistry, cnsRegistryForwarder);
@@ -119,7 +119,7 @@ export const deployCNSForwardersTask: Task = {
     const resolverForwarder = await ethers.deployContract(
       ArtifactName.ResolverForwarder,
       [CNSRegistry.address, Resolver.address],
-      owner,
+      owner as unknown as Signer,
     );
 
     await ctx.saveForwarderConfig(UnsContractName.Resolver, resolverForwarder);
@@ -165,16 +165,26 @@ const deployUNSTask = {
     let unsOperatorImpl: string;
 
     if (ctx.options.proxy) {
-      unsRegistry = await deployProxy(await ethers.getContractFactory(ArtifactName.UNSRegistry, owner), [], {
-        initializer: false,
-        unsafeAllow: ['delegatecall'],
-      });
+      unsRegistry = await deployProxy(
+        await ethers.getContractFactory(ArtifactName.UNSRegistry, owner as unknown as Signer),
+        [],
+        {
+          initializer: false,
+          unsafeAllow: ['delegatecall'],
+        },
+      );
 
-      mintingManager = await deployProxy(await ethers.getContractFactory(ArtifactName.MintingManager, owner), [], {
-        initializer: false,
-      });
+      mintingManager = await deployProxy(
+        await ethers.getContractFactory(ArtifactName.MintingManager, owner as unknown as Signer),
+        [],
+        {
+          initializer: false,
+        },
+      );
 
-      unsOperator = await deployProxy(await ethers.getContractFactory(ArtifactName.UNSOperator, owner));
+      unsOperator = await deployProxy(
+        await ethers.getContractFactory(ArtifactName.UNSOperator, owner as unknown as Signer),
+      );
 
       proxyAdmin = await upgrades.admin.getInstance();
       await ctx.saveContractConfig(UnsContractName.ProxyAdmin, proxyAdmin);
@@ -191,17 +201,17 @@ const deployUNSTask = {
       await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator, unsOperatorImpl);
       await verify(ctx, unsOperatorImpl, []);
     } else {
-      unsRegistry = await ethers.deployContract(UnsContractName.UNSRegistry, owner);
+      unsRegistry = await ethers.deployContract(UnsContractName.UNSRegistry, owner as unknown as Signer);
       await ctx.saveContractConfig(UnsContractName.UNSRegistry, unsRegistry);
       await unsRegistry.waitForDeployment();
       await verify(ctx, await unsRegistry.getAddress(), []);
 
-      mintingManager = await ethers.deployContract(UnsContractName.MintingManager, owner);
+      mintingManager = await ethers.deployContract(UnsContractName.MintingManager, owner as unknown as Signer);
       await ctx.saveContractConfig(UnsContractName.MintingManager, mintingManager);
       await mintingManager.waitForDeployment();
       await verify(ctx, await mintingManager.getAddress(), []);
 
-      unsOperator = await ethers.deployContract(UnsContractName.UNSOperator, owner);
+      unsOperator = await ethers.deployContract(UnsContractName.UNSOperator, owner as unknown as Signer);
       await ctx.saveContractConfig(UnsContractName.UNSOperator, unsOperator);
       await unsOperator.waitForDeployment();
       await verify(ctx, await unsOperator.getAddress(), []);
@@ -215,7 +225,7 @@ const deployUNSTask = {
     const forwarder = await ethers.deployContract(
       ArtifactName.MintingManagerForwarder,
       [await mintingManager.getAddress()],
-      owner,
+      owner as unknown as Signer,
     );
     await ctx.saveForwarderConfig(UnsContractName.MintingManager, forwarder);
     await forwarder.waitForDeployment();
@@ -273,7 +283,7 @@ const deployUNSProxyReaderTask: Task = {
     ]);
 
     const proxyReader = await deployProxy<ProxyReader>(
-      await ethers.getContractFactory(ArtifactName.ProxyReader, owner),
+      await ethers.getContractFactory(ArtifactName.ProxyReader, owner as unknown as Signer),
       [UNSRegistry.address, CNSRegistry.address],
       { unsafeAllow: ['delegatecall'] },
     );
@@ -286,7 +296,11 @@ const deployUNSProxyReaderTask: Task = {
     await ctx.saveContractConfig(UnsContractName.ProxyReader, proxyReader, proxyReaderImpl);
     await verify(ctx, proxyReaderImpl, []);
 
-    const mintingManager = await ethers.getContractAt(ArtifactName.MintingManager, MintingManager.address, owner);
+    const mintingManager = await ethers.getContractAt(
+      ArtifactName.MintingManager,
+      MintingManager.address,
+      owner as unknown as Signer,
+    );
 
     await mintingManager.addProxyReaders([await getContractAddress(proxyReader)]);
   },
@@ -318,7 +332,7 @@ const configureCNSTask = {
     const mintingController = await ethers.getContractAt(
       ArtifactName.MintingController,
       MintingController.address,
-      owner,
+      owner as unknown as Signer,
     );
 
     if (!(await mintingController.isMinter(MintingManager.address))) {
@@ -328,7 +342,7 @@ const configureCNSTask = {
     const uriPrefixController = await ethers.getContractAt(
       ArtifactName.URIPrefixController,
       URIPrefixController.address,
-      owner,
+      owner as unknown as Signer,
     );
 
     if (!(await uriPrefixController.isWhitelisted(MintingManager.address))) {
@@ -337,7 +351,11 @@ const configureCNSTask = {
 
     // Set tokenURI prefix only for Sandbox
     if (isSandbox) {
-      const mintingManager = await ethers.getContractAt(ArtifactName.MintingManager, MintingManager.address, owner);
+      const mintingManager = await ethers.getContractAt(
+        ArtifactName.MintingManager,
+        MintingManager.address,
+        owner as unknown as Signer,
+      );
       await mintingManager.setTokenURIPrefix('https://example.com/');
     }
   },
@@ -364,10 +382,14 @@ const deployMMForwarderTask = {
     const forwarder = await ethers.deployContract(
       ArtifactName.MintingManagerForwarder,
       [MintingManager.address],
-      owner,
+      owner as unknown as Signer,
     );
 
-    const mintingManager = await ethers.getContractAt(ArtifactName.MintingManager, MintingManager.address, owner);
+    const mintingManager = await ethers.getContractAt(
+      ArtifactName.MintingManager,
+      MintingManager.address,
+      owner as unknown as Signer,
+    );
 
     await mintingManager.setForwarder(await forwarder.getAddress());
     await ctx.saveForwarderConfig(UnsContractName.MintingManager, forwarder);
@@ -389,7 +411,7 @@ const deployUNSOperatorTask: Task = {
     const { owner } = ctx.accounts;
 
     const unsOperator = await upgrades.deployProxy(
-      await ethers.getContractFactory(ArtifactName.UNSOperator, owner),
+      await ethers.getContractFactory(ArtifactName.UNSOperator, owner as unknown as Signer),
       [],
     );
     await unsOperator.waitForDeployment();
@@ -423,12 +445,16 @@ const deployZilliqaRecoverTask: Task = {
     ]);
 
     const zilliqaRecover = await deployProxy<ZilliqaRecover>(
-      await ethers.getContractFactory(ArtifactName.ZilliqaRecover, owner),
+      await ethers.getContractFactory(ArtifactName.ZilliqaRecover, owner as unknown as Signer),
       [UNSRegistry.address, MintingManager.address],
     );
 
     if (isSandbox) {
-      const mintingManager = await ethers.getContractAt(ArtifactName.MintingManager, MintingManager.address, owner);
+      const mintingManager = await ethers.getContractAt(
+        ArtifactName.MintingManager,
+        MintingManager.address,
+        owner as unknown as Signer,
+      );
       await mintingManager.addMinter(await zilliqaRecover.getAddress());
     }
 
@@ -571,7 +597,11 @@ const mintUnsTldsTask: Task = {
     const mintingManagerAddr =
       ctx.getNetworkConfig().networks[network.config.chainId!].contracts[UnsContractName.MintingManager].address;
 
-    const mintingManager = await ethers.getContractAt(ArtifactName.MintingManager, mintingManagerAddr, owner);
+    const mintingManager = await ethers.getContractAt(
+      ArtifactName.MintingManager,
+      mintingManagerAddr,
+      owner as unknown as Signer,
+    );
     await mintUnsTlds(mintingManager, owner);
   },
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
@@ -732,16 +762,28 @@ const deployPolygonPosBridgeTask: Task = {
   run: async (ctx: Deployer) => {
     const { owner } = ctx.accounts;
 
-    const stateSender = await ethers.deployContract(ArtifactName.DummyStateSender, [], owner);
-    const checkpointManager = await ethers.deployContract(ArtifactName.CheckpointManager, [], owner);
+    const stateSender = await ethers.deployContract(ArtifactName.DummyStateSender, [], owner as unknown as Signer);
+    const checkpointManager = await ethers.deployContract(
+      ArtifactName.CheckpointManager,
+      [],
+      owner as unknown as Signer,
+    );
 
     // deploy Predicate
-    const predicate = await ethers.deployContract(ArtifactName.MintableERC721Predicate, [], owner);
+    const predicate = await ethers.deployContract(
+      ArtifactName.MintableERC721Predicate,
+      [],
+      owner as unknown as Signer,
+    );
     await predicate.initialize(owner.address);
     await ctx.saveContractConfig(UnsContractName.MintableERC721Predicate, predicate);
 
     // deploy RootChainManager
-    const rootChainManager = await ethers.deployContract(ArtifactName.RootChainManager, [], owner);
+    const rootChainManager = await ethers.deployContract(
+      ArtifactName.RootChainManager,
+      [],
+      owner as unknown as Signer,
+    );
     await rootChainManager.initialize(owner.address);
     await rootChainManager.setCheckpointManager(await checkpointManager.getAddress());
     await rootChainManager.setStateSender(await stateSender.getAddress());
@@ -765,7 +807,7 @@ const configurePolygonPosBridgeTask: Task = {
     const rootChainManager = await ethers.getContractAt(
       ArtifactName.RootChainManager,
       RootChainManager.address,
-      owner,
+      owner as unknown as Signer,
     );
 
     const tokenType = keccak256(UNSRegistry.address);
@@ -775,7 +817,7 @@ const configurePolygonPosBridgeTask: Task = {
     const predicate = await ethers.getContractAt(
       ArtifactName.MintableERC721Predicate,
       MintableERC721Predicate.address,
-      owner,
+      owner as unknown as Signer,
     );
     await predicate.grantRole(await predicate.MANAGER_ROLE(), await rootChainManager.getAddress());
   },
@@ -798,7 +840,11 @@ const deployDotCoinBurnerTask: Task = {
     const { owner } = ctx.accounts;
     const UNSRegistry = unwrap(dependencies, ArtifactName.UNSRegistry);
 
-    const dotCoinBurner = await ethers.deployContract(ArtifactName.DotCoinBurner, [UNSRegistry.address], owner);
+    const dotCoinBurner = await ethers.deployContract(
+      ArtifactName.DotCoinBurner,
+      [UNSRegistry.address],
+      owner as unknown as Signer,
+    );
     await ctx.saveContractConfig(UnsContractName.DotCoinBurner, dotCoinBurner);
     await dotCoinBurner.waitForDeployment();
     await verify(ctx, await dotCoinBurner.getAddress(), [UNSRegistry.address]);
@@ -852,20 +898,20 @@ const deployENSTask = {
   run: async (ctx: Deployer) => {
     const { owner } = ctx.accounts;
 
-    const ens = await ethers.deployContract(ArtifactName.ENSRegistry, [], owner);
+    const ens = await ethers.deployContract(ArtifactName.ENSRegistry, [], owner as unknown as Signer);
     await ctx.saveContractConfig(EnsContractName.ENSRegistry, ens);
 
     const baseRegistrar = await ethers.deployContract(
       ArtifactName.BaseRegistrarImplementation,
       [await ens.getAddress(), namehash('eth')],
-      owner,
+      owner as unknown as Signer,
     );
     await ctx.saveContractConfig(EnsContractName.BaseRegistrarImplementation, baseRegistrar);
 
     const reverseRegistrar = await ethers.deployContract(
       ArtifactName.ReverseRegistrar,
       [await ens.getAddress()],
-      owner,
+      owner as unknown as Signer,
     );
     await ctx.saveContractConfig(EnsContractName.ReverseRegistrar, reverseRegistrar);
 
@@ -875,19 +921,23 @@ const deployENSTask = {
     const nameWrapper = await ethers.deployContract(
       ArtifactName.NameWrapper,
       [await ens.getAddress(), await baseRegistrar.getAddress(), await owner.getAddress()],
-      owner,
+      owner as unknown as Signer,
     );
     await ctx.saveContractConfig(EnsContractName.NameWrapper, nameWrapper);
 
     await ens.setSubnodeOwner(ZERO_WORD, notNullSha('eth'), await baseRegistrar.getAddress());
 
-    const dummyOracle = await ethers.deployContract(ArtifactName.DummyOracle, ['100000000'], owner);
+    const dummyOracle = await ethers.deployContract(
+      ArtifactName.DummyOracle,
+      ['100000000'],
+      owner as unknown as Signer,
+    );
     await ctx.saveContractConfig(EnsContractName.DummyOracle, dummyOracle);
 
     const priceOracle = await ethers.deployContract(
       ArtifactName.StablePriceOracle,
       [await dummyOracle.getAddress(), [0, 0, 4, 2, 1]],
-      owner,
+      owner as unknown as Signer,
     );
     await ctx.saveContractConfig(EnsContractName.StablePriceOracle, priceOracle);
 
@@ -905,7 +955,7 @@ const deployENSTask = {
     const legacyController = await ethers.deployContract(
       ArtifactName.LegacyETHRegistrarController,
       [await baseRegistrar.getAddress(), await priceOracle.getAddress(), 600, 86400],
-      owner,
+      owner as unknown as Signer,
     );
     await ctx.saveContractConfig(EnsContractName.LegacyETHRegistrarController, legacyController);
 
@@ -925,7 +975,7 @@ const deployENSTask = {
         await controller.getAddress(),
         await reverseRegistrar.getAddress(),
       ],
-      owner,
+      owner as unknown as Signer,
     );
 
     await ctx.saveContractConfig(EnsContractName.PublicResolver, resolver);
@@ -937,11 +987,15 @@ const deployENSTask = {
         await controller.getAddress(),
         await reverseRegistrar.getAddress(),
       ],
-      owner,
+      owner as unknown as Signer,
     );
     await ctx.saveContractLegacyAddresses(EnsContractName.PublicResolver, [await legacyResolver.getAddress()]);
     await reverseRegistrar.setDefaultResolver(await resolver.getAddress());
-    const legacyEnsRegistry = await ethers.deployContract(ArtifactName.LegacyENSRegistry, [], owner);
+    const legacyEnsRegistry = await ethers.deployContract(
+      ArtifactName.LegacyENSRegistry,
+      [],
+      owner as unknown as Signer,
+    );
     await legacyEnsRegistry.setSubnodeOwner(ZERO_WORD, notNullSha('eth'), await owner.getAddress());
     await ctx.saveContractConfig(EnsContractName.LegacyENSRegistry, legacyEnsRegistry);
 
@@ -957,16 +1011,36 @@ const deployENSTask = {
       [ArtifactName.SHA1NSEC3Digest]: 1,
     };
     const algorithmsAndDigests = {
-      [ArtifactName.RSASHA256Algorithm]: await ethers.deployContract(ArtifactName.RSASHA256Algorithm, [], owner),
-      [ArtifactName.DummyAlgorithm]: await ethers.deployContract(ArtifactName.DummyAlgorithm, [], owner),
-      [ArtifactName.SHA256Digest]: await ethers.deployContract(ArtifactName.SHA256Digest, [], owner),
-      [ArtifactName.SHA1Digest]: await ethers.deployContract(ArtifactName.SHA1Digest, [], owner),
-      [ArtifactName.SHA1NSEC3Digest]: await ethers.deployContract(ArtifactName.SHA1NSEC3Digest, [], owner),
+      [ArtifactName.RSASHA256Algorithm]: await ethers.deployContract(
+        ArtifactName.RSASHA256Algorithm,
+        [],
+        owner as unknown as Signer,
+      ),
+      [ArtifactName.DummyAlgorithm]: await ethers.deployContract(
+        ArtifactName.DummyAlgorithm,
+        [],
+        owner as unknown as Signer,
+      ),
+      [ArtifactName.SHA256Digest]: await ethers.deployContract(
+        ArtifactName.SHA256Digest,
+        [],
+        owner as unknown as Signer,
+      ),
+      [ArtifactName.SHA1Digest]: await ethers.deployContract(ArtifactName.SHA1Digest, [], owner as unknown as Signer),
+      [ArtifactName.SHA1NSEC3Digest]: await ethers.deployContract(
+        ArtifactName.SHA1NSEC3Digest,
+        [],
+        owner as unknown as Signer,
+      ),
     };
     const rootTrustAnchors =
       // eslint-disable-next-line max-len
       '0x00002b000100000e1000244a5c080249aac11d7b6f6446702e54a1607371607a1a41855200fd2ce1cdde32f24e8fb500002b000100000e1000244f660802e06d44b80b8f1d39a95c0b0d7c65d08458e880409bbc683457104237c7f8ec8d';
-    const dnssecOracle = await ethers.deployContract(ArtifactName.DNSSECImpl, [rootTrustAnchors], owner);
+    const dnssecOracle = await ethers.deployContract(
+      ArtifactName.DNSSECImpl,
+      [rootTrustAnchors],
+      owner as unknown as Signer,
+    );
     for (const [algorithm, id] of Object.entries(algorithmsIds)) {
       await dnssecOracle.setAlgorithm(id, await algorithmsAndDigests[algorithm].getAddress());
     }
@@ -978,13 +1052,17 @@ const deployENSTask = {
     }
     await ctx.saveContractConfig(EnsContractName.DNSSECImpl, dnssecOracle);
 
-    const tldPublicSuffixList = await ethers.deployContract(ArtifactName.TLDPublicSuffixList, [], owner);
+    const tldPublicSuffixList = await ethers.deployContract(
+      ArtifactName.TLDPublicSuffixList,
+      [],
+      owner as unknown as Signer,
+    );
     const dnsRegistrar = await ethers.deployContract(ArtifactName.DNSRegistrar, [
       await dnssecOracle.getAddress(),
       await tldPublicSuffixList.getAddress(),
       await ens.getAddress(),
     ]);
-    const root = await ethers.deployContract(ArtifactName.Root, [await ens.getAddress()], owner);
+    const root = await ethers.deployContract(ArtifactName.Root, [await ens.getAddress()], owner as unknown as Signer);
     await ctx.saveContractConfig(EnsContractName.Root, root);
     await root.setController(await dnsRegistrar.getAddress(), true);
     await root.setController(await owner.getAddress(), true);
@@ -1006,11 +1084,10 @@ const deployENSCustodyTask: Task = {
       EnsContractName.BaseRegistrarImplementation,
     ]);
 
-    const custody = await deployProxy<ENSCustody>(await ethers.getContractFactory(ArtifactName.ENSCustody, owner), [
-      ETHRegistrarController.address,
-      NameWrapper.address,
-      BaseRegistrarImplementation.address,
-    ]);
+    const custody = await deployProxy<ENSCustody>(
+      await ethers.getContractFactory(ArtifactName.ENSCustody, owner as unknown as Signer),
+      [ETHRegistrarController.address, NameWrapper.address, BaseRegistrarImplementation.address],
+    );
     await custody.waitForDeployment();
 
     const proxyAdmin = await upgrades.admin.getInstance();
@@ -1121,8 +1198,16 @@ const deploySeaportTask: Task = {
       throw new Error('This task is only available for sandbox');
     }
 
-    const conduitController = await ethers.deployContract(ArtifactName.ConduitController, [], owner);
-    const seaport = await ethers.deployContract(ArtifactName.Seaport, [await conduitController.getAddress()], owner);
+    const conduitController = await ethers.deployContract(
+      ArtifactName.ConduitController,
+      [],
+      owner as unknown as Signer,
+    );
+    const seaport = await ethers.deployContract(
+      ArtifactName.Seaport,
+      [await conduitController.getAddress()],
+      owner as unknown as Signer,
+    );
     await seaport.waitForDeployment();
     await ctx.saveContractConfig(UnsContractName.Seaport, seaport);
   },
@@ -1139,7 +1224,7 @@ const deployMulticall3SandboxTask: Task = {
       throw new Error('This task is only available for sandbox or testnet');
     }
 
-    const multicall = await ethers.deployContract(ArtifactName.Muticall3, [], owner);
+    const multicall = await ethers.deployContract(ArtifactName.Muticall3, [], owner as unknown as Signer);
     await multicall.waitForDeployment();
     await ctx.saveContractConfig(UnsContractName.Multicall3, multicall);
     await verify(ctx, await multicall.getAddress(), [], 'contracts/mocks/Multicall3.sol:Multicall3');
@@ -1157,9 +1242,13 @@ const deployUsdcMockTask: Task = {
       throw new Error('This task is only available for sandbox or testnet');
     }
 
-    const usdcMock = await deployProxy<USDC>(await ethers.getContractFactory(ArtifactName.USDC, owner), [], {
-      redeployImplementation: 'onchange',
-    });
+    const usdcMock = await deployProxy<USDC>(
+      await ethers.getContractFactory(ArtifactName.USDC, owner as unknown as Signer),
+      [],
+      {
+        redeployImplementation: 'onchange',
+      },
+    );
     await usdcMock.waitForDeployment();
     const proxyAdmin = await upgrades.admin.getInstance();
     const usdcMockImpl = await proxyAdmin.getProxyImplementation.staticCall(await usdcMock.getAddress());
@@ -1176,7 +1265,7 @@ const deploySeaportProxyBuyerTask: Task = {
     const { owner } = ctx.accounts;
     const [Seaport] = unwrapDependencies(dependencies, [UnsContractName.Seaport]);
     const seaportProxyBuyer = await deployProxy<SeaportProxyBuyer>(
-      await ethers.getContractFactory(ArtifactName.SeaportProxyBuyer, owner),
+      await ethers.getContractFactory(ArtifactName.SeaportProxyBuyer, owner as unknown as Signer),
       [Seaport.address],
     );
     await seaportProxyBuyer.waitForDeployment();
@@ -1225,12 +1314,16 @@ const fundSeaportProxyBuyerTask: Task = {
       UnsContractName.SeaportProxyBuyer,
       UnsContractName.USDC,
     ]);
-    const usdcMockContract = await ethers.getContractAt(UnsContractName.USDC, USDCMock.address, owner);
+    const usdcMockContract = await ethers.getContractAt(
+      UnsContractName.USDC,
+      USDCMock.address,
+      owner as unknown as Signer,
+    );
     await usdcMockContract.mint(SeaportProxyBuyer.address, amountToFund);
     const seaportProxyBuyerContract = await ethers.getContractAt(
       UnsContractName.SeaportProxyBuyer,
       SeaportProxyBuyer.address,
-      owner,
+      owner as unknown as Signer,
     );
     await seaportProxyBuyerContract.approve(USDCMock.address);
   },
@@ -1298,7 +1391,7 @@ const deployRegistrarCustodyTask: Task = {
     ]);
 
     const registrarCustody = await deployProxy<RegistrarCustody>(
-      await ethers.getContractFactory(ArtifactName.RegistrarCustody, owner),
+      await ethers.getContractFactory(ArtifactName.RegistrarCustody, owner as unknown as Signer),
       [UNSRegistry.address, MintingManager.address],
     );
     await registrarCustody.waitForDeployment();
@@ -1320,7 +1413,11 @@ const deployRegistrarCustodyTask: Task = {
       }
     }
 
-    const mintingManager = await ethers.getContractAt(ArtifactName.MintingManager, MintingManager.address, owner);
+    const mintingManager = await ethers.getContractAt(
+      ArtifactName.MintingManager,
+      MintingManager.address,
+      owner as unknown as Signer,
+    );
     const addMintingRightTx = await mintingManager.addMinters([await registrarCustody.getAddress()]);
     await addMintingRightTx.wait();
 
@@ -1340,6 +1437,42 @@ const deployRegistrarCustodyTask: Task = {
     config = merge(ctx.getDeployConfig(), config);
 
     return ensureDeployed(config, UnsContractName.UNSRegistry, UnsContractName.MintingManager);
+  },
+};
+
+const deployFaucetSAImplementationTask: Task = {
+  tags: ['faucet_sa_implementation', 'workers_set_up', 'full', 'uns'],
+  priority: 30,
+  run: async (ctx: Deployer) => {
+    const { owner } = ctx.accounts;
+
+    const FaucetFactory = await ethers.getContractFactory(ArtifactName.Faucet);
+    const Faucet = await FaucetFactory.connect(owner).deploy();
+    await Faucet.waitForDeployment();
+    await ctx.saveContractConfig(UnsContractName.Faucet, Faucet);
+    await verify(ctx, await Faucet.getAddress(), []);
+  },
+  ensureDependencies: () => ({}),
+};
+
+const deployWorkerSAImplementationTask: Task = {
+  tags: ['worker_sa_implementation', 'workers_set_up', 'full', 'uns'],
+  priority: 30,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const { owner } = ctx.accounts;
+    const [Faucet] = unwrapDependencies(dependencies, [UnsContractName.Faucet]);
+
+    const WorkerFactory = await ethers.getContractFactory(ArtifactName.Worker);
+    const Worker = await WorkerFactory.connect(owner).deploy(Faucet.address);
+    await Worker.waitForDeployment();
+    await ctx.saveContractConfig(UnsContractName.Worker, Worker);
+    await verify(ctx, await Worker.getAddress(), [Faucet.address]);
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.Faucet);
   },
 };
 
@@ -1375,4 +1508,6 @@ export const tasks: Task[] = [
   mintUnsTldsTask,
   proposeSeaportProxyBuyerTask,
   deployRegistrarCustodyTask,
+  deployFaucetSAImplementationTask,
+  deployWorkerSAImplementationTask,
 ];

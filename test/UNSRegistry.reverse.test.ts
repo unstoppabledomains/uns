@@ -28,7 +28,7 @@ describe('UNSRegistry (reverse)', () => {
   });
 
   beforeEach(async () => {
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
 
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistry.mintTLD(TLD.crypto.hash, 'crypto');
@@ -40,7 +40,7 @@ describe('UNSRegistry (reverse)', () => {
     await unsRegistry.addProxyReader(reader.address);
 
     // mock
-    unsRegistryMock = await new UNSRegistryMock__factory(coinbase).deploy();
+    unsRegistryMock = await new UNSRegistryMock__factory().connect(coinbase).deploy();
     await unsRegistryMock.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
     await unsRegistryMock.mintTLD(TLD.crypto.hash, 'crypto');
     await unsRegistryMock.mintTLD(TLD.x.hash, 'x');

@@ -23,8 +23,8 @@ describe('BaseForwarder', () => {
 
     const ERC1271MockFactory = await ethers.getContractFactory('ERC1271Mock');
 
-    forwarder = await new BaseForwarderMock__factory(owner).deploy();
-    simpleWallet = await new ERC1271SimpleWallet__factory(owner).deploy(owner.address);
+    forwarder = await new BaseForwarderMock__factory().connect(owner).deploy();
+    simpleWallet = await new ERC1271SimpleWallet__factory().connect(owner).deploy(owner.address);
     mockWallet = await ERC1271MockFactory.deploy();
 
     buildExecuteParams = buildExecuteFunc(forwarder.interface, await forwarder.getAddress(), forwarder);

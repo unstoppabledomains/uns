@@ -26,6 +26,8 @@ export enum ArtifactName {
   ConduitController = 'ConduitController',
   USDC = 'USDC',
   Muticall3 = 'Multicall3',
+  Faucet = 'Faucet',
+  Worker = 'Worker',
 
   // ENS
   ENSRegistry = 'ENSRegistry',
@@ -75,6 +77,8 @@ export enum UnsContractName {
   USDC = 'USDC',
   Multicall3 = 'Multicall3',
   L1GasPriceOracle = 'L1GasPriceOracle',
+  Faucet = 'Faucet',
+  Worker = 'Worker',
 }
 
 export enum EnsContractName {

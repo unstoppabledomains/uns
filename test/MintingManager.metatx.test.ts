@@ -25,12 +25,14 @@ describe('MintingManager (metatx)', () => {
   });
 
   beforeEach(async () => {
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
 
-    mintingManager = await deployProxy(new MintingManager__factory(coinbase), [], { initializer: false });
+    mintingManager = await deployProxy(new MintingManager__factory().connect(coinbase), [], { initializer: false });
     await unsRegistry.initialize(await mintingManager.getAddress(), ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
 
-    forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(await mintingManager.getAddress());
+    forwarder = await new MintingManagerForwarder__factory()
+      .connect(coinbase)
+      .deploy(await mintingManager.getAddress());
 
     await mintingManager.initialize(
       await unsRegistry.getAddress(),
@@ -121,7 +123,7 @@ describe('MintingManager (metatx)', () => {
     const expiry = (await getLatestBlockTimestamp()) + 24 * 60 * 60;
     const price = parseEther('5');
 
-    const erc20Mock: ERC20Mock = await new ERC20Mock__factory(coinbase).deploy();
+    const erc20Mock: ERC20Mock = await new ERC20Mock__factory().connect(coinbase).deploy();
     await erc20Mock.mint(receiver.address, price);
 
     const labels = ['test-erc20-onchain-purchase-metatx', 'wallet'];

@@ -17,8 +17,8 @@ describe('ERC2771Context', () => {
     signers = await ethers.getSigners();
     [coinbase, account] = signers;
 
-    context = await new ERC2771ContextMock__factory(coinbase).deploy();
-    forwarder = await new MintingManagerForwarder__factory(coinbase).deploy(await context.getAddress());
+    context = await new ERC2771ContextMock__factory().connect(coinbase).deploy();
+    forwarder = await new MintingManagerForwarder__factory().connect(coinbase).deploy(await context.getAddress());
 
     await context.initialize(await forwarder.getAddress());
 

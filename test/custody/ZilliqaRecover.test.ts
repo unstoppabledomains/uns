@@ -53,9 +53,9 @@ describe('ZilliqaRecover', () => {
 
     await (await coinbase.sendTransaction({ to: zilWallet.address, value: BigInt('100000000000000000000') })).wait();
 
-    unsRegistry = await new UNSRegistry__factory(coinbase).deploy();
-    mintingManager = await new MintingManager__factory(coinbase).deploy();
-    zilliqaRecover = await deployProxy<ZilliqaRecover>(new custody.ZilliqaRecover__factory(coinbase), [
+    unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
+    mintingManager = await new MintingManager__factory().connect(coinbase).deploy();
+    zilliqaRecover = await deployProxy<ZilliqaRecover>(new custody.ZilliqaRecover__factory().connect(coinbase), [
       await unsRegistry.getAddress(),
       await mintingManager.getAddress(),
     ]);
