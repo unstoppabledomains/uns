@@ -1,6 +1,6 @@
 {
   "name": "uns",
-  "version": "0.9.50",
+  "version": "0.9.51",
   "description": "UNS contracts and tools",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "main": "./dist/index.js",
@@ -110,12 +110,12 @@
     "@ensdomains/address-encoder": "^0.2.22",
     "bip39": "^3.0.0",
     "bip44-constants": "^243.0.0",
-    "ethers": "^6.14.3",
+    "ethers": "^6.14.4",
     "hdkey": "^2.0.1",
     "web3": "^1.7.4"
   },
   "resolutions": {
-    "ethers": "^6.14.3"
+    "ethers": "^6.14.4"
   },
   "packageManager": "yarn@3.4.1"
 }
