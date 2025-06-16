@@ -1,3 +1,7 @@
+## v0.9.51
+
+- Updated ethers version
+
 ## v0.9.50
 
 - Added self sustainable workers with EIP-7702
