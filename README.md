@@ -162,7 +162,7 @@ describe('UNSRegistry', () => {
 
 - `{NETWORK}_INFURA_KEY` - Infura key for connecting to Ethereum Node
 - `{NETWORK}_UNS_PRIVATE_KEY` - Private key of account for contracts deployment
-- `{EXPLORER}_API_KEY` - Etherscan(or any whitelabled compatible explorer) API Key for smart contracts verification
+- `{EXPLORER}_API_KEY` - Etherscan(or any whitelabeled compatible explorer) API Key for smart contracts verification
 
 NOTE: All private keys should be in HEX format with `0x` prefix
 
@@ -196,7 +196,7 @@ Note: List of changes which makes UNS and CNS backward incompatible
 * `event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value)` 
   * Moved from Resolver to Registry
 * `event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key)` 
-  * Moved from Resolver to Regisry
+  * Moved from Resolver to Registry
 * `event ResetRecords(uint256 indexed tokenId)` 
   * Moved from Resolver to Registry
   * Registry now fires this event when records are reset on transfer.
