@@ -1,5 +1,5 @@
 {
-    "version": "0.9.20",
+    "version": "0.9.21",
     "networks": {
         "1": {
             "contracts": {
@@ -573,7 +573,8 @@
                 },
                 "Worker": {
                     "address": "0xc965345EDaC823D56812cD20A10316233916a605",
-                    "deploymentBlock": "0x33"
+                    "deploymentBlock": "0x33",
+                    "legacyAddresses": []
                 }
             }
         },
@@ -994,19 +995,21 @@
                     "deploymentBlock": "0x0"
                 },
                 "RegistrarCustody": {
-                    "address": "0x64ED8886421Da2118f988fAC5D65d0b8f7f7fbB6",
-                    "forwarder": "0x64ED8886421Da2118f988fAC5D65d0b8f7f7fbB6",
+                    "address": "0x4Fc4962687FCd0B06A6395B8Ffa5955238CB51DA",
+                    "forwarder": "0x4Fc4962687FCd0B06A6395B8Ffa5955238CB51DA",
                     "legacyAddresses": [],
                     "deploymentBlock": "0xd1938c",
                     "implementation": "0x1cd82f8bD1636D3F40435a45e9CB3effA3b30bcF"
                 },
                 "Faucet": {
                     "address": "0x1DF7aa6E0b5d004AD07d5e33153C123aa872dBf0",
+                    "legacyAddresses": [],
                     "deploymentBlock": "0x015abb50"
                 },
                 "Worker": {
                     "address": "0xf97E1b96d5081c715b26d6FC9Bd15b0Fee16f002",
-                    "deploymentBlock": "0x015abb53"
+                    "deploymentBlock": "0x015abb53",
+                    "legacyAddresses": []
                 }
             }
         },
