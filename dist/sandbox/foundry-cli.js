@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.installAnvil = exports.getAnvilCommand = void 0;
 const child_process_1 = require("child_process");
 const path_1 = __importDefault(require("path"));
-const FOUNDRY_VERSION = 'nightly-de33b6af53005037b463318d2628b5cfcaf39916';
+const FOUNDRY_VERSION = 'v1.2.3';
 function getAnvilCommand() {
     return __awaiter(this, void 0, void 0, function* () {
         const cmd = foundryAnvilBinPath();
