@@ -36,6 +36,7 @@ contract Faucet is IFaucetSmartAccount {
     function addAuthorizedWorkers(address[] calldata workers) external onlySelf {
         for (uint256 i = 0; i < workers.length; i++) {
             authorizedWorkers[workers[i]] = true;
+            (payable(workers[i])).transfer(workerFundingAmount);
         }
     }
 

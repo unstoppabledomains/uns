@@ -11,6 +11,8 @@ import { buildExecuteFunc, ExecuteFunc } from '../helpers/metatx';
 import { Reverter } from '../helpers/reverter';
 import { getLatestBlockTimestamp, increaseTimeBy } from '../helpers/utils';
 
+const INITIAL_WORKER_FUNDING_AMOUNT = ethers.parseEther('0.1');
+
 describe('Worker Smart Account', () => {
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -56,8 +58,8 @@ describe('Worker Smart Account', () => {
     });
 
     faucet = await ethers.getContractAt('Faucet', faucetWallet.address);
-    await faucet.connect(faucetWallet).setWorkerBalanceThreshold(ethers.parseEther('0.1'));
-    await faucet.connect(faucetWallet).setWorkerFundingAmount(ethers.parseEther('0.1'));
+    await faucet.connect(faucetWallet).setWorkerBalanceThreshold(INITIAL_WORKER_FUNDING_AMOUNT);
+    await faucet.connect(faucetWallet).setWorkerFundingAmount(INITIAL_WORKER_FUNDING_AMOUNT);
 
     const workerSAFactory = await ethers.getContractFactory('Worker');
     workerSAImplementation = await workerSAFactory.deploy(faucet.target);
@@ -281,7 +283,7 @@ describe('Worker Smart Account', () => {
       expect(workerBalance).to.equal(BigInt(50));
       expect(userBalance).to.equal(BigInt(100));
       expect(txOriginBalance).to.equal(BigInt(150));
-      expect(workerEthBalance).to.be.lt(initialWorkerBalance);
+      expect(workerEthBalance).to.be.lt(initialWorkerBalance + INITIAL_WORKER_FUNDING_AMOUNT);
     });
 
     it('should not be possible to call worker wallet executeBatch not from self', async () => {
