@@ -15,7 +15,7 @@ async function main () {
   }
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['faucet_sa_implementation'], config);
+  const deployConfig = await deployer.execute(['workers_set_up'], config);
   mergeNetworkConfig(deployConfig, NameService.UNS);
 
   console.log('Deployed!');
