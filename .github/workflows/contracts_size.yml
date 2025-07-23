@@ -3,6 +3,10 @@ name: Contracts size
 on:
   pull_request: {}
 
+permissions:
+  contents: read       
+  actions: read       
+
 jobs:
   target-contracts-size:
     runs-on: ubuntu-latest
