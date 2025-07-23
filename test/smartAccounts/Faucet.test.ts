@@ -55,7 +55,9 @@ describe('Faucet', () => {
 
   describe('worker authorization', () => {
     it('should allow self to add authorized workers', async () => {
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address, worker2.address]);
+      await faucet
+        .connect(faucetWallet)
+        .addAuthorizedWorkers([worker1.address, worker2.address], { gasLimit: 100000 });
       expect(await faucet.authorizedWorkers(worker1.address)).to.be.true;
       expect(await faucet.authorizedWorkers(worker2.address)).to.be.true;
     });
@@ -65,7 +67,9 @@ describe('Faucet', () => {
       const initialWorker2Balance = await ethers.provider.getBalance(worker2.address);
       const initialFaucetBalance = await ethers.provider.getBalance(faucet.target);
 
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address, worker2.address]);
+      await faucet
+        .connect(faucetWallet)
+        .addAuthorizedWorkers([worker1.address, worker2.address], { gasLimit: 100000 });
 
       const finalWorker1Balance = await ethers.provider.getBalance(worker1.address);
       const finalWorker2Balance = await ethers.provider.getBalance(worker2.address);
@@ -83,7 +87,7 @@ describe('Faucet', () => {
       const initialWorkerBalance = await ethers.provider.getBalance(worker1.address);
       const initialFaucetBalance = await ethers.provider.getBalance(faucet.target);
 
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address]);
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address], { gasLimit: 100000 });
 
       const finalWorkerBalance = await ethers.provider.getBalance(worker1.address);
       const finalFaucetBalance = await ethers.provider.getBalance(faucet.target);
@@ -106,7 +110,9 @@ describe('Faucet', () => {
     });
 
     it('should allow self to remove authorized workers', async () => {
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address, worker2.address]);
+      await faucet
+        .connect(faucetWallet)
+        .addAuthorizedWorkers([worker1.address, worker2.address], { gasLimit: 100000 });
       await faucet.connect(faucetWallet).removeAuthorizedWorkers([worker1.address]);
       expect(await faucet.authorizedWorkers(worker1.address)).to.be.false;
       expect(await faucet.authorizedWorkers(worker2.address)).to.be.true;
@@ -120,7 +126,7 @@ describe('Faucet', () => {
     });
 
     it('should not allow non-self to remove authorized workers', async () => {
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address]);
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address], { gasLimit: 100000 });
       await expect(faucet.connect(random).removeAuthorizedWorkers([worker1.address])).to.be.revertedWithCustomError(
         faucet,
         'NotSelf',
@@ -130,7 +136,7 @@ describe('Faucet', () => {
 
   describe('worker withdrawals', () => {
     beforeEach(async () => {
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address]);
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address], { gasLimit: 100000 });
     });
 
     it('should allow authorized worker to withdraw funding amount', async () => {
