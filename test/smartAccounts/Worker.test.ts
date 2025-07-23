@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { Wallet, Authorization } from 'ethers';
 import { expect } from 'chai';
+import { conduitControllerSol } from '@opensea/seaport-js/lib/typechain-types/seaport/contracts/conduit';
 import { Worker, Faucet } from '../../types/contracts/smartAccounts';
 import { MintingManager, UNSRegistry } from '../../types/contracts';
 import { MintingManagerForwarder } from '../../types/contracts/metatx';
@@ -118,7 +119,7 @@ describe('Worker Smart Account', () => {
         value: ethers.parseEther('10'),
       });
 
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([workerWallet.address]);
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([workerWallet.address], { gasLimit: 100000 });
 
       const workerAuth: Authorization = await workerWallet.authorize({ address: workerSAImplementation.target });
 
@@ -564,7 +565,7 @@ describe('Worker Smart Account', () => {
         nonce: (await workerWallet.getNonce()) + 1,
       });
 
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([workerWallet.address]);
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([workerWallet.address], { gasLimit: 100000 });
 
       await workerWallet.sendTransaction({
         to: workerWallet.address,
@@ -666,7 +667,7 @@ describe('Worker Smart Account', () => {
         nonce: (await workerWallet.getNonce()) + 1,
       });
 
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([workerWallet.address]);
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([workerWallet.address], { gasLimit: 100000 });
 
       await workerWallet.sendTransaction({
         to: workerWallet.address,
