@@ -853,8 +853,8 @@
                     "deploymentBlock": "0x0"
                 },
                 "Faucet": {
-                    "address": "0x8c21e85d4D9a210fC6A6979852776c4eb50b9119",
-                    "deploymentBlock": "0x02b50e44"
+                    "address": "0xD2B66842bAE3b370f530e59d10a75a4234071aBE",
+                    "deploymentBlock": "0x0338a00b"
                 },
                 "Worker": {
                     "address": "0x22cF47f7A7a0D4D12e753f4789402215d998EE57",
@@ -1002,9 +1002,9 @@
                     "implementation": "0x1cd82f8bD1636D3F40435a45e9CB3effA3b30bcF"
                 },
                 "Faucet": {
-                    "address": "0x1DF7aa6E0b5d004AD07d5e33153C123aa872dBf0",
+                    "address": "0x334b436511107E50CD8695c204263eE4C17836Ad",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x015abb50"
+                    "deploymentBlock": "0x01725414"
                 },
                 "Worker": {
                     "address": "0xf97E1b96d5081c715b26d6FC9Bd15b0Fee16f002",
@@ -1150,8 +1150,8 @@
                     "deploymentBlock": "0x0"
                 },
                 "Faucet": {
-                    "address": "0x6d619039a9b036daa319231E8EFFb08A7De95660",
-                    "deploymentBlock": "0x019a7fd1"
+                    "address": "0xecACC65a8Bcaa328E9BDFa810Bd5c8e708a6381E",
+                    "deploymentBlock": "0x01b6dcb1"
                 },
                 "Worker": {
                     "address": "0x5f907b9412b604926e25c765da8211eE20cd2F63",
@@ -1301,8 +1301,8 @@
                     "deploymentBlock": "0x0"
                 },
                 "Faucet": {
-                    "address": "0x7bAB9Fa172199354A8D9BAc7BC81756abf8F0156",
-                    "deploymentBlock": "0x81ff12"
+                    "address": "0x2FB93fACcCd0A464fDA2F5F2B55481A06385373e",
+                    "deploymentBlock": "0x86ade7"
                 },
                 "Worker": {
                     "address": "0x3Cecef6227752D30FCD185d7eA2eCe74580BfB1D",

@@ -1,3 +1,7 @@
+## v0.9.53
+
+- `Faucet` smart account was updated and redeployed
+
 ## v0.9.52
 
 - `RegistrarCustody@0.2.0` was deployed to amoy
