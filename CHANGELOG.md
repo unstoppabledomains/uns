@@ -1,3 +1,7 @@
+## v0.9.53
+
+- Ensured that we have `Faucet` and `Worker` contracts defined in all networks
+
 ## v0.9.52
 
 - `RegistrarCustody@0.2.0` was deployed to amoy
