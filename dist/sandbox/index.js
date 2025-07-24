@@ -31,7 +31,7 @@ const DEFAULT_SERVER_CONFIG = {
     gasLimit: 6721975,
     defaultBalanceEther: 1000,
     totalAccounts: 10,
-    hardfork: 'cancun',
+    hardfork: 'prague',
     hdPath: 'm/44\'/60\'/0\'/0/',
     mnemonic: 'mimic dune forward party defy island absorb insane deputy obvious brother immense',
     chainId: 1337,
