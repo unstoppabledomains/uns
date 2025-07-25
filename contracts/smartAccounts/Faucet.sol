@@ -13,6 +13,8 @@ import './IFaucetSmartAccount.sol';
  * or use a new keypair for faucet wallet with clean storage before delegation.
  */
 contract Faucet is IFaucetSmartAccount {
+    string public constant VERSION = '1.1.0';
+
     uint256 public workerBalanceThreshold;
     uint256 public workerFundingAmount;
 
