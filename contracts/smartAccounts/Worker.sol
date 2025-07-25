@@ -9,6 +9,8 @@ import './IWorkerSmartAccount.sol';
 import '../metatx/IForwarder.sol';
 
 contract Worker is IWorkerSmartAccount {
+    string public constant VERSION = '1.0.0';
+
     IFaucetSmartAccount public immutable faucet;
 
     constructor(IFaucetSmartAccount _faucet) {

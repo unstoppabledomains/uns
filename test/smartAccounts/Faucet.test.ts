@@ -55,13 +55,64 @@ describe('Faucet', () => {
 
   describe('worker authorization', () => {
     it('should allow self to add authorized workers', async () => {
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address, worker2.address]);
+      await faucet
+        .connect(faucetWallet)
+        .addAuthorizedWorkers([worker1.address, worker2.address], { gasLimit: 100000 });
       expect(await faucet.authorizedWorkers(worker1.address)).to.be.true;
       expect(await faucet.authorizedWorkers(worker2.address)).to.be.true;
     });
 
+    it('should transfer funding amount to workers when adding them as authorized', async () => {
+      const initialWorker1Balance = await ethers.provider.getBalance(worker1.address);
+      const initialWorker2Balance = await ethers.provider.getBalance(worker2.address);
+      const initialFaucetBalance = await ethers.provider.getBalance(faucet.target);
+
+      await faucet
+        .connect(faucetWallet)
+        .addAuthorizedWorkers([worker1.address, worker2.address], { gasLimit: 100000 });
+
+      const finalWorker1Balance = await ethers.provider.getBalance(worker1.address);
+      const finalWorker2Balance = await ethers.provider.getBalance(worker2.address);
+      const finalFaucetBalance = await ethers.provider.getBalance(faucet.target);
+
+      // Workers should receive the funding amount
+      expect(finalWorker1Balance - initialWorker1Balance).to.equal(WORKER_FUNDING_AMOUNT);
+      expect(finalWorker2Balance - initialWorker2Balance).to.equal(WORKER_FUNDING_AMOUNT);
+
+      // Faucet should have sent at least 2 * funding amount (plus gas costs)
+      expect(initialFaucetBalance - finalFaucetBalance).to.be.gte(WORKER_FUNDING_AMOUNT * BigInt(2));
+    });
+
+    it('should transfer funding amount to single worker when adding as authorized', async () => {
+      const initialWorkerBalance = await ethers.provider.getBalance(worker1.address);
+      const initialFaucetBalance = await ethers.provider.getBalance(faucet.target);
+
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address], { gasLimit: 100000 });
+
+      const finalWorkerBalance = await ethers.provider.getBalance(worker1.address);
+      const finalFaucetBalance = await ethers.provider.getBalance(faucet.target);
+
+      // Worker should receive the funding amount
+      expect(finalWorkerBalance - initialWorkerBalance).to.equal(WORKER_FUNDING_AMOUNT);
+
+      // Faucet should have sent at least the funding amount (plus gas costs)
+      expect(initialFaucetBalance - finalFaucetBalance).to.be.gte(WORKER_FUNDING_AMOUNT);
+    });
+
+    it('should fail to add workers if faucet has insufficient balance', async () => {
+      // Drain the faucet to leave insufficient balance for funding
+      await faucetWallet.sendTransaction({
+        to: owner.address,
+        value: ethers.parseEther('0.95'),
+      });
+
+      await expect(faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address])).to.be.reverted;
+    });
+
     it('should allow self to remove authorized workers', async () => {
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address, worker2.address]);
+      await faucet
+        .connect(faucetWallet)
+        .addAuthorizedWorkers([worker1.address, worker2.address], { gasLimit: 100000 });
       await faucet.connect(faucetWallet).removeAuthorizedWorkers([worker1.address]);
       expect(await faucet.authorizedWorkers(worker1.address)).to.be.false;
       expect(await faucet.authorizedWorkers(worker2.address)).to.be.true;
@@ -75,7 +126,7 @@ describe('Faucet', () => {
     });
 
     it('should not allow non-self to remove authorized workers', async () => {
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address]);
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address], { gasLimit: 100000 });
       await expect(faucet.connect(random).removeAuthorizedWorkers([worker1.address])).to.be.revertedWithCustomError(
         faucet,
         'NotSelf',
@@ -85,7 +136,7 @@ describe('Faucet', () => {
 
   describe('worker withdrawals', () => {
     beforeEach(async () => {
-      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address]);
+      await faucet.connect(faucetWallet).addAuthorizedWorkers([worker1.address], { gasLimit: 100000 });
     });
 
     it('should allow authorized worker to withdraw funding amount', async () => {
@@ -117,7 +168,7 @@ describe('Faucet', () => {
     it('should fail if contract has insufficient balance', async () => {
       await faucetWallet.sendTransaction({
         to: owner.address,
-        value: ethers.parseEther('0.95'),
+        value: ethers.parseEther('0.88'),
       });
       await expect(faucet.connect(worker1).requestFunding()).to.be.revertedWithCustomError(faucet, 'TransferFailed');
     });

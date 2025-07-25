@@ -17,11 +17,13 @@ export declare namespace ISmartAccount {
     };
 }
 export interface WorkerInterface extends Interface {
-    getFunction(nameOrSignature: "executeBatch" | "executeBatchAndEnsureBalance" | "faucet"): FunctionFragment;
+    getFunction(nameOrSignature: "VERSION" | "executeBatch" | "executeBatchAndEnsureBalance" | "faucet"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "InternalCallFailed"): EventFragment;
+    encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
     encodeFunctionData(functionFragment: "executeBatch", values: [ISmartAccount.CallStruct[], boolean]): string;
     encodeFunctionData(functionFragment: "executeBatchAndEnsureBalance", values: [ISmartAccount.CallStruct[], boolean]): string;
     encodeFunctionData(functionFragment: "faucet", values?: undefined): string;
+    decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "executeBatch", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "executeBatchAndEnsureBalance", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "faucet", data: BytesLike): Result;
@@ -51,6 +53,7 @@ export interface Worker extends BaseContract {
     listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    VERSION: TypedContractMethod<[], [string], "view">;
     executeBatch: TypedContractMethod<[
         calls: ISmartAccount.CallStruct[],
         revertOnError: boolean
@@ -65,6 +68,7 @@ export interface Worker extends BaseContract {
     ], "payable">;
     faucet: TypedContractMethod<[], [string], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "VERSION"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "executeBatch"): TypedContractMethod<[
         calls: ISmartAccount.CallStruct[],
         revertOnError: boolean

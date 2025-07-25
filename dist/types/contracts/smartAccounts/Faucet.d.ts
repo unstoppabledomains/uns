@@ -1,7 +1,8 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../common";
 export interface FaucetInterface extends Interface {
-    getFunction(nameOrSignature: "addAuthorizedWorkers" | "authorizedWorkers" | "removeAuthorizedWorkers" | "requestFunding" | "setWorkerBalanceThreshold" | "setWorkerFundingAmount" | "workerBalanceThreshold" | "workerFundingAmount"): FunctionFragment;
+    getFunction(nameOrSignature: "VERSION" | "addAuthorizedWorkers" | "authorizedWorkers" | "removeAuthorizedWorkers" | "requestFunding" | "setWorkerBalanceThreshold" | "setWorkerFundingAmount" | "workerBalanceThreshold" | "workerFundingAmount"): FunctionFragment;
+    encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
     encodeFunctionData(functionFragment: "addAuthorizedWorkers", values: [AddressLike[]]): string;
     encodeFunctionData(functionFragment: "authorizedWorkers", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "removeAuthorizedWorkers", values: [AddressLike[]]): string;
@@ -10,6 +11,7 @@ export interface FaucetInterface extends Interface {
     encodeFunctionData(functionFragment: "setWorkerFundingAmount", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "workerBalanceThreshold", values?: undefined): string;
     encodeFunctionData(functionFragment: "workerFundingAmount", values?: undefined): string;
+    decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addAuthorizedWorkers", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "authorizedWorkers", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeAuthorizedWorkers", data: BytesLike): Result;
@@ -32,6 +34,7 @@ export interface Faucet extends BaseContract {
     listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    VERSION: TypedContractMethod<[], [string], "view">;
     addAuthorizedWorkers: TypedContractMethod<[
         workers: AddressLike[]
     ], [
@@ -61,6 +64,7 @@ export interface Faucet extends BaseContract {
     workerBalanceThreshold: TypedContractMethod<[], [bigint], "view">;
     workerFundingAmount: TypedContractMethod<[], [bigint], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "VERSION"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "addAuthorizedWorkers"): TypedContractMethod<[workers: AddressLike[]], [void], "nonpayable">;
     getFunction(nameOrSignature: "authorizedWorkers"): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
     getFunction(nameOrSignature: "removeAuthorizedWorkers"): TypedContractMethod<[workers: AddressLike[]], [void], "nonpayable">;

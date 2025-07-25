@@ -13,6 +13,8 @@ import './IFaucetSmartAccount.sol';
  * or use a new keypair for faucet wallet with clean storage before delegation.
  */
 contract Faucet is IFaucetSmartAccount {
+    string public constant VERSION = '1.1.0';
+
     uint256 public workerBalanceThreshold;
     uint256 public workerFundingAmount;
 
@@ -36,6 +38,7 @@ contract Faucet is IFaucetSmartAccount {
     function addAuthorizedWorkers(address[] calldata workers) external onlySelf {
         for (uint256 i = 0; i < workers.length; i++) {
             authorizedWorkers[workers[i]] = true;
+            (payable(workers[i])).transfer(workerFundingAmount);
         }
     }
 
