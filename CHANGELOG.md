@@ -1,6 +1,6 @@
 ## v0.9.53
 
-- Ensured that we have `Faucet` and `Worker` contracts defined in all networks
+- `Faucet` smart account was updated and redeployed
 
 ## v0.9.52
 
