@@ -104,8 +104,10 @@ export class Sandbox {
     if (options.verbose) {
       debug.enable('UNS:sandbox*');
       anvilOptions.silent = false;
+      anvilOptions.verbose = true;
     } else {
       anvilOptions.silent = true;
+      anvilOptions.verbose = false;
     }
 
     if (options.rebuild) {

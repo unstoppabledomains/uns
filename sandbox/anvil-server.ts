@@ -20,6 +20,7 @@ export type AnvilServerOptions = {
   dumpStatePath: string;
   loadStatePath: string;
   silent: boolean;
+  verbose: boolean;
   anvilCliPath: string;
 };
 
@@ -38,6 +39,7 @@ const ANVIL_ARGUMENTS_MAP: Record<Exclude<keyof AnvilServerOptions, 'anvilCliPat
   dumpStatePath: '--dump-state',
   loadStatePath: '--load-state',
   silent: '--silent',
+  verbose: '-vvv',
 };
 
 const BLOCKS_TO_KEEP = 500;
