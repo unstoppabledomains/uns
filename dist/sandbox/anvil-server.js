@@ -33,6 +33,7 @@ const ANVIL_ARGUMENTS_MAP = {
     dumpStatePath: '--dump-state',
     loadStatePath: '--load-state',
     silent: '--silent',
+    verbose: '-vvv',
 };
 const BLOCKS_TO_KEEP = 500;
 class AnvilServer {

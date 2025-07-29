@@ -1,3 +1,7 @@
+## v0.9.54
+
+- Upgrade foundry to 1.2.3 (EIP-7702 support), rebuild sandbox
+
 ## v0.9.53
 
 - `Faucet` smart account was updated and redeployed

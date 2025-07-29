@@ -13,6 +13,7 @@ export declare type AnvilServerOptions = {
     dumpStatePath: string;
     loadStatePath: string;
     silent: boolean;
+    verbose: boolean;
     anvilCliPath: string;
 };
 export declare class AnvilServer {
