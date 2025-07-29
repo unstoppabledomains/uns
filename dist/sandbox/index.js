@@ -84,9 +84,11 @@ class Sandbox {
             if (options.verbose) {
                 debug_1.default.enable('UNS:sandbox*');
                 anvilOptions.silent = false;
+                anvilOptions.verbose = true;
             }
             else {
                 anvilOptions.silent = true;
+                anvilOptions.verbose = false;
             }
             if (options.rebuild) {
                 if (fs_1.default.existsSync(networkOptions.statePath)) {
