@@ -116,9 +116,14 @@ describe('RegistrarCustody', () => {
 
       const newExpiry = expiry + 60 * 60 * 24;
 
-      await registrarCustody
+      const result = await registrarCustody
         .connect(registrar)
         .tokenizeDomain(labels, ['key1'], ['value1'], newExpiry, registrarId, user.address);
+
+      expect(result)
+        .to.emit(unsRegistry, 'Transfer')
+        .withArgs(await mintingManager.getAddress(), await registrarCustody.getAddress(), tokenId);
+      expect(result).to.emit(registrarCustody, 'DomainTokenized').withArgs(tokenId, registrarId, user.address);
 
       expect(await unsRegistry.ownerOf(tokenId)).to.equal(await registrarCustody.getAddress());
       expect(await unsRegistry.get('key1', tokenId)).to.equal('value1');

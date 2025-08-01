@@ -26,7 +26,7 @@ contract RegistrarCustody is
     using ECDSAUpgradeable for bytes32;
 
     string public constant NAME = 'UNS: Registrar Custody';
-    string public constant VERSION = '0.2.0';
+    string public constant VERSION = '0.2.1';
 
     bytes4 internal constant _ERC1271_MAGIC_VALUE = bytes4(keccak256('isValidSignature(bytes32,bytes)'));
 
@@ -67,9 +67,9 @@ contract RegistrarCustody is
         address userDelegation
     ) external onlyAdmin nonReentrant {
         uint256 tokenId = unsRegistry.namehash(labels);
-        bool domainExists = unsRegistry.exists(tokenId);
+        address owner = unsRegistry.exists(tokenId) ? unsRegistry.ownerOf(tokenId) : address(0);
 
-        if (domainExists && unsRegistry.ownerOf(tokenId) == address(this)) {
+        if (owner == address(this)) {
             uint256 currentExpiry = unsRegistry.expiryOf(tokenId);
             if (currentExpiry == 0) {
                 revert InvalidExpiry();
@@ -81,7 +81,7 @@ contract RegistrarCustody is
 
             unsRegistry.setMany(keys, values, tokenId);
         } else {
-            if (domainExists) {
+            if (owner != address(0) && owner != address(mintingManager)) {
                 mintingManager.revoke(tokenId);
             }
 
