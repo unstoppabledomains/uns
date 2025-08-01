@@ -1,3 +1,7 @@
+## v0.9.55
+
+- `RegistrarCustody@0.2.1` avoid revoking when domain was already de-tokenized
+
 ## v0.9.54
 
 - Upgrade foundry to 1.2.3 (EIP-7702 support), rebuild sandbox
