@@ -1385,9 +1385,10 @@ const deployRegistrarCustodyTask: Task = {
   priority: 30,
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const { owner } = ctx.accounts;
-    const [UNSRegistry, MintingManager] = unwrapDependencies(dependencies, [
+    const [UNSRegistry, MintingManager, Seaport] = unwrapDependencies(dependencies, [
       UnsContractName.UNSRegistry,
       UnsContractName.MintingManager,
+      UnsContractName.Seaport,
     ]);
 
     const registrarCustody = await deployProxy<RegistrarCustody>(
@@ -1413,13 +1414,19 @@ const deployRegistrarCustodyTask: Task = {
       }
     }
 
-    const mintingManager = await ethers.getContractAt(
-      ArtifactName.MintingManager,
-      MintingManager.address,
-      owner as unknown as Signer,
-    );
-    const addMintingRightTx = await mintingManager.addMinters([await registrarCustody.getAddress()]);
-    await addMintingRightTx.wait();
+    ctx.log('Setting approval for Seaport, address:', Seaport.address);
+    const approvalTx = await registrarCustody.setApprovalForAll(Seaport.address, true);
+    await approvalTx.wait();
+
+    if (isTestnet) {
+      const mintingManager = await ethers.getContractAt(
+        ArtifactName.MintingManager,
+        MintingManager.address,
+        owner as unknown as Signer,
+      );
+      const addMintingRightTx = await mintingManager.addMinters([await registrarCustody.getAddress()]);
+      await addMintingRightTx.wait();
+    }
 
     const proxyAdmin = await upgrades.admin.getInstance();
     const registrarCustodyImpl = await proxyAdmin.getProxyImplementation.staticCall(
@@ -1436,7 +1443,12 @@ const deployRegistrarCustodyTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
-    return ensureDeployed(config, UnsContractName.UNSRegistry, UnsContractName.MintingManager);
+    return ensureDeployed(
+      config,
+      UnsContractName.UNSRegistry,
+      UnsContractName.MintingManager,
+      UnsContractName.Seaport,
+    );
   },
 };
 
@@ -1476,6 +1488,52 @@ const deployWorkerSAImplementationTask: Task = {
   },
 };
 
+const proposeRegistrarCustodyTask: Task = {
+  tags: ['propose_registrar_custody'],
+  priority: 30,
+  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
+    const RegistrarCustody = unwrap(dependencies, ArtifactName.RegistrarCustody);
+
+    const version = params?.version;
+    if (!version) {
+      throw new Error('Version parameter is not provided');
+    }
+
+    if (!ctx.multisig) {
+      throw new Error('Multisig address is not provided');
+    }
+
+    ctx.log('Deploying new implementation');
+
+    const newImplementationAddress = (await upgrades.prepareUpgrade(
+      RegistrarCustody.address,
+      await ethers.getContractFactory(ArtifactName.RegistrarCustody),
+    )) as string;
+
+    await verify(ctx, newImplementationAddress, []);
+
+    await ctx.saveContractConfig(
+      UnsContractName.RegistrarCustody,
+      await ethers.getContractAt(ArtifactName.RegistrarCustody, RegistrarCustody.address),
+      newImplementationAddress,
+    );
+
+    ctx.log('Preparing proposal...');
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+
+    await proposeContractUpgrade(RegistrarCustody.address, newImplementationAddress, await proxyAdmin.getAddress());
+
+    ctx.log('Upgrade proposal created');
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.RegistrarCustody);
+  },
+};
+
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -1510,4 +1568,5 @@ export const tasks: Task[] = [
   deployRegistrarCustodyTask,
   deployFaucetSAImplementationTask,
   deployWorkerSAImplementationTask,
+  proposeRegistrarCustodyTask,
 ];
