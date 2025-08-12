@@ -1,3 +1,7 @@
+## v0.9.56
+
+- `RegistrarCustody@0.2.1` was upgraded to Amoy, deployed to Polygon Mainnet
+
 ## v0.9.55
 
 - `RegistrarCustody@0.2.1` avoid revoking when domain was already de-tokenized

@@ -1,5 +1,5 @@
 {
-    "version": "0.9.22",
+    "version": "0.9.23",
     "networks": {
         "1": {
             "contracts": {
@@ -295,10 +295,11 @@
                     "deploymentBlock": "0x0"
                 },
                 "RegistrarCustody": {
-                    "address": "0x0000000000000000000000000000000000000000",
-                    "forwarder": "0x0000000000000000000000000000000000000000",
+                    "address": "0x6fCAB4eFDa1978878A63d3d70aD4F53d35f0781A",
+                    "forwarder": "0x6fCAB4eFDa1978878A63d3d70aD4F53d35f0781A",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x0"
+                    "deploymentBlock": "0x047a0de0",
+                    "implementation": "0x19B0395Cf20ca136360A80E65D690098DE207025"
                 },
                 "Faucet": {
                     "address": "0x0000000000000000000000000000000000000000",
@@ -1038,8 +1039,8 @@
                     "address": "0x4Fc4962687FCd0B06A6395B8Ffa5955238CB51DA",
                     "forwarder": "0x4Fc4962687FCd0B06A6395B8Ffa5955238CB51DA",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0xd1938c",
-                    "implementation": "0x1cd82f8bD1636D3F40435a45e9CB3effA3b30bcF"
+                    "deploymentBlock": "0x0153a381",
+                    "implementation": "0x94ac0a00E60FAAce15aA9c17335073271a2793B2"
                 },
                 "Faucet": {
                     "address": "0x334b436511107E50CD8695c204263eE4C17836Ad",
