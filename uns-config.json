@@ -556,16 +556,16 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x25D0359804421aDF8E28c3629f611bfD4F04F4fD",
+                    "address": "0x51A944e573DdcA58500583A997F2E46616A15770",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x66"
+                    "deploymentBlock": "0x67"
                 },
                 "ZilliqaRecover": {
-                    "address": "0x72FA6D0C2F56b802D762a14F1a71f9A56221cabe",
-                    "deploymentBlock": "0x35",
-                    "implementation": "0xf670681605eFc4efC804F5a9b97ee89520473d56",
+                    "address": "0xB3106671C1BCBBa687F15520c6ebf985663Cea96",
+                    "deploymentBlock": "0x36",
+                    "implementation": "0x72FA6D0C2F56b802D762a14F1a71f9A56221cabe",
                     "legacyAddresses": [],
-                    "forwarder": "0x72FA6D0C2F56b802D762a14F1a71f9A56221cabe"
+                    "forwarder": "0xB3106671C1BCBBa687F15520c6ebf985663Cea96"
                 },
                 "Seaport": {
                     "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
@@ -599,12 +599,12 @@
                     "forwarder": "0x38Dae41aEed12884D39dabD8F8a81Bb5B4562756"
                 },
                 "Faucet": {
-                    "address": "0x3F1194B9019002863Ad0DBBE295294547c0d36A9",
-                    "deploymentBlock": "0x32"
+                    "address": "0xc965345EDaC823D56812cD20A10316233916a605",
+                    "deploymentBlock": "0x33"
                 },
                 "Worker": {
-                    "address": "0xc965345EDaC823D56812cD20A10316233916a605",
-                    "deploymentBlock": "0x33",
+                    "address": "0xf670681605eFc4efC804F5a9b97ee89520473d56",
+                    "deploymentBlock": "0x34",
                     "legacyAddresses": []
                 }
             }
