@@ -1418,7 +1418,7 @@ const deployRegistrarCustodyTask: Task = {
     const approvalTx = await registrarCustody.setApprovalForAll(Seaport.address, true);
     await approvalTx.wait();
 
-    if (isTestnet) {
+    if (isTestnet || isSandbox) {
       const mintingManager = await ethers.getContractAt(
         ArtifactName.MintingManager,
         MintingManager.address,

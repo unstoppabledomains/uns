@@ -1,3 +1,7 @@
+## v0.9.57
+
+- Small sandbox fix for `RegistrarCustody`
+
 ## v0.9.56
 
 - `RegistrarCustody@0.2.1` was upgraded to Amoy, deployed to Polygon Mainnet
