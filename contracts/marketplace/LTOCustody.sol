@@ -1,7 +1,7 @@
 pragma solidity 0.8.24;
 
 import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
-import {AdvancedOrder, CriteriaResolver} from 'seaport-types/src/lib/ConsiderationStructs.sol';
+import {AdvancedOrder, CriteriaResolver, OrderType, ItemType, OfferItem, ConsiderationItem} from 'seaport-types/src/lib/ConsiderationStructs.sol';
 import '../metatx/Forwarder.sol';
 import '../IUNSRegistry.sol';
 import './LTOCustodyAdminRole.sol';
@@ -13,7 +13,15 @@ import './ILTOCustody.sol';
  * @author Unstoppable Domains, Inc.
  * @dev Custody contract for partial marketplace sales.
  */
-contract LTOCustody is Initializable, Forwarder, LTOCustodyAdminRole, ReentrancyGuardUpgradeable, PausableUpgradeable, ILTOCustody {
+contract LTOCustody is
+    Initializable,
+    Forwarder,
+    ERC2771RegistryContext,
+    ReentrancyGuardUpgradeable,
+    PausableUpgradeable,
+    LTOCustodyAdminRole,
+    ILTOCustody
+{
     IUNSRegistry public registry;
     SeaportProxyBuyer public seaportProxyBuyer;
 
@@ -34,6 +42,8 @@ contract LTOCustody is Initializable, Forwarder, LTOCustodyAdminRole, Reentrancy
         __Ownable_init_unchained();
         __LTOCustodyAdminRole_init_unchained();
         __ReentrancyGuard_init_unchained();
+        __Pausable_init_unchained();
+        __ERC2771RegistryContext_init_unchained();
         registry = _registry;
         seaportProxyBuyer = _seaportProxyBuyer;
     }
@@ -61,6 +71,22 @@ contract LTOCustody is Initializable, Forwarder, LTOCustodyAdminRole, Reentrancy
         _;
     }
 
+    function _msgSender() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (address) {
+        return super._msgSender();
+    }
+
+    function _msgData() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (bytes calldata) {
+        return super._msgData();
+    }
+
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    function unpause() public onlyOwner {
+        _unpause();
+    }
+
     /**
      * @notice Initiates the custody of an asset from a Seaport order.
      * @param ltoId The custody ID.
@@ -76,21 +102,50 @@ contract LTOCustody is Initializable, Forwarder, LTOCustodyAdminRole, Reentrancy
         bytes32 fulfillerConduitKey,
         address recipient
     ) external onlyCustodyAdmin {
-        address seller = advancedOrder.parameters.offerer;
-        address buyer = recipient;
-        uint256 tokenId = advancedOrder.parameters.offer[0].identifierOrCriteria;
+        (address seller, address buyer, uint256 tokenId) = _parseOrderData(advancedOrder, recipient);
         _initiateLTO(ltoId, seller, buyer, tokenId);
 
-        bool fulfilled = seaportProxyBuyer.fulfillAdvancedOrder(advancedOrder, criteriaResolvers, fulfillerConduitKey, address(this));
-        if (!fulfilled) {
-            revert OrderIsNotFulfilled();
-        }
+        seaportProxyBuyer.fulfillAdvancedOrder(advancedOrder, criteriaResolvers, fulfillerConduitKey, address(this));
 
         if (registry.ownerOf(tokenId) != address(this)) {
             revert OrderIsNotFulfilled();
         }
 
         emit AssetDeposited(ltoId, tokenId, seller, buyer);
+    }
+
+    /**
+     * @notice Parses the order data to get the seller, buyer and token ID for the LTO.
+     * @param advancedOrder The Seaport order.
+     * @param recipient The recipient address.
+     * @return seller The seller address.
+     * @return buyer The buyer address.
+     * @return tokenId The token ID.
+     */
+    function _parseOrderData(
+        AdvancedOrder calldata advancedOrder,
+        address recipient
+    ) private view returns (address seller, address buyer, uint256 tokenId) {
+        // expect a full restricted order
+        if (
+            advancedOrder.parameters.orderType != OrderType.FULL_RESTRICTED ||
+            advancedOrder.parameters.consideration.length == 0 ||
+            advancedOrder.parameters.offer.length == 0
+        ) {
+            revert InvalidOrder();
+        }
+        // check offer first
+        OfferItem calldata offer = advancedOrder.parameters.offer[0];
+        if (offer.itemType == ItemType.ERC721 && offer.token == address(registry)) {
+            return (advancedOrder.parameters.offerer, recipient, offer.identifierOrCriteria);
+        }
+        // we couldn't find a domain in the offer -> check the consideration
+        ConsiderationItem calldata consideration = advancedOrder.parameters.consideration[0];
+        if (consideration.itemType == ItemType.ERC721 && consideration.token == address(registry)) {
+            return (consideration.recipient, recipient, consideration.identifierOrCriteria);
+        }
+        // we couldn't find a domain to lock -> the order is invalid
+        revert InvalidOrder();
     }
 
     /**
@@ -197,9 +252,12 @@ contract LTOCustody is Initializable, Forwarder, LTOCustodyAdminRole, Reentrancy
         }
 
         ltoAssets[ltoId].isFinalized = true;
-        registry.transferFrom(address(this), to, ltoAssets[ltoId].tokenId);
+        uint256 tokenId = ltoAssets[ltoId].tokenId;
+        delete tokenLTOs[tokenId];
 
-        emit AssetReleased(ltoId, ltoAssets[ltoId].tokenId, to);
+        registry.transferFrom(address(this), to, tokenId);
+
+        emit AssetReleased(ltoId, tokenId, to);
     }
 
     /**

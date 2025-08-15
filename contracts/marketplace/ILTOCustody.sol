@@ -30,5 +30,6 @@ interface ILTOCustody {
     error InvalidBuyer();
     error InvalidLTOId();
     error InvalidRecipient();
+    error InvalidOrder();
     error TokenAlreadyInLTO();
 }

@@ -15,6 +15,11 @@
     },
     {
       "inputs": [],
+      "name": "InvalidOrder",
+      "type": "error"
+    },
+    {
+      "inputs": [],
       "name": "InvalidRecipient",
       "type": "error"
     },
