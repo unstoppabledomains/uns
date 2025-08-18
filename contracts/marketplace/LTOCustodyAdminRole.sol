@@ -1,7 +1,6 @@
 // @author Unstoppable Domains, Inc.
-// @date May 21st, 2025
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.24;
 
 import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
@@ -13,13 +12,6 @@ abstract contract LTOCustodyAdminRole is OwnableUpgradeable, AccessControlUpgrad
     event CustodyAdminRemoved(address indexed account);
 
     error Unauthorized();
-
-    // solhint-disable-next-line func-name-mixedcase
-    function __LTOCustodyAdminRole_init() internal onlyInitializing {
-        __Ownable_init_unchained();
-        __AccessControl_init_unchained();
-        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-    }
 
     // solhint-disable-next-line func-name-mixedcase
     function __LTOCustodyAdminRole_init_unchained() internal onlyInitializing {

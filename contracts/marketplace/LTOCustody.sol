@@ -1,3 +1,5 @@
+// @author Unstoppable Domains, Inc.
+
 pragma solidity 0.8.24;
 
 import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
@@ -40,6 +42,7 @@ contract LTOCustody is
     function initialize(IUNSRegistry _registry, SeaportProxyBuyer _seaportProxyBuyer) public initializer {
         __Forwarder_init_unchained();
         __Ownable_init_unchained();
+        __AccessControl_init_unchained();
         __LTOCustodyAdminRole_init_unchained();
         __ReentrancyGuard_init_unchained();
         __Pausable_init_unchained();
@@ -72,11 +75,11 @@ contract LTOCustody is
     }
 
     function _msgSender() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (address) {
-        return super._msgSender();
+        return ERC2771RegistryContext._msgSender();
     }
 
     function _msgData() internal view override(ContextUpgradeable, ERC2771RegistryContext) returns (bytes calldata) {
-        return super._msgData();
+        return ERC2771RegistryContext._msgData();
     }
 
     function pause() public onlyOwner {
@@ -101,13 +104,13 @@ contract LTOCustody is
         CriteriaResolver[] calldata criteriaResolvers,
         bytes32 fulfillerConduitKey,
         address recipient
-    ) external onlyCustodyAdmin {
+    ) external nonReentrant onlyCustodyAdmin {
         (address seller, address buyer, uint256 tokenId) = _parseOrderData(advancedOrder, recipient);
         _initiateLTO(ltoId, seller, buyer, tokenId);
 
-        seaportProxyBuyer.fulfillAdvancedOrder(advancedOrder, criteriaResolvers, fulfillerConduitKey, address(this));
+        bool fulfilled = seaportProxyBuyer.fulfillAdvancedOrder(advancedOrder, criteriaResolvers, fulfillerConduitKey, address(this));
 
-        if (registry.ownerOf(tokenId) != address(this)) {
+        if (!fulfilled || registry.ownerOf(tokenId) != address(this)) {
             revert OrderIsNotFulfilled();
         }
 
@@ -155,7 +158,7 @@ contract LTOCustody is
      * @param buyer The buyer address.
      * @param tokenId The token ID.
      */
-    function initiateLTO(uint256 ltoId, address seller, address buyer, uint256 tokenId) public onlyCustodyAdmin whenNotPaused {
+    function initiateLTO(uint256 ltoId, address seller, address buyer, uint256 tokenId) public nonReentrant onlyCustodyAdmin whenNotPaused {
         _initiateLTO(ltoId, seller, buyer, tokenId);
 
         if (registry.ownerOf(tokenId) != address(this)) {
@@ -267,10 +270,6 @@ contract LTOCustody is
      * @param values The values to set.
      */
     function setMany(uint256 ltoId, string[] calldata keys, string[] calldata values) public onlyLTOBuyer(ltoId) whenNotPaused {
-        if (!isLTOInitiated(ltoId)) {
-            revert LTONotInitiated();
-        }
-
         registry.setMany(keys, values, ltoAssets[ltoId].tokenId);
     }
 }
