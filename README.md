@@ -196,7 +196,7 @@ Note: List of changes which makes UNS and CNS backward incompatible
 * `event Set(uint256 indexed tokenId, string indexed keyIndex, string indexed valueIndex, string key, string value)` 
   * Moved from Resolver to Registry
 * `event NewKey(uint256 indexed tokenId, string indexed keyIndex, string key)` 
-  * Moved from Resolver to Regisry
+  * Moved from Resolver to Registry
 * `event ResetRecords(uint256 indexed tokenId)` 
   * Moved from Resolver to Registry
   * Registry now fires this event when records are reset on transfer.
