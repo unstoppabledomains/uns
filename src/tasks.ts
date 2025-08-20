@@ -1569,6 +1569,18 @@ const deployLTOCustodyTask: Task = {
 
     const proxyAdmin = await upgrades.admin.getInstance();
     const ltoCustodyImpl = await proxyAdmin.getProxyImplementation.staticCall(await ltoCustody.getAddress());
+
+    // Add lto custody as minter to seaport proxy buyer
+    const seaportProxyBuyerContract = await ethers.getContractAt(
+      UnsContractName.SeaportProxyBuyer,
+      SeaportProxyBuyer.address,
+      owner as unknown as Signer,
+    );
+    const addSeaportMinterTx = await seaportProxyBuyerContract
+      .connect(owner)
+      .addMinters([await ltoCustody.getAddress()]);
+    await addSeaportMinterTx.wait();
+
     await ctx.saveContractConfig(UnsContractName.LTOCustody, ltoCustody, ltoCustodyImpl, ltoCustody);
     await verify(ctx, ltoCustodyImpl, []);
   },
