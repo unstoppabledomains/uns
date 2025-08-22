@@ -15,6 +15,10 @@ export declare class ILTOCustody__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
+        readonly name: "InvalidOrderType";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
         readonly name: "InvalidRecipient";
         readonly type: "error";
     }, {

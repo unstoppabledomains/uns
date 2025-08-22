@@ -129,23 +129,19 @@ contract LTOCustody is
         AdvancedOrder calldata advancedOrder,
         address recipient
     ) private view returns (address seller, address buyer, uint256 tokenId) {
-        // expect a full restricted order
-        if (
-            advancedOrder.parameters.orderType != OrderType.FULL_RESTRICTED ||
-            advancedOrder.parameters.consideration.length == 0 ||
-            advancedOrder.parameters.offer.length == 0
-        ) {
-            revert InvalidOrder();
-        }
         // check offer first
-        OfferItem calldata offer = advancedOrder.parameters.offer[0];
-        if (offer.itemType == ItemType.ERC721 && offer.token == address(registry)) {
-            return (advancedOrder.parameters.offerer, recipient, offer.identifierOrCriteria);
+        if (advancedOrder.parameters.offer.length != 0) {
+            OfferItem calldata offer = advancedOrder.parameters.offer[0];
+            if (offer.itemType == ItemType.ERC721 && offer.token == address(registry)) {
+                return (advancedOrder.parameters.offerer, recipient, offer.identifierOrCriteria);
+            }
         }
         // we couldn't find a domain in the offer -> check the consideration
-        ConsiderationItem calldata consideration = advancedOrder.parameters.consideration[0];
-        if (consideration.itemType == ItemType.ERC721 && consideration.token == address(registry)) {
-            return (consideration.recipient, recipient, consideration.identifierOrCriteria);
+        if (advancedOrder.parameters.consideration.length != 0) {
+            ConsiderationItem calldata consideration = advancedOrder.parameters.consideration[0];
+            if (consideration.itemType == ItemType.ERC721 && consideration.token == address(registry)) {
+                return (consideration.recipient, recipient, consideration.identifierOrCriteria);
+            }
         }
         // we couldn't find a domain to lock -> the order is invalid
         revert InvalidOrder();

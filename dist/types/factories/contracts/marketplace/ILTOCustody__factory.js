@@ -20,6 +20,11 @@ const _abi = [
     },
     {
         inputs: [],
+        name: "InvalidOrderType",
+        type: "error",
+    },
+    {
+        inputs: [],
         name: "InvalidRecipient",
         type: "error",
     },
