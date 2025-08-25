@@ -216,7 +216,7 @@ describe('LTOCustody (metatx)', () => {
     const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
     expect(domainOwner).to.be.eq(await ltoCustody.getAddress());
 
-    const lto = await ltoCustody.getLTOData(ltoId);
+    const lto = await ltoCustody.ltoAssets(ltoId);
     expect(lto.seller).to.be.eq(seller.address);
     expect(lto.buyer).to.be.eq(buyer.address);
     expect(lto.tokenId).to.be.eq(nftIdToTrade);
@@ -237,7 +237,7 @@ describe('LTOCustody (metatx)', () => {
       const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
       expect(domainOwner).to.be.eq(buyer.address);
 
-      const lto = await ltoCustody.getLTOData(ltoId);
+      const lto = await ltoCustody.ltoAssets(ltoId);
       expect(lto.isFinalized).to.be.eq(true);
       const owner = await unsRegistry.ownerOf(nftIdToTrade);
       expect(owner).to.be.eq(buyer.address);
@@ -250,7 +250,7 @@ describe('LTOCustody (metatx)', () => {
       const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
       expect(domainOwner).to.be.eq(seller.address);
 
-      const lto = await ltoCustody.getLTOData(ltoId);
+      const lto = await ltoCustody.ltoAssets(ltoId);
       expect(lto.isFinalized).to.be.eq(true);
       const owner = await unsRegistry.ownerOf(nftIdToTrade);
       expect(owner).to.be.eq(seller.address);
@@ -265,7 +265,7 @@ describe('LTOCustody (metatx)', () => {
       );
       await ltoCustody.connect(coinbase).execute(req, signature);
 
-      const lto = await ltoCustody.getLTOData(ltoId);
+      const lto = await ltoCustody.ltoAssets(ltoId);
       expect(lto.seller).to.be.eq(otherUser.address);
       expect(lto.buyer).to.be.eq(buyer.address);
       expect(lto.tokenId).to.be.eq(nftIdToTrade);
@@ -280,7 +280,7 @@ describe('LTOCustody (metatx)', () => {
       );
       await ltoCustody.connect(coinbase).execute(req, signature);
 
-      const lto = await ltoCustody.getLTOData(ltoId);
+      const lto = await ltoCustody.ltoAssets(ltoId);
       expect(lto.seller).to.be.eq(seller.address);
       expect(lto.buyer).to.be.eq(otherUser.address);
       expect(lto.tokenId).to.be.eq(nftIdToTrade);
@@ -290,9 +290,9 @@ describe('LTOCustody (metatx)', () => {
       it('should set many records', async () => {
         const { req, signature } = await buildExecuteParams(
           'setMany(uint256,string[],string[])',
-          [ltoId, ['key_1', 'key_2'], ['value_1', 'value_2']],
+          [nftIdToTrade, ['key_1', 'key_2'], ['value_1', 'value_2']],
           buyer,
-          ltoId,
+          nftIdToTrade,
         );
         await ltoCustody.connect(coinbase).execute(req, signature);
 

@@ -1568,16 +1568,18 @@ const deployLTOCustodyTask: Task = {
     }
 
     // Add lto custody as minter to seaport proxy buyer
-    const ltoCustodyAddress = await ltoCustody.getAddress();
-    ctx.log(`Adding ${ltoCustodyAddress} as minter to seaport proxy buyer`);
-    const seaportProxyBuyerContract = await ethers.getContractAt(
-      UnsContractName.SeaportProxyBuyer,
-      SeaportProxyBuyer.address,
-      owner as unknown as Signer,
-    );
-    const addSeaportMinterTx = await seaportProxyBuyerContract.connect(owner).addMinters([ltoCustodyAddress]);
-    await addSeaportMinterTx.wait();
-    ctx.log(`Added ${ltoCustodyAddress} as minter to seaport proxy buyer`);
+    if (isTestnet || isSandbox) {
+      const ltoCustodyAddress = await ltoCustody.getAddress();
+      ctx.log(`Adding ${ltoCustodyAddress} as minter to seaport proxy buyer`);
+      const seaportProxyBuyerContract = await ethers.getContractAt(
+        UnsContractName.SeaportProxyBuyer,
+        SeaportProxyBuyer.address,
+        owner as unknown as Signer,
+      );
+      const addSeaportMinterTx = await seaportProxyBuyerContract.connect(owner).addMinters([ltoCustodyAddress]);
+      await addSeaportMinterTx.wait();
+      ctx.log(`Added ${ltoCustodyAddress} as minter to seaport proxy buyer`);
+    }
 
     const proxyAdmin = await upgrades.admin.getInstance();
     const ltoCustodyImpl = await proxyAdmin.getProxyImplementation.staticCall(await ltoCustody.getAddress());

@@ -16,7 +16,6 @@ interface ILTOCustody {
     function complete(uint256 ltoId) external;
     function cancel(uint256 ltoId) external;
     function setMany(uint256 ltoId, string[] calldata keys, string[] calldata values) external;
-    function getLTOData(uint256 ltoId) external view returns (address seller, address buyer, uint256 tokenId, bool isFinalized);
 
     event AssetDeposited(uint256 indexed ltoId, uint256 indexed tokenId, address seller, address buyer);
     event AssetReleased(uint256 indexed ltoId, uint256 indexed tokenId, address to);

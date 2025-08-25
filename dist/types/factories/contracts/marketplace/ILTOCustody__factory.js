@@ -20,11 +20,6 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "InvalidOrderType",
-        type: "error",
-    },
-    {
-        inputs: [],
         name: "InvalidRecipient",
         type: "error",
     },
@@ -171,40 +166,6 @@ const _abi = [
         name: "complete",
         outputs: [],
         stateMutability: "nonpayable",
-        type: "function",
-    },
-    {
-        inputs: [
-            {
-                internalType: "uint256",
-                name: "ltoId",
-                type: "uint256",
-            },
-        ],
-        name: "getLTOData",
-        outputs: [
-            {
-                internalType: "address",
-                name: "seller",
-                type: "address",
-            },
-            {
-                internalType: "address",
-                name: "buyer",
-                type: "address",
-            },
-            {
-                internalType: "uint256",
-                name: "tokenId",
-                type: "uint256",
-            },
-            {
-                internalType: "bool",
-                name: "isFinalized",
-                type: "bool",
-            },
-        ],
-        stateMutability: "view",
         type: "function",
     },
     {

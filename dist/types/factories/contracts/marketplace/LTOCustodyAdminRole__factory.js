@@ -175,19 +175,6 @@ const _abi = [
                 type: "address",
             },
         ],
-        name: "addAdmin",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-    },
-    {
-        inputs: [
-            {
-                internalType: "address",
-                name: "account",
-                type: "address",
-            },
-        ],
         name: "addCustodyAdmin",
         outputs: [],
         stateMutability: "nonpayable",
@@ -262,25 +249,6 @@ const _abi = [
                 type: "address",
             },
         ],
-        name: "isAdmin",
-        outputs: [
-            {
-                internalType: "bool",
-                name: "",
-                type: "bool",
-            },
-        ],
-        stateMutability: "view",
-        type: "function",
-    },
-    {
-        inputs: [
-            {
-                internalType: "address",
-                name: "account",
-                type: "address",
-            },
-        ],
         name: "isCustodyAdmin",
         outputs: [
             {
@@ -313,27 +281,7 @@ const _abi = [
                 type: "address",
             },
         ],
-        name: "removeAdmin",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-    },
-    {
-        inputs: [
-            {
-                internalType: "address",
-                name: "account",
-                type: "address",
-            },
-        ],
         name: "removeCustodyAdmin",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-    },
-    {
-        inputs: [],
-        name: "renounceAdmin",
         outputs: [],
         stateMutability: "nonpayable",
         type: "function",
@@ -377,19 +325,6 @@ const _abi = [
             },
         ],
         name: "revokeRole",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-    },
-    {
-        inputs: [
-            {
-                internalType: "address",
-                name: "newAdmin",
-                type: "address",
-            },
-        ],
-        name: "rotateAdmin",
         outputs: [],
         stateMutability: "nonpayable",
         type: "function",

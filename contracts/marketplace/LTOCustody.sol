@@ -11,9 +11,9 @@ import './SeaportProxyBuyer.sol';
 import './ILTOCustody.sol';
 
 /**
- * @title MarketplaceCustody
+ * @title LTOCustody
  * @author Unstoppable Domains, Inc.
- * @dev Custody contract for partial marketplace sales.
+ * @dev Custody contract for LTO marketplace sales.
  */
 contract LTOCustody is
     Initializable,
@@ -34,10 +34,11 @@ contract LTOCustody is
         bool isFinalized;
     }
 
-    // custody id => custody asset
+    // lto id => asset
     mapping(uint256 => LTOAsset) public ltoAssets;
     // token id => lto id
     mapping(uint256 => uint256) public tokenLTOs;
+    uint256 public ltoIdCounter;
 
     function initialize(IUNSRegistry _registry, SeaportProxyBuyer _seaportProxyBuyer) public initializer {
         __Forwarder_init_unchained();
@@ -49,15 +50,6 @@ contract LTOCustody is
         __ERC2771RegistryContext_init_unchained();
         registry = _registry;
         seaportProxyBuyer = _seaportProxyBuyer;
-    }
-
-    function getLTOData(uint256 ltoId) public view returns (address seller, address buyer, uint256 tokenId, bool isFinalized) {
-        LTOAsset memory asset = ltoAssets[ltoId];
-        return (asset.seller, asset.buyer, asset.tokenId, asset.isFinalized);
-    }
-
-    function getTokenLTO(uint256 tokenId) public view returns (uint256 ltoId) {
-        return tokenLTOs[tokenId];
     }
 
     function isLTOInitiated(uint256 ltoId) public view returns (bool) {
@@ -82,17 +74,17 @@ contract LTOCustody is
         return ERC2771RegistryContext._msgData();
     }
 
-    function pause() public onlyOwner {
+    function pause() external onlyOwner {
         _pause();
     }
 
-    function unpause() public onlyOwner {
+    function unpause() external onlyOwner {
         _unpause();
     }
 
     /**
-     * @notice Initiates the custody of an asset from a Seaport order.
-     * @param ltoId The custody ID.
+     * @notice Initiates the LTO custody of an asset from a Seaport order.
+     * @param ltoId The LTO ID.
      * @param advancedOrder The Seaport order.
      * @param criteriaResolvers The criteria resolvers.
      * @param fulfillerConduitKey The fulfiller conduit key.
@@ -104,10 +96,11 @@ contract LTOCustody is
         CriteriaResolver[] calldata criteriaResolvers,
         bytes32 fulfillerConduitKey,
         address recipient
-    ) external nonReentrant onlyCustodyAdmin {
+    ) external nonReentrant onlyCustodyAdmin whenNotPaused {
         (address seller, address buyer, uint256 tokenId) = _parseOrderData(advancedOrder, recipient);
         _initiateLTO(ltoId, seller, buyer, tokenId);
 
+        // substitute the recipient with the custody contract address to receive the asset. We've saved the original recipient in the lto data.
         bool fulfilled = seaportProxyBuyer.fulfillAdvancedOrder(advancedOrder, criteriaResolvers, fulfillerConduitKey, address(this));
 
         if (!fulfilled || registry.ownerOf(tokenId) != address(this)) {
@@ -120,7 +113,7 @@ contract LTOCustody is
     /**
      * @notice Parses the order data to get the seller, buyer and token ID for the LTO.
      * @param advancedOrder The Seaport order.
-     * @param recipient The recipient address.
+     * @param recipient The recipient address of the seaport order.
      * @return seller The seller address.
      * @return buyer The buyer address.
      * @return tokenId The token ID.
@@ -129,18 +122,11 @@ contract LTOCustody is
         AdvancedOrder calldata advancedOrder,
         address recipient
     ) private view returns (address seller, address buyer, uint256 tokenId) {
-        // check offer first
-        if (advancedOrder.parameters.offer.length != 0) {
+        // only offers are supported for now
+        if (advancedOrder.parameters.offer.length == 1) {
             OfferItem calldata offer = advancedOrder.parameters.offer[0];
             if (offer.itemType == ItemType.ERC721 && offer.token == address(registry)) {
                 return (advancedOrder.parameters.offerer, recipient, offer.identifierOrCriteria);
-            }
-        }
-        // we couldn't find a domain in the offer -> check the consideration
-        if (advancedOrder.parameters.consideration.length != 0) {
-            ConsiderationItem calldata consideration = advancedOrder.parameters.consideration[0];
-            if (consideration.itemType == ItemType.ERC721 && consideration.token == address(registry)) {
-                return (consideration.recipient, recipient, consideration.identifierOrCriteria);
             }
         }
         // we couldn't find a domain to lock -> the order is invalid
@@ -148,13 +134,18 @@ contract LTOCustody is
     }
 
     /**
-     * @notice Initiates the custody of an asset.
-     * @param ltoId The custody ID.
+     * @notice Initiates the LTO custody of an asset.
+     * @param ltoId The LTO ID.
      * @param seller The seller address.
      * @param buyer The buyer address.
      * @param tokenId The token ID.
      */
-    function initiateLTO(uint256 ltoId, address seller, address buyer, uint256 tokenId) public nonReentrant onlyCustodyAdmin whenNotPaused {
+    function initiateLTO(
+        uint256 ltoId,
+        address seller,
+        address buyer,
+        uint256 tokenId
+    ) external nonReentrant onlyCustodyAdmin whenNotPaused {
         _initiateLTO(ltoId, seller, buyer, tokenId);
 
         if (registry.ownerOf(tokenId) != address(this)) {
@@ -183,14 +174,15 @@ contract LTOCustody is
 
         ltoAssets[ltoId] = LTOAsset({seller: seller, buyer: buyer, tokenId: tokenId, isFinalized: false});
         tokenLTOs[tokenId] = ltoId;
+        ltoIdCounter++;
     }
 
     /**
-     * @notice Transfer the custody asset to a new seller.
-     * @param ltoId The custody ID.
+     * @notice Transfer the LTO custody asset to a new seller.
+     * @param ltoId The LTO ID.
      * @param seller The new seller address.
      */
-    function transferSeller(uint256 ltoId, address seller) public onlyCustodyAdmin whenNotPaused {
+    function transferSeller(uint256 ltoId, address seller) external onlyCustodyAdmin whenNotPaused {
         if (!isLTOInitiated(ltoId)) {
             revert LTONotInitiated();
         }
@@ -204,11 +196,11 @@ contract LTOCustody is
     }
 
     /**
-     * @notice Transfer the custody asset to a new buyer.
-     * @param ltoId The custody ID.
+     * @notice Transfer the LTO custody asset to a new buyer.
+     * @param ltoId The LTO ID.
      * @param buyer The new buyer address.
      */
-    function transferBuyer(uint256 ltoId, address buyer) public onlyCustodyAdmin whenNotPaused {
+    function transferBuyer(uint256 ltoId, address buyer) external onlyCustodyAdmin whenNotPaused {
         if (!isLTOInitiated(ltoId)) {
             revert LTONotInitiated();
         }
@@ -222,24 +214,24 @@ contract LTOCustody is
     }
 
     /**
-     * @notice Completes the custody of an asset and transfers it to the buyer.
-     * @param ltoId The custody ID.
+     * @notice Completes the LTO custody of an asset and transfers it to the buyer.
+     * @param ltoId The LTO ID.
      */
-    function complete(uint256 ltoId) public onlyCustodyAdmin whenNotPaused {
+    function complete(uint256 ltoId) external onlyCustodyAdmin whenNotPaused {
         releaseAsset(ltoId, ltoAssets[ltoId].buyer);
     }
 
     /**
-     * @notice Cancels the custody of an asset and transfers it back to the seller.
-     * @param ltoId The custody ID.
+     * @notice Cancels the LTO custody of an asset and transfers it back to the seller.
+     * @param ltoId The LTO ID.
      */
-    function cancel(uint256 ltoId) public onlyCustodyAdmin whenNotPaused {
+    function cancel(uint256 ltoId) external onlyCustodyAdmin whenNotPaused {
         releaseAsset(ltoId, ltoAssets[ltoId].seller);
     }
 
     /**
-     * Releases a specific NFT from custody.
-     * @param ltoId The custody ID.
+     * Releases a specific NFT from LTO custody.
+     * @param ltoId The LTO ID.
      * @param to The address to release the asset to.
      */
     function releaseAsset(uint256 ltoId, address to) public onlyCustodyAdmin nonReentrant whenNotPaused {
@@ -260,12 +252,16 @@ contract LTOCustody is
     }
 
     /**
-     * @notice Sets many records for a given custody ID.
-     * @param ltoId The custody ID.
+     * @notice Sets many records for a given token ID.
+     * @param tokenId The token ID.
      * @param keys The keys to set.
      * @param values The values to set.
      */
-    function setMany(uint256 ltoId, string[] calldata keys, string[] calldata values) public onlyLTOBuyer(ltoId) whenNotPaused {
-        registry.setMany(keys, values, ltoAssets[ltoId].tokenId);
+    function setMany(
+        uint256 tokenId,
+        string[] calldata keys,
+        string[] calldata values
+    ) external onlyLTOBuyer(tokenLTOs[tokenId]) whenNotPaused {
+        registry.setMany(keys, values, tokenId);
     }
 }

@@ -15,10 +15,6 @@ export declare class ILTOCustody__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "InvalidOrderType";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
         readonly name: "InvalidRecipient";
         readonly type: "error";
     }, {
@@ -135,32 +131,6 @@ export declare class ILTOCustody__factory {
         readonly name: "complete";
         readonly outputs: readonly [];
         readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "ltoId";
-            readonly type: "uint256";
-        }];
-        readonly name: "getLTOData";
-        readonly outputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "seller";
-            readonly type: "address";
-        }, {
-            readonly internalType: "address";
-            readonly name: "buyer";
-            readonly type: "address";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "tokenId";
-            readonly type: "uint256";
-        }, {
-            readonly internalType: "bool";
-            readonly name: "isFinalized";
-            readonly type: "bool";
-        }];
-        readonly stateMutability: "view";
         readonly type: "function";
     }, {
         readonly inputs: readonly [{

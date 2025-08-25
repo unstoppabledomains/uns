@@ -18,33 +18,11 @@ abstract contract LTOCustodyAdminRole is OwnableUpgradeable, AccessControlUpgrad
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
-    modifier onlyAdmin() {
-        if (!hasRole(DEFAULT_ADMIN_ROLE, _msgSender())) {
+    modifier onlyCustodyAdmin() {
+        if (!isCustodyAdmin(_msgSender())) {
             revert Unauthorized();
         }
-
         _;
-    }
-
-    function isAdmin(address account) public view returns (bool) {
-        return hasRole(DEFAULT_ADMIN_ROLE, account);
-    }
-
-    function addAdmin(address account) external onlyOwner {
-        _setupRole(DEFAULT_ADMIN_ROLE, account);
-    }
-
-    function removeAdmin(address account) external onlyOwner {
-        revokeRole(DEFAULT_ADMIN_ROLE, account);
-    }
-
-    function renounceAdmin() external {
-        renounceRole(DEFAULT_ADMIN_ROLE, _msgSender());
-    }
-
-    function rotateAdmin(address newAdmin) external onlyOwner {
-        _setupRole(DEFAULT_ADMIN_ROLE, newAdmin);
-        renounceRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
     function isCustodyAdmin(address account) public view returns (bool) {
@@ -59,14 +37,6 @@ abstract contract LTOCustodyAdminRole is OwnableUpgradeable, AccessControlUpgrad
     function removeCustodyAdmin(address account) external onlyOwner {
         revokeRole(CUSTODY_ADMIN_ROLE, account);
         emit CustodyAdminRemoved(account);
-    }
-
-    modifier onlyCustodyAdmin() {
-        if (!isCustodyAdmin(_msgSender())) {
-            revert Unauthorized();
-        }
-
-        _;
     }
 
     uint256[50] private __gap;

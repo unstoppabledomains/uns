@@ -136,16 +136,6 @@ export declare class LTOCustodyAdminRole__factory {
             readonly name: "account";
             readonly type: "address";
         }];
-        readonly name: "addAdmin";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "account";
-            readonly type: "address";
-        }];
         readonly name: "addCustodyAdmin";
         readonly outputs: readonly [];
         readonly stateMutability: "nonpayable";
@@ -202,20 +192,6 @@ export declare class LTOCustodyAdminRole__factory {
             readonly name: "account";
             readonly type: "address";
         }];
-        readonly name: "isAdmin";
-        readonly outputs: readonly [{
-            readonly internalType: "bool";
-            readonly name: "";
-            readonly type: "bool";
-        }];
-        readonly stateMutability: "view";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "account";
-            readonly type: "address";
-        }];
         readonly name: "isCustodyAdmin";
         readonly outputs: readonly [{
             readonly internalType: "bool";
@@ -240,23 +216,7 @@ export declare class LTOCustodyAdminRole__factory {
             readonly name: "account";
             readonly type: "address";
         }];
-        readonly name: "removeAdmin";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "account";
-            readonly type: "address";
-        }];
         readonly name: "removeCustodyAdmin";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "renounceAdmin";
         readonly outputs: readonly [];
         readonly stateMutability: "nonpayable";
         readonly type: "function";
@@ -291,16 +251,6 @@ export declare class LTOCustodyAdminRole__factory {
             readonly type: "address";
         }];
         readonly name: "revokeRole";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "newAdmin";
-            readonly type: "address";
-        }];
-        readonly name: "rotateAdmin";
         readonly outputs: readonly [];
         readonly stateMutability: "nonpayable";
         readonly type: "function";

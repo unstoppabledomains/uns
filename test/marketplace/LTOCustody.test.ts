@@ -1,7 +1,7 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { CreateOrderAction, CreateOrderInput, SeaportContract } from '@opensea/seaport-js/lib/types';
 import { expect } from 'chai';
-import { namehash, Signature, Signer, TypedDataEncoder } from 'ethers';
+import { Signature, Signer, TypedDataEncoder } from 'ethers';
 import { ethers } from 'hardhat';
 import { Seaport as seaportjs } from '@opensea/seaport-js';
 import { OrderStruct } from '@opensea/seaport-js/lib/typechain-types/seaport-core/src/lib/Consideration';
@@ -28,6 +28,7 @@ import {
 import { deployProxy } from '../../src/helpers';
 import { ZERO_ADDRESS } from '../helpers/constants';
 import { getLatestBlockTimestamp } from '../helpers/utils';
+import { Reverter } from '../helpers/reverter';
 
 describe('LTOCustody', () => {
   let signers: SignerWithAddress[],
@@ -53,8 +54,9 @@ describe('LTOCustody', () => {
   let latestBlockTimestamp: number;
 
   const registrarId = BigInt(42);
-  let snapshotId: unknown;
   let nftIdToTrade: bigint;
+
+  const reverter: Reverter = new Reverter();
 
   const generateSellOrderInputData = async (
     tokenIdentifier: bigint,
@@ -231,14 +233,16 @@ describe('LTOCustody', () => {
     await mintingManager.connect(registrar).issueWithRecords(seller.address, labels, [], [], true);
 
     await usdcMock.mint(await seaportProxyBuyer.getAddress(), ethers.parseUnits('250000', 6));
-  });
+    await usdcMock.mint(await buyer.getAddress(), ethers.parseUnits('250000', 6));
 
-  beforeEach(async () => {
-    snapshotId = await provider.send('evm_snapshot', []);
+    await unsRegistry.connect(seller).setApprovalForAll(await seaportContract.getAddress(), true);
+    await unsRegistry.connect(seller).setApprovalForAll(await seaportProxyBuyer.getAddress(), true);
+
+    await reverter.snapshot();
   });
 
   afterEach(async () => {
-    await provider.send('evm_revert', [snapshotId]);
+    await reverter.revert();
   });
 
   describe('initiate lto', () => {
@@ -263,37 +267,30 @@ describe('LTOCustody', () => {
         const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
         expect(domainOwner).to.be.eq(await ltoCustody.getAddress());
 
-        const lto = await ltoCustody.getLTOData(ltoId);
+        const lto = await ltoCustody.ltoAssets(ltoId);
         expect(lto.seller).to.be.eq(seller.address);
         expect(lto.buyer).to.be.eq(buyer.address);
         expect(lto.tokenId).to.be.eq(nftIdToTrade);
       });
 
-      // TBD???
-      it.skip('should initiate lto from order consideration', async () => {
+      it('should revert for buy orders', async () => {
         const priceToSell = ethers.parseUnits('100', 6);
         const { fulfillOrderData, numerator, denominator } = await createOrder(
           await generateBuyOrderInputData(nftIdToTrade, priceToSell, await seaportProxyBuyer.getAddress()),
           buyer,
         );
         const ltoId = BigInt(1);
-        await ltoCustody
-          .connect(custodyAdmin)
-          .initiateLTOFromOrder(
-            ltoId,
-            { ...fulfillOrderData, numerator, denominator, extraData: '0x' },
-            [],
-            ethers.ZeroHash,
-            buyer.address,
-          );
-
-        const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
-        expect(domainOwner).to.be.eq(await ltoCustody.getAddress());
-
-        const lto = await ltoCustody.getLTOData(ltoId);
-        expect(lto.seller).to.be.eq(seller.address);
-        expect(lto.buyer).to.be.eq(buyer.address);
-        expect(lto.tokenId).to.be.eq(nftIdToTrade);
+        await expect(
+          ltoCustody
+            .connect(custodyAdmin)
+            .initiateLTOFromOrder(
+              ltoId,
+              { ...fulfillOrderData, numerator, denominator, extraData: '0x' },
+              [],
+              ethers.ZeroHash,
+              seller.address,
+            ),
+        ).to.be.revertedWithCustomError(ltoCustody, 'InvalidOrder');
       });
 
       it('should revert if order is invalid', async () => {
@@ -325,6 +322,47 @@ describe('LTOCustody', () => {
             .initiateLTOFromOrder(ltoId, invalidOrder, [], ethers.ZeroHash, buyer.address),
         ).to.be.revertedWithCustomError(ltoCustody, 'InvalidOrder');
       });
+
+      it('should revert if called by non-custody admin', async () => {
+        const priceToSell = ethers.parseUnits('100', 6);
+        const { fulfillOrderData, numerator, denominator } = await createOrder(
+          await generateSellOrderInputData(nftIdToTrade, priceToSell, await seaportProxyBuyer.getAddress()),
+          seller,
+        );
+        const ltoId = BigInt(1);
+        await expect(
+          ltoCustody
+            .connect(otherUser)
+            .initiateLTOFromOrder(
+              ltoId,
+              { ...fulfillOrderData, numerator, denominator, extraData: '0x' },
+              [],
+              ethers.ZeroHash,
+              buyer.address,
+            ),
+        ).to.be.revertedWithCustomError(ltoCustody, 'Unauthorized');
+      });
+
+      it('should revert if paused', async () => {
+        const priceToSell = ethers.parseUnits('100', 6);
+        const { fulfillOrderData, numerator, denominator } = await createOrder(
+          await generateSellOrderInputData(nftIdToTrade, priceToSell, await seaportProxyBuyer.getAddress()),
+          seller,
+        );
+        const ltoId = BigInt(1);
+        await ltoCustody.connect(coinbase).pause();
+        await expect(
+          ltoCustody
+            .connect(custodyAdmin)
+            .initiateLTOFromOrder(
+              ltoId,
+              { ...fulfillOrderData, numerator, denominator, extraData: '0x' },
+              [],
+              ethers.ZeroHash,
+              buyer.address,
+            ),
+        ).to.be.revertedWith('Pausable: paused');
+      });
     });
 
     describe('initiateLTO', () => {
@@ -336,7 +374,7 @@ describe('LTOCustody', () => {
         const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
         expect(domainOwner).to.be.eq(await ltoCustody.getAddress());
 
-        const lto = await ltoCustody.getLTOData(ltoId);
+        const lto = await ltoCustody.ltoAssets(ltoId);
         expect(lto.seller).to.be.eq(seller.address);
         expect(lto.buyer).to.be.eq(buyer.address);
         expect(lto.tokenId).to.be.eq(nftIdToTrade);
@@ -358,16 +396,10 @@ describe('LTOCustody', () => {
         await unsRegistry.connect(seller).approve(await ltoCustody.getAddress(), nftIdToTrade);
         await ltoCustody.connect(custodyAdmin).initiateLTO(ltoId2, seller.address, buyer.address, nftIdToTrade);
 
-        const lto = await ltoCustody.getLTOData(ltoId2);
+        const lto = await ltoCustody.ltoAssets(ltoId2);
         expect(lto.seller).to.be.eq(seller.address);
         expect(lto.buyer).to.be.eq(buyer.address);
         expect(lto.tokenId).to.be.eq(nftIdToTrade);
-      });
-
-      it('should revert if paused', async () => {
-        // Note: LTOCustody inherits from PausableUpgradeable but doesn't implement pause functionality
-        // This test is skipped as the contract doesn't have pause/unpause functions
-        // The whenNotPaused modifier is present but pause control is not exposed
       });
 
       it('should revert if not called by custody admin', async () => {
@@ -428,6 +460,23 @@ describe('LTOCustody', () => {
           ltoCustody.connect(custodyAdmin).initiateLTO(ltoId2, seller.address, buyer.address, nftIdToTrade),
         ).to.be.revertedWithCustomError(ltoCustody, 'TokenAlreadyInLTO');
       });
+
+      it('should revert if called by non-custody admin', async () => {
+        const ltoId = BigInt(1);
+        await unsRegistry.connect(seller).approve(await ltoCustody.getAddress(), nftIdToTrade);
+
+        await expect(
+          ltoCustody.connect(otherUser).initiateLTO(ltoId, seller.address, buyer.address, nftIdToTrade),
+        ).to.be.revertedWithCustomError(ltoCustody, 'Unauthorized');
+      });
+
+      it('should revert if paused', async () => {
+        const ltoId = BigInt(1);
+        await ltoCustody.connect(coinbase).pause();
+        await expect(
+          ltoCustody.connect(custodyAdmin).initiateLTO(ltoId, seller.address, buyer.address, nftIdToTrade),
+        ).to.be.revertedWith('Pausable: paused');
+      });
     });
   });
 
@@ -439,35 +488,133 @@ describe('LTOCustody', () => {
       await ltoCustody.connect(custodyAdmin).initiateLTO(ltoId, seller.address, buyer.address, nftIdToTrade);
     });
 
-    it('should complete lto', async () => {
-      await ltoCustody.connect(custodyAdmin).complete(ltoId);
+    describe('complete', () => {
+      it('should complete lto', async () => {
+        await ltoCustody.connect(custodyAdmin).complete(ltoId);
 
-      const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
-      expect(domainOwner).to.be.eq(buyer.address);
+        const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
+        expect(domainOwner).to.be.eq(buyer.address);
 
-      const lto = await ltoCustody.getLTOData(ltoId);
-      expect(lto.isFinalized).to.be.eq(true);
-      const owner = await unsRegistry.ownerOf(nftIdToTrade);
-      expect(owner).to.be.eq(buyer.address);
+        const lto = await ltoCustody.ltoAssets(ltoId);
+        expect(lto.isFinalized).to.be.eq(true);
+        const owner = await unsRegistry.ownerOf(nftIdToTrade);
+        expect(owner).to.be.eq(buyer.address);
+      });
+
+      it('should revert if lto is not initiated', async () => {
+        const nonExistentLtoId = BigInt(999);
+        await expect(ltoCustody.connect(custodyAdmin).complete(nonExistentLtoId)).to.be.revertedWithCustomError(
+          ltoCustody,
+          'LTONotInitiated',
+        );
+      });
+
+      it('should revert if lto is already finalized', async () => {
+        await ltoCustody.connect(custodyAdmin).complete(ltoId);
+        await expect(ltoCustody.connect(custodyAdmin).complete(ltoId)).to.be.revertedWithCustomError(
+          ltoCustody,
+          'LTONotInitiated',
+        );
+      });
+
+      it('should revert if not called by custody admin', async () => {
+        await expect(ltoCustody.connect(buyer).complete(ltoId)).to.be.revertedWithCustomError(
+          ltoCustody,
+          'Unauthorized',
+        );
+      });
+
+      it('should revert if paused', async () => {
+        await ltoCustody.connect(coinbase).pause();
+        await expect(ltoCustody.connect(custodyAdmin).complete(ltoId)).to.be.revertedWith('Pausable: paused');
+      });
     });
 
-    it('should cancel lto', async () => {
-      await ltoCustody.connect(custodyAdmin).cancel(ltoId);
+    describe('cancel', () => {
+      it('should cancel lto', async () => {
+        await ltoCustody.connect(custodyAdmin).cancel(ltoId);
 
-      const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
-      expect(domainOwner).to.be.eq(seller.address);
+        const domainOwner = await unsRegistry.ownerOf(nftIdToTrade);
+        expect(domainOwner).to.be.eq(seller.address);
 
-      const lto = await ltoCustody.getLTOData(ltoId);
-      expect(lto.isFinalized).to.be.eq(true);
-      const owner = await unsRegistry.ownerOf(nftIdToTrade);
-      expect(owner).to.be.eq(seller.address);
+        const lto = await ltoCustody.ltoAssets(ltoId);
+        expect(lto.isFinalized).to.be.eq(true);
+        const owner = await unsRegistry.ownerOf(nftIdToTrade);
+        expect(owner).to.be.eq(seller.address);
+      });
+
+      it('should revert if lto is not initiated', async () => {
+        const nonExistentLtoId = BigInt(999);
+        await expect(ltoCustody.connect(custodyAdmin).cancel(nonExistentLtoId)).to.be.revertedWithCustomError(
+          ltoCustody,
+          'LTONotInitiated',
+        );
+      });
+
+      it('should revert if lto is already finalized', async () => {
+        await ltoCustody.connect(custodyAdmin).complete(ltoId);
+        await expect(ltoCustody.connect(custodyAdmin).cancel(ltoId)).to.be.revertedWithCustomError(
+          ltoCustody,
+          'LTONotInitiated',
+        );
+      });
+
+      it('should revert if not called by custody admin', async () => {
+        await expect(ltoCustody.connect(buyer).cancel(ltoId)).to.be.revertedWithCustomError(
+          ltoCustody,
+          'Unauthorized',
+        );
+      });
+
+      it('should revert if paused', async () => {
+        await ltoCustody.connect(coinbase).pause();
+        await expect(ltoCustody.connect(custodyAdmin).cancel(ltoId)).to.be.revertedWith('Pausable: paused');
+      });
+    });
+
+    describe('releaseAsset', () => {
+      it('should release lto', async () => {
+        await ltoCustody.connect(custodyAdmin).releaseAsset(ltoId, buyer.address);
+
+        const lto = await ltoCustody.ltoAssets(ltoId);
+        expect(lto.isFinalized).to.be.eq(true);
+        const owner = await unsRegistry.ownerOf(nftIdToTrade);
+        expect(owner).to.be.eq(buyer.address);
+      });
+
+      it('should revert if lto is not initiated', async () => {
+        const nonExistentLtoId = BigInt(999);
+        await expect(
+          ltoCustody.connect(custodyAdmin).releaseAsset(nonExistentLtoId, buyer.address),
+        ).to.be.revertedWithCustomError(ltoCustody, 'LTONotInitiated');
+      });
+
+      it('should revert if recipient is invalid', async () => {
+        await expect(
+          ltoCustody.connect(custodyAdmin).releaseAsset(ltoId, ethers.ZeroAddress),
+        ).to.be.revertedWithCustomError(ltoCustody, 'InvalidRecipient');
+      });
+
+      it('should revert if not called by custody admin', async () => {
+        await expect(ltoCustody.connect(buyer).releaseAsset(ltoId, buyer.address)).to.be.revertedWithCustomError(
+          ltoCustody,
+          'Unauthorized',
+        );
+      });
+
+      it('should revert if paused', async () => {
+        await ltoCustody.connect(coinbase).pause();
+        await expect(ltoCustody.connect(custodyAdmin).releaseAsset(ltoId, buyer.address)).to.be.revertedWith(
+          'Pausable: paused',
+        );
+      });
     });
 
     describe('transferSeller', () => {
       it('should transfer lto seller', async () => {
         await ltoCustody.connect(custodyAdmin).transferSeller(ltoId, otherUser.address);
 
-        const lto = await ltoCustody.getLTOData(ltoId);
+        const lto = await ltoCustody.ltoAssets(ltoId);
         expect(lto.seller).to.be.eq(otherUser.address);
         expect(lto.buyer).to.be.eq(buyer.address);
         expect(lto.tokenId).to.be.eq(nftIdToTrade);
@@ -485,17 +632,32 @@ describe('LTOCustody', () => {
           ltoCustody.connect(custodyAdmin).transferSeller(ltoId, ethers.ZeroAddress),
         ).to.be.revertedWithCustomError(ltoCustody, 'InvalidSeller');
       });
+
+      it('should revert if not called by custody admin', async () => {
+        await expect(ltoCustody.connect(buyer).transferSeller(ltoId, otherUser.address)).to.be.revertedWithCustomError(
+          ltoCustody,
+          'Unauthorized',
+        );
+      });
+
+      it('should revert if paused', async () => {
+        await ltoCustody.connect(coinbase).pause();
+        await expect(ltoCustody.connect(custodyAdmin).transferSeller(ltoId, otherUser.address)).to.be.revertedWith(
+          'Pausable: paused',
+        );
+      });
     });
 
     describe('transferBuyer', () => {
       it('should transfer lto buyer', async () => {
         await ltoCustody.connect(custodyAdmin).transferBuyer(ltoId, otherUser.address);
 
-        const lto = await ltoCustody.getLTOData(ltoId);
+        const lto = await ltoCustody.ltoAssets(ltoId);
         expect(lto.seller).to.be.eq(seller.address);
         expect(lto.buyer).to.be.eq(otherUser.address);
         expect(lto.tokenId).to.be.eq(nftIdToTrade);
       });
+
       it('should revert if lto is not initiated', async () => {
         const nonExistentLtoId = BigInt(999);
         await expect(
@@ -508,26 +670,48 @@ describe('LTOCustody', () => {
           ltoCustody.connect(custodyAdmin).transferBuyer(ltoId, ethers.ZeroAddress),
         ).to.be.revertedWithCustomError(ltoCustody, 'InvalidBuyer');
       });
+
+      it('should revert if not called by custody admin', async () => {
+        await expect(ltoCustody.connect(buyer).transferBuyer(ltoId, otherUser.address)).to.be.revertedWithCustomError(
+          ltoCustody,
+          'Unauthorized',
+        );
+      });
+
+      it('should revert if paused', async () => {
+        await ltoCustody.connect(coinbase).pause();
+        await expect(ltoCustody.connect(custodyAdmin).transferBuyer(ltoId, otherUser.address)).to.be.revertedWith(
+          'Pausable: paused',
+        );
+      });
     });
 
-    describe('management in custody', () => {
+    describe('setMany', () => {
       it('should set many records', async () => {
-        await ltoCustody.connect(buyer).setMany(ltoId, ['key_1', 'key_2'], ['value_1', 'value_2']);
+        await ltoCustody.connect(buyer).setMany(nftIdToTrade, ['key_1', 'key_2'], ['value_1', 'value_2']);
 
         const records = await unsRegistry.getMany(['key_1', 'key_2'], nftIdToTrade);
         expect(records).to.deep.eq(['value_1', 'value_2']);
       });
+
       it('should revert if lto is not initiated', async () => {
-        const nonExistentLtoId = BigInt(999);
+        const nonExistentId = BigInt(999);
         await expect(
-          ltoCustody.connect(buyer).setMany(nonExistentLtoId, ['key_1'], ['value_1']),
+          ltoCustody.connect(buyer).setMany(nonExistentId, ['key_1'], ['value_1']),
         ).to.be.revertedWithCustomError(ltoCustody, 'LTONotInitiated');
       });
 
       it('should revert if not called by lto buyer', async () => {
         await expect(
-          ltoCustody.connect(otherUser).setMany(ltoId, ['key_1'], ['value_1']),
+          ltoCustody.connect(otherUser).setMany(nftIdToTrade, ['key_1'], ['value_1']),
         ).to.be.revertedWithCustomError(ltoCustody, 'Unauthorized');
+      });
+
+      it('should revert if paused', async () => {
+        await ltoCustody.connect(coinbase).pause();
+        await expect(ltoCustody.connect(buyer).setMany(nftIdToTrade, ['key_1'], ['value_1'])).to.be.revertedWith(
+          'Pausable: paused',
+        );
       });
     });
   });
@@ -564,10 +748,68 @@ describe('LTOCustody', () => {
       const domainOwner = await unsRegistry.ownerOf(tokenId);
       expect(domainOwner).to.be.eq(await ltoCustody.getAddress());
 
-      const lto = await ltoCustody.getLTOData(ltoId);
+      const lto = await ltoCustody.ltoAssets(ltoId);
       expect(lto.seller).to.be.eq(await registrarCustody.getAddress());
       expect(lto.buyer).to.be.eq(buyer.address);
       expect(lto.tokenId).to.be.eq(tokenId);
+    });
+  });
+
+  describe('pausable', () => {
+    const ltoId = BigInt(1);
+
+    beforeEach(async () => {
+      await unsRegistry.connect(seller).approve(await ltoCustody.getAddress(), nftIdToTrade);
+      await ltoCustody.connect(custodyAdmin).initiateLTO(ltoId, seller.address, buyer.address, nftIdToTrade);
+      await ltoCustody.connect(coinbase).pause();
+    });
+
+    it('should pause', async () => {
+      expect(await ltoCustody.paused()).to.be.eq(true);
+    });
+
+    it('should unpause', async () => {
+      await ltoCustody.connect(coinbase).unpause();
+      expect(await ltoCustody.paused()).to.be.eq(false);
+    });
+
+    it('should revert if pause is called by non-owner', async () => {
+      await expect(ltoCustody.connect(buyer).pause()).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+
+    it('should revert if unpause is called by non-owner', async () => {
+      await expect(ltoCustody.connect(buyer).unpause()).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+
+    it('should revert if pause is called when paused', async () => {
+      await expect(ltoCustody.connect(coinbase).pause()).to.be.revertedWith('Pausable: paused');
+    });
+
+    it('should revert if unpause is called when not paused', async () => {
+      await ltoCustody.connect(coinbase).unpause();
+      await expect(ltoCustody.connect(coinbase).unpause()).to.be.revertedWith('Pausable: not paused');
+    });
+  });
+
+  describe('custody admin role', () => {
+    it('should allow owner to add custody admin', async () => {
+      await ltoCustody.connect(coinbase).addCustodyAdmin(otherUser.address);
+      expect(await ltoCustody.isCustodyAdmin(otherUser.address)).to.be.true;
+    });
+
+    it('should allow owner to remove custody admin', async () => {
+      await ltoCustody.connect(coinbase).addCustodyAdmin(otherUser.address);
+      await ltoCustody.connect(coinbase).removeCustodyAdmin(otherUser.address);
+      expect(await ltoCustody.isCustodyAdmin(otherUser.address)).to.be.false;
+    });
+
+    it('should revert if not called by owner', async () => {
+      await expect(ltoCustody.connect(buyer).addCustodyAdmin(otherUser.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
+      await expect(ltoCustody.connect(buyer).removeCustodyAdmin(otherUser.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
     });
   });
 });

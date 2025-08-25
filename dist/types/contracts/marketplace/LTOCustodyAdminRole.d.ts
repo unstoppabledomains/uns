@@ -1,44 +1,34 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
 export interface LTOCustodyAdminRoleInterface extends Interface {
-    getFunction(nameOrSignature: "CUSTODY_ADMIN_ROLE" | "DEFAULT_ADMIN_ROLE" | "addAdmin" | "addCustodyAdmin" | "getRoleAdmin" | "grantRole" | "hasRole" | "isAdmin" | "isCustodyAdmin" | "owner" | "removeAdmin" | "removeCustodyAdmin" | "renounceAdmin" | "renounceOwnership" | "renounceRole" | "revokeRole" | "rotateAdmin" | "supportsInterface" | "transferOwnership"): FunctionFragment;
+    getFunction(nameOrSignature: "CUSTODY_ADMIN_ROLE" | "DEFAULT_ADMIN_ROLE" | "addCustodyAdmin" | "getRoleAdmin" | "grantRole" | "hasRole" | "isCustodyAdmin" | "owner" | "removeCustodyAdmin" | "renounceOwnership" | "renounceRole" | "revokeRole" | "supportsInterface" | "transferOwnership"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "CustodyAdminAdded" | "CustodyAdminRemoved" | "Initialized" | "OwnershipTransferred" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked"): EventFragment;
     encodeFunctionData(functionFragment: "CUSTODY_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
-    encodeFunctionData(functionFragment: "addAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "addCustodyAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
-    encodeFunctionData(functionFragment: "isAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "isCustodyAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-    encodeFunctionData(functionFragment: "removeAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "removeCustodyAdmin", values: [AddressLike]): string;
-    encodeFunctionData(functionFragment: "renounceAdmin", values?: undefined): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
     encodeFunctionData(functionFragment: "renounceRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "revokeRole", values: [BytesLike, AddressLike]): string;
-    encodeFunctionData(functionFragment: "rotateAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
     decodeFunctionResult(functionFragment: "CUSTODY_ADMIN_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "addAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addCustodyAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getRoleAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "isAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isCustodyAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "removeAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeCustodyAdmin", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "renounceAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "rotateAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
 }
@@ -157,7 +147,6 @@ export interface LTOCustodyAdminRole extends BaseContract {
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     CUSTODY_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
     DEFAULT_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
-    addAdmin: TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
     addCustodyAdmin: TypedContractMethod<[
         account: AddressLike
     ], [
@@ -176,24 +165,17 @@ export interface LTOCustodyAdminRole extends BaseContract {
     ], [
         boolean
     ], "view">;
-    isAdmin: TypedContractMethod<[account: AddressLike], [boolean], "view">;
     isCustodyAdmin: TypedContractMethod<[
         account: AddressLike
     ], [
         boolean
     ], "view">;
     owner: TypedContractMethod<[], [string], "view">;
-    removeAdmin: TypedContractMethod<[
-        account: AddressLike
-    ], [
-        void
-    ], "nonpayable">;
     removeCustodyAdmin: TypedContractMethod<[
         account: AddressLike
     ], [
         void
     ], "nonpayable">;
-    renounceAdmin: TypedContractMethod<[], [void], "nonpayable">;
     renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
     renounceRole: TypedContractMethod<[
         role: BytesLike,
@@ -204,11 +186,6 @@ export interface LTOCustodyAdminRole extends BaseContract {
     revokeRole: TypedContractMethod<[
         role: BytesLike,
         account: AddressLike
-    ], [
-        void
-    ], "nonpayable">;
-    rotateAdmin: TypedContractMethod<[
-        newAdmin: AddressLike
     ], [
         void
     ], "nonpayable">;
@@ -225,7 +202,6 @@ export interface LTOCustodyAdminRole extends BaseContract {
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "CUSTODY_ADMIN_ROLE"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE"): TypedContractMethod<[], [string], "view">;
-    getFunction(nameOrSignature: "addAdmin"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "addCustodyAdmin"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "getRoleAdmin"): TypedContractMethod<[role: BytesLike], [string], "view">;
     getFunction(nameOrSignature: "grantRole"): TypedContractMethod<[
@@ -240,12 +216,9 @@ export interface LTOCustodyAdminRole extends BaseContract {
     ], [
         boolean
     ], "view">;
-    getFunction(nameOrSignature: "isAdmin"): TypedContractMethod<[account: AddressLike], [boolean], "view">;
     getFunction(nameOrSignature: "isCustodyAdmin"): TypedContractMethod<[account: AddressLike], [boolean], "view">;
     getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
-    getFunction(nameOrSignature: "removeAdmin"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "removeCustodyAdmin"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
-    getFunction(nameOrSignature: "renounceAdmin"): TypedContractMethod<[], [void], "nonpayable">;
     getFunction(nameOrSignature: "renounceOwnership"): TypedContractMethod<[], [void], "nonpayable">;
     getFunction(nameOrSignature: "renounceRole"): TypedContractMethod<[
         role: BytesLike,
@@ -259,7 +232,6 @@ export interface LTOCustodyAdminRole extends BaseContract {
     ], [
         void
     ], "nonpayable">;
-    getFunction(nameOrSignature: "rotateAdmin"): TypedContractMethod<[newAdmin: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
     getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
     getEvent(key: "CustodyAdminAdded"): TypedContractEvent<CustodyAdminAddedEvent.InputTuple, CustodyAdminAddedEvent.OutputTuple, CustodyAdminAddedEvent.OutputObject>;
