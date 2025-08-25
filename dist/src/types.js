@@ -29,6 +29,7 @@ var ArtifactName;
     ArtifactName["Muticall3"] = "Multicall3";
     ArtifactName["Faucet"] = "Faucet";
     ArtifactName["Worker"] = "Worker";
+    ArtifactName["LTOCustody"] = "LTOCustody";
     ArtifactName["ENSRegistry"] = "ENSRegistry";
     ArtifactName["BaseRegistrarImplementation"] = "BaseRegistrarImplementation";
     ArtifactName["ReverseRegistrar"] = "ReverseRegistrar";
@@ -78,6 +79,7 @@ var UnsContractName;
     UnsContractName["L1GasPriceOracle"] = "L1GasPriceOracle";
     UnsContractName["Faucet"] = "Faucet";
     UnsContractName["Worker"] = "Worker";
+    UnsContractName["LTOCustody"] = "LTOCustody";
 })(UnsContractName = exports.UnsContractName || (exports.UnsContractName = {}));
 var EnsContractName;
 (function (EnsContractName) {

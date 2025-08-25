@@ -1,4 +1,13 @@
-import { Contract, BigNumberish, Signer, Interface, solidityPackedKeccak256, keccak256, getBytes } from 'ethers';
+import {
+  Contract,
+  BigNumberish,
+  Signer,
+  Interface,
+  solidityPackedKeccak256,
+  keccak256,
+  getBytes,
+  FunctionFragment,
+} from 'ethers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import type {
   BaseRoutingForwarderMock,
@@ -20,7 +29,7 @@ export async function sign (
 }
 
 export type ExecuteFunc = (
-  selector: string,
+  selector: string | FunctionFragment,
   params: unknown[],
   from: ISignerWithAddress,
   tokenId: BigNumberish,
@@ -49,7 +58,7 @@ export function buildExecuteFunc (
     | RegistrarCustody,
 ): ExecuteFunc {
   return async (
-    selector: string,
+    selector: string | FunctionFragment,
     params: unknown[],
     from: ISignerWithAddress,
     tokenId: BigNumberish,
