@@ -1084,9 +1084,11 @@
                     "legacyAddresses": []
                 },
                 "LTOCustody": {
-                    "address": "0x0000000000000000000000000000000000000000",
+                    "address": "0x54AB1461CF29e20A7E912e9a71974aB52e2FDae0",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x0"
+                    "deploymentBlock": "0x0186c557",
+                    "implementation": "0xE675A1b589E9DdC448A733F123440861593E418A",
+                    "forwarder": "0x54AB1461CF29e20A7E912e9a71974aB52e2FDae0"
                 }
             }
         },

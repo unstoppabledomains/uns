@@ -1568,7 +1568,7 @@ const deployLTOCustodyTask: Task = {
     }
 
     // Add lto custody as minter to seaport proxy buyer
-    if (isTestnet || isSandbox) {
+    if (isSandbox) {
       const ltoCustodyAddress = await ltoCustody.getAddress();
       ctx.log(`Adding ${ltoCustodyAddress} as minter to seaport proxy buyer`);
       const seaportProxyBuyerContract = await ethers.getContractAt(
