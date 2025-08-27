@@ -1087,7 +1087,7 @@
                     "address": "0x54AB1461CF29e20A7E912e9a71974aB52e2FDae0",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0186c557",
-                    "implementation": "0xE675A1b589E9DdC448A733F123440861593E418A",
+                    "implementation": "0x9c93B2167917fCbd579aafE763837eaDE1834997",
                     "forwarder": "0x54AB1461CF29e20A7E912e9a71974aB52e2FDae0"
                 }
             }

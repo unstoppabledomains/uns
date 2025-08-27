@@ -29,7 +29,6 @@
     "deploy:sepolia": "hardhat run --network sepolia scripts/deploy.ts",
     "deploy:mainnet": "hardhat run --network mainnet scripts/deploy_UNS.ts",
     "deploy:amoy": "hardhat run --network amoy scripts/deploy.ts",
-    "deploy:amoy:lto": "hardhat run --network amoy scripts/deploy_LTOCustody.ts",
     "upgrade:localhost": "hardhat run --network localhost scripts/upgrade.ts",
     "upgrade:sepolia": "hardhat run --network sepolia scripts/upgrade.ts",
     "upgrade:mainnet": "hardhat run --network mainnet scripts/upgrade.ts",

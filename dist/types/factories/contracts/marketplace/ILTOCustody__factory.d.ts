@@ -7,10 +7,6 @@ export declare class ILTOCustody__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "InvalidLTOId";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
         readonly name: "InvalidOrder";
         readonly type: "error";
     }, {
@@ -134,10 +130,32 @@ export declare class ILTOCustody__factory {
         readonly type: "function";
     }, {
         readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "seller";
+            readonly type: "address";
+        }, {
+            readonly internalType: "address";
+            readonly name: "buyer";
+            readonly type: "address";
+        }, {
             readonly internalType: "uint256";
-            readonly name: "ltoId";
+            readonly name: "tokenId";
             readonly type: "uint256";
         }, {
+            readonly internalType: "uint256";
+            readonly name: "counter";
+            readonly type: "uint256";
+        }];
+        readonly name: "getLtoCustodyId";
+        readonly outputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "";
+            readonly type: "uint256";
+        }];
+        readonly stateMutability: "pure";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
             readonly internalType: "address";
             readonly name: "seller";
             readonly type: "address";
@@ -156,10 +174,6 @@ export declare class ILTOCustody__factory {
         readonly type: "function";
     }, {
         readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "ltoId";
-            readonly type: "uint256";
-        }, {
             readonly components: readonly [{
                 readonly components: readonly [{
                     readonly internalType: "address";
@@ -315,10 +329,6 @@ export declare class ILTOCustody__factory {
         readonly type: "function";
     }, {
         readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "ltoId";
-            readonly type: "uint256";
-        }, {
             readonly internalType: "string[]";
             readonly name: "keys";
             readonly type: "string[]";
@@ -326,6 +336,10 @@ export declare class ILTOCustody__factory {
             readonly internalType: "string[]";
             readonly name: "values";
             readonly type: "string[]";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "tokenId";
+            readonly type: "uint256";
         }];
         readonly name: "setMany";
         readonly outputs: readonly [];

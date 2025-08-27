@@ -203,11 +203,11 @@ describe('LTOCustody (metatx)', () => {
       seller,
       await seaportProxyBuyer.getAddress(),
     );
-    const ltoId = BigInt(1);
+    const ltoId = await ltoCustody.getLtoCustodyId(seller.address, buyer.address, nftIdToTrade, 0);
 
     const { req, signature } = await buildExecuteParams(
       ltoCustody.interface.getFunction('initiateLTOFromOrder'),
-      [ltoId, { ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address],
+      [{ ...fulfillOrderData, numerator, denominator, extraData: '0x' }, [], ethers.ZeroHash, buyer.address],
       custodyAdmin,
       nftIdToTrade,
     );
@@ -223,11 +223,12 @@ describe('LTOCustody (metatx)', () => {
   });
 
   describe('lifecycle functions', () => {
-    const ltoId = BigInt(1);
+    let ltoId: bigint;
 
     beforeEach(async () => {
+      ltoId = await ltoCustody.getLtoCustodyId(seller.address, buyer.address, nftIdToTrade, 0);
       await unsRegistry.connect(seller).approve(await ltoCustody.getAddress(), nftIdToTrade);
-      await ltoCustody.connect(custodyAdmin).initiateLTO(ltoId, seller.address, buyer.address, nftIdToTrade);
+      await ltoCustody.connect(custodyAdmin).initiateLTO(seller.address, buyer.address, nftIdToTrade);
     });
 
     it('should complete lto', async () => {
@@ -289,8 +290,8 @@ describe('LTOCustody (metatx)', () => {
     describe('management in custody', () => {
       it('should set many records', async () => {
         const { req, signature } = await buildExecuteParams(
-          'setMany(uint256,string[],string[])',
-          [nftIdToTrade, ['key_1', 'key_2'], ['value_1', 'value_2']],
+          'setMany(string[],string[],uint256)',
+          [['key_1', 'key_2'], ['value_1', 'value_2'], nftIdToTrade],
           buyer,
           nftIdToTrade,
         );

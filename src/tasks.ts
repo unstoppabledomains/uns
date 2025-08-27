@@ -19,7 +19,15 @@ import { Deployer } from './deployer';
 import { ArtifactName, DependenciesMap, EnsContractName, NsNetworkConfig, UnsContractName } from './types';
 import verify from './verify';
 import { notNullSha, unwrap, unwrapDependencies } from './utils';
-import { deployProxy, ensureDeployed, ensureUpgradable, isSandbox, isTestnet, mintUnsTlds } from './helpers';
+import {
+  deployProxy,
+  ensureDeployed,
+  ensureUpgradable,
+  isSandbox,
+  isTestnet,
+  mintUnsTlds,
+  upgradeProxy,
+} from './helpers';
 import { proposeContractUpgrade } from './safe';
 
 export type Task = {
@@ -1534,6 +1542,7 @@ const proposeRegistrarCustodyTask: Task = {
     return ensureDeployed(config, UnsContractName.RegistrarCustody);
   },
 };
+
 const deployLTOCustodyTask: Task = {
   tags: ['lto_custody', 'full'],
   priority: 30,
@@ -1594,6 +1603,52 @@ const deployLTOCustodyTask: Task = {
   },
 };
 
+const proposeLTOCustodyTask: Task = {
+  tags: ['propose_lto_custody'],
+  priority: 30,
+  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
+    const LTOCustody = unwrap(dependencies, ArtifactName.LTOCustody);
+
+    const version = params?.version;
+    if (!version) {
+      throw new Error('Version parameter is not provided');
+    }
+
+    if (!ctx.multisig) {
+      throw new Error('Multisig address is not provided');
+    }
+
+    ctx.log('Deploying new implementation');
+
+    const newImplementationAddress = (await upgrades.prepareUpgrade(
+      LTOCustody.address,
+      await ethers.getContractFactory(ArtifactName.LTOCustody),
+    )) as string;
+
+    await verify(ctx, newImplementationAddress, []);
+
+    await ctx.saveContractConfig(
+      UnsContractName.LTOCustody,
+      await ethers.getContractAt(ArtifactName.LTOCustody, LTOCustody.address),
+      newImplementationAddress,
+    );
+
+    ctx.log('Preparing proposal...');
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+
+    await proposeContractUpgrade(LTOCustody.address, newImplementationAddress, await proxyAdmin.getAddress());
+
+    ctx.log('Upgrade proposal created');
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.LTOCustody);
+  },
+};
+
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -1630,4 +1685,5 @@ export const tasks: Task[] = [
   deployWorkerSAImplementationTask,
   proposeRegistrarCustodyTask,
   deployLTOCustodyTask,
+  proposeLTOCustodyTask,
 ];

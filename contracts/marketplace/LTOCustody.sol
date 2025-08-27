@@ -38,7 +38,15 @@ contract LTOCustody is
     mapping(uint256 => LTOAsset) public ltoAssets;
     // token id => lto id
     mapping(uint256 => uint256) public tokenLTOs;
+    // global lto custody counter
     uint256 public ltoIdCounter;
+    // token id => counter
+    mapping(uint256 => uint256) public tokenLtoIdCounter;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
 
     function initialize(IUNSRegistry _registry, SeaportProxyBuyer _seaportProxyBuyer) public initializer {
         __Forwarder_init_unchained();
@@ -54,6 +62,10 @@ contract LTOCustody is
 
     function isLTOInitiated(uint256 ltoId) public view returns (bool) {
         return ltoAssets[ltoId].tokenId != 0 && !ltoAssets[ltoId].isFinalized;
+    }
+
+    function getLtoCustodyId(address seller, address buyer, uint256 tokenId, uint256 counter) public pure returns (uint256) {
+        return uint256(keccak256(abi.encode(seller, buyer, tokenId, counter)));
     }
 
     modifier onlyLTOBuyer(uint256 ltoId) {
@@ -84,28 +96,22 @@ contract LTOCustody is
 
     /**
      * @notice Initiates the LTO custody of an asset from a Seaport order.
-     * @param ltoId The LTO ID.
      * @param advancedOrder The Seaport order.
      * @param criteriaResolvers The criteria resolvers.
      * @param fulfillerConduitKey The fulfiller conduit key.
      * @param recipient The recipient address.
      */
     function initiateLTOFromOrder(
-        uint256 ltoId,
         AdvancedOrder calldata advancedOrder,
         CriteriaResolver[] calldata criteriaResolvers,
         bytes32 fulfillerConduitKey,
         address recipient
     ) external nonReentrant onlyCustodyAdmin whenNotPaused {
         (address seller, address buyer, uint256 tokenId) = _parseOrderData(advancedOrder, recipient);
-        _initiateLTO(ltoId, seller, buyer, tokenId);
+        uint256 ltoId = _initiateLTO(seller, buyer, tokenId);
 
         // substitute the recipient with the custody contract address to receive the asset. We've saved the original recipient in the lto data.
-        bool fulfilled = seaportProxyBuyer.fulfillAdvancedOrder(advancedOrder, criteriaResolvers, fulfillerConduitKey, address(this));
-
-        if (!fulfilled || registry.ownerOf(tokenId) != address(this)) {
-            revert OrderIsNotFulfilled();
-        }
+        seaportProxyBuyer.fulfillAdvancedOrder(advancedOrder, criteriaResolvers, fulfillerConduitKey, address(this));
 
         emit AssetDeposited(ltoId, tokenId, seller, buyer);
     }
@@ -135,18 +141,12 @@ contract LTOCustody is
 
     /**
      * @notice Initiates the LTO custody of an asset.
-     * @param ltoId The LTO ID.
      * @param seller The seller address.
      * @param buyer The buyer address.
      * @param tokenId The token ID.
      */
-    function initiateLTO(
-        uint256 ltoId,
-        address seller,
-        address buyer,
-        uint256 tokenId
-    ) external nonReentrant onlyCustodyAdmin whenNotPaused {
-        _initiateLTO(ltoId, seller, buyer, tokenId);
+    function initiateLTO(address seller, address buyer, uint256 tokenId) external nonReentrant onlyCustodyAdmin whenNotPaused {
+        uint256 ltoId = _initiateLTO(seller, buyer, tokenId);
 
         if (registry.ownerOf(tokenId) != address(this)) {
             registry.transferFrom(seller, address(this), tokenId);
@@ -155,26 +155,23 @@ contract LTOCustody is
         emit AssetDeposited(ltoId, tokenId, seller, buyer);
     }
 
-    function _initiateLTO(uint256 ltoId, address seller, address buyer, uint256 tokenId) private {
+    function _initiateLTO(address seller, address buyer, uint256 tokenId) private returns (uint256) {
         if (seller == address(0)) {
             revert InvalidSeller();
         }
         if (buyer == address(0)) {
             revert InvalidBuyer();
         }
-        if (ltoId == 0) {
-            revert InvalidLTOId();
-        }
-        if (isLTOInitiated(ltoId)) {
-            revert LTOAlreadyInitiated();
-        }
         if (tokenLTOs[tokenId] != 0) {
             revert TokenAlreadyInLTO();
         }
-
+        uint256 ltoId = getLtoCustodyId(seller, buyer, tokenId, tokenLtoIdCounter[tokenId]);
         ltoAssets[ltoId] = LTOAsset({seller: seller, buyer: buyer, tokenId: tokenId, isFinalized: false});
         tokenLTOs[tokenId] = ltoId;
+        tokenLtoIdCounter[tokenId]++;
         ltoIdCounter++;
+
+        return ltoId;
     }
 
     /**
@@ -218,7 +215,10 @@ contract LTOCustody is
      * @param ltoId The LTO ID.
      */
     function complete(uint256 ltoId) external onlyCustodyAdmin whenNotPaused {
-        releaseAsset(ltoId, ltoAssets[ltoId].buyer);
+        if (!isLTOInitiated(ltoId)) {
+            revert LTONotInitiated();
+        }
+        _releaseAsset(ltoId, ltoAssets[ltoId].buyer);
     }
 
     /**
@@ -226,7 +226,16 @@ contract LTOCustody is
      * @param ltoId The LTO ID.
      */
     function cancel(uint256 ltoId) external onlyCustodyAdmin whenNotPaused {
-        releaseAsset(ltoId, ltoAssets[ltoId].seller);
+        if (!isLTOInitiated(ltoId)) {
+            revert LTONotInitiated();
+        }
+        if (registry.ownerOf(ltoAssets[ltoId].tokenId) == address(this)) {
+            _releaseAsset(ltoId, ltoAssets[ltoId].seller);
+        } else {
+            // if the asset is already not in the custody we can clean up the lto data
+            ltoAssets[ltoId].isFinalized = true;
+            delete tokenLTOs[ltoAssets[ltoId].tokenId];
+        }
     }
 
     /**
@@ -241,7 +250,10 @@ contract LTOCustody is
         if (to == address(0)) {
             revert InvalidRecipient();
         }
+        _releaseAsset(ltoId, to);
+    }
 
+    function _releaseAsset(uint256 ltoId, address to) private {
         ltoAssets[ltoId].isFinalized = true;
         uint256 tokenId = ltoAssets[ltoId].tokenId;
         delete tokenLTOs[tokenId];
@@ -253,14 +265,14 @@ contract LTOCustody is
 
     /**
      * @notice Sets many records for a given token ID.
-     * @param tokenId The token ID.
      * @param keys The keys to set.
      * @param values The values to set.
+     * @param tokenId The token ID.
      */
     function setMany(
-        uint256 tokenId,
         string[] calldata keys,
-        string[] calldata values
+        string[] calldata values,
+        uint256 tokenId
     ) external onlyLTOBuyer(tokenLTOs[tokenId]) whenNotPaused {
         registry.setMany(keys, values, tokenId);
     }

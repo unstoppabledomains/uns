@@ -122,23 +122,24 @@ export declare type CriteriaResolverStructOutput = [
     criteriaProof: string[];
 };
 export interface ILTOCustodyInterface extends Interface {
-    getFunction(nameOrSignature: "cancel" | "complete" | "initiateLTO" | "initiateLTOFromOrder" | "setMany" | "transferBuyer" | "transferSeller"): FunctionFragment;
+    getFunction(nameOrSignature: "cancel" | "complete" | "getLtoCustodyId" | "initiateLTO" | "initiateLTOFromOrder" | "setMany" | "transferBuyer" | "transferSeller"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AssetBuyerChanged" | "AssetDeposited" | "AssetReleased" | "AssetSellerChanged"): EventFragment;
     encodeFunctionData(functionFragment: "cancel", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "complete", values: [BigNumberish]): string;
-    encodeFunctionData(functionFragment: "initiateLTO", values: [BigNumberish, AddressLike, AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getLtoCustodyId", values: [AddressLike, AddressLike, BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "initiateLTO", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "initiateLTOFromOrder", values: [
-        BigNumberish,
         AdvancedOrderStruct,
         CriteriaResolverStruct[],
         BytesLike,
         AddressLike
     ]): string;
-    encodeFunctionData(functionFragment: "setMany", values: [BigNumberish, string[], string[]]): string;
+    encodeFunctionData(functionFragment: "setMany", values: [string[], string[], BigNumberish]): string;
     encodeFunctionData(functionFragment: "transferBuyer", values: [BigNumberish, AddressLike]): string;
     encodeFunctionData(functionFragment: "transferSeller", values: [BigNumberish, AddressLike]): string;
     decodeFunctionResult(functionFragment: "cancel", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "complete", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "getLtoCustodyId", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initiateLTO", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initiateLTOFromOrder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setMany", data: BytesLike): Result;
@@ -225,8 +226,15 @@ export interface ILTOCustody extends BaseContract {
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     cancel: TypedContractMethod<[ltoId: BigNumberish], [void], "nonpayable">;
     complete: TypedContractMethod<[ltoId: BigNumberish], [void], "nonpayable">;
+    getLtoCustodyId: TypedContractMethod<[
+        seller: AddressLike,
+        buyer: AddressLike,
+        tokenId: BigNumberish,
+        counter: BigNumberish
+    ], [
+        bigint
+    ], "view">;
     initiateLTO: TypedContractMethod<[
-        ltoId: BigNumberish,
         seller: AddressLike,
         buyer: AddressLike,
         tokenId: BigNumberish
@@ -234,7 +242,6 @@ export interface ILTOCustody extends BaseContract {
         void
     ], "nonpayable">;
     initiateLTOFromOrder: TypedContractMethod<[
-        ltoId: BigNumberish,
         advancedOrder: AdvancedOrderStruct,
         criteriaResolvers: CriteriaResolverStruct[],
         fulfillerConduitKey: BytesLike,
@@ -243,9 +250,9 @@ export interface ILTOCustody extends BaseContract {
         void
     ], "nonpayable">;
     setMany: TypedContractMethod<[
-        ltoId: BigNumberish,
         keys: string[],
-        values: string[]
+        values: string[],
+        tokenId: BigNumberish
     ], [
         void
     ], "nonpayable">;
@@ -264,8 +271,15 @@ export interface ILTOCustody extends BaseContract {
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "cancel"): TypedContractMethod<[ltoId: BigNumberish], [void], "nonpayable">;
     getFunction(nameOrSignature: "complete"): TypedContractMethod<[ltoId: BigNumberish], [void], "nonpayable">;
+    getFunction(nameOrSignature: "getLtoCustodyId"): TypedContractMethod<[
+        seller: AddressLike,
+        buyer: AddressLike,
+        tokenId: BigNumberish,
+        counter: BigNumberish
+    ], [
+        bigint
+    ], "view">;
     getFunction(nameOrSignature: "initiateLTO"): TypedContractMethod<[
-        ltoId: BigNumberish,
         seller: AddressLike,
         buyer: AddressLike,
         tokenId: BigNumberish
@@ -273,7 +287,6 @@ export interface ILTOCustody extends BaseContract {
         void
     ], "nonpayable">;
     getFunction(nameOrSignature: "initiateLTOFromOrder"): TypedContractMethod<[
-        ltoId: BigNumberish,
         advancedOrder: AdvancedOrderStruct,
         criteriaResolvers: CriteriaResolverStruct[],
         fulfillerConduitKey: BytesLike,
@@ -282,9 +295,9 @@ export interface ILTOCustody extends BaseContract {
         void
     ], "nonpayable">;
     getFunction(nameOrSignature: "setMany"): TypedContractMethod<[
-        ltoId: BigNumberish,
         keys: string[],
-        values: string[]
+        values: string[],
+        tokenId: BigNumberish
     ], [
         void
     ], "nonpayable">;

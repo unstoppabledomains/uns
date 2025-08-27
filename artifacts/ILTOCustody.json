@@ -10,11 +10,6 @@
     },
     {
       "inputs": [],
-      "name": "InvalidLTOId",
-      "type": "error"
-    },
-    {
-      "inputs": [],
       "name": "InvalidOrder",
       "type": "error"
     },
@@ -171,10 +166,39 @@
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "seller",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "buyer",
+          "type": "address"
+        },
+        {
           "internalType": "uint256",
-          "name": "ltoId",
+          "name": "tokenId",
           "type": "uint256"
         },
+        {
+          "internalType": "uint256",
+          "name": "counter",
+          "type": "uint256"
+        }
+      ],
+      "name": "getLtoCustodyId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
         {
           "internalType": "address",
           "name": "seller",
@@ -198,11 +222,6 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "ltoId",
-          "type": "uint256"
-        },
         {
           "components": [
             {
@@ -402,11 +421,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "ltoId",
-          "type": "uint256"
-        },
-        {
           "internalType": "string[]",
           "name": "keys",
           "type": "string[]"
@@ -415,6 +429,11 @@
           "internalType": "string[]",
           "name": "values",
           "type": "string[]"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
         }
       ],
       "name": "setMany",
