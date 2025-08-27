@@ -1,0 +1,43 @@
+// @author Unstoppable Domains, Inc.
+
+pragma solidity 0.8.24;
+
+import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+
+abstract contract LTOCustodyAdminRole is OwnableUpgradeable, AccessControlUpgradeable {
+    bytes32 public constant CUSTODY_ADMIN_ROLE = keccak256('CUSTODY_ADMIN_ROLE');
+
+    event CustodyAdminAdded(address indexed account);
+    event CustodyAdminRemoved(address indexed account);
+
+    error Unauthorized();
+
+    // solhint-disable-next-line func-name-mixedcase
+    function __LTOCustodyAdminRole_init_unchained() internal onlyInitializing {
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    }
+
+    modifier onlyCustodyAdmin() {
+        if (!isCustodyAdmin(_msgSender())) {
+            revert Unauthorized();
+        }
+        _;
+    }
+
+    function isCustodyAdmin(address account) public view returns (bool) {
+        return hasRole(CUSTODY_ADMIN_ROLE, account);
+    }
+
+    function addCustodyAdmin(address account) external onlyOwner {
+        _setupRole(CUSTODY_ADMIN_ROLE, account);
+        emit CustodyAdminAdded(account);
+    }
+
+    function removeCustodyAdmin(address account) external onlyOwner {
+        revokeRole(CUSTODY_ADMIN_ROLE, account);
+        emit CustodyAdminRemoved(account);
+    }
+
+    uint256[50] private __gap;
+}

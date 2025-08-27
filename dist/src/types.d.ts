@@ -25,6 +25,7 @@ export declare enum ArtifactName {
     Muticall3 = "Multicall3",
     Faucet = "Faucet",
     Worker = "Worker",
+    LTOCustody = "LTOCustody",
     ENSRegistry = "ENSRegistry",
     BaseRegistrarImplementation = "BaseRegistrarImplementation",
     ReverseRegistrar = "ReverseRegistrar",
@@ -72,7 +73,8 @@ export declare enum UnsContractName {
     Multicall3 = "Multicall3",
     L1GasPriceOracle = "L1GasPriceOracle",
     Faucet = "Faucet",
-    Worker = "Worker"
+    Worker = "Worker",
+    LTOCustody = "LTOCustody"
 }
 export declare enum EnsContractName {
     ENSRegistry = "ENSRegistry",
