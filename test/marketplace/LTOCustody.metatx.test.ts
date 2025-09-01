@@ -159,6 +159,7 @@ describe('LTOCustody (metatx)', () => {
 
     ltoCustody = await deployProxy(new LTOCustody__factory().connect(coinbase), [
       await unsRegistry.getAddress(),
+      await mintingManager.getAddress(),
       await seaportProxyBuyer.getAddress(),
     ]);
 
@@ -290,7 +291,7 @@ describe('LTOCustody (metatx)', () => {
     describe('management in custody', () => {
       it('should set many records', async () => {
         const { req, signature } = await buildExecuteParams(
-          'setMany(string[],string[],uint256)',
+          'setRecords(string[],string[],uint256)',
           [['key_1', 'key_2'], ['value_1', 'value_2'], nftIdToTrade],
           buyer,
           nftIdToTrade,

@@ -15,7 +15,8 @@ interface ILTOCustody {
     function transferBuyer(uint256 ltoId, address buyer) external;
     function complete(uint256 ltoId) external;
     function cancel(uint256 ltoId) external;
-    function setMany(string[] calldata keys, string[] calldata values, uint256 tokenId) external;
+    function revokeAsset(uint256 tokenId) external;
+    function setRecords(string[] calldata keys, string[] calldata values, uint256 tokenId) external;
 
     event AssetDeposited(uint256 indexed ltoId, uint256 indexed tokenId, address seller, address buyer);
     event AssetReleased(uint256 indexed ltoId, uint256 indexed tokenId, address to);

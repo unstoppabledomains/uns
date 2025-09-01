@@ -122,7 +122,7 @@ export declare type CriteriaResolverStructOutput = [
     criteriaProof: string[];
 };
 export interface ILTOCustodyInterface extends Interface {
-    getFunction(nameOrSignature: "cancel" | "complete" | "getLtoCustodyId" | "initiateLTO" | "initiateLTOFromOrder" | "setMany" | "transferBuyer" | "transferSeller"): FunctionFragment;
+    getFunction(nameOrSignature: "cancel" | "complete" | "getLtoCustodyId" | "initiateLTO" | "initiateLTOFromOrder" | "revokeAsset" | "setRecords" | "transferBuyer" | "transferSeller"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AssetBuyerChanged" | "AssetDeposited" | "AssetReleased" | "AssetSellerChanged"): EventFragment;
     encodeFunctionData(functionFragment: "cancel", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "complete", values: [BigNumberish]): string;
@@ -134,7 +134,8 @@ export interface ILTOCustodyInterface extends Interface {
         BytesLike,
         AddressLike
     ]): string;
-    encodeFunctionData(functionFragment: "setMany", values: [string[], string[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "revokeAsset", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setRecords", values: [string[], string[], BigNumberish]): string;
     encodeFunctionData(functionFragment: "transferBuyer", values: [BigNumberish, AddressLike]): string;
     encodeFunctionData(functionFragment: "transferSeller", values: [BigNumberish, AddressLike]): string;
     decodeFunctionResult(functionFragment: "cancel", data: BytesLike): Result;
@@ -142,7 +143,8 @@ export interface ILTOCustodyInterface extends Interface {
     decodeFunctionResult(functionFragment: "getLtoCustodyId", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initiateLTO", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initiateLTOFromOrder", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "setMany", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "revokeAsset", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferBuyer", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferSeller", data: BytesLike): Result;
 }
@@ -249,7 +251,12 @@ export interface ILTOCustody extends BaseContract {
     ], [
         void
     ], "nonpayable">;
-    setMany: TypedContractMethod<[
+    revokeAsset: TypedContractMethod<[
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    setRecords: TypedContractMethod<[
         keys: string[],
         values: string[],
         tokenId: BigNumberish
@@ -294,7 +301,8 @@ export interface ILTOCustody extends BaseContract {
     ], [
         void
     ], "nonpayable">;
-    getFunction(nameOrSignature: "setMany"): TypedContractMethod<[
+    getFunction(nameOrSignature: "revokeAsset"): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+    getFunction(nameOrSignature: "setRecords"): TypedContractMethod<[
         keys: string[],
         values: string[],
         tokenId: BigNumberish

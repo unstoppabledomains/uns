@@ -1548,14 +1548,15 @@ const deployLTOCustodyTask: Task = {
   priority: 30,
   run: async (ctx: Deployer, dependencies: DependenciesMap) => {
     const { owner } = ctx.accounts;
-    const [UNSRegistry, SeaportProxyBuyer] = unwrapDependencies(dependencies, [
+    const [UNSRegistry, MintingManager, SeaportProxyBuyer] = unwrapDependencies(dependencies, [
       UnsContractName.UNSRegistry,
+      UnsContractName.MintingManager,
       UnsContractName.SeaportProxyBuyer,
     ]);
 
     const ltoCustody = await deployProxy<LTOCustody>(
       await ethers.getContractFactory(ArtifactName.LTOCustody, owner as unknown as Signer),
-      [UNSRegistry.address, SeaportProxyBuyer.address],
+      [UNSRegistry.address, MintingManager.address, SeaportProxyBuyer.address],
     );
     await ltoCustody.waitForDeployment();
     if (ctx.minters.length) {
@@ -1599,7 +1600,12 @@ const deployLTOCustodyTask: Task = {
   ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
     config = merge(ctx.getDeployConfig(), config);
 
-    return ensureDeployed(config, UnsContractName.UNSRegistry, UnsContractName.SeaportProxyBuyer);
+    return ensureDeployed(
+      config,
+      UnsContractName.UNSRegistry,
+      UnsContractName.MintingManager,
+      UnsContractName.SeaportProxyBuyer,
+    );
   },
 };
 

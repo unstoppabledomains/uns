@@ -209,6 +209,7 @@ describe('LTOCustody', () => {
 
     ltoCustody = await deployProxy(new LTOCustody__factory().connect(coinbase), [
       await unsRegistry.getAddress(),
+      await mintingManager.getAddress(),
       await seaportProxyBuyer.getAddress(),
     ]);
 
@@ -555,31 +556,26 @@ describe('LTOCustody', () => {
       });
     });
 
-    describe('releaseAsset', () => {
-      it('should release lto', async () => {
-        await ltoCustody.connect(custodyAdmin).releaseAsset(ltoId, buyer.address);
+    describe('revokeAsset', () => {
+      it('should revoke lto asset', async () => {
+        await ltoCustody.connect(custodyAdmin).revokeAsset(nftIdToTrade);
 
         const lto = await ltoCustody.ltoAssets(ltoId);
         expect(lto.isFinalized).to.be.eq(true);
         const owner = await unsRegistry.ownerOf(nftIdToTrade);
-        expect(owner).to.be.eq(buyer.address);
+        expect(owner).to.be.eq(await mintingManager.getAddress());
       });
 
       it('should revert if lto is not initiated', async () => {
         const nonExistentLtoId = BigInt(999);
-        await expect(
-          ltoCustody.connect(custodyAdmin).releaseAsset(nonExistentLtoId, buyer.address),
-        ).to.be.revertedWithCustomError(ltoCustody, 'LTONotInitiated');
-      });
-
-      it('should revert if recipient is invalid', async () => {
-        await expect(
-          ltoCustody.connect(custodyAdmin).releaseAsset(ltoId, ethers.ZeroAddress),
-        ).to.be.revertedWithCustomError(ltoCustody, 'InvalidRecipient');
+        await expect(ltoCustody.connect(custodyAdmin).revokeAsset(nonExistentLtoId)).to.be.revertedWithCustomError(
+          ltoCustody,
+          'LTONotInitiated',
+        );
       });
 
       it('should revert if not called by custody admin', async () => {
-        await expect(ltoCustody.connect(buyer).releaseAsset(ltoId, buyer.address)).to.be.revertedWithCustomError(
+        await expect(ltoCustody.connect(buyer).revokeAsset(ltoId)).to.be.revertedWithCustomError(
           ltoCustody,
           'Unauthorized',
         );
@@ -587,9 +583,7 @@ describe('LTOCustody', () => {
 
       it('should revert if paused', async () => {
         await ltoCustody.connect(coinbase).pause();
-        await expect(ltoCustody.connect(custodyAdmin).releaseAsset(ltoId, buyer.address)).to.be.revertedWith(
-          'Pausable: paused',
-        );
+        await expect(ltoCustody.connect(custodyAdmin).revokeAsset(ltoId)).to.be.revertedWith('Pausable: paused');
       });
     });
 
@@ -669,9 +663,9 @@ describe('LTOCustody', () => {
       });
     });
 
-    describe('setMany', () => {
+    describe('setRecords', () => {
       it('should set many records', async () => {
-        await ltoCustody.connect(buyer).setMany(['key_1', 'key_2'], ['value_1', 'value_2'], nftIdToTrade);
+        await ltoCustody.connect(buyer).setRecords(['key_1', 'key_2'], ['value_1', 'value_2'], nftIdToTrade);
 
         const records = await unsRegistry.getMany(['key_1', 'key_2'], nftIdToTrade);
         expect(records).to.deep.eq(['value_1', 'value_2']);
@@ -680,19 +674,19 @@ describe('LTOCustody', () => {
       it('should revert if lto is not initiated', async () => {
         const nonExistentId = BigInt(999);
         await expect(
-          ltoCustody.connect(buyer).setMany(['key_1'], ['value_1'], nonExistentId),
+          ltoCustody.connect(buyer).setRecords(['key_1'], ['value_1'], nonExistentId),
         ).to.be.revertedWithCustomError(ltoCustody, 'LTONotInitiated');
       });
 
       it('should revert if not called by lto buyer', async () => {
         await expect(
-          ltoCustody.connect(otherUser).setMany(['key_1'], ['value_1'], nftIdToTrade),
+          ltoCustody.connect(otherUser).setRecords(['key_1'], ['value_1'], nftIdToTrade),
         ).to.be.revertedWithCustomError(ltoCustody, 'Unauthorized');
       });
 
       it('should revert if paused', async () => {
         await ltoCustody.connect(coinbase).pause();
-        await expect(ltoCustody.connect(buyer).setMany(['key_1'], ['value_1'], nftIdToTrade)).to.be.revertedWith(
+        await expect(ltoCustody.connect(buyer).setRecords(['key_1'], ['value_1'], nftIdToTrade)).to.be.revertedWith(
           'Pausable: paused',
         );
       });

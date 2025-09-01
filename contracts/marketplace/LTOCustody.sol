@@ -9,6 +9,7 @@ import '../IUNSRegistry.sol';
 import './LTOCustodyAdminRole.sol';
 import './SeaportProxyBuyer.sol';
 import './ILTOCustody.sol';
+import '../IMintingManager.sol';
 
 /**
  * @title LTOCustody
@@ -26,6 +27,7 @@ contract LTOCustody is
 {
     IUNSRegistry public registry;
     SeaportProxyBuyer public seaportProxyBuyer;
+    IMintingManager public mintingManager;
 
     struct LTOAsset {
         address seller;
@@ -38,8 +40,6 @@ contract LTOCustody is
     mapping(uint256 => LTOAsset) public ltoAssets;
     // token id => lto id
     mapping(uint256 => uint256) public tokenLTOs;
-    // global lto custody counter
-    uint256 public ltoIdCounter;
     // token id => counter
     mapping(uint256 => uint256) public tokenLtoIdCounter;
 
@@ -48,7 +48,7 @@ contract LTOCustody is
         _disableInitializers();
     }
 
-    function initialize(IUNSRegistry _registry, SeaportProxyBuyer _seaportProxyBuyer) public initializer {
+    function initialize(IUNSRegistry _registry, IMintingManager _mintingManager, SeaportProxyBuyer _seaportProxyBuyer) public initializer {
         __Forwarder_init_unchained();
         __Ownable_init_unchained();
         __AccessControl_init_unchained();
@@ -57,6 +57,7 @@ contract LTOCustody is
         __Pausable_init_unchained();
         __ERC2771RegistryContext_init_unchained();
         registry = _registry;
+        mintingManager = _mintingManager;
         seaportProxyBuyer = _seaportProxyBuyer;
     }
 
@@ -169,8 +170,6 @@ contract LTOCustody is
         ltoAssets[ltoId] = LTOAsset({seller: seller, buyer: buyer, tokenId: tokenId, isFinalized: false});
         tokenLTOs[tokenId] = ltoId;
         tokenLtoIdCounter[tokenId]++;
-        ltoIdCounter++;
-
         return ltoId;
     }
 
@@ -239,18 +238,15 @@ contract LTOCustody is
     }
 
     /**
-     * Releases a specific NFT from LTO custody.
-     * @param ltoId The LTO ID.
-     * @param to The address to release the asset to.
+     * Revokes a specific NFT from LTO custody to the minting manager contract.
+     * @param tokenId the token ID to revoke
      */
-    function releaseAsset(uint256 ltoId, address to) public onlyCustodyAdmin nonReentrant whenNotPaused {
-        if (!isLTOInitiated(ltoId)) {
+    function revokeAsset(uint256 tokenId) external onlyCustodyAdmin nonReentrant whenNotPaused {
+        uint256 ltoId = tokenLTOs[tokenId];
+        if (ltoId == 0) {
             revert LTONotInitiated();
         }
-        if (to == address(0)) {
-            revert InvalidRecipient();
-        }
-        _releaseAsset(ltoId, to);
+        _releaseAsset(ltoId, address(mintingManager));
     }
 
     function _releaseAsset(uint256 ltoId, address to) private {
@@ -269,7 +265,7 @@ contract LTOCustody is
      * @param values The values to set.
      * @param tokenId The token ID.
      */
-    function setMany(
+    function setRecords(
         string[] calldata keys,
         string[] calldata values,
         uint256 tokenId

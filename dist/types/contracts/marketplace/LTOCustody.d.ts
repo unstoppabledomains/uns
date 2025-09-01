@@ -141,7 +141,7 @@ export declare namespace IForwarder {
     };
 }
 export interface LTOCustodyInterface extends Interface {
-    getFunction(nameOrSignature: "CUSTODY_ADMIN_ROLE" | "DEFAULT_ADMIN_ROLE" | "addCustodyAdmin" | "cancel" | "complete" | "execute" | "getLtoCustodyId" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "initiateLTO" | "initiateLTOFromOrder" | "isCustodyAdmin" | "isLTOInitiated" | "isTrustedForwarder" | "ltoAssets" | "ltoIdCounter" | "nonceOf" | "owner" | "pause" | "paused" | "registry" | "releaseAsset" | "removeCustodyAdmin" | "renounceOwnership" | "renounceRole" | "revokeRole" | "seaportProxyBuyer" | "setMany" | "supportsInterface" | "tokenLTOs" | "tokenLtoIdCounter" | "transferBuyer" | "transferOwnership" | "transferSeller" | "unpause" | "verify"): FunctionFragment;
+    getFunction(nameOrSignature: "CUSTODY_ADMIN_ROLE" | "DEFAULT_ADMIN_ROLE" | "addCustodyAdmin" | "cancel" | "complete" | "execute" | "getLtoCustodyId" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "initiateLTO" | "initiateLTOFromOrder" | "isCustodyAdmin" | "isLTOInitiated" | "isTrustedForwarder" | "ltoAssets" | "mintingManager" | "nonceOf" | "owner" | "pause" | "paused" | "registry" | "removeCustodyAdmin" | "renounceOwnership" | "renounceRole" | "revokeAsset" | "revokeRole" | "seaportProxyBuyer" | "setRecords" | "supportsInterface" | "tokenLTOs" | "tokenLtoIdCounter" | "transferBuyer" | "transferOwnership" | "transferSeller" | "unpause" | "verify"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AssetBuyerChanged" | "AssetDeposited" | "AssetReleased" | "AssetSellerChanged" | "CustodyAdminAdded" | "CustodyAdminRemoved" | "Initialized" | "OwnershipTransferred" | "Paused" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Unpaused"): EventFragment;
     encodeFunctionData(functionFragment: "CUSTODY_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
@@ -153,7 +153,7 @@ export interface LTOCustodyInterface extends Interface {
     encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
-    encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "initiateLTO", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "initiateLTOFromOrder", values: [
         AdvancedOrderStruct,
@@ -165,19 +165,19 @@ export interface LTOCustodyInterface extends Interface {
     encodeFunctionData(functionFragment: "isLTOInitiated", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "isTrustedForwarder", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "ltoAssets", values: [BigNumberish]): string;
-    encodeFunctionData(functionFragment: "ltoIdCounter", values?: undefined): string;
+    encodeFunctionData(functionFragment: "mintingManager", values?: undefined): string;
     encodeFunctionData(functionFragment: "nonceOf", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "pause", values?: undefined): string;
     encodeFunctionData(functionFragment: "paused", values?: undefined): string;
     encodeFunctionData(functionFragment: "registry", values?: undefined): string;
-    encodeFunctionData(functionFragment: "releaseAsset", values: [BigNumberish, AddressLike]): string;
     encodeFunctionData(functionFragment: "removeCustodyAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
     encodeFunctionData(functionFragment: "renounceRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "revokeAsset", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "revokeRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "seaportProxyBuyer", values?: undefined): string;
-    encodeFunctionData(functionFragment: "setMany", values: [string[], string[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setRecords", values: [string[], string[], BigNumberish]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "tokenLTOs", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "tokenLtoIdCounter", values: [BigNumberish]): string;
@@ -203,19 +203,19 @@ export interface LTOCustodyInterface extends Interface {
     decodeFunctionResult(functionFragment: "isLTOInitiated", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isTrustedForwarder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "ltoAssets", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "ltoIdCounter", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "mintingManager", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "nonceOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "registry", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "releaseAsset", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeCustodyAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceRole", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "revokeAsset", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "seaportProxyBuyer", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "setMany", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setRecords", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "tokenLTOs", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "tokenLtoIdCounter", data: BytesLike): Result;
@@ -463,6 +463,7 @@ export interface LTOCustody extends BaseContract {
     ], "view">;
     initialize: TypedContractMethod<[
         _registry: AddressLike,
+        _mintingManager: AddressLike,
         _seaportProxyBuyer: AddressLike
     ], [
         void
@@ -508,18 +509,12 @@ export interface LTOCustody extends BaseContract {
             isFinalized: boolean;
         }
     ], "view">;
-    ltoIdCounter: TypedContractMethod<[], [bigint], "view">;
+    mintingManager: TypedContractMethod<[], [string], "view">;
     nonceOf: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
     owner: TypedContractMethod<[], [string], "view">;
     pause: TypedContractMethod<[], [void], "nonpayable">;
     paused: TypedContractMethod<[], [boolean], "view">;
     registry: TypedContractMethod<[], [string], "view">;
-    releaseAsset: TypedContractMethod<[
-        ltoId: BigNumberish,
-        to: AddressLike
-    ], [
-        void
-    ], "nonpayable">;
     removeCustodyAdmin: TypedContractMethod<[
         account: AddressLike
     ], [
@@ -532,6 +527,11 @@ export interface LTOCustody extends BaseContract {
     ], [
         void
     ], "nonpayable">;
+    revokeAsset: TypedContractMethod<[
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
     revokeRole: TypedContractMethod<[
         role: BytesLike,
         account: AddressLike
@@ -539,7 +539,7 @@ export interface LTOCustody extends BaseContract {
         void
     ], "nonpayable">;
     seaportProxyBuyer: TypedContractMethod<[], [string], "view">;
-    setMany: TypedContractMethod<[
+    setRecords: TypedContractMethod<[
         keys: string[],
         values: string[],
         tokenId: BigNumberish
@@ -616,6 +616,7 @@ export interface LTOCustody extends BaseContract {
     ], "view">;
     getFunction(nameOrSignature: "initialize"): TypedContractMethod<[
         _registry: AddressLike,
+        _mintingManager: AddressLike,
         _seaportProxyBuyer: AddressLike
     ], [
         void
@@ -653,18 +654,12 @@ export interface LTOCustody extends BaseContract {
             isFinalized: boolean;
         }
     ], "view">;
-    getFunction(nameOrSignature: "ltoIdCounter"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "mintingManager"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "nonceOf"): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
     getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "pause"): TypedContractMethod<[], [void], "nonpayable">;
     getFunction(nameOrSignature: "paused"): TypedContractMethod<[], [boolean], "view">;
     getFunction(nameOrSignature: "registry"): TypedContractMethod<[], [string], "view">;
-    getFunction(nameOrSignature: "releaseAsset"): TypedContractMethod<[
-        ltoId: BigNumberish,
-        to: AddressLike
-    ], [
-        void
-    ], "nonpayable">;
     getFunction(nameOrSignature: "removeCustodyAdmin"): TypedContractMethod<[account: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "renounceOwnership"): TypedContractMethod<[], [void], "nonpayable">;
     getFunction(nameOrSignature: "renounceRole"): TypedContractMethod<[
@@ -673,6 +668,7 @@ export interface LTOCustody extends BaseContract {
     ], [
         void
     ], "nonpayable">;
+    getFunction(nameOrSignature: "revokeAsset"): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
     getFunction(nameOrSignature: "revokeRole"): TypedContractMethod<[
         role: BytesLike,
         account: AddressLike
@@ -680,7 +676,7 @@ export interface LTOCustody extends BaseContract {
         void
     ], "nonpayable">;
     getFunction(nameOrSignature: "seaportProxyBuyer"): TypedContractMethod<[], [string], "view">;
-    getFunction(nameOrSignature: "setMany"): TypedContractMethod<[
+    getFunction(nameOrSignature: "setRecords"): TypedContractMethod<[
         keys: string[],
         values: string[],
         tokenId: BigNumberish

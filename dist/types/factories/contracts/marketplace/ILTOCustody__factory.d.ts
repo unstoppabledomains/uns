@@ -329,6 +329,16 @@ export declare class ILTOCustody__factory {
         readonly type: "function";
     }, {
         readonly inputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "tokenId";
+            readonly type: "uint256";
+        }];
+        readonly name: "revokeAsset";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
             readonly internalType: "string[]";
             readonly name: "keys";
             readonly type: "string[]";
@@ -341,7 +351,7 @@ export declare class ILTOCustody__factory {
             readonly name: "tokenId";
             readonly type: "uint256";
         }];
-        readonly name: "setMany";
+        readonly name: "setRecords";
         readonly outputs: readonly [];
         readonly stateMutability: "nonpayable";
         readonly type: "function";
