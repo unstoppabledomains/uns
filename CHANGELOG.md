@@ -1,3 +1,6 @@
+## v0.9.58
+- Added `LTOCustody` smart contract.
+
 ## v0.9.57
 
 - Small sandbox fix for `RegistrarCustody`
