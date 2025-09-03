@@ -50,7 +50,6 @@ describe('LTOCustody', () => {
     ltoCustody: LTOCustody,
     registrarCustody: RegistrarCustody;
 
-  let provider: HardhatEthersProvider;
   let latestBlockTimestamp: number;
 
   const registrarId = BigInt(42);
@@ -160,7 +159,6 @@ describe('LTOCustody', () => {
   };
 
   before(async () => {
-    provider = ethers.provider;
     signers = await ethers.getSigners();
     [coinbase, registrar, custodyAdmin, seller, buyer, otherUser] = signers;
 
@@ -394,6 +392,68 @@ describe('LTOCustody', () => {
         expect(await ltoCustody.getLtoCsutodyTokenId(ltoId2, 0)).to.be.eq(nftIdToTrade);
       });
 
+      it('should re-initiate new lto with the same token after it was revoked externally', async () => {
+        const expirableLabels = ['revokeme', 'com'];
+        const tokenId = await unsRegistry.namehash(expirableLabels);
+        const expiry = latestBlockTimestamp + 60 * 60 * 24;
+
+        await mintingManager
+          .connect(registrar)
+          .issueExpirableWithRecords(seller.address, expirableLabels, [], [], expiry, false);
+
+        // Initiate first LTO
+        await unsRegistry.connect(seller).approve(await ltoCustody.getAddress(), tokenId);
+        await ltoCustody.connect(custodyAdmin).initiateLTO(seller.address, buyer.address, tokenId);
+
+        // Revoke domain from first lto
+        await mintingManager.connect(registrar).revoke(tokenId);
+        // Issue the domain again
+        await mintingManager
+          .connect(registrar)
+          .issueExpirableWithRecords(seller.address, expirableLabels, [], [], expiry, false);
+
+        // Re-initiate with same token
+        await unsRegistry.connect(seller).approve(await ltoCustody.getAddress(), tokenId);
+        await ltoCustody.connect(custodyAdmin).initiateLTO(seller.address, buyer.address, tokenId);
+
+        const ltoId = await ltoCustody.getLtoCustodyId([tokenId], [1]);
+        const lto = await ltoCustody.ltoAssets(ltoId);
+        expect(lto.seller).to.be.eq(seller.address);
+        expect(lto.buyer).to.be.eq(buyer.address);
+        expect(await ltoCustody.getLtoCsutodyTokenId(ltoId, 0)).to.be.eq(tokenId);
+      });
+
+      it('should re-initiate new lto with the same token after it was revoked from custody', async () => {
+        const expirableLabels = ['revokeme', 'com'];
+        const tokenId = await unsRegistry.namehash(expirableLabels);
+        const expiry = latestBlockTimestamp + 60 * 60 * 24;
+
+        await mintingManager
+          .connect(registrar)
+          .issueExpirableWithRecords(seller.address, expirableLabels, [], [], expiry, false);
+
+        // Initiate first LTO
+        await unsRegistry.connect(seller).approve(await ltoCustody.getAddress(), tokenId);
+        await ltoCustody.connect(custodyAdmin).initiateLTO(seller.address, buyer.address, tokenId);
+
+        // Revoke domain from first lto
+        await ltoCustody.connect(custodyAdmin).revokeAsset(tokenId);
+        // Issue the domain again
+        await mintingManager
+          .connect(registrar)
+          .issueExpirableWithRecords(seller.address, expirableLabels, [], [], expiry, false);
+
+        // Re-initiate with same token
+        await unsRegistry.connect(seller).approve(await ltoCustody.getAddress(), tokenId);
+        await ltoCustody.connect(custodyAdmin).initiateLTO(seller.address, buyer.address, tokenId);
+
+        const ltoId = await ltoCustody.getLtoCustodyId([tokenId], [1]);
+        const lto = await ltoCustody.ltoAssets(ltoId);
+        expect(lto.seller).to.be.eq(seller.address);
+        expect(lto.buyer).to.be.eq(buyer.address);
+        expect(await ltoCustody.getLtoCsutodyTokenId(ltoId, 0)).to.be.eq(tokenId);
+      });
+
       it('should revert if not called by custody admin', async () => {
         await unsRegistry.connect(seller).approve(await ltoCustody.getAddress(), nftIdToTrade);
 
@@ -576,8 +636,6 @@ describe('LTOCustody', () => {
 
         const revokableLtoId = await ltoCustody.getLtoCustodyId([revokableNftId], [BigInt(0)]);
         await ltoCustody.connect(custodyAdmin).initiateLTO(seller.address, buyer.address, revokableNftId);
-
-        await mintingManager.connect(registrar).revoke(revokableNftId);
 
         await ltoCustody.connect(custodyAdmin).revokeAsset(revokableNftId);
         const lto = await ltoCustody.ltoAssets(revokableLtoId);

@@ -66,7 +66,7 @@ contract LTOCustody is
     }
 
     function isTokenInLTOCustody(uint256 tokenId) public view returns (bool) {
-        return tokenLTOs[tokenId] != 0;
+        return tokenLTOs[tokenId] != 0 && registry.ownerOf(tokenId) == address(this);
     }
 
     function getLtoCustodyId(uint256[] memory tokenIds, uint256[] memory counters) public pure returns (uint256) {
@@ -175,7 +175,7 @@ contract LTOCustody is
         if (buyer == address(0)) {
             revert InvalidBuyer();
         }
-        if (tokenLTOs[tokenId] != 0) {
+        if (isTokenInLTOCustody(tokenId)) {
             revert TokenAlreadyInLTO();
         }
 
@@ -270,10 +270,6 @@ contract LTOCustody is
     }
 
     function _releaseAsset(uint256 tokenId, address to) private {
-        if (!isTokenInLTOCustody(tokenId)) {
-            return;
-        }
-
         uint256 ltoId = tokenLTOs[tokenId];
         delete tokenLTOs[tokenId];
 
