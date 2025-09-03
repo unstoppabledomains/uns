@@ -1,6 +1,6 @@
 {
   "name": "uns",
-  "version": "0.9.57",
+  "version": "0.9.58",
   "description": "UNS contracts and tools",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "main": "./dist/index.js",
@@ -29,6 +29,7 @@
     "deploy:sepolia": "hardhat run --network sepolia scripts/deploy.ts",
     "deploy:mainnet": "hardhat run --network mainnet scripts/deploy_UNS.ts",
     "deploy:amoy": "hardhat run --network amoy scripts/deploy.ts",
+    "deploy:mainnet:lto": "hardhat run --network polygon scripts/deploy_LTOCustody.ts",
     "upgrade:localhost": "hardhat run --network localhost scripts/upgrade.ts",
     "upgrade:sepolia": "hardhat run --network sepolia scripts/upgrade.ts",
     "upgrade:mainnet": "hardhat run --network mainnet scripts/upgrade.ts",

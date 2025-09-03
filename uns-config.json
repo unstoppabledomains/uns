@@ -1,5 +1,5 @@
 {
-    "version": "0.9.23",
+    "version": "0.9.24",
     "networks": {
         "1": {
             "contracts": {
@@ -153,6 +153,11 @@
                     "deploymentBlock": "0x0"
                 },
                 "Worker": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
+                },
+                "LTOCustody": {
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
@@ -310,6 +315,13 @@
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
+                },
+                "LTOCustody": {
+                    "address": "0x58Bd25d637f56360d1d3e9c69E3737F0A755b0fa",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0487d8d7",
+                    "implementation": "0x382614247589b336899E99f992f95a22a28dee29",
+                    "forwarder": "0x58Bd25d637f56360d1d3e9c69E3737F0A755b0fa"
                 }
             }
         },
@@ -457,6 +469,11 @@
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
+                },
+                "LTOCustody": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -556,16 +573,16 @@
                     "deploymentBlock": "0x0f"
                 },
                 "DotCoinBurner": {
-                    "address": "0x51A944e573DdcA58500583A997F2E46616A15770",
+                    "address": "0x437e64920801CB57C4694d30239586b5509F547f",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x67"
+                    "deploymentBlock": "0x6b"
                 },
                 "ZilliqaRecover": {
-                    "address": "0xB3106671C1BCBBa687F15520c6ebf985663Cea96",
-                    "deploymentBlock": "0x36",
-                    "implementation": "0x72FA6D0C2F56b802D762a14F1a71f9A56221cabe",
+                    "address": "0xeC71E4E674fe0f432693DC2b935C34bd2774C003",
+                    "deploymentBlock": "0x3a",
+                    "implementation": "0xf3810eB7d64D1C11AE12727d957c6202B24492F5",
                     "legacyAddresses": [],
-                    "forwarder": "0xB3106671C1BCBBa687F15520c6ebf985663Cea96"
+                    "forwarder": "0xeC71E4E674fe0f432693DC2b935C34bd2774C003"
                 },
                 "Seaport": {
                     "address": "0x5CC819C9915eADfcEBd76952B8C1BC36CADd7376",
@@ -606,6 +623,12 @@
                     "address": "0xf670681605eFc4efC804F5a9b97ee89520473d56",
                     "deploymentBlock": "0x34",
                     "legacyAddresses": []
+                },
+                "LTOCustody": {
+                    "address": "0xB3106671C1BCBBa687F15520c6ebf985663Cea96",
+                    "deploymentBlock": "0x36",
+                    "implementation": "0x72FA6D0C2F56b802D762a14F1a71f9A56221cabe",
+                    "forwarder": "0xB3106671C1BCBBa687F15520c6ebf985663Cea96"
                 }
             }
         },
@@ -755,6 +778,11 @@
                     "address": "0x0000000000000000000000000000000000000000",
                     "legacyAddresses": [],
                     "deploymentBlock": "0x0"
+                },
+                "LTOCustody": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -900,6 +928,11 @@
                 "Worker": {
                     "address": "0x22cF47f7A7a0D4D12e753f4789402215d998EE57",
                     "deploymentBlock": "0x02b50e53"
+                },
+                "LTOCustody": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -1051,6 +1084,13 @@
                     "address": "0xf97E1b96d5081c715b26d6FC9Bd15b0Fee16f002",
                     "deploymentBlock": "0x015abb53",
                     "legacyAddresses": []
+                },
+                "LTOCustody": {
+                    "address": "0x387B8263281C07039A837468eceD4E0f0534a93d",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x018bfcaa",
+                    "forwarder": "0x387B8263281C07039A837468eceD4E0f0534a93d",
+                    "implementation": "0x418a007457903fB86b889F78910457F9282495Ec"
                 }
             }
         },
@@ -1197,6 +1237,11 @@
                 "Worker": {
                     "address": "0x5f907b9412b604926e25c765da8211eE20cd2F63",
                     "deploymentBlock": "0x019a7fe9"
+                },
+                "LTOCustody": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         },
@@ -1348,6 +1393,11 @@
                 "Worker": {
                     "address": "0x3Cecef6227752D30FCD185d7eA2eCe74580BfB1D",
                     "deploymentBlock": "0x81ff16"
+                },
+                "LTOCustody": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "legacyAddresses": [],
+                    "deploymentBlock": "0x0"
                 }
             }
         }

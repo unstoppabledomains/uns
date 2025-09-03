@@ -5,6 +5,7 @@ import { getContractAddress } from '@openzeppelin/hardhat-upgrades/dist/utils';
 import { ZERO_ADDRESS, ZERO_WORD } from '../test/helpers/constants';
 import {
   ENSCustody,
+  LTOCustody,
   MintingManager,
   ProxyReader,
   RegistrarCustody,
@@ -18,7 +19,15 @@ import { Deployer } from './deployer';
 import { ArtifactName, DependenciesMap, EnsContractName, NsNetworkConfig, UnsContractName } from './types';
 import verify from './verify';
 import { notNullSha, unwrap, unwrapDependencies } from './utils';
-import { deployProxy, ensureDeployed, ensureUpgradable, isSandbox, isTestnet, mintUnsTlds } from './helpers';
+import {
+  deployProxy,
+  ensureDeployed,
+  ensureUpgradable,
+  isSandbox,
+  isTestnet,
+  mintUnsTlds,
+  upgradeProxy,
+} from './helpers';
 import { proposeContractUpgrade } from './safe';
 
 export type Task = {
@@ -1534,6 +1543,118 @@ const proposeRegistrarCustodyTask: Task = {
   },
 };
 
+const deployLTOCustodyTask: Task = {
+  tags: ['lto_custody', 'full'],
+  priority: 30,
+  run: async (ctx: Deployer, dependencies: DependenciesMap) => {
+    const { owner } = ctx.accounts;
+    const [UNSRegistry, MintingManager, SeaportProxyBuyer] = unwrapDependencies(dependencies, [
+      UnsContractName.UNSRegistry,
+      UnsContractName.MintingManager,
+      UnsContractName.SeaportProxyBuyer,
+    ]);
+
+    const ltoCustody = await deployProxy<LTOCustody>(
+      await ethers.getContractFactory(ArtifactName.LTOCustody, owner as unknown as Signer),
+      [UNSRegistry.address, MintingManager.address, SeaportProxyBuyer.address],
+    );
+    await ltoCustody.waitForDeployment();
+    if (ctx.minters.length) {
+      const chunkSize = 100;
+      for (let i = 0, j = ctx.minters.length; i < j; i += chunkSize) {
+        const array = ctx.minters.slice(i, i + chunkSize);
+
+        ctx.log('Adding custody admins...', array);
+
+        for (const minter of array) {
+          ctx.log(`Adding ${minter} as custody admin`);
+
+          const addMintersTx = await ltoCustody.connect(owner).addCustodyAdmin(minter);
+          await addMintersTx.wait();
+        }
+
+        ctx.log(`Added ${array.length} custody admins`);
+      }
+    }
+
+    // Add lto custody as minter to seaport proxy buyer
+    if (isSandbox) {
+      const ltoCustodyAddress = await ltoCustody.getAddress();
+      ctx.log(`Adding ${ltoCustodyAddress} as minter to seaport proxy buyer`);
+      const seaportProxyBuyerContract = await ethers.getContractAt(
+        UnsContractName.SeaportProxyBuyer,
+        SeaportProxyBuyer.address,
+        owner as unknown as Signer,
+      );
+      const addSeaportMinterTx = await seaportProxyBuyerContract.connect(owner).addMinters([ltoCustodyAddress]);
+      await addSeaportMinterTx.wait();
+      ctx.log(`Added ${ltoCustodyAddress} as minter to seaport proxy buyer`);
+    }
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+    const ltoCustodyImpl = await proxyAdmin.getProxyImplementation.staticCall(await ltoCustody.getAddress());
+
+    await ctx.saveContractConfig(UnsContractName.LTOCustody, ltoCustody, ltoCustodyImpl, ltoCustody);
+    await verify(ctx, ltoCustodyImpl, []);
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig): DependenciesMap => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    return ensureDeployed(
+      config,
+      UnsContractName.UNSRegistry,
+      UnsContractName.MintingManager,
+      UnsContractName.SeaportProxyBuyer,
+    );
+  },
+};
+
+const proposeLTOCustodyTask: Task = {
+  tags: ['propose_lto_custody'],
+  priority: 30,
+  run: async (ctx: Deployer, dependencies: DependenciesMap, params?: Record<string, string>) => {
+    const LTOCustody = unwrap(dependencies, ArtifactName.LTOCustody);
+
+    const version = params?.version;
+    if (!version) {
+      throw new Error('Version parameter is not provided');
+    }
+
+    if (!ctx.multisig) {
+      throw new Error('Multisig address is not provided');
+    }
+
+    ctx.log('Deploying new implementation');
+
+    const newImplementationAddress = (await upgrades.prepareUpgrade(
+      LTOCustody.address,
+      await ethers.getContractFactory(ArtifactName.LTOCustody),
+    )) as string;
+
+    await verify(ctx, newImplementationAddress, []);
+
+    await ctx.saveContractConfig(
+      UnsContractName.LTOCustody,
+      await ethers.getContractAt(ArtifactName.LTOCustody, LTOCustody.address),
+      newImplementationAddress,
+    );
+
+    ctx.log('Preparing proposal...');
+
+    const proxyAdmin = await upgrades.admin.getInstance();
+
+    await proposeContractUpgrade(LTOCustody.address, newImplementationAddress, await proxyAdmin.getAddress());
+
+    ctx.log('Upgrade proposal created');
+  },
+  ensureDependencies: (ctx: Deployer, config?: NsNetworkConfig) => {
+    config = merge(ctx.getDeployConfig(), config);
+
+    ensureUpgradable(config);
+    return ensureDeployed(config, UnsContractName.LTOCustody);
+  },
+};
+
 export const tasks: Task[] = [
   deployCNSTask,
   deployCNSForwardersTask,
@@ -1569,4 +1690,6 @@ export const tasks: Task[] = [
   deployFaucetSAImplementationTask,
   deployWorkerSAImplementationTask,
   proposeRegistrarCustodyTask,
+  deployLTOCustodyTask,
+  proposeLTOCustodyTask,
 ];
