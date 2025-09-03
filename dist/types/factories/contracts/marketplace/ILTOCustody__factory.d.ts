@@ -130,21 +130,45 @@ export declare class ILTOCustody__factory {
         readonly type: "function";
     }, {
         readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "seller";
-            readonly type: "address";
-        }, {
-            readonly internalType: "address";
-            readonly name: "buyer";
-            readonly type: "address";
-        }, {
             readonly internalType: "uint256";
-            readonly name: "tokenId";
+            readonly name: "ltoId";
+            readonly type: "uint256";
+        }];
+        readonly name: "getLtoCsutodyTokenCount";
+        readonly outputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "";
+            readonly type: "uint256";
+        }];
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "ltoId";
             readonly type: "uint256";
         }, {
             readonly internalType: "uint256";
-            readonly name: "counter";
+            readonly name: "index";
             readonly type: "uint256";
+        }];
+        readonly name: "getLtoCsutodyTokenId";
+        readonly outputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "";
+            readonly type: "uint256";
+        }];
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "uint256[]";
+            readonly name: "tokenIds";
+            readonly type: "uint256[]";
+        }, {
+            readonly internalType: "uint256[]";
+            readonly name: "counters";
+            readonly type: "uint256[]";
         }];
         readonly name: "getLtoCustodyId";
         readonly outputs: readonly [{
@@ -350,6 +374,10 @@ export declare class ILTOCustody__factory {
             readonly internalType: "uint256";
             readonly name: "tokenId";
             readonly type: "uint256";
+        }, {
+            readonly internalType: "bool";
+            readonly name: "resetRecords";
+            readonly type: "bool";
         }];
         readonly name: "setRecords";
         readonly outputs: readonly [];

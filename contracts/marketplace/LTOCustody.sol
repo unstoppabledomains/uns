@@ -32,7 +32,7 @@ contract LTOCustody is
     struct LTOAsset {
         address seller;
         address buyer;
-        uint256 tokenId;
+        uint256[] tokenIds;
         bool isFinalized;
     }
 
@@ -62,11 +62,23 @@ contract LTOCustody is
     }
 
     function isLTOInitiated(uint256 ltoId) public view returns (bool) {
-        return ltoAssets[ltoId].tokenId != 0 && !ltoAssets[ltoId].isFinalized;
+        return ltoAssets[ltoId].tokenIds.length != 0 && !ltoAssets[ltoId].isFinalized;
     }
 
-    function getLtoCustodyId(address seller, address buyer, uint256 tokenId, uint256 counter) public pure returns (uint256) {
-        return uint256(keccak256(abi.encode(seller, buyer, tokenId, counter)));
+    function isTokenInLTOCustody(uint256 tokenId) public view returns (bool) {
+        return tokenLTOs[tokenId] != 0;
+    }
+
+    function getLtoCustodyId(uint256[] memory tokenIds, uint256[] memory counters) public pure returns (uint256) {
+        return uint256(keccak256(abi.encode(tokenIds, counters)));
+    }
+
+    function getLtoCsutodyTokenCount(uint256 ltoId) public view returns (uint256) {
+        return ltoAssets[ltoId].tokenIds.length;
+    }
+
+    function getLtoCsutodyTokenId(uint256 ltoId, uint256 index) public view returns (uint256) {
+        return ltoAssets[ltoId].tokenIds[index];
     }
 
     modifier onlyLTOBuyer(uint256 ltoId) {
@@ -166,8 +178,13 @@ contract LTOCustody is
         if (tokenLTOs[tokenId] != 0) {
             revert TokenAlreadyInLTO();
         }
-        uint256 ltoId = getLtoCustodyId(seller, buyer, tokenId, tokenLtoIdCounter[tokenId]);
-        ltoAssets[ltoId] = LTOAsset({seller: seller, buyer: buyer, tokenId: tokenId, isFinalized: false});
+
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+        uint256[] memory counters = new uint256[](1);
+        counters[0] = tokenLtoIdCounter[tokenId];
+        uint256 ltoId = getLtoCustodyId(tokenIds, counters);
+        ltoAssets[ltoId] = LTOAsset({seller: seller, buyer: buyer, tokenIds: tokenIds, isFinalized: false});
         tokenLTOs[tokenId] = ltoId;
         tokenLtoIdCounter[tokenId]++;
         return ltoId;
@@ -217,7 +234,10 @@ contract LTOCustody is
         if (!isLTOInitiated(ltoId)) {
             revert LTONotInitiated();
         }
-        _releaseAsset(ltoId, ltoAssets[ltoId].buyer);
+        for (uint256 i = 0; i < ltoAssets[ltoId].tokenIds.length; i++) {
+            _releaseAsset(ltoAssets[ltoId].tokenIds[i], ltoAssets[ltoId].buyer);
+        }
+        ltoAssets[ltoId].isFinalized = true;
     }
 
     /**
@@ -228,35 +248,41 @@ contract LTOCustody is
         if (!isLTOInitiated(ltoId)) {
             revert LTONotInitiated();
         }
-        if (registry.ownerOf(ltoAssets[ltoId].tokenId) == address(this)) {
-            _releaseAsset(ltoId, ltoAssets[ltoId].seller);
-        } else {
-            // if the asset is already not in the custody we can clean up the lto data
-            ltoAssets[ltoId].isFinalized = true;
-            delete tokenLTOs[ltoAssets[ltoId].tokenId];
+        for (uint256 i = 0; i < ltoAssets[ltoId].tokenIds.length; i++) {
+            _releaseAsset(ltoAssets[ltoId].tokenIds[i], ltoAssets[ltoId].seller);
         }
+        ltoAssets[ltoId].isFinalized = true;
     }
 
     /**
      * Revokes a specific NFT from LTO custody to the minting manager contract.
+     * Finalizes the LTO if no assets are left in custody.
      * @param tokenId the token ID to revoke
      */
     function revokeAsset(uint256 tokenId) external onlyCustodyAdmin nonReentrant whenNotPaused {
         uint256 ltoId = tokenLTOs[tokenId];
-        if (ltoId == 0) {
+        if (!isTokenInLTOCustody(tokenId)) {
             revert LTONotInitiated();
         }
-        _releaseAsset(ltoId, address(mintingManager));
+        _releaseAsset(tokenId, address(mintingManager));
+        // currently only one asset is supported per LTO so we finalize it immediately
+        ltoAssets[ltoId].isFinalized = true;
     }
 
-    function _releaseAsset(uint256 ltoId, address to) private {
-        ltoAssets[ltoId].isFinalized = true;
-        uint256 tokenId = ltoAssets[ltoId].tokenId;
+    function _releaseAsset(uint256 tokenId, address to) private {
+        if (!isTokenInLTOCustody(tokenId)) {
+            return;
+        }
+
+        uint256 ltoId = tokenLTOs[tokenId];
         delete tokenLTOs[tokenId];
 
-        registry.transferFrom(address(this), to, tokenId);
-
-        emit AssetReleased(ltoId, tokenId, to);
+        // do not attepmt to transfer the asset if it's not in custody
+        // the asset may be revoked externally
+        if (registry.ownerOf(tokenId) == address(this)) {
+            registry.transferFrom(address(this), to, tokenId);
+            emit AssetReleased(ltoId, tokenId, to);
+        }
     }
 
     /**
@@ -264,12 +290,18 @@ contract LTOCustody is
      * @param keys The keys to set.
      * @param values The values to set.
      * @param tokenId The token ID.
+     * @param resetRecords Whether to reset the records.
      */
     function setRecords(
         string[] calldata keys,
         string[] calldata values,
-        uint256 tokenId
+        uint256 tokenId,
+        bool resetRecords
     ) external onlyLTOBuyer(tokenLTOs[tokenId]) whenNotPaused {
-        registry.setMany(keys, values, tokenId);
+        if (resetRecords) {
+            registry.reconfigure(keys, values, tokenId);
+        } else {
+            registry.setMany(keys, values, tokenId);
+        }
     }
 }

@@ -166,24 +166,57 @@ const _abi = [
     {
         inputs: [
             {
-                internalType: "address",
-                name: "seller",
-                type: "address",
+                internalType: "uint256",
+                name: "ltoId",
+                type: "uint256",
             },
-            {
-                internalType: "address",
-                name: "buyer",
-                type: "address",
-            },
+        ],
+        name: "getLtoCsutodyTokenCount",
+        outputs: [
             {
                 internalType: "uint256",
-                name: "tokenId",
+                name: "",
+                type: "uint256",
+            },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "uint256",
+                name: "ltoId",
                 type: "uint256",
             },
             {
                 internalType: "uint256",
-                name: "counter",
+                name: "index",
                 type: "uint256",
+            },
+        ],
+        name: "getLtoCsutodyTokenId",
+        outputs: [
+            {
+                internalType: "uint256",
+                name: "",
+                type: "uint256",
+            },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [
+            {
+                internalType: "uint256[]",
+                name: "tokenIds",
+                type: "uint256[]",
+            },
+            {
+                internalType: "uint256[]",
+                name: "counters",
+                type: "uint256[]",
             },
         ],
         name: "getLtoCustodyId",
@@ -447,6 +480,11 @@ const _abi = [
                 internalType: "uint256",
                 name: "tokenId",
                 type: "uint256",
+            },
+            {
+                internalType: "bool",
+                name: "resetRecords",
+                type: "bool",
             },
         ],
         name: "setRecords",

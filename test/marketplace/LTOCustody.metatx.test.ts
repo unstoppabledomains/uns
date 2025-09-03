@@ -204,7 +204,7 @@ describe('LTOCustody (metatx)', () => {
       seller,
       await seaportProxyBuyer.getAddress(),
     );
-    const ltoId = await ltoCustody.getLtoCustodyId(seller.address, buyer.address, nftIdToTrade, 0);
+    const ltoId = await ltoCustody.getLtoCustodyId([nftIdToTrade], [0]);
 
     const { req, signature } = await buildExecuteParams(
       ltoCustody.interface.getFunction('initiateLTOFromOrder'),
@@ -220,14 +220,14 @@ describe('LTOCustody (metatx)', () => {
     const lto = await ltoCustody.ltoAssets(ltoId);
     expect(lto.seller).to.be.eq(seller.address);
     expect(lto.buyer).to.be.eq(buyer.address);
-    expect(lto.tokenId).to.be.eq(nftIdToTrade);
+    expect(await ltoCustody.getLtoCsutodyTokenId(ltoId, 0)).to.be.eq(nftIdToTrade);
   });
 
   describe('lifecycle functions', () => {
     let ltoId: bigint;
 
     beforeEach(async () => {
-      ltoId = await ltoCustody.getLtoCustodyId(seller.address, buyer.address, nftIdToTrade, 0);
+      ltoId = await ltoCustody.getLtoCustodyId([nftIdToTrade], [0]);
       await unsRegistry.connect(seller).approve(await ltoCustody.getAddress(), nftIdToTrade);
       await ltoCustody.connect(custodyAdmin).initiateLTO(seller.address, buyer.address, nftIdToTrade);
     });
@@ -270,7 +270,7 @@ describe('LTOCustody (metatx)', () => {
       const lto = await ltoCustody.ltoAssets(ltoId);
       expect(lto.seller).to.be.eq(otherUser.address);
       expect(lto.buyer).to.be.eq(buyer.address);
-      expect(lto.tokenId).to.be.eq(nftIdToTrade);
+      expect(await ltoCustody.getLtoCsutodyTokenId(ltoId, 0)).to.be.eq(nftIdToTrade);
     });
 
     it('should transfer lto buyer', async () => {
@@ -285,14 +285,14 @@ describe('LTOCustody (metatx)', () => {
       const lto = await ltoCustody.ltoAssets(ltoId);
       expect(lto.seller).to.be.eq(seller.address);
       expect(lto.buyer).to.be.eq(otherUser.address);
-      expect(lto.tokenId).to.be.eq(nftIdToTrade);
+      expect(await ltoCustody.getLtoCsutodyTokenId(ltoId, 0)).to.be.eq(nftIdToTrade);
     });
 
     describe('management in custody', () => {
       it('should set many records', async () => {
         const { req, signature } = await buildExecuteParams(
-          'setRecords(string[],string[],uint256)',
-          [['key_1', 'key_2'], ['value_1', 'value_2'], nftIdToTrade],
+          'setRecords(string[],string[],uint256,bool)',
+          [['key_1', 'key_2'], ['value_1', 'value_2'], nftIdToTrade, false],
           buyer,
           nftIdToTrade,
         );

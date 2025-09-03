@@ -141,7 +141,7 @@ export declare namespace IForwarder {
     };
 }
 export interface LTOCustodyInterface extends Interface {
-    getFunction(nameOrSignature: "CUSTODY_ADMIN_ROLE" | "DEFAULT_ADMIN_ROLE" | "addCustodyAdmin" | "cancel" | "complete" | "execute" | "getLtoCustodyId" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "initiateLTO" | "initiateLTOFromOrder" | "isCustodyAdmin" | "isLTOInitiated" | "isTrustedForwarder" | "ltoAssets" | "mintingManager" | "nonceOf" | "owner" | "pause" | "paused" | "registry" | "removeCustodyAdmin" | "renounceOwnership" | "renounceRole" | "revokeAsset" | "revokeRole" | "seaportProxyBuyer" | "setRecords" | "supportsInterface" | "tokenLTOs" | "tokenLtoIdCounter" | "transferBuyer" | "transferOwnership" | "transferSeller" | "unpause" | "verify"): FunctionFragment;
+    getFunction(nameOrSignature: "CUSTODY_ADMIN_ROLE" | "DEFAULT_ADMIN_ROLE" | "addCustodyAdmin" | "cancel" | "complete" | "execute" | "getLtoCsutodyTokenCount" | "getLtoCsutodyTokenId" | "getLtoCustodyId" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "initiateLTO" | "initiateLTOFromOrder" | "isCustodyAdmin" | "isLTOInitiated" | "isTokenInLTOCustody" | "isTrustedForwarder" | "ltoAssets" | "mintingManager" | "nonceOf" | "owner" | "pause" | "paused" | "registry" | "removeCustodyAdmin" | "renounceOwnership" | "renounceRole" | "revokeAsset" | "revokeRole" | "seaportProxyBuyer" | "setRecords" | "supportsInterface" | "tokenLTOs" | "tokenLtoIdCounter" | "transferBuyer" | "transferOwnership" | "transferSeller" | "unpause" | "verify"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AssetBuyerChanged" | "AssetDeposited" | "AssetReleased" | "AssetSellerChanged" | "CustodyAdminAdded" | "CustodyAdminRemoved" | "Initialized" | "OwnershipTransferred" | "Paused" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Unpaused"): EventFragment;
     encodeFunctionData(functionFragment: "CUSTODY_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
@@ -149,7 +149,9 @@ export interface LTOCustodyInterface extends Interface {
     encodeFunctionData(functionFragment: "cancel", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "complete", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "execute", values: [IForwarder.ForwardRequestStruct, BytesLike]): string;
-    encodeFunctionData(functionFragment: "getLtoCustodyId", values: [AddressLike, AddressLike, BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getLtoCsutodyTokenCount", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getLtoCsutodyTokenId", values: [BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getLtoCustodyId", values: [BigNumberish[], BigNumberish[]]): string;
     encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
@@ -163,6 +165,7 @@ export interface LTOCustodyInterface extends Interface {
     ]): string;
     encodeFunctionData(functionFragment: "isCustodyAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "isLTOInitiated", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "isTokenInLTOCustody", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "isTrustedForwarder", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "ltoAssets", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "mintingManager", values?: undefined): string;
@@ -177,7 +180,7 @@ export interface LTOCustodyInterface extends Interface {
     encodeFunctionData(functionFragment: "revokeAsset", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "revokeRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "seaportProxyBuyer", values?: undefined): string;
-    encodeFunctionData(functionFragment: "setRecords", values: [string[], string[], BigNumberish]): string;
+    encodeFunctionData(functionFragment: "setRecords", values: [string[], string[], BigNumberish, boolean]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "tokenLTOs", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "tokenLtoIdCounter", values: [BigNumberish]): string;
@@ -192,6 +195,8 @@ export interface LTOCustodyInterface extends Interface {
     decodeFunctionResult(functionFragment: "cancel", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "complete", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "getLtoCsutodyTokenCount", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "getLtoCsutodyTokenId", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getLtoCustodyId", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getRoleAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
@@ -201,6 +206,7 @@ export interface LTOCustodyInterface extends Interface {
     decodeFunctionResult(functionFragment: "initiateLTOFromOrder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isCustodyAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isLTOInitiated", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "isTokenInLTOCustody", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isTrustedForwarder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "ltoAssets", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "mintingManager", data: BytesLike): Result;
@@ -440,11 +446,20 @@ export interface LTOCustody extends BaseContract {
     ], [
         string
     ], "nonpayable">;
+    getLtoCsutodyTokenCount: TypedContractMethod<[
+        ltoId: BigNumberish
+    ], [
+        bigint
+    ], "view">;
+    getLtoCsutodyTokenId: TypedContractMethod<[
+        ltoId: BigNumberish,
+        index: BigNumberish
+    ], [
+        bigint
+    ], "view">;
     getLtoCustodyId: TypedContractMethod<[
-        seller: AddressLike,
-        buyer: AddressLike,
-        tokenId: BigNumberish,
-        counter: BigNumberish
+        tokenIds: BigNumberish[],
+        counters: BigNumberish[]
     ], [
         bigint
     ], "view">;
@@ -489,6 +504,11 @@ export interface LTOCustody extends BaseContract {
         boolean
     ], "view">;
     isLTOInitiated: TypedContractMethod<[ltoId: BigNumberish], [boolean], "view">;
+    isTokenInLTOCustody: TypedContractMethod<[
+        tokenId: BigNumberish
+    ], [
+        boolean
+    ], "view">;
     isTrustedForwarder: TypedContractMethod<[
         forwarder: AddressLike
     ], [
@@ -500,12 +520,10 @@ export interface LTOCustody extends BaseContract {
         [
             string,
             string,
-            bigint,
             boolean
         ] & {
             seller: string;
             buyer: string;
-            tokenId: bigint;
             isFinalized: boolean;
         }
     ], "view">;
@@ -542,7 +560,8 @@ export interface LTOCustody extends BaseContract {
     setRecords: TypedContractMethod<[
         keys: string[],
         values: string[],
-        tokenId: BigNumberish
+        tokenId: BigNumberish,
+        resetRecords: boolean
     ], [
         void
     ], "nonpayable">;
@@ -593,11 +612,16 @@ export interface LTOCustody extends BaseContract {
     ], [
         string
     ], "nonpayable">;
+    getFunction(nameOrSignature: "getLtoCsutodyTokenCount"): TypedContractMethod<[ltoId: BigNumberish], [bigint], "view">;
+    getFunction(nameOrSignature: "getLtoCsutodyTokenId"): TypedContractMethod<[
+        ltoId: BigNumberish,
+        index: BigNumberish
+    ], [
+        bigint
+    ], "view">;
     getFunction(nameOrSignature: "getLtoCustodyId"): TypedContractMethod<[
-        seller: AddressLike,
-        buyer: AddressLike,
-        tokenId: BigNumberish,
-        counter: BigNumberish
+        tokenIds: BigNumberish[],
+        counters: BigNumberish[]
     ], [
         bigint
     ], "view">;
@@ -638,6 +662,7 @@ export interface LTOCustody extends BaseContract {
     ], "nonpayable">;
     getFunction(nameOrSignature: "isCustodyAdmin"): TypedContractMethod<[account: AddressLike], [boolean], "view">;
     getFunction(nameOrSignature: "isLTOInitiated"): TypedContractMethod<[ltoId: BigNumberish], [boolean], "view">;
+    getFunction(nameOrSignature: "isTokenInLTOCustody"): TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
     getFunction(nameOrSignature: "isTrustedForwarder"): TypedContractMethod<[forwarder: AddressLike], [boolean], "view">;
     getFunction(nameOrSignature: "ltoAssets"): TypedContractMethod<[
         arg0: BigNumberish
@@ -645,12 +670,10 @@ export interface LTOCustody extends BaseContract {
         [
             string,
             string,
-            bigint,
             boolean
         ] & {
             seller: string;
             buyer: string;
-            tokenId: bigint;
             isFinalized: boolean;
         }
     ], "view">;
@@ -679,7 +702,8 @@ export interface LTOCustody extends BaseContract {
     getFunction(nameOrSignature: "setRecords"): TypedContractMethod<[
         keys: string[],
         values: string[],
-        tokenId: BigNumberish
+        tokenId: BigNumberish,
+        resetRecords: boolean
     ], [
         void
     ], "nonpayable">;
