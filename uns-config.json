@@ -1084,11 +1084,11 @@
                     "legacyAddresses": []
                 },
                 "LTOCustody": {
-                    "address": "0xf116B904A357Cf29Cbcae2cc41f4D4DCB5aba3b0",
+                    "address": "0x387B8263281C07039A837468eceD4E0f0534a93d",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x018ad9d0",
-                    "forwarder": "0xf116B904A357Cf29Cbcae2cc41f4D4DCB5aba3b0",
-                    "implementation": "0xcc2F22D90Cf0a226Aa40d63b6779F5a7d0481b71"
+                    "deploymentBlock": "0x018bfcaa",
+                    "forwarder": "0x387B8263281C07039A837468eceD4E0f0534a93d",
+                    "implementation": "0x1ffF99E3Ae17287d483ab423E94971aF419b41FC"
                 }
             }
         },
