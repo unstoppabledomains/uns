@@ -317,9 +317,11 @@
                     "deploymentBlock": "0x0"
                 },
                 "LTOCustody": {
-                    "address": "0x0000000000000000000000000000000000000000",
+                    "address": "0x58Bd25d637f56360d1d3e9c69E3737F0A755b0fa",
                     "legacyAddresses": [],
-                    "deploymentBlock": "0x0"
+                    "deploymentBlock": "0x0487d8d7",
+                    "implementation": "0x382614247589b336899E99f992f95a22a28dee29",
+                    "forwarder": "0x58Bd25d637f56360d1d3e9c69E3737F0A755b0fa"
                 }
             }
         },
