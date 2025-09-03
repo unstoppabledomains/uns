@@ -13,7 +13,7 @@ async function main () {
   }
 
   const deployer = await Deployer.create();
-  const deployConfig = await deployer.execute(['propose_lto_custody'], config, { version: '0.0.1' });
+  const deployConfig = await deployer.execute(['propose_lto_custody'], config, { version: '0.1.0' });
   mergeNetworkConfig(deployConfig);
 }
 
