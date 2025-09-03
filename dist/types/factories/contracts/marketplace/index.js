@@ -1,13 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SeaportProxyBuyer__factory = exports.LTOCustodyAdminRole__factory = exports.LTOCustody__factory = exports.ISeaportProxyBuyer__factory = exports.ILTOCustody__factory = void 0;
-var ILTOCustody__factory_1 = require("./ILTOCustody__factory");
-Object.defineProperty(exports, "ILTOCustody__factory", { enumerable: true, get: function () { return ILTOCustody__factory_1.ILTOCustody__factory; } });
+exports.SeaportProxyBuyer__factory = exports.ISeaportProxyBuyer__factory = void 0;
 var ISeaportProxyBuyer__factory_1 = require("./ISeaportProxyBuyer__factory");
 Object.defineProperty(exports, "ISeaportProxyBuyer__factory", { enumerable: true, get: function () { return ISeaportProxyBuyer__factory_1.ISeaportProxyBuyer__factory; } });
-var LTOCustody__factory_1 = require("./LTOCustody__factory");
-Object.defineProperty(exports, "LTOCustody__factory", { enumerable: true, get: function () { return LTOCustody__factory_1.LTOCustody__factory; } });
-var LTOCustodyAdminRole__factory_1 = require("./LTOCustodyAdminRole__factory");
-Object.defineProperty(exports, "LTOCustodyAdminRole__factory", { enumerable: true, get: function () { return LTOCustodyAdminRole__factory_1.LTOCustodyAdminRole__factory; } });
 var SeaportProxyBuyer__factory_1 = require("./SeaportProxyBuyer__factory");
 Object.defineProperty(exports, "SeaportProxyBuyer__factory", { enumerable: true, get: function () { return SeaportProxyBuyer__factory_1.SeaportProxyBuyer__factory; } });
