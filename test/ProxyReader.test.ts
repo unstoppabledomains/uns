@@ -1318,7 +1318,7 @@ describe('ProxyReader', () => {
       expect(results).to.be.eql([ZERO_ADDRESS, coinbase.address, coinbase.address]);
     });
 
-    it('should return existance of tokens', async () => {
+    it('should return existence of tokens', async () => {
       const unknownTokenId = await unsRegistry.namehash(['unknown', 'crypto']);
       const owners = await proxyReader.multicall.staticCall([
         proxyReader.interface.encodeFunctionData('exists', [unknownTokenId]),

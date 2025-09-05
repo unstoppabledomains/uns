@@ -17,7 +17,7 @@ describe.skip('DotCoinBurner (consumption)', () => {
     [coinbase] = signers;
     [, ...accounts] = signers;
 
-    // deploy UNS regisry
+    // deploy UNS registry
     unsRegistry = await new UNSRegistry__factory().connect(coinbase).deploy();
     await unsRegistry.initialize(coinbase.address, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS);
   });
