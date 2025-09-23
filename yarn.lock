@@ -2526,6 +2526,85 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@unstoppabledomains/uns@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@unstoppabledomains/uns@workspace:."
+  dependencies:
+    "@ensdomains/address-encoder": ^0.2.22
+    "@ensdomains/ens-contracts": ^0.0.21
+    "@eth-optimism/contracts-ts": ^0.17.2
+    "@ethereumjs/tx": ^4.0.1
+    "@nomicfoundation/hardhat-chai-matchers": ^2.0.6
+    "@nomicfoundation/hardhat-ethers": ^3.0.8
+    "@nomicfoundation/hardhat-ledger": ^1.1.0
+    "@nomicfoundation/hardhat-verify": ^1.1.0
+    "@nomiclabs/hardhat-solhint": ^3.0.1
+    "@opensea/seaport-js": ^4.0.0
+    "@openzeppelin/contracts-upgradeable": ^4.7.3
+    "@openzeppelin/hardhat-upgrades": ^2.0.0
+    "@openzeppelin/upgrades-core": ^1.32.5
+    "@safe-global/api-kit": ^3.0.1
+    "@safe-global/protocol-kit": ^4.0.3
+    "@safe-global/types-kit": ^2.0.1
+    "@typechain/ethers-v6": ^0.5.0
+    "@typechain/hardhat": ^9.1.0
+    "@types/bip39": ^3.0.0
+    "@types/chai": ^4.3.3
+    "@types/debug": ^4.1.7
+    "@types/hdkey": ^2.0.1
+    "@types/keccak": ^3.0.1
+    "@types/lodash.merge": ^4.6.7
+    "@types/mocha": ^9.1.1
+    "@types/node": ^18.7.6
+    "@types/tar": ^6.1.2
+    "@types/yargs": ^17.0.13
+    "@typescript-eslint/eslint-plugin": ^5.42.0
+    "@typescript-eslint/parser": ^5.42.0
+    "@zilliqa-js/crypto": ^3.4.4
+    bip39: ^3.0.0
+    bip44-constants: ^243.0.0
+    chai: ^4.3.6
+    csv-parse: ^5.4.0
+    debug: ^4.3.1
+    dot-crypto: "https://github.com/unstoppabledomains/dot-crypto.git#v2.0.1"
+    dotenv: ^16.5.0
+    eslint: ^8.26.0
+    eslint-plugin-import: ^2.26.0
+    eslint-plugin-mocha-no-only: ^1.1.1
+    eslint-plugin-node: ^11.1.0
+    eslint-plugin-promise: ^6.1.1
+    ethereumjs-block: ^1.7.1
+    ethereumjs-common: ^1.5.2
+    ethereumjs-tx: ^1.3.7
+    ethereumjs-util: ^7.1.0
+    ethers: ^6.14.4
+    hardhat: ^2.26.1
+    hardhat-abi-exporter: ^2.2.1
+    hardhat-contract-sizer: ~2.6.0
+    hardhat-gas-reporter: ^2.1.1
+    hdkey: ^2.0.1
+    husky: ^8.0.1
+    lodash.merge: ^4.6.2
+    merkle-patricia-tree: ^4.0.0
+    mocha: ^10.0.0
+    p-limit: 3.1.0
+    p-retry: 4.6.2
+    prettier: ^2.3.0
+    prettier-plugin-solidity: ^1.3.1
+    seaport-core: 1.6.4
+    seaport-types: 1.6.3
+    solhint: ^3.3.7
+    solidity-coverage: ^0.8.4
+    tar: ^6.1.9
+    ts-mocha: ^10.0.0
+    ts-node: ^10.9.1
+    typechain: ^8.3.2
+    typescript: ^4.7.4
+    web3: ^1.7.4
+    yargs: ^17.6.0
+  languageName: unknown
+  linkType: soft
+
 "@zilliqa-js/crypto@npm:^3.4.4":
   version: 3.4.4
   resolution: "@zilliqa-js/crypto@npm:3.4.4"
@@ -12727,85 +12806,6 @@ __metadata:
   checksum: 4fa18d8d8d977c55cb09715385c203197105e10a6d220087ec819f50cb68870f02942244f1017565484237f1f8c5d3cd413631b1ae104d3096f24fdfde1b4aa2
   languageName: node
   linkType: hard
-
-"uns@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "uns@workspace:."
-  dependencies:
-    "@ensdomains/address-encoder": ^0.2.22
-    "@ensdomains/ens-contracts": ^0.0.21
-    "@eth-optimism/contracts-ts": ^0.17.2
-    "@ethereumjs/tx": ^4.0.1
-    "@nomicfoundation/hardhat-chai-matchers": ^2.0.6
-    "@nomicfoundation/hardhat-ethers": ^3.0.8
-    "@nomicfoundation/hardhat-ledger": ^1.1.0
-    "@nomicfoundation/hardhat-verify": ^1.1.0
-    "@nomiclabs/hardhat-solhint": ^3.0.1
-    "@opensea/seaport-js": ^4.0.0
-    "@openzeppelin/contracts-upgradeable": ^4.7.3
-    "@openzeppelin/hardhat-upgrades": ^2.0.0
-    "@openzeppelin/upgrades-core": ^1.32.5
-    "@safe-global/api-kit": ^3.0.1
-    "@safe-global/protocol-kit": ^4.0.3
-    "@safe-global/types-kit": ^2.0.1
-    "@typechain/ethers-v6": ^0.5.0
-    "@typechain/hardhat": ^9.1.0
-    "@types/bip39": ^3.0.0
-    "@types/chai": ^4.3.3
-    "@types/debug": ^4.1.7
-    "@types/hdkey": ^2.0.1
-    "@types/keccak": ^3.0.1
-    "@types/lodash.merge": ^4.6.7
-    "@types/mocha": ^9.1.1
-    "@types/node": ^18.7.6
-    "@types/tar": ^6.1.2
-    "@types/yargs": ^17.0.13
-    "@typescript-eslint/eslint-plugin": ^5.42.0
-    "@typescript-eslint/parser": ^5.42.0
-    "@zilliqa-js/crypto": ^3.4.4
-    bip39: ^3.0.0
-    bip44-constants: ^243.0.0
-    chai: ^4.3.6
-    csv-parse: ^5.4.0
-    debug: ^4.3.1
-    dot-crypto: "https://github.com/unstoppabledomains/dot-crypto.git#v2.0.1"
-    dotenv: ^16.5.0
-    eslint: ^8.26.0
-    eslint-plugin-import: ^2.26.0
-    eslint-plugin-mocha-no-only: ^1.1.1
-    eslint-plugin-node: ^11.1.0
-    eslint-plugin-promise: ^6.1.1
-    ethereumjs-block: ^1.7.1
-    ethereumjs-common: ^1.5.2
-    ethereumjs-tx: ^1.3.7
-    ethereumjs-util: ^7.1.0
-    ethers: ^6.14.4
-    hardhat: ^2.26.1
-    hardhat-abi-exporter: ^2.2.1
-    hardhat-contract-sizer: ~2.6.0
-    hardhat-gas-reporter: ^2.1.1
-    hdkey: ^2.0.1
-    husky: ^8.0.1
-    lodash.merge: ^4.6.2
-    merkle-patricia-tree: ^4.0.0
-    mocha: ^10.0.0
-    p-limit: 3.1.0
-    p-retry: 4.6.2
-    prettier: ^2.3.0
-    prettier-plugin-solidity: ^1.3.1
-    seaport-core: 1.6.4
-    seaport-types: 1.6.3
-    solhint: ^3.3.7
-    solidity-coverage: ^0.8.4
-    tar: ^6.1.9
-    ts-mocha: ^10.0.0
-    ts-node: ^10.9.1
-    typechain: ^8.3.2
-    typescript: ^4.7.4
-    web3: ^1.7.4
-    yargs: ^17.6.0
-  languageName: unknown
-  linkType: soft
 
 "upper-case-first@npm:^2.0.2":
   version: 2.0.2
