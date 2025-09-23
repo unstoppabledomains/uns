@@ -11,6 +11,7 @@ jobs:
     concurrency: uns-release
     permissions:
       contents: write
+      packages: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,6 +44,12 @@ jobs:
 
       - run: yarn build:ci
         if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
+
+      - name: Publish to GitHub Packages
+        if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
+        run: yarn npm publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
