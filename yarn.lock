@@ -2526,9 +2526,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@unstoppabledomains/uns@workspace:.":
+"@unstoppabledomains-private/uns@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@unstoppabledomains/uns@workspace:."
+  resolution: "@unstoppabledomains-private/uns@workspace:."
   dependencies:
     "@ensdomains/address-encoder": ^0.2.22
     "@ensdomains/ens-contracts": ^0.0.21
