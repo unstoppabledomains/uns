@@ -1,13 +1,10 @@
 {
-  "name": "@unstoppabledomains-private/uns",
+  "name": "@unstoppabledomains/uns",
   "version": "1.0.1",
   "description": "UNS contracts and tools",
   "repository": "https://github.com/unstoppabledomains/uns.git",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "scripts": {
     "compile": "hardhat compile --force;",
     "build:package": "yarn compile; rm -Rf dist/*; tsc --project tsconfig.build.json",
