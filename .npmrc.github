@@ -1,0 +1,3 @@
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+@unstoppabledomains:registry=https://npm.pkg.github.com
+registry=https://npm.pkg.github.com
