@@ -53,7 +53,7 @@ jobs:
 
       - name: Publish to NPM Registry
         if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
-        run: npm publish --userconfig=.npmrc.npm
+        run: npm publish --access public --userconfig=.npmrc.npm
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
