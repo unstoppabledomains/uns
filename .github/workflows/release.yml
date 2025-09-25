@@ -45,17 +45,17 @@ jobs:
       - run: yarn build:ci
         if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
 
-      - name: Publish to GitHub Packages
-        if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
-        run: npm publish --userconfig=.npmrc.github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Publish to NPM Registry
         if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
         run: npm publish --access public --userconfig=.npmrc.npm
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to GitHub Packages
+        if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
+        run: npm publish --userconfig=.npmrc.github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         if: steps.latesttag.outputs.tag != env.PACKAGE_VERSION
